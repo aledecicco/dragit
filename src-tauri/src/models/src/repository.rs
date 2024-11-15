@@ -101,7 +101,7 @@ pub enum FileStatus {
     },
 
     Unmerged {
-        merge_status: MergeStatus,
+        unstaged: MergeStatus,
     },
 
     Untracked {},

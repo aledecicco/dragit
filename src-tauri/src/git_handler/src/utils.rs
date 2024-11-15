@@ -127,7 +127,7 @@ fn parse_file_info(line: &String) -> Option<FileInfo> {
             FileInfo {
                 path: path.to_string(),
                 status: FileStatus::Unmerged {
-                    merge_status: merge_status,
+                    unstaged: merge_status,
                 },
             }
         }

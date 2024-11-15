@@ -16,13 +16,13 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
       <p>{file.path}</p>
       <p>
         {match(file)
-          .with({ mergeStatus: 'addedByThem' }, () => 'File created by them')
-          .with({ mergeStatus: 'addedByUs' }, () => 'File created by us')
-          .with({ mergeStatus: 'bothAdded' }, () => 'File created by both')
-          .with({ mergeStatus: 'bothDeleted' }, () => 'File deleted by both')
-          .with({ mergeStatus: 'bothModified' }, () => 'File modified by both')
-          .with({ mergeStatus: 'deletedByThem' }, () => 'File deleted by them')
-          .with({ mergeStatus: 'deletedByUs' }, () => 'File deleted by us')
+          .with({ unstaged: 'addedByThem' }, () => 'File created by them')
+          .with({ unstaged: 'addedByUs' }, () => 'File created by us')
+          .with({ unstaged: 'bothAdded' }, () => 'File created by both')
+          .with({ unstaged: 'bothDeleted' }, () => 'File deleted by both')
+          .with({ unstaged: 'bothModified' }, () => 'File modified by both')
+          .with({ unstaged: 'deletedByThem' }, () => 'File deleted by them')
+          .with({ unstaged: 'deletedByUs' }, () => 'File deleted by us')
           .exhaustive()}
       </p>
       <button

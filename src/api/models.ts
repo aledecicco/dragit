@@ -68,7 +68,7 @@ export type UnstagedFile =
 
 export interface UnmergedFile extends BaseFile {
   status: 'unmerged'
-  mergeStatus: MergeStatus
+  unstaged: MergeStatus
 }
 
 export interface UntrackedFile extends BaseFile {
