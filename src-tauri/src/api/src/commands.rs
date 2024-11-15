@@ -101,3 +101,21 @@ pub async fn get_commit_info(
 pub async fn get_head_info(state: State<'_, AppState>) -> Result<HeadInfo, AppError> {
     with_handler(&state, &|h| h.get_head_info())
 }
+
+#[tauri::command]
+pub async fn add_to_index(state: State<'_, AppState>, files: Vec<&str>) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.add_to_index(&files))
+}
+
+#[tauri::command]
+pub async fn remove_from_index(
+    state: State<'_, AppState>,
+    files: Vec<&str>,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.remove_from_index(&files))
+}
+
+#[tauri::command]
+pub async fn commit_index(state: State<'_, AppState>, message: &str) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.commit_index(message))
+}

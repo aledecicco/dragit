@@ -36,4 +36,13 @@ pub trait GitHandler {
 
     /// Returns information about the current state of the HEAD.
     fn get_head_info(&self) -> Result<HeadInfo, GitError>;
+
+    /// Adds the given list of files to the current index.
+    fn add_to_index(&self, files: &Vec<&str>) -> Result<(), GitError>;
+
+    /// Removes the given list of files from the current index.
+    fn remove_from_index(&self, files: &Vec<&str>) -> Result<(), GitError>;
+
+    /// Commits the current index with the given message.
+    fn commit_index(&self, message: &str) -> Result<(), GitError>;
 }

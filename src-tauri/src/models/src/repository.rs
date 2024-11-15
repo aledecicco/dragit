@@ -74,34 +74,34 @@ pub enum MovedStatus {
 #[derive(strum::EnumString, Debug, Clone)]
 pub enum StatusType {
     #[strum(serialize = "1")]
-    Normal,
+    Modified,
 
     #[strum(serialize = "2")]
-    Renamed,
+    Moved,
 
     #[strum(serialize = "u")]
-    Conflict,
+    Unmerged,
 
     #[strum(serialize = "?")]
     Untracked,
 }
 
 #[derive(serde::Serialize, Debug, Clone)]
-#[serde(rename_all(serialize = "camelCase"), tag = "type")]
+#[serde(rename_all(serialize = "camelCase"), tag = "status")]
 pub enum FileStatus {
     Modified {
         staged: ChangeStatus,
         unstaged: ChangeStatus,
     },
 
-    Renamed {
+    Moved {
         from: String,
-        status: MovedStatus,
+        staged: MovedStatus,
         unstaged: ChangeStatus,
     },
 
     Unmerged {
-        status: MergeStatus,
+        merge_status: MergeStatus,
     },
 
     Untracked {},
@@ -111,6 +111,8 @@ pub enum FileStatus {
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct FileInfo {
     pub path: String,
+
+    #[serde(flatten)]
     pub status: FileStatus,
 }
 

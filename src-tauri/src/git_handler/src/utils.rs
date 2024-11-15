@@ -5,12 +5,27 @@ use models::{
     StatusType,
 };
 
+/// Format used to get the needed information about a commit, as a JSON-parseable string.
+/// The commit message is included raw after a newline to allow parsing it without issues.
 pub const COMMIT_INFO_FORMAT: &str = "--format=format:{\"hash\": \"%H\", \"short_hash\": \"%h\", \"author_name\": \"%an\", \"author_email\": \"%ae\", \"timestamp\": %ct}%n%B";
+/// The prefix of the line with the commit hash when printing the current status.
 pub const HEAD_INFO_COMMIT_PREFIX: &str = "# branch.oid ";
+/// The prefix of the line with the branch name when printing the current status.
 pub const HEAD_INFO_BRANCH_PREFIX: &str = "# branch.head ";
+/// The prefix of all lines related to the HEAD info when printing the current status.
 pub const HEAD_INFO_PREFIX: &str = "#";
-pub const INITIAL_COMMIT: &str = "(initial)";
-pub const DETACHED_BRANCH: &str = "(detached)";
+/// The string that denotes that the current commit is the initial one when printing the current status.
+pub const HEAD_INFO_INITIAL_COMMIT: &str = "(initial)";
+/// The string that denotes that the HEAD is in a detached state when printing the current status.
+pub const HEAD_INFO_DETACHED_BRANCH: &str = "(detached)";
+/// The number of space-separated segments each line has for modified files.
+pub const MODIFIED_FILE_INFO_SEGMENTS: usize = 9;
+/// The number of space-separated segments each line has for moved files.
+pub const MOVED_FILE_INFO_SEGMENTS: usize = 10;
+/// The number of space-separated segments each line has for unmerged files.
+pub const UNMERGED_FILE_INFO_SEGMENTS: usize = 11;
+/// The number of space-separated segments each line has for untracked files.
+pub const UNTRACKED_FILE_INFO_SEGMENTS: usize = 2;
 
 pub fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
     if let Some((line, rest)) = lines.split_first() {
@@ -51,11 +66,11 @@ fn parse_head_status(lines: &Vec<String>) -> Option<HeadStatus> {
     branch_line.drain(0..HEAD_INFO_BRANCH_PREFIX.len());
 
     match (commit_line.as_str(), branch_line.as_str()) {
-        (INITIAL_COMMIT, DETACHED_BRANCH) => None,
-        (commit_id, DETACHED_BRANCH) => Some(HeadStatus::Detached {
+        (HEAD_INFO_INITIAL_COMMIT, HEAD_INFO_DETACHED_BRANCH) => None,
+        (commit_id, HEAD_INFO_DETACHED_BRANCH) => Some(HeadStatus::Detached {
             commit: commit_id.to_string(),
         }),
-        (INITIAL_COMMIT, branch_name) => Some(HeadStatus::Initial {
+        (HEAD_INFO_INITIAL_COMMIT, branch_name) => Some(HeadStatus::Initial {
             branch: branch_name.to_string(),
         }),
         (_, branch_name) => Some(HeadStatus::Branch {
@@ -65,11 +80,12 @@ fn parse_head_status(lines: &Vec<String>) -> Option<HeadStatus> {
 }
 
 fn parse_file_info(line: &String) -> Option<FileInfo> {
-    let segments: Vec<&str> = line.split(" ").collect();
-    let status_type = StatusType::from_str(segments.get(0)?).ok()?;
+    let status_str = line.chars().nth(0)?.to_string();
+    let status_type = StatusType::from_str(&status_str).ok()?;
 
     Some(match status_type {
-        StatusType::Normal => {
+        StatusType::Modified => {
+            let segments: Vec<&str> = line.splitn(MODIFIED_FILE_INFO_SEGMENTS, ' ').collect();
             let (staged_str, unstaged_str) = segments.get(1)?.split_at(1);
             let staged_status = ChangeStatus::from_str(staged_str).ok()?;
             let unstaged_status = ChangeStatus::from_str(unstaged_str).ok()?;
@@ -83,34 +99,41 @@ fn parse_file_info(line: &String) -> Option<FileInfo> {
                 },
             }
         }
-        StatusType::Renamed => {
+
+        StatusType::Moved => {
+            let segments: Vec<&str> = line.splitn(MOVED_FILE_INFO_SEGMENTS, ' ').collect();
             let (staged_str, unstaged_str) = segments.get(1)?.split_at(1);
             let moved_status = MovedStatus::from_str(staged_str).ok()?;
             let unstaged_status = ChangeStatus::from_str(unstaged_str).ok()?;
-            let old_path = segments.last()?;
-            let path = segments.get(segments.len() - 2)?;
+
+            let path_segment = segments.last()?;
+            let (path, old_path) = path_segment.split_once('\t')?;
 
             FileInfo {
                 path: path.to_string(),
-                status: FileStatus::Renamed {
+                status: FileStatus::Moved {
                     from: old_path.to_string(),
-                    status: moved_status,
+                    staged: moved_status,
                     unstaged: unstaged_status,
                 },
             }
         }
-        StatusType::Conflict => {
+
+        StatusType::Unmerged => {
+            let segments: Vec<&str> = line.splitn(UNMERGED_FILE_INFO_SEGMENTS, ' ').collect();
             let merge_status = MergeStatus::from_str(segments.get(1)?).ok()?;
             let path = segments.last()?;
 
             FileInfo {
                 path: path.to_string(),
                 status: FileStatus::Unmerged {
-                    status: merge_status,
+                    merge_status: merge_status,
                 },
             }
         }
+
         StatusType::Untracked => {
+            let segments: Vec<&str> = line.splitn(UNTRACKED_FILE_INFO_SEGMENTS, ' ').collect();
             let path = segments.last()?;
 
             FileInfo {

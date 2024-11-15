@@ -18,8 +18,8 @@ use crate::{
     get_objects_folder,
 };
 
-/// A file watcher behind a debouncer, with default options optimized for each platform.
-pub struct DefaultDebouncer {
+/// Implementation of [`RepoWatcher`] that uses a debouncer to group events.
+pub struct DebouncedWatcher {
     app_handle: AppHandle,
     debouncer: Option<Debouncer<RecommendedWatcher, FileIdMap>>,
     path: Option<String>,
@@ -27,9 +27,9 @@ pub struct DefaultDebouncer {
 
 static EVENT_ID: &str = "git-event";
 
-impl DefaultDebouncer {
+impl DebouncedWatcher {
     pub fn new(app_handle: AppHandle) -> Self {
-        DefaultDebouncer {
+        DebouncedWatcher {
             app_handle: app_handle,
             debouncer: None,
             path: None,
@@ -50,9 +50,9 @@ impl DefaultDebouncer {
 
             match res {
                 Ok(events) => {
-                    let mut files_modified = false; // TODO: one event for each file?
+                    let mut files_modified = false;
                     let mut head_changed = false;
-                    let mut branches_updated = false; // TODO: one event for each branch?
+                    let mut branches_updated = false;
                     let mut git_folder_modified = false;
                     let mut commit_updated = false;
                     let mut commit_message_updated = false;
@@ -147,7 +147,7 @@ impl DefaultDebouncer {
     }
 }
 
-impl RepoWatcher for DefaultDebouncer {
+impl RepoWatcher for DebouncedWatcher {
     fn get_path(&self) -> Result<String, RepoWatcherError> {
         let path = self
             .path

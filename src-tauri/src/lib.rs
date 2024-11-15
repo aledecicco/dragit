@@ -3,7 +3,7 @@ use tauri::Manager;
 use api;
 use git_handler::cmd_git::CmdGit;
 use models::AppState;
-use repo_watcher::debouncer::DefaultDebouncer;
+use repo_watcher::debounced_watcher::DebouncedWatcher;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -13,7 +13,7 @@ pub fn run() {
         .setup(|app| {
             app.manage(AppState::new(
                 Box::new(CmdGit::new()),
-                Box::new(DefaultDebouncer::new(app.handle().clone())),
+                Box::new(DebouncedWatcher::new(app.handle().clone())),
             ));
 
             Ok(())
@@ -29,6 +29,9 @@ pub fn run() {
             api::fetch_remote,
             api::get_commit_history,
             api::get_commit_info,
+            api::add_to_index,
+            api::remove_from_index,
+            api::commit_index,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

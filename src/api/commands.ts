@@ -6,6 +6,9 @@ const mutationKeys = {
   initRepository: ['init_repository'] as const,
   checkoutLocalBranch: ['checkout_local_branch'] as const,
   fetchRemote: ['fetch_remote'] as const,
+  addToIndex: ['add'] as const,
+  removeFromIndex: ['remove'] as const,
+  commitIndex: ['commit'] as const,
 }
 
 const pushOpenFolder = (path: string): Promise<void> =>
@@ -54,10 +57,49 @@ const useFetchRemote = () => {
   return () => mutation.mutateAsync()
 }
 
+const pushAddToIndex = (files: string[]): Promise<void> =>
+  invoke('add_to_index', { files: files })
+
+const useAddToIndex = () => {
+  const mutation = useMutation({
+    mutationKey: mutationKeys.addToIndex,
+    mutationFn: pushAddToIndex,
+  })
+
+  return (files: string[]) => mutation.mutateAsync(files)
+}
+
+const pushRemoveFromIndex = (files: string[]): Promise<void> =>
+  invoke('remove_from_index', { files: files })
+
+const useRemoveFromIndex = () => {
+  const mutation = useMutation({
+    mutationKey: mutationKeys.removeFromIndex,
+    mutationFn: pushRemoveFromIndex,
+  })
+
+  return (files: string[]) => mutation.mutateAsync(files)
+}
+
+const pushCommitIndex = (message: string): Promise<void> =>
+  invoke('commit_index', { message: message })
+
+const useCommitIndex = () => {
+  const mutation = useMutation({
+    mutationKey: mutationKeys.commitIndex,
+    mutationFn: pushCommitIndex,
+  })
+
+  return (message: string) => mutation.mutateAsync(message)
+}
+
 export {
   mutationKeys,
   useOpenFolder,
   useInitRepository,
   useCheckoutLocalBranch,
   useFetchRemote,
+  useAddToIndex,
+  useRemoveFromIndex,
+  useCommitIndex,
 }

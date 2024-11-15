@@ -17,21 +17,65 @@ export type HeadStatus =
   | { type: 'detached'; commit: string }
   | { type: 'branch'; name: string }
 
-export type FileInfo = {
+interface BaseFile {
   path: string
-  status: FileStatus
 }
 
-export type FileStatus =
-  | { type: 'modified'; staged: ChangeStatus; unstaged: ChangeStatus }
-  | {
-      type: 'renamed'
-      from: string
-      status: MovedStatus
-      unstaged: ChangeStatus
-    }
-  | { type: 'unmerged'; status: MergeStatus }
-  | { type: 'untracked' }
+export interface StagedOnlyFile extends BaseFile {
+  status: 'modified'
+  staged: Exclude<ChangeStatus, 'unmodified'>
+  unstaged: Extract<ChangeStatus, 'unmodified'>
+}
+
+export interface UnstagedOnlyFile extends BaseFile {
+  status: 'modified'
+  staged: Extract<ChangeStatus, 'unmodified'>
+  unstaged: Exclude<ChangeStatus, 'unmodified'>
+}
+
+export interface StagedAndUnstagedFile extends BaseFile {
+  status: 'modified'
+  staged: Exclude<ChangeStatus, 'unmodified'>
+  unstaged: Exclude<ChangeStatus, 'unmodified'>
+}
+
+export type ModifiedFile =
+  | StagedOnlyFile
+  | UnstagedOnlyFile
+  | StagedAndUnstagedFile
+
+export interface MovedOnlyFile extends BaseFile {
+  status: 'moved'
+  from: string
+  staged: MovedStatus
+  unstaged: Extract<ChangeStatus, 'unmodified'>
+}
+
+export interface MovedAndModifiedFile extends BaseFile {
+  status: 'moved'
+  from: string
+  staged: MovedStatus
+  unstaged: Exclude<ChangeStatus, 'unmodified'>
+}
+
+export type MovedFile = MovedOnlyFile | MovedAndModifiedFile
+
+export type StagedFile = Exclude<ModifiedFile, UnstagedOnlyFile> | MovedFile
+
+export type UnstagedFile =
+  | Exclude<ModifiedFile, StagedOnlyFile>
+  | MovedAndModifiedFile
+
+export interface UnmergedFile extends BaseFile {
+  status: 'unmerged'
+  mergeStatus: MergeStatus
+}
+
+export interface UntrackedFile extends BaseFile {
+  status: 'untracked'
+}
+
+export type FileInfo = ModifiedFile | MovedFile | UnmergedFile | UntrackedFile
 
 export type ChangeStatus =
   | 'unmodified'
@@ -41,6 +85,8 @@ export type ChangeStatus =
   | 'deleted'
 
 export type MovedStatus = 'renamed' | 'copied'
+
+export type ModifiedStatus = ChangeStatus | MovedStatus
 
 export type MergeStatus =
   | 'bothAdded'

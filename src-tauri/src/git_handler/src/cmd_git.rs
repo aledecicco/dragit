@@ -162,4 +162,25 @@ impl GitHandler for CmdGit {
 
         parse_head_info(&lines).ok_or(GitError::GetHeadInfoFailed {})
     }
+
+    fn add_to_index(&self, files: &Vec<&str>) -> Result<(), GitError> {
+        let args = [vec!["add"], files.clone()].concat();
+        run_command(&self.get_path()?, args).or(Err(GitError::AddToIndexFailed {}))?;
+
+        Ok(())
+    }
+
+    fn remove_from_index(&self, files: &Vec<&str>) -> Result<(), GitError> {
+        let args = [vec!["reset"], files.clone()].concat();
+        run_command(&self.get_path()?, args).or(Err(GitError::RemoveFromIndexFailed {}))?;
+
+        Ok(())
+    }
+
+    fn commit_index(&self, message: &str) -> Result<(), GitError> {
+        run_command(&self.get_path()?, ["commit", "-m", message])
+            .or(Err(GitError::CommitFailed {}))?;
+
+        Ok(())
+    }
 }

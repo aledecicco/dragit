@@ -30,6 +30,15 @@ pub enum GitError {
 
     #[error("Failed to get current HEAD info")]
     GetHeadInfoFailed {},
+
+    #[error("Failed to add files to the index")]
+    AddToIndexFailed {},
+
+    #[error("Failed to remove files from the index")]
+    RemoveFromIndexFailed {},
+
+    #[error("Failed to commit the current index")]
+    CommitFailed {},
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug, Clone)]
