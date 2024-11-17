@@ -1,5 +1,5 @@
 use notify::{
-    event::{CreateKind, ModifyKind, RemoveKind},
+    event::{CreateKind, RemoveKind},
     RecommendedWatcher, Watcher,
 };
 use notify_debouncer_full::{
@@ -14,8 +14,7 @@ use tauri::{AppHandle, Emitter};
 use models::{AppEvent, RepoWatcher, RepoWatcherError};
 
 use crate::{
-    get_branches_folder, get_commit_message_file, get_git_folder, get_head_file, get_index_file,
-    get_objects_folder,
+    get_branches_folder, get_git_folder, get_head_file, get_index_file, get_objects_folder,
 };
 
 /// Implementation of [`RepoWatcher`] that uses a debouncer to group events.
@@ -46,16 +45,14 @@ impl DebouncedWatcher {
             let branches_folder = get_branches_folder(repo_path);
             let objects_folder = get_objects_folder(repo_path);
             let index_file = get_index_file(repo_path);
-            let commit_message_file = get_commit_message_file(repo_path);
 
             match res {
                 Ok(events) => {
                     let mut files_modified = false;
                     let mut head_changed = false;
-                    let mut branches_updated = false;
                     let mut git_folder_modified = false;
-                    let mut commit_updated = false;
-                    let mut commit_message_updated = false;
+                    let mut index_updated = false;
+                    let mut branches_list_updated = false;
 
                     events.iter().for_each(|event| {
                         println!("{:?}", event.kind);
@@ -69,17 +66,26 @@ impl DebouncedWatcher {
                             files_modified = true;
                         }
 
+                        if event.paths.contains(&objects_folder) {
+                            index_updated = true;
+                        }
+
+                        event.paths.iter().for_each(|path| {
+                            if path.starts_with(&branches_folder) && path.is_file() {
+                                if let Some(branch_name) =
+                                    path.file_name().and_then(|path| path.to_str())
+                                {
+                                    let _ = app_handle.emit(
+                                        EVENT_ID,
+                                        AppEvent::BranchUpdated {
+                                            name: branch_name.to_string(),
+                                        },
+                                    );
+                                }
+                            }
+                        });
+
                         match event.kind {
-                            notify::EventKind::Modify(ModifyKind::Data(_)) => {
-                                if event.paths.contains(&commit_message_file) {
-                                    commit_message_updated = true;
-                                }
-                            }
-                            notify::EventKind::Modify(ModifyKind::Metadata(_)) => {
-                                if event.paths.contains(&objects_folder) {
-                                    commit_updated = true;
-                                }
-                            }
                             notify::EventKind::Create(CreateKind::Folder) => {
                                 if event.paths.contains(&git_folder) {
                                     git_folder_modified = true;
@@ -95,11 +101,11 @@ impl DebouncedWatcher {
                                     .iter()
                                     .any(|path| path.starts_with(&branches_folder))
                                 {
-                                    branches_updated = true;
+                                    branches_list_updated = true;
                                 }
 
                                 if event.paths.contains(&index_file) {
-                                    commit_updated = true;
+                                    index_updated = true;
                                 }
                             }
                             notify::EventKind::Remove(RemoveKind::Folder) => {
@@ -113,7 +119,7 @@ impl DebouncedWatcher {
                                     .iter()
                                     .any(|path| path.starts_with(&branches_folder))
                                 {
-                                    branches_updated = true;
+                                    branches_list_updated = true;
                                 }
                             }
                             _ => {}
@@ -128,18 +134,27 @@ impl DebouncedWatcher {
                     if head_changed {
                         let _ = app_handle.emit(EVENT_ID, AppEvent::HeadChanged);
                     }
-                    if branches_updated {
-                        let _ = app_handle.emit(EVENT_ID, AppEvent::BranchesUpdated);
+
+                    if branches_list_updated {
+                        let _ = app_handle.emit(EVENT_ID, AppEvent::BranchesListUpdated);
                     }
+
                     if git_folder_modified {
                         let _ = app_handle.emit(EVENT_ID, AppEvent::GitFolderModified);
                     }
-                    if commit_updated {
-                        let _ = app_handle.emit(EVENT_ID, AppEvent::CommitUpdated);
+
+                    if index_updated {
+                        let _ = app_handle.emit(EVENT_ID, AppEvent::IndexUpdated);
                     }
-                    if commit_message_updated {
-                        let _ = app_handle.emit(EVENT_ID, AppEvent::CommitMessageUpdated);
-                    }
+
+                    println!(
+                        "files: {} head: {} branches: {} gitfolder: {} index: {}\n\n",
+                        files_modified,
+                        head_changed,
+                        branches_list_updated,
+                        git_folder_modified,
+                        index_updated,
+                    );
                 }
                 Err(_) => {} // TODO: warn frontend about possible unsync
             };

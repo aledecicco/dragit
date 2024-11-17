@@ -4,7 +4,6 @@ static GIT_FOLDER_NAME: &str = ".git";
 static OBJECTS_FOLDER_NAME: &str = "objects";
 static INDEX_FILE_NAME: &str = "index";
 static HEAD_FILE_NAME: &str = "HEAD";
-static COMMIT_MESSAGE_FILE_NAME: &str = "COMMIT_EDITMSG";
 static REFS_FOLDER_NAME: &str = "refs";
 static HEADS_FOLDER_NAME: &str = "heads";
 
@@ -22,10 +21,6 @@ pub(crate) fn get_objects_folder(repo_path: &Path) -> PathBuf {
 
 pub(crate) fn get_index_file(repo_path: &Path) -> PathBuf {
     get_git_folder(repo_path).join(INDEX_FILE_NAME)
-}
-
-pub(crate) fn get_commit_message_file(repo_path: &Path) -> PathBuf {
-    get_git_folder(repo_path).join(COMMIT_MESSAGE_FILE_NAME)
 }
 
 pub(crate) fn get_branches_folder(repo_path: &Path) -> PathBuf {

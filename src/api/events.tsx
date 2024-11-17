@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
 import { type PropsWithChildren, useEffect } from 'react'
-import { match } from 'ts-pattern'
+import { P, match } from 'ts-pattern'
 
 import { currentDirQuery, queryKeys } from './queries'
 
@@ -35,13 +35,26 @@ const EventHandler = (props: PropsWithChildren) => {
             })
           }
         })
-        .with({ type: 'branchesUpdated' }, () => {
+        .with({ type: 'branchesListUpdated' }, () => {
           if (currentDir.data) {
             client.invalidateQueries({
               queryKey: queryKeys.directory.branches.all(currentDir.data),
             })
           }
         })
+        .with(
+          { type: 'branchUpdated', name: P.string.select() },
+          (branchName) => {
+            if (currentDir.data) {
+              client.invalidateQueries({
+                queryKey: queryKeys.directory.commitHistory.branch(
+                  currentDir.data,
+                  branchName,
+                ),
+              })
+            }
+          },
+        )
         .with({ type: 'headChanged' }, () => {
           if (currentDir.data) {
             client.invalidateQueries({
@@ -56,15 +69,12 @@ const EventHandler = (props: PropsWithChildren) => {
             })
           }
         })
-        .with({ type: 'commitUpdated' }, () => {
+        .with({ type: 'indexUpdated' }, () => {
           if (currentDir.data) {
             client.invalidateQueries({
               queryKey: queryKeys.directory.headInfo(currentDir.data),
             })
           }
-        })
-        .with({ type: 'commitMessageUpdated' }, () => {
-          // TODO: invalidate commit status
         })
     })
 

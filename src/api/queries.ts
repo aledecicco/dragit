@@ -49,11 +49,7 @@ const isRepositoryQuery = (path: string) =>
     queryFn: fetchIsRepository,
   })
 
-const fetchHeadInfo = (): Promise<HeadInfo> => {
-  const a: Promise<HeadInfo> = invoke('get_head_info')
-  a.then(console.log).catch(console.log)
-  return a
-}
+const fetchHeadInfo = (): Promise<HeadInfo> => invoke('get_head_info')
 
 const headInfoQuery = (path: string) =>
   queryOptions({

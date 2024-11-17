@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { open } from '@tauri-apps/plugin-dialog'
+import { useEffect, useRef } from 'react'
 
 import { useOpenFolder } from '@api/commands'
 import { currentDirQuery } from '@api/queries'
@@ -7,6 +8,14 @@ import { currentDirQuery } from '@api/queries'
 const CurrentDirectory = () => {
   const currentDir = useQuery(currentDirQuery)
   const openFolder = useOpenFolder()
+
+  const a = useRef(false)
+  useEffect(() => {
+    if (!a.current) {
+      a.current = true
+      openFolder('/home/adecicco/Projects/test-git')
+    }
+  }, [openFolder])
 
   return (
     <div>

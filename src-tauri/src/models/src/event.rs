@@ -8,7 +8,10 @@ pub enum AppEvent {
     GitFolderModified,
 
     /// Branches were created or deleted.
-    BranchesUpdated,
+    BranchesListUpdated,
+
+    /// The state or history of a branch was updated.
+    BranchUpdated { name: String },
 
     /// A new reference was checked out.
     HeadChanged,
@@ -17,8 +20,5 @@ pub enum AppEvent {
     FilesModified,
 
     /// The status of the current commit was updated.
-    CommitUpdated,
-
-    /// The current commit's message was updated.
-    CommitMessageUpdated,
+    IndexUpdated,
 }
