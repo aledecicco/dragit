@@ -43,6 +43,12 @@ pub trait GitHandler {
     /// Removes the given list of files from the current index.
     fn remove_from_index(&self, files: &Vec<&str>) -> Result<(), GitError>;
 
+    /// Removes the given list of files from the tree and the current index.
+    fn remove_from_tree(&self, files: &Vec<&str>) -> Result<(), GitError>;
+
     /// Commits the current index with the given message.
     fn commit_index(&self, message: &str) -> Result<(), GitError>;
+
+    /// Returns the commit hash of the latest common ancestor between the two given branches.
+    fn get_common_ancestor(&self, branch_a: &str, branch_b: &str) -> Result<String, GitError>;
 }

@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { currentDirQuery } from '@api/queries'
-import { CurrentDirectory } from 'components/CurrentDirectory'
-import { FileStatuses } from 'components/FileStatuses'
-import { CurrentBranch } from 'components/Graph/CurrentBranch'
+import { CurrentDirectory } from '@main/CurrentDirectory'
+import { FileStatuses } from '@main/FileStatuses'
+import { Graph } from '@main/Graph'
 
 const App = () => {
   const currentDir = useQuery(currentDirQuery)
@@ -14,7 +14,7 @@ const App = () => {
       {currentDir.data && (
         <>
           <FileStatuses path={currentDir.data} />
-          <CurrentBranch path={currentDir.data} />
+          <Graph path={currentDir.data} />
         </>
       )}
     </div>

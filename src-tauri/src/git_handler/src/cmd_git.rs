@@ -125,7 +125,6 @@ impl GitHandler for CmdGit {
                 "-n",
                 &page_size_arg,
                 "--first-parent",
-                "--abbrev-commit",
             ],
         )
         .ok()
@@ -177,10 +176,27 @@ impl GitHandler for CmdGit {
         Ok(())
     }
 
+    fn remove_from_tree(&self, files: &Vec<&str>) -> Result<(), GitError> {
+        let args = [vec!["rm"], files.clone()].concat();
+        run_command(&self.get_path()?, args).or(Err(GitError::RemoveFromTreeFailed {}))?;
+
+        Ok(())
+    }
+
     fn commit_index(&self, message: &str) -> Result<(), GitError> {
         run_command(&self.get_path()?, ["commit", "-m", message])
             .or(Err(GitError::CommitFailed {}))?;
 
         Ok(())
+    }
+
+    fn get_common_ancestor(&self, branch_a: &str, branch_b: &str) -> Result<String, GitError> {
+        run_command(&self.get_path()?, ["merge-base", &branch_a, &branch_b])
+            .ok()
+            .and_then(|output| self.get_output_string(output).ok())
+            .ok_or(GitError::GetCommonAncestorFailed {
+                branch_a: branch_a.to_string(),
+                branch_b: branch_b.to_string(),
+            })
     }
 }

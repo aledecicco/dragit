@@ -37,8 +37,14 @@ pub enum GitError {
     #[error("Failed to remove files from the index")]
     RemoveFromIndexFailed {},
 
+    #[error("Failed to remove files from the tree")]
+    RemoveFromTreeFailed {},
+
     #[error("Failed to commit the current index")]
     CommitFailed {},
+
+    #[error("Failed to get common ancestor of \"{branch_a}\" and \"{branch_b}\"")]
+    GetCommonAncestorFailed { branch_a: String, branch_b: String },
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug, Clone)]

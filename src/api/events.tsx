@@ -3,7 +3,7 @@ import { listen } from '@tauri-apps/api/event'
 import { type PropsWithChildren, useEffect } from 'react'
 import { P, match } from 'ts-pattern'
 
-import { currentDirQuery, queryKeys } from './queries'
+import { currentDirQuery, headInfoQuery, queryKeys } from './queries'
 
 const EventHandler = (props: PropsWithChildren) => {
   const { children } = props
@@ -25,63 +25,76 @@ const EventHandler = (props: PropsWithChildren) => {
     }
   }, [client])
 
+  return currentDir.data ? (
+    <EventHandlerInner currentDir={currentDir.data}>
+      {children}
+    </EventHandlerInner>
+  ) : (
+    children
+  )
+}
+
+const EventHandlerInner = (
+  props: PropsWithChildren<{ currentDir: string }>,
+) => {
+  const { currentDir, children } = props
+  const client = useQueryClient()
+  const headInfo = useQuery(headInfoQuery(currentDir))
+
   useEffect(() => {
     const unlisten = listen('git-event', (event) => {
       match(event.payload)
         .with({ type: 'gitFolderModified' }, () => {
-          if (currentDir.data) {
-            client.invalidateQueries({
-              queryKey: queryKeys.directory.isRepository(currentDir.data),
-            })
-          }
+          client.invalidateQueries({
+            queryKey: queryKeys.directory.isRepository(currentDir),
+          })
         })
         .with({ type: 'branchesListUpdated' }, () => {
-          if (currentDir.data) {
-            client.invalidateQueries({
-              queryKey: queryKeys.directory.branches.all(currentDir.data),
-            })
-          }
+          client.invalidateQueries({
+            queryKey: queryKeys.directory.branches.all(currentDir),
+          })
         })
         .with(
           { type: 'branchUpdated', name: P.string.select() },
           (branchName) => {
-            if (currentDir.data) {
+            client.invalidateQueries({
+              queryKey: queryKeys.directory.commitHistory.branch(
+                currentDir,
+                branchName,
+              ),
+            })
+
+            if (
+              headInfo.data?.status.type === 'branch' &&
+              headInfo.data.status.name === branchName
+            ) {
               client.invalidateQueries({
-                queryKey: queryKeys.directory.commitHistory.branch(
-                  currentDir.data,
-                  branchName,
-                ),
+                queryKey: queryKeys.directory.headInfo(currentDir),
               })
             }
           },
         )
         .with({ type: 'headChanged' }, () => {
-          if (currentDir.data) {
-            client.invalidateQueries({
-              queryKey: queryKeys.directory.headInfo(currentDir.data),
-            })
-          }
+          client.invalidateQueries({
+            queryKey: queryKeys.directory.headInfo(currentDir),
+          })
         })
         .with({ type: 'filesModified' }, () => {
-          if (currentDir.data) {
-            client.invalidateQueries({
-              queryKey: queryKeys.directory.headInfo(currentDir.data),
-            })
-          }
+          client.invalidateQueries({
+            queryKey: queryKeys.directory.headInfo(currentDir),
+          })
         })
         .with({ type: 'indexUpdated' }, () => {
-          if (currentDir.data) {
-            client.invalidateQueries({
-              queryKey: queryKeys.directory.headInfo(currentDir.data),
-            })
-          }
+          client.invalidateQueries({
+            queryKey: queryKeys.directory.headInfo(currentDir),
+          })
         })
     })
 
     return () => {
       unlisten.then((f) => f())
     }
-  }, [client, currentDir.data])
+  }, [client, currentDir, headInfo.data])
 
   return children
 }

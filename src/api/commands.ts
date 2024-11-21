@@ -7,7 +7,8 @@ const mutationKeys = {
   checkoutLocalBranch: ['checkout_local_branch'] as const,
   fetchRemote: ['fetch_remote'] as const,
   addToIndex: ['add'] as const,
-  removeFromIndex: ['remove'] as const,
+  removeFromIndex: ['remove_index'] as const,
+  removeFromTree: ['remove_tree'] as const,
   commitIndex: ['commit'] as const,
 }
 
@@ -81,6 +82,18 @@ const useRemoveFromIndex = () => {
   return (files: string[]) => mutation.mutateAsync(files)
 }
 
+const pushRemoveFromTree = (files: string[]): Promise<void> =>
+  invoke('remove_from_tree', { files: files })
+
+const useRemoveFromTree = () => {
+  const mutation = useMutation({
+    mutationKey: mutationKeys.removeFromTree,
+    mutationFn: pushRemoveFromTree,
+  })
+
+  return (files: string[]) => mutation.mutateAsync(files)
+}
+
 const pushCommitIndex = (message: string): Promise<void> =>
   invoke('commit_index', { message: message })
 
@@ -101,5 +114,6 @@ export {
   useFetchRemote,
   useAddToIndex,
   useRemoveFromIndex,
+  useRemoveFromTree,
   useCommitIndex,
 }

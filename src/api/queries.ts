@@ -1,34 +1,82 @@
-import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
+import {
+  infiniteQueryOptions,
+  queryOptions,
+  skipToken,
+} from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { CommitInfo, HeadInfo } from './models'
+import type { BranchName, CommitId, CommitInfo, HeadInfo } from './models'
 
 const queryKeys = {
   currentDir: ['current_dir'] as const,
   directory: {
-    all: ['directory'] as const,
-    current: (path: string) => [...queryKeys.directory.all, path] as const,
+    current: (path: string) => ({ path: path }) as const,
     isRepository: (path: string) =>
-      [...queryKeys.directory.current(path), 'is_repository'] as const,
+      ({
+        ...queryKeys.directory.current(path),
+        key: 'is_repository',
+      }) as const,
     headInfo: (path: string) =>
-      [...queryKeys.directory.current(path), 'head_info'] as const,
+      ({
+        ...queryKeys.directory.current(path),
+        key: 'head_info',
+      }) as const,
     branches: {
       all: (path: string) =>
-        [...queryKeys.directory.current(path), 'branches'] as const,
-      branch: (path: string, branch: string) =>
-        [...queryKeys.directory.branches.all(path), branch] as const,
+        ({
+          ...queryKeys.directory.current(path),
+          key: 'branches',
+        }) as const,
+      branch: (path: string, branch: BranchName) =>
+        ({
+          ...queryKeys.directory.branches.all(path),
+          branch: branch,
+        }) as const,
     },
     commitHistory: {
       all: (path: string) =>
-        [...queryKeys.directory.current(path), 'commit_history'] as const,
-      branch: (path: string, branch: string) =>
-        [...queryKeys.directory.commitHistory.all(path), branch] as const,
+        ({
+          ...queryKeys.directory.current(path),
+          key: 'commit_history',
+        }) as const,
+      branch: (path: string, branch: BranchName) =>
+        ({
+          ...queryKeys.directory.branches.branch(path, branch),
+          ...queryKeys.directory.commitHistory.all(path),
+        }) as const,
     },
     commitInfo: {
       all: (path: string) =>
-        [...queryKeys.directory.current(path), 'commit_info'] as const,
-      commit: (path: string, reference: string) =>
-        [...queryKeys.directory.commitInfo.all(path), reference] as const,
+        ({
+          ...queryKeys.directory.current(path),
+          key: 'commit_info',
+        }) as const,
+      commit: (path: string, commit: CommitId) =>
+        ({
+          ...queryKeys.directory.commitInfo.all(path),
+          commit: commit,
+        }) as const,
+    },
+    commonAncestor: {
+      all: (path: string) =>
+        ({
+          ...queryKeys.directory.current(path),
+          key: 'common_ancestor',
+        }) as const,
+      branch: (path: string, branch: BranchName | undefined) =>
+        ({
+          ...queryKeys.directory.commonAncestor.all(path),
+          branch: branch,
+        }) as const,
+      pair: (
+        path: string,
+        branch: BranchName | undefined,
+        otherBranch: BranchName | undefined,
+      ) =>
+        ({
+          ...queryKeys.directory.commonAncestor.branch(path, branch),
+          otherBranch: otherBranch,
+        }) as const,
     },
   },
 }
@@ -45,7 +93,7 @@ const fetchIsRepository = (): Promise<boolean> => invoke('is_repository')
 
 const isRepositoryQuery = (path: string) =>
   queryOptions({
-    queryKey: queryKeys.directory.isRepository(path),
+    queryKey: [queryKeys.directory.isRepository(path)],
     queryFn: fetchIsRepository,
   })
 
@@ -53,43 +101,65 @@ const fetchHeadInfo = (): Promise<HeadInfo> => invoke('get_head_info')
 
 const headInfoQuery = (path: string) =>
   queryOptions({
-    queryKey: queryKeys.directory.headInfo(path),
+    queryKey: [queryKeys.directory.headInfo(path)],
     queryFn: fetchHeadInfo,
   })
 
-const fetchBranches = (): Promise<string[]> => invoke('get_branches')
+const fetchBranches = (): Promise<BranchName[]> => invoke('get_branches')
 
 const branchesQuery = (path: string) =>
   queryOptions({
-    queryKey: queryKeys.directory.branches.all(path),
+    queryKey: [queryKeys.directory.branches.all(path)],
     queryFn: fetchBranches,
   })
 
 const PAGE_SIZE = 10
 
-const fetchCommitHistory = (branch: string, page: number): Promise<string[]> =>
+const fetchCommitHistory = (
+  branch: BranchName,
+  page: number,
+): Promise<CommitId[]> =>
   invoke('get_commit_history', {
     branch: branch,
     startAfter: page * PAGE_SIZE,
     limit: PAGE_SIZE,
   })
 
-const commitHistoryQuery = (path: string, branch: string) =>
+const commitHistoryQuery = (path: string, branch: BranchName) =>
   infiniteQueryOptions({
-    queryKey: queryKeys.directory.commitHistory.branch(path, branch),
+    queryKey: [queryKeys.directory.commitHistory.branch(path, branch)],
     queryFn: ({ pageParam }) => fetchCommitHistory(branch, pageParam),
     initialPageParam: 0,
     getNextPageParam: (lastPage, _, lastPageParam) =>
       lastPage.length === PAGE_SIZE ? lastPageParam + 1 : undefined,
   })
 
-const fetchCommitInfo = (reference: string): Promise<CommitInfo> =>
+const fetchCommitInfo = (reference: CommitId): Promise<CommitInfo> =>
   invoke('get_commit_info', { reference: reference })
 
-const commitInfoQuery = (path: string, reference: string) =>
+const commitInfoQuery = (path: string, reference: CommitId) =>
   queryOptions({
-    queryKey: queryKeys.directory.commitInfo.commit(path, reference),
+    queryKey: [queryKeys.directory.commitInfo.commit(path, reference)],
     queryFn: () => fetchCommitInfo(reference),
+  })
+
+const fetchCommonAncestor = (
+  branchA: BranchName,
+  branchB: BranchName,
+): Promise<CommitId> =>
+  invoke('get_common_ancestor', { branchA: branchA, branchB: branchB })
+
+const commonAncestorQuery = (
+  path: string,
+  branchA: BranchName | undefined,
+  branchB: BranchName | undefined,
+) =>
+  queryOptions({
+    queryKey: [queryKeys.directory.commonAncestor.pair(path, branchA, branchB)],
+    queryFn:
+      branchA && branchB
+        ? () => fetchCommonAncestor(branchA, branchB)
+        : skipToken,
   })
 
 export {
@@ -100,4 +170,5 @@ export {
   branchesQuery,
   commitHistoryQuery,
   commitInfoQuery,
+  commonAncestorQuery,
 }

@@ -1,6 +1,6 @@
-import { match } from 'ts-pattern'
+import { P, match } from 'ts-pattern'
 
-import { useAddToIndex } from '@api/commands'
+import { useAddToIndex, useRemoveFromTree } from '@api/commands'
 import type { UnmergedFile } from '@api/models'
 
 interface UnmergedFileStatusItemProps {
@@ -10,6 +10,7 @@ interface UnmergedFileStatusItemProps {
 const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
   const { file } = props
   const stage = useAddToIndex()
+  const remove = useRemoveFromTree()
 
   return (
     <div>
@@ -32,6 +33,18 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
       >
         Mark as resolved
       </button>
+
+      {match(file.unstaged)
+        .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => (
+          <button
+            type="button"
+            aria-label="Delete file"
+            onClick={() => remove([file.path])}
+          >
+            Delete file
+          </button>
+        ))
+        .otherwise(() => undefined)}
     </div>
   )
 }

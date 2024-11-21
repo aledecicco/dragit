@@ -81,6 +81,7 @@ impl DebouncedWatcher {
                                             name: branch_name.to_string(),
                                         },
                                     );
+                                    println!("branch updated {}", branch_name);
                                 }
                             }
                         });

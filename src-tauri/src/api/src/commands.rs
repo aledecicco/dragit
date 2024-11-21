@@ -116,6 +116,23 @@ pub async fn remove_from_index(
 }
 
 #[tauri::command]
+pub async fn remove_from_tree(
+    state: State<'_, AppState>,
+    files: Vec<&str>,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.remove_from_tree(&files))
+}
+
+#[tauri::command]
 pub async fn commit_index(state: State<'_, AppState>, message: &str) -> Result<(), AppError> {
     with_handler(&state, &|h| h.commit_index(message))
+}
+
+#[tauri::command]
+pub async fn get_common_ancestor(
+    state: State<'_, AppState>,
+    branch_a: &str,
+    branch_b: &str,
+) -> Result<String, AppError> {
+    with_handler(&state, &|h| h.get_common_ancestor(branch_a, branch_b))
 }

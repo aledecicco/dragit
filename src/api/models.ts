@@ -1,5 +1,8 @@
+export type CommitId = string
+export type BranchName = string
+
 export type CommitInfo = {
-  hash: string
+  hash: CommitId
   shortHash: string
   authorName: string
   authorEmail: string
@@ -13,9 +16,9 @@ export type HeadInfo = {
 }
 
 export type HeadStatus =
-  | { type: 'initial'; branch: string }
-  | { type: 'detached'; commit: string }
-  | { type: 'branch'; name: string }
+  | { type: 'initial'; branch: BranchName }
+  | { type: 'detached'; commit: CommitId }
+  | { type: 'branch'; name: BranchName }
 
 interface BaseFile {
   path: string
