@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 
 import type { BranchName, CommitId } from '@api/models'
 import { commitHistoryQuery, headInfoQuery } from '@api/queries'
+import { range } from '@utils/array'
 import { GraphCommit } from '../Commit'
 
 interface GraphBranchProps {
@@ -16,7 +17,6 @@ const GraphBranch = (props: GraphBranchProps) => {
   const headInfo = useQuery(headInfoQuery(path))
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
 
-  // ToDo: cleanup
   const pagination = useMemo(() => {
     if (history.data) {
       for (let i = 0; i <= history.data.pages.length; i++) {
@@ -24,8 +24,9 @@ const GraphBranch = (props: GraphBranchProps) => {
           if (history.data.pages[i][j] === stopAt) {
             return {
               lastPageIndex: i,
-              pageIndexes: [...Array(i + 1).keys()],
-              lastPageCommitIndexes: [...Array(j).keys()],
+              pageIndexes: range(i + 1),
+              commitIndexes: range(history.data.pages[0].length),
+              lastCommitIndexes: range(j),
               stopped: true,
             }
           }
@@ -33,7 +34,13 @@ const GraphBranch = (props: GraphBranchProps) => {
       }
     }
 
-    return { pageIndexes: [], lastPageCommitIndexes: [], stopped: false }
+    return {
+      lastPageIndex: undefined,
+      pageIndexes: [],
+      commitIndexes: [],
+      lastCommitIndexes: [],
+      stopped: false,
+    }
   }, [history.data, stopAt])
 
   return (
@@ -46,17 +53,16 @@ const GraphBranch = (props: GraphBranchProps) => {
       </h4>
       {history.data ? (
         pagination.pageIndexes.map((pageIndex) =>
-          pageIndex === pagination.lastPageIndex
-            ? pagination.lastPageCommitIndexes.map((commitIndex) => (
-                <GraphCommit
-                  key={history.data.pages[pageIndex][commitIndex]}
-                  path={path}
-                  reference={history.data.pages[pageIndex][commitIndex]}
-                />
-              ))
-            : history.data.pages[pageIndex].map((commit) => (
-                <GraphCommit key={commit} path={path} reference={commit} />
-              )),
+          (pageIndex === pagination.lastPageIndex
+            ? pagination.lastCommitIndexes
+            : pagination.commitIndexes
+          ).map((commitIndex) => (
+            <GraphCommit
+              key={history.data.pages[pageIndex][commitIndex]}
+              path={path}
+              reference={history.data.pages[pageIndex][commitIndex]}
+            />
+          )),
         )
       ) : (
         <p>
