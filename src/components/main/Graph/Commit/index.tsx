@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
-import type { CommitInfo } from '@api/models'
+import type { CommitId, CommitInfo } from '@api/models'
 import { commitInfoQuery } from '@api/queries'
+
+const COMMIT_ID = (ref: CommitId) => `commit_${ref}`
 
 type GraphCommitProps = {
   path: string
@@ -13,7 +15,7 @@ const GraphCommit = (props: GraphCommitProps) => {
   const commitInfo = useQuery(commitInfoQuery(path, reference))
 
   return (
-    <div>
+    <div id={COMMIT_ID(reference)}>
       {reference}
       {commitInfo.data ? (
         <GraphCommitInfo commitInfo={commitInfo.data} />

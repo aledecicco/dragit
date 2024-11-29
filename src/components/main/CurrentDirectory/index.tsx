@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react'
 
 import { useOpenFolder } from '@api/commands'
 import { currentDirQuery } from '@api/queries'
+import { Button } from '@lib/Button'
+import { TextInput } from '@lib/TextInput'
 
 const CurrentDirectory = () => {
   const currentDir = useQuery(currentDirQuery)
@@ -26,8 +28,10 @@ const CurrentDirectory = () => {
             ? 'Loading current directory...'
             : 'No directory open'}
       </p>
-      <button
+      <TextInput placeholder="aaaa" />
+      <Button
         type="button"
+        variant="primary"
         aria-label="Select and open a folder in your system"
         onClick={() => {
           open({
@@ -41,7 +45,7 @@ const CurrentDirectory = () => {
         }}
       >
         Open folder
-      </button>
+      </Button>
     </div>
   )
 }

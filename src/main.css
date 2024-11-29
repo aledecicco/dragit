@@ -1,7 +1,43 @@
-* {
-  box-sizing: border-box;
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-light-shade: oklch(96.14% 0.0029 84.56);
+  --color-light-shade-darker: oklch(93.8% 0.0035 67.78);
+  --color-light-shade-darkest: oklch(0.87 0.01 78.28);
+
+  --color-light-accent-lightest: oklch(75.88% 0.0238 321.37);
+  --color-light-accent-lighter: oklch(67.56% 0.0312 320.6);
+  --color-light-accent: oklch(56.4% 0.0353 322.7);
+  --color-light-accent-darker: oklch(51.87% 0.0348 324.33);
+  --color-light-accent-darkest: oklch(46% 0.0277 323.79);
+
+  --color-brand-lightest: oklch(0.79 0.02 240.06);
+  --color-brand-lighter: oklch(0.71 0.02 250.46);
+  --color-brand: oklch(0.64 0.03 257.06);
+  --color-brand-darker: oklch(0.59 0.02 256.77);
+  --color-brand-darkest: oklch(0.51 0.02 256.34);
+
+  --color-dark-accent-lightest: oklch(0.56 0.03 280.2);
+  --color-dark-accent-lighter: oklch(0.48 0.03 282.57);
+  --color-dark-accent: oklch(0.41 0.02 281.71);
+  --color-dark-accent-darker: oklch(0.38 0.02 280.61);
+  --color-dark-accent-darkest: oklch(0.35 0.01 285.66);
+
+  --color-dark-shade: oklch(0.37 0.03 275);
+  --color-dark-shade-lighter: oklch(0.34 0.03 276.05);
+  --color-dark-shade-lightest: oklch(0.3 0.02 277.56);
 }
 
-body {
-  margin: 0;
+#root {
+  font-family: "Inter", sans-serif;
+  @apply flex flex-col flex-nowrap min-h-dvh;
+  @apply bg-light-shade text-dark-shade;
+  @apply font-normal;
+}
+
+h1,
+h2,
+h3 {
+  @apply font-bold;
 }

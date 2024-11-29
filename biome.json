@@ -34,5 +34,10 @@
       "arrowParentheses": "always",
       "trailingCommas": "all"
     }
+  },
+  "css": {
+    "formatter": {
+      "enabled": true
+    }
   }
 }

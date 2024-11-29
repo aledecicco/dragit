@@ -19,8 +19,8 @@ const GraphBranch = (props: GraphBranchProps) => {
 
   const pagination = useMemo(() => {
     if (history.data) {
-      for (let i = 0; i <= history.data.pages.length; i++) {
-        for (let j = 0; j <= history.data.pages[i].length; j++) {
+      for (let i = 0; i < history.data.pages.length; i++) {
+        for (let j = 0; j < history.data.pages[i].length; j++) {
           if (history.data.pages[i][j] === stopAt) {
             return {
               lastPageIndex: i,
@@ -31,6 +31,14 @@ const GraphBranch = (props: GraphBranchProps) => {
             }
           }
         }
+      }
+
+      return {
+        lastPageIndex: undefined,
+        pageIndexes: range(history.data.pages.length),
+        commitIndexes: range(history.data.pages[0].length),
+        lastCommitIndexes: [],
+        stopped: false,
       }
     }
 

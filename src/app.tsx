@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import clsx from 'clsx'
 
 import { currentDirQuery } from '@api/queries'
 import { CurrentDirectory } from '@main/CurrentDirectory'
@@ -9,7 +10,7 @@ const App = () => {
   const currentDir = useQuery(currentDirQuery)
 
   return (
-    <div>
+    <div className={clsx('p-2')}>
       <CurrentDirectory />
       {currentDir.data && (
         <>

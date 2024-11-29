@@ -1,26 +1,44 @@
 import { useQuery } from '@tanstack/react-query'
+import clsx from 'clsx'
 
 import type { BranchName } from '@api/models'
-import { commonAncestorQuery } from '@api/queries'
+import { branchesQuery, commonAncestorQuery } from '@api/queries'
+import { SelectInput } from '@lib/SelectInput'
+import { useState } from 'react'
 import { GraphBranch } from './Branch'
 
 interface GraphProps {
   path: string
-  branch?: BranchName
-  otherBranch?: BranchName
 }
 
 const Graph = (props: GraphProps) => {
-  const { path, branch = 'b3', otherBranch = 'main' } = props
+  const { path } = props
+  const [branch, setBranch] = useState<BranchName>()
+  const [otherBranch, setOtherBranch] = useState<BranchName>()
   const ancestor = useQuery(commonAncestorQuery(path, branch, otherBranch))
+  const branches = useQuery(branchesQuery(path))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
+    <div className={clsx('flex flex-row')}>
+      <SelectInput
+        ariaLabel="Branch"
+        placeholder="Select a branch..."
+        options={branches.data?.map((branch) => ({ value: branch })) ?? []}
+        value={branch}
+        onValueChange={setBranch}
+      />
       {branch ? (
         <GraphBranch path={path} branch={branch} stopAt={ancestor.data} />
       ) : (
         <p>No branch selected</p>
       )}
+      <SelectInput
+        ariaLabel="Branch"
+        placeholder="Select a branch..."
+        options={branches.data?.map((branch) => ({ value: branch })) ?? []}
+        value={otherBranch}
+        onValueChange={setOtherBranch}
+      />
       {otherBranch ? (
         <GraphBranch path={path} branch={otherBranch} />
       ) : (
