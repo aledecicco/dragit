@@ -13,7 +13,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>((props, ref) => {
       className={clsx(
         'flex flex-row items-center',
         'rounded-md px-2 py-1 outline-none',
-        'text-dark-accent bg-light-shade border-1 border-dark-accent-lightest',
+        'bg-light-50 border-1 border-dark-600 text-dark-800',
         props.className,
       )}
     />

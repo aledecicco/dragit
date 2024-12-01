@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import { type ButtonHTMLAttributes, forwardRef } from 'react'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant: 'primary' | 'flat'
+  variant: 'primary' | 'cta' | 'neutral' | 'plain'
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
@@ -13,19 +13,24 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
       {...buttonProps}
       ref={ref}
       className={clsx(
-        'flex flex-row justify-center items-center text-center',
+        'flex flex-row justify-center items-center text-center h-max',
+        'border-none outline-none px-4 py-2 rounded-lg font-semibold text-md',
         'not-disabled:cursor-pointer',
         variant === 'primary' && [
-          'px-4 py-2',
-          'rounded-lg font-semibold text-md',
-          'border-none bg-brand text-light-shade',
-          'hover:bg-brand-lighter active:bg-brand active:scale-98',
+          'bg-primary-600 text-light-50',
+          'hover:bg-primary-700 dark:hover:bg-primary-500',
         ],
-        variant === 'flat' && [
-          'px-5',
-          'rounded-lg font-normal text-md',
-          'border-2 border-light-accent text-light-accent bg-light-shade',
-          'hover:bg-light-shade-darker active:bg-light-shade-darkest active:scale-98',
+        variant === 'cta' && [
+          'bg-accent-500 text-light-50',
+          'hover:bg-accent-600 dark:hover:bg-accent-400',
+        ],
+        variant === 'neutral' && [
+          'bg-light-200 text-dark-700 dark:bg-dark-900 dark:text-light-50',
+          'hover:bg-light-300 dark:hover:bg-dark-800',
+        ],
+        variant === 'plain' && [
+          'bg-transparent text-dark-800 dark:text-light-50',
+          'hover:bg-dark/5 dark:hover:bg-light/5',
         ],
         props.className,
       )}

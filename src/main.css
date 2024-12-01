@@ -2,38 +2,81 @@
 @import "tailwindcss";
 
 @theme {
-  --color-light-shade: oklch(96.14% 0.0029 84.56);
-  --color-light-shade-darker: oklch(93.8% 0.0035 67.78);
-  --color-light-shade-darkest: oklch(0.87 0.01 78.28);
+  --color-light-50: #fcfcfc;
+  --color-light-100: #efefef;
+  --color-light-200: #dcdcdc;
+  --color-light-300: #bdbdbd;
+  --color-light-400: #989898;
+  --color-light-500: #7c7c7c;
+  --color-light-600: #656565;
+  --color-light-700: #525252;
+  --color-light-800: #464646;
+  --color-light-900: #3d3d3d;
+  --color-light-950: #292929;
+  --color-light: var(--color-light-50);
 
-  --color-light-accent-lightest: oklch(75.88% 0.0238 321.37);
-  --color-light-accent-lighter: oklch(67.56% 0.0312 320.6);
-  --color-light-accent: oklch(56.4% 0.0353 322.7);
-  --color-light-accent-darker: oklch(51.87% 0.0348 324.33);
-  --color-light-accent-darkest: oklch(46% 0.0277 323.79);
+  --color-dark-50: #f6f6f6;
+  --color-dark-100: #e7e7e7;
+  --color-dark-200: #d1d1d1;
+  --color-dark-300: #b0b0b0;
+  --color-dark-400: #888888;
+  --color-dark-500: #6d6d6d;
+  --color-dark-600: #5d5d5d;
+  --color-dark-700: #4f4f4f;
+  --color-dark-800: #454545;
+  --color-dark-900: #3d3d3d;
+  --color-dark-950: #222222;
+  --color-dark: var(--color-dark-950);
 
-  --color-brand-lightest: oklch(0.79 0.02 240.06);
-  --color-brand-lighter: oklch(0.71 0.02 250.46);
-  --color-brand: oklch(0.64 0.03 257.06);
-  --color-brand-darker: oklch(0.59 0.02 256.77);
-  --color-brand-darkest: oklch(0.51 0.02 256.34);
+  --color-primary-50: #eff4fe;
+  --color-primary-100: #e3e9fc;
+  --color-primary-200: #ccd7f9;
+  --color-primary-300: #adbcf4;
+  --color-primary-400: #8b99ee;
+  --color-primary-500: #6f78e5;
+  --color-primary-600: #6564db;
+  --color-primary-700: #4845bd;
+  --color-primary-800: #3b3a99;
+  --color-primary-900: #35357a;
+  --color-primary-950: #201f47;
+  --color-primary: var(--color-primary-600);
 
-  --color-dark-accent-lightest: oklch(0.56 0.03 280.2);
-  --color-dark-accent-lighter: oklch(0.48 0.03 282.57);
-  --color-dark-accent: oklch(0.41 0.02 281.71);
-  --color-dark-accent-darker: oklch(0.38 0.02 280.61);
-  --color-dark-accent-darkest: oklch(0.35 0.01 285.66);
+  --color-accent-50: #fdf3f3;
+  --color-accent-100: #fce4e5;
+  --color-accent-200: #fbcdcf;
+  --color-accent-300: #f6abad;
+  --color-accent-400: #ef767a;
+  --color-accent-500: #e44f54;
+  --color-accent-600: #d03237;
+  --color-accent-700: #af262b;
+  --color-accent-800: #912327;
+  --color-accent-900: #792326;
+  --color-accent-950: #410e10;
+  --color-accent: var(--color-accent-400);
 
-  --color-dark-shade: oklch(0.37 0.03 275);
-  --color-dark-shade-lighter: oklch(0.34 0.03 276.05);
-  --color-dark-shade-lightest: oklch(0.3 0.02 277.56);
+  --color-danger-50: #fff0f8;
+  --color-danger-100: #ffe4f4;
+  --color-danger-200: #ffc9eb;
+  --color-danger-300: #ff9cd8;
+  --color-danger-400: #ff5fbc;
+  --color-danger-500: #ff30a0;
+  --color-danger-600: #f50d7b;
+  --color-danger-700: #e40066;
+  --color-danger-800: #b0044e;
+  --color-danger-900: #920944;
+  --color-danger-950: #5b0025;
+  --color-danger: var(--color-danger-700);
+}
+
+:root {
+  font-family: "Inter", sans-serif;
+  @apply bg-light text-dark dark:bg-dark dark:text-light;
+  @apply scheme-light dark:scheme-dark;
+  @apply font-normal;
 }
 
 #root {
-  font-family: "Inter", sans-serif;
   @apply flex flex-col flex-nowrap min-h-dvh;
-  @apply bg-light-shade text-dark-shade;
-  @apply font-normal;
 }
 
 h1,

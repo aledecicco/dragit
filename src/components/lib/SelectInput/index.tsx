@@ -1,3 +1,4 @@
+import { Button } from '@lib/Button'
 import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
 import * as Select from '@radix-ui/react-select'
 import clsx from 'clsx'
@@ -18,30 +19,28 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
 
     return (
       <Select.Root {...selectProps}>
-        <Select.Trigger
-          aria-label={ariaLabel}
-          ref={ref}
-          className={clsx(
-            'h-max outline-none inline-flex items-center px-2',
-            'rounded-lg font-normal text-md',
-            'border-1 border-light-accent text-light-accent bg-light-shade',
-            'not-disabled:cursor-pointer hover:bg-light-shade-darker active:bg-light-shade-darkest',
-          )}
-        >
-          <Select.Value placeholder={placeholder} />
-          <Select.Icon>
-            <ChevronDownIcon />
-          </Select.Icon>
+        <Select.Trigger aria-label={ariaLabel} ref={ref} asChild>
+          <Button variant="plain" className={clsx('group gap-4')}>
+            <Select.Value placeholder={placeholder} />
+            <Select.Icon className={clsx(' group-aria-expanded:rotate-180')}>
+              <ChevronDownIcon />
+            </Select.Icon>
+          </Button>
         </Select.Trigger>
         <Select.Portal>
           <Select.Content
-            position="popper"
-            sideOffset={0}
             className={clsx(
-              'overflow-hidden bg-light-shade rounded-sm shadow-sm',
+              'overflow-hidden rounded-sm shadow-sm',
+              'bg-light-100 dark:bg-dark-900',
+              'w-max',
             )}
           >
-            <Select.ScrollUpButton>
+            <Select.ScrollUpButton
+              className={clsx(
+                'flex items-center justify-center',
+                'border-b-2 border-b-dark/5 dark:border-b-light/5',
+              )}
+            >
               <ChevronUpIcon />
             </Select.ScrollUpButton>
             <Select.Viewport>
@@ -53,7 +52,12 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
                 />
               ))}
             </Select.Viewport>
-            <Select.ScrollDownButton>
+            <Select.ScrollDownButton
+              className={clsx(
+                'flex items-center justify-center',
+                'border-t-2 border-t-dark/5 dark:border-t-light/5',
+              )}
+            >
               <ChevronDownIcon />
             </Select.ScrollDownButton>
           </Select.Content>
@@ -76,9 +80,11 @@ const SelectInputItem = forwardRef<HTMLDivElement, SelectInputItemProps>(
         ref={ref}
         {...selectItemProps}
         className={clsx(
-          'text-sm flex flex-row items-center justify-center px-4 py-1',
-          'relative select-none outline-none not-disabled:cursor-pointer',
-          'data-highlighted:bg-light-shade-darker data-[state=checked]:bg-light-accent-lightest',
+          'text-sm flex flex-row items-center justify-center px-6 py-2',
+          'select-none outline-none not-disabled:cursor-pointer',
+          'data-highlighted:bg-dark/5 data-highlighted:dark:bg-light/5',
+          'data-[state=checked]:bg-primary/50',
+          'data-highlighted:data-[state=checked]:bg-primary/70',
           selectItemProps.className,
         )}
       >
