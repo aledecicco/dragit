@@ -15,24 +15,24 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
       className={clsx(
         'flex flex-row justify-center items-center text-center h-max',
         'border-none outline-none px-4 py-2 rounded-lg font-semibold text-md',
-        'not-disabled:cursor-pointer',
+        'enabled:cursor-pointer enabled:active:scale-98',
         variant === 'primary' && [
           'bg-primary-600 text-light-50',
-          'hover:bg-primary-700 dark:hover:bg-primary-500',
+          'enabled:hover:bg-primary-700 enabled:dark:hover:bg-primary-500',
         ],
         variant === 'cta' && [
           'bg-accent-500 text-light-50',
-          'hover:bg-accent-600 dark:hover:bg-accent-400',
+          'enabled:hover:bg-accent-600 enabled:dark:hover:bg-accent-400',
         ],
         variant === 'neutral' && [
           'bg-light-200 text-dark-700 dark:bg-dark-900 dark:text-light-50',
-          'hover:bg-light-300 dark:hover:bg-dark-800',
+          'enabled:hover:bg-light-300 enabled:dark:hover:bg-dark-800',
         ],
         variant === 'plain' && [
           'bg-transparent text-dark-800 dark:text-light-50',
-          'hover:bg-dark/5 dark:hover:bg-light/5',
+          'enabled:hover:bg-dark/5 enabled:dark:hover:bg-light/5',
         ],
-        props.className,
+        buttonProps.className,
       )}
     />
   )

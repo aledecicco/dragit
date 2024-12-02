@@ -1,8 +1,11 @@
+import { PlusIcon } from '@radix-ui/react-icons'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import clsx from 'clsx'
 import { useMemo } from 'react'
 
 import type { BranchName, CommitId } from '@api/models'
 import { commitHistoryQuery, headInfoQuery } from '@api/queries'
+import { Button } from '@lib/Button'
 import { range } from '@utils/array'
 import { GraphCommit } from '../Commit'
 
@@ -52,13 +55,7 @@ const GraphBranch = (props: GraphBranchProps) => {
   }, [history.data, stopAt])
 
   return (
-    <div>
-      <h4>
-        {branch}
-        {headInfo.data?.status.type === 'branch' &&
-          headInfo.data.status.name === branch &&
-          ' *'}
-      </h4>
+    <div className={clsx('flex flex-col gap-9 p-6')}>
       {history.data ? (
         pagination.pageIndexes.map((pageIndex) =>
           (pageIndex === pagination.lastPageIndex
@@ -80,16 +77,18 @@ const GraphBranch = (props: GraphBranchProps) => {
         </p>
       )}
       {!pagination.stopped && (
-        <button
+        <Button
           type="button"
+          variant="neutral"
+          className={clsx('w-max h-max')}
           aria-label="Load more commits for this branch"
           disabled={history.isFetchingNextPage || !history.hasNextPage}
           onClick={() => {
             history.fetchNextPage()
           }}
         >
-          {history.isFetchingNextPage ? 'Loading more...' : 'Load more'}
-        </button>
+          <PlusIcon />
+        </Button>
       )}
     </div>
   )

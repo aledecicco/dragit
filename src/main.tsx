@@ -1,5 +1,7 @@
+import { TooltipProvider } from '@radix-ui/react-tooltip'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+
 import '@fontsource/inter'
 
 import './main.css'
@@ -11,7 +13,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ClientProvider>
       <EventHandler>
-        <App />
+        <TooltipProvider>
+          <App />
+        </TooltipProvider>
       </EventHandler>
     </ClientProvider>
   </React.StrictMode>,

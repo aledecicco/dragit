@@ -12,12 +12,7 @@ const EventHandler = (props: PropsWithChildren) => {
 
   useEffect(() => {
     const unlisten = listen('dir-changed', () => {
-      client.invalidateQueries({
-        queryKey: queryKeys.currentDir,
-      })
-      client.invalidateQueries({
-        queryKey: queryKeys.directory.all,
-      })
+      client.invalidateQueries()
     })
 
     return () => {
@@ -46,22 +41,24 @@ const EventHandlerInner = (
       match(event.payload)
         .with({ type: 'gitFolderModified' }, () => {
           client.invalidateQueries({
-            queryKey: queryKeys.directory.isRepository(currentDir),
+            queryKey: [queryKeys.directory.isRepository(currentDir)],
           })
         })
         .with({ type: 'branchesListUpdated' }, () => {
           client.invalidateQueries({
-            queryKey: queryKeys.directory.branches.all(currentDir),
+            queryKey: [queryKeys.directory.branches.all(currentDir)],
           })
         })
         .with(
           { type: 'branchUpdated', name: P.string.select() },
           (branchName) => {
             client.invalidateQueries({
-              queryKey: queryKeys.directory.commitHistory.branch(
-                currentDir,
-                branchName,
-              ),
+              queryKey: [
+                queryKeys.directory.commitHistory.branch(
+                  currentDir,
+                  branchName,
+                ),
+              ],
             })
 
             if (
@@ -69,24 +66,24 @@ const EventHandlerInner = (
               headInfo.data.status.name === branchName
             ) {
               client.invalidateQueries({
-                queryKey: queryKeys.directory.headInfo(currentDir),
+                queryKey: [queryKeys.directory.headInfo(currentDir)],
               })
             }
           },
         )
         .with({ type: 'headChanged' }, () => {
           client.invalidateQueries({
-            queryKey: queryKeys.directory.headInfo(currentDir),
+            queryKey: [queryKeys.directory.headInfo(currentDir)],
           })
         })
         .with({ type: 'filesModified' }, () => {
           client.invalidateQueries({
-            queryKey: queryKeys.directory.headInfo(currentDir),
+            queryKey: [queryKeys.directory.headInfo(currentDir)],
           })
         })
         .with({ type: 'indexUpdated' }, () => {
           client.invalidateQueries({
-            queryKey: queryKeys.directory.headInfo(currentDir),
+            queryKey: [queryKeys.directory.headInfo(currentDir)],
           })
         })
     })

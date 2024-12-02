@@ -12,9 +12,10 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>((props, ref) => {
       ref={ref}
       className={clsx(
         'flex flex-row items-center',
-        'rounded-md px-2 py-1 outline-none',
-        'bg-light-50 border-1 border-dark-600 text-dark-800',
-        props.className,
+        'rounded-md px-2 py-1 outline-none border-1',
+        'dark:bg-dark-900 dark:text-light-100 dark:border-dark-700',
+        'bg-light-100 text-dark-900 border-light-300',
+        inputProps.className,
       )}
     />
   )

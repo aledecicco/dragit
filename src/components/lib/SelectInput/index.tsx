@@ -1,10 +1,11 @@
-import { Button } from '@lib/Button'
 import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
-import * as Select from '@radix-ui/react-select'
+import * as SelectPrimitive from '@radix-ui/react-select'
 import clsx from 'clsx'
 import { type ReactNode, forwardRef } from 'react'
 
-interface SelectInputProps extends Select.SelectProps {
+import { Button } from '@lib/Button'
+
+interface SelectInputProps extends SelectPrimitive.SelectProps {
   options: {
     value: string
     render?: () => ReactNode
@@ -18,32 +19,39 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
     const { options, placeholder, ariaLabel, ...selectProps } = props
 
     return (
-      <Select.Root {...selectProps}>
-        <Select.Trigger aria-label={ariaLabel} ref={ref} asChild>
-          <Button variant="plain" className={clsx('group gap-4')}>
-            <Select.Value placeholder={placeholder} />
-            <Select.Icon className={clsx(' group-aria-expanded:rotate-180')}>
-              <ChevronDownIcon />
-            </Select.Icon>
-          </Button>
-        </Select.Trigger>
-        <Select.Portal>
-          <Select.Content
+      <SelectPrimitive.Root {...selectProps}>
+        <SelectPrimitive.Trigger aria-label={ariaLabel} ref={ref} asChild>
+          <Button
+            variant="plain"
             className={clsx(
-              'overflow-hidden rounded-sm shadow-sm',
+              'group gap-3 active:scale-100 data-placeholder:font-thin data-placeholder:italic',
+            )}
+          >
+            <SelectPrimitive.Value placeholder={placeholder} />
+            <SelectPrimitive.Icon
+              className={clsx('group-aria-expanded:rotate-180')}
+            >
+              <ChevronDownIcon />
+            </SelectPrimitive.Icon>
+          </Button>
+        </SelectPrimitive.Trigger>
+        <SelectPrimitive.Portal>
+          <SelectPrimitive.Content
+            className={clsx(
+              'overflow-hidden rounded-lg shadow-sm',
               'bg-light-100 dark:bg-dark-900',
               'w-max',
             )}
           >
-            <Select.ScrollUpButton
+            <SelectPrimitive.ScrollUpButton
               className={clsx(
                 'flex items-center justify-center',
                 'border-b-2 border-b-dark/5 dark:border-b-light/5',
               )}
             >
               <ChevronUpIcon />
-            </Select.ScrollUpButton>
-            <Select.Viewport>
+            </SelectPrimitive.ScrollUpButton>
+            <SelectPrimitive.Viewport>
               {options.map((option) => (
                 <SelectInputItem
                   key={option.value}
@@ -51,23 +59,23 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
                   render={option.render}
                 />
               ))}
-            </Select.Viewport>
-            <Select.ScrollDownButton
+            </SelectPrimitive.Viewport>
+            <SelectPrimitive.ScrollDownButton
               className={clsx(
                 'flex items-center justify-center',
                 'border-t-2 border-t-dark/5 dark:border-t-light/5',
               )}
             >
               <ChevronDownIcon />
-            </Select.ScrollDownButton>
-          </Select.Content>
-        </Select.Portal>
-      </Select.Root>
+            </SelectPrimitive.ScrollDownButton>
+          </SelectPrimitive.Content>
+        </SelectPrimitive.Portal>
+      </SelectPrimitive.Root>
     )
   },
 )
 
-interface SelectInputItemProps extends Select.SelectItemProps {
+interface SelectInputItemProps extends SelectPrimitive.SelectItemProps {
   render?: () => ReactNode
 }
 
@@ -76,7 +84,7 @@ const SelectInputItem = forwardRef<HTMLDivElement, SelectInputItemProps>(
     const { render, ...selectItemProps } = props
 
     return (
-      <Select.SelectItem
+      <SelectPrimitive.SelectItem
         ref={ref}
         {...selectItemProps}
         className={clsx(
@@ -88,10 +96,10 @@ const SelectInputItem = forwardRef<HTMLDivElement, SelectInputItemProps>(
           selectItemProps.className,
         )}
       >
-        <Select.ItemText>
+        <SelectPrimitive.ItemText>
           {render ? render() : selectItemProps.value}
-        </Select.ItemText>
-      </Select.SelectItem>
+        </SelectPrimitive.ItemText>
+      </SelectPrimitive.SelectItem>
     )
   },
 )

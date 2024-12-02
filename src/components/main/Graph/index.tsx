@@ -14,36 +14,40 @@ interface GraphProps {
 const Graph = (props: GraphProps) => {
   const { path } = props
   const [branch, setBranch] = useState<BranchName>()
-  const [otherBranch, setOtherBranch] = useState<BranchName>()
-  const ancestor = useQuery(commonAncestorQuery(path, branch, otherBranch))
+  const [baseBranch, setBaseBranch] = useState<BranchName>()
+  const ancestor = useQuery(commonAncestorQuery(path, branch, baseBranch))
   const branches = useQuery(branchesQuery(path))
 
   return (
-    <div className={clsx('flex flex-row')}>
-      <SelectInput
-        ariaLabel="Branch"
-        placeholder="Select a branch..."
-        options={branches.data?.map((branch) => ({ value: branch })) ?? []}
-        value={branch}
-        onValueChange={setBranch}
-      />
-      {branch ? (
-        <GraphBranch path={path} branch={branch} stopAt={ancestor.data} />
-      ) : (
-        <p>No branch selected</p>
-      )}
-      <SelectInput
-        ariaLabel="Branch"
-        placeholder="Select a branch..."
-        options={branches.data?.map((branch) => ({ value: branch })) ?? []}
-        value={otherBranch}
-        onValueChange={setOtherBranch}
-      />
-      {otherBranch ? (
-        <GraphBranch path={path} branch={otherBranch} />
-      ) : (
-        <p>No branch selected</p>
-      )}
+    <div className={clsx('flex flex-row gap-8')}>
+      <div className={clsx('flex flex-col items-center gap-4 p-10')}>
+        <SelectInput
+          ariaLabel="Branch"
+          placeholder="Branch..."
+          options={branches.data?.map((branch) => ({ value: branch })) ?? []}
+          value={branch}
+          onValueChange={setBranch}
+        />
+        {branch ? (
+          <GraphBranch path={path} branch={branch} stopAt={ancestor.data} />
+        ) : (
+          <p>No branch selected</p>
+        )}
+      </div>
+      <div className={clsx('flex flex-col items-center gap-4 p-10')}>
+        <SelectInput
+          ariaLabel="Branch"
+          placeholder="Branch..."
+          options={branches.data?.map((branch) => ({ value: branch })) ?? []}
+          value={baseBranch}
+          onValueChange={setBaseBranch}
+        />
+        {baseBranch ? (
+          <GraphBranch path={path} branch={baseBranch} />
+        ) : (
+          <p>No branch selected</p>
+        )}
+      </div>
     </div>
   )
 }
