@@ -4,15 +4,15 @@ import clsx from 'clsx'
 import { useMemo } from 'react'
 
 import type { BranchName, CommitId } from '@api/models'
-import { commitHistoryQuery, headInfoQuery } from '@api/queries'
+import { PAGE_SIZE, commitHistoryQuery, headInfoQuery } from '@api/queries'
 import { Button } from '@lib/Button'
-import { range } from '@utils/array'
-import { GraphCommit } from '../Commit'
+import { last, range } from '@utils/array'
+import { COMMIT_ID, GraphCommit } from '../Commit'
 
 interface GraphBranchProps {
   path: string
   branch: BranchName
-  stopAt?: CommitId
+  stopAt?: { branch: BranchName; commit: CommitId }
 }
 
 const GraphBranch = (props: GraphBranchProps) => {
@@ -21,14 +21,14 @@ const GraphBranch = (props: GraphBranchProps) => {
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
 
   const pagination = useMemo(() => {
-    if (history.data) {
+    if (history.data?.pages) {
       for (let i = 0; i < history.data.pages.length; i++) {
         for (let j = 0; j < history.data.pages[i].length; j++) {
-          if (history.data.pages[i][j] === stopAt) {
+          if (history.data.pages[i][j] === stopAt?.commit) {
             return {
               lastPageIndex: i,
               pageIndexes: range(i + 1),
-              commitIndexes: range(history.data.pages[0].length),
+              commitIndexes: range(PAGE_SIZE),
               lastCommitIndexes: range(j),
               stopped: true,
             }
@@ -37,10 +37,10 @@ const GraphBranch = (props: GraphBranchProps) => {
       }
 
       return {
-        lastPageIndex: undefined,
+        lastPageIndex: history.data.pages.length - 1,
         pageIndexes: range(history.data.pages.length),
-        commitIndexes: range(history.data.pages[0].length),
-        lastCommitIndexes: [],
+        commitIndexes: range(PAGE_SIZE),
+        lastCommitIndexes: range(last(history.data.pages).length),
         stopped: false,
       }
     }
@@ -52,7 +52,7 @@ const GraphBranch = (props: GraphBranchProps) => {
       lastCommitIndexes: [],
       stopped: false,
     }
-  }, [history.data, stopAt])
+  }, [history.data?.pages, stopAt])
 
   return (
     <div className={clsx('flex flex-col gap-9 p-6')}>
@@ -61,13 +61,29 @@ const GraphBranch = (props: GraphBranchProps) => {
           (pageIndex === pagination.lastPageIndex
             ? pagination.lastCommitIndexes
             : pagination.commitIndexes
-          ).map((commitIndex) => (
-            <GraphCommit
-              key={history.data.pages[pageIndex][commitIndex]}
-              path={path}
-              reference={history.data.pages[pageIndex][commitIndex]}
-            />
-          )),
+          ).map((commitIndex) => {
+            const nextCommit: CommitId | undefined =
+              history.data.pages[pageIndex][commitIndex + 1] ??
+              history.data.pages[pageIndex + 1]?.[0]
+
+            const nextBranch =
+              nextCommit && stopAt && nextCommit === stopAt.commit
+                ? stopAt.branch
+                : branch
+            const parent = nextCommit
+              ? COMMIT_ID(nextCommit, nextBranch)
+              : undefined
+
+            return (
+              <GraphCommit
+                key={history.data.pages[pageIndex][commitIndex]}
+                path={path}
+                branch={branch}
+                reference={history.data.pages[pageIndex][commitIndex]}
+                parent={parent}
+              />
+            )
+          }),
         )
       ) : (
         <p>
@@ -76,11 +92,12 @@ const GraphBranch = (props: GraphBranchProps) => {
             : 'No commits found'}
         </p>
       )}
-      {!pagination.stopped && (
+      {!pagination.stopped && history.hasNextPage && (
         <Button
           type="button"
           variant="neutral"
-          className={clsx('w-max h-max')}
+          className={clsx('self-center')}
+          rounded
           aria-label="Load more commits for this branch"
           disabled={history.isFetchingNextPage || !history.hasNextPage}
           onClick={() => {

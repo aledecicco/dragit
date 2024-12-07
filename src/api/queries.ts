@@ -113,7 +113,7 @@ const branchesQuery = (path: string) =>
     queryFn: fetchBranches,
   })
 
-const PAGE_SIZE = 10
+export const PAGE_SIZE = 10
 
 const fetchCommitHistory = (
   branch: BranchName,
@@ -146,7 +146,7 @@ const commitInfoQuery = (path: string, reference: CommitId) =>
 const fetchCommonAncestor = (
   branchA: BranchName,
   branchB: BranchName,
-): Promise<CommitId> =>
+): Promise<CommitId | undefined> =>
   invoke('get_common_ancestor', { branchA: branchA, branchB: branchB })
 
 const commonAncestorQuery = (

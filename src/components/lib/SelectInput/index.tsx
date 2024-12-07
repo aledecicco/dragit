@@ -1,4 +1,4 @@
-import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
+import { ChevronDownIcon } from '@radix-ui/react-icons'
 import * as SelectPrimitive from '@radix-ui/react-select'
 import clsx from 'clsx'
 import { type ReactNode, forwardRef } from 'react'
@@ -24,7 +24,8 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
           <Button
             variant="plain"
             className={clsx(
-              'group gap-3 active:scale-100 data-placeholder:font-thin data-placeholder:italic',
+              'group gap-2 active:scale-100',
+              'data-placeholder:font-thin data-placeholder:italic',
             )}
           >
             <SelectPrimitive.Value placeholder={placeholder} />
@@ -38,19 +39,11 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
         <SelectPrimitive.Portal>
           <SelectPrimitive.Content
             className={clsx(
-              'overflow-hidden rounded-lg shadow-sm',
+              'overflow-hidden rounded-lg shadow-md',
               'bg-light-100 dark:bg-dark-900',
               'w-max',
             )}
           >
-            <SelectPrimitive.ScrollUpButton
-              className={clsx(
-                'flex items-center justify-center',
-                'border-b-2 border-b-dark/5 dark:border-b-light/5',
-              )}
-            >
-              <ChevronUpIcon />
-            </SelectPrimitive.ScrollUpButton>
             <SelectPrimitive.Viewport>
               {options.map((option) => (
                 <SelectInputItem
@@ -60,14 +53,6 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
                 />
               ))}
             </SelectPrimitive.Viewport>
-            <SelectPrimitive.ScrollDownButton
-              className={clsx(
-                'flex items-center justify-center',
-                'border-t-2 border-t-dark/5 dark:border-t-light/5',
-              )}
-            >
-              <ChevronDownIcon />
-            </SelectPrimitive.ScrollDownButton>
           </SelectPrimitive.Content>
         </SelectPrimitive.Portal>
       </SelectPrimitive.Root>

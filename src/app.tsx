@@ -10,13 +10,13 @@ const App = () => {
   const currentDir = useQuery(currentDirQuery)
 
   return (
-    <div className={clsx('p-2')}>
+    <div className={clsx('px-8 py-4 flex flex-col items-center gap-4')}>
       <CurrentDirectory />
       {currentDir.data && (
-        <>
-          <FileStatuses path={currentDir.data} />
+        <div className={clsx('flex flex-row justify-between w-full')}>
           <Graph path={currentDir.data} />
-        </>
+          <FileStatuses path={currentDir.data} />
+        </div>
       )}
     </div>
   )

@@ -133,6 +133,6 @@ pub async fn get_common_ancestor(
     state: State<'_, AppState>,
     branch_a: &str,
     branch_b: &str,
-) -> Result<String, AppError> {
+) -> Result<Option<String>, AppError> {
     with_handler(&state, &|h| h.get_common_ancestor(branch_a, branch_b))
 }

@@ -50,5 +50,9 @@ pub trait GitHandler {
     fn commit_index(&self, message: &str) -> Result<(), GitError>;
 
     /// Returns the commit hash of the latest common ancestor between the two given branches.
-    fn get_common_ancestor(&self, branch_a: &str, branch_b: &str) -> Result<String, GitError>;
+    fn get_common_ancestor(
+        &self,
+        branch_a: &str,
+        branch_b: &str,
+    ) -> Result<Option<String>, GitError>;
 }

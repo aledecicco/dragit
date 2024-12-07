@@ -22,7 +22,7 @@ const Tooltip = (props: TooltipProps) => {
           align="center"
           {...contentProps}
           className={clsx(
-            'shadow-sm bg-light-100 dark:bg-dark-900',
+            'shadow-md bg-light-100 dark:bg-dark-900',
             'p-4 rounded-md',
             contentProps?.className,
           )}
