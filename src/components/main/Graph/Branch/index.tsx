@@ -1,13 +1,13 @@
 import { PlusIcon } from '@radix-ui/react-icons'
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { useMemo } from 'react'
 
 import type { BranchName, CommitId } from '@api/models'
-import { PAGE_SIZE, commitHistoryQuery, headInfoQuery } from '@api/queries'
+import { PAGE_SIZE, commitHistoryQuery } from '@api/queries'
 import { Button } from '@lib/Button'
 import { last, range } from '@utils/array'
-import { COMMIT_ID, GraphCommit } from '../Commit'
+import { GraphCommit } from '../Commit'
 
 interface GraphBranchProps {
   path: string
@@ -17,7 +17,6 @@ interface GraphBranchProps {
 
 const GraphBranch = (props: GraphBranchProps) => {
   const { path, branch, stopAt } = props
-  const headInfo = useQuery(headInfoQuery(path))
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
 
   const pagination = useMemo(() => {
@@ -62,25 +61,25 @@ const GraphBranch = (props: GraphBranchProps) => {
             ? pagination.lastCommitIndexes
             : pagination.commitIndexes
           ).map((commitIndex) => {
+            const commit: CommitId = history.data.pages[pageIndex][commitIndex]
             const nextCommit: CommitId | undefined =
               history.data.pages[pageIndex][commitIndex + 1] ??
               history.data.pages[pageIndex + 1]?.[0]
 
-            const nextBranch =
-              nextCommit && stopAt && nextCommit === stopAt.commit
+            const nextBranch = nextCommit
+              ? stopAt && nextCommit === stopAt.commit
                 ? stopAt.branch
                 : branch
-            const parent = nextCommit
-              ? COMMIT_ID(nextCommit, nextBranch)
               : undefined
 
             return (
               <GraphCommit
-                key={history.data.pages[pageIndex][commitIndex]}
+                key={commit}
                 path={path}
+                commitId={commit}
                 branch={branch}
-                reference={history.data.pages[pageIndex][commitIndex]}
-                parent={parent}
+                parentCommitId={nextCommit}
+                parentBranch={nextBranch}
               />
             )
           }),

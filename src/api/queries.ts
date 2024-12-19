@@ -134,13 +134,13 @@ const commitHistoryQuery = (path: string, branch: BranchName) =>
       lastPage.length === PAGE_SIZE ? lastPageParam + 1 : undefined,
   })
 
-const fetchCommitInfo = (reference: CommitId): Promise<CommitInfo> =>
-  invoke('get_commit_info', { reference: reference })
+const fetchCommitInfo = (commitId: CommitId): Promise<CommitInfo> =>
+  invoke('get_commit_info', { reference: commitId })
 
-const commitInfoQuery = (path: string, reference: CommitId) =>
+const commitInfoQuery = (path: string, commitId: CommitId) =>
   queryOptions({
-    queryKey: [queryKeys.directory.commitInfo.commit(path, reference)],
-    queryFn: () => fetchCommitInfo(reference),
+    queryKey: [queryKeys.directory.commitInfo.commit(path, commitId)],
+    queryFn: () => fetchCommitInfo(commitId),
   })
 
 const fetchCommonAncestor = (

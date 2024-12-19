@@ -23,7 +23,6 @@
     "@tauri-apps/plugin-shell": ">=2.0.0",
     "clsx": "^2.1.1",
     "react": "^18.2.0",
-    "react-archer": "^4.4.0",
     "react-dom": "^18.2.0",
     "tailwindcss": "4.0.0-beta.3",
     "ts-pattern": "^5.5.0",

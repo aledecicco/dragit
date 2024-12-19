@@ -1,56 +1,43 @@
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { ArcherElement } from 'react-archer'
+import { forwardRef } from 'react'
 
-import type { BranchName, CommitId, CommitInfo } from '@api/models'
+import type { CommitId, CommitInfo } from '@api/models'
 import { commitInfoQuery } from '@api/queries'
 import { Tooltip } from '@lib/Tooltip'
-
-export const COMMIT_ID = (ref: CommitId, branch: BranchName) =>
-  `commit_${branch}_${ref}`
+import { makeTracked } from '@main/SvgOverlay'
 
 type GraphCommitProps = {
   path: string
-  branch: BranchName
-  reference: CommitId
-  parent?: string
+  commitId: CommitId
 }
 
-const GraphCommit = (props: GraphCommitProps) => {
-  const { path, branch, reference, parent } = props
-  const commitInfo = useQuery(commitInfoQuery(path, reference))
+const GraphCommit = makeTracked(
+  forwardRef<HTMLDivElement, GraphCommitProps>((props, ref) => {
+    const { path, commitId } = props
+    const commitInfo = useQuery(commitInfoQuery(path, commitId))
 
-  return (
-    <Tooltip content={<GraphCommitInfo commitInfo={commitInfo.data} />}>
-      <div
-        className={clsx('flex flex-row items-center p-2 gap-5 cursor-pointer')}
-      >
-        <ArcherElement
-          id={COMMIT_ID(reference, branch)}
-          relations={
-            parent
-              ? [
-                  {
-                    targetId: parent,
-                    targetAnchor: 'top',
-                    sourceAnchor: 'bottom',
-                  },
-                ]
-              : undefined
-          }
+    return (
+      <Tooltip content={<GraphCommitInfo commitInfo={commitInfo.data} />}>
+        <div
+          className={clsx(
+            'flex flex-row items-center p-2 gap-5 cursor-pointer',
+          )}
         >
-          <div className={clsx('bg-primary rounded-full w-7 h-7 shadow-md')} />
-        </ArcherElement>
-        <div>
-          <p className={clsx('text-xs')}>
-            {commitInfo.data?.shortHash ?? '...'}
-          </p>
-          <p className={clsx('text-xs')}>{parent ?? '...'}</p>
+          <div
+            className={clsx('bg-primary rounded-full w-7 h-7 shadow-md')}
+            ref={ref}
+          />
+          <div>
+            <p className={clsx('text-xs')}>
+              {commitInfo.data?.shortHash ?? '...'}
+            </p>
+          </div>
         </div>
-      </div>
-    </Tooltip>
-  )
-}
+      </Tooltip>
+    )
+  }),
+)
 
 const GraphCommitInfo = (props: { commitInfo?: CommitInfo }) => {
   const { commitInfo } = props
