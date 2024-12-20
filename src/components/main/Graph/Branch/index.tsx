@@ -54,7 +54,7 @@ const GraphBranch = (props: GraphBranchProps) => {
   }, [history.data?.pages, stopAt])
 
   return (
-    <div className={clsx('flex flex-col gap-9 p-6')}>
+    <div className={clsx('flex flex-col gap-12 p-6')}>
       {history.data ? (
         pagination.pageIndexes.map((pageIndex) =>
           (pageIndex === pagination.lastPageIndex

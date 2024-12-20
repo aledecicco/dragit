@@ -25,7 +25,7 @@ const GraphCommit = makeTracked(
           )}
         >
           <div
-            className={clsx('bg-primary rounded-full w-7 h-7 shadow-md')}
+            className={clsx('bg-primary rounded-full w-5 h-5 shadow-md')}
             ref={ref}
           />
           <div>
