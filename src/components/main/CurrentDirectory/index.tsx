@@ -5,9 +5,12 @@ import { useEffect, useRef } from 'react'
 
 import { useOpenFolder } from '@api/commands'
 import { currentDirQuery } from '@api/queries'
-import { Button } from '@lib/Button'
+import { Button, type ButtonProps } from '@lib/Button'
 
-const CurrentDirectory = () => {
+interface CurrentDirectoryProps extends Partial<ButtonProps> {}
+
+const CurrentDirectory = (props: CurrentDirectoryProps) => {
+  const { ...buttonProps } = props
   const currentDir = useQuery(currentDirQuery)
   const openFolder = useOpenFolder()
 
@@ -23,10 +26,6 @@ const CurrentDirectory = () => {
     <Button
       type="button"
       variant="plain"
-      className={clsx(
-        '[&]:text-primary-900 [&]:dark:text-primary-300 [&]:font-medium [&]:text-sm',
-        !currentDir.data && '[&]:italic',
-      )}
       aria-label="Select and open a folder in your system"
       onClick={() => {
         open({
@@ -38,6 +37,12 @@ const CurrentDirectory = () => {
           }
         })
       }}
+      {...buttonProps}
+      className={clsx(
+        '[&]:text-primary-900 [&]:dark:text-primary-300 [&]:font-medium [&]:text-sm',
+        !currentDir.data && '[&]:italic',
+        buttonProps.className,
+      )}
     >
       {currentDir.data ??
         (currentDir.isFetching ? 'Loading directory...' : 'Choose a directory')}

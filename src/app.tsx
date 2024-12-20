@@ -10,12 +10,20 @@ const App = () => {
   const currentDir = useQuery(currentDirQuery)
 
   return (
-    <div className={clsx('px-8 py-4 flex flex-col items-center gap-4')}>
-      <CurrentDirectory />
+    <div
+      className={clsx(
+        'px-8 py-4 w-full h-full max-h-full',
+        'grid grid-cols-1 grid-rows-[max-content_1fr] gap-4',
+      )}
+    >
+      <CurrentDirectory className={clsx('justify-self-center')} />
       {currentDir.data && (
-        <div className={clsx('flex flex-row justify-between w-full')}>
+        <div className={clsx('grid grid-cols-2 min-h-0 gap-8')}>
           <Graph path={currentDir.data} />
-          <FileStatuses path={currentDir.data} />
+          <FileStatuses
+            path={currentDir.data}
+            className={clsx('justify-self-end')}
+          />
         </div>
       )}
     </div>

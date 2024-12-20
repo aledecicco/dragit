@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useReducer,
   useState,
 } from 'react'
 
@@ -23,12 +24,14 @@ interface SvgOverlayState {
   elements: Map<CommitId, Element>
   registerElement: (id: CommitId, element: Element) => void
   unregisterElement: (id: CommitId) => void
+  refresh: () => void
 }
 
 const emptyState: SvgOverlayState = {
   elements: new Map(),
   registerElement: () => {},
   unregisterElement: () => {},
+  refresh: () => {},
 }
 
 const SvgOverlayContext = createContext(emptyState)
@@ -55,13 +58,17 @@ const SvgOverlayContextProvider = (props: PropsWithChildren) => {
     })
   }, [])
 
+  const [n, refresh] = useReducer((n) => n + 1, 0)
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const contextValue: SvgOverlayState = useMemo(() => {
     return {
       elements,
       registerElement,
       unregisterElement,
+      refresh,
     }
-  }, [elements, registerElement, unregisterElement])
+  }, [elements, registerElement, unregisterElement, n])
 
   return (
     <SvgOverlayContext.Provider value={contextValue}>

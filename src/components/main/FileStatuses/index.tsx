@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { type HTMLProps, useMemo } from 'react'
 
 import type { FileInfo } from '@api/models'
 import { headInfoQuery } from '@api/queries'
@@ -8,16 +8,16 @@ import { UnmergedFileStatusItem } from './UnmergedFile'
 import { UnstagedFileStatusItem } from './UnstagedFile'
 import { UntrackedFileStatusItem } from './UntrackedFile'
 
-interface FileStatusesProps {
+interface FileStatusesProps extends HTMLProps<HTMLDivElement> {
   path: string
 }
 
 const FileStatuses = (props: FileStatusesProps) => {
-  const { path } = props
+  const { path, ...divProps } = props
   const headInfo = useQuery(headInfoQuery(path))
 
   return (
-    <div>
+    <div {...divProps}>
       {headInfo.data ? (
         <FileStatusesList files={headInfo.data.files} />
       ) : (

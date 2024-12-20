@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { type HTMLProps, useState } from 'react'
+import { type HTMLProps, forwardRef, useRef, useState } from 'react'
 
 import type { BranchName } from '@api/models'
-import { branchesQuery, commonAncestorQuery, headInfoQuery } from '@api/queries'
+import { branchesQuery, commonAncestorQuery } from '@api/queries'
 import { SelectInput } from '@lib/SelectInput'
-import { SvgOverlay } from '@main/SvgOverlay'
+import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
 import { GraphBranch } from './Branch'
 
 interface GraphProps extends HTMLProps<HTMLDivElement> {
@@ -13,57 +13,76 @@ interface GraphProps extends HTMLProps<HTMLDivElement> {
 }
 
 const Graph = (props: GraphProps) => {
+  const canvasRef = useRef<HTMLDivElement>(null)
+  return (
+    <div className={clsx('h-full w-full min-h-0')}>
+      <SvgOverlay canvasRef={canvasRef}>
+        <GraphInner ref={canvasRef} {...props} />
+      </SvgOverlay>
+    </div>
+  )
+}
+
+const GraphInner = forwardRef<HTMLDivElement, GraphProps>((props, ref) => {
   const { path, ...divProps } = props
   const [branch, setBranch] = useState<BranchName>()
   const [baseBranch, setBaseBranch] = useState<BranchName>()
   const ancestor = useQuery(commonAncestorQuery(path, branch, baseBranch))
   const branches = useQuery(branchesQuery(path))
 
+  const { refresh } = useSvgOverlay()
+
   return (
-    <SvgOverlay>
-      <div
-        {...divProps}
-        className={clsx('flex flex-row gap-8', divProps.className)}
-      >
-        <div className={clsx('flex flex-col items-center gap-4 p-10')}>
-          <SelectInput
-            ariaLabel="Branch"
-            placeholder="Branch..."
-            options={branches.data?.map((branch) => ({ value: branch })) ?? []}
-            value={branch}
-            onValueChange={setBranch}
+    <div
+      ref={ref}
+      {...divProps}
+      className={clsx(
+        'grid grid-cols-2 gap-8',
+        'overflow-auto w-full h-full',
+        divProps.className,
+      )}
+      onScroll={() => {
+        refresh()
+      }}
+    >
+      <div className={clsx('flex flex-col items-center gap-4 p-10')}>
+        <SelectInput
+          ariaLabel="Branch"
+          placeholder="Branch..."
+          options={branches.data?.map((branch) => ({ value: branch })) ?? []}
+          value={branch}
+          onValueChange={setBranch}
+        />
+        {branch ? (
+          <GraphBranch
+            path={path}
+            branch={branch}
+            stopAt={
+              baseBranch && ancestor.data
+                ? { branch: baseBranch, commit: ancestor.data }
+                : undefined
+            }
           />
-          {branch && !ancestor.isFetching ? (
-            <GraphBranch
-              path={path}
-              branch={branch}
-              stopAt={
-                baseBranch && ancestor.data
-                  ? { branch: baseBranch, commit: ancestor.data }
-                  : undefined
-              }
-            />
-          ) : (
-            <p>No branch selected</p>
-          )}
-        </div>
-        <div className={clsx('flex flex-col items-center gap-4 p-10')}>
-          <SelectInput
-            ariaLabel="Branch"
-            placeholder="Branch..."
-            options={branches.data?.map((branch) => ({ value: branch })) ?? []}
-            value={baseBranch}
-            onValueChange={setBaseBranch}
-          />
-          {baseBranch && !ancestor.isFetching ? (
-            <GraphBranch path={path} branch={baseBranch} />
-          ) : (
-            <p>No branch selected</p>
-          )}
-        </div>
+        ) : (
+          <p>No branch selected</p>
+        )}
       </div>
-    </SvgOverlay>
+      <div className={clsx('flex flex-col items-center gap-4 p-10')}>
+        <SelectInput
+          ariaLabel="Branch"
+          placeholder="Branch..."
+          options={branches.data?.map((branch) => ({ value: branch })) ?? []}
+          value={baseBranch}
+          onValueChange={setBaseBranch}
+        />
+        {baseBranch ? (
+          <GraphBranch path={path} branch={baseBranch} />
+        ) : (
+          <p>No branch selected</p>
+        )}
+      </div>
+    </div>
   )
-}
+})
 
 export { Graph, type GraphProps }
