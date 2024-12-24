@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { type HTMLProps, forwardRef, useRef, useState } from 'react'
+import { type HTMLProps, useEffect, useState } from 'react'
 
 import type { BranchName } from '@api/models'
 import { branchesQuery, commonAncestorQuery } from '@api/queries'
@@ -13,37 +13,38 @@ interface GraphProps extends HTMLProps<HTMLDivElement> {
 }
 
 const Graph = (props: GraphProps) => {
-  const canvasRef = useRef<HTMLDivElement>(null)
   return (
     <div className={clsx('h-full w-full min-h-0')}>
-      <SvgOverlay canvasRef={canvasRef}>
-        <GraphInner ref={canvasRef} {...props} />
+      <SvgOverlay>
+        <GraphInner {...props} />
       </SvgOverlay>
     </div>
   )
 }
 
-const GraphInner = forwardRef<HTMLDivElement, GraphProps>((props, ref) => {
+const GraphInner = (props: GraphProps) => {
   const { path, ...divProps } = props
   const [branch, setBranch] = useState<BranchName>()
   const [baseBranch, setBaseBranch] = useState<BranchName>()
   const ancestor = useQuery(commonAncestorQuery(path, branch, baseBranch))
   const branches = useQuery(branchesQuery(path))
 
-  const { refresh } = useSvgOverlay()
+  const svgOverlay = useSvgOverlay()
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
+  useEffect(() => {
+    svgOverlay.refresh()
+  }, [ancestor.data])
 
   return (
     <div
-      ref={ref}
+      ref={svgOverlay.componentRef}
       {...divProps}
       className={clsx(
         'grid grid-cols-2 gap-8',
-        'overflow-auto w-full h-full',
+        'overflow-hidden w-full h-full',
         divProps.className,
       )}
-      onScroll={() => {
-        refresh()
-      }}
     >
       <div className={clsx('flex flex-col items-center gap-4 p-10')}>
         <SelectInput
@@ -83,6 +84,6 @@ const GraphInner = forwardRef<HTMLDivElement, GraphProps>((props, ref) => {
       </div>
     </div>
   )
-})
+}
 
 export { Graph, type GraphProps }
