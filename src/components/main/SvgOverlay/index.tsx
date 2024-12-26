@@ -101,12 +101,6 @@ const SvgOverlayInner = (props: SvgOverlayProps) => {
           }
         })}
       </svg>
-      <div
-        ref={svgOverlay.scrollerRef}
-        className={clsx(
-          'absolute left-0 top-0 pointer-events-none invisible overflow-scroll',
-        )}
-      />
     </div>
   )
 }

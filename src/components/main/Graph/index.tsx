@@ -34,7 +34,7 @@ const GraphInner = (props: GraphProps) => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
     svgOverlay.refresh()
-  }, [ancestor.data])
+  }, [ancestor.data, branch, baseBranch])
 
   return (
     <div

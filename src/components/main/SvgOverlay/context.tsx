@@ -29,7 +29,6 @@ interface SvgOverlayState {
   elements: Map<CommitId, Element>
   registerElement: (id: CommitId, element: Element) => void
   unregisterElement: (id: CommitId) => void
-  scrollerRef: RefObject<HTMLDivElement>
   svgRef: RefObject<SVGSVGElement>
   componentRef: RefObject<HTMLDivElement>
   refresh: () => void
@@ -39,7 +38,6 @@ const emptyState: SvgOverlayState = {
   elements: new Map(),
   registerElement: () => {},
   unregisterElement: () => {},
-  scrollerRef: { current: null },
   svgRef: { current: null },
   componentRef: { current: null },
   refresh: () => {},
@@ -54,7 +52,6 @@ interface SvgOverlayContextProviderProps extends PropsWithChildren {}
 const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
   const { children } = props
   const [elements, setElements] = useState<Map<string, Element>>(new Map())
-  const scrollerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const componentRef = useRef<HTMLDivElement>(null)
 
@@ -83,24 +80,15 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
     }
   }, [])
 
-  const syncScroller = useCallback(() => {
-    if (scrollerRef.current && componentRef.current) {
-      scrollerRef.current.style.width = `${componentRef.current.scrollWidth}px`
-      scrollerRef.current.style.height = `${componentRef.current.scrollHeight}px`
-      scrollerRef.current.style.maxWidth = `${componentRef.current.clientWidth}px`
-      scrollerRef.current.style.maxHeight = `${componentRef.current.clientHeight}px`
-    }
-  }, [])
-
   const painting = useRef(false)
-  const panTo = useCallback(
-    (x: number, y: number) => {
+  const pan = useCallback(
+    (dx: number, dy: number) => {
       if (!painting.current) {
         painting.current = true
         requestAnimationFrame(() => {
           if (componentRef.current) {
-            componentRef.current.scrollLeft = x
-            componentRef.current.scrollTop = y
+            componentRef.current.scrollLeft += dx
+            componentRef.current.scrollTop += dy
 
             syncSvg()
           }
@@ -113,35 +101,33 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
 
   const [n, rerender] = useReducer((n) => n + 1, 0)
   const refresh = useCallback(() => {
-    syncScroller()
     syncSvg()
     rerender()
-  }, [syncSvg, syncScroller])
+  }, [syncSvg])
   const observer = useRef(new ResizeObserver(refresh))
 
   useEffect(() => {
-    const scroll = (e: Event) => {
-      e.preventDefault()
-      e.stopPropagation()
-      const div = e.currentTarget as HTMLDivElement
-      console.log(e)
-      panTo(div.scrollTop, div.scrollLeft)
+    const scroll = (_event: Event) => {
+      const event = _event as WheelEvent
+      pan(event.deltaX * 2, event.deltaY * 2)
+      event.preventDefault()
+      event.stopPropagation()
     }
 
-    if (componentRef.current && scrollerRef.current) {
-      scrollerRef.current.addEventListener('scroll', scroll)
+    if (componentRef.current) {
+      componentRef.current.addEventListener('wheel', scroll)
       observer.current.observe(componentRef.current)
     }
     window.addEventListener('resize', refresh)
 
     return () => {
-      if (scrollerRef.current) {
-        scrollerRef.current.removeEventListener('scroll', scroll)
+      if (componentRef.current) {
+        componentRef.current.removeEventListener('wheel', scroll)
         observer.current.disconnect()
       }
       window.removeEventListener('resize', refresh)
     }
-  }, [panTo, refresh])
+  }, [pan, refresh])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: need to update context when rerender is forced
   const contextValue: SvgOverlayState = useMemo(() => {
@@ -149,7 +135,6 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
       elements,
       registerElement,
       unregisterElement,
-      scrollerRef,
       svgRef,
       componentRef,
       refresh,
