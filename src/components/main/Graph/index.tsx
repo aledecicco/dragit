@@ -38,11 +38,11 @@ const GraphInner = (props: GraphProps) => {
 
   return (
     <div
-      ref={svgOverlay.componentRef}
       {...divProps}
+      ref={svgOverlay.componentRef}
       className={clsx(
-        'grid grid-cols-2 gap-8',
         'overflow-hidden w-full h-full',
+        'grid grid-cols-2 gap-8',
         divProps.className,
       )}
     >

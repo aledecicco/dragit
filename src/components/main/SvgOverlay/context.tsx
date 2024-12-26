@@ -1,6 +1,9 @@
 import {
+  type EventHandler,
   type PropsWithChildren,
   type RefObject,
+  type UIEvent,
+  type UIEventHandler,
   createContext,
   useCallback,
   useContext,
@@ -26,6 +29,7 @@ interface SvgOverlayState {
   elements: Map<CommitId, Element>
   registerElement: (id: CommitId, element: Element) => void
   unregisterElement: (id: CommitId) => void
+  scrollerRef: RefObject<HTMLDivElement>
   svgRef: RefObject<SVGSVGElement>
   componentRef: RefObject<HTMLDivElement>
   refresh: () => void
@@ -35,6 +39,7 @@ const emptyState: SvgOverlayState = {
   elements: new Map(),
   registerElement: () => {},
   unregisterElement: () => {},
+  scrollerRef: { current: null },
   svgRef: { current: null },
   componentRef: { current: null },
   refresh: () => {},
@@ -49,6 +54,7 @@ interface SvgOverlayContextProviderProps extends PropsWithChildren {}
 const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
   const { children } = props
   const [elements, setElements] = useState<Map<string, Element>>(new Map())
+  const scrollerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const componentRef = useRef<HTMLDivElement>(null)
 
@@ -68,53 +74,74 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
     })
   }, [])
 
-  const painting = useRef(false)
-  const pan = useCallback((x: number, y: number) => {
-    if (!painting.current) {
-      painting.current = true
-      requestAnimationFrame(() => {
-        if (svgRef.current && componentRef.current) {
-          componentRef.current.scrollLeft += x
-          componentRef.current.scrollTop += y
-
-          svgRef.current.setAttribute(
-            'viewBox',
-            `${componentRef.current.scrollLeft} ${componentRef.current.scrollTop} ${componentRef.current.clientWidth} ${componentRef.current.clientHeight}`,
-          )
-        }
-        painting.current = false
-      })
+  const syncSvg = useCallback(() => {
+    if (svgRef.current && componentRef.current) {
+      svgRef.current.setAttribute(
+        'viewBox',
+        `${componentRef.current.scrollLeft} ${componentRef.current.scrollTop} ${componentRef.current.clientWidth} ${componentRef.current.clientHeight}`,
+      )
     }
   }, [])
 
+  const syncScroller = useCallback(() => {
+    if (scrollerRef.current && componentRef.current) {
+      scrollerRef.current.style.width = `${componentRef.current.scrollWidth}px`
+      scrollerRef.current.style.height = `${componentRef.current.scrollHeight}px`
+      scrollerRef.current.style.maxWidth = `${componentRef.current.clientWidth}px`
+      scrollerRef.current.style.maxHeight = `${componentRef.current.clientHeight}px`
+    }
+  }, [])
+
+  const painting = useRef(false)
+  const panTo = useCallback(
+    (x: number, y: number) => {
+      if (!painting.current) {
+        painting.current = true
+        requestAnimationFrame(() => {
+          if (componentRef.current) {
+            componentRef.current.scrollLeft = x
+            componentRef.current.scrollTop = y
+
+            syncSvg()
+          }
+          painting.current = false
+        })
+      }
+    },
+    [syncSvg],
+  )
+
   const [n, rerender] = useReducer((n) => n + 1, 0)
   const refresh = useCallback(() => {
+    syncScroller()
+    syncSvg()
     rerender()
-    pan(0, 0)
-  }, [pan])
+  }, [syncSvg, syncScroller])
   const observer = useRef(new ResizeObserver(refresh))
 
   useEffect(() => {
-    const scroll = (e: WheelEvent) => {
+    const scroll = (e: Event) => {
       e.preventDefault()
       e.stopPropagation()
-      pan(e.deltaX * 2, e.deltaY * 2)
+      const div = e.currentTarget as HTMLDivElement
+      console.log(e)
+      panTo(div.scrollTop, div.scrollLeft)
     }
 
-    if (componentRef.current) {
-      componentRef.current.addEventListener('wheel', scroll)
+    if (componentRef.current && scrollerRef.current) {
+      scrollerRef.current.addEventListener('scroll', scroll)
       observer.current.observe(componentRef.current)
     }
     window.addEventListener('resize', refresh)
 
     return () => {
-      if (componentRef.current) {
-        componentRef.current.removeEventListener('wheel', scroll)
+      if (scrollerRef.current) {
+        scrollerRef.current.removeEventListener('scroll', scroll)
         observer.current.disconnect()
       }
       window.removeEventListener('resize', refresh)
     }
-  }, [pan, refresh])
+  }, [panTo, refresh])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: need to update context when rerender is forced
   const contextValue: SvgOverlayState = useMemo(() => {
@@ -122,6 +149,7 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
       elements,
       registerElement,
       unregisterElement,
+      scrollerRef,
       svgRef,
       componentRef,
       refresh,
