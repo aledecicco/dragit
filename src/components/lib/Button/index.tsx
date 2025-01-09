@@ -1,13 +1,15 @@
 import clsx from 'clsx'
 import { type ButtonHTMLAttributes, forwardRef } from 'react'
+import { match } from 'ts-pattern'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant: 'primary' | 'cta' | 'neutral' | 'plain'
   rounded?: boolean
+  size?: 'sm' | 'md' | 'lg'
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-  const { variant, rounded, ...buttonProps } = props
+  const { variant, rounded = false, size = 'md', ...buttonProps } = props
 
   return (
     <button
@@ -16,9 +18,23 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
       className={clsx(
         'w-max h-max',
         'flex flex-row justify-center items-center text-center',
-        'border-none outline-none font-semibold text-md',
+        'border-none outline-none font-semibold',
         'enabled:cursor-pointer enabled:active:scale-98',
-        rounded ? 'p-2 rounded-4xl' : 'px-4 py-2 rounded-lg',
+        match(size)
+          .with('sm', () => [
+            'text-sm gap-2',
+            rounded ? 'p-0.75 rounded-4xl' : 'px-2 py-1 rounded-lg',
+          ])
+          .with('md', () => [
+            'text-md gap-2',
+            rounded ? 'p-2 rounded-4xl' : 'px-3 py-2 rounded-lg',
+          ])
+          .with('lg', () => [
+            'text-lg gap-3',
+            rounded ? 'p-3 rounded-4xl' : 'px-4 py-3 rounded-lg',
+          ])
+          .exhaustive(),
+        rounded && 'aspect-square',
         variant === 'primary' && [
           'shadow-xs bg-primary-600 text-light-50',
           'enabled:hover:bg-primary-700 enabled:dark:hover:bg-primary-500',

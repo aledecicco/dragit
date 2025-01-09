@@ -1,9 +1,6 @@
 import {
-  type EventHandler,
   type PropsWithChildren,
   type RefObject,
-  type UIEvent,
-  type UIEventHandler,
   createContext,
   useCallback,
   useContext,

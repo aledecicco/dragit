@@ -18,11 +18,13 @@ const App = () => {
     >
       <CurrentDirectory className={clsx('justify-self-center')} />
       {currentDir.data && (
-        <div className={clsx('grid grid-cols-2 min-h-0 gap-8')}>
+        <div className={clsx('grid grid-cols-[5fr_1fr] min-h-0 gap-8')}>
           <Graph path={currentDir.data} />
           <FileStatuses
             path={currentDir.data}
-            className={clsx('justify-self-end')}
+            className={clsx(
+              'justify-self-start min-w-0 overflow-hidden w-full',
+            )}
           />
         </div>
       )}

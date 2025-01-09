@@ -1,7 +1,10 @@
+import { CheckIcon, FileTextIcon, TrashIcon } from '@radix-ui/react-icons'
+import clsx from 'clsx'
 import { P, match } from 'ts-pattern'
 
 import { useAddToIndex, useRemoveFromTree } from '@api/commands'
 import type { UnmergedFile } from '@api/models'
+import { IconButton } from '@lib/IconButton'
 
 interface UnmergedFileStatusItemProps {
   file: UnmergedFile
@@ -13,36 +16,26 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
   const remove = useRemoveFromTree()
 
   return (
-    <div>
-      <p>{file.path}</p>
-      <p>
-        {match(file)
-          .with({ unstaged: 'addedByThem' }, () => 'File created by them')
-          .with({ unstaged: 'addedByUs' }, () => 'File created by us')
-          .with({ unstaged: 'bothAdded' }, () => 'File created by both')
-          .with({ unstaged: 'bothDeleted' }, () => 'File deleted by both')
-          .with({ unstaged: 'bothModified' }, () => 'File modified by both')
-          .with({ unstaged: 'deletedByThem' }, () => 'File deleted by them')
-          .with({ unstaged: 'deletedByUs' }, () => 'File deleted by us')
-          .exhaustive()}
-      </p>
-      <button
-        type="button"
+    <div className={clsx('flex flex-row items-center gap-2', 'text-warning')}>
+      <FileTextIcon />
+      <p className={clsx('text-sm')}>{file.path}</p>
+      <IconButton
+        Icon={CheckIcon}
+        variant="neutral"
+        size="sm"
         aria-label="Mark conflict as resolved"
         onClick={() => stage([file.path])}
-      >
-        Mark as resolved
-      </button>
+      />
 
       {match(file.unstaged)
         .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => (
-          <button
-            type="button"
+          <IconButton
+            Icon={TrashIcon}
+            variant="neutral"
+            size="sm"
             aria-label="Delete file"
             onClick={() => remove([file.path])}
-          >
-            Delete file
-          </button>
+          />
         ))
         .otherwise(() => undefined)}
     </div>
