@@ -11,21 +11,21 @@ import {
   useState,
 } from 'react'
 
-import type { BranchName, CommitId } from '@api/models'
+import { clamp } from '@utils/number'
+
+export const SCROLL_SPEED = 2.5
 
 type ElementId = string
 
 interface Element {
   ref: RefObject<HTMLElement>
-  commitId: CommitId
-  branch: BranchName
   parent: ElementId | undefined
 }
 
 interface SvgOverlayState {
-  elements: Map<CommitId, Element>
-  registerElement: (id: CommitId, element: Element) => void
-  unregisterElement: (id: CommitId) => void
+  elements: Map<ElementId, Element>
+  registerElement: (id: ElementId, element: Element) => void
+  unregisterElement: (id: ElementId) => void
   svgRef: RefObject<SVGSVGElement>
   componentRef: RefObject<HTMLDivElement>
   refresh: () => void
@@ -48,11 +48,11 @@ interface SvgOverlayContextProviderProps extends PropsWithChildren {}
 
 const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
   const { children } = props
-  const [elements, setElements] = useState<Map<string, Element>>(new Map())
+  const [elements, setElements] = useState<Map<ElementId, Element>>(new Map())
   const svgRef = useRef<SVGSVGElement>(null)
   const componentRef = useRef<HTMLDivElement>(null)
 
-  const registerElement = useCallback((id: string, element: Element) => {
+  const registerElement = useCallback((id: ElementId, element: Element) => {
     setElements((prevElements) => {
       const newElements = new Map(prevElements)
       newElements.set(id, element)
@@ -60,7 +60,7 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
     })
   }, [])
 
-  const unregisterElement = useCallback((id: string) => {
+  const unregisterElement = useCallback((id: ElementId) => {
     setElements((prevElements) => {
       const newElements = new Map(prevElements)
       newElements.delete(id)
@@ -84,19 +84,32 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
         painting.current = true
         requestAnimationFrame(() => {
           if (componentRef.current) {
-            componentRef.current.scrollLeft += dx
-            componentRef.current.scrollTop += dy
+            componentRef.current.scrollLeft = clamp(
+              componentRef.current.scrollLeft + dx,
+              0,
+              componentRef.current.scrollWidth -
+                componentRef.current.clientWidth,
+            )
+            componentRef.current.scrollTop = clamp(
+              componentRef.current.scrollTop + dy,
+              0,
+              componentRef.current.scrollHeight -
+                componentRef.current.clientHeight,
+            )
 
             syncSvg()
           }
-          painting.current = false
+
+          setTimeout(() => {
+            painting.current = false
+          }, 1000 / 60)
         })
       }
     },
     [syncSvg],
   )
 
-  const [n, rerender] = useReducer((n) => n + 1, 0)
+  const [refresherDep, rerender] = useReducer((n) => n + 1, 0)
   const refresh = useCallback(() => {
     syncSvg()
     rerender()
@@ -106,7 +119,7 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
   useEffect(() => {
     const scroll = (_event: Event) => {
       const event = _event as WheelEvent
-      pan(event.deltaX * 2, event.deltaY * 2)
+      pan(event.deltaX * SCROLL_SPEED, event.deltaY * SCROLL_SPEED)
       event.preventDefault()
       event.stopPropagation()
     }
@@ -136,7 +149,7 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
       componentRef,
       refresh,
     }
-  }, [n, elements, registerElement, unregisterElement])
+  }, [refresherDep, elements, registerElement, unregisterElement])
 
   return (
     <SvgOverlayContext.Provider value={contextValue}>

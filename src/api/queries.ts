@@ -27,7 +27,7 @@ const queryKeys = {
           ...queryKeys.directory.current(path),
           key: 'branches',
         }) as const,
-      branch: (path: string, branch: BranchName) =>
+      branch: (path: string, branch: BranchName | undefined) =>
         ({
           ...queryKeys.directory.branches.all(path),
           branch: branch,
@@ -39,7 +39,7 @@ const queryKeys = {
           ...queryKeys.directory.current(path),
           key: 'commit_history',
         }) as const,
-      branch: (path: string, branch: BranchName) =>
+      branch: (path: string, branch: BranchName | undefined) =>
         ({
           ...queryKeys.directory.branches.branch(path, branch),
           ...queryKeys.directory.commitHistory.all(path),
@@ -125,10 +125,12 @@ const fetchCommitHistory = (
     limit: PAGE_SIZE,
   })
 
-const commitHistoryQuery = (path: string, branch: BranchName) =>
+const commitHistoryQuery = (path: string, branch: BranchName | undefined) =>
   infiniteQueryOptions({
     queryKey: [queryKeys.directory.commitHistory.branch(path, branch)],
-    queryFn: ({ pageParam }) => fetchCommitHistory(branch, pageParam),
+    queryFn: branch
+      ? ({ pageParam }) => fetchCommitHistory(branch, pageParam)
+      : skipToken,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _, lastPageParam) =>
       lastPage.length === PAGE_SIZE ? lastPageParam + 1 : undefined,

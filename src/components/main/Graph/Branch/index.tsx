@@ -1,101 +1,81 @@
 import { PlusIcon } from '@radix-ui/react-icons'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { useMemo } from 'react'
 
 import type { BranchName, CommitId } from '@api/models'
 import { PAGE_SIZE, commitHistoryQuery } from '@api/queries'
 import { Button } from '@lib/Button'
-import { last, range } from '@utils/array'
+import type { Virtualizer } from '@tanstack/react-virtual'
 import { GraphCommit } from '../Commit'
 
+const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
+  `commit_${commitId}_${branch}`
+
 interface GraphBranchProps {
+  virtualizer: Virtualizer<HTMLDivElement, Element>
   path: string
   branch: BranchName
+  isBase?: boolean // ToDo: tidier?
   stopAt?: { branch: BranchName; commit: CommitId }
 }
 
 const GraphBranch = (props: GraphBranchProps) => {
-  const { path, branch, stopAt } = props
+  const { virtualizer, path, branch, isBase, stopAt } = props
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
 
-  const pagination = useMemo(() => {
-    if (history.data?.pages) {
-      for (let i = 0; i < history.data.pages.length; i++) {
-        for (let j = 0; j < history.data.pages[i].length; j++) {
-          if (history.data.pages[i][j] === stopAt?.commit) {
-            return {
-              lastPageIndex: i,
-              pageIndexes: range(i + 1),
-              commitIndexes: range(PAGE_SIZE),
-              lastCommitIndexes: range(j),
-              stopped: true,
-            }
-          }
-        }
-      }
-
-      return {
-        lastPageIndex: history.data.pages.length - 1,
-        pageIndexes: range(history.data.pages.length),
-        commitIndexes: range(PAGE_SIZE),
-        lastCommitIndexes: range(last(history.data.pages).length),
-        stopped: false,
-      }
-    }
-
-    return {
-      lastPageIndex: undefined,
-      pageIndexes: [],
-      commitIndexes: [],
-      lastCommitIndexes: [],
-      stopped: false,
-    }
-  }, [history.data?.pages, stopAt])
-
   return (
-    <div className={clsx('flex flex-col gap-12 p-6')}>
+    <>
       {history.data ? (
-        pagination.pageIndexes.map((pageIndex) =>
-          (pageIndex === pagination.lastPageIndex
-            ? pagination.lastCommitIndexes
-            : pagination.commitIndexes
-          ).map((commitIndex) => {
-            const commit: CommitId = history.data.pages[pageIndex][commitIndex]
-            const nextCommit: CommitId | undefined =
-              history.data.pages[pageIndex][commitIndex + 1] ??
-              history.data.pages[pageIndex + 1]?.[0]
+        virtualizer.getVirtualItems().map((virtualRow) => {
+          const pageIndex = Math.floor(virtualRow.index / PAGE_SIZE)
+          const itemIndex = virtualRow.index % PAGE_SIZE
 
-            const nextBranch = nextCommit
-              ? stopAt && nextCommit === stopAt.commit
-                ? stopAt.branch
-                : branch
-              : undefined
+          const commit: CommitId | undefined =
+            history.data.pages[pageIndex]?.[itemIndex]
+          const nextCommit: CommitId | undefined =
+            history.data.pages[pageIndex]?.[itemIndex + 1] ??
+            history.data.pages[pageIndex + 1]?.[0]
+          const nextBranch: BranchName | undefined = nextCommit
+            ? stopAt && nextCommit === stopAt.commit
+              ? stopAt.branch
+              : branch
+            : undefined
 
-            return (
-              <GraphCommit
-                key={commit}
-                path={path}
-                commitId={commit}
-                branch={branch}
-                parentCommitId={nextCommit}
-                parentBranch={nextBranch}
-              />
-            )
-          }),
-        )
+          return commit ? (
+            <GraphCommit
+              key={virtualRow.index}
+              path={path}
+              commitId={commit}
+              elementId={COMMIT_ELEMENT_ID(commit, branch)}
+              parentId={
+                nextCommit && nextBranch
+                  ? COMMIT_ELEMENT_ID(nextCommit, nextBranch)
+                  : undefined
+              }
+              className={clsx(
+                'absolute top-0',
+                isBase ? 'left-half' : 'left-0',
+              )}
+              style={{
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            />
+          ) : undefined
+        })
       ) : (
         <p>
-          {history.isFetching
-            ? 'Loading branch history...'
-            : 'No commits found'}
+          history.isFetching ? 'Loading branch history...' : 'No commits found'
         </p>
       )}
-      {!pagination.stopped && history.hasNextPage && (
+
+      {history.hasNextPage && (
         <Button
           type="button"
           variant="neutral"
-          className={clsx('self-center')}
+          className={clsx(
+            'absolute top-full translate-full',
+            isBase ? 'left-half' : 'left-0',
+          )}
           rounded
           aria-label="Load more commits for this branch"
           disabled={history.isFetchingNextPage || !history.hasNextPage}
@@ -106,7 +86,7 @@ const GraphBranch = (props: GraphBranchProps) => {
           <PlusIcon />
         </Button>
       )}
-    </div>
+    </>
   )
 }
 

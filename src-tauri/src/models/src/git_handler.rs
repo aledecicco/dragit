@@ -32,7 +32,7 @@ pub trait GitHandler {
     ) -> Result<Vec<String>, GitError>;
 
     /// Returns information about the given commit.
-    fn get_commit_info(&self, commit: &str) -> Result<CommitInfo, GitError>;
+    fn get_commit_info(&self, reference: &str) -> Result<CommitInfo, GitError>;
 
     /// Returns information about the current state of the HEAD.
     fn get_head_info(&self) -> Result<HeadInfo, GitError>;

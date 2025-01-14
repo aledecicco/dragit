@@ -1,27 +1,24 @@
 import clsx from 'clsx'
-import type { PropsWithChildren } from 'react'
+import type { HTMLProps } from 'react'
 
 import { SvgOverlayContextProvider, useSvgOverlay } from './context'
-import { makeTracked } from './utils'
+import {
+  BEGIN_PATH,
+  CURVE_DOWN_RIGHT,
+  CURVE_RIGHT_DOWN,
+  CURVE_RIGHT_UP,
+  CURVE_SIZE,
+  CURVE_UP_RIGHT,
+  EDGE_OFFSET,
+  HALF_LINE_RIGHT,
+  LINE_DOWN,
+  LINE_RIGHT,
+  LINE_UP,
+  getPosition,
+  makeTracked,
+} from './utils'
 
-const EDGE_OFFSET = 8
-const CURVE_SIZE = 22
-const CURVE_HANDLES_OFFSET = 15
-
-const BEGIN_PATH = (X_FROM: number, Y_FROM: number) => `M ${X_FROM} ${Y_FROM}`
-const CURVE_DOWN_RIGHT = `c 0 ${CURVE_HANDLES_OFFSET}, ${CURVE_SIZE - CURVE_HANDLES_OFFSET} ${CURVE_SIZE}, ${CURVE_SIZE} ${CURVE_SIZE}`
-const CURVE_RIGHT_UP = `c ${CURVE_HANDLES_OFFSET} 0, ${CURVE_SIZE} ${-(CURVE_SIZE - CURVE_HANDLES_OFFSET)}, ${CURVE_SIZE} ${-CURVE_SIZE}`
-const CURVE_RIGHT_DOWN = `c ${CURVE_HANDLES_OFFSET} 0, ${CURVE_SIZE} ${CURVE_SIZE - CURVE_HANDLES_OFFSET}, ${CURVE_SIZE} ${CURVE_SIZE}`
-const CURVE_UP_RIGHT = `c 0 ${-CURVE_HANDLES_OFFSET}, ${CURVE_SIZE - CURVE_HANDLES_OFFSET} ${-CURVE_SIZE}, ${CURVE_SIZE} ${-CURVE_SIZE}`
-const LINE_UP = (Y_FROM: number, Y_TO: number) => `l 0 ${Y_TO - Y_FROM}`
-const LINE_DOWN = (Y_FROM: number, Y_TO: number) =>
-  `l 0 ${Y_TO - Y_FROM - 4 * CURVE_SIZE}`
-const LINE_RIGHT = (X_FROM: number, X_TO: number) =>
-  `l ${X_TO - X_FROM - CURVE_SIZE * 2} 0`
-const HALF_LINE_RIGHT = (X_FROM: number, X_TO: number) =>
-  `l ${(X_TO - X_FROM) / 2 - CURVE_SIZE * 2} 0`
-
-interface SvgOverlayProps extends PropsWithChildren {}
+interface SvgOverlayProps extends HTMLProps<HTMLDivElement> {}
 
 const SvgOverlay = (props: SvgOverlayProps) => {
   return (
@@ -32,11 +29,17 @@ const SvgOverlay = (props: SvgOverlayProps) => {
 }
 
 const SvgOverlayInner = (props: SvgOverlayProps) => {
-  const { children } = props
+  const { children, ...divProps } = props
   const svgOverlay = useSvgOverlay()
 
   return (
-    <div className={clsx('relative w-full h-full overflow-hidden')}>
+    <div
+      {...divProps}
+      className={clsx(
+        'relative w-full h-full overflow-hidden',
+        divProps.className,
+      )}
+    >
       {children}
       <svg
         ref={svgOverlay.svgRef}
@@ -52,20 +55,23 @@ const SvgOverlayInner = (props: SvgOverlayProps) => {
             const parentElem = svgOverlay.elements.get(elem.parent)
 
             if (parentElem?.ref?.current) {
-              const elemRef = elem.ref.current
-              const parentRef = parentElem.ref.current
+              const elemSize = elem.ref.current.clientHeight
+              const parentSize = parentElem.ref.current.clientHeight
+              const elemPos = getPosition(elem)
+              const parentPos = getPosition(parentElem)
 
               const [elemX, elemY] = [
-                elemRef.offsetLeft + elemRef.clientWidth / 2,
-                elemRef.offsetTop + elemRef.clientHeight + EDGE_OFFSET,
+                elemPos.x + elemSize / 2,
+                elemPos.y + elemSize + EDGE_OFFSET,
               ]
               const [parentX, parentY] = [
-                parentRef.offsetLeft + parentRef.clientWidth / 2,
-                parentRef.offsetTop - EDGE_OFFSET,
+                parentPos.x + parentSize / 2,
+                parentPos.y - EDGE_OFFSET,
               ]
 
               const parentIsAbove = parentY <= elemY + CURVE_SIZE // The top of the parent is above the bottom of the element
               const parentIsLevel = Math.abs(parentY - elemY) <= CURVE_SIZE * 3 // The top of the parent is aligned with the bottom of the element
+              const parentIsAligned = parentX === elemX // The parent is directly below the element
 
               return (
                 <path
@@ -73,7 +79,7 @@ const SvgOverlayInner = (props: SvgOverlayProps) => {
                   className={clsx('fill-none stroke-primary-800 stroke-4')}
                   d={[
                     BEGIN_PATH(elemX, elemY),
-                    ...(parentElem.branch === elem.branch
+                    ...(parentIsAligned
                       ? [`L ${parentX} ${parentY}`]
                       : [
                           CURVE_DOWN_RIGHT,

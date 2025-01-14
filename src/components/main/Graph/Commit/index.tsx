@@ -1,32 +1,38 @@
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { forwardRef } from 'react'
+import type { HTMLProps } from 'react'
 
 import type { CommitId, CommitInfo } from '@api/models'
 import { commitInfoQuery } from '@api/queries'
 import { Tooltip } from '@lib/Tooltip'
 import { makeTracked } from '@main/SvgOverlay'
+import type { TrackRefProps } from '@main/SvgOverlay/utils'
 
-type GraphCommitProps = {
+export const NODE_SIZE = 20
+
+interface GraphCommitProps extends HTMLProps<HTMLDivElement> {
   path: string
   commitId: CommitId
 }
 
 const GraphCommit = makeTracked(
-  forwardRef<HTMLDivElement, GraphCommitProps>((props, ref) => {
-    const { path, commitId } = props
+  (props: GraphCommitProps & TrackRefProps<HTMLDivElement>) => {
+    const { path, commitId, trackRef, ...divProps } = props
     const commitInfo = useQuery(commitInfoQuery(path, commitId))
 
     return (
       <Tooltip content={<GraphCommitInfo commitInfo={commitInfo.data} />}>
         <div
+          {...divProps}
+          ref={trackRef}
           className={clsx(
-            'flex flex-row items-center p-2 gap-5 cursor-pointer',
+            'flex flex-row items-center gap-5 cursor-pointer',
+            divProps.className,
           )}
         >
           <div
-            className={clsx('bg-primary rounded-full w-5 h-5 shadow-md')}
-            ref={ref}
+            className={clsx('bg-primary rounded-full shadow-md')}
+            style={{ width: NODE_SIZE, height: NODE_SIZE }}
           />
           <div>
             <p className={clsx('text-xs')}>
@@ -36,7 +42,7 @@ const GraphCommit = makeTracked(
         </div>
       </Tooltip>
     )
-  }),
+  },
 )
 
 const GraphCommitInfo = (props: { commitInfo?: CommitInfo }) => {

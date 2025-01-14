@@ -92,6 +92,8 @@
   --color-success-900: #054f3b;
   --color-success-950: #022c22;
   --color-success: var(--color-success-300);
+
+  --spacing-half: 50%;
 }
 
 :root {
