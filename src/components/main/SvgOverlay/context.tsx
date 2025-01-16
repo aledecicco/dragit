@@ -163,4 +163,5 @@ export {
   useSvgOverlay,
   type Element,
   type ElementId,
+  type SvgOverlayState,
 }

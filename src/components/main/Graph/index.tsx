@@ -11,9 +11,9 @@ import {
 } from '@api/queries'
 import { SelectInput } from '@lib/SelectInput'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
-import { CURVE_SIZE, EDGE_OFFSET } from '@main/SvgOverlay/utils'
 import { GraphBranch } from './Branch'
 import { NODE_SIZE } from './Commit'
+import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
 
 interface GraphProps {
   path: string
@@ -49,7 +49,7 @@ const Graph = (props: GraphProps) => {
           onValueChange={setBaseBranch}
         />
 
-        <SvgOverlay className={clsx('grid col-span-2')}>
+        <SvgOverlay className={clsx('grid col-span-2')} RenderOverlay={Edges}>
           <GraphInner {...props} branch={branch} baseBranch={baseBranch} />
         </SvgOverlay>
       </div>

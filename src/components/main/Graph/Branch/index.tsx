@@ -64,7 +64,9 @@ const GraphBranch = (props: GraphBranchProps) => {
         })
       ) : (
         <p>
-          history.isFetching ? 'Loading branch history...' : 'No commits found'
+          {history.isFetching
+            ? 'Loading branch history...'
+            : 'No commits found'}
         </p>
       )}
 
