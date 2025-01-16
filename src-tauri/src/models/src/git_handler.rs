@@ -1,4 +1,4 @@
-use crate::{error::GitError, CommitInfo, HeadInfo};
+use crate::{error::GitError, AncestorInfo, CommitInfo, HeadInfo};
 
 /// Abstraction for common operations that a git implementation needs to support.
 pub trait GitHandler {
@@ -54,5 +54,5 @@ pub trait GitHandler {
         &self,
         branch_a: &str,
         branch_b: &str,
-    ) -> Result<Option<String>, GitError>;
+    ) -> Result<Option<AncestorInfo>, GitError>;
 }

@@ -2,13 +2,15 @@ import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import type { HTMLProps } from 'react'
 
-import type { CommitId, CommitInfo } from '@api/models'
+import type { BranchName, CommitId, CommitInfo } from '@api/models'
 import { commitInfoQuery } from '@api/queries'
 import { Tooltip } from '@lib/Tooltip'
 import { makeTracked } from '@main/SvgOverlay'
 import type { TrackRefProps } from '@main/SvgOverlay/utils'
 
 export const NODE_SIZE = 20
+export const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
+  `commit_${commitId}_${branch}`
 
 interface GraphCommitProps extends HTMLProps<HTMLDivElement> {
   path: string

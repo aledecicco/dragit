@@ -1,12 +1,12 @@
 use std::{
-    collections::HashSet,
+    collections::{HashMap, HashSet},
     io::{self, ErrorKind},
     path::Path,
     process::{Command, ExitStatus, Output},
     string::FromUtf8Error,
 };
 
-use models::{CommitInfo, GitError, GitHandler, HeadInfo};
+use models::{AncestorInfo, CommitInfo, GitError, GitHandler, HeadInfo};
 
 use crate::{parse_commit_info, parse_head_info, COMMIT_INFO_FORMAT};
 
@@ -126,13 +126,13 @@ impl GitHandler for CmdGit {
     ) -> Result<Vec<String>, GitError> {
         let page_arg = start_after.to_string();
         let page_size_arg = limit.to_string();
-        let branch_arg = branch.to_string() + "~" + &page_arg;
+        let branchrg = branch.to_string() + "~" + &page_arg;
 
         command_output(
             &self.get_path()?,
             [
                 "rev-list",
-                &branch_arg,
+                &branchrg,
                 "-n",
                 &page_size_arg,
                 "--first-parent",
@@ -203,9 +203,9 @@ impl GitHandler for CmdGit {
 
     fn get_common_ancestor(
         &self,
-        branch_a: &str,
-        branch_b: &str,
-    ) -> Result<Option<String>, GitError> {
+        branch: &str,
+        base_branch: &str,
+    ) -> Result<Option<AncestorInfo>, GitError> {
         let parse_ref = |reference: &str, back: u64| -> Result<Option<String>, GitError> {
             command_output(
                 &self.get_path()?,
@@ -215,36 +215,49 @@ impl GitHandler for CmdGit {
             .map(|output| {
                 self.get_output_string(output)
                     .map_err(|_| GitError::GetCommonAncestorFailed {
-                        branch_a: branch_a.to_string(),
-                        branch_b: branch_b.to_string(),
+                        branch: branch.to_string(),
+                        base_branch: base_branch.to_string(),
                     })
             })
             .transpose()
         };
 
-        let mut ancestors_a = HashSet::new();
-        let mut ancestors_b = HashSet::new();
+        let mut branch_distance = 0;
+        let mut base_distance = 0;
 
-        let mut commit_a = parse_ref(branch_a, 0)?;
-        let mut commit_b = parse_ref(branch_b, 0)?;
+        let mut branch_ancestors: HashMap<String, u64> = HashMap::new();
+        let mut base_ancestors: HashMap<String, u64> = HashMap::new();
+
+        let mut branch_commit = parse_ref(branch, 0)?;
+        let mut base_commit = parse_ref(base_branch, 0)?;
 
         loop {
-            if let Some(hash_a) = commit_a {
-                if ancestors_b.contains(&hash_a) {
-                    return Ok(Some(hash_a));
+            if let Some(branch_hash) = branch_commit {
+                if let Some(base_distance) = base_ancestors.get(&branch_hash) {
+                    return Ok(Some(AncestorInfo {
+                        commit: branch_hash,
+                        branch_distance: branch_distance - 1,
+                        base_distance: *base_distance,
+                    }));
                 }
 
-                ancestors_a.insert(hash_a.to_owned());
-                commit_a = parse_ref(&hash_a, 1)?;
+                branch_ancestors.insert(branch_hash.to_owned(), branch_distance);
+                branch_commit = parse_ref(&branch_hash, 1)?;
+                branch_distance += 1;
             }
 
-            if let Some(hash_b) = commit_b {
-                if ancestors_a.contains(&hash_b) {
-                    return Ok(Some(hash_b));
+            if let Some(base_hash) = base_commit {
+                if let Some(branch_distance) = branch_ancestors.get(&base_hash) {
+                    return Ok(Some(AncestorInfo {
+                        commit: base_hash,
+                        branch_distance: *branch_distance - 1,
+                        base_distance: base_distance,
+                    }));
                 }
 
-                ancestors_b.insert(hash_b.to_owned());
-                commit_b = parse_ref(&hash_b, 1)?;
+                base_ancestors.insert(base_hash.to_owned(), base_distance);
+                base_commit = parse_ref(&base_hash, 1)?;
+                base_distance += 1;
             }
         }
     }

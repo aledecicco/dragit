@@ -10,6 +10,12 @@ export type CommitInfo = {
   message: string | null
 }
 
+export type AncestorInfo = {
+  commit: CommitId
+  branchDistance: number
+  baseDistance: number
+}
+
 export type HeadInfo = {
   status: HeadStatus
   files: FileInfo[]

@@ -5,7 +5,13 @@ import {
 } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { BranchName, CommitId, CommitInfo, HeadInfo } from './models'
+import type {
+  AncestorInfo,
+  BranchName,
+  CommitId,
+  CommitInfo,
+  HeadInfo,
+} from './models'
 
 const queryKeys = {
   currentDir: ['current_dir'] as const,
@@ -71,11 +77,11 @@ const queryKeys = {
       pair: (
         path: string,
         branch: BranchName | undefined,
-        otherBranch: BranchName | undefined,
+        baseBranch: BranchName | undefined,
       ) =>
         ({
           ...queryKeys.directory.commonAncestor.branch(path, branch),
-          otherBranch: otherBranch,
+          baseBranch: baseBranch,
         }) as const,
     },
   },
@@ -146,21 +152,23 @@ const commitInfoQuery = (path: string, commitId: CommitId) =>
   })
 
 const fetchCommonAncestor = (
-  branchA: BranchName,
-  branchB: BranchName,
-): Promise<CommitId | undefined> =>
-  invoke('get_common_ancestor', { branchA: branchA, branchB: branchB })
+  branch: BranchName,
+  baseBranch: BranchName,
+): Promise<AncestorInfo | undefined> =>
+  invoke('get_common_ancestor', { branch: branch, baseBranch: baseBranch })
 
 const commonAncestorQuery = (
   path: string,
-  branchA: BranchName | undefined,
-  branchB: BranchName | undefined,
+  branch: BranchName | undefined,
+  baseBranch: BranchName | undefined,
 ) =>
   queryOptions({
-    queryKey: [queryKeys.directory.commonAncestor.pair(path, branchA, branchB)],
+    queryKey: [
+      queryKeys.directory.commonAncestor.pair(path, branch, baseBranch),
+    ],
     queryFn:
-      branchA && branchB
-        ? () => fetchCommonAncestor(branchA, branchB)
+      branch && baseBranch
+        ? () => fetchCommonAncestor(branch, baseBranch)
         : skipToken,
   })
 

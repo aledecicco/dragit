@@ -1,6 +1,8 @@
 use tauri::{AppHandle, Emitter, Manager, State};
 
-use models::{AppError, AppEvent, AppState, CommitInfo, GitError, HeadInfo, SafeHandler};
+use models::{
+    AncestorInfo, AppError, AppEvent, AppState, CommitInfo, GitError, HeadInfo, SafeHandler,
+};
 
 fn with_handler<T>(
     state: &State<AppState>,
@@ -131,8 +133,8 @@ pub async fn commit_index(state: State<'_, AppState>, message: &str) -> Result<(
 #[tauri::command]
 pub async fn get_common_ancestor(
     state: State<'_, AppState>,
-    branch_a: &str,
-    branch_b: &str,
-) -> Result<Option<String>, AppError> {
-    with_handler(&state, &|h| h.get_common_ancestor(branch_a, branch_b))
+    branch: &str,
+    base_branch: &str,
+) -> Result<Option<AncestorInfo>, AppError> {
+    with_handler(&state, &|h| h.get_common_ancestor(branch, base_branch))
 }

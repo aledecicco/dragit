@@ -122,3 +122,11 @@ pub struct HeadInfo {
     pub status: HeadStatus,
     pub files: Vec<FileInfo>,
 }
+
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
+pub struct AncestorInfo {
+    pub commit: String,
+    pub branch_distance: u64,
+    pub base_distance: u64,
+}

@@ -11,6 +11,7 @@ import {
 } from '@api/queries'
 import { SelectInput } from '@lib/SelectInput'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
+import { GraphBaseBranch } from './BaseBranch'
 import { GraphBranch } from './Branch'
 import { NODE_SIZE } from './Commit'
 import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
@@ -78,18 +79,19 @@ const GraphInner = (props: GraphInnerProps) => {
     commitHistoryQuery(path, baseBranch),
   )
 
+  const branchLength = Math.min(
+    ancestor.data?.branchDistance ?? Number.POSITIVE_INFINITY,
+    branchHistory.data?.pages.reduce((sum, page) => sum + page.length, 0) ?? 0,
+  )
+  const baseLength =
+    baseBranchHistory.data?.pages.reduce((sum, page) => sum + page.length, 0) ??
+    0
+
   const virtualizer = useVirtualizer({
     estimateSize: () => NODE_SIZE,
     gap: CURVE_SIZE * 2 + EDGE_OFFSET * 2,
     getScrollElement: () => svgOverlay.componentRef.current,
-    count: Math.max(
-      branchHistory.data?.pages.reduce((sum, page) => sum + page.length, 0) ??
-        0,
-      baseBranchHistory.data?.pages.reduce(
-        (sum, page) => sum + page.length,
-        0,
-      ) ?? 0,
-    ),
+    count: Math.max(branchLength, baseLength),
   })
 
   return (
@@ -106,22 +108,18 @@ const GraphInner = (props: GraphInnerProps) => {
             virtualizer={virtualizer}
             path={path}
             branch={branch}
-            stopAt={
-              baseBranch && ancestor.data
-                ? { branch: baseBranch, commit: ancestor.data }
-                : undefined
-            }
+            baseBranch={baseBranch}
+            commonAncestor={ancestor.data}
           />
         ) : (
           <p>No branch selected</p>
         )}
 
         {baseBranch ? (
-          <GraphBranch
+          <GraphBaseBranch
             virtualizer={virtualizer}
             path={path}
             branch={baseBranch}
-            isBase
           />
         ) : (
           <p>No branch selected</p>
