@@ -225,9 +225,12 @@ impl GitHandler for CmdGit {
         let mut branch_distance = 0;
         let mut base_distance = 0;
 
-        let mut branch_ancestors: HashMap<String, u64> = HashMap::new();
+        // For each commit, keep track of the depth it was found at, and the immediate next commit.
+        let mut branch_ancestors: HashMap<String, (u64, Option<String>)> = HashMap::new();
+        // For each commit, keep track of the depth it was found at.
         let mut base_ancestors: HashMap<String, u64> = HashMap::new();
 
+        let mut prev_branch_commit = None;
         let mut branch_commit = parse_ref(branch, 0)?;
         let mut base_commit = parse_ref(base_branch, 0)?;
 
@@ -235,21 +238,29 @@ impl GitHandler for CmdGit {
             if let Some(branch_hash) = branch_commit {
                 if let Some(base_distance) = base_ancestors.get(&branch_hash) {
                     return Ok(Some(AncestorInfo {
-                        commit: branch_hash,
+                        common_commit: branch_hash,
+                        last_commit: prev_branch_commit,
                         branch_distance: branch_distance - 1,
                         base_distance: *base_distance,
                     }));
                 }
 
-                branch_ancestors.insert(branch_hash.to_owned(), branch_distance);
+                branch_ancestors.insert(
+                    branch_hash.to_owned(),
+                    (branch_distance, prev_branch_commit),
+                );
+                prev_branch_commit = Some(branch_hash.to_owned());
                 branch_commit = parse_ref(&branch_hash, 1)?;
                 branch_distance += 1;
             }
 
             if let Some(base_hash) = base_commit {
-                if let Some(branch_distance) = branch_ancestors.get(&base_hash) {
+                if let Some((branch_distance, prev_branch_commit)) =
+                    branch_ancestors.get(&base_hash)
+                {
                     return Ok(Some(AncestorInfo {
-                        commit: base_hash,
+                        common_commit: base_hash,
+                        last_commit: prev_branch_commit.to_owned(),
                         branch_distance: *branch_distance - 1,
                         base_distance: base_distance,
                     }));

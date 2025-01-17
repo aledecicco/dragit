@@ -126,7 +126,8 @@ pub struct HeadInfo {
 #[derive(serde::Serialize, Debug, Clone)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct AncestorInfo {
-    pub commit: String,
+    pub last_commit: Option<String>,
+    pub common_commit: String,
     pub branch_distance: u64,
     pub base_distance: u64,
 }

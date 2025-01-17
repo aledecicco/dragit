@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 
@@ -92,15 +92,6 @@ const GraphInner = (props: GraphInnerProps) => {
     gap: CURVE_SIZE * 2 + EDGE_OFFSET * 2,
     getScrollElement: () => svgOverlay.componentRef.current,
     count: Math.max(branchLength, baseLength),
-    rangeExtractor: (range) => {
-      const indexes = new Set(defaultRangeExtractor(range))
-      if (ancestor.data) {
-        indexes.add(ancestor.data.branchDistance)
-        indexes.add(ancestor.data.baseDistance)
-      }
-
-      return [...indexes].sort((a, b) => a - b)
-    },
   })
 
   return (
@@ -118,7 +109,7 @@ const GraphInner = (props: GraphInnerProps) => {
             path={path}
             branch={branch}
             baseBranch={baseBranch}
-            commonAncestor={ancestor.data}
+            ancestorInfo={ancestor.data}
           />
         ) : (
           <p>No branch selected</p>
@@ -129,6 +120,7 @@ const GraphInner = (props: GraphInnerProps) => {
             virtualizer={virtualizer}
             path={path}
             branch={baseBranch}
+            ancestorInfo={ancestor.data}
           />
         ) : (
           <p>No branch selected</p>

@@ -11,7 +11,8 @@ export type CommitInfo = {
 }
 
 export type AncestorInfo = {
-  commit: CommitId
+  commonCommit: CommitId
+  lastCommit: CommitId | undefined
   branchDistance: number
   baseDistance: number
 }

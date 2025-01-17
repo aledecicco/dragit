@@ -16,41 +16,50 @@ interface GraphBranchProps {
   path: string
   branch: BranchName
   baseBranch: BranchName | undefined
-  commonAncestor: AncestorInfo | undefined
+  ancestorInfo: AncestorInfo | undefined
 }
 
 const GraphBranch = (props: GraphBranchProps) => {
-  const { virtualizer, path, branch, baseBranch, commonAncestor } = props
+  const { virtualizer, path, branch, baseBranch, ancestorInfo } = props
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
+
+  const lastCommitNotInRange =
+    ancestorInfo &&
+    virtualizer.range &&
+    (virtualizer.range.startIndex - virtualizer.options.overscan >
+      ancestorInfo.branchDistance ||
+      virtualizer.range.endIndex + virtualizer.options.overscan <
+        ancestorInfo.branchDistance)
 
   return (
     <>
       {history.data ? (
         virtualizer.getVirtualItems().map((virtualRow) => {
-          if (
-            commonAncestor &&
-            virtualRow?.index > commonAncestor.branchDistance
-          ) {
+          if (ancestorInfo && virtualRow.index > ancestorInfo.branchDistance) {
             return
           }
 
-          const pageIndex = Math.floor(virtualRow?.index / PAGE_SIZE)
-          const itemIndex = virtualRow?.index % PAGE_SIZE
+          const pageIndex = Math.floor(virtualRow.index / PAGE_SIZE)
+          const itemIndex = virtualRow.index % PAGE_SIZE
 
           const commit: CommitId | undefined =
             history.data.pages[pageIndex]?.[itemIndex]
+
           const nextCommit: CommitId | undefined =
-            history.data.pages[pageIndex]?.[itemIndex + 1] ??
-            history.data.pages[pageIndex + 1]?.[0]
+            ancestorInfo && commit === ancestorInfo.lastCommit
+              ? ancestorInfo.commonCommit
+              : (history.data.pages[pageIndex]?.[itemIndex + 1] ??
+                history.data.pages[pageIndex + 1]?.[0])
+
           const nextBranch: BranchName | undefined = nextCommit
-            ? commonAncestor && nextCommit === commonAncestor.commit
+            ? ancestorInfo && nextCommit === ancestorInfo.commonCommit
               ? baseBranch
               : branch
             : undefined
 
           return commit ? (
             <GraphCommit
-              key={virtualRow?.index}
+              key={virtualRow.index}
               path={path}
               commitId={commit}
               elementId={COMMIT_ELEMENT_ID(commit, branch)}
@@ -61,7 +70,7 @@ const GraphBranch = (props: GraphBranchProps) => {
               }
               className={clsx('absolute top-0 left-0')}
               style={{
-                transform: `translateY(${virtualRow?.start}px)`,
+                transform: `translateY(${virtualRow.start}px)`,
               }}
             />
           ) : undefined
@@ -72,6 +81,20 @@ const GraphBranch = (props: GraphBranchProps) => {
             ? 'Loading branch history...'
             : 'No commits found'}
         </p>
+      )}
+
+      {lastCommitNotInRange && ancestorInfo.lastCommit && baseBranch && (
+        <GraphCommit
+          key={ancestorInfo.branchDistance}
+          path={path}
+          commitId={ancestorInfo.lastCommit}
+          elementId={COMMIT_ELEMENT_ID(ancestorInfo.lastCommit, branch)}
+          parentId={COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, baseBranch)}
+          className={clsx('absolute top-0 left-0')}
+          style={{
+            transform: `translateY(${(virtualizer.options.gap + virtualizer.options.estimateSize(ancestorInfo.branchDistance)) * ancestorInfo.branchDistance}px)`,
+          }}
+        />
       )}
 
       {history.hasNextPage && (

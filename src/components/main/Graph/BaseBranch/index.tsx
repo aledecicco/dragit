@@ -3,7 +3,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 
-import type { BranchName, CommitId } from '@api/models'
+import type { AncestorInfo, BranchName, CommitId } from '@api/models'
 import { PAGE_SIZE, commitHistoryQuery } from '@api/queries'
 import { Button } from '@lib/Button'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
@@ -12,18 +12,27 @@ interface GraphBaseBranchProps {
   virtualizer: Virtualizer<HTMLDivElement, Element>
   path: string
   branch: BranchName
+  ancestorInfo: AncestorInfo | undefined
 }
 
 const GraphBaseBranch = (props: GraphBaseBranchProps) => {
-  const { virtualizer, path, branch } = props
+  const { virtualizer, path, branch, ancestorInfo } = props
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
+
+  const ancestorNotInRange =
+    ancestorInfo &&
+    virtualizer.range &&
+    (virtualizer.range.startIndex - virtualizer.options.overscan >
+      ancestorInfo.baseDistance ||
+      virtualizer.range.endIndex + virtualizer.options.overscan <
+        ancestorInfo.baseDistance)
 
   return (
     <>
       {history.data ? (
         virtualizer.getVirtualItems().map((virtualRow) => {
-          const pageIndex = Math.floor(virtualRow?.index / PAGE_SIZE)
-          const itemIndex = virtualRow?.index % PAGE_SIZE
+          const pageIndex = Math.floor(virtualRow.index / PAGE_SIZE)
+          const itemIndex = virtualRow.index % PAGE_SIZE
 
           const commit: CommitId | undefined =
             history.data.pages[pageIndex]?.[itemIndex]
@@ -33,7 +42,7 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
 
           return commit ? (
             <GraphCommit
-              key={virtualRow?.index}
+              key={virtualRow.index}
               path={path}
               commitId={commit}
               elementId={COMMIT_ELEMENT_ID(commit, branch)}
@@ -42,7 +51,7 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
               }
               className={clsx('absolute top-0 left-half')}
               style={{
-                transform: `translateY(${virtualRow?.start}px)`,
+                transform: `translateY(${virtualRow.start}px)`,
               }}
             />
           ) : undefined
@@ -53,6 +62,20 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
             ? 'Loading branch history...'
             : 'No commits found'}
         </p>
+      )}
+
+      {ancestorNotInRange && (
+        <GraphCommit
+          key={ancestorInfo.baseDistance}
+          path={path}
+          commitId={ancestorInfo.commonCommit}
+          elementId={COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, branch)}
+          parentId={undefined}
+          className={clsx('absolute top-0 left-half')}
+          style={{
+            transform: `translateY(${(virtualizer.options.gap + virtualizer.options.estimateSize(ancestorInfo.baseDistance)) * ancestorInfo.baseDistance}px)`,
+          }}
+        />
       )}
 
       {history.hasNextPage && (
