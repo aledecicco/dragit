@@ -29,13 +29,13 @@ const GraphBranch = (props: GraphBranchProps) => {
         virtualizer.getVirtualItems().map((virtualRow) => {
           if (
             commonAncestor &&
-            virtualRow.index > commonAncestor.branchDistance
+            virtualRow?.index > commonAncestor.branchDistance
           ) {
             return
           }
 
-          const pageIndex = Math.floor(virtualRow.index / PAGE_SIZE)
-          const itemIndex = virtualRow.index % PAGE_SIZE
+          const pageIndex = Math.floor(virtualRow?.index / PAGE_SIZE)
+          const itemIndex = virtualRow?.index % PAGE_SIZE
 
           const commit: CommitId | undefined =
             history.data.pages[pageIndex]?.[itemIndex]
@@ -50,7 +50,7 @@ const GraphBranch = (props: GraphBranchProps) => {
 
           return commit ? (
             <GraphCommit
-              key={virtualRow.index}
+              key={virtualRow?.index}
               path={path}
               commitId={commit}
               elementId={COMMIT_ELEMENT_ID(commit, branch)}
@@ -61,7 +61,7 @@ const GraphBranch = (props: GraphBranchProps) => {
               }
               className={clsx('absolute top-0 left-0')}
               style={{
-                transform: `translateY(${virtualRow.start}px)`,
+                transform: `translateY(${virtualRow?.start}px)`,
               }}
             />
           ) : undefined
