@@ -28,7 +28,7 @@ const GraphBranch = (props: GraphBranchProps) => {
     virtualizer.range &&
     (virtualizer.range.startIndex - virtualizer.options.overscan >
       ancestorInfo.branchDistance ||
-      virtualizer.range.endIndex + virtualizer.options.overscan <
+      virtualizer.range.endIndex + virtualizer.options.overscan <=
         ancestorInfo.branchDistance)
 
   return (
