@@ -80,7 +80,7 @@ const GraphInner = (props: GraphInnerProps) => {
   )
 
   const branchLength = Math.min(
-    ancestor.data?.branchDistance ?? Number.POSITIVE_INFINITY,
+    (ancestor.data?.branchDistance ?? Number.POSITIVE_INFINITY) + 1,
     branchHistory.data?.pages.reduce((sum, page) => sum + page.length, 0) ?? 0,
   )
   const baseLength =
