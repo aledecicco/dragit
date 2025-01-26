@@ -56,7 +56,7 @@ const Edges = (props: EdgesProps) => {
         return (
           <path
             key={id}
-            className={clsx('fill-none stroke-primary-800 stroke-4')}
+            className={clsx('fill-none stroke-primary-700 stroke-4')}
             d={[
               BEGIN_PATH(elemX, elemY),
               ...(parentIsAligned
