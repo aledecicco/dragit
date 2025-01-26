@@ -19,18 +19,15 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
   const { virtualizer, path, branch, ancestorInfo } = props
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
 
+  const items = virtualizer.getVirtualItems()
   const ancestorNotInRange =
     ancestorInfo &&
-    virtualizer.range &&
-    (virtualizer.range.startIndex - virtualizer.options.overscan >
-      ancestorInfo.baseDistance ||
-      virtualizer.range.endIndex + virtualizer.options.overscan <
-        ancestorInfo.baseDistance)
+    !items.find((virtualRow) => virtualRow.index === ancestorInfo.baseDistance)
 
   return (
     <>
       {history.data ? (
-        virtualizer.getVirtualItems().map((virtualRow) => {
+        items.map((virtualRow) => {
           const pageIndex = Math.floor(virtualRow.index / PAGE_SIZE)
           const itemIndex = virtualRow.index % PAGE_SIZE
 

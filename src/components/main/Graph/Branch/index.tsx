@@ -23,18 +23,17 @@ const GraphBranch = (props: GraphBranchProps) => {
   const { virtualizer, path, branch, baseBranch, ancestorInfo } = props
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
 
-  const lastCommitNotInRange =
+  const items = virtualizer.getVirtualItems()
+  const ancestorNotInRange =
     ancestorInfo &&
-    virtualizer.range &&
-    (virtualizer.range.startIndex - virtualizer.options.overscan >
-      ancestorInfo.branchDistance ||
-      virtualizer.range.endIndex + virtualizer.options.overscan <=
-        ancestorInfo.branchDistance)
+    !items.find(
+      (virtualRow) => virtualRow.index === ancestorInfo.branchDistance,
+    )
 
   return (
     <>
       {history.data ? (
-        virtualizer.getVirtualItems().map((virtualRow) => {
+        items.map((virtualRow) => {
           if (ancestorInfo && virtualRow.index > ancestorInfo.branchDistance) {
             return
           }
@@ -83,7 +82,7 @@ const GraphBranch = (props: GraphBranchProps) => {
         </p>
       )}
 
-      {lastCommitNotInRange && ancestorInfo.lastCommit && baseBranch && (
+      {ancestorNotInRange && ancestorInfo.lastCommit && baseBranch && (
         <GraphCommit
           key={ancestorInfo.branchDistance}
           path={path}
