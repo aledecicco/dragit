@@ -1,14 +1,14 @@
 use std::{
-    collections::{HashMap, HashSet},
+    collections::HashMap,
     io::{self, ErrorKind},
     path::Path,
     process::{Command, ExitStatus, Output},
     string::FromUtf8Error,
 };
 
-use models::{AncestorInfo, CommitInfo, GitError, GitHandler, HeadInfo};
+use models::{AncestorInfo, CommitInfo, GitError, GitHandler, HeadInfo, HistoryItem};
 
-use crate::{parse_commit_info, parse_head_info, COMMIT_INFO_FORMAT};
+use crate::utils::*;
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
 pub struct CmdGit {
@@ -123,25 +123,37 @@ impl GitHandler for CmdGit {
         branch: &str,
         start_after: u8,
         limit: u8,
-    ) -> Result<Vec<String>, GitError> {
+    ) -> Result<Vec<HistoryItem>, GitError> {
         let page_arg = start_after.to_string();
         let page_size_arg = limit.to_string();
-        let branchrg = branch.to_string() + "~" + &page_arg;
+        let branch_arg = branch.to_string() + "~" + &page_arg;
 
         command_output(
             &self.get_path()?,
             [
                 "rev-list",
-                &branchrg,
+                &branch_arg,
                 "-n",
                 &page_size_arg,
                 "--first-parent",
+                "--parents",
             ],
         )
         .ok()
         .and_then(|output| self.get_output_lines(output).ok())
         .ok_or(GitError::GetReferenceHistoryFailed {
             reference: branch.to_string(),
+        })
+        .and_then(|lines| {
+            lines
+                .iter()
+                .map(parse_history_item)
+                .map(|item| {
+                    item.ok_or(GitError::GetReferenceHistoryFailed {
+                        reference: branch.to_string(),
+                    })
+                })
+                .collect()
         })
     }
 

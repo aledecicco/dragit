@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
 use models::{
-    ChangeStatus, CommitInfo, FileInfo, FileStatus, HeadInfo, HeadStatus, MergeStatus, MovedStatus,
-    StatusType,
+    ChangeStatus, CommitInfo, FileInfo, FileStatus, HeadInfo, HeadStatus, HistoryItem, MergeStatus,
+    MovedStatus, StatusType,
 };
 
 /// Format used to get the needed information about a commit, as a JSON-parseable string.
@@ -141,5 +141,16 @@ fn parse_file_info(line: &String) -> Option<FileInfo> {
                 status: FileStatus::Untracked {},
             }
         }
+    })
+}
+
+pub fn parse_history_item(line: &String) -> Option<HistoryItem> {
+    let mut commits = line.split_ascii_whitespace().map(String::from);
+    let hash = commits.next()?;
+    let parents = commits.skip(1).collect();
+
+    Some(HistoryItem {
+        hash: hash.to_string(),
+        other_parents: parents,
     })
 }

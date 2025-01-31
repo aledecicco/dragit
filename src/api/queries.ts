@@ -11,6 +11,7 @@ import type {
   CommitId,
   CommitInfo,
   HeadInfo,
+  HistoryItem,
 } from './models'
 
 const queryKeys = {
@@ -124,7 +125,7 @@ export const PAGE_SIZE = 10
 const fetchCommitHistory = (
   branch: BranchName,
   page: number,
-): Promise<CommitId[]> =>
+): Promise<HistoryItem[]> =>
   invoke('get_commit_history', {
     branch: branch,
     startAfter: page * PAGE_SIZE,

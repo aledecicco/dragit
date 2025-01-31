@@ -42,13 +42,13 @@ const GraphBranch = (props: GraphBranchProps) => {
           const itemIndex = virtualRow.index % PAGE_SIZE
 
           const commit: CommitId | undefined =
-            history.data.pages[pageIndex]?.[itemIndex]
+            history.data.pages[pageIndex]?.[itemIndex]?.hash
 
           const nextCommit: CommitId | undefined =
             ancestorInfo && commit === ancestorInfo.lastCommit
               ? ancestorInfo.commonCommit
-              : (history.data.pages[pageIndex]?.[itemIndex + 1] ??
-                history.data.pages[pageIndex + 1]?.[0])
+              : (history.data.pages.at(pageIndex)?.at(itemIndex + 1)?.hash ??
+                history.data.pages.at(pageIndex + 1)?.at(0)?.hash)
 
           const nextBranch: BranchName | undefined = nextCommit
             ? ancestorInfo && nextCommit === ancestorInfo.commonCommit

@@ -1,4 +1,4 @@
-use crate::{error::GitError, AncestorInfo, CommitInfo, HeadInfo};
+use crate::{error::GitError, AncestorInfo, CommitInfo, HeadInfo, HistoryItem};
 
 /// Abstraction for common operations that a git implementation needs to support.
 pub trait GitHandler {
@@ -29,7 +29,7 @@ pub trait GitHandler {
         reference: &str,
         start_after: u8,
         limit: u8,
-    ) -> Result<Vec<String>, GitError>;
+    ) -> Result<Vec<HistoryItem>, GitError>;
 
     /// Returns information about the given commit.
     fn get_commit_info(&self, reference: &str) -> Result<CommitInfo, GitError>;

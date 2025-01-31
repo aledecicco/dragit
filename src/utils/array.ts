@@ -13,7 +13,3 @@ export const range: {
 
   return to === undefined ? array : array.map((elem) => elem + from)
 }
-
-export const last = <T>(elements: T[]): T => {
-  return elements[elements.length - 1]
-}

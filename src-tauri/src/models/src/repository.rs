@@ -131,3 +131,10 @@ pub struct AncestorInfo {
     pub branch_distance: u64,
     pub base_distance: u64,
 }
+
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
+pub struct HistoryItem {
+    pub hash: String,
+    pub other_parents: Vec<String>,
+}

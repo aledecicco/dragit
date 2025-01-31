@@ -1,7 +1,7 @@
 export type CommitId = string
 export type BranchName = string
 
-export type CommitInfo = {
+export interface CommitInfo {
   hash: CommitId
   shortHash: string
   authorName: string
@@ -10,14 +10,19 @@ export type CommitInfo = {
   message: string | null
 }
 
-export type AncestorInfo = {
+export interface AncestorInfo {
   commonCommit: CommitId
   lastCommit: CommitId | undefined
   branchDistance: number
   baseDistance: number
 }
 
-export type HeadInfo = {
+export interface HistoryItem {
+  hash: CommitId
+  otherParents: CommitId[]
+}
+
+export interface HeadInfo {
   status: HeadStatus
   files: FileInfo[]
 }

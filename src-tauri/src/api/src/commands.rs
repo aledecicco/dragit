@@ -1,7 +1,8 @@
 use tauri::{AppHandle, Emitter, Manager, State};
 
 use models::{
-    AncestorInfo, AppError, AppEvent, AppState, CommitInfo, GitError, HeadInfo, SafeHandler,
+    AncestorInfo, AppError, AppEvent, AppState, CommitInfo, GitError, HeadInfo, HistoryItem,
+    SafeHandler,
 };
 
 fn with_handler<T>(
@@ -85,7 +86,7 @@ pub async fn get_commit_history(
     branch: &str,
     start_after: u8,
     limit: u8,
-) -> Result<Vec<String>, AppError> {
+) -> Result<Vec<HistoryItem>, AppError> {
     with_handler(&state, &|h| {
         h.get_commit_history(branch, start_after, limit)
     })
