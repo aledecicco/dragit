@@ -40,7 +40,7 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
           <SelectPrimitive.Content
             className={clsx(
               'overflow-hidden rounded-lg shadow-md',
-              'bg-light-100 dark:bg-dark-900',
+              'bg-dark-900',
               'w-max',
             )}
           >
@@ -75,7 +75,7 @@ const SelectInputItem = forwardRef<HTMLDivElement, SelectInputItemProps>(
         className={clsx(
           'text-sm flex flex-row items-center justify-center px-6 py-2',
           'select-none outline-none not-disabled:cursor-pointer',
-          'data-highlighted:bg-dark/5 data-highlighted:dark:bg-light/5',
+          'data-highlighted:bg-light/5',
           'data-[state=checked]:bg-primary/50',
           'data-highlighted:data-[state=checked]:bg-primary/70',
           selectItemProps.className,

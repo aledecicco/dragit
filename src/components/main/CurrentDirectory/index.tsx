@@ -39,7 +39,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
       }}
       {...buttonProps}
       className={clsx(
-        '[&]:text-primary-900 [&]:dark:text-primary-300 [&]:font-medium [&]:text-sm',
+        '[&]:text-primary-300 [&]:font-medium [&]:text-sm',
         !currentDir.data && '[&]:italic',
         buttonProps.className,
       )}

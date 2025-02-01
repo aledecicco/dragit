@@ -22,13 +22,13 @@ const Tooltip = (props: TooltipProps) => {
           align="center"
           {...contentProps}
           className={clsx(
-            'shadow-md bg-light-100 dark:bg-dark-900',
+            'shadow-md bg-dark-900',
             'p-4 rounded-md',
             contentProps?.className,
           )}
         >
           {content}
-          <TooltipPrimitive.Arrow className="fill-light-100 dark:fill-dark-900" />
+          <TooltipPrimitive.Arrow className="fill-dark-900" />
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Portal>
     </TooltipPrimitive.Root>

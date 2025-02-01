@@ -17,7 +17,7 @@ const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
   return (
     <FileStatusItem
       file={file}
-      className={clsx('text-light-500')}
+      className={clsx('text-light-400')}
       Icon={FileIcon}
       actions={
         <IconButton

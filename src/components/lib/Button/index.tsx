@@ -37,19 +37,19 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
         rounded && 'aspect-square',
         variant === 'primary' && [
           'shadow-xs bg-primary-600 text-light-50',
-          'enabled:hover:bg-primary-700 enabled:dark:hover:bg-primary-500',
+          'enabled:hover:bg-primary-500',
         ],
         variant === 'cta' && [
           'shadow-xs bg-accent-500 text-light-50',
-          'enabled:hover:bg-accent-600 enabled:dark:hover:bg-accent-400',
+          'enabled:hover:bg-accent-400',
         ],
         variant === 'neutral' && [
-          'shadow-xs bg-light-200 text-dark-700 dark:bg-dark-900 dark:text-light-50',
-          'enabled:hover:bg-light-300 enabled:dark:hover:bg-dark-800',
+          'shadow-xs bg-dark-900 text-light-50',
+          'enabled:hover:bg-dark-800',
         ],
         variant === 'plain' && [
-          'hover:shadow-xs bg-transparent text-dark-800 dark:text-light-50',
-          'enabled:hover:bg-dark/5 enabled:dark:hover:bg-light/5',
+          'hover:shadow-xs bg-transparent text-light-50',
+          'enabled:hover:bg-light/5',
         ],
         buttonProps.className,
       )}

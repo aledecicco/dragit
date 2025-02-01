@@ -55,20 +55,18 @@ const GraphCommitInfo = (props: { commitInfo?: CommitInfo }) => {
       {commitInfo ? (
         <>
           <div>
-            <p className={clsx('text-xs text-dark-600 dark:text-light-400')}>
+            <p className={clsx('text-xs text-light-400')}>
               {commitInfo.authorName} - {commitInfo.authorEmail}
             </p>
-            <p className={clsx('text-xs text-dark-600 dark:text-light-400')}>
+            <p className={clsx('text-xs text-light-400')}>
               {new Date(commitInfo.timestamp).toDateString()}
             </p>
           </div>
           <p className={clsx('text-sm')}>{commitInfo.message}</p>
-          <p className={clsx('text-xs text-primary-500 dark:text-primary-300')}>
-            {commitInfo.hash}
-          </p>
+          <p className={clsx('text-xs text-primary-300')}>{commitInfo.hash}</p>
         </>
       ) : (
-        <p className={clsx('text-xs text-dark-600 dark:text-light-400')}>...</p>
+        <p className={clsx('text-xs text-light-400')}>...</p>
       )}
     </div>
   )

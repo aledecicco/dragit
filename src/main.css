@@ -98,8 +98,8 @@
 
 :root {
   font-family: "Inter", sans-serif;
-  @apply bg-light text-dark dark:bg-dark dark:text-light;
-  @apply scheme-light dark:scheme-dark;
+  @apply bg-dark text-light;
+  @apply scheme-dark;
   @apply font-normal;
 }
 
