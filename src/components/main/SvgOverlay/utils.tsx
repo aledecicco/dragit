@@ -1,10 +1,15 @@
 import { type ComponentType, type Ref, useEffect, useRef } from 'react'
 
-import { type Element, type ElementId, useSvgOverlay } from './context'
+import {
+  type Element,
+  type ElementId,
+  type ParentRel,
+  useSvgOverlay,
+} from './context'
 
 interface TrackedComponentProps {
   elementId: ElementId
-  parentId: ElementId | undefined
+  parent: ParentRel | undefined
 }
 
 interface TrackRefProps<T extends HTMLElement> {
@@ -17,15 +22,21 @@ const makeTracked = <P, T extends HTMLElement>(
   const TrackedComponent = (
     props: Omit<P, 'trackRef'> & TrackedComponentProps,
   ) => {
-    const { elementId, parentId, ...componentProps } = props
+    const { elementId, parent, ...componentProps } = props
     const svgOverlay = useSvgOverlay()
 
     const ref = useRef<T>(null)
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: refresh when type of parent changes
     useEffect(() => {
       svgOverlay.registerElement(elementId, {
         ref,
-        parent: parentId,
+        parent: parent
+          ? {
+              id: parent?.id,
+              type: parent?.type,
+            }
+          : undefined,
       })
 
       return () => {
@@ -33,7 +44,8 @@ const makeTracked = <P, T extends HTMLElement>(
       }
     }, [
       elementId,
-      parentId,
+      parent?.id,
+      parent?.type,
       svgOverlay.registerElement,
       svgOverlay.unregisterElement,
     ])

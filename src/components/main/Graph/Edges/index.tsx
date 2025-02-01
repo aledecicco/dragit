@@ -3,6 +3,10 @@ import clsx from 'clsx'
 import type { Element, ElementId } from '@main/SvgOverlay/context'
 import { getPosition } from '@main/SvgOverlay/utils'
 
+export const DASHED_PARENT = 'dashed'
+export const SOLID_PARENT = 'solid'
+export type PARENT_TYPE = typeof DASHED_PARENT | typeof SOLID_PARENT
+
 export const EDGE_OFFSET = 8
 export const CURVE_SIZE = 22
 export const CURVE_HANDLES_OFFSET = 15
@@ -30,7 +34,7 @@ const Edges = (props: EdgesProps) => {
 
   return [...elements.entries()].map(([id, elem]) => {
     if (elem.ref.current && elem.parent) {
-      const parentElem = elements.get(elem.parent)
+      const parentElem = elements.get(elem.parent.id)
 
       if (parentElem?.ref?.current) {
         const elemSize = elem.ref.current.clientHeight
@@ -56,7 +60,10 @@ const Edges = (props: EdgesProps) => {
         return (
           <path
             key={id}
-            className={clsx('fill-none stroke-primary-700 stroke-4')}
+            className={clsx(
+              'fill-none stroke-primary-700 stroke-4',
+              elem.parent.type === DASHED_PARENT && '[stroke-dasharray:8_5]',
+            )}
             d={[
               BEGIN_PATH(elemX, elemY),
               ...(parentIsAligned

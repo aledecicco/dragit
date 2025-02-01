@@ -19,7 +19,12 @@ type ElementId = string
 
 interface Element {
   ref: RefObject<HTMLElement>
-  parent: ElementId | undefined
+  parent: ParentRel | undefined
+}
+
+interface ParentRel {
+  id: ElementId
+  type: string
 }
 
 interface SvgOverlayState {
@@ -163,5 +168,6 @@ export {
   useSvgOverlay,
   type Element,
   type ElementId,
+  type ParentRel,
   type SvgOverlayState,
 }

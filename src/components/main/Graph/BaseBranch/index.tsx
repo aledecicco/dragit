@@ -4,9 +4,12 @@ import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 
 import type { AncestorInfo, BranchName, CommitId } from '@api/models'
-import { PAGE_SIZE, commitHistoryQuery } from '@api/queries'
+import { commitHistoryQuery } from '@api/queries'
+import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
 import { Button } from '@lib/Button'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
+import { DASHED_PARENT, SOLID_PARENT } from '../Edges'
+import { ancestorNotInRange } from '../utils'
 
 interface GraphBaseBranchProps {
   virtualizer: Virtualizer<HTMLDivElement, Element>
@@ -20,22 +23,27 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
 
   const items = virtualizer.getVirtualItems()
-  const ancestorNotInRange =
+  const displayExtraAncestor =
     ancestorInfo &&
-    !items.find((virtualRow) => virtualRow.index === ancestorInfo.baseDistance)
+    ancestorNotInRange(ancestorInfo.baseDistance, history, items)
 
   return (
     <>
       {history.data ? (
         items.map((virtualRow) => {
-          const pageIndex = Math.floor(virtualRow.index / PAGE_SIZE)
-          const itemIndex = virtualRow.index % PAGE_SIZE
+          const commit: CommitId | undefined = getPaginatedItem(
+            history,
+            virtualRow.index,
+          )?.hash
 
-          const commit: CommitId | undefined =
-            history.data.pages[pageIndex]?.[itemIndex]?.hash
-          const nextCommit: CommitId | undefined =
-            history.data.pages.at(pageIndex)?.at(itemIndex + 1)?.hash ??
-            history.data.pages.at(pageIndex + 1)?.at(0)?.hash
+          const nextIsCommon =
+            ancestorInfo && virtualRow.index + 1 === ancestorInfo.baseDistance
+
+          const parentCommit: CommitId | undefined =
+            getNextPaginatedItem(history, virtualRow.index)?.hash ??
+            (ancestorInfo && ancestorInfo.baseDistance > virtualRow.index
+              ? ancestorInfo.commonCommit
+              : undefined)
 
           return commit ? (
             <GraphCommit
@@ -43,8 +51,18 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
               path={path}
               commitId={commit}
               elementId={COMMIT_ELEMENT_ID(commit, branch)}
-              parentId={
-                nextCommit ? COMMIT_ELEMENT_ID(nextCommit, branch) : undefined
+              parent={
+                parentCommit
+                  ? {
+                      id: COMMIT_ELEMENT_ID(parentCommit, branch),
+                      type:
+                        displayExtraAncestor &&
+                        parentCommit === ancestorInfo.commonCommit &&
+                        !nextIsCommon
+                          ? DASHED_PARENT
+                          : SOLID_PARENT,
+                    }
+                  : undefined
               }
               className={clsx('absolute top-0 left-half')}
               style={{
@@ -61,13 +79,13 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
         </p>
       )}
 
-      {ancestorNotInRange && (
+      {displayExtraAncestor && (
         <GraphCommit
           key={ancestorInfo.baseDistance}
           path={path}
           commitId={ancestorInfo.commonCommit}
           elementId={COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, branch)}
-          parentId={undefined}
+          parent={undefined}
           className={clsx('absolute top-0 left-half')}
           style={{
             transform: `translateY(${(virtualizer.options.gap + virtualizer.options.estimateSize(ancestorInfo.baseDistance)) * ancestorInfo.baseDistance}px)`,
@@ -79,13 +97,16 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
         <Button
           type="button"
           variant="neutral"
-          className={clsx('absolute top-full translate-full left-half')}
+          className={clsx(
+            'absolute top-full translate-y-[-100%] left-half translate-x-[200%]',
+          )}
           rounded
           aria-label="Load more commits for this branch"
           disabled={history.isFetchingNextPage || !history.hasNextPage}
           onClick={() => {
             history.fetchNextPage()
           }}
+          size="sm"
         >
           <PlusIcon />
         </Button>

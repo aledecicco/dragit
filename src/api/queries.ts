@@ -120,7 +120,7 @@ const branchesQuery = (path: string) =>
     queryFn: fetchBranches,
   })
 
-export const PAGE_SIZE = 10
+export const PAGE_SIZE = 3
 
 const fetchCommitHistory = (
   branch: BranchName,

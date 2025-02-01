@@ -9,6 +9,7 @@ import {
   commitHistoryQuery,
   commonAncestorQuery,
 } from '@api/queries'
+import { getPaginatedLength } from '@api/utils'
 import { SelectInput } from '@lib/SelectInput'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
 import { GraphBaseBranch } from './BaseBranch'
@@ -23,8 +24,8 @@ interface GraphProps {
 const Graph = (props: GraphProps) => {
   const { path } = props
   const branches = useQuery(branchesQuery(path))
-  const [branch, setBranch] = useState<BranchName>()
-  const [baseBranch, setBaseBranch] = useState<BranchName>()
+  const [branch, setBranch] = useState<BranchName>('test7')
+  const [baseBranch, setBaseBranch] = useState<BranchName>('main-4')
 
   return (
     <div className={clsx('h-full w-full min-h-0')}>
@@ -81,15 +82,14 @@ const GraphInner = (props: GraphInnerProps) => {
 
   const branchLength = Math.min(
     (ancestor.data?.branchDistance ?? Number.POSITIVE_INFINITY) + 1,
-    branchHistory.data?.pages.reduce((sum, page) => sum + page.length, 0) ?? 0,
+    getPaginatedLength(branchHistory),
   )
-  const baseLength =
-    baseBranchHistory.data?.pages.reduce((sum, page) => sum + page.length, 0) ??
-    0
+  const baseLength = getPaginatedLength(baseBranchHistory)
 
   const virtualizer = useVirtualizer({
     estimateSize: () => NODE_SIZE,
     gap: CURVE_SIZE * 2 + EDGE_OFFSET * 2,
+    paddingEnd: CURVE_SIZE * 2,
     getScrollElement: () => svgOverlay.componentRef.current,
     count: Math.max(branchLength, baseLength),
   })

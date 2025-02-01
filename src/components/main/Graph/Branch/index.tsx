@@ -1,12 +1,15 @@
 import { PlusIcon } from '@radix-ui/react-icons'
 import { useInfiniteQuery } from '@tanstack/react-query'
+import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 
 import type { AncestorInfo, BranchName, CommitId } from '@api/models'
-import { PAGE_SIZE, commitHistoryQuery } from '@api/queries'
+import { commitHistoryQuery } from '@api/queries'
+import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
 import { Button } from '@lib/Button'
-import type { Virtualizer } from '@tanstack/react-virtual'
 import { GraphCommit } from '../Commit'
+import { DASHED_PARENT, SOLID_PARENT } from '../Edges'
+import { ancestorNotInRange } from '../utils'
 
 const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
   `commit_${commitId}_${branch}`
@@ -24,11 +27,10 @@ const GraphBranch = (props: GraphBranchProps) => {
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
 
   const items = virtualizer.getVirtualItems()
-  const ancestorNotInRange =
-    ancestorInfo &&
-    !items.find(
-      (virtualRow) => virtualRow.index === ancestorInfo.branchDistance,
-    )
+  const displayExtraAncestor =
+    ancestorInfo?.lastCommit &&
+    baseBranch &&
+    ancestorNotInRange(ancestorInfo.branchDistance, history, items)
 
   return (
     <>
@@ -38,20 +40,23 @@ const GraphBranch = (props: GraphBranchProps) => {
             return
           }
 
-          const pageIndex = Math.floor(virtualRow.index / PAGE_SIZE)
-          const itemIndex = virtualRow.index % PAGE_SIZE
+          const commit: CommitId | undefined = getPaginatedItem(
+            history,
+            virtualRow.index,
+          )?.hash
 
-          const commit: CommitId | undefined =
-            history.data.pages[pageIndex]?.[itemIndex]?.hash
+          const isLast =
+            ancestorInfo && virtualRow.index === ancestorInfo.branchDistance
+          const nextIsLast =
+            ancestorInfo && virtualRow.index + 1 === ancestorInfo.branchDistance
 
-          const nextCommit: CommitId | undefined =
-            ancestorInfo && commit === ancestorInfo.lastCommit
-              ? ancestorInfo.commonCommit
-              : (history.data.pages.at(pageIndex)?.at(itemIndex + 1)?.hash ??
-                history.data.pages.at(pageIndex + 1)?.at(0)?.hash)
+          const parentCommit: CommitId | undefined = isLast
+            ? ancestorInfo.commonCommit
+            : (getNextPaginatedItem(history, virtualRow.index)?.hash ??
+              ancestorInfo?.lastCommit)
 
-          const nextBranch: BranchName | undefined = nextCommit
-            ? ancestorInfo && nextCommit === ancestorInfo.commonCommit
+          const parentBranch: BranchName | undefined = parentCommit
+            ? ancestorInfo && parentCommit === ancestorInfo.commonCommit
               ? baseBranch
               : branch
             : undefined
@@ -62,9 +67,17 @@ const GraphBranch = (props: GraphBranchProps) => {
               path={path}
               commitId={commit}
               elementId={COMMIT_ELEMENT_ID(commit, branch)}
-              parentId={
-                nextCommit && nextBranch
-                  ? COMMIT_ELEMENT_ID(nextCommit, nextBranch)
+              parent={
+                parentCommit && parentBranch
+                  ? {
+                      id: COMMIT_ELEMENT_ID(parentCommit, parentBranch),
+                      type:
+                        displayExtraAncestor &&
+                        parentCommit === ancestorInfo.lastCommit &&
+                        !nextIsLast
+                          ? DASHED_PARENT
+                          : SOLID_PARENT,
+                    }
                   : undefined
               }
               className={clsx('absolute top-0 left-0')}
@@ -82,13 +95,16 @@ const GraphBranch = (props: GraphBranchProps) => {
         </p>
       )}
 
-      {ancestorNotInRange && ancestorInfo.lastCommit && baseBranch && (
+      {displayExtraAncestor && ancestorInfo.lastCommit && baseBranch && (
         <GraphCommit
           key={ancestorInfo.branchDistance}
           path={path}
           commitId={ancestorInfo.lastCommit}
           elementId={COMMIT_ELEMENT_ID(ancestorInfo.lastCommit, branch)}
-          parentId={COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, baseBranch)}
+          parent={{
+            id: COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, baseBranch),
+            type: SOLID_PARENT,
+          }}
           className={clsx('absolute top-0 left-0')}
           style={{
             transform: `translateY(${(virtualizer.options.gap + virtualizer.options.estimateSize(ancestorInfo.branchDistance)) * ancestorInfo.branchDistance}px)`,
@@ -100,13 +116,16 @@ const GraphBranch = (props: GraphBranchProps) => {
         <Button
           type="button"
           variant="neutral"
-          className={clsx('absolute top-full translate-full left-0')}
+          className={clsx(
+            'absolute top-full translate-y-[-100%] left-0 translate-x-[200%]',
+          )}
           rounded
           aria-label="Load more commits for this branch"
           disabled={history.isFetchingNextPage || !history.hasNextPage}
           onClick={() => {
             history.fetchNextPage()
           }}
+          size="sm"
         >
           <PlusIcon />
         </Button>
