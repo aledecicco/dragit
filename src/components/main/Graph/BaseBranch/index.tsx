@@ -1,4 +1,3 @@
-import { PlusIcon } from '@radix-ui/react-icons'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
@@ -6,10 +5,9 @@ import clsx from 'clsx'
 import type { AncestorInfo, BranchName, CommitId } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
 import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
-import { Button } from '@lib/Button'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import { DASHED_PARENT, SOLID_PARENT } from '../Edges'
-import { ancestorNotInRange } from '../utils'
+import { ancestorNotInRange, useInfiniteScroll } from '../utils'
 
 interface GraphBaseBranchProps {
   virtualizer: Virtualizer<HTMLDivElement, Element>
@@ -23,6 +21,8 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
 
   const items = virtualizer.getVirtualItems()
+  useInfiniteScroll(history, items)
+
   const displayExtraAncestor =
     ancestorInfo &&
     ancestorNotInRange(ancestorInfo.baseDistance, history, items)
@@ -91,25 +91,6 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
             transform: `translateY(${(virtualizer.options.gap + virtualizer.options.estimateSize(ancestorInfo.baseDistance)) * ancestorInfo.baseDistance}px)`,
           }}
         />
-      )}
-
-      {history.hasNextPage && (
-        <Button
-          type="button"
-          variant="neutral"
-          className={clsx(
-            'absolute top-full translate-y-[-100%] left-half translate-x-[200%]',
-          )}
-          rounded
-          aria-label="Load more commits for this branch"
-          disabled={history.isFetchingNextPage || !history.hasNextPage}
-          onClick={() => {
-            history.fetchNextPage()
-          }}
-          size="sm"
-        >
-          <PlusIcon />
-        </Button>
       )}
     </>
   )

@@ -1,15 +1,18 @@
-import { PlusIcon } from '@radix-ui/react-icons'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 
 import type { AncestorInfo, BranchName, CommitId } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
-import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
-import { Button } from '@lib/Button'
+import {
+  getNextPaginatedItem,
+  getPaginatedItem,
+  getPaginatedLength,
+} from '@api/utils'
+import { useCallback } from 'react'
 import { GraphCommit } from '../Commit'
 import { DASHED_PARENT, SOLID_PARENT } from '../Edges'
-import { ancestorNotInRange } from '../utils'
+import { ancestorNotInRange, useInfiniteScroll } from '../utils'
 
 const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
   `commit_${commitId}_${branch}`
@@ -27,6 +30,14 @@ const GraphBranch = (props: GraphBranchProps) => {
   const history = useInfiniteQuery(commitHistoryQuery(path, branch))
 
   const items = virtualizer.getVirtualItems()
+  const shouldFetch = useCallback(() => {
+    return (
+      !ancestorInfo ||
+      getPaginatedLength(history) <= ancestorInfo.branchDistance
+    )
+  }, [history, ancestorInfo])
+  useInfiniteScroll(history, items, shouldFetch)
+
   const displayExtraAncestor =
     ancestorInfo?.lastCommit &&
     baseBranch &&
@@ -110,25 +121,6 @@ const GraphBranch = (props: GraphBranchProps) => {
             transform: `translateY(${(virtualizer.options.gap + virtualizer.options.estimateSize(ancestorInfo.branchDistance)) * ancestorInfo.branchDistance}px)`,
           }}
         />
-      )}
-
-      {history.hasNextPage && (
-        <Button
-          type="button"
-          variant="neutral"
-          className={clsx(
-            'absolute top-full translate-y-[-100%] left-0 translate-x-[200%]',
-          )}
-          rounded
-          aria-label="Load more commits for this branch"
-          disabled={history.isFetchingNextPage || !history.hasNextPage}
-          onClick={() => {
-            history.fetchNextPage()
-          }}
-          size="sm"
-        >
-          <PlusIcon />
-        </Button>
       )}
     </>
   )

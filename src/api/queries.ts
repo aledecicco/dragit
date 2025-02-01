@@ -14,6 +14,8 @@ import type {
   HistoryItem,
 } from './models'
 
+export const PAGE_SIZE = 2
+
 const queryKeys = {
   currentDir: ['current_dir'] as const,
   directory: {
@@ -119,8 +121,6 @@ const branchesQuery = (path: string) =>
     queryKey: [queryKeys.directory.branches.all(path)],
     queryFn: fetchBranches,
   })
-
-export const PAGE_SIZE = 3
 
 const fetchCommitHistory = (
   branch: BranchName,

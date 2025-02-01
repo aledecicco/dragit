@@ -3,6 +3,7 @@ import type {
   UseInfiniteQueryResult,
 } from '@tanstack/react-query'
 import type { VirtualItem } from '@tanstack/react-virtual'
+import { useEffect } from 'react'
 
 import type { HistoryItem } from '@api/models'
 import { getPaginatedLength } from '@api/utils'
@@ -20,4 +21,24 @@ const ancestorNotInRange = (
   )
 }
 
-export { ancestorNotInRange }
+const useInfiniteScroll = (
+  history: HistoryQuery,
+  items: VirtualItem[],
+  fetchCondition?: () => boolean,
+) => {
+  useEffect(() => {
+    const lastItem = items.at(-1)
+
+    if (
+      (!fetchCondition || fetchCondition()) &&
+      lastItem &&
+      lastItem.index >= getPaginatedLength(history) - 1 &&
+      history.hasNextPage &&
+      !history.isFetchingNextPage
+    ) {
+      history.fetchNextPage()
+    }
+  }, [items, history, fetchCondition])
+}
+
+export { ancestorNotInRange, useInfiniteScroll }
