@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
+import clsx from 'clsx'
 import { type HTMLProps, useMemo } from 'react'
 
 import type { FileInfo } from '@api/models'
 import { headInfoQuery } from '@api/queries'
-import clsx from 'clsx'
 import { StagedFileStatusItem } from './StagedFile'
 import { UnmergedFileStatusItem } from './UnmergedFile'
 import { UnstagedFileStatusItem } from './UnstagedFile'

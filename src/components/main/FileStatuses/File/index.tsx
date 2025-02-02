@@ -3,30 +3,35 @@ import clsx from 'clsx'
 import type { HTMLProps, ReactNode } from 'react'
 
 import type { FileInfo } from '@api/models'
-import { EllipsisText } from '@lib/EllipsisText'
+import { Tooltip } from '@lib/Tooltip'
+import { FileStatusMoreInfo } from '../MoreInfo'
 
-interface FileStatusItemProps<F extends FileInfo>
+interface FileStatusItemProps
   extends Omit<HTMLProps<HTMLDivElement>, 'children'> {
-  file: F
+  file: FileInfo
   Icon: React.ComponentType<IconProps>
   actions?: ReactNode
 }
 
-const FileStatusItem = <F extends FileInfo>(props: FileStatusItemProps<F>) => {
+const FileStatusItem = (props: FileStatusItemProps) => {
   const { file, Icon, actions, ...divProps } = props
 
   return (
-    <div
-      {...divProps}
-      className={clsx(
-        'flex flex-row items-center gap-2 min-w-0',
-        divProps.className,
-      )}
-    >
-      <Icon className={clsx('shrink-0 stroke-[1.5] size-5')} />
-      <EllipsisText className={clsx('text-sm')}>{file.path}</EllipsisText>
-      {actions}
-    </div>
+    <Tooltip content={<FileStatusMoreInfo file={file} />}>
+      <div
+        {...divProps}
+        className={clsx(
+          'flex flex-row items-center gap-2 min-w-0',
+          divProps.className,
+        )}
+      >
+        <Icon className={clsx('shrink-0 stroke-[1.5] size-5')} />
+        <p className={clsx('text-sm overflow-hidden overflow-ellipsis')}>
+          {file.path}
+        </p>
+        {actions}
+      </div>
+    </Tooltip>
   )
 }
 

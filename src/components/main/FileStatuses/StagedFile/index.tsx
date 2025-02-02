@@ -8,8 +8,8 @@ import {
   IconFileArrowRight,
   IconFileCode2,
   IconFileMinus,
+  IconFilePencil,
   IconFilePlus,
-  IconFileText,
   IconFiles,
   IconMinus,
 } from '@tabler/icons-react'
@@ -30,7 +30,7 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
       Icon={match(file.staged)
         .with('added', () => IconFilePlus)
         .with('deleted', () => IconFileMinus)
-        .with('modified', () => IconFileText)
+        .with('modified', () => IconFilePencil)
         .with('copied', () => IconFiles)
         .with('renamed', () => IconFileArrowRight)
         .with('typeChanged', () => IconFileCode2)

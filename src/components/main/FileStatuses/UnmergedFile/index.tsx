@@ -1,8 +1,8 @@
 import {
   IconCheck,
   IconFileMinus,
+  IconFilePencil,
   IconFilePlus,
-  IconFileText,
   IconTrash,
 } from '@tabler/icons-react'
 import clsx from 'clsx'
@@ -35,7 +35,7 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
           P.union('deletedByThem', 'deletedByUs', 'bothDeleted'),
           () => IconFileMinus,
         )
-        .with('bothModified', () => IconFileText)
+        .with('bothModified', () => IconFilePencil)
         .exhaustive()}
       actions={
         <>

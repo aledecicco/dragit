@@ -1,8 +1,8 @@
 import {
   IconFileCode2,
   IconFileMinus,
+  IconFilePencil,
   IconFilePlus,
-  IconFileText,
   IconPlus,
 } from '@tabler/icons-react'
 import clsx from 'clsx'
@@ -28,7 +28,7 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
       Icon={match(file.unstaged)
         .with('added', () => IconFilePlus)
         .with('deleted', () => IconFileMinus)
-        .with('modified', () => IconFileText)
+        .with('modified', () => IconFilePencil)
         .with('typeChanged', () => IconFileCode2)
         .exhaustive()}
       actions={
