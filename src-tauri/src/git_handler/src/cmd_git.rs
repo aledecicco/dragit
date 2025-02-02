@@ -193,7 +193,7 @@ impl GitHandler for CmdGit {
     }
 
     fn remove_from_index(&self, files: &Vec<&str>) -> Result<(), GitError> {
-        let args = [vec!["reset"], files.clone()].concat();
+        let args = [vec!["reset", "--"], files.clone()].concat();
         command_output(&self.get_path()?, args).or(Err(GitError::RemoveFromIndexFailed {}))?;
 
         Ok(())

@@ -1,4 +1,4 @@
-import type { IconProps } from '@radix-ui/react-icons/dist/types'
+import type { IconProps } from '@tabler/icons-react'
 import clsx from 'clsx'
 import type { HTMLProps, ReactNode } from 'react'
 
@@ -23,7 +23,7 @@ const FileStatusItem = <F extends FileInfo>(props: FileStatusItemProps<F>) => {
         divProps.className,
       )}
     >
-      <Icon className={clsx('shrink-0')} />
+      <Icon className={clsx('shrink-0 stroke-[1.5] size-5')} />
       <EllipsisText className={clsx('text-sm')}>{file.path}</EllipsisText>
       {actions}
     </div>

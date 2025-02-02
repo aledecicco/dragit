@@ -1,4 +1,4 @@
-import { CheckIcon, FileTextIcon, TrashIcon } from '@radix-ui/react-icons'
+import { IconCheck, IconFileText, IconTrash } from '@tabler/icons-react'
 import clsx from 'clsx'
 import { P, match } from 'ts-pattern'
 
@@ -20,11 +20,11 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
     <FileStatusItem
       file={file}
       className={clsx('text-warning')}
-      Icon={FileTextIcon}
+      Icon={IconFileText}
       actions={
         <>
           <IconButton
-            Icon={CheckIcon}
+            Icon={IconCheck}
             variant="neutral"
             size="sm"
             aria-label="Mark conflict as resolved"
@@ -36,7 +36,7 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
               P.union('bothDeleted', 'deletedByThem', 'deletedByUs'),
               () => (
                 <IconButton
-                  Icon={TrashIcon}
+                  Icon={IconTrash}
                   variant="neutral"
                   size="sm"
                   aria-label="Delete file"

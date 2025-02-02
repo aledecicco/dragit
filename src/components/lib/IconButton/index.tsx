@@ -1,4 +1,4 @@
-import type { IconProps } from '@radix-ui/react-icons/dist/types'
+import type { IconProps } from '@tabler/icons-react'
 import type { ForwardRefExoticComponent } from 'react'
 import { match } from 'ts-pattern'
 
@@ -14,13 +14,7 @@ const IconButton = (props: IconButtonProps) => {
   return (
     <Button {...buttonProps} rounded>
       <Icon
-        width={match(buttonProps.size)
-          .with('sm', () => 12)
-          .with('md', () => 15)
-          .with(undefined, () => 15)
-          .with('lg', () => 18)
-          .exhaustive()}
-        height={match(buttonProps.size)
+        size={match(buttonProps.size)
           .with('sm', () => 12)
           .with('md', () => 15)
           .with(undefined, () => 15)

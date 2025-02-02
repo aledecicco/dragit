@@ -1,5 +1,5 @@
-import { ChevronDownIcon } from '@radix-ui/react-icons'
 import * as SelectPrimitive from '@radix-ui/react-select'
+import { IconCaretDownFilled } from '@tabler/icons-react'
 import clsx from 'clsx'
 import { type ReactNode, forwardRef } from 'react'
 
@@ -32,7 +32,7 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
             <SelectPrimitive.Icon
               className={clsx('group-aria-expanded:rotate-180')}
             >
-              <ChevronDownIcon />
+              <IconCaretDownFilled size={16} />
             </SelectPrimitive.Icon>
           </Button>
         </SelectPrimitive.Trigger>

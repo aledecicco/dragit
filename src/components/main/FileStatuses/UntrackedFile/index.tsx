@@ -1,4 +1,4 @@
-import { FileIcon, PlusIcon } from '@radix-ui/react-icons'
+import { IconFileUnknown, IconPlus } from '@tabler/icons-react'
 import clsx from 'clsx'
 
 import { useAddToIndex } from '@api/commands'
@@ -18,10 +18,10 @@ const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
     <FileStatusItem
       file={file}
       className={clsx('text-light-400')}
-      Icon={FileIcon}
+      Icon={IconFileUnknown}
       actions={
         <IconButton
-          Icon={PlusIcon}
+          Icon={IconPlus}
           variant="neutral"
           size="sm"
           aria-label="Stage file"

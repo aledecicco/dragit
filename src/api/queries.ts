@@ -14,7 +14,7 @@ import type {
   HistoryItem,
 } from './models'
 
-export const PAGE_SIZE = 2
+export const PAGE_SIZE = 50
 
 const queryKeys = {
   currentDir: ['current_dir'] as const,

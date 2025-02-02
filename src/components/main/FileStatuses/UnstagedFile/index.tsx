@@ -1,5 +1,12 @@
-import { FileMinusIcon, PlusIcon } from '@radix-ui/react-icons'
+import {
+  IconFileCode2,
+  IconFileMinus,
+  IconFilePlus,
+  IconFileText,
+  IconPlus,
+} from '@tabler/icons-react'
 import clsx from 'clsx'
+import { match } from 'ts-pattern'
 
 import { useAddToIndex } from '@api/commands'
 import type { UnstagedFile } from '@api/models'
@@ -18,10 +25,15 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
     <FileStatusItem
       file={file}
       className={clsx('text-danger')}
-      Icon={FileMinusIcon}
+      Icon={match(file.unstaged)
+        .with('added', () => IconFilePlus)
+        .with('deleted', () => IconFileMinus)
+        .with('modified', () => IconFileText)
+        .with('typeChanged', () => IconFileCode2)
+        .exhaustive()}
       actions={
         <IconButton
-          Icon={PlusIcon}
+          Icon={IconPlus}
           variant="neutral"
           size="sm"
           aria-label="Stage file"
