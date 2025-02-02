@@ -1,4 +1,10 @@
-import { IconCheck, IconFileText, IconTrash } from '@tabler/icons-react'
+import {
+  IconCheck,
+  IconFileMinus,
+  IconFilePlus,
+  IconFileText,
+  IconTrash,
+} from '@tabler/icons-react'
 import clsx from 'clsx'
 import { P, match } from 'ts-pattern'
 
@@ -20,7 +26,17 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
     <FileStatusItem
       file={file}
       className={clsx('text-warning')}
-      Icon={IconFileText}
+      Icon={match(file.unstaged)
+        .with(
+          P.union('addedByThem', 'addedByUs', 'bothAdded'),
+          () => IconFilePlus,
+        )
+        .with(
+          P.union('deletedByThem', 'deletedByUs', 'bothDeleted'),
+          () => IconFileMinus,
+        )
+        .with('bothModified', () => IconFileText)
+        .exhaustive()}
       actions={
         <>
           <IconButton
