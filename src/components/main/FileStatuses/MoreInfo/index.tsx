@@ -2,6 +2,9 @@ import clsx from 'clsx'
 import { P, match } from 'ts-pattern'
 
 import type { FileInfo } from '@api/models'
+import { Icon } from '@lib/Icon'
+import { Separator } from '@lib/Separator'
+import { IconFile, IconFolder } from '@tabler/icons-react'
 
 interface FileStatusMoreInfoProps {
   file: FileInfo
@@ -12,7 +15,28 @@ const FileStatusMoreInfo = (props: FileStatusMoreInfoProps) => {
 
   return (
     <div className={clsx('flex flex-col gap-2')}>
-      <p className={clsx('text-sm text-light')}>{file.path}</p>
+      <div
+        className={clsx(
+          'flex flex-row items-center gap-2',
+          'text-light-200 text-md',
+        )}
+      >
+        {file.isDir ? (
+          <Icon Glyph={IconFolder} size="md" />
+        ) : (
+          <Icon Glyph={IconFile} size="md" />
+        )}
+        <p
+          className={clsx(
+            'flex flex-row-reverse',
+            'overflow-auto pb-2.5 -mb-2.5',
+          )}
+        >
+          {file.path}
+        </p>
+      </div>
+
+      <Separator />
 
       <div>
         <ul className={clsx('text-sm pl-5 list-disc')}>

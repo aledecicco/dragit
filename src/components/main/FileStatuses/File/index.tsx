@@ -1,20 +1,20 @@
-import type { IconProps } from '@tabler/icons-react'
 import clsx from 'clsx'
 import type { HTMLProps, ReactNode } from 'react'
 
 import type { FileInfo } from '@api/models'
+import { type Glyph, Icon } from '@lib/Icon'
 import { Tooltip } from '@lib/Tooltip'
 import { FileStatusMoreInfo } from '../MoreInfo'
 
 interface FileStatusItemProps
   extends Omit<HTMLProps<HTMLDivElement>, 'children'> {
   file: FileInfo
-  Icon: React.ComponentType<IconProps>
+  Glyph: Glyph
   actions?: ReactNode
 }
 
 const FileStatusItem = (props: FileStatusItemProps) => {
-  const { file, Icon, actions, ...divProps } = props
+  const { file, Glyph, actions, ...divProps } = props
 
   return (
     <Tooltip content={<FileStatusMoreInfo file={file} />}>
@@ -25,7 +25,7 @@ const FileStatusItem = (props: FileStatusItemProps) => {
           divProps.className,
         )}
       >
-        <Icon className={clsx('shrink-0 stroke-[1.5] size-5')} />
+        <Icon Glyph={Glyph} size="sm" />
         <p className={clsx('text-sm overflow-hidden overflow-ellipsis')}>
           {file.path}
         </p>

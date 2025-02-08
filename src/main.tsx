@@ -1,4 +1,4 @@
-import { TooltipProvider } from '@radix-ui/react-tooltip'
+import { Tooltip } from 'radix-ui'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
@@ -13,9 +13,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ClientProvider>
       <EventHandler>
-        <TooltipProvider>
+        <Tooltip.Provider>
           <App />
-        </TooltipProvider>
+        </Tooltip.Provider>
       </EventHandler>
     </ClientProvider>
   </React.StrictMode>,

@@ -2,10 +2,12 @@ import clsx from 'clsx'
 import { type ButtonHTMLAttributes, forwardRef } from 'react'
 import { match } from 'ts-pattern'
 
+import type { Size } from '@utils/types'
+
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant: 'primary' | 'cta' | 'neutral' | 'plain'
   rounded?: boolean
-  size?: 'sm' | 'md' | 'lg'
+  size?: Size
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {

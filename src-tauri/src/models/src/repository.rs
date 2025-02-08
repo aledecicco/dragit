@@ -112,6 +112,8 @@ pub enum FileStatus {
 pub struct FileInfo {
     pub path: String,
 
+    pub is_dir: bool,
+
     #[serde(flatten)]
     pub status: FileStatus,
 }

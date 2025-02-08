@@ -1,5 +1,5 @@
-import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
+import { Tooltip as TooltipPrimitive } from 'radix-ui'
 import type { ReactNode } from 'react'
 
 interface TooltipProps extends TooltipPrimitive.TooltipProps {
@@ -22,6 +22,7 @@ const Tooltip = (props: TooltipProps) => {
           align="center"
           {...contentProps}
           className={clsx(
+            'max-w-sm',
             'shadow-md bg-dark-900',
             'p-4 rounded-md',
             contentProps?.className,

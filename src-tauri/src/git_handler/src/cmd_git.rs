@@ -174,15 +174,17 @@ impl GitHandler for CmdGit {
     }
 
     fn get_head_info(&self) -> Result<HeadInfo, GitError> {
+        let path = self.get_path()?;
+
         let lines = command_output(
-            &self.get_path()?,
+            &path,
             ["status", "--porcelain=2", "--untracked=normal", "--branch"],
         )
         .ok()
         .and_then(|output| self.get_output_lines(output).ok())
         .ok_or(GitError::GetHeadInfoFailed {})?;
 
-        parse_head_info(&lines).ok_or(GitError::GetHeadInfoFailed {})
+        parse_head_info(&path, &lines).ok_or(GitError::GetHeadInfoFailed {})
     }
 
     fn add_to_index(&self, files: &Vec<&str>) -> Result<(), GitError> {

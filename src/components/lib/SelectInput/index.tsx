@@ -1,11 +1,11 @@
-import * as SelectPrimitive from '@radix-ui/react-select'
 import { IconCaretDownFilled } from '@tabler/icons-react'
 import clsx from 'clsx'
+import { Select } from 'radix-ui'
 import { type ReactNode, forwardRef } from 'react'
 
 import { Button } from '@lib/Button'
 
-interface SelectInputProps extends SelectPrimitive.SelectProps {
+interface SelectInputProps extends Select.SelectProps {
   options: {
     value: string
     render?: () => ReactNode
@@ -19,8 +19,8 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
     const { options, placeholder, ariaLabel, ...selectProps } = props
 
     return (
-      <SelectPrimitive.Root {...selectProps}>
-        <SelectPrimitive.Trigger aria-label={ariaLabel} ref={ref} asChild>
+      <Select.Root {...selectProps}>
+        <Select.Trigger aria-label={ariaLabel} ref={ref} asChild>
           <Button
             variant="plain"
             className={clsx(
@@ -28,23 +28,21 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
               'data-placeholder:font-thin data-placeholder:italic',
             )}
           >
-            <SelectPrimitive.Value placeholder={placeholder} />
-            <SelectPrimitive.Icon
-              className={clsx('group-aria-expanded:rotate-180')}
-            >
+            <Select.Value placeholder={placeholder} />
+            <Select.Icon className={clsx('group-aria-expanded:rotate-180')}>
               <IconCaretDownFilled size={16} />
-            </SelectPrimitive.Icon>
+            </Select.Icon>
           </Button>
-        </SelectPrimitive.Trigger>
-        <SelectPrimitive.Portal>
-          <SelectPrimitive.Content
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Content
             className={clsx(
               'overflow-hidden rounded-lg shadow-md',
               'bg-dark-900',
               'w-max',
             )}
           >
-            <SelectPrimitive.Viewport>
+            <Select.Viewport>
               {options.map((option) => (
                 <SelectInputItem
                   key={option.value}
@@ -52,15 +50,15 @@ const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
                   render={option.render}
                 />
               ))}
-            </SelectPrimitive.Viewport>
-          </SelectPrimitive.Content>
-        </SelectPrimitive.Portal>
-      </SelectPrimitive.Root>
+            </Select.Viewport>
+          </Select.Content>
+        </Select.Portal>
+      </Select.Root>
     )
   },
 )
 
-interface SelectInputItemProps extends SelectPrimitive.SelectItemProps {
+interface SelectInputItemProps extends Select.SelectItemProps {
   render?: () => ReactNode
 }
 
@@ -69,7 +67,7 @@ const SelectInputItem = forwardRef<HTMLDivElement, SelectInputItemProps>(
     const { render, ...selectItemProps } = props
 
     return (
-      <SelectPrimitive.SelectItem
+      <Select.SelectItem
         ref={ref}
         {...selectItemProps}
         className={clsx(
@@ -81,10 +79,10 @@ const SelectInputItem = forwardRef<HTMLDivElement, SelectInputItemProps>(
           selectItemProps.className,
         )}
       >
-        <SelectPrimitive.ItemText>
+        <Select.ItemText>
           {render ? render() : selectItemProps.value}
-        </SelectPrimitive.ItemText>
-      </SelectPrimitive.SelectItem>
+        </Select.ItemText>
+      </Select.SelectItem>
     )
   },
 )

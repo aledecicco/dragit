@@ -3,6 +3,10 @@ import {
   IconFileMinus,
   IconFilePencil,
   IconFilePlus,
+  IconFolderCode,
+  IconFolderCog,
+  IconFolderMinus,
+  IconFolderPlus,
   IconPlus,
 } from '@tabler/icons-react'
 import clsx from 'clsx'
@@ -25,15 +29,15 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
     <FileStatusItem
       file={file}
       className={clsx('text-danger')}
-      Icon={match(file.unstaged)
-        .with('added', () => IconFilePlus)
-        .with('deleted', () => IconFileMinus)
-        .with('modified', () => IconFilePencil)
-        .with('typeChanged', () => IconFileCode2)
+      Glyph={match(file.unstaged)
+        .with('added', () => (file.isDir ? IconFolderPlus : IconFilePlus))
+        .with('deleted', () => (file.isDir ? IconFolderMinus : IconFileMinus))
+        .with('modified', () => (file.isDir ? IconFolderCode : IconFilePencil))
+        .with('typeChanged', () => (file.isDir ? IconFolderCog : IconFileCode2))
         .exhaustive()}
       actions={
         <IconButton
-          Icon={IconPlus}
+          Glyph={IconPlus}
           variant="neutral"
           size="sm"
           aria-label="Stage file"

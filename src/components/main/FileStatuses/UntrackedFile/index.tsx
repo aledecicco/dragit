@@ -1,4 +1,8 @@
-import { IconFileUnknown, IconPlus } from '@tabler/icons-react'
+import {
+  IconFileUnknown,
+  IconFolderQuestion,
+  IconPlus,
+} from '@tabler/icons-react'
 import clsx from 'clsx'
 
 import { useAddToIndex } from '@api/commands'
@@ -18,10 +22,10 @@ const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
     <FileStatusItem
       file={file}
       className={clsx('text-light-400')}
-      Icon={IconFileUnknown}
+      Glyph={file.isDir ? IconFolderQuestion : IconFileUnknown}
       actions={
         <IconButton
-          Icon={IconPlus}
+          Glyph={IconPlus}
           variant="neutral"
           size="sm"
           aria-label="Stage file"

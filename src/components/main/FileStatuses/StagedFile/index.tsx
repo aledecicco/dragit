@@ -1,9 +1,3 @@
-import clsx from 'clsx'
-import { match } from 'ts-pattern'
-
-import { useRemoveFromIndex } from '@api/commands'
-import type { StagedFile } from '@api/models'
-import { IconButton } from '@lib/IconButton'
 import {
   IconFileArrowRight,
   IconFileCode2,
@@ -11,8 +5,20 @@ import {
   IconFilePencil,
   IconFilePlus,
   IconFiles,
+  IconFolderCode,
+  IconFolderCog,
+  IconFolderMinus,
+  IconFolderPlus,
+  IconFolderShare,
+  IconFolders,
   IconMinus,
 } from '@tabler/icons-react'
+import clsx from 'clsx'
+import { match } from 'ts-pattern'
+
+import { useRemoveFromIndex } from '@api/commands'
+import type { StagedFile } from '@api/models'
+import { IconButton } from '@lib/IconButton'
 import { FileStatusItem } from '../File'
 
 interface StagedFileStatusItemProps {
@@ -27,17 +33,19 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
     <FileStatusItem
       file={file}
       className={clsx('text-success')}
-      Icon={match(file.staged)
-        .with('added', () => IconFilePlus)
-        .with('deleted', () => IconFileMinus)
-        .with('modified', () => IconFilePencil)
-        .with('copied', () => IconFiles)
-        .with('renamed', () => IconFileArrowRight)
-        .with('typeChanged', () => IconFileCode2)
+      Glyph={match(file.staged)
+        .with('added', () => (file.isDir ? IconFolderPlus : IconFilePlus))
+        .with('deleted', () => (file.isDir ? IconFolderMinus : IconFileMinus))
+        .with('modified', () => (file.isDir ? IconFolderCode : IconFilePencil))
+        .with('copied', () => (file.isDir ? IconFolders : IconFiles))
+        .with('renamed', () =>
+          file.isDir ? IconFolderShare : IconFileArrowRight,
+        )
+        .with('typeChanged', () => (file.isDir ? IconFolderCog : IconFileCode2))
         .exhaustive()}
       actions={
         <IconButton
-          Icon={IconMinus}
+          Glyph={IconMinus}
           variant="neutral"
           size="sm"
           aria-label="Unstage file"

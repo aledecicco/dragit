@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fs, path::Path, str::FromStr};
 
 use models::{
     ChangeStatus, CommitInfo, FileInfo, FileStatus, HeadInfo, HeadStatus, HistoryItem, MergeStatus,
@@ -38,12 +38,12 @@ pub fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
     }
 }
 
-pub fn parse_head_info(lines: &Vec<String>) -> Option<HeadInfo> {
+pub fn parse_head_info(dir: &String, lines: &Vec<String>) -> Option<HeadInfo> {
     let head_status = parse_head_status(lines)?;
     let files_info = lines
         .iter()
         .skip_while(|line| line.starts_with(HEAD_INFO_PREFIX))
-        .map(|line| parse_file_info(line))
+        .map(|line| parse_file_info(dir, line))
         .flatten();
 
     Some(HeadInfo {
@@ -79,7 +79,7 @@ fn parse_head_status(lines: &Vec<String>) -> Option<HeadStatus> {
     }
 }
 
-fn parse_file_info(line: &String) -> Option<FileInfo> {
+fn parse_file_info(dir: &String, line: &String) -> Option<FileInfo> {
     let status_str = line.chars().nth(0)?.to_string();
     let status_type = StatusType::from_str(&status_str).ok()?;
 
@@ -97,6 +97,7 @@ fn parse_file_info(line: &String) -> Option<FileInfo> {
                     staged: staged_status,
                     unstaged: unstaged_status,
                 },
+                is_dir: is_dir(dir, path),
             }
         }
 
@@ -116,6 +117,7 @@ fn parse_file_info(line: &String) -> Option<FileInfo> {
                     staged: moved_status,
                     unstaged: unstaged_status,
                 },
+                is_dir: is_dir(dir, path),
             }
         }
 
@@ -129,6 +131,7 @@ fn parse_file_info(line: &String) -> Option<FileInfo> {
                 status: FileStatus::Unmerged {
                     unstaged: merge_status,
                 },
+                is_dir: is_dir(dir, path),
             }
         }
 
@@ -139,6 +142,7 @@ fn parse_file_info(line: &String) -> Option<FileInfo> {
             FileInfo {
                 path: path.to_string(),
                 status: FileStatus::Untracked {},
+                is_dir: is_dir(dir, path),
             }
         }
     })
@@ -153,4 +157,13 @@ pub fn parse_history_item(line: &String) -> Option<HistoryItem> {
         hash: hash.to_string(),
         other_parents: parents,
     })
+}
+
+fn is_dir(dir: &String, path: &str) -> bool {
+    let full_path = Path::new(dir).join(path);
+    if let Ok(metadata) = fs::metadata(full_path) {
+        metadata.is_dir()
+    } else {
+        false
+    }
 }

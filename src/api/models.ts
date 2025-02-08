@@ -34,6 +34,7 @@ export type HeadStatus =
 
 interface BaseFile {
   path: string
+  isDir: boolean
 }
 
 export interface StagedOnlyFile extends BaseFile {

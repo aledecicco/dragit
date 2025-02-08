@@ -3,6 +3,9 @@ import {
   IconFileMinus,
   IconFilePencil,
   IconFilePlus,
+  IconFolderCode,
+  IconFolderMinus,
+  IconFolderPlus,
   IconTrash,
 } from '@tabler/icons-react'
 import clsx from 'clsx'
@@ -26,21 +29,21 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
     <FileStatusItem
       file={file}
       className={clsx('text-warning')}
-      Icon={match(file.unstaged)
-        .with(
-          P.union('addedByThem', 'addedByUs', 'bothAdded'),
-          () => IconFilePlus,
+      Glyph={match(file.unstaged)
+        .with(P.union('addedByThem', 'addedByUs', 'bothAdded'), () =>
+          file.isDir ? IconFolderPlus : IconFilePlus,
         )
-        .with(
-          P.union('deletedByThem', 'deletedByUs', 'bothDeleted'),
-          () => IconFileMinus,
+        .with(P.union('deletedByThem', 'deletedByUs', 'bothDeleted'), () =>
+          file.isDir ? IconFolderMinus : IconFileMinus,
         )
-        .with('bothModified', () => IconFilePencil)
+        .with('bothModified', () =>
+          file.isDir ? IconFolderCode : IconFilePencil,
+        )
         .exhaustive()}
       actions={
         <>
           <IconButton
-            Icon={IconCheck}
+            Glyph={IconCheck}
             variant="neutral"
             size="sm"
             aria-label="Mark conflict as resolved"
@@ -52,7 +55,7 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
               P.union('bothDeleted', 'deletedByThem', 'deletedByUs'),
               () => (
                 <IconButton
-                  Icon={IconTrash}
+                  Glyph={IconTrash}
                   variant="neutral"
                   size="sm"
                   aria-label="Delete file"
