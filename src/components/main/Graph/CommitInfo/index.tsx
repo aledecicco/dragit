@@ -21,7 +21,11 @@ const GraphCommitInfo = (props: GraphCommitInfoProps) => {
               {new Date(commitInfo.timestamp).toDateString()}
             </p>
           </div>
-          <p className={clsx('text-sm')}>{commitInfo.message}</p>
+          <p
+            className={clsx('text-sm', 'max-h-20 overflow-y-auto break-words')}
+          >
+            {commitInfo.message}
+          </p>
           <p className={clsx('text-xs text-primary-300')}>{commitInfo.hash}</p>
         </>
       ) : (
