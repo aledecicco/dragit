@@ -1,12 +1,15 @@
-import type {
-  InfiniteData,
-  UseInfiniteQueryResult,
+import {
+  type InfiniteData,
+  type UseInfiniteQueryResult,
+  useQuery,
 } from '@tanstack/react-query'
 import type { VirtualItem } from '@tanstack/react-virtual'
 import { useEffect } from 'react'
 
-import type { HistoryItem } from '@api/models'
+import type { BranchName, HeadInfo, HistoryItem } from '@api/models'
+import { headInfoQuery } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
+import { match } from 'ts-pattern'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<HistoryItem[]>>
 
@@ -14,7 +17,7 @@ const ancestorNotInRange = (
   ancestorDistance: number,
   history: HistoryQuery,
   items: VirtualItem[],
-) => {
+): boolean => {
   return (
     !items.find((virtualRow) => virtualRow.index === ancestorDistance) ||
     getPaginatedLength(history) <= ancestorDistance
@@ -41,4 +44,17 @@ const useInfiniteScroll = (
   }, [items, history, fetchCondition])
 }
 
-export { ancestorNotInRange, useInfiniteScroll }
+const useCurrentBranch = (path: string): BranchName | undefined => {
+  const branch = useQuery({
+    ...headInfoQuery(path),
+    select: (headInfo) =>
+      match(headInfo.status)
+        .with({ type: 'branch' }, (head) => head.name)
+        .with({ type: 'initial' }, (head) => head.branch)
+        .otherwise(() => undefined),
+  })
+
+  return branch.data
+}
+
+export { ancestorNotInRange, useInfiniteScroll, useCurrentBranch }

@@ -3,11 +3,13 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 
+import { useCheckoutLocalBranch } from '@api/commands'
 import type { BranchName } from '@api/models'
 import {
   branchesQuery,
   commitHistoryQuery,
   commonAncestorQuery,
+  headInfoQuery,
 } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
 import { SelectInput } from '@lib/SelectInput'
@@ -16,6 +18,7 @@ import { GraphBaseBranch } from './BaseBranch'
 import { GraphBranch } from './Branch'
 import { NODE_SIZE } from './Commit'
 import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
+import { useCurrentBranch } from './utils'
 
 interface GraphProps {
   path: string
@@ -24,8 +27,10 @@ interface GraphProps {
 const Graph = (props: GraphProps) => {
   const { path } = props
   const branches = useQuery(branchesQuery(path))
-  const [branch, setBranch] = useState<BranchName>('test7')
-  const [baseBranch, setBaseBranch] = useState<BranchName>('main-4')
+  const headInfo = useQuery(headInfoQuery(path))
+  const currentBranch = useCurrentBranch(path)
+  const [baseBranch, setBaseBranch] = useState<BranchName>()
+  const checkout = useCheckoutLocalBranch()
 
   return (
     <div className={clsx('h-full w-full min-h-0')}>
@@ -39,20 +44,29 @@ const Graph = (props: GraphProps) => {
           ariaLabel="Branch"
           placeholder="Branch..."
           options={branches.data?.map((branch) => ({ value: branch })) ?? []}
-          value={branch}
-          onValueChange={setBranch}
+          value={currentBranch}
+          disabled={headInfo.isLoading}
+          onValueChange={(newBranch) => checkout(newBranch)}
         />
 
         <SelectInput
           ariaLabel="Branch"
           placeholder="Branch..."
-          options={branches.data?.map((branch) => ({ value: branch })) ?? []}
+          options={
+            branches.data
+              ?.filter((branch) => branch !== currentBranch)
+              .map((branch) => ({ value: branch })) ?? []
+          }
           value={baseBranch}
           onValueChange={setBaseBranch}
         />
 
         <SvgOverlay className={clsx('grid col-span-2')} RenderOverlay={Edges}>
-          <GraphInner {...props} branch={branch} baseBranch={baseBranch} />
+          <GraphInner
+            {...props}
+            branch={currentBranch}
+            baseBranch={baseBranch}
+          />
         </SvgOverlay>
       </div>
     </div>

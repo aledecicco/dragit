@@ -17,7 +17,7 @@ const FileStatusMoreInfo = (props: FileStatusMoreInfoProps) => {
     <div className={clsx('flex flex-col gap-2')}>
       <div
         className={clsx(
-          'flex flex-row items-center gap-2',
+          'flex flex-row items-center gap-1.5',
           'text-light-200 text-md',
         )}
       >
@@ -29,7 +29,7 @@ const FileStatusMoreInfo = (props: FileStatusMoreInfoProps) => {
         <p
           className={clsx(
             'flex flex-row-reverse',
-            'overflow-auto pb-2.5 -mb-2.5',
+            'overflow-x-auto pb-2.5 -mb-2.5',
           )}
         >
           {file.path}
