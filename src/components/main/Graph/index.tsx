@@ -43,7 +43,9 @@ const Graph = (props: GraphProps) => {
         <SelectInput
           ariaLabel="Branch"
           placeholder="Branch..."
-          options={branches.data?.map((branch) => ({ value: branch })) ?? []}
+          options={
+            branches.data?.map((branch) => ({ value: branch.name })) ?? []
+          }
           value={currentBranch}
           disabled={headInfo.isLoading}
           onValueChange={(newBranch) => checkout(newBranch)}
@@ -54,8 +56,8 @@ const Graph = (props: GraphProps) => {
           placeholder="Branch..."
           options={
             branches.data
-              ?.filter((branch) => branch !== currentBranch)
-              .map((branch) => ({ value: branch })) ?? []
+              ?.filter((branch) => branch.name !== currentBranch)
+              .map((branch) => ({ value: branch.name })) ?? []
           }
           value={baseBranch}
           onValueChange={setBaseBranch}

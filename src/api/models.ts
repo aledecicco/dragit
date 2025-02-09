@@ -32,6 +32,19 @@ export type HeadStatus =
   | { type: 'detached'; commit: CommitId }
   | { type: 'branch'; name: BranchName }
 
+export interface LocalBranch {
+  name: BranchName
+  branchType: 'local'
+  remote: BranchName | null
+}
+
+export interface RemoteBranch {
+  name: BranchName
+  branchType: 'remote'
+}
+
+export type BranchInfo = LocalBranch | RemoteBranch
+
 interface BaseFile {
   path: string
   isDir: boolean

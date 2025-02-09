@@ -1,8 +1,8 @@
 use tauri::{AppHandle, Emitter, Manager, State};
 
 use models::{
-    AncestorInfo, AppError, AppEvent, AppState, CommitInfo, GitError, HeadInfo, HistoryItem,
-    SafeHandler,
+    AncestorInfo, AppError, AppEvent, AppState, BranchInfo, CommitInfo, GitError, HeadInfo,
+    HistoryItem, SafeHandler,
 };
 
 fn with_handler<T>(
@@ -61,7 +61,7 @@ pub async fn is_repository(state: State<'_, AppState>) -> Result<bool, AppError>
 
 /// Returns a list of the current known local and remote branches.
 #[tauri::command]
-pub async fn get_branches(state: State<'_, AppState>) -> Result<Vec<String>, AppError> {
+pub async fn get_branches(state: State<'_, AppState>) -> Result<Vec<BranchInfo>, AppError> {
     with_handler(&state, &|h| h.get_branches())
 }
 
@@ -127,8 +127,12 @@ pub async fn remove_from_tree(
 }
 
 #[tauri::command]
-pub async fn commit_index(state: State<'_, AppState>, message: &str) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.commit_index(message))
+pub async fn commit_index(
+    state: State<'_, AppState>,
+    message: &str,
+    is_amend: bool,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.commit_index(message, is_amend))
 }
 
 #[tauri::command]

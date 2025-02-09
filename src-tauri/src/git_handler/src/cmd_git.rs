@@ -1,12 +1,14 @@
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     io::{self, ErrorKind},
     path::Path,
     process::{Command, ExitStatus, Output},
     string::FromUtf8Error,
 };
 
-use models::{AncestorInfo, CommitInfo, GitError, GitHandler, HeadInfo, HistoryItem};
+use models::{
+    AncestorInfo, BranchInfo, BranchType, CommitInfo, GitError, GitHandler, HeadInfo, HistoryItem,
+};
 
 use crate::utils::*;
 
@@ -88,14 +90,38 @@ impl GitHandler for CmdGit {
             .is_ok_and(|path| command_output(&path, ["rev-parse"]).is_ok())
     }
 
-    fn get_branches(&self) -> Result<Vec<String>, GitError> {
-        command_output(
+    fn get_branches(&self) -> Result<Vec<BranchInfo>, GitError> {
+        let mut branches: Vec<BranchInfo> = command_output(
             &self.get_path()?,
-            ["branch", "-a", "--format=%(refname:short)"],
+            ["branch", "--list", "-a", BRANCHES_INFO_FORMAT],
         )
         .ok()
         .and_then(|output| self.get_output_lines(output).ok())
         .ok_or(GitError::GetBranchesFailed {})
+        .and_then(|lines| {
+            Ok(lines
+                .iter()
+                .map(parse_branch_info)
+                .filter_map(|x| x)
+                .collect())
+        })?;
+
+        let mut tracked_remotes = HashSet::new();
+        for branch in &mut branches {
+            if let BranchType::Local {
+                remote: Some(remote_name),
+            } = &branch.branch_type
+            {
+                tracked_remotes.insert(remote_name.to_string());
+            }
+        }
+
+        branches.retain(|branch| {
+            !(matches!(branch.branch_type, BranchType::Remote {})
+                && tracked_remotes.contains(&branch.name))
+        });
+
+        Ok(branches)
     }
 
     fn checkout_local_branch(&self, branch: &str) -> Result<(), GitError> {
@@ -208,9 +234,14 @@ impl GitHandler for CmdGit {
         Ok(())
     }
 
-    fn commit_index(&self, message: &str) -> Result<(), GitError> {
-        command_output(&self.get_path()?, ["commit", "-m", message])
-            .or(Err(GitError::CommitFailed {}))?;
+    fn commit_index(&self, message: &str, is_amend: bool) -> Result<(), GitError> {
+        let mut args = vec!["commit", "-m", message];
+
+        if is_amend {
+            args.push("--amend");
+        }
+
+        command_output(&self.get_path()?, args).or(Err(GitError::CommitFailed {}))?;
 
         Ok(())
     }

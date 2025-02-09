@@ -140,3 +140,20 @@ pub struct HistoryItem {
     pub hash: String,
     pub other_parents: Vec<String>,
 }
+
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
+pub struct BranchInfo {
+    pub name: String,
+
+    #[serde(flatten)]
+    pub branch_type: BranchType,
+}
+
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"), tag = "type")]
+pub enum BranchType {
+    Remote {},
+
+    Local { remote: Option<String> },
+}

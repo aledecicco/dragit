@@ -6,7 +6,7 @@ import {
 import type { VirtualItem } from '@tanstack/react-virtual'
 import { useEffect } from 'react'
 
-import type { BranchName, HeadInfo, HistoryItem } from '@api/models'
+import type { BranchName, HistoryItem } from '@api/models'
 import { headInfoQuery } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
 import { match } from 'ts-pattern'

@@ -1,4 +1,4 @@
-use crate::{error::GitError, AncestorInfo, CommitInfo, HeadInfo, HistoryItem};
+use crate::{error::GitError, AncestorInfo, BranchInfo, CommitInfo, HeadInfo, HistoryItem};
 
 /// Abstraction for common operations that a git implementation needs to support.
 pub trait GitHandler {
@@ -15,7 +15,7 @@ pub trait GitHandler {
     fn is_repository(&self) -> bool;
 
     /// Returns a list of the current known local and remote branches.
-    fn get_branches(&self) -> Result<Vec<String>, GitError>;
+    fn get_branches(&self) -> Result<Vec<BranchInfo>, GitError>;
 
     /// Switches the current repository to a local branch.
     fn checkout_local_branch(&self, branch: &str) -> Result<(), GitError>;
@@ -47,7 +47,7 @@ pub trait GitHandler {
     fn remove_from_tree(&self, files: &Vec<&str>) -> Result<(), GitError>;
 
     /// Commits the current index with the given message.
-    fn commit_index(&self, message: &str) -> Result<(), GitError>;
+    fn commit_index(&self, message: &str, is_amend: bool) -> Result<(), GitError>;
 
     /// Returns the commit hash of the latest common ancestor between the two given branches.
     fn get_common_ancestor(

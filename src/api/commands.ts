@@ -94,8 +94,10 @@ const useRemoveFromTree = () => {
   return (files: string[]) => mutation.mutateAsync(files)
 }
 
-const pushCommitIndex = (message: string): Promise<void> =>
-  invoke('commit_index', { message: message })
+const pushCommitIndex = (args: {
+  message: string
+  isAmend: boolean
+}): Promise<void> => invoke('commit_index', args)
 
 const useCommitIndex = () => {
   const mutation = useMutation({
@@ -103,7 +105,10 @@ const useCommitIndex = () => {
     mutationFn: pushCommitIndex,
   })
 
-  return (message: string) => mutation.mutateAsync(message)
+  return (args: {
+    message: string
+    isAmend: boolean
+  }) => mutation.mutateAsync(args)
 }
 
 export {

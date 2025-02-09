@@ -1,8 +1,8 @@
 use std::{fs, path::Path, str::FromStr};
 
 use models::{
-    ChangeStatus, CommitInfo, FileInfo, FileStatus, HeadInfo, HeadStatus, HistoryItem, MergeStatus,
-    MovedStatus, StatusType,
+    BranchInfo, BranchType, ChangeStatus, CommitInfo, FileInfo, FileStatus, HeadInfo, HeadStatus,
+    HistoryItem, MergeStatus, MovedStatus, StatusType,
 };
 
 /// Format used to get the needed information about a commit, as a JSON-parseable string.
@@ -26,6 +26,12 @@ pub const MOVED_FILE_INFO_SEGMENTS: usize = 10;
 pub const UNMERGED_FILE_INFO_SEGMENTS: usize = 11;
 /// The number of space-separated segments each line has for untracked files.
 pub const UNTRACKED_FILE_INFO_SEGMENTS: usize = 2;
+/// Format used to get the needed information about branches.
+pub const BRANCHES_INFO_FORMAT: &str = "--format=%(refname) %(upstream)";
+/// The string that denotes that a branch is a local ref when printing its status.
+pub const LOCAL_BRANCH_PREFIX: &str = "refs/heads/";
+/// The string that denotes that a branch is a local ref when printing its status.
+pub const REMOTE_BRANCH_PREFIX: &str = "refs/remotes/";
 
 pub fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
     if let Some((line, rest)) = lines.split_first() {
@@ -159,11 +165,41 @@ pub fn parse_history_item(line: &String) -> Option<HistoryItem> {
     })
 }
 
+pub fn parse_branch_info(line: &String) -> Option<BranchInfo> {
+    let mut names = line.split_ascii_whitespace().map(String::from);
+    let branch_name = names.next()?;
+    let upstream_name = names.next();
+
+    if branch_name.starts_with(LOCAL_BRANCH_PREFIX) {
+        Some(BranchInfo {
+            name: strip_branch_prefix(&branch_name, LOCAL_BRANCH_PREFIX),
+            branch_type: BranchType::Local {
+                remote: upstream_name
+                    .map(|upstream_name| strip_branch_prefix(&upstream_name, REMOTE_BRANCH_PREFIX)),
+            },
+        })
+    } else if branch_name.starts_with(REMOTE_BRANCH_PREFIX) {
+        Some(BranchInfo {
+            name: strip_branch_prefix(&branch_name, REMOTE_BRANCH_PREFIX),
+            branch_type: BranchType::Remote {},
+        })
+    } else {
+        None
+    }
+}
+
 fn is_dir(dir: &String, path: &str) -> bool {
     let full_path = Path::new(dir).join(path);
     if let Ok(metadata) = fs::metadata(full_path) {
         metadata.is_dir()
     } else {
         false
+    }
+}
+
+fn strip_branch_prefix(full_name: &String, prefix: &str) -> String {
+    match full_name.strip_prefix(prefix) {
+        Some(short_name) => short_name.to_string(),
+        None => full_name.to_string(),
     }
 }

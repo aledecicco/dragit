@@ -15,6 +15,7 @@ use models::{AppEvent, RepoWatcher, RepoWatcherError};
 
 use crate::{
     get_branches_folder, get_git_folder, get_head_file, get_index_file, get_objects_folder,
+    get_remotes_folder,
 };
 
 /// Implementation of [`RepoWatcher`] that uses a debouncer to group events.
@@ -43,6 +44,7 @@ impl DebouncedWatcher {
             let git_folder = get_git_folder(repo_path);
             let head_file = get_head_file(repo_path);
             let branches_folder = get_branches_folder(repo_path);
+            let remotes_folder = get_remotes_folder(repo_path);
             let objects_folder = get_objects_folder(repo_path);
             let index_file = get_index_file(repo_path);
 
@@ -72,8 +74,9 @@ impl DebouncedWatcher {
 
                         event.paths.iter().for_each(|path| {
                             if path.starts_with(&branches_folder) && path.is_file() {
-                                if let Some(branch_name) =
-                                    path.file_name().and_then(|path| path.to_str())
+                                if let Ok(Some(branch_name)) = path
+                                    .strip_prefix(&branches_folder)
+                                    .map(|path| path.to_str())
                                 {
                                     let _ = app_handle.emit(
                                         EVENT_ID,
@@ -82,6 +85,20 @@ impl DebouncedWatcher {
                                         },
                                     );
                                     println!("branch updated {}", branch_name);
+                                }
+                            }
+
+                            if path.starts_with(&remotes_folder) && path.is_file() {
+                                if let Ok(Some(branch_name)) =
+                                    path.strip_prefix(&remotes_folder).map(|path| path.to_str())
+                                {
+                                    let _ = app_handle.emit(
+                                        EVENT_ID,
+                                        AppEvent::BranchUpdated {
+                                            name: branch_name.to_string(),
+                                        },
+                                    );
+                                    println!("remote branch updated {}", branch_name);
                                 }
                             }
                         });
@@ -97,11 +114,10 @@ impl DebouncedWatcher {
                                     head_changed = true
                                 }
 
-                                if event
-                                    .paths
-                                    .iter()
-                                    .any(|path| path.starts_with(&branches_folder))
-                                {
+                                if event.paths.iter().any(|path| {
+                                    path.starts_with(&branches_folder)
+                                        || path.starts_with(&remotes_folder)
+                                }) {
                                     branches_list_updated = true;
                                 }
 

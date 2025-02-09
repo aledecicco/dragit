@@ -7,6 +7,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type {
   AncestorInfo,
+  BranchInfo,
   BranchName,
   CommitId,
   CommitInfo,
@@ -114,7 +115,7 @@ const headInfoQuery = (path: string) =>
     queryFn: fetchHeadInfo,
   })
 
-const fetchBranches = (): Promise<BranchName[]> => invoke('get_branches')
+const fetchBranches = (): Promise<BranchInfo[]> => invoke('get_branches')
 
 const branchesQuery = (path: string) =>
   queryOptions({
