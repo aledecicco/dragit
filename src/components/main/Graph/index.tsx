@@ -1,7 +1,8 @@
+import { IconSwitchHorizontal } from '@tabler/icons-react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { useCheckoutLocalBranch } from '@api/commands'
 import type { BranchName } from '@api/models'
@@ -12,6 +13,7 @@ import {
   headInfoQuery,
 } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
+import { IconButton } from '@lib/IconButton'
 import { SelectInput } from '@lib/SelectInput'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
 import { GraphBaseBranch } from './BaseBranch'
@@ -24,20 +26,49 @@ interface GraphProps {
   path: string
 }
 
+interface ChosenBranches {
+  branch: BranchName | undefined
+  baseBranch: BranchName | undefined
+}
+
 const Graph = (props: GraphProps) => {
   const { path } = props
+
   const branches = useQuery(branchesQuery(path))
   const headInfo = useQuery(headInfoQuery(path))
   const currentBranch = useCurrentBranch(path)
-  const [baseBranch, setBaseBranch] = useState<BranchName>()
+
+  const [{ branch, baseBranch }, setChosenBranches] = useState<ChosenBranches>({
+    branch: currentBranch,
+    baseBranch: undefined,
+  })
+
   const checkout = useCheckoutLocalBranch()
+
+  useEffect(() => {
+    setChosenBranches((oldBranches) => ({
+      branch: currentBranch,
+      baseBranch:
+        oldBranches.baseBranch && oldBranches.baseBranch === currentBranch
+          ? oldBranches.branch
+          : oldBranches.baseBranch,
+    }))
+  }, [currentBranch])
+
+  const changeBaseBranch = useCallback((newBaseBranch: BranchName) => {
+    setChosenBranches((oldBranches) => ({
+      ...oldBranches,
+      baseBranch: newBaseBranch,
+    }))
+  }, [])
 
   return (
     <div className={clsx('h-full w-full min-h-0')}>
       <div
         className={clsx(
-          'overflow-hidden w-full h-full',
-          'grid grid-cols-2 grid-rows-[max-content_1fr] gap-8',
+          'overflow-hidden w-full h-full relative',
+          'grid grid-cols-2 grid-rows-[max-content_1fr]',
+          'gap-8 place-items-center',
         )}
       >
         <SelectInput
@@ -46,29 +77,41 @@ const Graph = (props: GraphProps) => {
           options={
             branches.data?.map((branch) => ({ value: branch.name })) ?? []
           }
-          value={currentBranch}
+          value={branch}
           disabled={headInfo.isLoading}
           onValueChange={(newBranch) => checkout(newBranch)}
         />
 
+        <IconButton
+          Glyph={IconSwitchHorizontal}
+          className={clsx(
+            'absolute top-0 left-half -translate-x-full translate-y-[25%]',
+          )}
+          variant="neutral"
+          aria-label="Switch branch and base branch"
+          disabled={!branch || !baseBranch}
+          size="sm"
+          onClick={() => {
+            if (baseBranch) {
+              checkout(baseBranch)
+            }
+          }}
+        />
+
         <SelectInput
-          ariaLabel="Branch"
-          placeholder="Branch..."
+          ariaLabel="Base branch"
+          placeholder="Base branch..."
           options={
             branches.data
               ?.filter((branch) => branch.name !== currentBranch)
               .map((branch) => ({ value: branch.name })) ?? []
           }
           value={baseBranch}
-          onValueChange={setBaseBranch}
+          onValueChange={changeBaseBranch}
         />
 
         <SvgOverlay className={clsx('grid col-span-2')} RenderOverlay={Edges}>
-          <GraphInner
-            {...props}
-            branch={currentBranch}
-            baseBranch={baseBranch}
-          />
+          <GraphInner {...props} branch={branch} baseBranch={baseBranch} />
         </SvgOverlay>
       </div>
     </div>

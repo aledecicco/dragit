@@ -23,7 +23,7 @@ const Icon = (props: IconProps) => {
         match(size)
           .with('sm', () => 'stroke-1.5 size-4')
           .with('md', () => 'stroke-2 size-5')
-          .with('lg', () => 'stroke-2.25 size-7')
+          .with('lg', () => 'stroke-2.5 size-5.5')
           .exhaustive(),
         iconProps.className,
       )}
