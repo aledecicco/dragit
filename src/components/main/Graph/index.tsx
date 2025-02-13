@@ -85,7 +85,7 @@ const Graph = (props: GraphProps) => {
         <IconButton
           Glyph={IconSwitchHorizontal}
           className={clsx(
-            'absolute top-0 left-half -translate-x-full translate-y-[25%]',
+            'absolute top-0 left-half -translate-x-[200%] translate-y-[25%]',
           )}
           variant="neutral"
           aria-label="Switch branch and base branch"

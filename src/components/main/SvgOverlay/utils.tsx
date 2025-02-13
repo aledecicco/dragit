@@ -29,14 +29,11 @@ const makeTracked = <P, T extends HTMLElement>(
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: refresh when type of parent changes
     useEffect(() => {
+      console.log('changed rel')
+
       svgOverlay.registerElement(elementId, {
         ref,
-        parent: parent
-          ? {
-              id: parent?.id,
-              type: parent?.type,
-            }
-          : undefined,
+        parent,
       })
 
       return () => {

@@ -91,7 +91,7 @@ const GraphBranch = (props: GraphBranchProps) => {
                     }
                   : undefined
               }
-              className={clsx('absolute top-0 left-[10%]')}
+              className={clsx('absolute top-0 left-[8%]')}
               style={{
                 transform: `translateY(${virtualRow.start}px)`,
               }}
@@ -116,7 +116,7 @@ const GraphBranch = (props: GraphBranchProps) => {
             id: COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, baseBranch),
             type: SOLID_PARENT,
           }}
-          className={clsx('absolute top-0 left-[10%]')}
+          className={clsx('absolute top-0 left-[8%]')}
           style={{
             transform: `translateY(${(virtualizer.options.gap + virtualizer.options.estimateSize(ancestorInfo.branchDistance)) * ancestorInfo.branchDistance}px)`,
           }}
