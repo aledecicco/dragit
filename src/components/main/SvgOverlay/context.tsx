@@ -12,19 +12,20 @@ import {
 } from 'react'
 
 import { clamp } from '@utils/number'
+import type { LiteralUnion } from '@utils/types'
 
 export const SCROLL_SPEED = 2.5
 
 type ElementId = string
 
-interface Element {
+interface Element<R extends string = string> {
   ref: RefObject<HTMLElement>
-  parent: ParentRel | undefined
+  parent: ParentRel<LiteralUnion<R>> | undefined
 }
 
-interface ParentRel {
+interface ParentRel<R> {
   id: ElementId
-  type: string
+  type: R
 }
 
 interface SvgOverlayState {

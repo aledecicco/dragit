@@ -7,20 +7,20 @@ import {
   useSvgOverlay,
 } from './context'
 
-interface TrackedComponentProps {
+interface TrackedComponentProps<R extends string> {
   elementId: ElementId
-  parent: ParentRel | undefined
+  parent: ParentRel<R> | undefined
 }
 
 interface TrackRefProps<T extends HTMLElement> {
   trackRef: Ref<T>
 }
 
-const makeTracked = <P, T extends HTMLElement>(
+const makeTracked = <P, T extends HTMLElement, R extends string>(
   WrappedComponent: ComponentType<P & TrackRefProps<T>>,
 ) => {
   const TrackedComponent = (
-    props: Omit<P, 'trackRef'> & TrackedComponentProps,
+    props: Omit<P, 'trackRef'> & TrackedComponentProps<R>,
   ) => {
     const { elementId, parent, ...componentProps } = props
     const svgOverlay = useSvgOverlay()

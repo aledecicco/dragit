@@ -11,7 +11,6 @@ import {
 } from '@api/utils'
 import { useCallback } from 'react'
 import { GraphCommit } from '../Commit'
-import { DASHED_PARENT, SOLID_PARENT } from '../Edges'
 import { ancestorNotInRange, useInfiniteScroll } from '../utils'
 
 const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
@@ -86,8 +85,8 @@ const GraphBranch = (props: GraphBranchProps) => {
                         displayExtraAncestor &&
                         parentCommit === ancestorInfo.lastCommit &&
                         !nextIsLast
-                          ? DASHED_PARENT
-                          : SOLID_PARENT,
+                          ? 'dashed'
+                          : 'solid',
                     }
                   : undefined
               }
@@ -114,7 +113,7 @@ const GraphBranch = (props: GraphBranchProps) => {
           elementId={COMMIT_ELEMENT_ID(ancestorInfo.lastCommit, branch)}
           parent={{
             id: COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, baseBranch),
-            type: SOLID_PARENT,
+            type: 'solid',
           }}
           className={clsx('absolute top-0 left-[8%]')}
           style={{

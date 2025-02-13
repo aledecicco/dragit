@@ -1,11 +1,10 @@
 import clsx from 'clsx'
+import { match } from 'ts-pattern'
 
 import type { Element, ElementId } from '@main/SvgOverlay/context'
 import { getPosition } from '@main/SvgOverlay/utils'
 
-export const DASHED_PARENT = 'dashed'
-export const SOLID_PARENT = 'solid'
-export type PARENT_TYPE = typeof DASHED_PARENT | typeof SOLID_PARENT
+export type ParentCommitType = 'solid' | 'dashed' | 'unconfirmed'
 
 export const EDGE_OFFSET = 8
 export const CURVE_SIZE = 22
@@ -26,7 +25,7 @@ export const HALF_LINE_RIGHT = (X_FROM: number, X_TO: number) =>
   `l ${(X_TO - X_FROM) / 2 - CURVE_SIZE * 2} 0`
 
 interface EdgesProps {
-  elements: Map<ElementId, Element>
+  elements: Map<ElementId, Element<ParentCommitType>>
 }
 
 const Edges = (props: EdgesProps) => {
@@ -61,8 +60,12 @@ const Edges = (props: EdgesProps) => {
           <path
             key={id}
             className={clsx(
-              'fill-none stroke-primary-700 stroke-4',
-              elem.parent.type === DASHED_PARENT && '[stroke-dasharray:8_5]',
+              'fill-none stroke-4',
+              match(elem.parent.type)
+                .with('solid', () => 'stroke-primary-700')
+                .with('dashed', () => 'stroke-primary-800')
+                .with('unconfirmed', () => 'stroke-accent-500'),
+              elem.parent.type === 'dashed' && '[stroke-dasharray:8_5]',
             )}
             d={[
               BEGIN_PATH(elemX, elemY),

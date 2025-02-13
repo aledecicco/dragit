@@ -6,7 +6,6 @@ import type { AncestorInfo, BranchName, CommitId } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
 import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
-import { DASHED_PARENT, SOLID_PARENT } from '../Edges'
 import { ancestorNotInRange, useInfiniteScroll } from '../utils'
 
 interface GraphBaseBranchProps {
@@ -59,8 +58,8 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
                         displayExtraAncestor &&
                         parentCommit === ancestorInfo.commonCommit &&
                         !nextIsCommon
-                          ? DASHED_PARENT
-                          : SOLID_PARENT,
+                          ? 'dashed'
+                          : 'solid',
                     }
                   : undefined
               }
