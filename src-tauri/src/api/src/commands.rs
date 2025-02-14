@@ -1,8 +1,8 @@
 use tauri::{AppHandle, Emitter, Manager, State};
 
 use models::{
-    AncestorInfo, AppError, AppEvent, AppState, BranchInfo, CommitInfo, GitError, HeadInfo,
-    HistoryItem, SafeHandler,
+    AncestorInfo, AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, GitError,
+    HeadInfo, HistoryItem, SafeHandler,
 };
 
 fn with_handler<T>(
@@ -142,4 +142,13 @@ pub async fn get_common_ancestor(
     base_branch: &str,
 ) -> Result<Option<AncestorInfo>, AppError> {
     with_handler(&state, &|h| h.get_common_ancestor(branch, base_branch))
+}
+
+#[tauri::command]
+pub async fn get_branch_divergence(
+    state: State<'_, AppState>,
+    branch: &str,
+    remote: &str,
+) -> Result<BranchDivergence, AppError> {
+    with_handler(&state, &|h| h.get_branch_divergence(branch, remote))
 }

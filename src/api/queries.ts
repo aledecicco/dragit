@@ -88,6 +88,27 @@ const queryKeys = {
           baseBranch: baseBranch,
         }) as const,
     },
+    branchDivergence: {
+      all: (path: string) =>
+        ({
+          ...queryKeys.directory.current(path),
+          key: 'branch_divergence',
+        }) as const,
+      branch: (path: string, branch: BranchName | undefined) =>
+        ({
+          ...queryKeys.directory.branchDivergence.all(path),
+          branch: branch,
+        }) as const,
+      pair: (
+        path: string,
+        branch: BranchName | undefined,
+        baseBranch: BranchName | undefined,
+      ) =>
+        ({
+          ...queryKeys.directory.branchDivergence.branch(path, branch),
+          baseBranch: baseBranch,
+        }) as const,
+    },
   },
 }
 
@@ -174,6 +195,27 @@ const commonAncestorQuery = (
         : skipToken,
   })
 
+const fetchBranchDivergence = (
+  branch: BranchName,
+  baseBranch: BranchName,
+): Promise<AncestorInfo | undefined> =>
+  invoke('get_branch_divergence', { branch: branch, baseBranch: baseBranch })
+
+const branchDivergenceQuery = (
+  path: string,
+  branch: BranchName | undefined,
+  baseBranch: BranchName | undefined,
+) =>
+  queryOptions({
+    queryKey: [
+      queryKeys.directory.branchDivergence.pair(path, branch, baseBranch),
+    ],
+    queryFn:
+      branch && baseBranch
+        ? () => fetchBranchDivergence(branch, baseBranch)
+        : skipToken,
+  })
+
 export {
   queryKeys,
   currentDirQuery,
@@ -183,4 +225,5 @@ export {
   commitHistoryQuery,
   commitInfoQuery,
   commonAncestorQuery,
+  branchDivergenceQuery,
 }

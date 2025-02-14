@@ -2,7 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 
-import type { AncestorInfo, BranchName, CommitId } from '@api/models'
+import type { AncestorInfo, BranchInfo, CommitId } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
 import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
@@ -11,13 +11,13 @@ import { ancestorNotInRange, useInfiniteScroll } from '../utils'
 interface GraphBaseBranchProps {
   virtualizer: Virtualizer<HTMLDivElement, Element>
   path: string
-  branch: BranchName
+  branch: BranchInfo
   ancestorInfo: AncestorInfo | undefined
 }
 
 const GraphBaseBranch = (props: GraphBaseBranchProps) => {
   const { virtualizer, path, branch, ancestorInfo } = props
-  const history = useInfiniteQuery(commitHistoryQuery(path, branch))
+  const history = useInfiniteQuery(commitHistoryQuery(path, branch.name))
 
   const items = virtualizer.getVirtualItems()
   useInfiniteScroll(history, items)
@@ -49,11 +49,11 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
               key={virtualRow.index}
               path={path}
               commitId={commit}
-              elementId={COMMIT_ELEMENT_ID(commit, branch)}
+              elementId={COMMIT_ELEMENT_ID(commit, branch.name)}
               parent={
                 parentCommit
                   ? {
-                      id: COMMIT_ELEMENT_ID(parentCommit, branch),
+                      id: COMMIT_ELEMENT_ID(parentCommit, branch.name),
                       type:
                         displayExtraAncestor &&
                         parentCommit === ancestorInfo.commonCommit &&
@@ -83,7 +83,7 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
           key={ancestorInfo.baseDistance}
           path={path}
           commitId={ancestorInfo.commonCommit}
-          elementId={COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, branch)}
+          elementId={COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, branch.name)}
           parent={undefined}
           className={clsx('absolute top-0 left-[60%]')}
           style={{

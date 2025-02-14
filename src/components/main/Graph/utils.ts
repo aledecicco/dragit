@@ -4,12 +4,12 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 import type { VirtualItem } from '@tanstack/react-virtual'
-import { useEffect } from 'react'
-
-import type { BranchName, HistoryItem } from '@api/models'
-import { headInfoQuery } from '@api/queries'
-import { getPaginatedLength } from '@api/utils'
+import { useEffect, useMemo } from 'react'
 import { match } from 'ts-pattern'
+
+import type { BranchInfo, HistoryItem } from '@api/models'
+import { branchesQuery, headInfoQuery } from '@api/queries'
+import { getPaginatedLength } from '@api/utils'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<HistoryItem[]>>
 
@@ -44,17 +44,22 @@ const useInfiniteScroll = (
   }, [items, history, fetchCondition])
 }
 
-const useCurrentBranch = (path: string): BranchName | undefined => {
-  const branch = useQuery({
-    ...headInfoQuery(path),
-    select: (headInfo) =>
-      match(headInfo.status)
-        .with({ type: 'branch' }, (head) => head.name)
-        .with({ type: 'initial' }, (head) => head.branch)
-        .otherwise(() => undefined),
-  })
+const useCurrentBranch = (path: string): BranchInfo | undefined => {
+  const branches = useQuery(branchesQuery(path))
+  const headInfo = useQuery(headInfoQuery(path))
 
-  return branch.data
+  const branch = useMemo(() => {
+    const branchName = match(headInfo.data?.status)
+      .with({ type: 'branch' }, (head) => head.name)
+      .with({ type: 'initial' }, (head) => head.branch)
+      .otherwise(() => undefined)
+
+    return branchName
+      ? branches.data?.find((branch) => branch.name === branchName)
+      : undefined
+  }, [branches.data, headInfo.data])
+
+  return branch
 }
 
 export { ancestorNotInRange, useInfiniteScroll, useCurrentBranch }

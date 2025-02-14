@@ -45,6 +45,9 @@ pub enum GitError {
 
     #[error("Failed to get common ancestor of \"{branch}\" and \"{base_branch}\"")]
     GetCommonAncestorFailed { branch: String, base_branch: String },
+
+    #[error("Failed to get divergence between \"{branch}\" and \"{base_branch}\"")]
+    GetBranchDivergenceFailed { branch: String, base_branch: String },
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug, Clone)]

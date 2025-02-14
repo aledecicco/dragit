@@ -157,3 +157,10 @@ pub enum BranchType {
 
     Local { remote: Option<String> },
 }
+
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
+pub struct BranchDivergence {
+    pub ahead: u64,
+    pub behind: u64,
+}

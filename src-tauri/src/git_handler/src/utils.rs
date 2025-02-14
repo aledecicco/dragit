@@ -1,8 +1,8 @@
 use std::{fs, path::Path, str::FromStr};
 
 use models::{
-    BranchInfo, BranchType, ChangeStatus, CommitInfo, FileInfo, FileStatus, HeadInfo, HeadStatus,
-    HistoryItem, MergeStatus, MovedStatus, StatusType,
+    BranchDivergence, BranchInfo, BranchType, ChangeStatus, CommitInfo, FileInfo, FileStatus,
+    HeadInfo, HeadStatus, HistoryItem, MergeStatus, MovedStatus, StatusType,
 };
 
 /// Format used to get the needed information about a commit, as a JSON-parseable string.
@@ -186,6 +186,14 @@ pub fn parse_branch_info(line: &String) -> Option<BranchInfo> {
     } else {
         None
     }
+}
+
+pub fn parse_branch_divergence(line: &String) -> Option<BranchDivergence> {
+    let mut divergence = line.split_ascii_whitespace().map(String::from);
+    let ahead = u64::from_str(&divergence.next()?).ok()?;
+    let behind = u64::from_str(&divergence.next()?).ok()?;
+
+    Some(BranchDivergence { ahead, behind })
 }
 
 fn is_dir(dir: &String, path: &str) -> bool {

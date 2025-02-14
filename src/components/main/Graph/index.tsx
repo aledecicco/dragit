@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import { useCallback, useEffect, useState } from 'react'
 
 import { useCheckoutLocalBranch } from '@api/commands'
-import type { BranchName } from '@api/models'
+import type { BranchInfo } from '@api/models'
 import {
   branchesQuery,
   commitHistoryQuery,
@@ -27,8 +27,8 @@ interface GraphProps {
 }
 
 interface ChosenBranches {
-  branch: BranchName | undefined
-  baseBranch: BranchName | undefined
+  branch: BranchInfo | undefined
+  baseBranch: BranchInfo | undefined
 }
 
 const Graph = (props: GraphProps) => {
@@ -49,18 +49,22 @@ const Graph = (props: GraphProps) => {
     setChosenBranches((oldBranches) => ({
       branch: currentBranch,
       baseBranch:
-        oldBranches.baseBranch && oldBranches.baseBranch === currentBranch
+        oldBranches.baseBranch &&
+        oldBranches.baseBranch.name === currentBranch?.name
           ? oldBranches.branch
           : oldBranches.baseBranch,
     }))
   }, [currentBranch])
 
-  const changeBaseBranch = useCallback((newBaseBranch: BranchName) => {
-    setChosenBranches((oldBranches) => ({
-      ...oldBranches,
-      baseBranch: newBaseBranch,
-    }))
-  }, [])
+  const changeBaseBranch = useCallback(
+    (newBaseBranch: BranchInfo | undefined) => {
+      setChosenBranches((oldBranches) => ({
+        ...oldBranches,
+        baseBranch: newBaseBranch,
+      }))
+    },
+    [],
+  )
 
   return (
     <div className={clsx('h-full w-full min-h-0')}>
@@ -77,7 +81,7 @@ const Graph = (props: GraphProps) => {
           options={
             branches.data?.map((branch) => ({ value: branch.name })) ?? []
           }
-          value={branch}
+          value={branch?.name}
           disabled={headInfo.isLoading}
           onValueChange={(newBranch) => checkout(newBranch)}
         />
@@ -93,7 +97,7 @@ const Graph = (props: GraphProps) => {
           size="sm"
           onClick={() => {
             if (baseBranch) {
-              checkout(baseBranch)
+              checkout(baseBranch.name)
             }
           }}
         />
@@ -103,11 +107,16 @@ const Graph = (props: GraphProps) => {
           placeholder="Base branch..."
           options={
             branches.data
-              ?.filter((branch) => branch.name !== currentBranch)
+              ?.filter((branch) => branch.name !== currentBranch?.name)
               .map((branch) => ({ value: branch.name })) ?? []
           }
-          value={baseBranch}
-          onValueChange={changeBaseBranch}
+          value={baseBranch?.name}
+          onValueChange={(newBaseBranch) => {
+            const branch = branches.data?.find(
+              (branch) => branch.name === newBaseBranch,
+            )
+            changeBaseBranch(branch)
+          }}
         />
 
         <SvgOverlay className={clsx('grid col-span-2')} RenderOverlay={Edges}>
@@ -119,13 +128,15 @@ const Graph = (props: GraphProps) => {
 }
 
 interface GraphInnerProps extends GraphProps {
-  branch: BranchName | undefined
-  baseBranch: BranchName | undefined
+  branch: BranchInfo | undefined
+  baseBranch: BranchInfo | undefined
 }
 
 const GraphInner = (props: GraphInnerProps) => {
   const { path, branch, baseBranch } = props
-  const ancestor = useQuery(commonAncestorQuery(path, branch, baseBranch))
+  const ancestor = useQuery(
+    commonAncestorQuery(path, branch?.name, baseBranch?.name),
+  )
 
   const svgOverlay = useSvgOverlay()
 
@@ -134,9 +145,9 @@ const GraphInner = (props: GraphInnerProps) => {
     svgOverlay.refresh()
   }, [ancestor.data, branch, baseBranch])
 
-  const branchHistory = useInfiniteQuery(commitHistoryQuery(path, branch))
+  const branchHistory = useInfiniteQuery(commitHistoryQuery(path, branch?.name))
   const baseBranchHistory = useInfiniteQuery(
-    commitHistoryQuery(path, baseBranch),
+    commitHistoryQuery(path, baseBranch?.name),
   )
 
   const branchLength = Math.min(

@@ -7,7 +7,8 @@ use std::{
 };
 
 use models::{
-    AncestorInfo, BranchInfo, BranchType, CommitInfo, GitError, GitHandler, HeadInfo, HistoryItem,
+    AncestorInfo, BranchDivergence, BranchInfo, BranchType, CommitInfo, GitError, GitHandler,
+    HeadInfo, HistoryItem,
 };
 
 use crate::utils::*;
@@ -154,7 +155,7 @@ impl GitHandler for CmdGit {
         let page_size_arg = limit.to_string();
         let branch_arg = branch.to_string() + "~" + &page_arg;
 
-        command_output(
+        let lines = command_output(
             &self.get_path()?,
             [
                 "rev-list",
@@ -169,32 +170,28 @@ impl GitHandler for CmdGit {
         .and_then(|output| self.get_output_lines(output).ok())
         .ok_or(GitError::GetReferenceHistoryFailed {
             reference: branch.to_string(),
-        })
-        .and_then(|lines| {
-            lines
-                .iter()
-                .map(parse_history_item)
-                .map(|item| {
-                    item.ok_or(GitError::GetReferenceHistoryFailed {
-                        reference: branch.to_string(),
-                    })
+        })?;
+
+        lines
+            .iter()
+            .map(parse_history_item)
+            .map(|item| {
+                item.ok_or(GitError::GetReferenceHistoryFailed {
+                    reference: branch.to_string(),
                 })
-                .collect()
-        })
+            })
+            .collect()
     }
 
     fn get_commit_info(&self, reference: &str) -> Result<CommitInfo, GitError> {
-        let lines = command_output(
+        command_output(
             &self.get_path()?,
             ["show", reference, COMMIT_INFO_FORMAT, "--quiet"],
         )
         .ok()
         .and_then(|output| self.get_output_lines(output).ok())
+        .and_then(|lines| parse_commit_info(&lines))
         .ok_or(GitError::GetCommitInfoFailed {
-            reference: reference.to_string(),
-        })?;
-
-        parse_commit_info(&lines).ok_or(GitError::GetCommitInfoFailed {
             reference: reference.to_string(),
         })
     }
@@ -202,15 +199,14 @@ impl GitHandler for CmdGit {
     fn get_head_info(&self) -> Result<HeadInfo, GitError> {
         let path = self.get_path()?;
 
-        let lines = command_output(
+        command_output(
             &path,
             ["status", "--porcelain=2", "--untracked=normal", "--branch"],
         )
         .ok()
         .and_then(|output| self.get_output_lines(output).ok())
-        .ok_or(GitError::GetHeadInfoFailed {})?;
-
-        parse_head_info(&path, &lines).ok_or(GitError::GetHeadInfoFailed {})
+        .and_then(|lines| parse_head_info(&path, &lines))
+        .ok_or(GitError::GetHeadInfoFailed {})
     }
 
     fn add_to_index(&self, files: &Vec<&str>) -> Result<(), GitError> {
@@ -316,5 +312,28 @@ impl GitHandler for CmdGit {
                 base_distance += 1;
             }
         }
+    }
+
+    fn get_branch_divergence(
+        &self,
+        branch: &str,
+        base_branch: &str,
+    ) -> Result<BranchDivergence, GitError> {
+        command_output(
+            &self.get_path()?,
+            [
+                "rev-list",
+                "--left-right",
+                "--count",
+                &format!("{}...{}", branch, base_branch),
+            ],
+        )
+        .ok()
+        .and_then(|output| self.get_output_string(output).ok())
+        .and_then(|line| parse_branch_divergence(&line))
+        .ok_or(GitError::GetBranchDivergenceFailed {
+            branch: branch.to_string(),
+            base_branch: base_branch.to_string(),
+        })
     }
 }

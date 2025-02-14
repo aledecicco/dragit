@@ -1,10 +1,15 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 import { useCallback } from 'react'
 
-import type { AncestorInfo, BranchName, CommitId } from '@api/models'
-import { commitHistoryQuery } from '@api/queries'
+import type {
+  AncestorInfo,
+  BranchInfo,
+  BranchName,
+  CommitId,
+} from '@api/models'
+import { branchDivergenceQuery, commitHistoryQuery } from '@api/queries'
 import {
   getNextPaginatedItem,
   getPaginatedItem,
@@ -19,14 +24,21 @@ const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
 interface GraphBranchProps {
   virtualizer: Virtualizer<HTMLDivElement, Element>
   path: string
-  branch: BranchName
-  baseBranch: BranchName | undefined
+  branch: BranchInfo
+  baseBranch: BranchInfo | undefined
   ancestorInfo: AncestorInfo | undefined
 }
 
 const GraphBranch = (props: GraphBranchProps) => {
   const { virtualizer, path, branch, baseBranch, ancestorInfo } = props
-  const history = useInfiniteQuery(commitHistoryQuery(path, branch))
+  const history = useInfiniteQuery(commitHistoryQuery(path, branch.name))
+  const divergence = useQuery(
+    branchDivergenceQuery(
+      path,
+      branch.name,
+      branch.branchType === 'local' ? (branch.remote ?? undefined) : undefined,
+    ),
+  )
 
   const items = virtualizer.getVirtualItems()
   const shouldFetch = useCallback(() => {
@@ -65,7 +77,7 @@ const GraphBranch = (props: GraphBranchProps) => {
             : (getNextPaginatedItem(history, virtualRow.index)?.hash ??
               ancestorInfo?.lastCommit)
 
-          const parentBranch: BranchName | undefined = parentCommit
+          const parentBranch: BranchInfo | undefined = parentCommit
             ? ancestorInfo && parentCommit === ancestorInfo.commonCommit
               ? baseBranch
               : branch
@@ -76,11 +88,11 @@ const GraphBranch = (props: GraphBranchProps) => {
               key={virtualRow.index}
               path={path}
               commitId={commit}
-              elementId={COMMIT_ELEMENT_ID(commit, branch)}
+              elementId={COMMIT_ELEMENT_ID(commit, branch.name)}
               parent={
                 parentCommit && parentBranch
                   ? {
-                      id: COMMIT_ELEMENT_ID(parentCommit, parentBranch),
+                      id: COMMIT_ELEMENT_ID(parentCommit, parentBranch.name),
                       type:
                         displayExtraAncestor &&
                         parentCommit === ancestorInfo.lastCommit &&
@@ -110,9 +122,9 @@ const GraphBranch = (props: GraphBranchProps) => {
           key={ancestorInfo.branchDistance}
           path={path}
           commitId={ancestorInfo.lastCommit}
-          elementId={COMMIT_ELEMENT_ID(ancestorInfo.lastCommit, branch)}
+          elementId={COMMIT_ELEMENT_ID(ancestorInfo.lastCommit, branch.name)}
           parent={{
-            id: COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, baseBranch),
+            id: COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, baseBranch.name),
             type: 'solid',
           }}
           className={clsx('absolute top-0 left-[8%]')}
