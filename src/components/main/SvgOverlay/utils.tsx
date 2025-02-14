@@ -16,7 +16,7 @@ interface TrackRefProps<T extends HTMLElement> {
   trackRef: Ref<T>
 }
 
-const makeTracked = <P, T extends HTMLElement, R extends string>(
+const makeTracked = <P, T extends HTMLElement, R extends string = string>(
   WrappedComponent: ComponentType<P & TrackRefProps<T>>,
 ) => {
   const TrackedComponent = (

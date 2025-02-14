@@ -14,18 +14,16 @@ import {
 import { clamp } from '@utils/number'
 import type { LiteralUnion } from '@utils/types'
 
-export const SCROLL_SPEED = 2.5
-
 type ElementId = string
 
 interface Element<R extends string = string> {
   ref: RefObject<HTMLElement>
-  parent: ParentRel<LiteralUnion<R>> | undefined
+  parent: ParentRel<R> | undefined
 }
 
-interface ParentRel<R> {
+interface ParentRel<R extends string> {
   id: ElementId
-  type: R
+  type: LiteralUnion<R>
 }
 
 interface SvgOverlayState {
@@ -84,20 +82,28 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
   }, [])
 
   const painting = useRef(false)
+  const accumulator = useRef({ x: 0, y: 0 })
+
   const pan = useCallback(
     (dx: number, dy: number) => {
+      accumulator.current.x += dx
+      accumulator.current.y += dy
+
       if (!painting.current) {
+        const distance = { ...accumulator.current }
         painting.current = true
+        accumulator.current = { x: 0, y: 0 }
+
         requestAnimationFrame(() => {
           if (componentRef.current) {
             componentRef.current.scrollLeft = clamp(
-              componentRef.current.scrollLeft + dx,
+              componentRef.current.scrollLeft + distance.x,
               0,
               componentRef.current.scrollWidth -
                 componentRef.current.clientWidth,
             )
             componentRef.current.scrollTop = clamp(
-              componentRef.current.scrollTop + dy,
+              componentRef.current.scrollTop + distance.y,
               0,
               componentRef.current.scrollHeight -
                 componentRef.current.clientHeight,
@@ -125,7 +131,7 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
   useEffect(() => {
     const scroll = (_event: Event) => {
       const event = _event as WheelEvent
-      pan(event.deltaX * SCROLL_SPEED, event.deltaY * SCROLL_SPEED)
+      pan(event.deltaX, event.deltaY)
       event.preventDefault()
       event.stopPropagation()
     }

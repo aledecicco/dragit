@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
+import { useCallback } from 'react'
 
 import type { AncestorInfo, BranchName, CommitId } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
@@ -9,7 +10,6 @@ import {
   getPaginatedItem,
   getPaginatedLength,
 } from '@api/utils'
-import { useCallback } from 'react'
 import { GraphCommit } from '../Commit'
 import { ancestorNotInRange, useInfiniteScroll } from '../utils'
 
