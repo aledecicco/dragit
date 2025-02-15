@@ -49,6 +49,7 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
               key={virtualRow.index}
               path={path}
               commitId={commit}
+              commitType="confirmed"
               elementId={COMMIT_ELEMENT_ID(commit, branch.name)}
               parent={
                 parentCommit
@@ -83,6 +84,7 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
           key={ancestorInfo.baseDistance}
           path={path}
           commitId={ancestorInfo.commonCommit}
+          commitType="confirmed"
           elementId={COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, branch.name)}
           parent={undefined}
           className={clsx('absolute top-0 left-[60%]')}

@@ -148,7 +148,7 @@ pub async fn get_common_ancestor(
 pub async fn get_branch_divergence(
     state: State<'_, AppState>,
     branch: &str,
-    remote: &str,
+    base_branch: &str,
 ) -> Result<BranchDivergence, AppError> {
-    with_handler(&state, &|h| h.get_branch_divergence(branch, remote))
+    with_handler(&state, &|h| h.get_branch_divergence(branch, base_branch))
 }

@@ -7,6 +7,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type {
   AncestorInfo,
+  BranchDivergence,
   BranchInfo,
   BranchName,
   CommitId,
@@ -198,7 +199,7 @@ const commonAncestorQuery = (
 const fetchBranchDivergence = (
   branch: BranchName,
   baseBranch: BranchName,
-): Promise<AncestorInfo | undefined> =>
+): Promise<BranchDivergence | undefined> =>
   invoke('get_branch_divergence', { branch: branch, baseBranch: baseBranch })
 
 const branchDivergenceQuery = (

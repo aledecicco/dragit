@@ -7,8 +7,12 @@ import type { VirtualItem } from '@tanstack/react-virtual'
 import { useEffect, useMemo } from 'react'
 import { match } from 'ts-pattern'
 
-import type { BranchInfo, HistoryItem } from '@api/models'
-import { branchesQuery, headInfoQuery } from '@api/queries'
+import type { BranchDivergence, BranchInfo, HistoryItem } from '@api/models'
+import {
+  branchDivergenceQuery,
+  branchesQuery,
+  headInfoQuery,
+} from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<HistoryItem[]>>
@@ -62,4 +66,26 @@ const useCurrentBranch = (path: string): BranchInfo | undefined => {
   return branch
 }
 
-export { ancestorNotInRange, useInfiniteScroll, useCurrentBranch }
+const useRemoteDivergence = (
+  path: string,
+  branch: BranchInfo,
+): BranchDivergence | undefined => {
+  const divergence = useQuery(
+    branchDivergenceQuery(
+      path,
+      branch.name,
+      branch.type === 'local' && !!branch.remote
+        ? `${branch.remote.remoteName}/${branch.remote.branchName}`
+        : undefined,
+    ),
+  )
+
+  return divergence.data
+}
+
+export {
+  ancestorNotInRange,
+  useInfiniteScroll,
+  useCurrentBranch,
+  useRemoteDivergence,
+}

@@ -58,10 +58,10 @@ pub trait GitHandler {
         branch_b: &str,
     ) -> Result<Option<AncestorInfo>, GitError>;
 
-    /// Returns the number of commits that the given branch is ahead/behind its remote counterpart.
+    /// Returns the number of commits that the given branch is ahead/behind another (possibly its remote counterpart).
     fn get_branch_divergence(
         &self,
         branch: &str,
-        remote: &str,
+        base_branch: &str,
     ) -> Result<BranchDivergence, GitError>;
 }

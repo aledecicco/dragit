@@ -155,7 +155,14 @@ pub struct BranchInfo {
 pub enum BranchType {
     Remote {},
 
-    Local { remote: Option<String> },
+    Local { remote: Option<RemoteRef> },
+}
+
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
+pub struct RemoteRef {
+    pub remote_name: String,
+    pub branch_name: String,
 }
 
 #[derive(serde::Serialize, Debug, Clone)]

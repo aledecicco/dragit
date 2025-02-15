@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 import { useCallback } from 'react'
@@ -9,14 +9,18 @@ import type {
   BranchName,
   CommitId,
 } from '@api/models'
-import { branchDivergenceQuery, commitHistoryQuery } from '@api/queries'
+import { commitHistoryQuery } from '@api/queries'
 import {
   getNextPaginatedItem,
   getPaginatedItem,
   getPaginatedLength,
 } from '@api/utils'
 import { GraphCommit } from '../Commit'
-import { ancestorNotInRange, useInfiniteScroll } from '../utils'
+import {
+  ancestorNotInRange,
+  useInfiniteScroll,
+  useRemoteDivergence,
+} from '../utils'
 
 const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
   `commit_${commitId}_${branch}`
@@ -32,13 +36,6 @@ interface GraphBranchProps {
 const GraphBranch = (props: GraphBranchProps) => {
   const { virtualizer, path, branch, baseBranch, ancestorInfo } = props
   const history = useInfiniteQuery(commitHistoryQuery(path, branch.name))
-  const divergence = useQuery(
-    branchDivergenceQuery(
-      path,
-      branch.name,
-      branch.branchType === 'local' ? (branch.remote ?? undefined) : undefined,
-    ),
-  )
 
   const items = virtualizer.getVirtualItems()
   const shouldFetch = useCallback(() => {
@@ -53,6 +50,8 @@ const GraphBranch = (props: GraphBranchProps) => {
     ancestorInfo?.lastCommit &&
     baseBranch &&
     ancestorNotInRange(ancestorInfo.branchDistance, history, items)
+
+  const divergence = useRemoteDivergence(path, branch)
 
   return (
     <>
@@ -75,7 +74,8 @@ const GraphBranch = (props: GraphBranchProps) => {
           const parentCommit: CommitId | undefined = isLast
             ? ancestorInfo.commonCommit
             : (getNextPaginatedItem(history, virtualRow.index)?.hash ??
-              ancestorInfo?.lastCommit)
+              ancestorInfo?.lastCommit ??
+              undefined)
 
           const parentBranch: BranchInfo | undefined = parentCommit
             ? ancestorInfo && parentCommit === ancestorInfo.commonCommit
@@ -83,11 +83,15 @@ const GraphBranch = (props: GraphBranchProps) => {
               : branch
             : undefined
 
+          const isUnconfirmed =
+            divergence && virtualRow.index + 1 <= divergence.ahead
+
           return commit ? (
             <GraphCommit
               key={virtualRow.index}
               path={path}
               commitId={commit}
+              commitType={isUnconfirmed ? 'unconfirmed' : 'confirmed'}
               elementId={COMMIT_ELEMENT_ID(commit, branch.name)}
               parent={
                 parentCommit && parentBranch
@@ -98,7 +102,9 @@ const GraphBranch = (props: GraphBranchProps) => {
                         parentCommit === ancestorInfo.lastCommit &&
                         !nextIsLast
                           ? 'dashed'
-                          : 'solid',
+                          : isUnconfirmed
+                            ? 'unconfirmed'
+                            : 'solid',
                     }
                   : undefined
               }
@@ -122,10 +128,18 @@ const GraphBranch = (props: GraphBranchProps) => {
           key={ancestorInfo.branchDistance}
           path={path}
           commitId={ancestorInfo.lastCommit}
+          commitType={
+            divergence && ancestorInfo.branchDistance + 1 <= divergence.ahead
+              ? 'unconfirmed'
+              : 'confirmed'
+          }
           elementId={COMMIT_ELEMENT_ID(ancestorInfo.lastCommit, branch.name)}
           parent={{
             id: COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, baseBranch.name),
-            type: 'solid',
+            type:
+              divergence && ancestorInfo.branchDistance + 1 <= divergence.ahead
+                ? 'unconfirmed'
+                : 'solid',
           }}
           className={clsx('absolute top-0 left-[8%]')}
           style={{

@@ -2,7 +2,7 @@ use std::{fs, path::Path, str::FromStr};
 
 use models::{
     BranchDivergence, BranchInfo, BranchType, ChangeStatus, CommitInfo, FileInfo, FileStatus,
-    HeadInfo, HeadStatus, HistoryItem, MergeStatus, MovedStatus, StatusType,
+    HeadInfo, HeadStatus, HistoryItem, MergeStatus, MovedStatus, RemoteRef, StatusType,
 };
 
 /// Format used to get the needed information about a commit, as a JSON-parseable string.
@@ -27,7 +27,8 @@ pub const UNMERGED_FILE_INFO_SEGMENTS: usize = 11;
 /// The number of space-separated segments each line has for untracked files.
 pub const UNTRACKED_FILE_INFO_SEGMENTS: usize = 2;
 /// Format used to get the needed information about branches.
-pub const BRANCHES_INFO_FORMAT: &str = "--format=%(refname) %(upstream)";
+pub const BRANCHES_INFO_FORMAT: &str =
+    "--format=%(refname) %(upstream:remotename) %(upstream:lstrip=-1)";
 /// The string that denotes that a branch is a local ref when printing its status.
 pub const LOCAL_BRANCH_PREFIX: &str = "refs/heads/";
 /// The string that denotes that a branch is a local ref when printing its status.
@@ -168,14 +169,21 @@ pub fn parse_history_item(line: &String) -> Option<HistoryItem> {
 pub fn parse_branch_info(line: &String) -> Option<BranchInfo> {
     let mut names = line.split_ascii_whitespace().map(String::from);
     let branch_name = names.next()?;
-    let upstream_name = names.next();
 
     if branch_name.starts_with(LOCAL_BRANCH_PREFIX) {
+        let remote_name = names.next();
+        let remote_branch_name = names.next();
+
         Some(BranchInfo {
             name: strip_branch_prefix(&branch_name, LOCAL_BRANCH_PREFIX),
             branch_type: BranchType::Local {
-                remote: upstream_name
-                    .map(|upstream_name| strip_branch_prefix(&upstream_name, REMOTE_BRANCH_PREFIX)),
+                remote: match (remote_name, remote_branch_name) {
+                    (Some(remote_name), Some(branch_name)) => Some(RemoteRef {
+                        remote_name,
+                        branch_name,
+                    }),
+                    _ => None,
+                },
             },
         })
     } else if branch_name.starts_with(REMOTE_BRANCH_PREFIX) {

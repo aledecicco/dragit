@@ -92,7 +92,7 @@ impl GitHandler for CmdGit {
     }
 
     fn get_branches(&self) -> Result<Vec<BranchInfo>, GitError> {
-        let mut branches: Vec<BranchInfo> = command_output(
+        command_output(
             &self.get_path()?,
             ["branch", "--list", "-a", BRANCHES_INFO_FORMAT],
         )
@@ -105,24 +105,7 @@ impl GitHandler for CmdGit {
                 .map(parse_branch_info)
                 .filter_map(|x| x)
                 .collect())
-        })?;
-
-        let mut tracked_remotes = HashSet::new();
-        for branch in &mut branches {
-            if let BranchType::Local {
-                remote: Some(remote_name),
-            } = &branch.branch_type
-            {
-                tracked_remotes.insert(remote_name.to_string());
-            }
-        }
-
-        branches.retain(|branch| {
-            !(matches!(branch.branch_type, BranchType::Remote {})
-                && tracked_remotes.contains(&branch.name))
-        });
-
-        Ok(branches)
+        })
     }
 
     fn checkout_local_branch(&self, branch: &str) -> Result<(), GitError> {

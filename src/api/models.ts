@@ -1,5 +1,6 @@
 export type CommitId = string
 export type BranchName = string
+export type RemoteName = string
 
 export interface CommitInfo {
   hash: CommitId
@@ -12,9 +13,14 @@ export interface CommitInfo {
 
 export interface AncestorInfo {
   commonCommit: CommitId
-  lastCommit: CommitId | undefined
+  lastCommit: CommitId | null
   branchDistance: number
   baseDistance: number
+}
+
+export interface BranchDivergence {
+  ahead: number
+  behind: number
 }
 
 export interface HistoryItem {
@@ -34,13 +40,16 @@ export type HeadStatus =
 
 export interface LocalBranch {
   name: BranchName
-  branchType: 'local'
-  remote: BranchName | null
+  type: 'local'
+  remote: {
+    remoteName: RemoteName
+    branchName: BranchName
+  } | null
 }
 
 export interface RemoteBranch {
   name: BranchName
-  branchType: 'remote'
+  type: 'remote'
 }
 
 export type BranchInfo = LocalBranch | RemoteBranch
