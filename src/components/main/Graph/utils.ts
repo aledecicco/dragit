@@ -5,7 +5,6 @@ import {
 } from '@tanstack/react-query'
 import type { VirtualItem } from '@tanstack/react-virtual'
 import { useEffect, useMemo } from 'react'
-import { match } from 'ts-pattern'
 
 import type { BranchDivergence, BranchInfo, HistoryItem } from '@api/models'
 import {
@@ -14,6 +13,7 @@ import {
   headInfoQuery,
 } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
+import { getCurrentBranchInfo, getRemoteCounterpart } from '@utils/repository'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<HistoryItem[]>>
 
@@ -49,18 +49,11 @@ const useInfiniteScroll = (
 }
 
 const useCurrentBranch = (path: string): BranchInfo | undefined => {
-  const branches = useQuery(branchesQuery(path))
   const headInfo = useQuery(headInfoQuery(path))
+  const branches = useQuery(branchesQuery(path))
 
   const branch = useMemo(() => {
-    const branchName = match(headInfo.data?.status)
-      .with({ type: 'branch' }, (head) => head.name)
-      .with({ type: 'initial' }, (head) => head.branch)
-      .otherwise(() => undefined)
-
-    return branchName
-      ? branches.data?.find((branch) => branch.name === branchName)
-      : undefined
+    return getCurrentBranchInfo(headInfo.data, branches.data)
   }, [branches.data, headInfo.data])
 
   return branch
@@ -71,13 +64,7 @@ const useRemoteDivergence = (
   branch: BranchInfo,
 ): BranchDivergence | undefined => {
   const divergence = useQuery(
-    branchDivergenceQuery(
-      path,
-      branch.name,
-      branch.type === 'local' && !!branch.remote
-        ? `${branch.remote.remoteName}/${branch.remote.branchName}`
-        : undefined,
-    ),
+    branchDivergenceQuery(path, branch.name, getRemoteCounterpart(branch)),
   )
 
   return divergence.data

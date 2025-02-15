@@ -38,6 +38,11 @@ const queryKeys = {
           ...queryKeys.directory.current(path),
           key: 'branches',
         }) as const,
+      list: (path: string) =>
+        ({
+          ...queryKeys.directory.current(path),
+          key: 'branches_list',
+        }) as const,
       branch: (path: string, branch: BranchName | undefined) =>
         ({
           ...queryKeys.directory.branches.all(path),
@@ -76,8 +81,13 @@ const queryKeys = {
         }) as const,
       branch: (path: string, branch: BranchName | undefined) =>
         ({
+          ...queryKeys.directory.branches.branch(path, branch),
           ...queryKeys.directory.commonAncestor.all(path),
-          branch: branch,
+        }) as const,
+      baseBranch: (path: string, baseBranch: BranchName | undefined) =>
+        ({
+          ...queryKeys.directory.commonAncestor.all(path),
+          baseBranch: baseBranch,
         }) as const,
       pair: (
         path: string,
@@ -86,7 +96,7 @@ const queryKeys = {
       ) =>
         ({
           ...queryKeys.directory.commonAncestor.branch(path, branch),
-          baseBranch: baseBranch,
+          ...queryKeys.directory.commonAncestor.baseBranch(path, baseBranch),
         }) as const,
     },
     branchDivergence: {
@@ -97,8 +107,13 @@ const queryKeys = {
         }) as const,
       branch: (path: string, branch: BranchName | undefined) =>
         ({
+          ...queryKeys.directory.branches.branch(path, branch),
           ...queryKeys.directory.branchDivergence.all(path),
-          branch: branch,
+        }) as const,
+      baseBranch: (path: string, baseBranch: BranchName | undefined) =>
+        ({
+          ...queryKeys.directory.branchDivergence.all(path),
+          baseBranch: baseBranch,
         }) as const,
       pair: (
         path: string,
@@ -107,7 +122,7 @@ const queryKeys = {
       ) =>
         ({
           ...queryKeys.directory.branchDivergence.branch(path, branch),
-          baseBranch: baseBranch,
+          ...queryKeys.directory.branchDivergence.baseBranch(path, baseBranch),
         }) as const,
     },
   },

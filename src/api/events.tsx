@@ -3,6 +3,7 @@ import { listen } from '@tauri-apps/api/event'
 import { type PropsWithChildren, useEffect } from 'react'
 import { P, match } from 'ts-pattern'
 
+import { getCurrentBranchName } from '@utils/repository'
 import { currentDirQuery, headInfoQuery, queryKeys } from './queries'
 
 const EventHandler = (props: PropsWithChildren) => {
@@ -40,13 +41,11 @@ const EventHandlerInner = (
     const unlisten = listen('git-event', (event) => {
       match(event.payload)
         .with({ type: 'gitFolderModified' }, () => {
-          client.invalidateQueries({
-            queryKey: [queryKeys.directory.isRepository(currentDir)],
-          })
+          client.invalidateQueries()
         })
         .with({ type: 'branchesListUpdated' }, () => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.branches.all(currentDir)],
+            queryKey: [queryKeys.directory.branches.list(currentDir)],
           })
         })
         .with(
@@ -61,10 +60,26 @@ const EventHandlerInner = (
               ],
             })
 
-            if (
-              headInfo.data?.status.type === 'branch' &&
-              headInfo.data.status.name === branchName
-            ) {
+            client.invalidateQueries({
+              queryKey: [
+                queryKeys.directory.branchDivergence.branch(
+                  currentDir,
+                  branchName,
+                ),
+              ],
+            })
+
+            client.invalidateQueries({
+              queryKey: [
+                queryKeys.directory.branchDivergence.baseBranch(
+                  currentDir,
+                  branchName,
+                ),
+              ],
+            })
+
+            const currentBranch = getCurrentBranchName(headInfo.data)
+            if (currentBranch === branchName) {
               client.invalidateQueries({
                 queryKey: [queryKeys.directory.headInfo(currentDir)],
               })

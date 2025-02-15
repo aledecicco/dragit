@@ -16,6 +16,7 @@ import type { LiteralUnion } from '@utils/types'
 
 type ElementId = string
 
+// ToDo: can this type be solved with less levels?
 interface Element<
   R extends string = string,
   T extends LiteralUnion<R> = string,
