@@ -3,7 +3,6 @@ import type {
   UseInfiniteQueryResult,
 } from '@tanstack/react-query'
 
-import type { BranchName, RemoteName } from './models'
 import { PAGE_SIZE } from './queries'
 
 const getPaginatedItem = <T>(

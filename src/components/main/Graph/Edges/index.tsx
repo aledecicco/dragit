@@ -64,7 +64,8 @@ const Edges = (props: EdgesProps) => {
               match(elem.parent.type)
                 .with('solid', () => 'stroke-primary-700')
                 .with('dashed', () => 'stroke-primary-800')
-                .with('unconfirmed', () => 'stroke-accent-500'),
+                .with('unconfirmed', () => 'stroke-accent-400')
+                .otherwise(() => undefined),
               elem.parent.type === 'dashed' && '[stroke-dasharray:8_5]',
             )}
             d={[

@@ -16,14 +16,17 @@ import type { LiteralUnion } from '@utils/types'
 
 type ElementId = string
 
-interface Element<R extends string = string> {
+interface Element<
+  R extends string = string,
+  T extends LiteralUnion<R> = string,
+> {
   ref: RefObject<HTMLElement>
-  parent: ParentRel<R> | undefined
+  parent: ParentRel<LiteralUnion<T>> | undefined
 }
 
 interface ParentRel<R extends string> {
   id: ElementId
-  type: LiteralUnion<R>
+  type: R
 }
 
 interface SvgOverlayState {
