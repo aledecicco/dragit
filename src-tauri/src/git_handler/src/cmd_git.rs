@@ -7,8 +7,8 @@ use std::{
 };
 
 use models::{
-    AncestorInfo, BranchDivergence, BranchInfo, BranchType, CommitInfo, GitError, GitHandler,
-    HeadInfo, HistoryItem,
+    AncestorInfo, BeforeAncestor, BranchDivergence, BranchInfo, BranchType, CommitInfo,
+    CommonAncestor, GitError, GitHandler, HeadInfo, HistoryItem,
 };
 
 use crate::utils::*;
@@ -246,53 +246,59 @@ impl GitHandler for CmdGit {
             .transpose()
         };
 
-        let mut branch_distance = 0;
-        let mut base_distance = 0;
+        let mut prev_branch_pointer = None;
+        let mut branch_pointer = parse_ref(branch, 0)?.map(|hash| (hash, 0));
+        let mut base_pointer = parse_ref(base_branch, 0)?.map(|hash| (hash, 0));
 
-        // For each commit, keep track of the depth it was found at, and the immediate next commit.
-        let mut branch_ancestors: HashMap<String, (u64, Option<String>)> = HashMap::new();
-        // For each commit, keep track of the depth it was found at.
-        let mut base_ancestors: HashMap<String, u64> = HashMap::new();
-
-        let mut prev_branch_commit = None;
-        let mut branch_commit = parse_ref(branch, 0)?;
-        let mut base_commit = parse_ref(base_branch, 0)?;
+        // For each commit in the branch, keep track of the commit that comes immediately next and its depth.
+        let mut found_in_branch: HashMap<String, Option<(String, u64)>> = HashMap::new();
+        // For each commit in the base branch, keep track of the depth it was found at.
+        let mut found_in_base: HashMap<String, u64> = HashMap::new();
 
         loop {
-            if let Some(branch_hash) = branch_commit {
-                if let Some(base_distance) = base_ancestors.get(&branch_hash) {
+            if let Some((branch_hash, branch_distance)) = branch_pointer {
+                if let Some(base_distance) = found_in_base.get(&branch_hash) {
                     return Ok(Some(AncestorInfo {
-                        common_commit: branch_hash,
-                        last_commit: prev_branch_commit,
-                        branch_distance: branch_distance - 1,
-                        base_distance: *base_distance,
+                        last_commit: prev_branch_pointer.map(
+                            |(prev_branch_hash, prev_branch_distance)| BeforeAncestor {
+                                hash: prev_branch_hash,
+                                branch_distance: prev_branch_distance,
+                            },
+                        ),
+                        common_commit: CommonAncestor {
+                            hash: branch_hash,
+                            base_distance: *base_distance,
+                        },
                     }));
                 }
 
-                branch_ancestors.insert(
-                    branch_hash.to_owned(),
-                    (branch_distance, prev_branch_commit),
-                );
-                prev_branch_commit = Some(branch_hash.to_owned());
-                branch_commit = parse_ref(&branch_hash, 1)?;
-                branch_distance += 1;
+                found_in_branch.insert(branch_hash.to_owned(), prev_branch_pointer);
+                prev_branch_pointer = Some((branch_hash.to_string(), branch_distance));
+                branch_pointer = parse_ref(&branch_hash, 1)?.map(|hash| (hash, branch_distance + 1))
             }
 
-            if let Some(base_hash) = base_commit {
-                if let Some((branch_distance, prev_branch_commit)) =
-                    branch_ancestors.get(&base_hash)
-                {
+            if let Some((base_hash, base_distance)) = base_pointer {
+                if let Some(prev_branch_pointer) = found_in_branch.get(&base_hash) {
                     return Ok(Some(AncestorInfo {
-                        common_commit: base_hash,
-                        last_commit: prev_branch_commit.to_owned(),
-                        branch_distance: *branch_distance - 1,
-                        base_distance: base_distance,
+                        last_commit: prev_branch_pointer.as_ref().map(
+                            |(prev_branch_hash, prev_branch_distance)| BeforeAncestor {
+                                hash: prev_branch_hash.to_string(),
+                                branch_distance: *prev_branch_distance,
+                            },
+                        ),
+                        common_commit: CommonAncestor {
+                            hash: base_hash,
+                            base_distance: base_distance,
+                        },
                     }));
                 }
 
-                base_ancestors.insert(base_hash.to_owned(), base_distance);
-                base_commit = parse_ref(&base_hash, 1)?;
-                base_distance += 1;
+                found_in_base.insert(base_hash.to_owned(), base_distance);
+                base_pointer = parse_ref(&base_hash, 1)?.map(|hash| (hash, base_distance + 1))
+            }
+
+            if branch_pointer.is_none() && base_pointer.is_none() {
+                return Ok(None);
             }
         }
     }

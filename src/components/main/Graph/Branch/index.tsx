@@ -40,8 +40,8 @@ const GraphBranch = (props: GraphBranchProps) => {
   const items = virtualizer.getVirtualItems()
   const shouldFetch = useCallback(() => {
     return (
-      !ancestorInfo ||
-      getPaginatedLength(history) <= ancestorInfo.branchDistance
+      !ancestorInfo?.lastCommit ||
+      getPaginatedLength(history) <= ancestorInfo.lastCommit.branchDistance
     )
   }, [history, ancestorInfo])
   useInfiniteScroll(history, items, shouldFetch)
@@ -49,7 +49,7 @@ const GraphBranch = (props: GraphBranchProps) => {
   const displayExtraAncestor =
     ancestorInfo?.lastCommit &&
     baseBranch &&
-    ancestorNotInRange(ancestorInfo.branchDistance, history, items)
+    ancestorNotInRange(ancestorInfo.lastCommit.branchDistance, history, items)
 
   const divergence = useRemoteDivergence(path, branch)
 
@@ -57,7 +57,10 @@ const GraphBranch = (props: GraphBranchProps) => {
     <>
       {history.data ? (
         items.map((virtualRow) => {
-          if (ancestorInfo && virtualRow.index > ancestorInfo.branchDistance) {
+          if (
+            ancestorInfo?.lastCommit &&
+            virtualRow.index > ancestorInfo.lastCommit.branchDistance
+          ) {
             return
           }
 
@@ -67,18 +70,20 @@ const GraphBranch = (props: GraphBranchProps) => {
           )?.hash
 
           const isLast =
-            ancestorInfo && virtualRow.index === ancestorInfo.branchDistance
+            ancestorInfo?.lastCommit &&
+            virtualRow.index === ancestorInfo.lastCommit.branchDistance
           const nextIsLast =
-            ancestorInfo && virtualRow.index + 1 === ancestorInfo.branchDistance
+            ancestorInfo?.lastCommit &&
+            virtualRow.index + 1 === ancestorInfo.lastCommit.branchDistance
 
           const parentCommit: CommitId | undefined = isLast
-            ? ancestorInfo.commonCommit
+            ? ancestorInfo.commonCommit.hash
             : (getNextPaginatedItem(history, virtualRow.index)?.hash ??
-              ancestorInfo?.lastCommit ??
+              ancestorInfo?.lastCommit?.hash ??
               undefined)
 
           const parentBranch: BranchInfo | undefined = parentCommit
-            ? ancestorInfo && parentCommit === ancestorInfo.commonCommit
+            ? ancestorInfo && parentCommit === ancestorInfo.commonCommit.hash
               ? baseBranch
               : branch
             : undefined
@@ -99,7 +104,7 @@ const GraphBranch = (props: GraphBranchProps) => {
                       id: COMMIT_ELEMENT_ID(parentCommit, parentBranch.name),
                       type:
                         displayExtraAncestor &&
-                        parentCommit === ancestorInfo.lastCommit &&
+                        parentCommit === ancestorInfo.lastCommit?.hash &&
                         !nextIsLast
                           ? 'dashed'
                           : isUnconfirmed
@@ -125,25 +130,33 @@ const GraphBranch = (props: GraphBranchProps) => {
 
       {displayExtraAncestor && ancestorInfo.lastCommit && baseBranch && (
         <GraphCommit
-          key={ancestorInfo.branchDistance}
+          key={ancestorInfo.lastCommit.branchDistance}
           path={path}
-          commitId={ancestorInfo.lastCommit}
+          commitId={ancestorInfo.lastCommit.hash}
           commitType={
-            divergence && ancestorInfo.branchDistance + 1 <= divergence.ahead
+            divergence &&
+            ancestorInfo.lastCommit.branchDistance + 1 <= divergence.ahead
               ? 'unconfirmed'
               : 'confirmed'
           }
-          elementId={COMMIT_ELEMENT_ID(ancestorInfo.lastCommit, branch.name)}
+          elementId={COMMIT_ELEMENT_ID(
+            ancestorInfo.lastCommit.hash,
+            branch.name,
+          )}
           parent={{
-            id: COMMIT_ELEMENT_ID(ancestorInfo.commonCommit, baseBranch.name),
+            id: COMMIT_ELEMENT_ID(
+              ancestorInfo.commonCommit.hash,
+              baseBranch.name,
+            ),
             type:
-              divergence && ancestorInfo.branchDistance + 1 <= divergence.ahead
+              divergence &&
+              ancestorInfo.lastCommit.branchDistance + 1 <= divergence.ahead
                 ? 'unconfirmed'
                 : 'solid',
           }}
           className={clsx('absolute top-0 left-[8%]')}
           style={{
-            transform: `translateY(${(virtualizer.options.gap + virtualizer.options.estimateSize(ancestorInfo.branchDistance)) * ancestorInfo.branchDistance}px)`,
+            transform: `translateY(${(virtualizer.options.gap + virtualizer.options.estimateSize(ancestorInfo.lastCommit.branchDistance)) * ancestorInfo.lastCommit.branchDistance}px)`,
           }}
         />
       )}
