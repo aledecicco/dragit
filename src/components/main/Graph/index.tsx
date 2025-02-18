@@ -16,7 +16,7 @@ import { getPaginatedLength } from '@api/utils'
 import { IconButton } from '@lib/IconButton'
 import { SelectInput } from '@lib/SelectInput'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
-import { GraphBaseBranch } from './BaseBranch'
+import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
 import { NODE_SIZE } from './Commit'
 import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
@@ -134,7 +134,7 @@ interface GraphInnerProps extends GraphProps {
 
 const GraphInner = (props: GraphInnerProps) => {
   const { path, branch, baseBranch } = props
-  const ancestor = useQuery(
+  const commonAncestor = useQuery(
     commonAncestorQuery(path, branch?.name, baseBranch?.name),
   )
 
@@ -143,7 +143,7 @@ const GraphInner = (props: GraphInnerProps) => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: refresh arrows when branches change
   useEffect(() => {
     svgOverlay.refresh()
-  }, [ancestor.data, branch, baseBranch])
+  }, [commonAncestor.data, branch, baseBranch])
 
   const branchHistory = useInfiniteQuery(commitHistoryQuery(path, branch?.name))
   const baseBranchHistory = useInfiniteQuery(
@@ -151,7 +151,7 @@ const GraphInner = (props: GraphInnerProps) => {
   )
 
   const branchLength = Math.min(
-    (ancestor.data?.branchDistance ?? Number.POSITIVE_INFINITY) + 1,
+    (commonAncestor.data?.lastCommit?.distance ?? Number.POSITIVE_INFINITY) + 1,
     getPaginatedLength(branchHistory),
   )
   const baseLength = getPaginatedLength(baseBranchHistory)
@@ -175,25 +175,38 @@ const GraphInner = (props: GraphInnerProps) => {
       >
         {branch ? (
           <GraphBranch
-            virtualizer={virtualizer}
             path={path}
+            virtualizer={virtualizer}
             branch={branch}
-            baseBranch={baseBranch}
-            ancestorInfo={ancestor.data}
+            anchor={commonAncestor.data?.lastCommit ?? undefined}
+            stopAtAnchor
+            commitProps={{ className: 'left-[8%]' }}
           />
         ) : (
-          <p>No branch selected</p>
+          <p>No branch checked out</p>
         )}
 
         {baseBranch ? (
-          <GraphBaseBranch
-            virtualizer={virtualizer}
+          <GraphBranch
             path={path}
+            virtualizer={virtualizer}
             branch={baseBranch}
-            ancestorInfo={ancestor.data}
+            anchor={commonAncestor.data?.commonCommit ?? undefined}
+            stopAtAnchor={false}
+            commitProps={{ className: 'left-[60%]' }}
           />
         ) : (
-          <p>No branch selected</p>
+          <p>No base branch selected</p>
+        )}
+
+        {branch && baseBranch && commonAncestor.data && (
+          <GraphAnchor
+            path={path}
+            virtualizer={virtualizer}
+            branch={branch}
+            baseBranch={baseBranch}
+            commonAncestorInfo={commonAncestor.data}
+          />
         )}
       </div>
     </div>

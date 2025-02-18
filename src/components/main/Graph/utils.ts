@@ -28,6 +28,13 @@ const ancestorNotInRange = (
   )
 }
 
+const ancestorIsDivergent = (
+  ancestorDistance: number,
+  branchDivergence: BranchDivergence,
+): boolean => {
+  return ancestorDistance + 1 <= branchDivergence.ahead
+}
+
 const useInfiniteScroll = (
   history: HistoryQuery,
   items: VirtualItem[],
@@ -72,6 +79,7 @@ const useRemoteDivergence = (
 
 export {
   ancestorNotInRange,
+  ancestorIsDivergent,
   useInfiniteScroll,
   useCurrentBranch,
   useRemoteDivergence,

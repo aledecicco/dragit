@@ -12,6 +12,7 @@ import type {
   BranchName,
   CommitId,
   CommitInfo,
+  CommonAncestorInfo,
   HeadInfo,
   HistoryItem,
 } from './models'
@@ -193,7 +194,7 @@ const commitInfoQuery = (path: string, commitId: CommitId) =>
 const fetchCommonAncestor = (
   branch: BranchName,
   baseBranch: BranchName,
-): Promise<AncestorInfo | undefined> =>
+): Promise<CommonAncestorInfo | undefined> =>
   invoke('get_common_ancestor', { branch: branch, baseBranch: baseBranch })
 
 const commonAncestorQuery = (
