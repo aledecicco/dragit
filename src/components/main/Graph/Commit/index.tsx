@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import type { HTMLProps } from 'react'
+import { match } from 'ts-pattern'
 
 import type { BranchName, CommitId } from '@api/models'
 import { commitInfoQuery } from '@api/queries'
 import { Tooltip } from '@lib/Tooltip'
 import { makeTracked } from '@main/SvgOverlay'
-import { match } from 'ts-pattern'
 import { GraphCommitInfo } from '../CommitInfo'
 import type { ParentCommitType } from '../Edges'
 

@@ -1,5 +1,6 @@
 use crate::{
-    error::GitError, AncestorInfo, BranchDivergence, BranchInfo, CommitInfo, HeadInfo, HistoryItem,
+    error::GitError, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, HeadInfo,
+    HistoryItem,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -56,7 +57,7 @@ pub trait GitHandler {
         &self,
         branch_a: &str,
         branch_b: &str,
-    ) -> Result<Option<AncestorInfo>, GitError>;
+    ) -> Result<Option<CommonAncestorInfo>, GitError>;
 
     /// Returns the number of commits that the given branch is ahead/behind another (possibly its remote counterpart).
     fn get_branch_divergence(

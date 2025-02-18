@@ -12,14 +12,13 @@ export interface CommitInfo {
 }
 
 export interface AncestorInfo {
-  lastCommit: {
-    branchDistance: number
-    hash: CommitId
-  } | null
-  commonCommit: {
-    baseDistance: number
-    hash: CommitId
-  }
+  distance: number
+  hash: CommitId
+}
+
+export interface CommonAncestorInfo {
+  lastCommit: AncestorInfo | null
+  commonCommit: AncestorInfo
 }
 
 export interface BranchDivergence {

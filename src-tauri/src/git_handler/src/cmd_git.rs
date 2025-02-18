@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, HashSet},
+    collections::HashMap,
     io::{self, ErrorKind},
     path::Path,
     process::{Command, ExitStatus, Output},
@@ -7,8 +7,8 @@ use std::{
 };
 
 use models::{
-    AncestorInfo, BeforeAncestor, BranchDivergence, BranchInfo, BranchType, CommitInfo,
-    CommonAncestor, GitError, GitHandler, HeadInfo, HistoryItem,
+    AncestorInfo, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError,
+    GitHandler, HeadInfo, HistoryItem,
 };
 
 use crate::utils::*;
@@ -229,7 +229,7 @@ impl GitHandler for CmdGit {
         &self,
         branch: &str,
         base_branch: &str,
-    ) -> Result<Option<AncestorInfo>, GitError> {
+    ) -> Result<Option<CommonAncestorInfo>, GitError> {
         let parse_ref = |reference: &str, back: u64| -> Result<Option<String>, GitError> {
             command_output(
                 &self.get_path()?,
@@ -258,16 +258,16 @@ impl GitHandler for CmdGit {
         loop {
             if let Some((branch_hash, branch_distance)) = branch_pointer {
                 if let Some(base_distance) = found_in_base.get(&branch_hash) {
-                    return Ok(Some(AncestorInfo {
+                    return Ok(Some(CommonAncestorInfo {
                         last_commit: prev_branch_pointer.map(
-                            |(prev_branch_hash, prev_branch_distance)| BeforeAncestor {
+                            |(prev_branch_hash, prev_branch_distance)| AncestorInfo {
                                 hash: prev_branch_hash,
-                                branch_distance: prev_branch_distance,
+                                distance: prev_branch_distance,
                             },
                         ),
-                        common_commit: CommonAncestor {
+                        common_commit: AncestorInfo {
                             hash: branch_hash,
-                            base_distance: *base_distance,
+                            distance: *base_distance,
                         },
                     }));
                 }
@@ -279,16 +279,16 @@ impl GitHandler for CmdGit {
 
             if let Some((base_hash, base_distance)) = base_pointer {
                 if let Some(prev_branch_pointer) = found_in_branch.get(&base_hash) {
-                    return Ok(Some(AncestorInfo {
+                    return Ok(Some(CommonAncestorInfo {
                         last_commit: prev_branch_pointer.as_ref().map(
-                            |(prev_branch_hash, prev_branch_distance)| BeforeAncestor {
+                            |(prev_branch_hash, prev_branch_distance)| AncestorInfo {
                                 hash: prev_branch_hash.to_string(),
-                                branch_distance: *prev_branch_distance,
+                                distance: *prev_branch_distance,
                             },
                         ),
-                        common_commit: CommonAncestor {
+                        common_commit: AncestorInfo {
                             hash: base_hash,
-                            base_distance: base_distance,
+                            distance: base_distance,
                         },
                     }));
                 }

@@ -3,34 +3,26 @@ import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 import { useCallback } from 'react'
 
-import type {
-  AncestorInfo,
-  BranchInfo,
-  BranchName,
-  CommitId,
-} from '@api/models'
+import type { BranchInfo, CommitId, CommonAncestorInfo } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
 import {
   getNextPaginatedItem,
   getPaginatedItem,
   getPaginatedLength,
 } from '@api/utils'
-import { GraphCommit } from '../Commit'
+import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import {
   ancestorNotInRange,
   useInfiniteScroll,
   useRemoteDivergence,
 } from '../utils'
 
-const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
-  `commit_${commitId}_${branch}`
-
 interface GraphBranchProps {
   virtualizer: Virtualizer<HTMLDivElement, Element>
   path: string
   branch: BranchInfo
   baseBranch: BranchInfo | undefined
-  ancestorInfo: AncestorInfo | undefined
+  ancestorInfo: CommonAncestorInfo | undefined
 }
 
 const GraphBranch = (props: GraphBranchProps) => {
@@ -41,7 +33,7 @@ const GraphBranch = (props: GraphBranchProps) => {
   const shouldFetch = useCallback(() => {
     return (
       !ancestorInfo?.lastCommit ||
-      getPaginatedLength(history) <= ancestorInfo.lastCommit.branchDistance
+      getPaginatedLength(history) <= ancestorInfo.lastCommit.distance
     )
   }, [history, ancestorInfo])
   useInfiniteScroll(history, items, shouldFetch)
@@ -49,7 +41,7 @@ const GraphBranch = (props: GraphBranchProps) => {
   const displayExtraAncestor =
     ancestorInfo?.lastCommit &&
     baseBranch &&
-    ancestorNotInRange(ancestorInfo.lastCommit.branchDistance, history, items)
+    ancestorNotInRange(ancestorInfo.lastCommit.distance, history, items)
 
   const divergence = useRemoteDivergence(path, branch)
 
@@ -58,8 +50,9 @@ const GraphBranch = (props: GraphBranchProps) => {
       {history.data ? (
         items.map((virtualRow) => {
           if (
-            ancestorInfo?.lastCommit &&
-            virtualRow.index > ancestorInfo.lastCommit.branchDistance
+            ancestorInfo &&
+            (ancestorInfo.lastCommit === null ||
+              virtualRow.index > ancestorInfo.lastCommit.distance)
           ) {
             return
           }
@@ -71,10 +64,10 @@ const GraphBranch = (props: GraphBranchProps) => {
 
           const isLast =
             ancestorInfo?.lastCommit &&
-            virtualRow.index === ancestorInfo.lastCommit.branchDistance
+            virtualRow.index === ancestorInfo.lastCommit.distance
           const nextIsLast =
             ancestorInfo?.lastCommit &&
-            virtualRow.index + 1 === ancestorInfo.lastCommit.branchDistance
+            virtualRow.index + 1 === ancestorInfo.lastCommit.distance
 
           const parentCommit: CommitId | undefined = isLast
             ? ancestorInfo.commonCommit.hash
@@ -130,12 +123,12 @@ const GraphBranch = (props: GraphBranchProps) => {
 
       {displayExtraAncestor && ancestorInfo.lastCommit && baseBranch && (
         <GraphCommit
-          key={ancestorInfo.lastCommit.branchDistance}
+          key={ancestorInfo.lastCommit.distance}
           path={path}
           commitId={ancestorInfo.lastCommit.hash}
           commitType={
             divergence &&
-            ancestorInfo.lastCommit.branchDistance + 1 <= divergence.ahead
+            ancestorInfo.lastCommit.distance + 1 <= divergence.ahead
               ? 'unconfirmed'
               : 'confirmed'
           }
@@ -150,13 +143,13 @@ const GraphBranch = (props: GraphBranchProps) => {
             ),
             type:
               divergence &&
-              ancestorInfo.lastCommit.branchDistance + 1 <= divergence.ahead
+              ancestorInfo.lastCommit.distance + 1 <= divergence.ahead
                 ? 'unconfirmed'
                 : 'solid',
           }}
           className={clsx('absolute top-0 left-[8%]')}
           style={{
-            transform: `translateY(${(virtualizer.options.gap + virtualizer.options.estimateSize(ancestorInfo.lastCommit.branchDistance)) * ancestorInfo.lastCommit.branchDistance}px)`,
+            transform: `translateY(${(virtualizer.options.gap + virtualizer.options.estimateSize(ancestorInfo.lastCommit.distance)) * ancestorInfo.lastCommit.distance}px)`,
           }}
         />
       )}

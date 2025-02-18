@@ -127,23 +127,16 @@ pub struct HeadInfo {
 
 #[derive(serde::Serialize, Debug, Clone)]
 #[serde(rename_all(serialize = "camelCase"))]
-pub struct CommonAncestor {
-    pub hash: String,
-    pub base_distance: u64,
-}
-
-#[derive(serde::Serialize, Debug, Clone)]
-#[serde(rename_all(serialize = "camelCase"))]
-pub struct BeforeAncestor {
-    pub hash: String,
-    pub branch_distance: u64,
-}
-
-#[derive(serde::Serialize, Debug, Clone)]
-#[serde(rename_all(serialize = "camelCase"))]
 pub struct AncestorInfo {
-    pub last_commit: Option<BeforeAncestor>,
-    pub common_commit: CommonAncestor,
+    pub hash: String,
+    pub distance: u64,
+}
+
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
+pub struct CommonAncestorInfo {
+    pub last_commit: Option<AncestorInfo>,
+    pub common_commit: AncestorInfo,
 }
 
 #[derive(serde::Serialize, Debug, Clone)]
