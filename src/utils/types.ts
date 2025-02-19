@@ -8,5 +8,16 @@ type Size = 'sm' | 'md' | 'lg'
 
 const idFn = <T>(v: T) => v
 
+const mapFn = <T, R>(
+  v: T | undefined | null,
+  f: (v: T) => R,
+): R | undefined => {
+  if (v === undefined || v === null) {
+    return undefined
+  }
+
+  return f(v)
+}
+
 export type { ReactSetter, LiteralUnion, Size }
-export { idFn }
+export { idFn, mapFn }

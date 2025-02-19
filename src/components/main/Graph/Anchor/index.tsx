@@ -1,9 +1,18 @@
+import { useInfiniteQuery } from '@tanstack/react-query'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
+import { useMemo } from 'react'
 
 import type { BranchInfo, CommonAncestorInfo } from '@api/models'
+import { commitHistoryQuery } from '@api/queries'
+import { getNextPaginatedItem } from '@api/utils'
+import { mapFn } from '@utils/types'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
-import { ancestorIsDivergent, useRemoteDivergence } from '../utils'
+import {
+  ancestorIsDivergent,
+  getBranchPositionClass,
+  useRemoteDivergence,
+} from '../utils'
 import { getAnchorTranslationY } from './utils'
 
 interface GraphAnchorProps {
@@ -17,6 +26,16 @@ interface GraphAnchorProps {
 const GraphAnchor = (props: GraphAnchorProps) => {
   const { path, virtualizer, branch, baseBranch, commonAncestorInfo } = props
   const divergence = useRemoteDivergence(path, branch)
+
+  const baseHistory = useInfiniteQuery(
+    commitHistoryQuery(path, baseBranch.name),
+  )
+  const anchorParent = useMemo(() => {
+    return getNextPaginatedItem(
+      baseHistory,
+      commonAncestorInfo.commonCommit.distance,
+    )
+  }, [baseHistory, commonAncestorInfo])
 
   const branchIsDivergent =
     divergence &&
@@ -44,7 +63,7 @@ const GraphAnchor = (props: GraphAnchorProps) => {
             id: commonCommitId,
             type: branchIsDivergent ? 'unconfirmed' : 'solid',
           }}
-          className={clsx('absolute top-0 left-[8%]')}
+          className={clsx('absolute top-0', getBranchPositionClass(false))}
           style={{
             transform: `translateY(${getAnchorTranslationY(virtualizer, commonAncestorInfo.lastCommit.distance)}px)`,
           }}
@@ -57,8 +76,11 @@ const GraphAnchor = (props: GraphAnchorProps) => {
         commitId={commonAncestorInfo.commonCommit.hash}
         commitType="confirmed"
         elementId={commonCommitId}
-        parent={undefined}
-        className={clsx('absolute top-0 left-[60%]')}
+        parent={mapFn(anchorParent, (anchorParent) => ({
+          id: COMMIT_ELEMENT_ID(anchorParent.hash, baseBranch.name),
+          type: 'solid',
+        }))}
+        className={clsx('absolute top-0', getBranchPositionClass(true))}
         style={{
           transform: `translateY(${getAnchorTranslationY(virtualizer, commonAncestorInfo.commonCommit.distance)}px)`,
         }}

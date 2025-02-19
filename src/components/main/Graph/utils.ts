@@ -77,10 +77,14 @@ const useRemoteDivergence = (
   return divergence.data
 }
 
+const getBranchPositionClass = (isBase: boolean) =>
+  isBase ? 'left-[60%]' : 'left-[8%]'
+
 export {
   ancestorNotInRange,
   ancestorIsDivergent,
   useInfiniteScroll,
   useCurrentBranch,
   useRemoteDivergence,
+  getBranchPositionClass,
 }

@@ -20,7 +20,7 @@ import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
 import { NODE_SIZE } from './Commit'
 import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
-import { useCurrentBranch } from './utils'
+import { getBranchPositionClass, useCurrentBranch } from './utils'
 
 interface GraphProps {
   path: string
@@ -178,12 +178,19 @@ const GraphInner = (props: GraphInnerProps) => {
             path={path}
             virtualizer={virtualizer}
             branch={branch}
-            anchor={commonAncestor.data?.lastCommit ?? undefined}
+            anchor={commonAncestor.data?.lastCommit}
             stopAtAnchor
-            commitProps={{ className: 'left-[8%]' }}
+            commitProps={{ className: getBranchPositionClass(false) }}
           />
         ) : (
-          <p>No branch checked out</p>
+          <p
+            className={clsx(
+              'absolute top-0 text-center w-[30%]',
+              getBranchPositionClass(false),
+            )}
+          >
+            No branch checked out
+          </p>
         )}
 
         {baseBranch ? (
@@ -193,10 +200,17 @@ const GraphInner = (props: GraphInnerProps) => {
             branch={baseBranch}
             anchor={commonAncestor.data?.commonCommit ?? undefined}
             stopAtAnchor={false}
-            commitProps={{ className: 'left-[60%]' }}
+            commitProps={{ className: getBranchPositionClass(true) }}
           />
         ) : (
-          <p>No base branch selected</p>
+          <p
+            className={clsx(
+              'absolute top-0 text-center w-[30%]',
+              getBranchPositionClass(true),
+            )}
+          >
+            No base branch selected
+          </p>
         )}
 
         {branch && baseBranch && commonAncestor.data && (
