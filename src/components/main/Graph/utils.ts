@@ -3,7 +3,7 @@ import {
   type UseInfiniteQueryResult,
   useQuery,
 } from '@tanstack/react-query'
-import type { VirtualItem } from '@tanstack/react-virtual'
+import type { VirtualItem, Virtualizer } from '@tanstack/react-virtual'
 import { useEffect, useMemo } from 'react'
 
 import type { BranchDivergence, BranchInfo, HistoryItem } from '@api/models'
@@ -14,6 +14,7 @@ import {
 } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
 import { getCurrentBranchInfo, getRemoteCounterpart } from '@utils/repository'
+import { CURVE_SIZE } from './Edges'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<HistoryItem[]>>
 
@@ -77,8 +78,19 @@ const useRemoteDivergence = (
   return divergence.data
 }
 
-const getBranchPositionClass = (isBase: boolean) =>
-  isBase ? 'left-[60%]' : 'left-[8%]'
+const getCommitPositionClass = (isBase: boolean) =>
+  isBase ? 'left-[62%]' : 'left-[8%]'
+
+const getCommitTranslationY = (
+  virtualizer: Virtualizer<HTMLDivElement, Element>,
+  distance: number,
+): number => {
+  return (
+    (virtualizer.options.gap + virtualizer.options.estimateSize(distance)) *
+      distance +
+    CURVE_SIZE * 2.25
+  )
+}
 
 export {
   ancestorNotInRange,
@@ -86,5 +98,6 @@ export {
   useInfiniteScroll,
   useCurrentBranch,
   useRemoteDivergence,
-  getBranchPositionClass,
+  getCommitPositionClass,
+  getCommitTranslationY,
 }

@@ -6,29 +6,27 @@ import type { AncestorInfo, BranchInfo } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
 import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
 import { mapFn } from '@utils/types'
-import {
-  COMMIT_ELEMENT_ID,
-  GraphCommit,
-  type GraphCommitProps,
-} from '../Commit'
+import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import {
   ancestorIsDivergent,
-  getBranchPositionClass,
+  getCommitPositionClass,
+  getCommitTranslationY,
   useInfiniteScroll,
   useRemoteDivergence,
 } from '../utils'
+import { BranchMessage } from './Message'
 
 interface GraphBranchProps {
   path: string
   virtualizer: Virtualizer<HTMLDivElement, Element>
   branch: BranchInfo
   anchor: AncestorInfo | undefined | null
-  stopAtAnchor: boolean
-  commitProps?: Partial<GraphCommitProps>
+  isBase: boolean
 }
 
 const GraphBranch = (props: GraphBranchProps) => {
-  const { path, virtualizer, branch, anchor, stopAtAnchor, commitProps } = props
+  const { path, virtualizer, branch, anchor, isBase } = props
+  const stopAtAnchor = !isBase
 
   const history = useInfiniteQuery(commitHistoryQuery(path, branch.name))
   const items = virtualizer.getVirtualItems()
@@ -37,28 +35,14 @@ const GraphBranch = (props: GraphBranchProps) => {
   const divergence = useRemoteDivergence(path, branch)
 
   if (stopAtAnchor && (anchor === null || anchor?.distance === 0)) {
-    return (
-      <p
-        className={clsx(
-          'absolute top-0 text-center w-[30%]',
-          getBranchPositionClass(false),
-        )}
-      >
-        No new commits
-      </p>
-    )
+    return <BranchMessage isBase={isBase}>No new commits</BranchMessage>
   }
 
   if (!history.data) {
     return (
-      <p
-        className={clsx(
-          'absolute top-0 text-center w-[30%]',
-          getBranchPositionClass(!stopAtAnchor),
-        )}
-      >
+      <BranchMessage isBase={isBase}>
         {history.isFetching ? 'Loading branch history...' : 'No commits found'}
-      </p>
+      </BranchMessage>
     )
   }
 
@@ -104,11 +88,9 @@ const GraphBranch = (props: GraphBranchProps) => {
               ? 'unconfirmed'
               : 'solid',
         }))}
-        {...commitProps}
-        className={clsx('absolute top-0', commitProps?.className)}
+        className={clsx('absolute top-0', getCommitPositionClass(isBase))}
         style={{
-          transform: `translateY(${virtualRow.start}px)`,
-          ...commitProps?.style,
+          transform: `translateY(${getCommitTranslationY(virtualizer, virtualRow.index)}px)`,
         }}
       />
     )

@@ -18,9 +18,10 @@ import { SelectInput } from '@lib/SelectInput'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
 import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
+import { BranchMessage } from './Branch/Message'
 import { NODE_SIZE } from './Commit'
 import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
-import { getBranchPositionClass, useCurrentBranch } from './utils'
+import { useCurrentBranch } from './utils'
 
 interface GraphProps {
   path: string
@@ -71,8 +72,8 @@ const Graph = (props: GraphProps) => {
       <div
         className={clsx(
           'overflow-hidden w-full h-full relative',
-          'grid grid-cols-2 grid-rows-[max-content_1fr]',
-          'gap-8 place-items-center',
+          'grid grid-cols-[1fr_max-content_max-content_1fr] grid-rows-[max-content_1fr]',
+          'col-gap-8 place-items-center',
         )}
       >
         <SelectInput
@@ -88,9 +89,7 @@ const Graph = (props: GraphProps) => {
 
         <IconButton
           Glyph={IconSwitchHorizontal}
-          className={clsx(
-            'absolute top-0 left-half -translate-x-[200%] translate-y-[25%]',
-          )}
+          className={clsx('col-span-2')}
           variant="neutral"
           aria-label="Switch branch and base branch"
           disabled={!branch || !baseBranch}
@@ -119,7 +118,7 @@ const Graph = (props: GraphProps) => {
           }}
         />
 
-        <SvgOverlay className={clsx('grid col-span-2')} RenderOverlay={Edges}>
+        <SvgOverlay className={clsx('col-span-4')} RenderOverlay={Edges}>
           <GraphInner {...props} branch={branch} baseBranch={baseBranch} />
         </SvgOverlay>
       </div>
@@ -159,7 +158,7 @@ const GraphInner = (props: GraphInnerProps) => {
   const virtualizer = useVirtualizer({
     estimateSize: () => NODE_SIZE,
     gap: CURVE_SIZE * 2 + EDGE_OFFSET * 2,
-    paddingEnd: CURVE_SIZE * 2,
+    paddingEnd: CURVE_SIZE * 3.5,
     getScrollElement: () => svgOverlay.componentRef.current,
     count: Math.max(branchLength, baseLength),
   })
@@ -179,18 +178,10 @@ const GraphInner = (props: GraphInnerProps) => {
             virtualizer={virtualizer}
             branch={branch}
             anchor={commonAncestor.data?.lastCommit}
-            stopAtAnchor
-            commitProps={{ className: getBranchPositionClass(false) }}
+            isBase={false}
           />
         ) : (
-          <p
-            className={clsx(
-              'absolute top-0 text-center w-[30%]',
-              getBranchPositionClass(false),
-            )}
-          >
-            No branch checked out
-          </p>
+          <BranchMessage isBase={false}>No branch checked out</BranchMessage>
         )}
 
         {baseBranch ? (
@@ -199,18 +190,10 @@ const GraphInner = (props: GraphInnerProps) => {
             virtualizer={virtualizer}
             branch={baseBranch}
             anchor={commonAncestor.data?.commonCommit ?? undefined}
-            stopAtAnchor={false}
-            commitProps={{ className: getBranchPositionClass(true) }}
+            isBase={true}
           />
         ) : (
-          <p
-            className={clsx(
-              'absolute top-0 text-center w-[30%]',
-              getBranchPositionClass(true),
-            )}
-          >
-            No base branch selected
-          </p>
+          <BranchMessage isBase={true}>No base branch selected</BranchMessage>
         )}
 
         {branch && baseBranch && commonAncestor.data && (

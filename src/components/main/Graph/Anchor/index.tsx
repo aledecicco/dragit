@@ -10,10 +10,10 @@ import { mapFn } from '@utils/types'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import {
   ancestorIsDivergent,
-  getBranchPositionClass,
+  getCommitPositionClass,
+  getCommitTranslationY,
   useRemoteDivergence,
 } from '../utils'
-import { getAnchorTranslationY } from './utils'
 
 interface GraphAnchorProps {
   path: string
@@ -63,9 +63,9 @@ const GraphAnchor = (props: GraphAnchorProps) => {
             id: commonCommitId,
             type: branchIsDivergent ? 'unconfirmed' : 'solid',
           }}
-          className={clsx('absolute top-0', getBranchPositionClass(false))}
+          className={clsx('absolute top-0', getCommitPositionClass(false))}
           style={{
-            transform: `translateY(${getAnchorTranslationY(virtualizer, commonAncestorInfo.lastCommit.distance)}px)`,
+            transform: `translateY(${getCommitTranslationY(virtualizer, commonAncestorInfo.lastCommit.distance)}px)`,
           }}
         />
       )}
@@ -80,9 +80,9 @@ const GraphAnchor = (props: GraphAnchorProps) => {
           id: COMMIT_ELEMENT_ID(anchorParent.hash, baseBranch.name),
           type: 'solid',
         }))}
-        className={clsx('absolute top-0', getBranchPositionClass(true))}
+        className={clsx('absolute top-0', getCommitPositionClass(true))}
         style={{
-          transform: `translateY(${getAnchorTranslationY(virtualizer, commonAncestorInfo.commonCommit.distance)}px)`,
+          transform: `translateY(${getCommitTranslationY(virtualizer, commonAncestorInfo.commonCommit.distance)}px)`,
         }}
       />
     </>
