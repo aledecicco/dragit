@@ -21,7 +21,7 @@ interface Element<
   R extends string = string,
   T extends LiteralUnion<R> = string,
 > {
-  ref: RefObject<HTMLElement>
+  ref: RefObject<HTMLElement | null>
   parent: ParentRel<LiteralUnion<T>> | undefined
 }
 
@@ -34,8 +34,8 @@ interface SvgOverlayState {
   elements: Map<ElementId, Element>
   registerElement: (id: ElementId, element: Element) => void
   unregisterElement: (id: ElementId) => void
-  svgRef: RefObject<SVGSVGElement>
-  componentRef: RefObject<HTMLDivElement>
+  svgRef: RefObject<SVGSVGElement | null>
+  componentRef: RefObject<HTMLDivElement | null>
   refresh: () => void
 }
 

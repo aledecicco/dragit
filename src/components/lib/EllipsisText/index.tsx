@@ -1,9 +1,9 @@
 import clsx from 'clsx'
-import { type HTMLProps, useEffect, useRef, useState } from 'react'
+import { type ComponentProps, useEffect, useRef, useState } from 'react'
 
 import { Tooltip } from '@lib/Tooltip'
 
-interface EllipsisTextProps extends HTMLProps<HTMLParagraphElement> {
+interface EllipsisTextProps extends ComponentProps<'p'> {
   tooltip?: boolean
 }
 

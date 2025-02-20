@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import type { HTMLProps } from 'react'
+import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
 import type { BranchName, CommitId } from '@api/models'
@@ -16,7 +16,7 @@ export const NODE_SIZE = 20
 export const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
   `commit_${commitId}_${branch}`
 
-interface GraphCommitProps extends HTMLProps<HTMLDivElement> {
+interface GraphCommitProps extends ComponentProps<'div'> {
   path: string
   commitId: CommitId
   commitType: CommitType

@@ -1,7 +1,7 @@
 import clsx from 'clsx'
-import type { HTMLProps } from 'react'
+import type { ComponentProps } from 'react'
 
-interface BranchMessageProps extends HTMLProps<HTMLParagraphElement> {
+interface BranchMessageProps extends ComponentProps<'p'> {
   isBase: boolean
 }
 

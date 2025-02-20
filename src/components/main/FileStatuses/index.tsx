@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { type HTMLProps, useMemo } from 'react'
+import { type ComponentProps, useMemo } from 'react'
 
 import type { FileInfo } from '@api/models'
 import { headInfoQuery } from '@api/queries'
@@ -9,7 +9,7 @@ import { UnmergedFileStatusItem } from './UnmergedFile'
 import { UnstagedFileStatusItem } from './UnstagedFile'
 import { UntrackedFileStatusItem } from './UntrackedFile'
 
-interface FileStatusesProps extends HTMLProps<HTMLDivElement> {
+interface FileStatusesProps extends ComponentProps<'div'> {
   path: string
 }
 

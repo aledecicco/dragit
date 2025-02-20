@@ -1,22 +1,21 @@
 import clsx from 'clsx'
-import { type ButtonHTMLAttributes, forwardRef } from 'react'
+import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
 import type { Size } from '@utils/types'
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ComponentProps<'button'> {
   variant: 'primary' | 'cta' | 'neutral' | 'plain'
   rounded?: boolean
   size?: Size
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+const Button = (props: ButtonProps) => {
   const { variant, rounded = false, size = 'md', ...buttonProps } = props
 
   return (
     <button
       {...buttonProps}
-      ref={ref}
       className={clsx(
         'w-max h-max',
         'flex flex-row justify-center items-center text-center',
@@ -61,6 +60,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
       )}
     />
   )
-})
+}
 
 export { Button, type ButtonProps }

@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import type { ComponentType, HTMLProps } from 'react'
+import type { ComponentProps, ComponentType } from 'react'
 
 import {
   SvgOverlayContextProvider,
@@ -8,7 +8,7 @@ import {
 } from './context'
 import { makeTracked } from './utils'
 
-interface SvgOverlayProps extends HTMLProps<HTMLDivElement> {
+interface SvgOverlayProps extends ComponentProps<'div'> {
   RenderOverlay: ComponentType<Pick<SvgOverlayState, 'elements'>>
 }
 

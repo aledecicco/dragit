@@ -1,13 +1,12 @@
 import clsx from 'clsx'
-import type { HTMLProps, ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 import type { FileInfo } from '@api/models'
 import { type Glyph, Icon } from '@lib/Icon'
 import { Tooltip } from '@lib/Tooltip'
 import { FileStatusMoreInfo } from '../MoreInfo'
 
-interface FileStatusItemProps
-  extends Omit<HTMLProps<HTMLDivElement>, 'children'> {
+interface FileStatusItemProps extends Omit<ComponentProps<'div'>, 'children'> {
   file: FileInfo
   Glyph: Glyph
   actions?: ReactNode

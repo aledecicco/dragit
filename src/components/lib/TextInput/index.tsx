@@ -1,15 +1,14 @@
 import clsx from 'clsx'
-import { type HTMLProps, forwardRef } from 'react'
+import type { ComponentProps } from 'react'
 
-interface TextInputProps extends HTMLProps<HTMLInputElement> {}
+interface TextInputProps extends ComponentProps<'input'> {}
 
-const TextInput = forwardRef<HTMLInputElement, TextInputProps>((props, ref) => {
+const TextInput = (props: TextInputProps) => {
   const { ...inputProps } = props
 
   return (
     <input
       {...inputProps}
-      ref={ref}
       className={clsx(
         'flex flex-row items-center',
         'rounded-md px-2 py-1 outline-none border-1',
@@ -18,6 +17,6 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>((props, ref) => {
       )}
     />
   )
-})
+}
 
 export { TextInput, type TextInputProps }
