@@ -51,7 +51,6 @@ const GraphAnchor = (props: GraphAnchorProps) => {
     <>
       {commonAncestorInfo.lastCommit && (
         <GraphCommit
-          key={commonAncestorInfo.lastCommit.distance}
           path={path}
           commitId={commonAncestorInfo.lastCommit.hash}
           commitType={branchIsDivergent ? 'unconfirmed' : 'confirmed'}
@@ -71,7 +70,6 @@ const GraphAnchor = (props: GraphAnchorProps) => {
       )}
 
       <GraphCommit
-        key={commonAncestorInfo.commonCommit.distance}
         path={path}
         commitId={commonAncestorInfo.commonCommit.hash}
         commitType="confirmed"

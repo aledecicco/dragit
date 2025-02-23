@@ -157,7 +157,7 @@ const fetchBranches = (): Promise<BranchInfo[]> => invoke('get_branches')
 
 const branchesQuery = (path: string) =>
   queryOptions({
-    queryKey: [queryKeys.directory.branches.all(path)],
+    queryKey: [queryKeys.directory.branches.list(path)],
     queryFn: fetchBranches,
   })
 

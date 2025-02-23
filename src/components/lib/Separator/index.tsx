@@ -1,12 +1,12 @@
+import * as Ariakit from '@ariakit/react'
 import clsx from 'clsx'
-import { Separator as SeparatorPrimitive } from 'radix-ui'
 
-interface SeparatorProps extends SeparatorPrimitive.SeparatorProps {}
+interface SeparatorProps extends Ariakit.SeparatorProps {}
 
 const Separator = (props: SeparatorProps) => {
   const { ...separatorProps } = props
   return (
-    <SeparatorPrimitive.Root
+    <Ariakit.Separator
       {...separatorProps}
       className={clsx(
         'border-t-[1px] border-dark-600',

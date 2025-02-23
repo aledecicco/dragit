@@ -34,7 +34,7 @@ const GraphBranch = (props: GraphBranchProps) => {
 
   const divergence = useRemoteDivergence(path, branch)
 
-  if (stopAtAnchor && (anchor === null || anchor?.distance === 0)) {
+  if (stopAtAnchor && anchor === null) {
     return <BranchMessage isBase={isBase}>No new commits</BranchMessage>
   }
 

@@ -2,7 +2,7 @@ import { IconSwitchHorizontal } from '@tabler/icons-react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useCheckoutLocalBranch } from '@api/commands'
 import type { BranchInfo } from '@api/models'
@@ -13,8 +13,8 @@ import {
   headInfoQuery,
 } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
+import { Combobox } from '@lib/Combobox'
 import { IconButton } from '@lib/IconButton'
-import { SelectInput } from '@lib/SelectInput'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
 import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
@@ -35,8 +35,8 @@ interface ChosenBranches {
 const Graph = (props: GraphProps) => {
   const { path } = props
 
-  const branches = useQuery(branchesQuery(path))
   const headInfo = useQuery(headInfoQuery(path))
+  const branches = useQuery(branchesQuery(path))
   const currentBranch = useCurrentBranch(path)
 
   const [{ branch, baseBranch }, setChosenBranches] = useState<ChosenBranches>({
@@ -67,33 +67,43 @@ const Graph = (props: GraphProps) => {
     [],
   )
 
+  const branchOptions = useMemo(() => {
+    return branches.data?.map((branch) => branch.name) ?? []
+  }, [branches.data])
+
+  const baseBranchOptions = useMemo(() => {
+    return (
+      branches.data
+        ?.filter((branch) => branch.name !== currentBranch?.name)
+        .map((branch) => branch.name) ?? []
+    )
+  }, [currentBranch, branches.data])
+
   return (
     <div className={clsx('h-full w-full min-h-0')}>
       <div
         className={clsx(
           'overflow-hidden w-full h-full relative',
           'grid grid-cols-[1fr_max-content_max-content_1fr] grid-rows-[max-content_1fr]',
-          'col-gap-8 place-items-center',
+          'col-gap-8 place-items-center p-1',
         )}
       >
-        <SelectInput
-          ariaLabel="Branch"
-          placeholder="Branch..."
-          options={
-            branches.data?.map((branch) => ({ value: branch.name })) ?? []
-          }
-          value={branch?.name}
-          disabled={headInfo.isLoading}
-          onValueChange={(newBranch) => checkout(newBranch)}
+        <Combobox
+          className={clsx('[&]:w-65')}
+          options={branchOptions}
+          value={branch?.name ?? ''}
+          setValue={checkout}
+          placeholder="Checkout a branch..."
+          disabled={headInfo.isLoading || branches.isLoading}
         />
 
         <IconButton
           Glyph={IconSwitchHorizontal}
-          className={clsx('col-span-2')}
+          className={clsx('col-span-2 mx-1')}
           variant="neutral"
           aria-label="Switch branch and base branch"
           disabled={!branch || !baseBranch}
-          size="sm"
+          size="md"
           onClick={() => {
             if (baseBranch) {
               checkout(baseBranch.name)
@@ -101,21 +111,18 @@ const Graph = (props: GraphProps) => {
           }}
         />
 
-        <SelectInput
-          ariaLabel="Base branch"
-          placeholder="Base branch..."
-          options={
-            branches.data
-              ?.filter((branch) => branch.name !== currentBranch?.name)
-              .map((branch) => ({ value: branch.name })) ?? []
-          }
-          value={baseBranch?.name}
-          onValueChange={(newBaseBranch) => {
+        <Combobox
+          className={clsx('[&]:w-65')}
+          options={baseBranchOptions}
+          value={baseBranch?.name ?? ''}
+          setValue={(newBaseBranch) => {
             const branch = branches.data?.find(
               (branch) => branch.name === newBaseBranch,
             )
             changeBaseBranch(branch)
           }}
+          placeholder="Choose a base branch..."
+          disabled={headInfo.isLoading || branches.isLoading}
         />
 
         <SvgOverlay className={clsx('col-span-4')} RenderOverlay={Edges}>

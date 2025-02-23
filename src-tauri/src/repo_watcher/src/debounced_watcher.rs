@@ -207,7 +207,6 @@ impl RepoWatcher for DebouncedWatcher {
 
             Ok(())
         } else {
-            // TODO: don't repeat error
             Err(RepoWatcherError::WatchFolderFailed {
                 path: repo_path.to_string(),
             })

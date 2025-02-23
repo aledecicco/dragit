@@ -132,6 +132,10 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
   }, [syncSvg])
   const observer = useRef(new ResizeObserver(refresh))
 
+  const refreshAfter = useCallback(() => {
+    requestAnimationFrame(() => syncSvg())
+  }, [syncSvg])
+
   useEffect(() => {
     const scroll = (_event: Event) => {
       const event = _event as WheelEvent
@@ -142,6 +146,7 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
 
     if (componentRef.current) {
       componentRef.current.addEventListener('wheel', scroll)
+      componentRef.current.addEventListener('focusin', refreshAfter)
       observer.current.observe(componentRef.current)
     }
     window.addEventListener('resize', refresh)
@@ -149,11 +154,12 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
     return () => {
       if (componentRef.current) {
         componentRef.current.removeEventListener('wheel', scroll)
+        componentRef.current.removeEventListener('focusin', refreshAfter)
         observer.current.disconnect()
       }
       window.removeEventListener('resize', refresh)
     }
-  }, [pan, refresh])
+  }, [pan, refresh, refreshAfter])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: need to update context when rerender is forced
   const contextValue: SvgOverlayState = useMemo(() => {

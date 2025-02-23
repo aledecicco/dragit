@@ -13,3 +13,11 @@ export const range: {
 
   return to === undefined ? array : array.map((elem) => elem + from)
 }
+
+export const mapOr = <T, R, D>(or: D, arr: T[], fn: (v: T) => R): R[] | D => {
+  if (arr.length === 0) {
+    return or
+  }
+
+  return arr.map(fn)
+}

@@ -1,4 +1,3 @@
-import { Tooltip } from 'radix-ui'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
@@ -13,9 +12,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ClientProvider>
       <EventHandler>
-        <Tooltip.Provider>
-          <App />
-        </Tooltip.Provider>
+        <App />
       </EventHandler>
     </ClientProvider>
   </React.StrictMode>,
