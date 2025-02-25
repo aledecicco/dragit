@@ -6,7 +6,7 @@ import { match } from 'ts-pattern'
 
 import type { BranchName, CommitId } from '@api/models'
 import { commitInfoQuery } from '@api/queries'
-import { Popover } from '@lib/Popover'
+import { Hovercard, HovercardDisclosure } from '@lib/Hovercard'
 import { makeTracked } from '@main/SvgOverlay'
 import { GraphCommitInfo } from '../CommitInfo'
 import type { ParentCommitType } from '../Edges'
@@ -32,7 +32,8 @@ const GraphCommit = makeTracked<
   const commitInfo = useQuery(commitInfoQuery(path, commitId))
 
   return (
-    <Popover
+    <Hovercard
+      className={clsx('p-4')}
       placement="right"
       anchor={
         <div
@@ -54,10 +55,11 @@ const GraphCommit = makeTracked<
             )}
             style={{ width: NODE_SIZE, height: NODE_SIZE }}
           />
-          <div>
+          <div className={clsx('flex flex-row gap-1 items-center')}>
             <p className={clsx('text-xs')}>
               {commitInfo.data?.shortHash ?? '...'}
             </p>
+            <HovercardDisclosure />
           </div>
         </div>
       }

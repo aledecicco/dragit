@@ -18,7 +18,7 @@ const FileStatusItem = (props: FileStatusItemProps) => {
 
   return (
     <Hovercard
-      placement="top"
+      placement="left"
       anchor={
         <div
           {...divProps}
