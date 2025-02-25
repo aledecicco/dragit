@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import type { ComponentProps } from 'react'
+import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
 
 import type { BranchName, CommitId } from '@api/models'
@@ -31,35 +32,37 @@ const GraphCommit = makeTracked<
   const commitInfo = useQuery(commitInfoQuery(path, commitId))
 
   return (
-    <div
-      {...divProps}
-      ref={trackRef}
-      className={clsx('cursor-pointer', divProps.className)}
-    >
-      <Popover
-        placement="right"
-        anchor={
-          <div className={clsx('flex flex-row items-center gap-5')}>
-            <div
-              className={clsx(
-                'rounded-full shadow-md',
-                match(commitType)
-                  .with('confirmed', () => 'bg-primary')
-                  .with('unconfirmed', () => 'bg-accent')
-                  .exhaustive(),
-              )}
-              style={{ width: NODE_SIZE, height: NODE_SIZE }}
-            />
-            <div>
-              <p className={clsx('text-xs')}>
-                {commitInfo.data?.shortHash ?? '...'}
-              </p>
-            </div>
+    <Popover
+      placement="right"
+      anchor={
+        <div
+          {...divProps}
+          ref={mergeRefs([trackRef, divProps.ref])}
+          className={clsx(
+            'flex flex-row items-center gap-5',
+            'cursor-pointer',
+            divProps.className,
+          )}
+        >
+          <div
+            className={clsx(
+              'rounded-full shadow-md',
+              match(commitType)
+                .with('confirmed', () => 'bg-primary')
+                .with('unconfirmed', () => 'bg-accent')
+                .exhaustive(),
+            )}
+            style={{ width: NODE_SIZE, height: NODE_SIZE }}
+          />
+          <div>
+            <p className={clsx('text-xs')}>
+              {commitInfo.data?.shortHash ?? '...'}
+            </p>
           </div>
-        }
-        description={<GraphCommitInfo commitInfo={commitInfo.data} />}
-      />
-    </div>
+        </div>
+      }
+      description={<GraphCommitInfo commitInfo={commitInfo.data} />}
+    />
   )
 })
 

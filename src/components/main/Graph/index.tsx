@@ -13,7 +13,7 @@ import {
   headInfoQuery,
 } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
-import { Combobox } from '@lib/Combobox'
+import { Combobox, type ComboboxOption } from '@lib/Combobox'
 import { IconButton } from '@lib/IconButton'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
 import { GraphAnchor } from './Anchor'
@@ -68,16 +68,20 @@ const Graph = (props: GraphProps) => {
   )
 
   const branchOptions = useMemo(() => {
-    return branches.data?.map((branch) => branch.name) ?? []
+    const options: ComboboxOption<BranchInfo>[] =
+      branches.data?.map((branch) => ({ value: branch.name, data: branch })) ??
+      []
+
+    return options
   }, [branches.data])
 
   const baseBranchOptions = useMemo(() => {
-    return (
-      branches.data
-        ?.filter((branch) => branch.name !== currentBranch?.name)
-        .map((branch) => branch.name) ?? []
-    )
-  }, [currentBranch, branches.data])
+    const options: ComboboxOption<BranchInfo | undefined>[] =
+      branchOptions.filter((branch) => branch.value !== currentBranch?.name)
+    options.unshift({ value: '', data: undefined })
+
+    return options
+  }, [currentBranch, branchOptions])
 
   return (
     <div className={clsx('h-full w-full min-h-0')}>
@@ -90,9 +94,12 @@ const Graph = (props: GraphProps) => {
       >
         <Combobox
           className={clsx('[&]:w-65')}
+          option={branch ? { value: branch.name, data: branch } : undefined}
           options={branchOptions}
-          value={branch?.name ?? ''}
-          setValue={checkout}
+          setOption={(newOption) => {
+            checkout(newOption.data.name)
+          }}
+          renderOption={(option) => option.data.name}
           placeholder="Checkout a branch..."
           disabled={headInfo.isLoading || branches.isLoading}
         />
@@ -113,14 +120,16 @@ const Graph = (props: GraphProps) => {
 
         <Combobox
           className={clsx('[&]:w-65')}
+          option={
+            baseBranch
+              ? { value: baseBranch.name, data: baseBranch }
+              : undefined
+          }
           options={baseBranchOptions}
-          value={baseBranch?.name ?? ''}
-          setValue={(newBaseBranch) => {
-            const branch = branches.data?.find(
-              (branch) => branch.name === newBaseBranch,
-            )
-            changeBaseBranch(branch)
+          setOption={(newOption) => {
+            changeBaseBranch(newOption.data)
           }}
+          renderOption={(option) => option.data?.name ?? 'No base branch'}
           placeholder="Choose a base branch..."
           disabled={headInfo.isLoading || branches.isLoading}
         />

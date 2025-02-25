@@ -7,28 +7,33 @@ import { Button } from '@lib/Button'
 import { Separator } from '@lib/Separator'
 import { mapOr } from '@utils/array'
 
-interface ComboboxProps extends Omit<Ariakit.SelectProps, 'value'> {
-  options: string[]
-  renderOption?: (option: string) => ReactNode
+interface ComboboxOption<T> {
   value: string
-  setValue: Ariakit.SelectProviderProps['setValue']
+  data: T
+}
+
+interface ComboboxProps<T> extends Omit<Ariakit.SelectProps, 'value'> {
+  option: ComboboxOption<T> | undefined
+  options: ComboboxOption<T>[]
+  renderOption: (option: ComboboxOption<T>) => ReactNode
+  setOption: (option: ComboboxOption<T>) => void
   placeholder?: string
 }
 
-const Combobox = (props: ComboboxProps) => {
+const Combobox = <T,>(props: ComboboxProps<T>) => {
   const {
+    option,
     options,
     renderOption,
-    value,
-    setValue,
-    placeholder,
+    setOption,
+    placeholder = 'Select...',
     ...selectProps
   } = props
 
   const [search, setSearch] = useState('')
 
   const matchingOptions = useMemo(() => {
-    return matchSorter(options, search)
+    return matchSorter(options, search, { keys: ['value'] })
   }, [options, search])
 
   return (
@@ -38,7 +43,17 @@ const Combobox = (props: ComboboxProps) => {
         startTransition(() => setSearch(value))
       }}
     >
-      <Ariakit.SelectProvider value={value} setValue={setValue} defaultValue="">
+      <Ariakit.SelectProvider
+        value={option?.value ?? ''}
+        setValue={(value) => {
+          const option = options.find((option) => value === option.value)
+
+          if (option) {
+            setOption(option)
+          }
+        }}
+        defaultValue=""
+      >
         <Ariakit.Select
           render={
             <Button
@@ -46,17 +61,13 @@ const Combobox = (props: ComboboxProps) => {
               size="lg"
               className={clsx(
                 'group gap-2 text-sm',
-                value === '' && 'font-thin [&]:text-light-300',
+                option === undefined && 'font-thin [&]:text-light-300',
               )}
             />
           }
           {...selectProps}
         >
-          {value === ''
-            ? placeholder
-            : renderOption
-              ? renderOption(value)
-              : value}
+          {option === undefined ? placeholder : renderOption(option)}
           <Ariakit.SelectArrow
             className={clsx('group-aria-expanded:rotate-180')}
           />
@@ -89,23 +100,25 @@ const Combobox = (props: ComboboxProps) => {
                 No matches found
               </div>,
               matchingOptions,
-              (option) => (
-                <Ariakit.SelectItem
-                  key={option}
-                  value={option}
-                  render={
-                    <Ariakit.ComboboxItem
-                      className={clsx(
-                        'text-sm text-center',
-                        'p-2 rounded-sm',
-                        'cursor-pointer data-[active-item]:bg-dark-700',
-                      )}
-                    />
-                  }
-                >
-                  {renderOption ? renderOption(option) : option}
-                </Ariakit.SelectItem>
-              ),
+              (option) => {
+                return (
+                  <Ariakit.SelectItem
+                    key={option.value}
+                    value={option.value}
+                    render={
+                      <Ariakit.ComboboxItem
+                        className={clsx(
+                          'text-sm text-center',
+                          'p-2 rounded-sm',
+                          'cursor-pointer data-[active-item]:bg-dark-700',
+                        )}
+                      />
+                    }
+                  >
+                    {renderOption(option)}
+                  </Ariakit.SelectItem>
+                )
+              },
             )}
           </Ariakit.ComboboxList>
         </Ariakit.SelectPopover>
@@ -114,4 +127,4 @@ const Combobox = (props: ComboboxProps) => {
   )
 }
 
-export { Combobox, type ComboboxProps }
+export { Combobox, type ComboboxProps, type ComboboxOption }

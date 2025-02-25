@@ -6,7 +6,6 @@ import {
 import { invoke } from '@tauri-apps/api/core'
 
 import type {
-  AncestorInfo,
   BranchDivergence,
   BranchInfo,
   BranchName,
