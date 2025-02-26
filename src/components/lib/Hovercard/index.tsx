@@ -49,10 +49,15 @@ const Hovercard = (props: HovercardProps) => {
   )
 }
 
-const HovercardDisclosure = () => {
+const HovercardDisclosure = (props: Ariakit.HovercardDisclosureProps) => {
+  const { ...hovercardDisclosureProps } = props
+
   return (
-    <Ariakit.HovercardDisclosure>
-      <Icon Glyph={IconInfoCircle} size="md" className="text-light-500" />
+    <Ariakit.HovercardDisclosure
+      {...hovercardDisclosureProps}
+      className={clsx('text-light-500', hovercardDisclosureProps.className)}
+    >
+      <Icon Glyph={IconInfoCircle} size="md" />
     </Ariakit.HovercardDisclosure>
   )
 }

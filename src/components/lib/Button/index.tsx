@@ -39,21 +39,25 @@ const Button = (props: ButtonProps) => {
         variant === 'primary' && [
           'shadow-xs bg-primary-600 text-light-50',
           'hover:bg-primary-500',
+          'aria-expanded:bg-primary-500',
           'aria-disabled:bg-primary-600/40 aria-disabled:text-light-500',
         ],
         variant === 'cta' && [
           'shadow-xs bg-accent-500 text-light-50',
           'hover:bg-accent-400',
+          'aria-expanded:bg-accent-400',
           'aria-disabled:bg-accent-500/40 aria-disabled:text-light-400',
         ],
         variant === 'neutral' && [
           'shadow-xs bg-dark-900 text-light-50',
           'hover:bg-dark-800',
+          'aria-expanded:bg-dark-800',
           'aria-disabled:bg-dark-900/50 aria-disabled:text-light-500',
         ],
         variant === 'plain' && [
           'hover:shadow-xs bg-transparent text-light-50',
           'hover:bg-light/5',
+          'aria-expanded:bg-light/5',
           'aria-disabled:text-light-600',
         ],
         buttonProps.className,

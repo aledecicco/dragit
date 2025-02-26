@@ -106,9 +106,3 @@
 #root {
   @apply min-h-dvh h-dvh;
 }
-
-h1,
-h2,
-h3 {
-  @apply font-bold;
-}
