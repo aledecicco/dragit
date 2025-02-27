@@ -9,6 +9,7 @@ import type {
   UntrackedFile,
 } from '@api/models'
 import { headInfoQuery } from '@api/queries'
+import { useCurrentDirectory } from '@context/directory'
 
 const getStagedFiles = (files: FileInfo[]): StagedFile[] =>
   files.filter(
@@ -49,7 +50,8 @@ interface FilesByStatus {
   untracked: UntrackedFile[]
 }
 
-const useCurrentFilesByStatus = (path: string) => {
+const useCurrentFilesByStatus = () => {
+  const path = useCurrentDirectory()
   const filesByStatus = useQuery({
     ...headInfoQuery(path),
     select: (headInfo) => ({

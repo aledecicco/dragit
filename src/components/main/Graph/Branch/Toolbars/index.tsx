@@ -3,36 +3,38 @@ import {
   IconDownload,
   IconUpload,
 } from '@tabler/icons-react'
-import clsx from 'clsx'
 
 import { Toolbar, type ToolbarTool } from '@lib/Toolbar'
-
-interface BranchToolbarProps {
-  isBase: boolean
-}
 
 const tools: ToolbarTool[] = [
   {
     Glyph: IconDownload,
     label: 'Pull',
     action: () => {},
+    className: '[&]:w-20',
   },
   {
     Glyph: IconCloudDownload,
     label: 'Fetch',
     action: () => {},
+    className: '[&]:w-20',
   },
   {
     Glyph: IconUpload,
     label: 'Push',
     action: () => {},
+    className: '[&]:w-20',
   },
 ]
 
-const BranchToolbar = (props: BranchToolbarProps) => {
-  const { isBase } = props
-
-  return <Toolbar tools={tools} className={clsx('w-60')} />
+const BranchToolbars = () => {
+  return (
+    <>
+      <Toolbar tools={tools} />
+      -
+      <Toolbar tools={tools} />
+    </>
+  )
 }
 
-export { BranchToolbar, type BranchToolbarProps }
+export { BranchToolbars }

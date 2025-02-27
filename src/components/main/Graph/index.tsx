@@ -1,81 +1,24 @@
-import {
-  IconCloudDownload,
-  IconDownload,
-  IconSwitchHorizontal,
-  IconUpload,
-} from '@tabler/icons-react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
-import { useCheckoutLocalBranch } from '@api/commands'
 import type { BranchInfo } from '@api/models'
-import {
-  branchesQuery,
-  commitHistoryQuery,
-  commonAncestorQuery,
-  headInfoQuery,
-} from '@api/queries'
+import { commitHistoryQuery, commonAncestorQuery } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
-import { Combobox, type ComboboxOption } from '@lib/Combobox'
-import { IconButton } from '@lib/IconButton'
-import { Toolbar, type ToolbarTool } from '@lib/Toolbar'
+import { useSelectedBranches } from '@context/branches'
+import { useCurrentDirectory } from '@context/directory'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
 import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
 import { BranchMessage } from './Branch/Message'
+import { BranchSelectors } from './Branch/Selectors'
+import { BranchToolbars } from './Branch/Toolbars'
 import { NODE_SIZE } from './Commit'
 import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
-import { useBranchSwitcher, useCurrentBranch } from './utils'
 
-interface GraphProps {
-  path: string
-}
-
-const tools: ToolbarTool[] = [
-  {
-    Glyph: IconDownload,
-    label: 'Pull',
-    action: () => {},
-  },
-  {
-    Glyph: IconCloudDownload,
-    label: 'Fetch',
-    action: () => {},
-  },
-  {
-    Glyph: IconUpload,
-    label: 'Push',
-    action: () => {},
-  },
-]
-
-const Graph = (props: GraphProps) => {
-  const { path } = props
-
-  const headInfo = useQuery(headInfoQuery(path))
-  const branches = useQuery(branchesQuery(path))
-  const currentBranch = useCurrentBranch(path)
-
-  const checkout = useCheckoutLocalBranch()
-  const { branch, baseBranch, changeBaseBranch } = useBranchSwitcher(path)
-
-  const branchOptions = useMemo(() => {
-    const options: ComboboxOption<BranchInfo>[] =
-      branches.data?.map((branch) => ({ value: branch.name, data: branch })) ??
-      []
-
-    return options
-  }, [branches.data])
-
-  const baseBranchOptions = useMemo(() => {
-    const options: ComboboxOption<BranchInfo | undefined>[] =
-      branchOptions.filter((branch) => branch.value !== currentBranch?.name)
-    options.unshift({ value: '', data: undefined })
-
-    return options
-  }, [currentBranch, branchOptions])
+const Graph = () => {
+  const { branch, baseBranch } = useSelectedBranches()
 
   return (
     <div className={clsx('h-full w-full min-h-0')}>
@@ -83,81 +26,30 @@ const Graph = (props: GraphProps) => {
         className={clsx(
           'overflow-hidden w-full h-full relative',
           'grid grid-cols-[1fr_max-content_1fr] grid-rows-[max-content_1fr_max-content]',
-          "[grid-template-areas:'branchselect_branchswap_baseselect''graph_graph_graph''branchtools_bottom_basetools']",
-          'col-gap-8 place-items-center p-1',
+          'col-gap-8 row-gap-4 place-items-center p-1',
         )}
       >
-        <Combobox
-          className={clsx('[&]:w-65 [grid-area:branchselect]')}
-          option={branch ? { value: branch.name, data: branch } : undefined}
-          options={branchOptions}
-          setOption={(newOption) => {
-            checkout(newOption.data.name)
-          }}
-          renderOption={(option) => option.data.name}
-          placeholder="Checkout a branch..."
-          disabled={headInfo.isLoading || branches.isLoading}
-        />
+        <BranchSelectors />
 
-        <IconButton
-          Glyph={IconSwitchHorizontal}
-          className={clsx('mx-1 [grid-area:branchswap]')}
-          variant="neutral"
-          aria-label="Switch branch and base branch"
-          disabled={!branch || !baseBranch}
-          size="md"
-          onClick={() => {
-            if (baseBranch) {
-              checkout(baseBranch.name)
-            }
-          }}
-        />
-
-        <Combobox
-          className={clsx('[&]:w-65 [grid-area:baseselect]')}
-          option={
-            baseBranch
-              ? { value: baseBranch.name, data: baseBranch }
-              : undefined
-          }
-          options={baseBranchOptions}
-          setOption={(newOption) => {
-            changeBaseBranch(newOption.data)
-          }}
-          renderOption={(option) => option.data?.name ?? 'No base branch'}
-          placeholder="Choose a base branch..."
-          disabled={headInfo.isLoading || branches.isLoading}
-        />
-
-        <SvgOverlay className={clsx('[grid-area:graph]')} RenderOverlay={Edges}>
-          <GraphInner {...props} branch={branch} baseBranch={baseBranch} />
+        <SvgOverlay className={clsx('col-span-3')} RenderOverlay={Edges}>
+          <GraphInner branch={branch} baseBranch={baseBranch} />
         </SvgOverlay>
 
-        {branch && (
-          <Toolbar
-            tools={tools}
-            className={clsx('w-65 [grid-area:branchtools]')}
-          />
-        )}
-
-        {baseBranch && (
-          <Toolbar
-            tools={tools}
-            className={clsx('w-65 [grid-area:basetools]')}
-          />
-        )}
+        <BranchToolbars />
       </div>
     </div>
   )
 }
 
-interface GraphInnerProps extends GraphProps {
+interface GraphInnerProps {
   branch: BranchInfo | undefined
   baseBranch: BranchInfo | undefined
 }
 
 const GraphInner = (props: GraphInnerProps) => {
-  const { path, branch, baseBranch } = props
+  const { branch, baseBranch } = props
+
+  const path = useCurrentDirectory()
   const commonAncestor = useQuery(
     commonAncestorQuery(path, branch?.name, baseBranch?.name),
   )
@@ -235,4 +127,4 @@ const GraphInner = (props: GraphInnerProps) => {
   )
 }
 
-export { Graph, type GraphProps }
+export { Graph }

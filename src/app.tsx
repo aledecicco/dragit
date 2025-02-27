@@ -1,13 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 
-import { currentDirQuery } from '@api/queries'
+import { useBranchesSync } from '@context/branches'
+import { useDirectoryIsOpen, useDirectorySync } from '@context/directory'
 import { CurrentDirectory } from '@main/CurrentDirectory'
 import { Graph } from '@main/Graph'
 import { FileStatuses } from '@widgets/FileStatuses'
 
 const App = () => {
-  const currentDir = useQuery(currentDirQuery)
+  const isOpen = useDirectoryIsOpen()
+  useDirectorySync()
 
   return (
     <div
@@ -17,17 +18,20 @@ const App = () => {
       )}
     >
       <CurrentDirectory className={clsx('justify-self-center')} />
-      {currentDir.data && (
-        <div className={clsx('grid grid-cols-[5fr_2fr] min-h-0 gap-8')}>
-          <Graph path={currentDir.data} />
-          <FileStatuses
-            path={currentDir.data}
-            className={clsx(
-              'justify-self-start min-w-0 overflow-hidden w-full',
-            )}
-          />
-        </div>
-      )}
+      {isOpen && <AppInner />}
+    </div>
+  )
+}
+
+const AppInner = () => {
+  useBranchesSync()
+
+  return (
+    <div className={clsx('grid grid-cols-[5fr_2fr] min-h-0 gap-8')}>
+      <Graph />
+      <FileStatuses
+        className={clsx('justify-self-start min-w-0 overflow-hidden w-full')}
+      />
     </div>
   )
 }

@@ -7,13 +7,11 @@ import { UnstagedFileStatusItem } from './UnstagedFile'
 import { UntrackedFileStatusItem } from './UntrackedFile'
 import { type FilesByStatus, useCurrentFilesByStatus } from './utils'
 
-interface FileStatusesProps extends ComponentProps<'div'> {
-  path: string
-}
+interface FileStatusesProps extends ComponentProps<'div'> {}
 
 const FileStatuses = (props: FileStatusesProps) => {
-  const { path, ...divProps } = props
-  const files = useCurrentFilesByStatus(path)
+  const { ...divProps } = props
+  const files = useCurrentFilesByStatus()
 
   return (
     <div {...divProps}>

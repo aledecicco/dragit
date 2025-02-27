@@ -4,7 +4,7 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 import type { VirtualItem, Virtualizer } from '@tanstack/react-virtual'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import type { BranchDivergence, BranchInfo, HistoryItem } from '@api/models'
 import {
@@ -13,6 +13,7 @@ import {
   headInfoQuery,
 } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
+import { useCurrentDirectory } from '@context/directory'
 import { getCurrentBranchInfo, getRemoteCounterpart } from '@utils/repository'
 import { CURVE_SIZE } from './Edges'
 
@@ -56,7 +57,8 @@ const useInfiniteScroll = (
   }, [items, history, fetchCondition])
 }
 
-const useCurrentBranch = (path: string): BranchInfo | undefined => {
+const useCurrentBranch = (): BranchInfo | undefined => {
+  const path = useCurrentDirectory()
   const headInfo = useQuery(headInfoQuery(path))
   const branches = useQuery(branchesQuery(path))
 
@@ -92,43 +94,6 @@ const getCommitTranslationY = (
   )
 }
 
-interface ChosenBranches {
-  branch: BranchInfo | undefined
-  baseBranch: BranchInfo | undefined
-}
-
-const useBranchSwitcher = (path: string) => {
-  const currentBranch = useCurrentBranch(path)
-
-  const [{ branch, baseBranch }, setChosenBranches] = useState<ChosenBranches>({
-    branch: currentBranch,
-    baseBranch: undefined,
-  })
-
-  useEffect(() => {
-    setChosenBranches((oldBranches) => ({
-      branch: currentBranch,
-      baseBranch:
-        oldBranches.baseBranch &&
-        oldBranches.baseBranch.name === currentBranch?.name
-          ? oldBranches.branch
-          : oldBranches.baseBranch,
-    }))
-  }, [currentBranch])
-
-  const changeBaseBranch = useCallback(
-    (newBaseBranch: BranchInfo | undefined) => {
-      setChosenBranches((oldBranches) => ({
-        ...oldBranches,
-        baseBranch: newBaseBranch,
-      }))
-    },
-    [],
-  )
-
-  return { branch, baseBranch, changeBaseBranch }
-}
-
 export {
   ancestorNotInRange,
   ancestorIsDivergent,
@@ -137,5 +102,4 @@ export {
   useRemoteDivergence,
   getCommitPositionClass,
   getCommitTranslationY,
-  useBranchSwitcher,
 }

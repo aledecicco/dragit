@@ -25,6 +25,7 @@
       "@assets/*": ["assets/*"],
       "@api/*": ["api/*"],
       "@config/*": ["config/*"],
+      "@context/*": ["context/*"],
       "@lib/*": ["components/lib/*"],
       "@main/*": ["components/main/*"],
       "@widgets/*": ["components/widgets/*"],

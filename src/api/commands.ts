@@ -1,6 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
+import type { BranchName, RemoteName } from './models'
+
 const mutationKeys = {
   openFolder: ['open_folder'] as const,
   initRepository: ['init_repository'] as const,
@@ -35,7 +37,7 @@ const useInitRepository = () => {
   return () => mutation.mutateAsync()
 }
 
-const pushCheckoutLocalBranch = (branch: string): Promise<void> =>
+const pushCheckoutLocalBranch = (branch: BranchName): Promise<void> =>
   invoke('checkout_local_branch', { branch: branch })
 
 const useCheckoutLocalBranch = () => {
@@ -44,10 +46,11 @@ const useCheckoutLocalBranch = () => {
     mutationFn: pushCheckoutLocalBranch,
   })
 
-  return (branch: string) => mutation.mutateAsync(branch)
+  return (branch: BranchName) => mutation.mutateAsync(branch)
 }
 
-const pushFetchRemote = (): Promise<void> => invoke('fetch_remote')
+const pushFetchRemote = (remote: RemoteName): Promise<void> =>
+  invoke('fetch_remote', { remote: remote })
 
 const useFetchRemote = () => {
   const mutation = useMutation({
@@ -55,7 +58,7 @@ const useFetchRemote = () => {
     mutationFn: pushFetchRemote,
   })
 
-  return () => mutation.mutateAsync()
+  return (remote: RemoteName) => mutation.mutateAsync(remote)
 }
 
 const pushAddToIndex = (files: string[]): Promise<void> =>

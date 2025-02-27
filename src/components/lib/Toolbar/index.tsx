@@ -14,17 +14,19 @@ interface ToolbarTool extends Ariakit.ToolbarItemProps {
 
 interface ToolbarProps extends Ariakit.ToolbarProps {
   tools: ToolbarTool[]
+  fixed?: boolean
 }
 
 const Toolbar = (props: ToolbarProps) => {
-  const { tools, ...toolbarProps } = props
+  const { tools, fixed, ...toolbarProps } = props
 
   return (
     <Ariakit.ToolbarProvider>
       <Ariakit.Toolbar
         {...toolbarProps}
         className={clsx(
-          'p-1 grid grid-flow-col auto-cols-fr',
+          'p-1 grid grid-flow-col',
+          fixed ? 'auto-cols-fr' : 'auto-cols-max',
           toolbarProps.className,
         )}
       >
@@ -38,7 +40,7 @@ const Toolbar = (props: ToolbarProps) => {
                   <Button
                     variant="neutral"
                     className={clsx(
-                      '[&]:w-full',
+                      fixed && '[&]:w-full',
                       'not-first:rounded-l-none',
                       'not-last:rounded-r-none not-last:border-r-1 not-last:border-solid not-last:border-dark-950',
                     )}
