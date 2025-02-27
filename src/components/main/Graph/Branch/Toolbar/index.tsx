@@ -32,7 +32,7 @@ const tools: ToolbarTool[] = [
 const BranchToolbar = (props: BranchToolbarProps) => {
   const { isBase } = props
 
-  return <Toolbar tools={tools} className={clsx('w-65')} />
+  return <Toolbar tools={tools} className={clsx('w-60')} />
 }
 
 export { BranchToolbar, type BranchToolbarProps }

@@ -3,8 +3,8 @@ import clsx from 'clsx'
 
 import { currentDirQuery } from '@api/queries'
 import { CurrentDirectory } from '@main/CurrentDirectory'
-import { FileStatuses } from '@main/FileStatuses'
 import { Graph } from '@main/Graph'
+import { FileStatuses } from '@widgets/FileStatuses'
 
 const App = () => {
   const currentDir = useQuery(currentDirQuery)

@@ -24,10 +24,11 @@
     "paths": {
       "@assets/*": ["assets/*"],
       "@api/*": ["api/*"],
-      "@main/*": ["components/main/*"],
+      "@config/*": ["config/*"],
       "@lib/*": ["components/lib/*"],
-      "@utils/*": ["utils/*"],
-      "@models/*": ["models/*"]
+      "@main/*": ["components/main/*"],
+      "@widgets/*": ["components/widgets/*"],
+      "@utils/*": ["utils/*"]
     }
   },
   "include": ["src"],

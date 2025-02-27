@@ -1,4 +1,9 @@
-import { IconSwitchHorizontal } from '@tabler/icons-react'
+import {
+  IconCloudDownload,
+  IconDownload,
+  IconSwitchHorizontal,
+  IconUpload,
+} from '@tabler/icons-react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
@@ -15,11 +20,11 @@ import {
 import { getPaginatedLength } from '@api/utils'
 import { Combobox, type ComboboxOption } from '@lib/Combobox'
 import { IconButton } from '@lib/IconButton'
+import { Toolbar, type ToolbarTool } from '@lib/Toolbar'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
 import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
 import { BranchMessage } from './Branch/Message'
-import { BranchToolbar } from './Branch/Toolbar'
 import { NODE_SIZE } from './Commit'
 import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
 import { useBranchSwitcher, useCurrentBranch } from './utils'
@@ -27,6 +32,24 @@ import { useBranchSwitcher, useCurrentBranch } from './utils'
 interface GraphProps {
   path: string
 }
+
+const tools: ToolbarTool[] = [
+  {
+    Glyph: IconDownload,
+    label: 'Pull',
+    action: () => {},
+  },
+  {
+    Glyph: IconCloudDownload,
+    label: 'Fetch',
+    action: () => {},
+  },
+  {
+    Glyph: IconUpload,
+    label: 'Push',
+    action: () => {},
+  },
+]
 
 const Graph = (props: GraphProps) => {
   const { path } = props
@@ -59,12 +82,13 @@ const Graph = (props: GraphProps) => {
       <div
         className={clsx(
           'overflow-hidden w-full h-full relative',
-          'grid grid-cols-[1fr_max-content_max-content_1fr] grid-rows-[max-content_1fr_max-content]',
+          'grid grid-cols-[1fr_max-content_1fr] grid-rows-[max-content_1fr_max-content]',
+          "[grid-template-areas:'branchselect_branchswap_baseselect''graph_graph_graph''branchtools_bottom_basetools']",
           'col-gap-8 place-items-center p-1',
         )}
       >
         <Combobox
-          className={clsx('[&]:w-65')}
+          className={clsx('[&]:w-65 [grid-area:branchselect]')}
           option={branch ? { value: branch.name, data: branch } : undefined}
           options={branchOptions}
           setOption={(newOption) => {
@@ -77,7 +101,7 @@ const Graph = (props: GraphProps) => {
 
         <IconButton
           Glyph={IconSwitchHorizontal}
-          className={clsx('col-span-2 mx-1')}
+          className={clsx('mx-1 [grid-area:branchswap]')}
           variant="neutral"
           aria-label="Switch branch and base branch"
           disabled={!branch || !baseBranch}
@@ -90,7 +114,7 @@ const Graph = (props: GraphProps) => {
         />
 
         <Combobox
-          className={clsx('[&]:w-65')}
+          className={clsx('[&]:w-65 [grid-area:baseselect]')}
           option={
             baseBranch
               ? { value: baseBranch.name, data: baseBranch }
@@ -105,11 +129,23 @@ const Graph = (props: GraphProps) => {
           disabled={headInfo.isLoading || branches.isLoading}
         />
 
-        <SvgOverlay className={clsx('col-span-4')} RenderOverlay={Edges}>
+        <SvgOverlay className={clsx('[grid-area:graph]')} RenderOverlay={Edges}>
           <GraphInner {...props} branch={branch} baseBranch={baseBranch} />
         </SvgOverlay>
 
-        {branch && <BranchToolbar isBase={false} />}
+        {branch && (
+          <Toolbar
+            tools={tools}
+            className={clsx('w-65 [grid-area:branchtools]')}
+          />
+        )}
+
+        {baseBranch && (
+          <Toolbar
+            tools={tools}
+            className={clsx('w-65 [grid-area:basetools]')}
+          />
+        )}
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 export type CommitId = string
 export type BranchName = string
 export type RemoteName = string
+export type RefName = `${RemoteName}/${BranchName}`
 
 export interface CommitInfo {
   hash: CommitId
@@ -51,7 +52,7 @@ export interface LocalBranch {
 }
 
 export interface RemoteBranch {
-  name: BranchName
+  name: RefName
   type: 'remote'
 }
 
