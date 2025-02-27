@@ -4,7 +4,7 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 import type { VirtualItem, Virtualizer } from '@tanstack/react-virtual'
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import type { BranchDivergence, BranchInfo, HistoryItem } from '@api/models'
 import {
@@ -92,6 +92,43 @@ const getCommitTranslationY = (
   )
 }
 
+interface ChosenBranches {
+  branch: BranchInfo | undefined
+  baseBranch: BranchInfo | undefined
+}
+
+const useBranchSwitcher = (path: string) => {
+  const currentBranch = useCurrentBranch(path)
+
+  const [{ branch, baseBranch }, setChosenBranches] = useState<ChosenBranches>({
+    branch: currentBranch,
+    baseBranch: undefined,
+  })
+
+  useEffect(() => {
+    setChosenBranches((oldBranches) => ({
+      branch: currentBranch,
+      baseBranch:
+        oldBranches.baseBranch &&
+        oldBranches.baseBranch.name === currentBranch?.name
+          ? oldBranches.branch
+          : oldBranches.baseBranch,
+    }))
+  }, [currentBranch])
+
+  const changeBaseBranch = useCallback(
+    (newBaseBranch: BranchInfo | undefined) => {
+      setChosenBranches((oldBranches) => ({
+        ...oldBranches,
+        baseBranch: newBaseBranch,
+      }))
+    },
+    [],
+  )
+
+  return { branch, baseBranch, changeBaseBranch }
+}
+
 export {
   ancestorNotInRange,
   ancestorIsDivergent,
@@ -100,4 +137,5 @@ export {
   useRemoteDivergence,
   getCommitPositionClass,
   getCommitTranslationY,
+  useBranchSwitcher,
 }

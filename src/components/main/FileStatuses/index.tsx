@@ -1,13 +1,11 @@
-import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { type ComponentProps, useMemo } from 'react'
+import type { ComponentProps } from 'react'
 
-import type { FileInfo } from '@api/models'
-import { headInfoQuery } from '@api/queries'
 import { StagedFileStatusItem } from './StagedFile'
 import { UnmergedFileStatusItem } from './UnmergedFile'
 import { UnstagedFileStatusItem } from './UnstagedFile'
 import { UntrackedFileStatusItem } from './UntrackedFile'
+import { type FilesByStatus, useCurrentFilesByStatus } from './utils'
 
 interface FileStatusesProps extends ComponentProps<'div'> {
   path: string
@@ -15,15 +13,15 @@ interface FileStatusesProps extends ComponentProps<'div'> {
 
 const FileStatuses = (props: FileStatusesProps) => {
   const { path, ...divProps } = props
-  const headInfo = useQuery(headInfoQuery(path))
+  const files = useCurrentFilesByStatus(path)
 
   return (
     <div {...divProps}>
-      {headInfo.data ? (
-        <FileStatusesList files={headInfo.data.files} />
+      {files.data ? (
+        <FileStatusesList files={files.data} />
       ) : (
         <p className={clsx('text-sm italic text-light-500')}>
-          {headInfo.isFetching
+          {files.isFetching
             ? 'Loading current branch...'
             : 'No file info found'}
         </p>
@@ -32,32 +30,9 @@ const FileStatuses = (props: FileStatusesProps) => {
   )
 }
 
-const FileStatusesList = (props: { files: FileInfo[] }) => {
+const FileStatusesList = (props: { files: FilesByStatus }) => {
   const { files } = props
-
-  const staged = useMemo(() => {
-    return files.filter(
-      (file) =>
-        (file.status === 'modified' || file.status === 'moved') &&
-        file.staged !== 'unmodified',
-    )
-  }, [files])
-
-  const unstaged = useMemo(() => {
-    return files.filter(
-      (file) =>
-        (file.status === 'modified' || file.status === 'moved') &&
-        file.unstaged !== 'unmodified',
-    )
-  }, [files])
-
-  const unmerged = useMemo(() => {
-    return files.filter((file) => file.status === 'unmerged')
-  }, [files])
-
-  const untracked = useMemo(() => {
-    return files.filter((file) => file.status === 'untracked')
-  }, [files])
+  const { staged, unstaged, unmerged, untracked } = files
 
   return (
     <div className={clsx('flex flex-col gap-4')}>

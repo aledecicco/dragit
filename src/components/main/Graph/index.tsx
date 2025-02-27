@@ -2,7 +2,7 @@ import { IconSwitchHorizontal } from '@tabler/icons-react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { useCheckoutLocalBranch } from '@api/commands'
 import type { BranchInfo } from '@api/models'
@@ -19,17 +19,13 @@ import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
 import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
 import { BranchMessage } from './Branch/Message'
+import { BranchToolbar } from './Branch/Toolbar'
 import { NODE_SIZE } from './Commit'
 import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
-import { useCurrentBranch } from './utils'
+import { useBranchSwitcher, useCurrentBranch } from './utils'
 
 interface GraphProps {
   path: string
-}
-
-interface ChosenBranches {
-  branch: BranchInfo | undefined
-  baseBranch: BranchInfo | undefined
 }
 
 const Graph = (props: GraphProps) => {
@@ -39,33 +35,8 @@ const Graph = (props: GraphProps) => {
   const branches = useQuery(branchesQuery(path))
   const currentBranch = useCurrentBranch(path)
 
-  const [{ branch, baseBranch }, setChosenBranches] = useState<ChosenBranches>({
-    branch: currentBranch,
-    baseBranch: undefined,
-  })
-
   const checkout = useCheckoutLocalBranch()
-
-  useEffect(() => {
-    setChosenBranches((oldBranches) => ({
-      branch: currentBranch,
-      baseBranch:
-        oldBranches.baseBranch &&
-        oldBranches.baseBranch.name === currentBranch?.name
-          ? oldBranches.branch
-          : oldBranches.baseBranch,
-    }))
-  }, [currentBranch])
-
-  const changeBaseBranch = useCallback(
-    (newBaseBranch: BranchInfo | undefined) => {
-      setChosenBranches((oldBranches) => ({
-        ...oldBranches,
-        baseBranch: newBaseBranch,
-      }))
-    },
-    [],
-  )
+  const { branch, baseBranch, changeBaseBranch } = useBranchSwitcher(path)
 
   const branchOptions = useMemo(() => {
     const options: ComboboxOption<BranchInfo>[] =
@@ -88,7 +59,7 @@ const Graph = (props: GraphProps) => {
       <div
         className={clsx(
           'overflow-hidden w-full h-full relative',
-          'grid grid-cols-[1fr_max-content_max-content_1fr] grid-rows-[max-content_1fr]',
+          'grid grid-cols-[1fr_max-content_max-content_1fr] grid-rows-[max-content_1fr_max-content]',
           'col-gap-8 place-items-center p-1',
         )}
       >
@@ -137,6 +108,8 @@ const Graph = (props: GraphProps) => {
         <SvgOverlay className={clsx('col-span-4')} RenderOverlay={Edges}>
           <GraphInner {...props} branch={branch} baseBranch={baseBranch} />
         </SvgOverlay>
+
+        {branch && <BranchToolbar isBase={false} />}
       </div>
     </div>
   )

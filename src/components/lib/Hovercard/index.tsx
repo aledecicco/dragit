@@ -16,7 +16,7 @@ const Hovercard = (props: HovercardProps) => {
   const { anchor, heading, description, placement, ...hovercardProps } = props
 
   return (
-    <Ariakit.HovercardProvider placement={placement} timeout={250}>
+    <Ariakit.HovercardProvider placement={placement}>
       <Ariakit.HovercardAnchor render={anchor} />
       <Ariakit.Hovercard
         portal
