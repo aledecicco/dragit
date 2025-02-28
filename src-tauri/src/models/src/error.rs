@@ -48,6 +48,20 @@ pub enum GitError {
 
     #[error("Failed to get divergence between \"{branch}\" and \"{base_branch}\"")]
     GetBranchDivergenceFailed { branch: String, base_branch: String },
+
+    #[error("Failed to push \"{branch}\" to refspec \"{remote}\"/\"{remote_branch}\"")]
+    PushBranchFailed {
+        branch: String,
+        remote: String,
+        remote_branch: String,
+    },
+
+    #[error("Failed to pull \"{branch}\" from refspec \"{remote}\"/\"{remote_branch}\"")]
+    PullBranchFailed {
+        branch: String,
+        remote: String,
+        remote_branch: String,
+    },
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug, Clone)]

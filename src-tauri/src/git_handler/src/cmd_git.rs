@@ -26,10 +26,11 @@ where
     let output = cmd.current_dir(path).args(args).output();
 
     output.and_then(|output| {
-        if output.stderr.len() > 0 {
-            Err(io::Error::from(ErrorKind::Other))
-        } else {
+        if output.status.code() == Some(0) {
             Ok(output)
+        } else {
+            println!("{:?}", String::from_utf8(output.stderr));
+            Err(io::Error::from(ErrorKind::Other))
         }
     })
 }
@@ -109,11 +110,12 @@ impl GitHandler for CmdGit {
     }
 
     fn checkout_local_branch(&self, branch: &str) -> Result<(), GitError> {
-        command_output(&self.get_path()?, ["checkout", branch]).or(Err(
-            GitError::CheckoutBranchFailed {
-                branch: branch.to_string(),
-            },
-        ))?;
+        let a = command_output(&self.get_path()?, ["checkout", branch]);
+
+        println!("{:?}", a);
+        a.or(Err(GitError::CheckoutBranchFailed {
+            branch: branch.to_string(),
+        }))?;
 
         Ok(())
     }
@@ -324,5 +326,51 @@ impl GitHandler for CmdGit {
             branch: branch.to_string(),
             base_branch: base_branch.to_string(),
         })
+    }
+
+    fn push_branch(
+        &self,
+        branch: &str,
+        remote: &str,
+        remote_branch: &str,
+        is_force: bool,
+    ) -> Result<(), GitError> {
+        let remote_ref = format!("{}:{}", branch, remote_branch);
+        let mut args = vec!["push", remote, &remote_ref];
+
+        if is_force {
+            args.push("--force");
+        }
+
+        command_output(&self.get_path()?, args).or(Err(GitError::PushBranchFailed {
+            branch: branch.to_string(),
+            remote: remote.to_string(),
+            remote_branch: remote_branch.to_string(),
+        }))?;
+
+        Ok(())
+    }
+
+    fn pull_branch(
+        &self,
+        branch: &str,
+        remote: &str,
+        remote_branch: &str,
+        is_rebase: bool,
+    ) -> Result<(), GitError> {
+        let remote_ref = format!("{}:{}", branch, remote_branch);
+        let mut args = vec!["pull", remote, &remote_ref];
+
+        if is_rebase {
+            args.push("--rebase");
+        }
+
+        command_output(&self.get_path()?, args).or(Err(GitError::PullBranchFailed {
+            branch: branch.to_string(),
+            remote: remote.to_string(),
+            remote_branch: remote_branch.to_string(),
+        }))?;
+
+        Ok(())
     }
 }

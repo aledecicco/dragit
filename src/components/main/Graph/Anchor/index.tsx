@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import type { BranchInfo, CommonAncestorInfo } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
 import { getNextPaginatedItem } from '@api/utils'
+import { useCurrentDirectory } from '@context/directory'
 import { mapFn } from '@utils/types'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import {
@@ -16,7 +17,6 @@ import {
 } from '../utils'
 
 interface GraphAnchorProps {
-  path: string
   virtualizer: Virtualizer<HTMLDivElement, Element>
   branch: BranchInfo
   baseBranch: BranchInfo
@@ -24,8 +24,9 @@ interface GraphAnchorProps {
 }
 
 const GraphAnchor = (props: GraphAnchorProps) => {
-  const { path, virtualizer, branch, baseBranch, commonAncestorInfo } = props
-  const divergence = useRemoteDivergence(path, branch)
+  const { virtualizer, branch, baseBranch, commonAncestorInfo } = props
+  const path = useCurrentDirectory()
+  const divergence = useRemoteDivergence(branch)
 
   const baseHistory = useInfiniteQuery(
     commitHistoryQuery(path, baseBranch.name),
@@ -51,7 +52,6 @@ const GraphAnchor = (props: GraphAnchorProps) => {
     <>
       {commonAncestorInfo.lastCommit && (
         <GraphCommit
-          path={path}
           commitId={commonAncestorInfo.lastCommit.hash}
           commitType={branchIsDivergent ? 'unconfirmed' : 'confirmed'}
           elementId={COMMIT_ELEMENT_ID(
@@ -70,7 +70,6 @@ const GraphAnchor = (props: GraphAnchorProps) => {
       )}
 
       <GraphCommit
-        path={path}
         commitId={commonAncestorInfo.commonCommit.hash}
         commitType="confirmed"
         elementId={commonCommitId}

@@ -18,9 +18,9 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
   useEffect(() => {
     if (!a.current) {
       a.current = true
-      openFolder('/home/adecicco/Projects/test-git')
+      openFolder.mutate('/home/adecicco/Projects/test-git')
     }
-  }, [openFolder])
+  }, [openFolder.mutate])
 
   return (
     <Button
@@ -32,7 +32,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
           directory: true,
         }).then((path) => {
           if (path) {
-            openFolder(path)
+            openFolder.mutate(path)
           }
         })
       }}

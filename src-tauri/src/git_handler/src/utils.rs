@@ -178,9 +178,9 @@ pub fn parse_branch_info(line: &String) -> Option<BranchInfo> {
             name: strip_branch_prefix(&branch_name, BRANCH_PREFIX),
             branch_type: BranchType::Local {
                 remote: match (remote_name, remote_branch_name) {
-                    (Some(remote_name), Some(branch_name)) => Some(RemoteRef {
+                    (Some(remote_name), Some(remote_branch_name)) => Some(RemoteRef {
                         remote_name,
-                        branch_name,
+                        branch_name: strip_branch_prefix(&remote_branch_name, BRANCH_PREFIX),
                     }),
                     _ => None,
                 },

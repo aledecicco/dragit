@@ -25,17 +25,17 @@ const Graph = () => {
       <div
         className={clsx(
           'overflow-hidden w-full h-full relative',
-          'grid grid-cols-[1fr_max-content_1fr] grid-rows-[max-content_1fr_max-content]',
-          'col-gap-8 row-gap-4 place-items-center p-1',
+          'grid grid-cols-[1fr_max-content_1fr] grid-rows-[max-content_max-content_1fr]',
+          'gap-x-8 place-items-center p-1',
         )}
       >
         <BranchSelectors />
 
+        <BranchToolbars />
+
         <SvgOverlay className={clsx('col-span-3')} RenderOverlay={Edges}>
           <GraphInner branch={branch} baseBranch={baseBranch} />
         </SvgOverlay>
-
-        <BranchToolbars />
       </div>
     </div>
   )
@@ -91,7 +91,6 @@ const GraphInner = (props: GraphInnerProps) => {
       >
         {branch ? (
           <GraphBranch
-            path={path}
             virtualizer={virtualizer}
             branch={branch}
             anchor={commonAncestor.data?.lastCommit}
@@ -103,7 +102,6 @@ const GraphInner = (props: GraphInnerProps) => {
 
         {baseBranch ? (
           <GraphBranch
-            path={path}
             virtualizer={virtualizer}
             branch={baseBranch}
             anchor={commonAncestor.data?.commonCommit ?? undefined}
@@ -115,7 +113,6 @@ const GraphInner = (props: GraphInnerProps) => {
 
         {branch && baseBranch && commonAncestor.data && (
           <GraphAnchor
-            path={path}
             virtualizer={virtualizer}
             branch={branch}
             baseBranch={baseBranch}

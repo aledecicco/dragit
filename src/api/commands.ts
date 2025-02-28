@@ -12,107 +12,108 @@ const mutationKeys = {
   removeFromIndex: ['remove_index'] as const,
   removeFromTree: ['remove_tree'] as const,
   commitIndex: ['commit'] as const,
+  pushBranch: ['push'] as const,
+  pullBranch: ['pull'] as const,
 }
 
-const pushOpenFolder = (path: string): Promise<void> =>
+const executeOpenFolder = (path: string): Promise<void> =>
   invoke('open_folder', { path: path })
 
-const useOpenFolder = () => {
-  const mutation = useMutation({
+const useOpenFolder = () =>
+  useMutation({
     mutationKey: mutationKeys.openFolder,
-    mutationFn: pushOpenFolder,
+    mutationFn: executeOpenFolder,
   })
 
-  return (path: string) => mutation.mutateAsync(path)
-}
+const executeInitRepository = (): Promise<void> => invoke('init_repository')
 
-const pushInitRepository = (): Promise<void> => invoke('init_repository')
-
-const useInitRepository = () => {
-  const mutation = useMutation({
+const useInitRepository = () =>
+  useMutation({
     mutationKey: mutationKeys.initRepository,
-    mutationFn: pushInitRepository,
+    mutationFn: executeInitRepository,
   })
 
-  return () => mutation.mutateAsync()
-}
-
-const pushCheckoutLocalBranch = (branch: BranchName): Promise<void> =>
+const executeCheckoutLocalBranch = (branch: BranchName): Promise<void> =>
   invoke('checkout_local_branch', { branch: branch })
 
-const useCheckoutLocalBranch = () => {
-  const mutation = useMutation({
+const useCheckoutLocalBranch = () =>
+  useMutation({
     mutationKey: mutationKeys.checkoutLocalBranch,
-    mutationFn: pushCheckoutLocalBranch,
+    mutationFn: executeCheckoutLocalBranch,
   })
 
-  return (branch: BranchName) => mutation.mutateAsync(branch)
-}
-
-const pushFetchRemote = (remote: RemoteName): Promise<void> =>
+const executeFetchRemote = (remote: RemoteName): Promise<void> =>
   invoke('fetch_remote', { remote: remote })
 
-const useFetchRemote = () => {
-  const mutation = useMutation({
+const useFetchRemote = () =>
+  useMutation({
     mutationKey: mutationKeys.fetchRemote,
-    mutationFn: pushFetchRemote,
+    mutationFn: executeFetchRemote,
   })
 
-  return (remote: RemoteName) => mutation.mutateAsync(remote)
-}
-
-const pushAddToIndex = (files: string[]): Promise<void> =>
+const executeAddToIndex = (files: string[]): Promise<void> =>
   invoke('add_to_index', { files: files })
 
-const useAddToIndex = () => {
-  const mutation = useMutation({
+const useAddToIndex = () =>
+  useMutation({
     mutationKey: mutationKeys.addToIndex,
-    mutationFn: pushAddToIndex,
+    mutationFn: executeAddToIndex,
   })
 
-  return (files: string[]) => mutation.mutateAsync(files)
-}
-
-const pushRemoveFromIndex = (files: string[]): Promise<void> =>
+const executeRemoveFromIndex = (files: string[]): Promise<void> =>
   invoke('remove_from_index', { files: files })
 
-const useRemoveFromIndex = () => {
-  const mutation = useMutation({
+const useRemoveFromIndex = () =>
+  useMutation({
     mutationKey: mutationKeys.removeFromIndex,
-    mutationFn: pushRemoveFromIndex,
+    mutationFn: executeRemoveFromIndex,
   })
 
-  return (files: string[]) => mutation.mutateAsync(files)
-}
-
-const pushRemoveFromTree = (files: string[]): Promise<void> =>
+const executeRemoveFromTree = (files: string[]): Promise<void> =>
   invoke('remove_from_tree', { files: files })
 
-const useRemoveFromTree = () => {
-  const mutation = useMutation({
+const useRemoveFromTree = () =>
+  useMutation({
     mutationKey: mutationKeys.removeFromTree,
-    mutationFn: pushRemoveFromTree,
+    mutationFn: executeRemoveFromTree,
   })
 
-  return (files: string[]) => mutation.mutateAsync(files)
-}
-
-const pushCommitIndex = (args: {
+const executeCommitIndex = (args: {
   message: string
   isAmend: boolean
 }): Promise<void> => invoke('commit_index', args)
 
-const useCommitIndex = () => {
-  const mutation = useMutation({
+const useCommitIndex = () =>
+  useMutation({
     mutationKey: mutationKeys.commitIndex,
-    mutationFn: pushCommitIndex,
+    mutationFn: executeCommitIndex,
   })
 
-  return (args: {
-    message: string
-    isAmend: boolean
-  }) => mutation.mutateAsync(args)
-}
+const executePushBranch = (args: {
+  branch: BranchName
+  remote: RemoteName
+  remoteBranch: BranchName
+  isForce: boolean
+}): Promise<void> => invoke('push_branch', args)
+
+const usePushBranch = () =>
+  useMutation({
+    mutationKey: mutationKeys.pushBranch,
+    mutationFn: executePushBranch,
+  })
+
+const executePullBranch = (args: {
+  branch: BranchName
+  remote: RemoteName
+  remoteBranch: BranchName
+  isRebase: boolean
+}): Promise<void> => invoke('pull_branch', args)
+
+const usePullBranch = () =>
+  useMutation({
+    mutationKey: mutationKeys.pullBranch,
+    mutationFn: executePullBranch,
+  })
 
 export {
   mutationKeys,
@@ -124,4 +125,6 @@ export {
   useRemoveFromIndex,
   useRemoveFromTree,
   useCommitIndex,
+  usePushBranch,
+  usePullBranch,
 }

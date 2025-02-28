@@ -47,6 +47,7 @@ const Toolbar = (props: ToolbarProps) => {
                   />
                 }
                 {...toolbarItemProps}
+                disabled={toolbarProps.disabled || toolbarItemProps.disabled}
               >
                 <Icon Glyph={Glyph} />
               </Ariakit.ToolbarItem>

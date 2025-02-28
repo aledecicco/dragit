@@ -1,8 +1,8 @@
 use tauri::{AppHandle, Emitter, Manager, State};
 
 use models::{
-    CommonAncestorInfo, AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, GitError,
-    HeadInfo, HistoryItem, SafeHandler,
+    AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
+    GitError, HeadInfo, HistoryItem, SafeHandler,
 };
 
 fn with_handler<T>(
@@ -151,4 +151,30 @@ pub async fn get_branch_divergence(
     base_branch: &str,
 ) -> Result<BranchDivergence, AppError> {
     with_handler(&state, &|h| h.get_branch_divergence(branch, base_branch))
+}
+
+#[tauri::command]
+pub async fn push_branch(
+    state: State<'_, AppState>,
+    branch: &str,
+    remote: &str,
+    remote_branch: &str,
+    is_force: bool,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| {
+        h.push_branch(branch, remote, remote_branch, is_force)
+    })
+}
+
+#[tauri::command]
+pub async fn pull_branch(
+    state: State<'_, AppState>,
+    branch: &str,
+    remote: &str,
+    remote_branch: &str,
+    is_rebase: bool,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| {
+        h.pull_branch(branch, remote, remote_branch, is_rebase)
+    })
 }

@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { Store, useStore } from '@tanstack/react-store'
 import { useEffect } from 'react'
 
-import { useOpenFolder } from '@api/commands'
 import { currentDirQuery } from '@api/queries'
 
 interface CurrentDirectory {
@@ -27,12 +26,6 @@ const useCurrentDirectory = () => {
 
   return currentDir.path
 }
-
-const changeDirectory = (path: string) => {
-  const openFolder = useOpenFolder()
-  return openFolder(path)
-}
-
 const useDirectorySync = () => {
   const currentDir = useQuery(currentDirQuery)
 
@@ -41,9 +34,4 @@ const useDirectorySync = () => {
   }, [currentDir.data])
 }
 
-export {
-  useCurrentDirectory,
-  useDirectoryIsOpen,
-  changeDirectory,
-  useDirectorySync,
-}
+export { useCurrentDirectory, useDirectoryIsOpen, useDirectorySync }

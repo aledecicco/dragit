@@ -26,7 +26,7 @@ pub trait GitHandler {
     /// Fetches the given remote, updating the remote references.
     fn fetch_remote(&self, remote: &str) -> Result<(), GitError>;
 
-    /// Returns the list of commit hashes leading up to a branch.
+    /// Returns the list of commit hashes leading up to a reference.
     fn get_commit_history(
         &self,
         reference: &str,
@@ -65,4 +65,22 @@ pub trait GitHandler {
         branch: &str,
         base_branch: &str,
     ) -> Result<BranchDivergence, GitError>;
+
+    /// Pushes the given branch, updating the refspec specified by the remote name and the remote branch.
+    fn push_branch(
+        &self,
+        branch: &str,
+        remote: &str,
+        remote_branch: &str,
+        is_force: bool,
+    ) -> Result<(), GitError>;
+
+    /// Pulls the given branch, updating it from the refspec specified by the remote name and the remote branch.
+    fn pull_branch(
+        &self,
+        branch: &str,
+        remote: &str,
+        remote_branch: &str,
+        is_rebase: bool,
+    ) -> Result<(), GitError>;
 }

@@ -70,9 +70,9 @@ const useCurrentBranch = (): BranchInfo | undefined => {
 }
 
 const useRemoteDivergence = (
-  path: string,
   branch: BranchInfo,
 ): BranchDivergence | undefined => {
+  const path = useCurrentDirectory()
   const divergence = useQuery(
     branchDivergenceQuery(path, branch.name, getRemoteCounterpart(branch)),
   )

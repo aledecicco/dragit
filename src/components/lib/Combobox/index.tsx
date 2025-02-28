@@ -39,6 +39,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
   return (
     <Ariakit.ComboboxProvider
       resetValueOnHide
+      includesBaseElement={false}
       setValue={(value) => {
         startTransition(() => setSearch(value))
       }}

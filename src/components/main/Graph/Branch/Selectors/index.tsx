@@ -3,13 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { useMemo } from 'react'
 
+import { useCheckoutLocalBranch } from '@api/commands'
 import type { BranchInfo } from '@api/models'
 import { branchesQuery, headInfoQuery } from '@api/queries'
-import {
-  changeBaseBranch,
-  changeBranch,
-  useSelectedBranches,
-} from '@context/branches'
+import { changeBaseBranch, useSelectedBranches } from '@context/branches'
 import { useCurrentDirectory } from '@context/directory'
 import { Combobox, type ComboboxOption } from '@lib/Combobox'
 import { IconButton } from '@lib/IconButton'
@@ -21,6 +18,7 @@ const BranchSelectors = () => {
   const branches = useQuery(branchesQuery(path))
 
   const { branch, baseBranch } = useSelectedBranches()
+  const checkout = useCheckoutLocalBranch()
 
   const branchOptions = useMemo(() => {
     const options: ComboboxOption<BranchInfo>[] =
@@ -45,7 +43,7 @@ const BranchSelectors = () => {
         option={branch ? { value: branch.name, data: branch } : undefined}
         options={branchOptions}
         setOption={(newOption) => {
-          changeBranch(newOption.data)
+          checkout.mutate(newOption.data.name)
         }}
         renderOption={(option) => option.data.name}
         placeholder="Checkout a branch..."
@@ -61,7 +59,7 @@ const BranchSelectors = () => {
         size="md"
         onClick={() => {
           if (baseBranch) {
-            changeBranch(baseBranch)
+            checkout.mutate(baseBranch.name)
           }
         }}
       />

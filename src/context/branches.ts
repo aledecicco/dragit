@@ -1,7 +1,6 @@
 import { Store, useStore } from '@tanstack/react-store'
 import { useEffect } from 'react'
 
-import { useCheckoutLocalBranch } from '@api/commands'
 import type { BranchInfo } from '@api/models'
 import { useCurrentBranch } from '@main/Graph/utils'
 
@@ -16,11 +15,6 @@ const selectedBranches = new Store<SelectedBranches>({
 })
 
 const useSelectedBranches = () => useStore(selectedBranches)
-
-const changeBranch = (branch: BranchInfo) => {
-  const checkout = useCheckoutLocalBranch()
-  return checkout(branch.name)
-}
 
 const changeBaseBranch = (baseBranch: BranchInfo | undefined) => {
   selectedBranches.setState((state) => ({
@@ -44,4 +38,4 @@ const useBranchesSync = () => {
   }, [currentBranch])
 }
 
-export { useSelectedBranches, changeBranch, changeBaseBranch, useBranchesSync }
+export { useSelectedBranches, changeBaseBranch, useBranchesSync }

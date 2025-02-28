@@ -6,6 +6,7 @@ import { match } from 'ts-pattern'
 
 import type { BranchName, CommitId } from '@api/models'
 import { commitInfoQuery } from '@api/queries'
+import { useCurrentDirectory } from '@context/directory'
 import { Hovercard, HovercardDisclosure } from '@lib/Hovercard'
 import { makeTracked } from '@main/SvgOverlay'
 import { GraphCommitInfo } from '../CommitInfo'
@@ -18,7 +19,6 @@ export const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
   `commit_${commitId}_${branch}`
 
 interface GraphCommitProps extends ComponentProps<'div'> {
-  path: string
   commitId: CommitId
   commitType: CommitType
 }
@@ -28,7 +28,8 @@ const GraphCommit = makeTracked<
   HTMLDivElement,
   ParentCommitType
 >((props) => {
-  const { path, commitId, commitType, trackRef, ...divProps } = props
+  const { commitId, commitType, trackRef, ...divProps } = props
+  const path = useCurrentDirectory()
   const commitInfo = useQuery(commitInfoQuery(path, commitId))
 
   return (

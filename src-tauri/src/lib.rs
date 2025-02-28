@@ -35,6 +35,8 @@ pub fn run() {
             api::commit_index,
             api::get_common_ancestor,
             api::get_branch_divergence,
+            api::push_branch,
+            api::pull_branch,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");
