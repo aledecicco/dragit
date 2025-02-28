@@ -3,12 +3,14 @@ import { useMemo } from 'react'
 
 import type {
   FileInfo,
+  HeadInfo,
   StagedFile,
   UnmergedFile,
   UnstagedFile,
   UntrackedFile,
 } from '@api/models'
 import { headInfoQuery } from '@api/queries'
+import { useRepositoryQuery } from '@api/utils'
 import { useCurrentDirectory } from '@context/directory'
 
 const getStagedFiles = (files: FileInfo[]): StagedFile[] =>
@@ -50,26 +52,18 @@ interface FilesByStatus {
   untracked: UntrackedFile[]
 }
 
-const useCurrentFilesByStatus = () => {
-  const path = useCurrentDirectory()
-  const filesByStatus = useQuery({
-    ...headInfoQuery(path),
-    select: (headInfo) => ({
-      staged: getStagedFiles(headInfo.files),
-      unstaged: getUnstagedFiles(headInfo.files),
-      unmerged: getUnmergedFiles(headInfo.files),
-      untracked: getUntrackedFiles(headInfo.files),
-    }),
-  })
-
-  return filesByStatus
-}
+const getFilesByStatus = (headInfo: HeadInfo): FilesByStatus => ({
+  staged: getStagedFiles(headInfo.files),
+  unstaged: getUnstagedFiles(headInfo.files),
+  unmerged: getUnmergedFiles(headInfo.files),
+  untracked: getUntrackedFiles(headInfo.files),
+})
 
 export {
   useStagedFiles,
   useUnstagedFiles,
   useUnmergedFiles,
   useUntrackedFiles,
-  useCurrentFilesByStatus,
+  getFilesByStatus,
   type FilesByStatus,
 }

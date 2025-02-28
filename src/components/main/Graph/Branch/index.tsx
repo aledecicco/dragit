@@ -1,11 +1,13 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 
 import type { AncestorInfo, BranchInfo } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
-import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
-import { useCurrentDirectory } from '@context/directory'
+import {
+  getNextPaginatedItem,
+  getPaginatedItem,
+  useRepositoryInfiniteQuery,
+} from '@api/utils'
 import { mapFn } from '@utils/types'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import {
@@ -28,8 +30,7 @@ const GraphBranch = (props: GraphBranchProps) => {
   const { virtualizer, branch, anchor, isBase } = props
   const stopAtAnchor = !isBase
 
-  const path = useCurrentDirectory()
-  const history = useInfiniteQuery(commitHistoryQuery(path, branch.name))
+  const history = useRepositoryInfiniteQuery(commitHistoryQuery, branch.name)
   const items = virtualizer.getVirtualItems()
   useInfiniteScroll(history, items)
 

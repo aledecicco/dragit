@@ -1,21 +1,18 @@
 import { IconSwitchHorizontal } from '@tabler/icons-react'
-import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { useMemo } from 'react'
 
 import { useCheckoutLocalBranch } from '@api/commands'
 import type { BranchInfo } from '@api/models'
 import { branchesQuery, headInfoQuery } from '@api/queries'
+import { useRepositoryQuery } from '@api/utils'
 import { changeBaseBranch, useSelectedBranches } from '@context/branches'
-import { useCurrentDirectory } from '@context/directory'
 import { Combobox, type ComboboxOption } from '@lib/Combobox'
 import { IconButton } from '@lib/IconButton'
 
 const BranchSelectors = () => {
-  const path = useCurrentDirectory()
-
-  const headInfo = useQuery(headInfoQuery(path))
-  const branches = useQuery(branchesQuery(path))
+  const headInfo = useRepositoryQuery(headInfoQuery)
+  const branches = useRepositoryQuery(branchesQuery)
 
   const { branch, baseBranch } = useSelectedBranches()
   const checkout = useCheckoutLocalBranch()

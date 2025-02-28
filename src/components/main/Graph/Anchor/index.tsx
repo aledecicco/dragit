@@ -1,12 +1,10 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 import { useMemo } from 'react'
 
 import type { BranchInfo, CommonAncestorInfo } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
-import { getNextPaginatedItem } from '@api/utils'
-import { useCurrentDirectory } from '@context/directory'
+import { getNextPaginatedItem, useRepositoryInfiniteQuery } from '@api/utils'
 import { mapFn } from '@utils/types'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import {
@@ -25,11 +23,11 @@ interface GraphAnchorProps {
 
 const GraphAnchor = (props: GraphAnchorProps) => {
   const { virtualizer, branch, baseBranch, commonAncestorInfo } = props
-  const path = useCurrentDirectory()
   const divergence = useRemoteDivergence(branch)
 
-  const baseHistory = useInfiniteQuery(
-    commitHistoryQuery(path, baseBranch.name),
+  const baseHistory = useRepositoryInfiniteQuery(
+    commitHistoryQuery,
+    baseBranch.name,
   )
   const anchorParent = useMemo(() => {
     return getNextPaginatedItem(

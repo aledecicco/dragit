@@ -42,6 +42,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
         !currentDir.data && '[&]:italic',
         buttonProps.className,
       )}
+      disabled={openFolder.isPending}
     >
       {currentDir.data ??
         (currentDir.isFetching ? 'Loading directory...' : 'Choose a directory')}

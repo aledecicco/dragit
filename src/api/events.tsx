@@ -1,15 +1,17 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
 import { type PropsWithChildren, useEffect } from 'react'
 import { P, match } from 'ts-pattern'
 
+import { useCurrentDirectory, useDirectoryIsOpen } from '@context/directory'
 import { getCurrentBranchName } from '@utils/repository'
-import { currentDirQuery, headInfoQuery, queryKeys } from './queries'
+import { headInfoQuery, queryKeys } from './queries'
+import { useRepositoryQuery } from './utils'
 
 const EventHandler = (props: PropsWithChildren) => {
   const { children } = props
   const client = useQueryClient()
-  const currentDir = useQuery(currentDirQuery)
+  const isOpen = useDirectoryIsOpen()
 
   useEffect(() => {
     const unlisten = listen('dir-changed', () => {
@@ -21,21 +23,14 @@ const EventHandler = (props: PropsWithChildren) => {
     }
   }, [client])
 
-  return currentDir.data ? (
-    <EventHandlerInner currentDir={currentDir.data}>
-      {children}
-    </EventHandlerInner>
-  ) : (
-    children
-  )
+  return isOpen ? <EventHandlerInner>{children}</EventHandlerInner> : children
 }
 
-const EventHandlerInner = (
-  props: PropsWithChildren<{ currentDir: string }>,
-) => {
-  const { currentDir, children } = props
+const EventHandlerInner = (props: PropsWithChildren) => {
+  const { children } = props
   const client = useQueryClient()
-  const headInfo = useQuery(headInfoQuery(currentDir))
+  const headInfo = useRepositoryQuery(headInfoQuery)
+  const currentDir = useCurrentDirectory()
 
   useEffect(() => {
     const unlisten = listen('git-event', (event) => {

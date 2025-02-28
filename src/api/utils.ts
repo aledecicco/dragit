@@ -1,8 +1,15 @@
-import type {
-  InfiniteData,
-  UseInfiniteQueryResult,
+import {
+  type DefaultError,
+  type InfiniteData,
+  type QueryKey,
+  type UseInfiniteQueryOptions,
+  type UseInfiniteQueryResult,
+  type UseQueryOptions,
+  useInfiniteQuery,
+  useQuery,
 } from '@tanstack/react-query'
 
+import { useCurrentDirectory } from '@context/directory'
 import { PAGE_SIZE } from './queries'
 
 const getPaginatedItem = <T>(
@@ -28,4 +35,52 @@ const getPaginatedLength = <T>(
   return query.data?.pages.reduce((sum, page) => sum + page.length, 0) ?? 0
 }
 
-export { getPaginatedItem, getNextPaginatedItem, getPaginatedLength }
+const useRepositoryQuery = <
+  A extends unknown[],
+  TQueryFnData = unknown,
+  TError = Error,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = readonly unknown[],
+>(
+  repositoryQuery: (
+    path: string,
+    ...args: A
+  ) => UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+  ...args: A
+) => {
+  const directory = useCurrentDirectory()
+  return useQuery(repositoryQuery(directory, ...args))
+}
+
+const useRepositoryInfiniteQuery = <
+  A extends unknown[],
+  TQueryFnData = unknown,
+  TError = DefaultError,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+  TPageParam = unknown,
+>(
+  repositoryQuery: (
+    path: string,
+    ...args: A
+  ) => UseInfiniteQueryOptions<
+    TQueryFnData,
+    TError,
+    TData,
+    TQueryFnData,
+    TQueryKey,
+    TPageParam
+  >,
+  ...args: A
+) => {
+  const directory = useCurrentDirectory()
+  return useInfiniteQuery(repositoryQuery(directory, ...args))
+}
+
+export {
+  getPaginatedItem,
+  getNextPaginatedItem,
+  getPaginatedLength,
+  useRepositoryQuery,
+  useRepositoryInfiniteQuery,
+}

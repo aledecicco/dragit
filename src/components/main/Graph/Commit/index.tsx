@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import type { ComponentProps } from 'react'
 import { mergeRefs } from 'react-merge-refs'
@@ -6,7 +5,7 @@ import { match } from 'ts-pattern'
 
 import type { BranchName, CommitId } from '@api/models'
 import { commitInfoQuery } from '@api/queries'
-import { useCurrentDirectory } from '@context/directory'
+import { useRepositoryQuery } from '@api/utils'
 import { Hovercard, HovercardDisclosure } from '@lib/Hovercard'
 import { makeTracked } from '@main/SvgOverlay'
 import { GraphCommitInfo } from '../CommitInfo'
@@ -29,8 +28,7 @@ const GraphCommit = makeTracked<
   ParentCommitType
 >((props) => {
   const { commitId, commitType, trackRef, ...divProps } = props
-  const path = useCurrentDirectory()
-  const commitInfo = useQuery(commitInfoQuery(path, commitId))
+  const commitInfo = useRepositoryQuery(commitInfoQuery, commitId)
 
   return (
     <Hovercard

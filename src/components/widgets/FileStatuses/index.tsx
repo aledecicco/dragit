@@ -1,36 +1,37 @@
 import clsx from 'clsx'
 import type { ComponentProps } from 'react'
 
+import type { HeadInfo } from '@api/models'
+import { headInfoQuery } from '@api/queries'
+import { useRepositoryQuery } from '@api/utils'
 import { StagedFileStatusItem } from './StagedFile'
 import { UnmergedFileStatusItem } from './UnmergedFile'
 import { UnstagedFileStatusItem } from './UnstagedFile'
 import { UntrackedFileStatusItem } from './UntrackedFile'
-import { type FilesByStatus, useCurrentFilesByStatus } from './utils'
+import { getFilesByStatus } from './utils'
 
 interface FileStatusesProps extends ComponentProps<'div'> {}
 
 const FileStatuses = (props: FileStatusesProps) => {
   const { ...divProps } = props
-  const files = useCurrentFilesByStatus()
+  const headInfo = useRepositoryQuery(headInfoQuery)
 
   return (
     <div {...divProps}>
-      {files.data ? (
-        <FileStatusesList files={files.data} />
+      {headInfo.data ? (
+        <FileStatusesList headInfo={headInfo.data} />
       ) : (
         <p className={clsx('text-sm italic text-light-500')}>
-          {files.isFetching
-            ? 'Loading current branch...'
-            : 'No file info found'}
+          {headInfo.isFetching ? 'Loading files...' : 'No file info found'}
         </p>
       )}
     </div>
   )
 }
 
-const FileStatusesList = (props: { files: FilesByStatus }) => {
-  const { files } = props
-  const { staged, unstaged, unmerged, untracked } = files
+const FileStatusesList = (props: { headInfo: HeadInfo }) => {
+  const { headInfo } = props
+  const { staged, unstaged, unmerged, untracked } = getFilesByStatus(headInfo)
 
   return (
     <div className={clsx('flex flex-col gap-4')}>

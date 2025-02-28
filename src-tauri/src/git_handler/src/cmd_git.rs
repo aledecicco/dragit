@@ -2,7 +2,7 @@ use std::{
     collections::HashMap,
     io::{self, ErrorKind},
     path::Path,
-    process::{Command, ExitStatus, Output},
+    process::{Command, Output},
     string::FromUtf8Error,
 };
 
@@ -33,14 +33,6 @@ where
             Err(io::Error::from(ErrorKind::Other))
         }
     })
-}
-
-fn run_command<'a, I>(path: &str, args: I) -> Result<ExitStatus, io::Error>
-where
-    I: IntoIterator<Item = &'a str>,
-{
-    let mut cmd = Command::new("git");
-    cmd.current_dir(path).args(args).status()
 }
 
 impl CmdGit {

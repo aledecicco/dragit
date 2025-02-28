@@ -1,7 +1,6 @@
-import {
-  type InfiniteData,
-  type UseInfiniteQueryResult,
-  useQuery,
+import type {
+  InfiniteData,
+  UseInfiniteQueryResult,
 } from '@tanstack/react-query'
 import type { VirtualItem, Virtualizer } from '@tanstack/react-virtual'
 import { useEffect, useMemo } from 'react'
@@ -12,8 +11,7 @@ import {
   branchesQuery,
   headInfoQuery,
 } from '@api/queries'
-import { getPaginatedLength } from '@api/utils'
-import { useCurrentDirectory } from '@context/directory'
+import { getPaginatedLength, useRepositoryQuery } from '@api/utils'
 import { getCurrentBranchInfo, getRemoteCounterpart } from '@utils/repository'
 import { CURVE_SIZE } from './Edges'
 
@@ -58,9 +56,8 @@ const useInfiniteScroll = (
 }
 
 const useCurrentBranch = (): BranchInfo | undefined => {
-  const path = useCurrentDirectory()
-  const headInfo = useQuery(headInfoQuery(path))
-  const branches = useQuery(branchesQuery(path))
+  const headInfo = useRepositoryQuery(headInfoQuery)
+  const branches = useRepositoryQuery(branchesQuery)
 
   const branch = useMemo(() => {
     return getCurrentBranchInfo(headInfo.data, branches.data)
@@ -72,9 +69,10 @@ const useCurrentBranch = (): BranchInfo | undefined => {
 const useRemoteDivergence = (
   branch: BranchInfo,
 ): BranchDivergence | undefined => {
-  const path = useCurrentDirectory()
-  const divergence = useQuery(
-    branchDivergenceQuery(path, branch.name, getRemoteCounterpart(branch)),
+  const divergence = useRepositoryQuery(
+    branchDivergenceQuery,
+    branch.name,
+    getRemoteCounterpart(branch),
   )
 
   return divergence.data

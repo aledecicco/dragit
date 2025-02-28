@@ -1,13 +1,15 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 import { useEffect } from 'react'
 
 import type { BranchInfo } from '@api/models'
 import { commitHistoryQuery, commonAncestorQuery } from '@api/queries'
-import { getPaginatedLength } from '@api/utils'
+import {
+  getPaginatedLength,
+  useRepositoryInfiniteQuery,
+  useRepositoryQuery,
+} from '@api/utils'
 import { useSelectedBranches } from '@context/branches'
-import { useCurrentDirectory } from '@context/directory'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
 import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
@@ -49,9 +51,10 @@ interface GraphInnerProps {
 const GraphInner = (props: GraphInnerProps) => {
   const { branch, baseBranch } = props
 
-  const path = useCurrentDirectory()
-  const commonAncestor = useQuery(
-    commonAncestorQuery(path, branch?.name, baseBranch?.name),
+  const commonAncestor = useRepositoryQuery(
+    commonAncestorQuery,
+    branch?.name,
+    baseBranch?.name,
   )
 
   const svgOverlay = useSvgOverlay()
@@ -61,9 +64,13 @@ const GraphInner = (props: GraphInnerProps) => {
     svgOverlay.refresh()
   }, [commonAncestor.data, branch, baseBranch])
 
-  const branchHistory = useInfiniteQuery(commitHistoryQuery(path, branch?.name))
-  const baseBranchHistory = useInfiniteQuery(
-    commitHistoryQuery(path, baseBranch?.name),
+  const branchHistory = useRepositoryInfiniteQuery(
+    commitHistoryQuery,
+    branch?.name,
+  )
+  const baseBranchHistory = useRepositoryInfiniteQuery(
+    commitHistoryQuery,
+    baseBranch?.name,
   )
 
   const branchLength = Math.min(
