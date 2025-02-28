@@ -36,7 +36,7 @@ const BranchSelectors = () => {
   return (
     <>
       <Combobox
-        className={clsx('[&]:w-65')}
+        className={clsx('[&]:w-65 col-start-1 row-start-1')}
         option={branch ? { value: branch.name, data: branch } : undefined}
         options={branchOptions}
         setOption={(newOption) => {
@@ -49,7 +49,7 @@ const BranchSelectors = () => {
 
       <IconButton
         Glyph={IconSwitchHorizontal}
-        className={clsx('mx-1')}
+        className={clsx('mx-1 col-start-2 row-start-1')}
         variant="neutral"
         aria-label="Switch branch and base branch"
         disabled={!branch || !baseBranch}
@@ -62,7 +62,7 @@ const BranchSelectors = () => {
       />
 
       <Combobox
-        className={clsx('[&]:w-65')}
+        className={clsx('[&]:w-65 col-start-3 row-start-1')}
         option={
           baseBranch ? { value: baseBranch.name, data: baseBranch } : undefined
         }

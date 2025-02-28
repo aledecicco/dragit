@@ -17,7 +17,6 @@ import {
   useInfiniteScroll,
   useRemoteDivergence,
 } from '../utils'
-import { BranchMessage } from './Message'
 
 interface GraphBranchProps {
   virtualizer: Virtualizer<HTMLDivElement, Element>
@@ -37,15 +36,11 @@ const GraphBranch = (props: GraphBranchProps) => {
   const divergence = useRemoteDivergence(branch)
 
   if (stopAtAnchor && anchor === null) {
-    return <BranchMessage isBase={isBase}>No new commits</BranchMessage>
+    return
   }
 
-  if (!history.data) {
-    return (
-      <BranchMessage isBase={isBase}>
-        {history.isFetching ? 'Loading branch history...' : 'No commits found'}
-      </BranchMessage>
-    )
+  if (!history.data?.pages) {
+    return
   }
 
   return items.map((virtualRow) => {

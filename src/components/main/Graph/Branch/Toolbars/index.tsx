@@ -1,4 +1,5 @@
 import { IconDownload, IconRefresh, IconUpload } from '@tabler/icons-react'
+import clsx from 'clsx'
 
 import { useFetchRemote, usePullBranch, usePushBranch } from '@api/commands'
 import { useSelectedBranches } from '@context/branches'
@@ -14,7 +15,8 @@ const BranchToolbars = () => {
   return (
     <>
       <Toolbar
-        disabled={!branch}
+        className={clsx('col-start-1 row-start-2')}
+        disabled={!branch || branch.type !== 'local'}
         tools={[
           {
             Glyph: IconDownload,
@@ -48,10 +50,27 @@ const BranchToolbars = () => {
             className: '[&]:w-17',
             disabled: pushBranch.isPending,
           },
+          {
+            Glyph: IconUpload,
+            label: 'Force',
+            action: () => {
+              if (branch?.type === 'local') {
+                pushBranch.mutate({
+                  branch: branch.name,
+                  remote: branch.remote?.remoteName ?? 'origin',
+                  remoteBranch: branch.remote?.branchName ?? branch.name,
+                  isForce: true,
+                })
+              }
+            },
+            className: '[&]:w-17',
+            disabled: pushBranch.isPending,
+          },
         ]}
       />
 
       <Toolbar
+        className={clsx('col-start-2 row-start-2')}
         tools={[
           {
             Glyph: IconRefresh,
@@ -66,7 +85,8 @@ const BranchToolbars = () => {
       />
 
       <Toolbar
-        disabled={!baseBranch}
+        className={clsx('col-start-3 row-start-2')}
+        disabled={!baseBranch || baseBranch.type !== 'local'}
         tools={[
           {
             Glyph: IconDownload,
@@ -84,6 +104,40 @@ const BranchToolbars = () => {
             },
             className: '[&]:w-17',
             disabled: pullBranch.isPending,
+          },
+          {
+            Glyph: IconUpload,
+            label: 'Push',
+            action: () => {
+              if (baseBranch?.type === 'local') {
+                pushBranch.mutate({
+                  branch: baseBranch.name,
+                  remote: baseBranch.remote?.remoteName ?? 'origin',
+                  remoteBranch:
+                    baseBranch.remote?.branchName ?? baseBranch.name,
+                  isForce: false,
+                })
+              }
+            },
+            className: '[&]:w-17',
+            disabled: pushBranch.isPending,
+          },
+          {
+            Glyph: IconUpload,
+            label: 'Force',
+            action: () => {
+              if (baseBranch?.type === 'local') {
+                pushBranch.mutate({
+                  branch: baseBranch.name,
+                  remote: baseBranch.remote?.remoteName ?? 'origin',
+                  remoteBranch:
+                    baseBranch.remote?.branchName ?? baseBranch.name,
+                  isForce: true,
+                })
+              }
+            },
+            className: '[&]:w-17',
+            disabled: pushBranch.isPending,
           },
         ]}
       />

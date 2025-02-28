@@ -9,9 +9,11 @@ import type { BranchDivergence, BranchInfo, HistoryItem } from '@api/models'
 import {
   branchDivergenceQuery,
   branchesQuery,
+  commonAncestorQuery,
   headInfoQuery,
 } from '@api/queries'
 import { getPaginatedLength, useRepositoryQuery } from '@api/utils'
+import { useSelectedBranches } from '@context/branches'
 import { getCurrentBranchInfo, getRemoteCounterpart } from '@utils/repository'
 import { CURVE_SIZE } from './Edges'
 
@@ -66,6 +68,17 @@ const useCurrentBranch = (): BranchInfo | undefined => {
   return branch
 }
 
+const useCurrentCommonAncestor = () => {
+  const { branch, baseBranch } = useSelectedBranches()
+  const commonAncestor = useRepositoryQuery(
+    commonAncestorQuery,
+    branch?.name,
+    baseBranch?.name,
+  )
+
+  return commonAncestor.data
+}
+
 const useRemoteDivergence = (
   branch: BranchInfo,
 ): BranchDivergence | undefined => {
@@ -79,7 +92,7 @@ const useRemoteDivergence = (
 }
 
 const getCommitPositionClass = (isBase: boolean) =>
-  isBase ? 'left-[62%]' : 'left-[8%]'
+  isBase ? 'left-[68%]' : 'left-[12%]'
 
 const getCommitTranslationY = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
@@ -97,6 +110,7 @@ export {
   ancestorIsDivergent,
   useInfiniteScroll,
   useCurrentBranch,
+  useCurrentCommonAncestor,
   useRemoteDivergence,
   getCommitPositionClass,
   getCommitTranslationY,

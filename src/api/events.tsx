@@ -15,7 +15,9 @@ const EventHandler = (props: PropsWithChildren) => {
 
   useEffect(() => {
     const unlisten = listen('dir-changed', () => {
-      client.invalidateQueries()
+      client.invalidateQueries({
+        queryKey: queryKeys.currentDir,
+      })
     })
 
     return () => {
@@ -67,6 +69,24 @@ const EventHandlerInner = (props: PropsWithChildren) => {
             client.invalidateQueries({
               queryKey: [
                 queryKeys.directory.branchDivergence.baseBranch(
+                  currentDir,
+                  branchName,
+                ),
+              ],
+            })
+
+            client.invalidateQueries({
+              queryKey: [
+                queryKeys.directory.commonAncestor.branch(
+                  currentDir,
+                  branchName,
+                ),
+              ],
+            })
+
+            client.invalidateQueries({
+              queryKey: [
+                queryKeys.directory.commonAncestor.baseBranch(
                   currentDir,
                   branchName,
                 ),

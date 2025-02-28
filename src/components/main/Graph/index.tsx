@@ -2,26 +2,20 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 import { useEffect } from 'react'
 
-import type { BranchInfo } from '@api/models'
-import { commitHistoryQuery, commonAncestorQuery } from '@api/queries'
-import {
-  getPaginatedLength,
-  useRepositoryInfiniteQuery,
-  useRepositoryQuery,
-} from '@api/utils'
+import { commitHistoryQuery } from '@api/queries'
+import { getPaginatedLength, useRepositoryInfiniteQuery } from '@api/utils'
 import { useSelectedBranches } from '@context/branches'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
 import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
-import { BranchMessage } from './Branch/Message'
+import { BranchMessages } from './Branch/Messages'
 import { BranchSelectors } from './Branch/Selectors'
 import { BranchToolbars } from './Branch/Toolbars'
 import { NODE_SIZE } from './Commit'
 import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
+import { useCurrentCommonAncestor } from './utils'
 
 const Graph = () => {
-  const { branch, baseBranch } = useSelectedBranches()
-
   return (
     <div className={clsx('h-full w-full min-h-0')}>
       <div
@@ -35,34 +29,29 @@ const Graph = () => {
 
         <BranchToolbars />
 
-        <SvgOverlay className={clsx('col-span-3')} RenderOverlay={Edges}>
-          <GraphInner branch={branch} baseBranch={baseBranch} />
+        <SvgOverlay
+          className={clsx('col-span-3 col-start-1 row-start-3 mt-4')}
+          RenderOverlay={Edges}
+        >
+          <GraphInner />
         </SvgOverlay>
+
+        <BranchMessages />
       </div>
     </div>
   )
 }
 
-interface GraphInnerProps {
-  branch: BranchInfo | undefined
-  baseBranch: BranchInfo | undefined
-}
-
-const GraphInner = (props: GraphInnerProps) => {
-  const { branch, baseBranch } = props
-
-  const commonAncestor = useRepositoryQuery(
-    commonAncestorQuery,
-    branch?.name,
-    baseBranch?.name,
-  )
+const GraphInner = () => {
+  const { branch, baseBranch } = useSelectedBranches()
+  const commonAncestor = useCurrentCommonAncestor()
 
   const svgOverlay = useSvgOverlay()
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: refresh arrows when branches change
   useEffect(() => {
     svgOverlay.refresh()
-  }, [commonAncestor.data, branch, baseBranch])
+  }, [commonAncestor, branch, baseBranch])
 
   const branchHistory = useRepositoryInfiniteQuery(
     commitHistoryQuery,
@@ -74,7 +63,7 @@ const GraphInner = (props: GraphInnerProps) => {
   )
 
   const branchLength = Math.min(
-    (commonAncestor.data?.lastCommit?.distance ?? Number.POSITIVE_INFINITY) + 1,
+    (commonAncestor?.lastCommit?.distance ?? Number.POSITIVE_INFINITY) + 1,
     getPaginatedLength(branchHistory),
   )
   const baseLength = getPaginatedLength(baseBranchHistory)
@@ -96,34 +85,30 @@ const GraphInner = (props: GraphInnerProps) => {
         className={clsx('relative w-full contain-layout')}
         style={{ height: virtualizer.getTotalSize() }}
       >
-        {branch ? (
+        {branch && (
           <GraphBranch
             virtualizer={virtualizer}
             branch={branch}
-            anchor={commonAncestor.data?.lastCommit}
+            anchor={commonAncestor?.lastCommit}
             isBase={false}
           />
-        ) : (
-          <BranchMessage isBase={false}>No branch checked out</BranchMessage>
         )}
 
-        {baseBranch ? (
+        {baseBranch && (
           <GraphBranch
             virtualizer={virtualizer}
             branch={baseBranch}
-            anchor={commonAncestor.data?.commonCommit ?? undefined}
+            anchor={commonAncestor?.commonCommit ?? undefined}
             isBase={true}
           />
-        ) : (
-          <BranchMessage isBase={true}>No base branch selected</BranchMessage>
         )}
 
-        {branch && baseBranch && commonAncestor.data && (
+        {branch && baseBranch && commonAncestor && (
           <GraphAnchor
             virtualizer={virtualizer}
             branch={branch}
             baseBranch={baseBranch}
-            commonAncestorInfo={commonAncestor.data}
+            commonAncestorInfo={commonAncestor}
           />
         )}
       </div>

@@ -38,4 +38,9 @@ const useBranchesSync = () => {
   }, [currentBranch])
 }
 
-export { useSelectedBranches, changeBaseBranch, useBranchesSync }
+export {
+  useSelectedBranches,
+  changeBaseBranch,
+  useBranchesSync,
+  type SelectedBranches,
+}

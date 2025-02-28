@@ -18,9 +18,9 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
   useEffect(() => {
     if (!a.current) {
       a.current = true
-      openFolder.mutate('/home/adecicco/Projects/test-git')
+      openFolder.mutateAsync('/home/adecicco/Projects/test-git')
     }
-  }, [openFolder.mutate])
+  }, [openFolder.mutateAsync])
 
   return (
     <Button
