@@ -77,7 +77,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
           portal
           sameWidth
           gutter={4}
-          className={clsx('rounded-lg shadow-md', 'bg-dark-900 p-2')}
+          className={clsx('rounded-lg shadow-md', 'bg-dark-300 p-2')}
         >
           <Ariakit.Combobox
             placeholder="Search..."
@@ -95,7 +95,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
               <div
                 className={clsx(
                   'text-center p-2',
-                  'text-sm italic text-dark-400',
+                  'text-sm italic text-light-950',
                 )}
               >
                 No matches found
@@ -111,7 +111,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
                         className={clsx(
                           'text-sm text-center',
                           'p-2 rounded-sm',
-                          'cursor-pointer data-[active-item]:bg-dark-700',
+                          'cursor-pointer data-[active-item]:bg-dark-200',
                         )}
                       />
                     }

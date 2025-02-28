@@ -21,7 +21,7 @@ const FileStatuses = (props: FileStatusesProps) => {
       {headInfo.data ? (
         <FileStatusesList headInfo={headInfo.data} />
       ) : (
-        <p className={clsx('text-sm italic text-light-500')}>
+        <p className={clsx('text-sm italic text-light-600')}>
           {headInfo.isFetching ? 'Loading files...' : 'No file info found'}
         </p>
       )}
@@ -45,7 +45,7 @@ const FileStatusesList = (props: { headInfo: HeadInfo }) => {
               <StagedFileStatusItem key={file.path} file={file} />
             ))
           ) : (
-            <p className={clsx('text-sm italic text-light-500')}>
+            <p className={clsx('text-sm italic text-light-800')}>
               No staged files
             </p>
           )}
@@ -62,7 +62,7 @@ const FileStatusesList = (props: { headInfo: HeadInfo }) => {
               <UnstagedFileStatusItem key={file.path} file={file} />
             ))
           ) : (
-            <p className={clsx('text-sm italic text-light-500')}>
+            <p className={clsx('text-sm italic text-light-800')}>
               No unstaged files
             </p>
           )}
@@ -79,7 +79,7 @@ const FileStatusesList = (props: { headInfo: HeadInfo }) => {
               <UnmergedFileStatusItem key={file.path} file={file} />
             ))
           ) : (
-            <p className={clsx('text-sm italic text-light-500')}>
+            <p className={clsx('text-sm italic text-light-800')}>
               No unmerged files
             </p>
           )}
@@ -96,7 +96,7 @@ const FileStatusesList = (props: { headInfo: HeadInfo }) => {
               <UntrackedFileStatusItem key={file.path} file={file} />
             ))
           ) : (
-            <p className={clsx('text-sm italic text-light-500')}>
+            <p className={clsx('text-sm italic text-light-800')}>
               No untracked files
             </p>
           )}

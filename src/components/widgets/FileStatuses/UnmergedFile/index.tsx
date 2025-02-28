@@ -28,7 +28,7 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
   return (
     <FileStatusItem
       file={file}
-      className={clsx('text-warning')}
+      className={clsx('text-warning-300')}
       Glyph={match(file.unstaged)
         .with(P.union('addedByThem', 'addedByUs', 'bothAdded'), () =>
           file.isDir ? IconFolderPlus : IconFilePlus,
@@ -47,7 +47,7 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
             variant="neutral"
             size="sm"
             aria-label="Mark conflict as resolved"
-            onClick={() => stage([file.path])}
+            onClick={() => stage.mutate([file.path])}
           />
 
           {match(file.unstaged)
@@ -59,7 +59,7 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
                   variant="neutral"
                   size="sm"
                   aria-label="Delete file"
-                  onClick={() => remove([file.path])}
+                  onClick={() => remove.mutate([file.path])}
                 />
               ),
             )

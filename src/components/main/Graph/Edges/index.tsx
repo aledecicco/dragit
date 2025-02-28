@@ -62,8 +62,8 @@ const Edges = (props: EdgesProps) => {
             className={clsx(
               'fill-none stroke-4',
               match(elem.parent.type)
-                .with('solid', () => 'stroke-primary-700')
-                .with('dashed', () => 'stroke-primary-800')
+                .with('solid', () => 'stroke-primary-600')
+                .with('dashed', () => 'stroke-primary-600')
                 .with('unconfirmed', () => 'stroke-accent-400')
                 .otherwise(() => undefined),
               elem.parent.type === 'dashed' && '[stroke-dasharray:8_5]',

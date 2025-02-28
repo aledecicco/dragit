@@ -32,7 +32,7 @@ const FileStatusMoreInfo = (props: FileStatusMoreInfoProps) => {
               .exhaustive()}
           </li>
         ) : (
-          <li className={clsx('text-light-400 marker:text-light-400')}>
+          <li className={clsx('text-light-800 marker:text-light-800')}>
             No staged changes
           </li>
         )}
@@ -82,7 +82,7 @@ const FileStatusMoreInfo = (props: FileStatusMoreInfoProps) => {
               .exhaustive()}
           </li>
         ) : (
-          <li className={clsx('text-light-400 marker:text-light-400')}>
+          <li className={clsx('text-light-800 marker:text-light-800')}>
             No unstaged changes
           </li>
         )}

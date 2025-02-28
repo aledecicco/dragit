@@ -21,7 +21,7 @@ const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
   return (
     <FileStatusItem
       file={file}
-      className={clsx('text-light-400')}
+      className={clsx('text-light-600')}
       Glyph={file.isDir ? IconFolderQuestion : IconFileUnknown}
       actions={
         <IconButton
@@ -29,7 +29,7 @@ const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
           variant="neutral"
           size="sm"
           aria-label="Stage file"
-          onClick={() => stage([file.path])}
+          onClick={() => stage.mutateAsync([file.path])}
         />
       }
     />

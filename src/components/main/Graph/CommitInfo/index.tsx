@@ -14,10 +14,10 @@ const GraphCommitInfo = (props: GraphCommitInfoProps) => {
       {commitInfo ? (
         <>
           <div>
-            <p className={clsx('text-xs text-light-400')}>
+            <p className={clsx('text-xs text-light-800')}>
               {commitInfo.authorName} - {commitInfo.authorEmail}
             </p>
-            <p className={clsx('text-xs text-light-400')}>
+            <p className={clsx('text-xs text-light-800')}>
               {new Date(commitInfo.timestamp).toDateString()}
             </p>
           </div>
@@ -29,7 +29,7 @@ const GraphCommitInfo = (props: GraphCommitInfoProps) => {
           <p className={clsx('text-xs text-primary-300')}>{commitInfo.hash}</p>
         </>
       ) : (
-        <p className={clsx('text-xs text-light-400')}>...</p>
+        <p className={clsx('text-xs text-light-800')}>...</p>
       )}
     </div>
   )

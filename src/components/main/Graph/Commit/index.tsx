@@ -48,8 +48,8 @@ const GraphCommit = makeTracked<
             className={clsx(
               'rounded-full shadow-md',
               match(commitType)
-                .with('confirmed', () => 'bg-primary')
-                .with('unconfirmed', () => 'bg-accent')
+                .with('confirmed', () => 'bg-primary-600')
+                .with('unconfirmed', () => 'bg-accent-400')
                 .exhaustive(),
             )}
             style={{ width: NODE_SIZE, height: NODE_SIZE }}

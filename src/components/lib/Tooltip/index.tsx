@@ -18,13 +18,13 @@ const Tooltip = (props: TooltipProps) => {
         {...tooltipProps}
         gutter={8}
         className={clsx(
-          'shadow-md bg-dark-900',
+          'shadow-md bg-dark-400',
           'p-2 rounded-sm text-xs text-light-300',
           tooltipProps.className,
         )}
       >
         {description}
-        <Ariakit.TooltipArrow className="[&>svg]:fill-dark-900" size={12} />
+        <Ariakit.TooltipArrow className="[&>svg]:fill-dark-400" size={12} />
       </Ariakit.Tooltip>
     </Ariakit.TooltipProvider>
   )

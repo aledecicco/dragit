@@ -28,7 +28,7 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
   return (
     <FileStatusItem
       file={file}
-      className={clsx('text-danger')}
+      className={clsx('text-danger-700')}
       Glyph={match(file.unstaged)
         .with('added', () => (file.isDir ? IconFolderPlus : IconFilePlus))
         .with('deleted', () => (file.isDir ? IconFolderMinus : IconFileMinus))
@@ -41,7 +41,7 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
           variant="neutral"
           size="sm"
           aria-label="Stage file"
-          onClick={() => stage([file.path])}
+          onClick={() => stage.mutate([file.path])}
         />
       }
     />
