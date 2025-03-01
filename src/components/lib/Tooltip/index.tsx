@@ -15,8 +15,9 @@ const Tooltip = (props: TooltipProps) => {
     <Ariakit.TooltipProvider placement={placement}>
       <Ariakit.TooltipAnchor render={anchor} />
       <Ariakit.Tooltip
-        {...tooltipProps}
+        unmountOnHide
         gutter={8}
+        {...tooltipProps}
         className={clsx(
           'shadow-md bg-dark-400',
           'p-2 rounded-sm text-xs text-light-300',

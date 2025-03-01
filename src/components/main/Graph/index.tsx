@@ -82,7 +82,7 @@ const GraphInner = () => {
       className={clsx('overflow-hidden contain-strict w-full h-full')}
     >
       <div
-        className={clsx('relative w-full contain-layout')}
+        className={clsx('relative w-full contain-layout bg-dark-700')}
         style={{ height: virtualizer.getTotalSize() }}
       >
         {branch && (

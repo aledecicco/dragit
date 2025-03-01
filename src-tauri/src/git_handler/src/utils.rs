@@ -28,7 +28,7 @@ pub const UNMERGED_FILE_INFO_SEGMENTS: usize = 11;
 pub const UNTRACKED_FILE_INFO_SEGMENTS: usize = 2;
 /// Format used to get the needed information about branches.
 pub const BRANCHES_INFO_FORMAT: &str =
-    "--format=%(refname) %(upstream:remotename) %(upstream:remoteref)";
+    "--format=%(refname) %(committerdate:unix) %(upstream:remotename) %(upstream:remoteref)";
 /// The string that denotes that a ref is a branch name when printing its status.
 pub const BRANCH_PREFIX: &str = "refs/heads/";
 /// The string that denotes that a branch is local when printing its status.
@@ -167,15 +167,17 @@ pub fn parse_history_item(line: &String) -> Option<HistoryItem> {
 }
 
 pub fn parse_branch_info(line: &String) -> Option<BranchInfo> {
-    let mut names = line.split_ascii_whitespace().map(String::from);
-    let branch_name = names.next()?;
+    let mut segments = line.split_ascii_whitespace().map(String::from);
+    let branch_name = segments.next()?;
+    let timestamp = u64::from_str(&segments.next()?).ok()? * 1000;
 
     if branch_name.starts_with(BRANCH_PREFIX) {
-        let remote_name = names.next();
-        let remote_branch_name = names.next();
+        let remote_name = segments.next();
+        let remote_branch_name = segments.next();
 
         Some(BranchInfo {
             name: strip_branch_prefix(&branch_name, BRANCH_PREFIX),
+            timestamp: timestamp,
             branch_type: BranchType::Local {
                 remote: match (remote_name, remote_branch_name) {
                     (Some(remote_name), Some(remote_branch_name)) => Some(RemoteRef {
@@ -189,6 +191,7 @@ pub fn parse_branch_info(line: &String) -> Option<BranchInfo> {
     } else if branch_name.starts_with(REMOTE_BRANCH_PREFIX) {
         Some(BranchInfo {
             name: strip_branch_prefix(&branch_name, REMOTE_BRANCH_PREFIX),
+            timestamp: timestamp,
             branch_type: BranchType::Remote {},
         })
     } else {

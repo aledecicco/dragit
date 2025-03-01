@@ -4,6 +4,8 @@ import type { ComponentProps } from 'react'
 import type { HeadInfo } from '@api/models'
 import { headInfoQuery } from '@api/queries'
 import { useRepositoryQuery } from '@api/utils'
+import { Accordion } from '@lib/Accordion'
+import { mapOr } from '@utils/array'
 import { StagedFileStatusItem } from './StagedFile'
 import { UnmergedFileStatusItem } from './UnmergedFile'
 import { UnstagedFileStatusItem } from './UnstagedFile'
@@ -22,7 +24,7 @@ const FileStatuses = (props: FileStatusesProps) => {
         <FileStatusesList headInfo={headInfo.data} />
       ) : (
         <p className={clsx('text-sm italic text-light-600')}>
-          {headInfo.isFetching ? 'Loading files...' : 'No file info found'}
+          Loading files...
         </p>
       )}
     </div>
@@ -34,75 +36,79 @@ const FileStatusesList = (props: { headInfo: HeadInfo }) => {
   const { staged, unstaged, unmerged, untracked } = getFilesByStatus(headInfo)
 
   return (
-    <div className={clsx('flex flex-col gap-4')}>
-      <div>
-        <p className={clsx('text-xs font-medium text-light-300 mb-1')}>
-          Staged Changes
-        </p>
-        <div className={clsx('flex flex-col gap-1 p-1')}>
-          {staged.length ? (
-            staged.map((file) => (
-              <StagedFileStatusItem key={file.path} file={file} />
-            ))
-          ) : (
+    <Accordion
+      showArrows
+      sections={[
+        {
+          id: 'staged',
+          label: 'Staged Files',
+          extraInfo: (
+            <div className={clsx('text-xs text-light-700 font-semibold')}>
+              {staged.length}
+            </div>
+          ),
+          defaultOpen: true,
+          description: mapOr(
             <p className={clsx('text-sm italic text-light-800')}>
               No staged files
-            </p>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <p className={clsx('text-xs font-medium text-light-300 mb-1')}>
-          Unstaged Changes
-        </p>
-        <div className={clsx('flex flex-col gap-1 p-1')}>
-          {unstaged.length ? (
-            unstaged.map((file) => (
-              <UnstagedFileStatusItem key={file.path} file={file} />
-            ))
-          ) : (
+            </p>,
+            staged,
+            (file) => <StagedFileStatusItem key={file.path} file={file} />,
+          ),
+        },
+        {
+          id: 'unstaged',
+          label: 'Unstaged Files',
+          extraInfo: (
+            <div className={clsx('text-xs text-light-700 font-semibold')}>
+              {unstaged.length}
+            </div>
+          ),
+          defaultOpen: true,
+          description: mapOr(
             <p className={clsx('text-sm italic text-light-800')}>
               No unstaged files
-            </p>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <p className={clsx('text-xs font-medium text-light-300 mb-1')}>
-          Unmerged Changes
-        </p>
-        <div className={clsx('flex flex-col gap-1 p-1')}>
-          {unmerged.length ? (
-            unmerged.map((file) => (
-              <UnmergedFileStatusItem key={file.path} file={file} />
-            ))
-          ) : (
+            </p>,
+            unstaged,
+            (file) => <UnstagedFileStatusItem key={file.path} file={file} />,
+          ),
+        },
+        {
+          id: 'unmerged',
+          label: 'Unmerged Files',
+          extraInfo: (
+            <div className={clsx('text-xs text-light-700 font-semibold')}>
+              {unmerged.length}
+            </div>
+          ),
+          defaultOpen: true,
+          description: mapOr(
             <p className={clsx('text-sm italic text-light-800')}>
               No unmerged files
-            </p>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <p className={clsx('text-xs font-medium text-light-300 mb-1')}>
-          Untracked Changes
-        </p>
-        <div className={clsx('flex flex-col gap-1 p-1')}>
-          {untracked.length ? (
-            untracked.map((file) => (
-              <UntrackedFileStatusItem key={file.path} file={file} />
-            ))
-          ) : (
+            </p>,
+            unmerged,
+            (file) => <UnmergedFileStatusItem key={file.path} file={file} />,
+          ),
+        },
+        {
+          id: 'untracked',
+          label: 'Untracked Files',
+          extraInfo: (
+            <div className={clsx('text-xs text-light-700 font-semibold')}>
+              {untracked.length}
+            </div>
+          ),
+          defaultOpen: true,
+          description: mapOr(
             <p className={clsx('text-sm italic text-light-800')}>
               No untracked files
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
+            </p>,
+            untracked,
+            (file) => <UntrackedFileStatusItem key={file.path} file={file} />,
+          ),
+        },
+      ]}
+    />
   )
 }
 

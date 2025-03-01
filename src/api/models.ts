@@ -44,6 +44,7 @@ export type HeadStatus =
 
 export interface LocalBranch {
   name: BranchName
+  timestamp: number
   type: 'local'
   remote: {
     remoteName: RemoteName
@@ -53,6 +54,7 @@ export interface LocalBranch {
 
 export interface RemoteBranch {
   name: RefName
+  timestamp: number
   type: 'remote'
 }
 

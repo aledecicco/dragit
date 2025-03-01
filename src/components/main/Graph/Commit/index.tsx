@@ -46,7 +46,7 @@ const GraphCommit = makeTracked<
         >
           <div
             className={clsx(
-              'rounded-full shadow-md',
+              'rounded-full shadow-sm',
               match(commitType)
                 .with('confirmed', () => 'bg-primary-600')
                 .with('unconfirmed', () => 'bg-accent-400')

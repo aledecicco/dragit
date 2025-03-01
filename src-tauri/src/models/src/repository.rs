@@ -151,6 +151,8 @@ pub struct HistoryItem {
 pub struct BranchInfo {
     pub name: String,
 
+    pub timestamp: u64,
+
     #[serde(flatten)]
     pub branch_type: BranchType,
 }
