@@ -62,7 +62,13 @@ const GraphCommit = makeTracked<
           </div>
         </div>
       }
-      description={<GraphCommitInfo commitInfo={commitInfo.data} />}
+      description={
+        commitInfo.data ? (
+          <GraphCommitInfo commitInfo={commitInfo.data} />
+        ) : (
+          <p className={clsx('text-xs text-light-800')}>...</p>
+        )
+      }
     />
   )
 })
