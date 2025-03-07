@@ -1,4 +1,3 @@
-import * as Ariakit from '@ariakit/react'
 import { IconFile, IconFolder } from '@tabler/icons-react'
 import clsx from 'clsx'
 import type { ComponentProps } from 'react'
@@ -17,16 +16,12 @@ const FileStatusItem = (props: FileStatusItemProps) => {
   const { file, Glyph, actions, ...divProps } = props
 
   return (
-    <Ariakit.CompositeItem
-      render={
-        <div
-          {...divProps}
-          className={clsx(
-            'flex flex-row items-center justify-between gap-4',
-            divProps.className,
-          )}
-        />
-      }
+    <div
+      {...divProps}
+      className={clsx(
+        'flex flex-row items-center justify-between gap-4',
+        divProps.className,
+      )}
     >
       <div className={clsx('flex flex-row items-center gap-x-1')}>
         {file.isDir ? (
@@ -45,7 +40,7 @@ const FileStatusItem = (props: FileStatusItemProps) => {
       </div>
 
       {actions && <Toolbar tools={actions} size="sm" />}
-    </Ariakit.CompositeItem>
+    </div>
   )
 }
 

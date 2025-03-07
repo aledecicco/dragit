@@ -24,7 +24,7 @@ const Accordion = (props: AccordionProps) => {
   const [expanded, setExpanded] = useState<string>()
 
   return (
-    <Ariakit.CompositeProvider focusLoop focusShift focusWrap>
+    <Ariakit.CompositeProvider focusLoop>
       <Ariakit.Composite
         render={
           <div
@@ -61,55 +61,49 @@ const Accordion = (props: AccordionProps) => {
                 },
               })}
             >
-              <Ariakit.CompositeRow>
-                <div
-                  className={clsx(
-                    'flex flex-row items-center justify-between',
-                    'px-2',
-                  )}
+              <div
+                className={clsx(
+                  'flex flex-row items-center justify-between',
+                  'px-2',
+                )}
+              >
+                <Ariakit.CompositeItem
+                  tabbable
+                  render={
+                    <Ariakit.Disclosure
+                      {...disclosureProps}
+                      className={clsx(
+                        'cursor-pointer w-full group',
+                        'text-sm text-light-900 text-start',
+                        'p-2 flex flex-row gap-x-2 items-center',
+                        'hover:text-light-700 hover:underline',
+                        'aria-disabled:text-light-950',
+                        disclosureProps.className,
+                      )}
+                    />
+                  }
                 >
-                  <Ariakit.CompositeItem
-                    tabbable
-                    render={
-                      <Ariakit.Disclosure
-                        {...disclosureProps}
-                        className={clsx(
-                          'cursor-pointer w-full group',
-                          'text-sm text-light-900 text-start',
-                          'p-2 flex flex-row gap-x-2 items-center',
-                          'hover:text-light-700 hover:underline',
-                          'aria-disabled:text-light-950',
-                          disclosureProps.className,
-                        )}
-                      />
-                    }
-                  >
-                    {showArrows && (
-                      <Icon
-                        Glyph={IconChevronDown}
-                        className={clsx('group-aria-expanded:rotate-180')}
-                      />
-                    )}
-                    {label}
-                  </Ariakit.CompositeItem>
+                  {showArrows && (
+                    <Icon
+                      Glyph={IconChevronDown}
+                      className={clsx('group-aria-expanded:rotate-180')}
+                    />
+                  )}
+                  {label}
+                </Ariakit.CompositeItem>
 
-                  {extraInfo}
-                </div>
-              </Ariakit.CompositeRow>
+                {extraInfo}
+              </div>
 
-              <Ariakit.CompositeRow
-                render={
-                  <Ariakit.DisclosureContent
-                    unmountOnHide
-                    className={clsx(
-                      'w-full overflow-y-auto grow',
-                      'bg-dark-600 rounded-sm py-2 px-6',
-                    )}
-                  />
-                }
+              <Ariakit.DisclosureContent
+                unmountOnHide
+                className={clsx(
+                  'w-full overflow-y-auto grow',
+                  'bg-dark-600 rounded-sm py-2 px-6',
+                )}
               >
                 {description}
-              </Ariakit.CompositeRow>
+              </Ariakit.DisclosureContent>
             </Ariakit.DisclosureProvider>
           )
         })}
