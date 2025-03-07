@@ -33,7 +33,6 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
       Glyph={file.isDir ? IconFolderExclamation : IconFileAlert}
       statusMessage={
         <p className={clsx('text-xs text-warning-400/50')}>
-          -{' '}
           {match(file.unstaged)
             .with('addedByThem', () => 'Added by incoming changes')
             .with('addedByUs', () => 'Added by local changes')

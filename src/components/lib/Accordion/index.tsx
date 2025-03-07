@@ -28,10 +28,7 @@ const Accordion = (props: AccordionProps) => {
         render={
           <div
             {...divProps}
-            className={clsx(
-              'flex flex-col bg-dark-600 overflow-hidden',
-              divProps.className,
-            )}
+            className={clsx('flex flex-col bg-dark-600', divProps.className)}
           />
         }
       >

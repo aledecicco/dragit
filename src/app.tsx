@@ -4,6 +4,7 @@ import { useBranchesSync } from '@context/branches'
 import { useDirectoryIsOpen, useDirectorySync } from '@context/directory'
 import { CurrentDirectory } from '@main/CurrentDirectory'
 import { Graph } from '@main/Graph'
+import { BranchesList } from '@widgets/BranchesList'
 import { FileStatuses } from '@widgets/FileStatuses'
 
 const App = () => {
@@ -27,9 +28,10 @@ const AppInner = () => {
   useBranchesSync()
 
   return (
-    <div className={clsx('grid grid-cols-[2fr_6fr]', 'min-h-0 max-h-full')}>
+    <div className={clsx('grid grid-cols-[2fr_6fr_2fr]', 'min-h-0 max-h-full')}>
       <FileStatuses />
       <Graph />
+      <BranchesList />
     </div>
   )
 }

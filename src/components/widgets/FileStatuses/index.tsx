@@ -50,7 +50,7 @@ const FileStatuses = (props: FileStatusesProps) => {
     <Accordion
       {...divProps}
       showArrows
-      className={clsx(divProps.className)}
+      className={clsx('overflow-hidden', divProps.className)}
       sections={[
         {
           id: 'untracked',

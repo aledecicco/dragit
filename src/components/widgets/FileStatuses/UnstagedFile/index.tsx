@@ -30,7 +30,6 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
       className={clsx('text-light-600')}
       statusMessage={
         <p className={clsx('text-xs text-light-950')}>
-          -{' '}
           {match(file.unstaged)
             .with('added', () =>
               file.isDir ? 'Directory created' : 'File created',

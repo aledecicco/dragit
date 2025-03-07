@@ -34,7 +34,6 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
       className={clsx('text-light-600')}
       statusMessage={
         <p className={clsx('text-xs text-success-300/80')}>
-          -{' '}
           {match(file.staged)
             .with('added', () => (file.isDir ? 'Folder added' : 'File added'))
             .with('deleted', () =>

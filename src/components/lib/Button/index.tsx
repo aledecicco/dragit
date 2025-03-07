@@ -11,7 +11,7 @@ interface ButtonProps extends Ariakit.ButtonProps {
 }
 
 const Button = (props: ButtonProps) => {
-  const { variant, round = false, size = 'md', ...buttonProps } = props
+  const { variant, round = false, size = 'sm', ...buttonProps } = props
 
   return (
     <Ariakit.Button
@@ -24,15 +24,15 @@ const Button = (props: ButtonProps) => {
         round && 'aspect-square',
         match(size)
           .with('sm', () => [
-            'text-sm gap-2',
+            'text-xs gap-2',
             round ? 'p-1 rounded-4xl' : 'px-2 py-1.25 rounded-md',
           ])
           .with('md', () => [
-            'text-md gap-2',
+            'text-sm gap-2',
             round ? 'p-1.5 rounded-4xl' : 'px-2.5 py-1.75 rounded-md',
           ])
           .with('lg', () => [
-            'text-lg gap-3',
+            'gap-3',
             round ? 'p-2 rounded-4xl' : 'px-3.5 py-2.25 rounded-md',
           ])
           .exhaustive(),

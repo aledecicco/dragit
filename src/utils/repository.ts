@@ -1,6 +1,12 @@
 import { P, match } from 'ts-pattern'
 
-import type { BranchInfo, BranchName, HeadInfo } from '@api/models'
+import type {
+  BranchInfo,
+  BranchName,
+  HeadInfo,
+  RefName,
+  RemoteName,
+} from '@api/models'
 import { idFn, mapFn } from './types'
 
 const getCurrentBranchName = (
@@ -29,10 +35,13 @@ const getCurrentBranchInfo = (
   )
 }
 
-const getRemoteCounterpart = (branch: BranchInfo): BranchName | undefined => {
+const getRemoteCounterpart = (branch: BranchInfo): RefName | undefined => {
   return match(branch)
     .with({ type: 'local', remote: P.select() }, (remote) =>
-      mapFn(remote, (remote) => `${remote.remoteName}/${remote.branchName}`),
+      mapFn(
+        remote,
+        (remote) => `${remote.remoteName}/${remote.branchName}` as const,
+      ),
     )
     .with({ type: 'remote' }, () => undefined)
     .exhaustive()
