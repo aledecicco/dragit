@@ -1,6 +1,6 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { commitHistoryQuery } from '@api/queries'
 import { getPaginatedLength, useRepositoryInfiniteQuery } from '@api/utils'
@@ -22,7 +22,7 @@ const Graph = () => {
         className={clsx(
           'overflow-hidden w-full h-full relative',
           'grid grid-cols-[1fr_max-content_1fr] grid-rows-[max-content_max-content_1fr]',
-          'gap-x-8 place-items-center p-1',
+          'gap-x-8 place-items-center py-1',
         )}
       >
         <BranchSelectors />
@@ -62,11 +62,15 @@ const GraphInner = () => {
     baseBranch?.name,
   )
 
-  const branchLength = Math.min(
-    (commonAncestor?.lastCommit?.distance ?? Number.POSITIVE_INFINITY) + 1,
-    getPaginatedLength(branchHistory),
-  )
-  const baseLength = getPaginatedLength(baseBranchHistory)
+  const branchLength = useMemo(() => {
+    return Math.min(
+      (commonAncestor?.lastCommit?.distance ?? Number.POSITIVE_INFINITY) + 1,
+      getPaginatedLength(branchHistory.data),
+    )
+  }, [commonAncestor, branchHistory.data])
+  const baseLength = useMemo(() => {
+    return getPaginatedLength(baseBranchHistory.data)
+  }, [baseBranchHistory.data])
 
   const virtualizer = useVirtualizer({
     estimateSize: () => NODE_SIZE,
@@ -79,10 +83,12 @@ const GraphInner = () => {
   return (
     <div
       ref={svgOverlay.componentRef}
-      className={clsx('overflow-hidden contain-strict w-full h-full')}
+      className={clsx(
+        'overflow-hidden contain-strict w-full h-full bg-dark-900/50',
+      )}
     >
       <div
-        className={clsx('relative w-full contain-layout bg-dark-700')}
+        className={clsx('relative w-full contain-layout')}
         style={{ height: virtualizer.getTotalSize() }}
       >
         {branch && (

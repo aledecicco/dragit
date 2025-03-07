@@ -1,17 +1,24 @@
 import { Button, type ButtonProps } from '@lib/Button'
 import { type Glyph, Icon } from '@lib/Icon'
+import { Tooltip } from '@lib/Tooltip'
 
-interface IconButtonProps extends Omit<ButtonProps, 'children' | 'rounded'> {
+interface IconButtonProps extends ButtonProps {
   Glyph: Glyph
+  label: string
 }
 
 const IconButton = (props: IconButtonProps) => {
-  const { Glyph, ...buttonProps } = props
+  const { Glyph, label, ...buttonProps } = props
 
   return (
-    <Button {...buttonProps} rounded>
-      <Icon Glyph={Glyph} size={buttonProps.size} />
-    </Button>
+    <Tooltip
+      description={label}
+      anchor={
+        <Button round aria-label={label} {...buttonProps}>
+          <Icon Glyph={Glyph} size={buttonProps.size} />
+        </Button>
+      }
+    />
   )
 }
 

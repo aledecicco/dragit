@@ -14,7 +14,6 @@ import { match } from 'ts-pattern'
 
 import { useAddToIndex } from '@api/commands'
 import type { UnstagedFile } from '@api/models'
-import { IconButton } from '@lib/IconButton'
 import { FileStatusItem } from '../File'
 
 interface UnstagedFileStatusItemProps {
@@ -35,15 +34,14 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
         .with('modified', () => (file.isDir ? IconFolderCode : IconFilePencil))
         .with('typeChanged', () => (file.isDir ? IconFolderCog : IconFileCode2))
         .exhaustive()}
-      actions={
-        <IconButton
-          Glyph={IconPlus}
-          variant="neutral"
-          size="sm"
-          aria-label="Stage file"
-          onClick={() => stage.mutate([file.path])}
-        />
-      }
+      actions={[
+        {
+          Glyph: IconPlus,
+          label: 'Stage',
+          action: () => stage.mutate([file.path]),
+          disabled: stage.isPending,
+        },
+      ]}
     />
   )
 }

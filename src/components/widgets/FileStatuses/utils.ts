@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
 import type {
@@ -9,9 +8,6 @@ import type {
   UnstagedFile,
   UntrackedFile,
 } from '@api/models'
-import { headInfoQuery } from '@api/queries'
-import { useRepositoryQuery } from '@api/utils'
-import { useCurrentDirectory } from '@context/directory'
 
 const getStagedFiles = (files: FileInfo[]): StagedFile[] =>
   files.filter(

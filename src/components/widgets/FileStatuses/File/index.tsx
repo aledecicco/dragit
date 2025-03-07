@@ -1,58 +1,51 @@
+import * as Ariakit from '@ariakit/react'
 import { IconFile, IconFolder } from '@tabler/icons-react'
 import clsx from 'clsx'
-import type { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps } from 'react'
 
 import type { FileInfo } from '@api/models'
-import { Hovercard } from '@lib/Hovercard'
 import { type Glyph, Icon } from '@lib/Icon'
-import { FileStatusMoreInfo } from '../MoreInfo'
+import { Toolbar, type ToolbarTool } from '@lib/Toolbar'
 
-interface FileStatusItemProps extends Omit<ComponentProps<'div'>, 'children'> {
+interface FileStatusItemProps extends ComponentProps<'div'> {
   file: FileInfo
   Glyph: Glyph
-  actions?: ReactNode
+  actions?: ToolbarTool[]
 }
 
 const FileStatusItem = (props: FileStatusItemProps) => {
   const { file, Glyph, actions, ...divProps } = props
 
   return (
-    <Hovercard
-      placement="left"
-      anchor={
+    <Ariakit.CompositeItem
+      render={
         <div
           {...divProps}
           className={clsx(
-            'flex flex-row items-center gap-2 min-w-0 w-max',
+            'flex flex-row items-center justify-between gap-4',
             divProps.className,
           )}
-        >
-          <Icon Glyph={Glyph} size="md" />
-          <p className={clsx('text-sm overflow-hidden overflow-ellipsis')}>
-            {file.path}
-          </p>
-          {actions}
-        </div>
+        />
       }
-      heading={
-        <div className={clsx('flex flex-row items-center gap-1.5')}>
-          {file.isDir ? (
-            <Icon Glyph={IconFolder} size="md" />
-          ) : (
-            <Icon Glyph={IconFile} size="md" />
+    >
+      <div className={clsx('flex flex-row items-center gap-x-1')}>
+        {file.isDir ? (
+          <Icon Glyph={IconFolder} size="md" />
+        ) : (
+          <Icon Glyph={IconFile} size="md" />
+        )}
+        <p
+          className={clsx(
+            'flex flex-row-reverse',
+            'overflow-x-auto pb-2.5 -mb-2.5',
           )}
-          <p
-            className={clsx(
-              'flex flex-row-reverse',
-              'overflow-x-auto pb-2.5 -mb-2.5',
-            )}
-          >
-            {file.path}
-          </p>
-        </div>
-      }
-      description={<FileStatusMoreInfo file={file} />}
-    />
+        >
+          {file.path}
+        </p>
+      </div>
+
+      {actions && <Toolbar tools={actions} size="sm" />}
+    </Ariakit.CompositeItem>
   )
 }
 

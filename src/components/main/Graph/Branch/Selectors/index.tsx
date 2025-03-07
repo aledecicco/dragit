@@ -49,9 +49,9 @@ const BranchSelectors = () => {
 
       <IconButton
         Glyph={IconSwitchHorizontal}
+        label="Switch branch and base branch"
         className={clsx('mx-1 col-start-2 row-start-1')}
         variant="neutral"
-        aria-label="Switch branch and base branch"
         disabled={!branch || !baseBranch}
         size="md"
         onClick={() => {

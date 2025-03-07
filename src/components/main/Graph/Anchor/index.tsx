@@ -31,10 +31,10 @@ const GraphAnchor = (props: GraphAnchorProps) => {
   )
   const anchorParent = useMemo(() => {
     return getNextPaginatedItem(
-      baseHistory,
+      baseHistory.data,
       commonAncestorInfo.commonCommit.distance,
     )
-  }, [baseHistory, commonAncestorInfo])
+  }, [baseHistory.data, commonAncestorInfo])
 
   const branchIsDivergent =
     divergence &&

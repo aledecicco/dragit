@@ -66,7 +66,7 @@ const BranchMessage = (props: PropsWithChildren<{ isBase: boolean }>) => {
     <p
       className={clsx(
         'text-center text-light-500 italic',
-        'self-start  row-start-3 mt-15',
+        'self-start row-start-3 mt-15',
         isBase ? 'col-start-3' : 'col-start-1',
       )}
     >

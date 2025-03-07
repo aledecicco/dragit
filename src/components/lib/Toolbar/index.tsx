@@ -2,9 +2,9 @@ import * as Ariakit from '@ariakit/react'
 import clsx from 'clsx'
 import type { MouseEventHandler } from 'react'
 
-import { Button } from '@lib/Button'
-import { type Glyph, Icon } from '@lib/Icon'
-import { Tooltip } from '@lib/Tooltip'
+import type { Glyph } from '@lib/Icon'
+import { IconButton } from '@lib/IconButton'
+import type { Size } from '@utils/types'
 
 interface ToolbarTool extends Ariakit.ToolbarItemProps {
   Glyph: Glyph
@@ -14,11 +14,12 @@ interface ToolbarTool extends Ariakit.ToolbarItemProps {
 
 interface ToolbarProps extends Ariakit.ToolbarProps {
   tools: ToolbarTool[]
+  size?: Size
   fixed?: boolean
 }
 
 const Toolbar = (props: ToolbarProps) => {
-  const { tools, fixed, ...toolbarProps } = props
+  const { tools, size, fixed, ...toolbarProps } = props
 
   return (
     <Ariakit.ToolbarProvider>
@@ -31,28 +32,25 @@ const Toolbar = (props: ToolbarProps) => {
         )}
       >
         {tools.map(({ Glyph, label, action, ...toolbarItemProps }) => (
-          <Tooltip
+          <Ariakit.ToolbarItem
             key={label}
-            anchor={
-              <Ariakit.ToolbarItem
-                onClick={action}
-                render={
-                  <Button
-                    variant="neutral"
-                    className={clsx(
-                      fixed && '[&]:w-full',
-                      'not-first:rounded-l-none',
-                      'not-last:rounded-r-none not-last:border-r-1 not-last:border-solid not-last:border-dark-950',
-                    )}
-                  />
-                }
-                {...toolbarItemProps}
-                disabled={toolbarProps.disabled || toolbarItemProps.disabled}
-              >
-                <Icon Glyph={Glyph} />
-              </Ariakit.ToolbarItem>
+            onClick={action}
+            render={
+              <IconButton
+                variant="neutral"
+                Glyph={Glyph}
+                label={label}
+                round={false}
+                size={size}
+                className={clsx(
+                  fixed && '[&]:w-full',
+                  'not-first:rounded-l-none',
+                  'not-last:rounded-r-none not-last:border-r-1 not-last:border-solid not-last:border-dark-950',
+                )}
+              />
             }
-            description={label}
+            {...toolbarItemProps}
+            disabled={toolbarProps.disabled || toolbarItemProps.disabled}
           />
         ))}
       </Ariakit.Toolbar>

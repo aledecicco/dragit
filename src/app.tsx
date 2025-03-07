@@ -27,10 +27,8 @@ const AppInner = () => {
   useBranchesSync()
 
   return (
-    <div className={clsx('grid grid-cols-[2fr_6fr] min-h-0 gap-8')}>
-      <FileStatuses
-        className={clsx('justify-self-start min-w-0 overflow-hidden w-full')}
-      />
+    <div className={clsx('grid grid-cols-[2fr_6fr]', 'min-h-0 max-h-full')}>
+      <FileStatuses />
       <Graph />
     </div>
   )

@@ -13,7 +13,6 @@ import { P, match } from 'ts-pattern'
 
 import { useAddToIndex, useRemoveFromTree } from '@api/commands'
 import type { UnmergedFile } from '@api/models'
-import { IconButton } from '@lib/IconButton'
 import { FileStatusItem } from '../File'
 
 interface UnmergedFileStatusItemProps {
@@ -40,32 +39,24 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
           file.isDir ? IconFolderCode : IconFilePencil,
         )
         .exhaustive()}
-      actions={
-        <>
-          <IconButton
-            Glyph={IconCheck}
-            variant="neutral"
-            size="sm"
-            aria-label="Mark conflict as resolved"
-            onClick={() => stage.mutate([file.path])}
-          />
-
-          {match(file.unstaged)
-            .with(
-              P.union('bothDeleted', 'deletedByThem', 'deletedByUs'),
-              () => (
-                <IconButton
-                  Glyph={IconTrash}
-                  variant="neutral"
-                  size="sm"
-                  aria-label="Delete file"
-                  onClick={() => remove.mutate([file.path])}
-                />
-              ),
-            )
-            .otherwise(() => undefined)}
-        </>
-      }
+      actions={[
+        {
+          Glyph: IconCheck,
+          label: 'Mark as resolved',
+          action: () => stage.mutate([file.path]),
+          disabled: stage.isPending,
+        },
+        ...match(file.unstaged)
+          .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => [
+            {
+              Glyph: IconTrash,
+              label: 'Delete',
+              action: () => remove.mutate([file.path]),
+              disabled: remove.isPending,
+            },
+          ])
+          .otherwise(() => []),
+      ]}
     />
   )
 }

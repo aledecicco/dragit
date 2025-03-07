@@ -54,13 +54,13 @@ const GraphBranch = (props: GraphBranchProps) => {
       }
     }
 
-    const commit = getPaginatedItem(history, virtualRow.index)?.hash
+    const commit = getPaginatedItem(history.data, virtualRow.index)?.hash
     if (!commit) {
       return undefined
     }
 
     const parentCommit =
-      getNextPaginatedItem(history, virtualRow.index)?.hash ??
+      getNextPaginatedItem(history.data, virtualRow.index)?.hash ??
       (anchor && anchor.distance > virtualRow.index ? anchor.hash : undefined)
     const parentIsDistantAnchor =
       anchor &&

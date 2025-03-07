@@ -18,7 +18,6 @@ import { match } from 'ts-pattern'
 
 import { useRemoveFromIndex } from '@api/commands'
 import type { StagedFile } from '@api/models'
-import { IconButton } from '@lib/IconButton'
 import { FileStatusItem } from '../File'
 
 interface StagedFileStatusItemProps {
@@ -43,15 +42,14 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
         )
         .with('typeChanged', () => (file.isDir ? IconFolderCog : IconFileCode2))
         .exhaustive()}
-      actions={
-        <IconButton
-          Glyph={IconMinus}
-          variant="neutral"
-          size="sm"
-          aria-label="Unstage file"
-          onClick={() => unstage.mutate([file.path])}
-        />
-      }
+      actions={[
+        {
+          Glyph: IconMinus,
+          label: 'Unstage',
+          action: () => unstage.mutate([file.path]),
+          disabled: unstage.isPending,
+        },
+      ]}
     />
   )
 }

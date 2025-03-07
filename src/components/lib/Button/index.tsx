@@ -6,12 +6,12 @@ import type { Size } from '@utils/types'
 
 interface ButtonProps extends Ariakit.ButtonProps {
   variant: 'primary' | 'cta' | 'neutral' | 'plain'
-  rounded?: boolean
+  round?: boolean
   size?: Size
 }
 
 const Button = (props: ButtonProps) => {
-  const { variant, rounded = false, size = 'md', ...buttonProps } = props
+  const { variant, round = false, size = 'md', ...buttonProps } = props
 
   return (
     <Ariakit.Button
@@ -21,19 +21,19 @@ const Button = (props: ButtonProps) => {
         'flex flex-row justify-center items-center text-center',
         'border-none font-semibold',
         'cursor-pointer active:scale-98',
-        rounded && 'aspect-square',
+        round && 'aspect-square',
         match(size)
           .with('sm', () => [
             'text-sm gap-2',
-            rounded ? 'p-1 rounded-4xl' : 'px-2 py-1.25 rounded-lg',
+            round ? 'p-1 rounded-4xl' : 'px-2 py-1.25 rounded-md',
           ])
           .with('md', () => [
             'text-md gap-2',
-            rounded ? 'p-1.5 rounded-4xl' : 'px-2.5 py-1.75 rounded-lg',
+            round ? 'p-1.5 rounded-4xl' : 'px-2.5 py-1.75 rounded-md',
           ])
           .with('lg', () => [
             'text-lg gap-3',
-            rounded ? 'p-2 rounded-4xl' : 'px-3.5 py-2.25 rounded-lg',
+            round ? 'p-2 rounded-4xl' : 'px-3.5 py-2.25 rounded-md',
           ])
           .exhaustive(),
         variant === 'primary' && [
