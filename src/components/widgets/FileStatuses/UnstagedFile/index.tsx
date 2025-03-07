@@ -27,7 +27,26 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
   return (
     <FileStatusItem
       file={file}
-      className={clsx('text-danger-700')}
+      className={clsx('text-light-600')}
+      statusMessage={
+        <p className={clsx('text-xs text-light-950')}>
+          -{' '}
+          {match(file.unstaged)
+            .with('added', () =>
+              file.isDir ? 'Directory created' : 'File created',
+            )
+            .with('deleted', () =>
+              file.isDir ? 'Directory deleted' : 'File deleted',
+            )
+            .with('modified', () =>
+              file.isDir ? 'Directory modified' : 'File modified',
+            )
+            .with('typeChanged', () =>
+              file.isDir ? 'Directory type changed' : 'File type changed',
+            )
+            .exhaustive()}
+        </p>
+      }
       Glyph={match(file.unstaged)
         .with('added', () => (file.isDir ? IconFolderPlus : IconFilePlus))
         .with('deleted', () => (file.isDir ? IconFolderMinus : IconFileMinus))

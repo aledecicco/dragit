@@ -5,12 +5,11 @@ import { type ComponentProps, type ReactNode, useState } from 'react'
 
 import { Icon } from '@lib/Icon'
 
-interface AccordionSection extends Ariakit.DisclosureProps {
+interface AccordionSection extends Ariakit.DisclosureContentProps {
   id: string
   label: ReactNode
   extraInfo?: ReactNode
   description: ReactNode
-  defaultOpen?: Ariakit.DisclosureProviderProps['defaultOpen']
 }
 
 interface AccordionProps extends ComponentProps<'div'> {
@@ -30,26 +29,19 @@ const Accordion = (props: AccordionProps) => {
           <div
             {...divProps}
             className={clsx(
-              'flex flex-col bg-dark-500 overflow-hidden',
+              'flex flex-col bg-dark-600 overflow-hidden',
               divProps.className,
             )}
           />
         }
       >
         {sections.map((section) => {
-          const {
-            id,
-            label,
-            extraInfo,
-            description,
-            defaultOpen,
-            ...disclosureProps
-          } = section
+          const { id, label, extraInfo, description, ...contentProps } = section
 
           return (
             <Ariakit.DisclosureProvider
               key={id}
-              defaultOpen={defaultOpen}
+              defaultOpen
               {...(oneAtATime && {
                 open: expanded === id,
                 setOpen: (open) => {
@@ -71,14 +63,12 @@ const Accordion = (props: AccordionProps) => {
                   tabbable
                   render={
                     <Ariakit.Disclosure
-                      {...disclosureProps}
                       className={clsx(
                         'cursor-pointer w-full group',
                         'text-sm text-light-900 text-start',
                         'p-2 flex flex-row gap-x-2 items-center',
                         'hover:text-light-700 hover:underline',
                         'aria-disabled:text-light-950',
-                        disclosureProps.className,
                       )}
                     />
                   }
@@ -97,9 +87,11 @@ const Accordion = (props: AccordionProps) => {
 
               <Ariakit.DisclosureContent
                 unmountOnHide
+                {...contentProps}
                 className={clsx(
-                  'w-full overflow-y-auto grow',
-                  'bg-dark-600 rounded-sm py-2 px-6',
+                  'overflow-y-auto grow',
+                  'w-full bg-dark-700 rounded-sm p-2',
+                  contentProps.className,
                 )}
               >
                 {description}

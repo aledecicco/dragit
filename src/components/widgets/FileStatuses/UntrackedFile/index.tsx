@@ -20,12 +20,12 @@ const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
   return (
     <FileStatusItem
       file={file}
-      className={clsx('text-light-600')}
+      className={clsx('text-light-950/90')}
       Glyph={file.isDir ? IconFolderQuestion : IconFileUnknown}
       actions={[
         {
           Glyph: IconPlus,
-          label: 'Stage',
+          label: 'Start tracking',
           action: () => stage.mutate([file.path]),
           disabled: stage.isPending,
         },

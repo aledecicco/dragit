@@ -31,9 +31,13 @@ const FileStatuses = (props: FileStatusesProps) => {
     return (
       <div
         {...divProps}
-        className={clsx('h-full bg-dark-500', divProps.className)}
+        className={clsx(
+          'h-full bg-dark-500',
+          'flex flex-col items-center justify-center',
+          divProps.className,
+        )}
       >
-        <p className={clsx('text-sm italic text-light-600')}>
+        <p className={clsx('text-sm italic text-light-950')}>
           Loading files...
         </p>
       </div>
@@ -46,7 +50,7 @@ const FileStatuses = (props: FileStatusesProps) => {
     <Accordion
       {...divProps}
       showArrows
-      className={clsx('', divProps.className)}
+      className={clsx(divProps.className)}
       sections={[
         {
           id: 'untracked',
@@ -56,7 +60,7 @@ const FileStatuses = (props: FileStatusesProps) => {
               round={false}
               Glyph={IconPlaylistAdd}
               variant="neutral"
-              label="Stage all"
+              label="Start tracking all"
               size="sm"
               disabled={files.untracked.length === 0 || stage.isPending}
               onClick={() => {
@@ -71,11 +75,11 @@ const FileStatuses = (props: FileStatusesProps) => {
             files.untracked,
             (file) => <UntrackedFileStatusItem key={file.path} file={file} />,
           ),
-          defaultOpen: files.untracked.length > 0,
+          className: 'flex flex-col gap-2 p-2 min-h-30',
         },
         {
           id: 'unmerged',
-          label: <>Unmerged files ({files.unmerged.length})</>,
+          label: <>Unmerged changes ({files.unmerged.length})</>,
           extraInfo: (
             <IconButton
               round={false}
@@ -94,11 +98,11 @@ const FileStatuses = (props: FileStatusesProps) => {
             files.unmerged,
             (file) => <UnmergedFileStatusItem key={file.path} file={file} />,
           ),
-          defaultOpen: files.unmerged.length > 0,
+          className: 'flex flex-col gap-2 p-2 min-h-30',
         },
         {
           id: 'unstaged',
-          label: <>Unstaged files ({files.unstaged.length})</>,
+          label: <>Unstaged changes ({files.unstaged.length})</>,
           extraInfo: (
             <IconButton
               round={false}
@@ -117,11 +121,11 @@ const FileStatuses = (props: FileStatusesProps) => {
             files.unstaged,
             (file) => <UnstagedFileStatusItem key={file.path} file={file} />,
           ),
-          defaultOpen: files.unstaged.length > 0,
+          className: 'flex flex-col gap-2 p-2 min-h-30',
         },
         {
           id: 'staged',
-          label: <>Staged files ({files.staged.length})</>,
+          label: <>Staged changes ({files.staged.length})</>,
           extraInfo: (
             <IconButton
               round={false}
@@ -140,7 +144,7 @@ const FileStatuses = (props: FileStatusesProps) => {
             files.staged,
             (file) => <StagedFileStatusItem key={file.path} file={file} />,
           ),
-          defaultOpen: files.staged.length > 0,
+          className: 'flex flex-col gap-2 p-2 min-h-30',
         },
       ]}
     />

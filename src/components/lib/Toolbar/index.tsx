@@ -26,7 +26,7 @@ const Toolbar = (props: ToolbarProps) => {
       <Ariakit.Toolbar
         {...toolbarProps}
         className={clsx(
-          'p-1 grid grid-flow-col',
+          'grid grid-flow-col',
           fixed ? 'auto-cols-fr' : 'auto-cols-max',
           toolbarProps.className,
         )}

@@ -1,9 +1,11 @@
 import {
   IconCheck,
+  IconFileAlert,
   IconFileMinus,
   IconFilePencil,
   IconFilePlus,
   IconFolderCode,
+  IconFolderExclamation,
   IconFolderMinus,
   IconFolderPlus,
   IconTrash,
@@ -27,18 +29,25 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
   return (
     <FileStatusItem
       file={file}
-      className={clsx('text-warning-300')}
-      Glyph={match(file.unstaged)
-        .with(P.union('addedByThem', 'addedByUs', 'bothAdded'), () =>
-          file.isDir ? IconFolderPlus : IconFilePlus,
-        )
-        .with(P.union('deletedByThem', 'deletedByUs', 'bothDeleted'), () =>
-          file.isDir ? IconFolderMinus : IconFileMinus,
-        )
-        .with('bothModified', () =>
-          file.isDir ? IconFolderCode : IconFilePencil,
-        )
-        .exhaustive()}
+      className={clsx('text-light-600')}
+      Glyph={file.isDir ? IconFolderExclamation : IconFileAlert}
+      statusMessage={
+        <p className={clsx('text-xs text-warning-400/50')}>
+          -{' '}
+          {match(file.unstaged)
+            .with('addedByThem', () => 'Added by incoming changes')
+            .with('addedByUs', () => 'Added by local changes')
+            .with('bothAdded', () => 'Added by local and incoming changes')
+            .with('deletedByThem', () => 'Deleted by incoming changes')
+            .with('deletedByUs', () => 'Deleted by local changes')
+            .with('bothDeleted', () => 'Deleted by local and incoming changes')
+            .with(
+              'bothModified',
+              () => 'Modified by local and incoming changes',
+            )
+            .exhaustive()}
+        </p>
+      }
       actions={[
         {
           Glyph: IconCheck,

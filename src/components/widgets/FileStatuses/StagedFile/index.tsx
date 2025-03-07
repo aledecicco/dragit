@@ -31,7 +31,30 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
   return (
     <FileStatusItem
       file={file}
-      className={clsx('text-success-300')}
+      className={clsx('text-light-600')}
+      statusMessage={
+        <p className={clsx('text-xs text-success-300/80')}>
+          -{' '}
+          {match(file.staged)
+            .with('added', () => (file.isDir ? 'Folder added' : 'File added'))
+            .with('deleted', () =>
+              file.isDir ? 'Folder deleted' : 'File deleted',
+            )
+            .with('modified', () =>
+              file.isDir ? 'Folder modified' : 'File modified',
+            )
+            .with('copied', () =>
+              file.isDir ? 'Folder copied from' : 'File copied from',
+            )
+            .with('renamed', () =>
+              file.isDir ? 'Folder renamed from' : 'File renamed from',
+            )
+            .with('typeChanged', () =>
+              file.isDir ? 'Folder type changed' : 'File type changed',
+            )
+            .exhaustive()}
+        </p>
+      }
       Glyph={match(file.staged)
         .with('added', () => (file.isDir ? IconFolderPlus : IconFilePlus))
         .with('deleted', () => (file.isDir ? IconFolderMinus : IconFileMinus))
