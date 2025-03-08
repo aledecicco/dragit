@@ -4,7 +4,6 @@ import type { ComponentProps } from 'react'
 
 import { branchesQuery } from '@api/queries'
 import { useRepositoryQuery } from '@api/utils'
-import { useSelectedBranches } from '@context/branches'
 import { Accordion } from '@lib/Accordion'
 import { mapOr } from '@utils/array'
 import { BranchesListItem } from './Item'
@@ -14,7 +13,6 @@ interface BranchesListProps extends ComponentProps<'div'> {}
 const BranchesList = (props: BranchesListProps) => {
   const { ...divProps } = props
 
-  const { branch: currentBranch } = useSelectedBranches()
   const branches = useRepositoryQuery(branchesQuery)
   const composite = Ariakit.useCompositeStore({ focusLoop: true })
 
@@ -47,18 +45,7 @@ const BranchesList = (props: BranchesListProps) => {
           description: mapOr(
             <p className={clsx('text-sm text-light-950')}>No branches found</p>,
             branches.data,
-            (branch) => (
-              <BranchesListItem
-                key={branch.name}
-                branch={branch}
-                className={clsx(
-                  branch &&
-                    currentBranch &&
-                    branch.name === currentBranch.name &&
-                    '[&]:bg-dark-500 border-1 border-primary-400',
-                )}
-              />
-            ),
+            (branch) => <BranchesListItem key={branch.name} branch={branch} />,
           ),
           render: (
             <Ariakit.Composite

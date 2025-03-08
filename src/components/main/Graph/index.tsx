@@ -22,7 +22,7 @@ const Graph = () => {
         className={clsx(
           'overflow-hidden w-full h-full relative',
           'grid grid-cols-[1fr_max-content_1fr] grid-rows-[max-content_max-content_1fr]',
-          'gap-x-8 place-items-center py-1',
+          'gap-y-1 gap-x-8 place-items-center py-1',
         )}
       >
         <BranchSelectors />

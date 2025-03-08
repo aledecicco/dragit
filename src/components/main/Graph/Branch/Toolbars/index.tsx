@@ -50,22 +50,6 @@ const BranchToolbars = () => {
             className: '[&]:w-17',
             disabled: pushBranch.isPending,
           },
-          {
-            Glyph: IconUpload,
-            label: 'Force',
-            action: () => {
-              if (branch?.type === 'local') {
-                pushBranch.mutate({
-                  branch: branch.name,
-                  remote: branch.remote?.remoteName ?? 'origin',
-                  remoteBranch: branch.remote?.branchName ?? branch.name,
-                  isForce: true,
-                })
-              }
-            },
-            className: '[&]:w-17',
-            disabled: pushBranch.isPending,
-          },
         ]}
       />
 
@@ -76,7 +60,7 @@ const BranchToolbars = () => {
             Glyph: IconRefresh,
             label: 'Fetch all',
             action: () => {
-              fetchRemote.mutate('origin')
+              fetchRemote.mutate('--all')
             },
             className: '[&]:w-20',
             disabled: fetchRemote.isPending,
@@ -116,23 +100,6 @@ const BranchToolbars = () => {
                   remoteBranch:
                     baseBranch.remote?.branchName ?? baseBranch.name,
                   isForce: false,
-                })
-              }
-            },
-            className: '[&]:w-17',
-            disabled: pushBranch.isPending,
-          },
-          {
-            Glyph: IconUpload,
-            label: 'Force',
-            action: () => {
-              if (baseBranch?.type === 'local') {
-                pushBranch.mutate({
-                  branch: baseBranch.name,
-                  remote: baseBranch.remote?.remoteName ?? 'origin',
-                  remoteBranch:
-                    baseBranch.remote?.branchName ?? baseBranch.name,
-                  isForce: true,
                 })
               }
             },

@@ -1,11 +1,20 @@
 import * as Ariakit from '@ariakit/react'
-import { IconDownload, IconGitBranch, IconUpload } from '@tabler/icons-react'
+import {
+  IconDownload,
+  IconGitBranch,
+  IconLocation,
+  IconLocationFilled,
+  IconMapPin,
+  IconMapPinFilled,
+  IconUpload,
+} from '@tabler/icons-react'
 import clsx from 'clsx'
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
 import { usePullBranch, usePushBranch } from '@api/commands'
 import type { BranchInfo, BranchName, RefName } from '@api/models'
+import { useSelectedBranches } from '@context/branches'
 import { Button } from '@lib/Button'
 import { Icon } from '@lib/Icon'
 import { Toolbar } from '@lib/Toolbar'
@@ -27,15 +36,21 @@ const BranchesListItem = (props: BranchesListItemProps) => {
   const pushBranch = usePushBranch()
   const pullBranch = usePullBranch()
 
+  const { branch: currentBranch } = useSelectedBranches()
+  const isCurrentBranch = currentBranch && branch.name === currentBranch.name
+
   return (
     <Ariakit.CompositeItem
+      id={BRANCHES_LIST_ITEM_ID(branch.name)}
       render={
         <div
+          aria-selected={isCurrentBranch}
           {...divProps}
-          id={BRANCHES_LIST_ITEM_ID(branch.name)}
           className={clsx(
             'flex flex-row items-center justify-between gap-4',
             'p-1.5 bg-dark-600 rounded-xs',
+            'focus:bg-dark-500 data-focus:bg-dark-500',
+            isCurrentBranch && '[&]:bg-dark-500 border-1 border-accent-300',
             divProps.className,
           )}
         />
@@ -55,6 +70,14 @@ const BranchesListItem = (props: BranchesListItemProps) => {
           >
             {branch.name}
           </p>
+
+          {isCurrentBranch && (
+            <Icon
+              Glyph={IconLocationFilled}
+              size="sm"
+              className={clsx('text-accent-400/90')}
+            />
+          )}
         </div>
 
         <p className={clsx('text-xs text-light-950')}>
