@@ -49,6 +49,24 @@ const BranchToolbars = () => {
             },
             className: '[&]:w-17',
             disabled: pushBranch.isPending,
+            otherActions: [
+              {
+                Glyph: IconUpload,
+                label: 'Force push this branch right now',
+                action: () => {
+                  if (branch?.type === 'local') {
+                    pushBranch.mutate({
+                      branch: branch.name,
+                      remote: branch.remote?.remoteName ?? 'origin',
+                      remoteBranch: branch.remote?.branchName ?? branch.name,
+                      isForce: true,
+                    })
+                  }
+                },
+                className: '[&]:w-17',
+                disabled: pushBranch.isPending,
+              },
+            ],
           },
         ]}
       />
@@ -60,7 +78,7 @@ const BranchToolbars = () => {
             Glyph: IconRefresh,
             label: 'Fetch all',
             action: () => {
-              fetchRemote.mutate('--all')
+              fetchRemote.mutate('origin')
             },
             className: '[&]:w-20',
             disabled: fetchRemote.isPending,
@@ -105,6 +123,25 @@ const BranchToolbars = () => {
             },
             className: '[&]:w-17',
             disabled: pushBranch.isPending,
+            otherActions: [
+              {
+                Glyph: IconUpload,
+                label: 'Force push',
+                action: () => {
+                  if (baseBranch?.type === 'local') {
+                    pushBranch.mutate({
+                      branch: baseBranch.name,
+                      remote: baseBranch.remote?.remoteName ?? 'origin',
+                      remoteBranch:
+                        baseBranch.remote?.branchName ?? baseBranch.name,
+                      isForce: true,
+                    })
+                  }
+                },
+                className: '[&]:w-17',
+                disabled: pushBranch.isPending,
+              },
+            ],
           },
         ]}
       />

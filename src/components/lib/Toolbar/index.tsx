@@ -4,12 +4,14 @@ import type { MouseEventHandler } from 'react'
 
 import type { Glyph } from '@lib/Icon'
 import { IconButton } from '@lib/IconButton'
+import { SplitButton, type SplitButtonItem } from '@lib/SplitButton'
 import type { Size } from '@utils/types'
 
 interface ToolbarTool extends Ariakit.ToolbarItemProps {
   Glyph: Glyph
   label: string
   action: MouseEventHandler<HTMLButtonElement>
+  otherActions?: SplitButtonItem[]
 }
 
 interface ToolbarProps extends Ariakit.ToolbarProps {
@@ -19,7 +21,7 @@ interface ToolbarProps extends Ariakit.ToolbarProps {
 }
 
 const Toolbar = (props: ToolbarProps) => {
-  const { tools, size, fixed, ...toolbarProps } = props
+  const { tools, size = 'md', fixed, ...toolbarProps } = props
 
   return (
     <Ariakit.ToolbarProvider>
@@ -31,28 +33,51 @@ const Toolbar = (props: ToolbarProps) => {
           toolbarProps.className,
         )}
       >
-        {tools.map(({ Glyph, label, action, ...toolbarItemProps }) => (
-          <Ariakit.ToolbarItem
-            key={label}
-            onClick={action}
-            render={
-              <IconButton
-                variant="neutral"
-                Glyph={Glyph}
-                label={label}
-                round={false}
-                size={size}
-                className={clsx(
-                  fixed && '[&]:w-full',
-                  'not-first:rounded-l-none',
-                  'not-last:rounded-r-none not-last:border-r-1 not-last:border-solid not-last:border-dark-950',
-                )}
-              />
-            }
-            {...toolbarItemProps}
-            disabled={toolbarProps.disabled || toolbarItemProps.disabled}
-          />
-        ))}
+        {tools.map(
+          ({ Glyph, label, action, otherActions, ...toolbarItemProps }) => (
+            <Ariakit.ToolbarItem
+              key={label}
+              onClick={action}
+              render={
+                otherActions?.length ? (
+                  <SplitButton
+                    items={otherActions}
+                    variant="neutral"
+                    Glyph={Glyph}
+                    label={label}
+                    round={false}
+                    size={size}
+                    className={clsx(
+                      fixed && '[&]:w-full',
+                      'group-not-first:rounded-l-none',
+                    )}
+                    menuButtonProps={{
+                      className:
+                        'group-not-last:rounded-r-none group-not-last:border-r-1 not-last:border-solid not-last:border-r-dark-600',
+                      disabled:
+                        toolbarProps.disabled || toolbarItemProps.disabled,
+                    }}
+                  />
+                ) : (
+                  <IconButton
+                    variant="neutral"
+                    Glyph={Glyph}
+                    label={label}
+                    round={false}
+                    size={size}
+                    className={clsx(
+                      fixed && '[&]:w-full',
+                      'not-first:rounded-l-none',
+                      'not-last:rounded-r-none not-last:border-r-1 not-last:border-solid not-last:border-r-dark-600',
+                    )}
+                  />
+                )
+              }
+              {...toolbarItemProps}
+              disabled={toolbarProps.disabled || toolbarItemProps.disabled}
+            />
+          ),
+        )}
       </Ariakit.Toolbar>
     </Ariakit.ToolbarProvider>
   )
