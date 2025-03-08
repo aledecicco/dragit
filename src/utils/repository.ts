@@ -1,12 +1,6 @@
 import { P, match } from 'ts-pattern'
 
-import type {
-  BranchInfo,
-  BranchName,
-  HeadInfo,
-  RefName,
-  RemoteName,
-} from '@api/models'
+import type { BranchInfo, BranchName, HeadInfo, RefName } from '@api/models'
 import { idFn, mapFn } from './types'
 
 const getCurrentBranchName = (

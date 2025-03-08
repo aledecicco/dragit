@@ -19,6 +19,9 @@ pub enum AppEvent {
     /// Non-git file/s were created, deleted, or updated.
     FilesModified,
 
+    /// The config file was updated.
+    ConfigUpdated,
+
     /// The status of the current commit was updated.
     IndexUpdated,
 }

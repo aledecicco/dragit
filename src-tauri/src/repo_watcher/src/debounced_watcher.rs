@@ -14,8 +14,8 @@ use tauri::{AppHandle, Emitter};
 use models::{AppEvent, RepoWatcher, RepoWatcherError};
 
 use crate::{
-    get_branches_folder, get_git_folder, get_head_file, get_index_file, get_objects_folder,
-    get_remotes_folder,
+    get_branches_folder, get_config_folder, get_git_folder, get_head_file, get_index_file,
+    get_objects_folder, get_remotes_folder,
 };
 
 /// Implementation of [`RepoWatcher`] that uses a debouncer to group events.
@@ -45,6 +45,7 @@ impl DebouncedWatcher {
             let head_file = get_head_file(repo_path);
             let branches_folder = get_branches_folder(repo_path);
             let remotes_folder = get_remotes_folder(repo_path);
+            let config_folder = get_config_folder(repo_path);
             let objects_folder = get_objects_folder(repo_path);
             let index_file = get_index_file(repo_path);
 
@@ -53,6 +54,7 @@ impl DebouncedWatcher {
                     let mut files_modified = false;
                     let mut head_changed = false;
                     let mut git_folder_modified = false;
+                    let mut config_updated = false;
                     let mut index_updated = false;
                     let mut branches_list_updated = false;
 
@@ -66,6 +68,10 @@ impl DebouncedWatcher {
                             .any(|path| !path.starts_with(&git_folder))
                         {
                             files_modified = true;
+                        }
+
+                        if event.paths.contains(&config_folder) {
+                            config_updated = true;
                         }
 
                         if event.paths.contains(&objects_folder) {
@@ -158,6 +164,10 @@ impl DebouncedWatcher {
 
                     if git_folder_modified {
                         let _ = app_handle.emit(EVENT_ID, AppEvent::GitFolderModified);
+                    }
+
+                    if config_updated {
+                        let _ = app_handle.emit(EVENT_ID, AppEvent::ConfigUpdated);
                     }
 
                     if index_updated {

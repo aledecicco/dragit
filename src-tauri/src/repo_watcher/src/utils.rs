@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 static GIT_FOLDER_NAME: &str = ".git";
+static CONFIG_FOLDER_NAME: &str = "config";
 static OBJECTS_FOLDER_NAME: &str = "objects";
 static INDEX_FILE_NAME: &str = "index";
 static HEAD_FILE_NAME: &str = "HEAD";
@@ -14,6 +15,10 @@ pub(crate) fn get_git_folder(repo_path: &Path) -> PathBuf {
 
 pub(crate) fn get_head_file(repo_path: &Path) -> PathBuf {
     get_git_folder(repo_path).join(HEAD_FILE_NAME)
+}
+
+pub(crate) fn get_config_folder(repo_path: &Path) -> PathBuf {
+    get_git_folder(repo_path).join(CONFIG_FOLDER_NAME)
 }
 
 pub(crate) fn get_objects_folder(repo_path: &Path) -> PathBuf {

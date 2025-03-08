@@ -26,7 +26,7 @@ const ancestorNotInRange = (
 ): boolean => {
   return (
     !items.find((virtualRow) => virtualRow.index === ancestorDistance) ||
-    getPaginatedLength(history) <= ancestorDistance
+    getPaginatedLength(history.data) <= ancestorDistance
   )
 }
 
@@ -48,7 +48,7 @@ const useInfiniteScroll = (
     if (
       (!fetchCondition || fetchCondition()) &&
       lastItem &&
-      lastItem.index >= getPaginatedLength(history) - 1 &&
+      lastItem.index >= getPaginatedLength(history.data) - 1 &&
       history.hasNextPage &&
       !history.isFetchingNextPage
     ) {

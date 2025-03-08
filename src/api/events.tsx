@@ -3,10 +3,9 @@ import { listen } from '@tauri-apps/api/event'
 import { type PropsWithChildren, useEffect } from 'react'
 import { P, match } from 'ts-pattern'
 
+import { useSelectedBranches } from '@context/branches'
 import { useCurrentDirectory, useDirectoryIsOpen } from '@context/directory'
-import { getCurrentBranchName } from '@utils/repository'
-import { headInfoQuery, queryKeys } from './queries'
-import { useRepositoryQuery } from './utils'
+import { queryKeys } from './queries'
 
 const EventHandler = (props: PropsWithChildren) => {
   const { children } = props
@@ -31,7 +30,7 @@ const EventHandler = (props: PropsWithChildren) => {
 const EventHandlerInner = (props: PropsWithChildren) => {
   const { children } = props
   const client = useQueryClient()
-  const headInfo = useRepositoryQuery(headInfoQuery)
+  const { branch: currentBranch } = useSelectedBranches()
   const currentDir = useCurrentDirectory()
 
   useEffect(() => {
@@ -48,6 +47,8 @@ const EventHandlerInner = (props: PropsWithChildren) => {
         .with(
           { type: 'branchUpdated', name: P.string.select() },
           (branchName) => {
+            console.log(branchName)
+
             client.invalidateQueries({
               queryKey: [
                 queryKeys.directory.commitHistory.branch(
@@ -93,8 +94,7 @@ const EventHandlerInner = (props: PropsWithChildren) => {
               ],
             })
 
-            const currentBranch = getCurrentBranchName(headInfo.data)
-            if (currentBranch === branchName) {
+            if (currentBranch && currentBranch.name === branchName) {
               client.invalidateQueries({
                 queryKey: [queryKeys.directory.headInfo(currentDir)],
               })
@@ -111,6 +111,11 @@ const EventHandlerInner = (props: PropsWithChildren) => {
             queryKey: [queryKeys.directory.headInfo(currentDir)],
           })
         })
+        .with({ type: 'configUpdated' }, () => {
+          client.invalidateQueries({
+            queryKey: [queryKeys.directory.branches.list(currentDir)],
+          })
+        })
         .with({ type: 'indexUpdated' }, () => {
           client.invalidateQueries({
             queryKey: [queryKeys.directory.headInfo(currentDir)],
@@ -121,7 +126,7 @@ const EventHandlerInner = (props: PropsWithChildren) => {
     return () => {
       unlisten.then((f) => f())
     }
-  }, [client, currentDir, headInfo.data])
+  }, [client, currentDir, currentBranch])
 
   return children
 }
