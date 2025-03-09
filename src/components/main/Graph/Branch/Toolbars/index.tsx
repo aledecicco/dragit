@@ -15,7 +15,8 @@ const BranchToolbars = () => {
   return (
     <>
       <Toolbar
-        className={clsx('col-start-1 row-start-2')}
+        fixed
+        className={clsx('col-start-1 row-start-2 w-40')}
         disabled={!branch || branch.type !== 'local'}
         tools={[
           {
@@ -31,7 +32,6 @@ const BranchToolbars = () => {
                 })
               }
             },
-            className: '[&]:w-17',
             disabled: pullBranch.isPending,
           },
           {
@@ -47,7 +47,6 @@ const BranchToolbars = () => {
                 })
               }
             },
-            className: '[&]:w-17',
             disabled: pushBranch.isPending,
             alternatives: [
               {
@@ -71,7 +70,8 @@ const BranchToolbars = () => {
       />
 
       <Toolbar
-        className={clsx('col-start-2 row-start-2')}
+        fixed
+        className={clsx('col-start-2 row-start-2 w-20')}
         tools={[
           {
             Glyph: IconRefresh,
@@ -79,14 +79,14 @@ const BranchToolbars = () => {
             action: () => {
               fetchRemote.mutate('origin')
             },
-            className: '[&]:w-20',
             disabled: fetchRemote.isPending,
           },
         ]}
       />
 
       <Toolbar
-        className={clsx('col-start-3 row-start-2')}
+        fixed
+        className={clsx('col-start-3 row-start-2 w-40')}
         disabled={!baseBranch || baseBranch.type !== 'local'}
         tools={[
           {
@@ -103,7 +103,6 @@ const BranchToolbars = () => {
                 })
               }
             },
-            className: '[&]:w-17',
             disabled: pullBranch.isPending,
           },
           {
@@ -120,7 +119,6 @@ const BranchToolbars = () => {
                 })
               }
             },
-            className: '[&]:w-17',
             disabled: pushBranch.isPending,
             alternatives: [
               {

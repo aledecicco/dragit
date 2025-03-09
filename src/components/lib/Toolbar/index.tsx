@@ -50,6 +50,7 @@ const Toolbar = (props: ToolbarProps) => {
                 toolProps.className,
               )}
               buttonProps={{
+                className: clsx(fixed && '[&]:pr-0'),
                 render: (
                   <Ariakit.ToolbarItem
                     render={
@@ -59,6 +60,7 @@ const Toolbar = (props: ToolbarProps) => {
                         label={label}
                         variant="neutral"
                         round={false}
+                        size={size}
                       />
                     }
                     disabled={toolbarProps.disabled || toolProps.disabled}

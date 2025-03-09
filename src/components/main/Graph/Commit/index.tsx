@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import type { ComponentProps } from 'react'
+import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
 
 import type { BranchName, CommitId } from '@api/models'
@@ -7,7 +8,6 @@ import { commitInfoQuery } from '@api/queries'
 import { useRepositoryQuery } from '@api/utils'
 import { Hovercard, HovercardDisclosure } from '@lib/Hovercard'
 import { makeTracked } from '@main/SvgOverlay'
-import { useCombinedRef } from '@utils/hooks'
 import { GraphCommitInfo } from '../CommitInfo'
 import type { ParentCommitType } from '../Edges'
 
@@ -30,8 +30,6 @@ const GraphCommit = makeTracked<
   const { commitId, commitType, trackRef, ...divProps } = props
   const commitInfo = useRepositoryQuery(commitInfoQuery, commitId)
 
-  const ref = useCombinedRef(divProps.ref)
-
   return (
     <Hovercard
       className={clsx('p-4')}
@@ -39,7 +37,7 @@ const GraphCommit = makeTracked<
       anchor={
         <div
           {...divProps}
-          ref={ref}
+          ref={mergeRefs([trackRef, divProps.ref])}
           className={clsx(
             'flex flex-row items-center gap-5',
             'cursor-pointer',

@@ -1,11 +1,11 @@
 import * as Ariakit from '@ariakit/react'
 import clsx from 'clsx'
-import type { ComponentProps, MouseEventHandler } from 'react'
+import { type ComponentProps, type MouseEventHandler, useRef } from 'react'
 import { match } from 'ts-pattern'
 
 import { Button, type ButtonOwnProps } from '@lib/Button'
 import { type Glyph, Icon } from '@lib/Icon'
-import { useCombinedRef } from '@utils/hooks'
+import { mergeRefs } from 'react-merge-refs'
 
 interface SplitButtonMenuItem extends Ariakit.MenuItemProps {
   Glyph?: Glyph
@@ -33,12 +33,12 @@ const SplitButton = (props: SplitButtonProps) => {
     ...divProps
   } = props
 
-  const ref = useCombinedRef(divProps.ref)
+  const anchorRef = useRef<HTMLDivElement>(null)
 
   return (
     <div
       {...divProps}
-      ref={ref}
+      ref={mergeRefs([anchorRef, divProps.ref])}
       className={clsx(
         'flex flex-row items-stretch rounded-md',
         divProps.className,
@@ -53,7 +53,11 @@ const SplitButton = (props: SplitButtonProps) => {
         className={clsx(
           'rounded-l-[inherit] rounded-r-none grow',
           'border-r-1 border-solid border-r-dark-400',
-          'pr-0',
+          match(size)
+            .with('sm', () => 'pr-1')
+            .with('md', () => 'pr-1.5')
+            .with('lg', () => 'pr-2')
+            .exhaustive(),
           buttonProps?.className,
         )}
       />
@@ -87,6 +91,20 @@ const SplitButton = (props: SplitButtonProps) => {
           gutter={4}
           portal
           unmountOnHide
+          getAnchorRect={() => {
+            const rect = anchorRef.current?.getBoundingClientRect()
+
+            if (!rect) {
+              return null
+            }
+
+            return {
+              x: rect.x,
+              y: rect.y,
+              width: rect.width,
+              height: rect.height,
+            }
+          }}
           className={clsx('rounded-lg shadow-md p-1', 'bg-dark-300')}
         >
           {items.map((menuItem) => {
@@ -99,7 +117,7 @@ const SplitButton = (props: SplitButtonProps) => {
                 onClick={action}
                 {...menuItemProps}
                 className={clsx(
-                  'flex flex-row items-center gap-x-2',
+                  'flex flex-row items-center gap-x-2 text-nowrap',
                   'rounded-sm text-light-100',
                   match(size)
                     .with('sm', () => 'text-xs p-1')
