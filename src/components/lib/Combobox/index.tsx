@@ -74,6 +74,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
           />
         </Ariakit.Select>
         <Ariakit.SelectPopover
+          unmountOnHide
           portal
           sameWidth
           gutter={4}

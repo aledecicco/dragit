@@ -4,11 +4,13 @@ import { match } from 'ts-pattern'
 
 import type { Size } from '@utils/types'
 
-interface ButtonProps extends Ariakit.ButtonProps {
+interface ButtonOwnProps {
   variant: 'primary' | 'cta' | 'neutral' | 'plain'
   round?: boolean
   size?: Size
 }
+
+type ButtonProps = ButtonOwnProps & Ariakit.ButtonProps
 
 const Button = (props: ButtonProps) => {
   const { variant, round = false, size = 'sm', ...buttonProps } = props
@@ -17,7 +19,7 @@ const Button = (props: ButtonProps) => {
     <Ariakit.Button
       {...buttonProps}
       className={clsx(
-        'w-max h-max',
+        'w-max',
         'flex flex-row justify-center items-center text-center',
         'border-none font-semibold',
         'cursor-pointer active:scale-98',
@@ -66,4 +68,4 @@ const Button = (props: ButtonProps) => {
   )
 }
 
-export { Button, type ButtonProps }
+export { Button, type ButtonProps, type ButtonOwnProps }

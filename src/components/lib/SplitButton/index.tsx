@@ -1,45 +1,61 @@
 import * as Ariakit from '@ariakit/react'
 import clsx from 'clsx'
-import type { MouseEventHandler } from 'react'
-
-import { Button, type ButtonProps } from '@lib/Button'
-import { type Glyph, Icon } from '@lib/Icon'
-import { IconButton, type IconButtonProps } from '@lib/IconButton'
+import type { ComponentProps, MouseEventHandler } from 'react'
 import { match } from 'ts-pattern'
 
-interface SplitButtonItem extends Ariakit.MenuItemProps {
+import { Button, type ButtonOwnProps } from '@lib/Button'
+import { type Glyph, Icon } from '@lib/Icon'
+import { useCombinedRef } from '@utils/hooks'
+
+interface SplitButtonMenuItem extends Ariakit.MenuItemProps {
   Glyph?: Glyph
   label: string
   action: MouseEventHandler<HTMLDivElement>
 }
 
-interface SplitButtonProps extends IconButtonProps {
-  items: SplitButtonItem[]
-  menuButtonProps?: Partial<ButtonProps>
+interface SplitButtonProps
+  extends ComponentProps<'div'>,
+    Omit<ButtonOwnProps, 'round'> {
+  action: MouseEventHandler<HTMLButtonElement>
+  items: SplitButtonMenuItem[]
+  buttonProps?: Partial<Ariakit.ButtonProps>
+  menuButtonProps?: Partial<Ariakit.ButtonProps>
 }
 
 const SplitButton = (props: SplitButtonProps) => {
   const {
+    action,
     items,
-    menuButtonProps,
-    Glyph,
-    label,
     variant,
-    round,
-    size = 'sm',
-    ...buttonProps
+    size = 'md',
+    buttonProps,
+    menuButtonProps,
+    ...divProps
   } = props
 
+  const ref = useCombinedRef(divProps.ref)
+
   return (
-    <div className={clsx('flex flex-row group items-stretch')}>
-      <IconButton
-        Glyph={Glyph}
-        label={label}
+    <div
+      {...divProps}
+      ref={ref}
+      className={clsx(
+        'flex flex-row items-stretch rounded-md',
+        divProps.className,
+      )}
+    >
+      <Button
         variant={variant}
-        round={round}
+        round={false}
         size={size}
+        onClick={action}
         {...buttonProps}
-        className={clsx('rounded-r-none grow', buttonProps.className)}
+        className={clsx(
+          'rounded-l-[inherit] rounded-r-none grow',
+          'border-r-1 border-solid border-r-dark-400',
+          'pr-0',
+          buttonProps?.className,
+        )}
       />
 
       <Ariakit.MenuProvider>
@@ -47,30 +63,30 @@ const SplitButton = (props: SplitButtonProps) => {
           render={
             <Button
               variant={variant}
-              round={round}
+              round={false}
               size={size}
               {...menuButtonProps}
               className={clsx(
-                'group rounded-l-none [&]:h-[unset]',
-                'border-l-1 border-solid border-l-dark-100',
+                'group rounded-l-none rounded-r-[inherit]',
                 match(size)
-                  .with('sm', () => '[&]:px-1')
-                  .with('md', () => '[&]:px-1.75')
-                  .with('lg', () => '[&]:px-2.25')
+                  .with('sm', () => '[&]:px-0.5')
+                  .with('md', () => '[&]:px-0.75')
+                  .with('lg', () => '[&]:px-1')
                   .exhaustive(),
                 menuButtonProps?.className,
               )}
-            >
-              <Ariakit.MenuButtonArrow
-                className={clsx('group-aria-expanded:rotate-180')}
-              />
-            </Button>
+            />
           }
-        />
+        >
+          <Ariakit.MenuButtonArrow
+            className={clsx('group-aria-expanded:rotate-180')}
+          />
+        </Ariakit.MenuButton>
 
         <Ariakit.Menu
           gutter={4}
           portal
+          unmountOnHide
           className={clsx('rounded-lg shadow-md p-1', 'bg-dark-300')}
         >
           {items.map((menuItem) => {
@@ -84,7 +100,12 @@ const SplitButton = (props: SplitButtonProps) => {
                 {...menuItemProps}
                 className={clsx(
                   'flex flex-row items-center gap-x-2',
-                  'text-xs p-2 rounded-sm',
+                  'rounded-sm text-light-100',
+                  match(size)
+                    .with('sm', () => 'text-xs p-1')
+                    .with('md', () => 'text-xs p-2')
+                    .with('lg', () => 'p-2.5')
+                    .exhaustive(),
                   'cursor-pointer hover:bg-dark-200 data-[active-item]:bg-dark-200',
                   menuItemProps.className,
                 )}
@@ -100,4 +121,4 @@ const SplitButton = (props: SplitButtonProps) => {
   )
 }
 
-export { SplitButton, type SplitButtonProps, type SplitButtonItem }
+export { SplitButton, type SplitButtonProps, type SplitButtonMenuItem }

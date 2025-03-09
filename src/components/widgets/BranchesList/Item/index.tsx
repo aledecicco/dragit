@@ -2,10 +2,7 @@ import * as Ariakit from '@ariakit/react'
 import {
   IconDownload,
   IconGitBranch,
-  IconLocation,
   IconLocationFilled,
-  IconMapPin,
-  IconMapPinFilled,
   IconUpload,
 } from '@tabler/icons-react'
 import clsx from 'clsx'
@@ -139,6 +136,23 @@ const BranchesListItem = (props: BranchesListItemProps) => {
                 })
               },
               disabled: pushBranch.isPending,
+              alternatives: [
+                {
+                  Glyph: IconUpload,
+                  label: 'Force push',
+                  action: () => {
+                    if (branch?.type === 'local') {
+                      pushBranch.mutate({
+                        branch: branch.name,
+                        remote: branch.remote?.remoteName ?? 'origin',
+                        remoteBranch: branch.remote?.branchName ?? branch.name,
+                        isForce: true,
+                      })
+                    }
+                  },
+                  disabled: pushBranch.isPending,
+                },
+              ],
             },
           ]}
           size="sm"

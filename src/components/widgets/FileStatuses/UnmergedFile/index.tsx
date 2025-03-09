@@ -1,13 +1,7 @@
 import {
   IconCheck,
   IconFileAlert,
-  IconFileMinus,
-  IconFilePencil,
-  IconFilePlus,
-  IconFolderCode,
   IconFolderExclamation,
-  IconFolderMinus,
-  IconFolderPlus,
   IconTrash,
 } from '@tabler/icons-react'
 import clsx from 'clsx'

@@ -49,10 +49,10 @@ const BranchToolbars = () => {
             },
             className: '[&]:w-17',
             disabled: pushBranch.isPending,
-            otherActions: [
+            alternatives: [
               {
                 Glyph: IconUpload,
-                label: 'Force push this branch right now',
+                label: 'Force push',
                 action: () => {
                   if (branch?.type === 'local') {
                     pushBranch.mutate({
@@ -63,7 +63,6 @@ const BranchToolbars = () => {
                     })
                   }
                 },
-                className: '[&]:w-17',
                 disabled: pushBranch.isPending,
               },
             ],
@@ -123,7 +122,7 @@ const BranchToolbars = () => {
             },
             className: '[&]:w-17',
             disabled: pushBranch.isPending,
-            otherActions: [
+            alternatives: [
               {
                 Glyph: IconUpload,
                 label: 'Force push',

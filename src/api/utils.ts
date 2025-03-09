@@ -3,7 +3,6 @@ import {
   type InfiniteData,
   type QueryKey,
   type UseInfiniteQueryOptions,
-  type UseInfiniteQueryResult,
   type UseQueryOptions,
   useInfiniteQuery,
   useQuery,
