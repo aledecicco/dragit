@@ -4,14 +4,15 @@ import type { HTMLAttributes, MouseEventHandler } from 'react'
 
 import type { Glyph } from '@lib/Icon'
 import { IconButton } from '@lib/IconButton'
-import { SplitButton, type SplitButtonMenuItem } from '@lib/SplitButton'
+import type { MenuItem } from '@lib/Menu'
+import { SplitButton } from '@lib/SplitButton'
 import type { Size } from '@utils/types'
 
 interface ToolbarTool extends HTMLAttributes<HTMLElement> {
   Glyph: Glyph
   label: string
   action: MouseEventHandler<HTMLButtonElement>
-  alternatives?: SplitButtonMenuItem[]
+  alternatives?: MenuItem[]
   disabled?: boolean
 }
 

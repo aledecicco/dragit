@@ -1,23 +1,17 @@
-import * as Ariakit from '@ariakit/react'
+import type * as Ariakit from '@ariakit/react'
 import clsx from 'clsx'
 import { type ComponentProps, type MouseEventHandler, useRef } from 'react'
+import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
 
 import { Button, type ButtonOwnProps } from '@lib/Button'
-import { type Glyph, Icon } from '@lib/Icon'
-import { mergeRefs } from 'react-merge-refs'
-
-interface SplitButtonMenuItem extends Ariakit.MenuItemProps {
-  Glyph?: Glyph
-  label: string
-  action: MouseEventHandler<HTMLDivElement>
-}
+import { Menu, type MenuItem } from '@lib/Menu'
 
 interface SplitButtonProps
   extends ComponentProps<'div'>,
     Omit<ButtonOwnProps, 'round'> {
   action: MouseEventHandler<HTMLButtonElement>
-  items: SplitButtonMenuItem[]
+  items: MenuItem[]
   buttonProps?: Partial<Ariakit.ButtonProps>
   menuButtonProps?: Partial<Ariakit.ButtonProps>
 }
@@ -62,81 +56,43 @@ const SplitButton = (props: SplitButtonProps) => {
         )}
       />
 
-      <Ariakit.MenuProvider>
-        <Ariakit.MenuButton
-          render={
-            <Button
-              variant={variant}
-              round={false}
-              size={size}
-              {...menuButtonProps}
-              className={clsx(
-                'group rounded-l-none rounded-r-[inherit]',
-                match(size)
-                  .with('sm', () => '[&]:px-0.5')
-                  .with('md', () => '[&]:px-0.75')
-                  .with('lg', () => '[&]:px-1')
-                  .exhaustive(),
-                menuButtonProps?.className,
-              )}
-            />
-          }
-        >
-          <Ariakit.MenuButtonArrow
-            className={clsx('group-aria-expanded:rotate-180')}
+      <Menu
+        items={items}
+        size={size}
+        anchor={
+          <Button
+            variant={variant}
+            round={false}
+            size={size}
+            {...menuButtonProps}
+            className={clsx(
+              'group rounded-l-none rounded-r-[inherit]',
+              match(size)
+                .with('sm', () => '[&]:px-0.5')
+                .with('md', () => '[&]:px-0.75')
+                .with('lg', () => '[&]:px-1')
+                .exhaustive(),
+              menuButtonProps?.className,
+            )}
           />
-        </Ariakit.MenuButton>
+        }
+        getAnchorRect={() => {
+          const rect = anchorRef.current?.getBoundingClientRect()
 
-        <Ariakit.Menu
-          gutter={4}
-          portal
-          unmountOnHide
-          getAnchorRect={() => {
-            const rect = anchorRef.current?.getBoundingClientRect()
+          if (!rect) {
+            return null
+          }
 
-            if (!rect) {
-              return null
-            }
-
-            return {
-              x: rect.x,
-              y: rect.y,
-              width: rect.width,
-              height: rect.height,
-            }
-          }}
-          className={clsx('rounded-lg shadow-md p-1', 'bg-dark-300')}
-        >
-          {items.map((menuItem) => {
-            const { Glyph, label, action, ...menuItemProps } = menuItem
-
-            return (
-              <Ariakit.MenuItem
-                key={label}
-                aria-label={label}
-                onClick={action}
-                {...menuItemProps}
-                className={clsx(
-                  'flex flex-row items-center gap-x-2 text-nowrap',
-                  'rounded-sm text-light-100',
-                  match(size)
-                    .with('sm', () => 'text-xs p-1')
-                    .with('md', () => 'text-xs p-2')
-                    .with('lg', () => 'p-2.5')
-                    .exhaustive(),
-                  'cursor-pointer hover:bg-dark-200 data-[active-item]:bg-dark-200',
-                  menuItemProps.className,
-                )}
-              >
-                {Glyph && <Icon Glyph={Glyph} size="sm" />}
-                {label}
-              </Ariakit.MenuItem>
-            )
-          })}
-        </Ariakit.Menu>
-      </Ariakit.MenuProvider>
+          return {
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+          }
+        }}
+      />
     </div>
   )
 }
 
-export { SplitButton, type SplitButtonProps, type SplitButtonMenuItem }
+export { SplitButton, type SplitButtonProps }
