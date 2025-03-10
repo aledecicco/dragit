@@ -74,6 +74,7 @@ const Toolbar = (props: ToolbarProps) => {
                     disabled={toolbarProps.disabled || toolProps.disabled}
                   />
                 ),
+                'aria-label': `View alternatives to ${label}`,
               }}
             />
           ) : (

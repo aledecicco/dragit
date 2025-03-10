@@ -1,7 +1,9 @@
 import clsx from 'clsx'
 
 import { useBranchesSync } from '@context/branches'
+import { useDialog } from '@context/dialogs'
 import { useDirectoryIsOpen, useDirectorySync } from '@context/directory'
+import { Dialog } from '@lib/Dialog'
 import { CurrentDirectory } from '@main/CurrentDirectory'
 import { Graph } from '@main/Graph'
 import { BranchesList } from '@widgets/BranchesList'
@@ -9,6 +11,7 @@ import { FileStatuses } from '@widgets/FileStatuses'
 
 const App = () => {
   const isOpen = useDirectoryIsOpen()
+  const dialog = useDialog()
   useDirectorySync()
 
   return (
@@ -20,6 +23,7 @@ const App = () => {
     >
       <CurrentDirectory className={clsx('justify-self-center')} />
       {isOpen && <AppInner />}
+      {dialog && <Dialog {...dialog} />}
     </div>
   )
 }

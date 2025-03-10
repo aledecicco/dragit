@@ -13,7 +13,7 @@ interface ButtonOwnProps {
 type ButtonProps = ButtonOwnProps & Ariakit.ButtonProps
 
 const Button = (props: ButtonProps) => {
-  const { variant, round = false, size = 'sm', ...buttonProps } = props
+  const { variant, round = false, size = 'md', ...buttonProps } = props
 
   return (
     <Ariakit.Button
@@ -35,7 +35,7 @@ const Button = (props: ButtonProps) => {
           ])
           .with('lg', () => [
             'gap-3',
-            round ? 'p-2 rounded-4xl' : 'px-3.5 py-2.25 rounded-md',
+            round ? 'p-2 rounded-4xl' : 'px-3.5 py-2 rounded-md',
           ])
           .exhaustive(),
         variant === 'primary' && [
