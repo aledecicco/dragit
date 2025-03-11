@@ -49,11 +49,11 @@ const Menu = (props: MenuProps) => {
               {...menuItemProps}
               className={clsx(
                 'flex flex-row items-center gap-x-2 text-nowrap',
-                'rounded-sm text-light-100',
+                'rounded-sm text-light-50',
                 match(size)
-                  .with('sm', () => 'text-xs p-1')
-                  .with('md', () => 'text-xs p-2')
-                  .with('lg', () => 'p-2.5')
+                  .with('sm', () => 'text-xs p-0.5')
+                  .with('md', () => 'text-xs p-1')
+                  .with('lg', () => 'text-sm p-2')
                   .exhaustive(),
                 'cursor-pointer hover:bg-dark-200 data-[active-item]:bg-dark-200',
                 menuItemProps.className,

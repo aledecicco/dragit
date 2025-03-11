@@ -2,6 +2,7 @@ import { IconDownload, IconRefresh, IconUpload } from '@tabler/icons-react'
 import clsx from 'clsx'
 
 import { useFetchRemote, usePullBranch, usePushBranch } from '@api/commands'
+import { askForValue } from '@common/AskForValueDialog'
 import { useSelectedBranches } from '@context/branches'
 import { Toolbar } from '@lib/Toolbar'
 
@@ -22,11 +23,17 @@ const BranchToolbars = () => {
           {
             Glyph: IconDownload,
             label: 'Pull',
-            action: () => {
+            action: async () => {
               if (branch?.type === 'local') {
                 pullBranch.mutate({
                   branch: branch.name,
-                  remote: branch.remote?.remoteName ?? 'origin',
+                  remote:
+                    branch.remote?.remoteName ??
+                    (await askForValue({
+                      defaultValue: 'origin',
+                      message: 'Choose a remote to pull from',
+                      label: 'Remote Name',
+                    })),
                   remoteBranch: branch.remote?.branchName ?? branch.name,
                   isRebase: false,
                 })

@@ -95,7 +95,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
                       ?.focus()
                   }
                 }}
-                className={clsx('inline [&]:px-0.5 [&]:text-light-400')}
+                className={clsx('inline [&]:p-0.5 [&]:text-light-400')}
                 aria-label={`Jump to remote counterpart ${remoteCounterpart}`}
               >
                 {remoteCounterpart}

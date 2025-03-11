@@ -78,7 +78,12 @@ const getDateDifference = (date: Date | number) => {
   return 'Just now'
 }
 
-const useDateDifference = (date: Date | number) =>
-  useTimedMemo(() => getDateDifference(date), MS_IN_MINUTE)
+const useDateDifference = (date: Date | number): string => {
+  const getDifference = useCallback(() => {
+    return getDateDifference(date)
+  }, [date])
+
+  return useTimedMemo(getDifference, MS_IN_MINUTE)
+}
 
 export { useThrottle, useTimedMemo, useDateDifference }

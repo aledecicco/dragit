@@ -28,6 +28,7 @@
       "@context/*": ["context/*"],
       "@lib/*": ["components/lib/*"],
       "@main/*": ["components/main/*"],
+      "@common/*": ["components/common/*"],
       "@widgets/*": ["components/widgets/*"],
       "@utils/*": ["utils/*"]
     }
