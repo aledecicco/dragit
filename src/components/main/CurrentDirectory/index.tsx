@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { open } from '@tauri-apps/plugin-dialog'
-import clsx from 'clsx'
 import { useEffect, useRef } from 'react'
 
 import { useOpenFolder } from '@api/commands'
 import { currentDirQuery } from '@api/queries'
 import { Button, type ButtonProps } from '@lib/Button'
+import { propsWithCn } from '@utils/styles'
 
 interface CurrentDirectoryProps extends Partial<ButtonProps> {}
 
@@ -36,13 +36,14 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
           }
         })
       }}
-      {...buttonProps}
-      className={clsx(
-        '[&]:text-primary-300 [&]:font-medium [&]:text-sm',
-        !currentDir.data && '[&]:italic',
-        buttonProps.className,
+      {...propsWithCn(
+        buttonProps,
+        'text-primary-300 font-medium text-sm',
+        !currentDir.data && 'italic',
       )}
-      disabled={openFolder.isPending || currentDir.isFetching}
+      disabled={
+        openFolder.isPending || currentDir.isFetching || buttonProps.disabled
+      }
     >
       {currentDir.data ??
         (currentDir.isFetching ? 'Loading directory...' : 'Choose a directory')}

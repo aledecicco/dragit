@@ -1,6 +1,5 @@
-import clsx from 'clsx'
-
 import type { CommitInfo } from '@api/models'
+import { cn } from '@utils/styles'
 import { useDateDifference } from '@utils/time'
 
 interface GraphCommitInfoProps {
@@ -12,17 +11,17 @@ const GraphCommitInfo = (props: GraphCommitInfoProps) => {
   const timeAgo = useDateDifference(commitInfo.timestamp)
 
   return (
-    <div className={clsx('flex flex-col gap-4')}>
+    <div className={cn('flex flex-col gap-4')}>
       <div>
-        <p className={clsx('text-xs text-light-800')}>
+        <p className={cn('text-xs text-light-800')}>
           {commitInfo.authorName} - {commitInfo.authorEmail}
         </p>
-        <p className={clsx('text-xs text-light-800')}>{timeAgo}</p>
+        <p className={cn('text-xs text-light-800')}>{timeAgo}</p>
       </div>
-      <p className={clsx('text-sm', 'max-h-20 overflow-y-auto break-words')}>
+      <p className={cn('text-sm', 'max-h-20 overflow-y-auto break-words')}>
         {commitInfo.message}
       </p>
-      <p className={clsx('text-xs text-primary-300')}>{commitInfo.hash}</p>
+      <p className={cn('text-xs text-primary-300')}>{commitInfo.hash}</p>
     </div>
   )
 }

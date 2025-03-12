@@ -1,6 +1,7 @@
 import * as Ariakit from '@ariakit/react'
-import clsx from 'clsx'
 import type { ReactNode } from 'react'
+
+import { propsWithCn } from '@utils/styles'
 
 interface TooltipProps extends Ariakit.TooltipProps {
   anchor: NonNullable<Ariakit.TooltipAnchorProps['render']>
@@ -17,11 +18,10 @@ const Tooltip = (props: TooltipProps) => {
       <Ariakit.Tooltip
         unmountOnHide
         gutter={8}
-        {...tooltipProps}
-        className={clsx(
+        {...propsWithCn(
+          tooltipProps,
           'shadow-md bg-dark-400',
           'p-2 rounded-sm text-xs text-light-300',
-          tooltipProps.className,
         )}
       >
         {description}

@@ -1,10 +1,10 @@
 import { IconDownload, IconRefresh, IconUpload } from '@tabler/icons-react'
-import clsx from 'clsx'
 
 import { useFetchRemote, usePullBranch, usePushBranch } from '@api/commands'
 import { askForValue } from '@common/AskForValueDialog'
 import { useSelectedBranches } from '@context/branches'
 import { Toolbar } from '@lib/Toolbar'
+import { cn } from '@utils/styles'
 
 const BranchToolbars = () => {
   const pushBranch = usePushBranch()
@@ -17,7 +17,7 @@ const BranchToolbars = () => {
     <>
       <Toolbar
         fixed
-        className={clsx('col-start-1 row-start-2 w-40')}
+        className={cn('col-start-1 row-start-2 w-40')}
         disabled={!branch || branch.type !== 'local'}
         tools={[
           {
@@ -78,7 +78,7 @@ const BranchToolbars = () => {
 
       <Toolbar
         fixed
-        className={clsx('col-start-2 row-start-2 w-20')}
+        className={cn('col-start-2 row-start-2 w-20')}
         tools={[
           {
             Glyph: IconRefresh,
@@ -93,7 +93,7 @@ const BranchToolbars = () => {
 
       <Toolbar
         fixed
-        className={clsx('col-start-3 row-start-2 w-40')}
+        className={cn('col-start-3 row-start-2 w-40')}
         disabled={!baseBranch || baseBranch.type !== 'local'}
         tools={[
           {
@@ -142,7 +142,7 @@ const BranchToolbars = () => {
                     })
                   }
                 },
-                className: '[&]:w-17',
+                className: 'w-17',
                 disabled: pushBranch.isPending,
               },
             ],

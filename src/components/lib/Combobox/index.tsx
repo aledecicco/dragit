@@ -1,11 +1,11 @@
 import * as Ariakit from '@ariakit/react'
-import clsx from 'clsx'
 import { matchSorter } from 'match-sorter'
 import { type ReactNode, startTransition, useMemo, useState } from 'react'
 
 import { Button } from '@lib/Button'
 import { Separator } from '@lib/Separator'
 import { mapOr } from '@utils/array'
+import { cn } from '@utils/styles'
 
 interface ComboboxOption<T> {
   value: string
@@ -27,6 +27,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
     renderOption,
     setOption,
     placeholder = 'Select...',
+    className,
     ...selectProps
   } = props
 
@@ -60,9 +61,10 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
             <Button
               variant="plain"
               size="lg"
-              className={clsx(
+              className={cn(
                 'group gap-2 text-sm',
-                option === undefined && 'font-thin [&]:text-light-300',
+                option === undefined && 'font-thin text-light-300',
+                className,
               )}
             />
           }
@@ -70,7 +72,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
         >
           {option === undefined ? placeholder : renderOption(option)}
           <Ariakit.SelectArrow
-            className={clsx('group-aria-expanded:rotate-180')}
+            className={cn('group-aria-expanded:rotate-180')}
           />
         </Ariakit.Select>
         <Ariakit.SelectPopover
@@ -78,23 +80,23 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
           portal
           sameWidth
           gutter={4}
-          className={clsx('rounded-lg shadow-md', 'bg-dark-300 p-2')}
+          className={cn('rounded-lg shadow-md', 'bg-dark-300 p-2')}
         >
           <Ariakit.Combobox
             placeholder="Search..."
-            className={clsx(
+            className={cn(
               'w-full px-2 py-3 rounded-sm',
               'text-sm bg-dark-950/40',
             )}
             autoSelect
           />
 
-          <Separator className={clsx('my-2')} />
+          <Separator className={cn('my-2')} />
 
-          <Ariakit.ComboboxList className={clsx('max-h-80 overflow-y-auto')}>
+          <Ariakit.ComboboxList className={cn('max-h-80 overflow-y-auto')}>
             {mapOr(
               <div
-                className={clsx(
+                className={cn(
                   'text-center p-2',
                   'text-sm italic text-light-950',
                 )}
@@ -109,7 +111,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
                     value={option.value}
                     render={
                       <Ariakit.ComboboxItem
-                        className={clsx(
+                        className={cn(
                           'text-sm text-center',
                           'p-2 rounded-sm',
                           'cursor-pointer data-[active-item]:bg-dark-200',

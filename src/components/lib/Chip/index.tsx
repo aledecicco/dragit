@@ -1,7 +1,7 @@
-import clsx from 'clsx'
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
+import { propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
 interface ChipProps extends ComponentProps<'div'> {
@@ -14,8 +14,8 @@ const Chip = (props: ChipProps) => {
 
   return (
     <div
-      {...divProps}
-      className={clsx(
+      {...propsWithCn(
+        divProps,
         'w-max h-max',
         'p-1 text-center font-semibold rounded-4xl',
         'shadow-xs bg-dark-50 text-light-500',
@@ -24,7 +24,6 @@ const Chip = (props: ChipProps) => {
           .with('md', () => 'text-sm px-2 py-1')
           .with('lg', () => 'text-md px-2.5 py-1.5')
           .exhaustive(),
-        divProps.className,
       )}
     />
   )

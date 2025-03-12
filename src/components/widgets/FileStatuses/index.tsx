@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import type { ComponentProps } from 'react'
 
 import { useAddToIndex, useRemoveFromIndex } from '@api/commands'
@@ -12,6 +11,7 @@ import {
   IconPlaylistX,
 } from '@tabler/icons-react'
 import { mapOr } from '@utils/array'
+import { cn, propsWithCn } from '@utils/styles'
 import { getFilesByStatus } from '@widgets/FileStatuses/utils'
 import { StagedFileStatusItem } from './StagedFile'
 import { UnmergedFileStatusItem } from './UnmergedFile'
@@ -30,16 +30,13 @@ const FileStatuses = (props: FileStatusesProps) => {
   if (!headInfo.data) {
     return (
       <div
-        {...divProps}
-        className={clsx(
+        {...propsWithCn(
+          divProps,
           'h-full bg-dark-500',
           'flex flex-col items-center justify-center',
-          divProps.className,
         )}
       >
-        <p className={clsx('text-sm italic text-light-950')}>
-          Loading files...
-        </p>
+        <p className={cn('text-sm italic text-light-950')}>Loading files...</p>
       </div>
     )
   }
@@ -48,9 +45,8 @@ const FileStatuses = (props: FileStatusesProps) => {
 
   return (
     <Accordion
-      {...divProps}
+      {...propsWithCn(divProps, 'overflow-hidden')}
       showArrows
-      className={clsx('overflow-hidden', divProps.className)}
       sections={[
         {
           id: 'untracked',
@@ -69,9 +65,7 @@ const FileStatuses = (props: FileStatusesProps) => {
             />
           ),
           description: mapOr(
-            <p className={clsx('text-sm text-light-950')}>
-              No untracked files
-            </p>,
+            <p className={cn('text-sm text-light-950')}>No untracked files</p>,
             files.untracked,
             (file) => <UntrackedFileStatusItem key={file.path} file={file} />,
           ),
@@ -94,7 +88,7 @@ const FileStatuses = (props: FileStatusesProps) => {
             />
           ),
           description: mapOr(
-            <p className={clsx('text-sm text-light-950')}>No unmerged files</p>,
+            <p className={cn('text-sm text-light-950')}>No unmerged files</p>,
             files.unmerged,
             (file) => <UnmergedFileStatusItem key={file.path} file={file} />,
           ),
@@ -117,7 +111,7 @@ const FileStatuses = (props: FileStatusesProps) => {
             />
           ),
           description: mapOr(
-            <p className={clsx('text-sm text-light-950')}>No unstaged files</p>,
+            <p className={cn('text-sm text-light-950')}>No unstaged files</p>,
             files.unstaged,
             (file) => <UnstagedFileStatusItem key={file.path} file={file} />,
           ),
@@ -140,7 +134,7 @@ const FileStatuses = (props: FileStatusesProps) => {
             />
           ),
           description: mapOr(
-            <p className={clsx('text-sm text-light-950')}>No staged files</p>,
+            <p className={cn('text-sm text-light-950')}>No staged files</p>,
             files.staged,
             (file) => <StagedFileStatusItem key={file.path} file={file} />,
           ),

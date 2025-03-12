@@ -1,6 +1,6 @@
-import clsx from 'clsx'
 import type { ComponentProps, ComponentType } from 'react'
 
+import { cn, propsWithCn } from '@utils/styles'
 import {
   SvgOverlayContextProvider,
   type SvgOverlayState,
@@ -26,16 +26,16 @@ const SvgOverlayInner = (props: SvgOverlayProps) => {
 
   return (
     <div
-      {...divProps}
-      className={clsx(
+      {...propsWithCn(
+        divProps,
+
         'relative w-full h-full overflow-hidden',
-        divProps.className,
       )}
     >
       {children}
       <svg
         ref={svgOverlay.svgRef}
-        className={clsx(
+        className={cn(
           'absolute left-0 top-0 w-full h-full',
           'pointer-events-none',
         )}

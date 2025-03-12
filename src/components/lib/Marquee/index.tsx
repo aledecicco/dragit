@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import {
   type CSSProperties,
   type ComponentProps,
@@ -9,6 +8,7 @@ import {
 import { mergeRefs } from 'react-merge-refs'
 
 import { useThrottle } from '@utils/performance'
+import { cn, propsWithCn } from '@utils/styles'
 
 interface MarqueeProps extends ComponentProps<'div'> {
   speed?: number
@@ -53,13 +53,12 @@ const Marquee = (props: MarqueeProps) => {
 
   return (
     <div
-      {...divProps}
+      {...propsWithCn(divProps, 'group overflow-x-hidden')}
       ref={mergeRefs([containerRef, divProps.ref])}
-      className={clsx('group overflow-x-hidden', divProps.className)}
     >
       <div
         ref={contentRef}
-        className={clsx(
+        className={cn(
           'text-nowrap whitespace-nowrap mr-8',
           overflow > 0 && 'group-hover:animate-scroll-horizontal',
           'min-w-max ',

@@ -1,7 +1,7 @@
 import * as Ariakit from '@ariakit/react'
-import clsx from 'clsx'
 import { match } from 'ts-pattern'
 
+import { propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
 interface ButtonOwnProps {
@@ -17,8 +17,8 @@ const Button = (props: ButtonProps) => {
 
   return (
     <Ariakit.Button
-      {...buttonProps}
-      className={clsx(
+      {...propsWithCn(
+        buttonProps,
         'w-max',
         'flex flex-row justify-center items-center text-center',
         'border-none font-semibold',
@@ -62,7 +62,6 @@ const Button = (props: ButtonProps) => {
           'aria-expanded:bg-dark-400',
           'aria-disabled:text-light-800',
         ],
-        buttonProps.className,
       )}
     />
   )

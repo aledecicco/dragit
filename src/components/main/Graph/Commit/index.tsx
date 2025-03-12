@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import type { ComponentProps } from 'react'
 import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
@@ -8,6 +7,7 @@ import { commitInfoQuery } from '@api/queries'
 import { useRepositoryQuery } from '@api/utils'
 import { Hovercard, HovercardDisclosure } from '@lib/Hovercard'
 import { makeTracked } from '@main/SvgOverlay'
+import { cn, propsWithCn } from '@utils/styles'
 import { GraphCommitInfo } from '../CommitInfo'
 import type { ParentCommitType } from '../Edges'
 
@@ -32,20 +32,20 @@ const GraphCommit = makeTracked<
 
   return (
     <Hovercard
-      className={clsx('p-4')}
+      className={cn('p-4')}
       placement="right"
       anchor={
         <div
           {...divProps}
           ref={mergeRefs([trackRef, divProps.ref])}
-          className={clsx(
+          {...propsWithCn(
+            divProps,
             'flex flex-row items-center gap-5',
             'cursor-pointer',
-            divProps.className,
           )}
         >
           <div
-            className={clsx(
+            className={cn(
               'rounded-full shadow-sm',
               match(commitType)
                 .with('confirmed', () => 'bg-primary-600')
@@ -54,8 +54,8 @@ const GraphCommit = makeTracked<
             )}
             style={{ width: NODE_SIZE, height: NODE_SIZE }}
           />
-          <div className={clsx('flex flex-row gap-1 items-center')}>
-            <p className={clsx('text-xs')}>
+          <div className={cn('flex flex-row gap-1 items-center')}>
+            <p className={cn('text-xs')}>
               {commitInfo.data?.shortHash ?? '...'}
             </p>
             <HovercardDisclosure />
@@ -66,7 +66,7 @@ const GraphCommit = makeTracked<
         commitInfo.data ? (
           <GraphCommitInfo commitInfo={commitInfo.data} />
         ) : (
-          <p className={clsx('text-xs text-light-800')}>...</p>
+          <p className={cn('text-xs text-light-800')}>...</p>
         )
       }
     />

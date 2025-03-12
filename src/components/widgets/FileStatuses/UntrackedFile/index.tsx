@@ -3,10 +3,10 @@ import {
   IconFolderQuestion,
   IconPlus,
 } from '@tabler/icons-react'
-import clsx from 'clsx'
 
 import { useAddToIndex } from '@api/commands'
 import type { UntrackedFile } from '@api/models'
+import { cn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
 interface UntrackedFileStatusItemProps {
@@ -20,7 +20,7 @@ const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
   return (
     <FileStatusItem
       file={file}
-      className={clsx('text-light-950/90')}
+      className={cn('text-light-950/90')}
       Glyph={file.isDir ? IconFolderQuestion : IconFileUnknown}
       actions={[
         {

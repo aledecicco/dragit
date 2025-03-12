@@ -1,5 +1,4 @@
 import { IconSwitchHorizontal } from '@tabler/icons-react'
-import clsx from 'clsx'
 import { useMemo } from 'react'
 
 import { useCheckoutLocalBranch } from '@api/commands'
@@ -9,6 +8,7 @@ import { useRepositoryQuery } from '@api/utils'
 import { changeBaseBranch, useSelectedBranches } from '@context/branches'
 import { Combobox, type ComboboxOption } from '@lib/Combobox'
 import { IconButton } from '@lib/IconButton'
+import { cn } from '@utils/styles'
 
 const BranchSelectors = () => {
   const headInfo = useRepositoryQuery(headInfoQuery)
@@ -36,7 +36,7 @@ const BranchSelectors = () => {
   return (
     <>
       <Combobox
-        className={clsx('[&]:w-65 col-start-1 row-start-1')}
+        className={cn('w-65 col-start-1 row-start-1')}
         option={branch ? { value: branch.name, data: branch } : undefined}
         options={branchOptions}
         setOption={(newOption) => {
@@ -50,7 +50,7 @@ const BranchSelectors = () => {
       <IconButton
         Glyph={IconSwitchHorizontal}
         label="Switch branch and base branch"
-        className={clsx('mx-1 col-start-2 row-start-1')}
+        className={cn('mx-1 col-start-2 row-start-1')}
         variant="neutral"
         disabled={!branch || !baseBranch}
         size="md"
@@ -62,7 +62,7 @@ const BranchSelectors = () => {
       />
 
       <Combobox
-        className={clsx('[&]:w-65 col-start-3 row-start-1')}
+        className={cn('w-65 col-start-3 row-start-1')}
         option={
           baseBranch ? { value: baseBranch.name, data: baseBranch } : undefined
         }

@@ -1,11 +1,11 @@
 import * as Ariakit from '@ariakit/react'
-import clsx from 'clsx'
 import type { HTMLAttributes, MouseEventHandler } from 'react'
 
 import type { Glyph } from '@lib/Icon'
 import { IconButton } from '@lib/IconButton'
 import type { MenuItem } from '@lib/Menu'
 import { SplitButton } from '@lib/SplitButton'
+import { cn, propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
 interface ToolbarTool extends HTMLAttributes<HTMLElement> {
@@ -28,11 +28,10 @@ const Toolbar = (props: ToolbarProps) => {
   return (
     <Ariakit.ToolbarProvider>
       <Ariakit.Toolbar
-        {...toolbarProps}
-        className={clsx(
+        {...propsWithCn(
+          toolbarProps,
           'grid grid-flow-col',
           fixed ? 'auto-cols-fr' : 'auto-cols-max',
-          toolbarProps.className,
         )}
       >
         {tools.map(({ Glyph, label, action, alternatives, ...toolProps }) =>
@@ -43,15 +42,14 @@ const Toolbar = (props: ToolbarProps) => {
               variant="neutral"
               items={alternatives}
               size={size}
-              {...toolProps}
-              className={clsx(
-                fixed && '[&]:w-full',
+              {...propsWithCn(
+                toolProps,
+                fixed && 'w-full',
                 'not-first:rounded-l-none',
                 'not-last:rounded-r-none not-last:border-r-2 not-last:border-solid not-last:border-r-dark-500',
-                toolProps.className,
               )}
               buttonProps={{
-                className: clsx(fixed && '[&]:pr-0'),
+                className: cn(fixed && 'pr-0'),
                 render: (
                   <Ariakit.ToolbarItem
                     render={
@@ -90,12 +88,11 @@ const Toolbar = (props: ToolbarProps) => {
                   size={size}
                 />
               }
-              {...toolProps}
-              className={clsx(
-                fixed && '[&]:w-full',
+              {...propsWithCn(
+                toolProps,
+                fixed && 'w-full',
                 'not-first:rounded-l-none',
                 'not-last:rounded-r-none not-last:border-r-2 not-last:border-solid not-last:border-r-dark-500',
-                toolProps.className,
               )}
               disabled={toolbarProps.disabled || toolProps.disabled}
             />

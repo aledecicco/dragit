@@ -1,10 +1,10 @@
-import clsx from 'clsx'
 import type { PropsWithChildren } from 'react'
 
 import { commitHistoryQuery } from '@api/queries'
 import { useRepositoryInfiniteQuery } from '@api/utils'
 import { useSelectedBranches } from '@context/branches'
 import { useCurrentCommonAncestor } from '@main/Graph/utils'
+import { cn } from '@utils/styles'
 
 const BranchMessages = () => {
   const { branch, baseBranch } = useSelectedBranches()
@@ -64,7 +64,7 @@ const BranchMessage = (props: PropsWithChildren<{ isBase: boolean }>) => {
 
   return (
     <p
-      className={clsx(
+      className={cn(
         'text-center text-light-500 italic',
         'self-start row-start-3 mt-15',
         isBase ? 'col-start-3' : 'col-start-1',

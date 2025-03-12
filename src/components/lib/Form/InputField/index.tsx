@@ -1,42 +1,41 @@
 import * as Ariakit from '@ariakit/react'
-import clsx from 'clsx'
 import type { ComponentProps } from 'react'
+
+import { cn, propsWithCn } from '@utils/styles'
 
 interface InputFieldProps extends Ariakit.FormInputProps {
   name: Ariakit.FormInputProps['name']
   label: string
-  container?: ComponentProps<'div'>
+  containerProps?: ComponentProps<'div'>
 }
 
 const InputField = (props: InputFieldProps) => {
-  const { name, label, container, ...inputProps } = props
+  const { name, label, containerProps, ...inputProps } = props
 
   return (
     <div
-      {...container}
-      className={clsx(
+      {...propsWithCn(
+        containerProps,
         'flex flex-col items-stretch gap-y-2',
         'relative mb-2',
-        container?.className,
       )}
     >
-      <Ariakit.FormLabel name={name} className={clsx('text-sm text-light-400')}>
+      <Ariakit.FormLabel name={name} className={cn('text-sm text-light-400')}>
         {label}
       </Ariakit.FormLabel>
 
       <Ariakit.FormInput
         name={name}
         placeholder={`Enter a ${label}`}
-        {...inputProps}
-        className={clsx(
+        {...propsWithCn(
+          inputProps,
           'p-3 bg-dark-800 rounded-sm text-sm text-light-800',
-          inputProps.className,
         )}
       />
 
       <Ariakit.FormError
         name={name}
-        className={clsx(
+        className={cn(
           'text-xs text-danger-300',
           'absolute top-full translate-y-1.5',
         )}

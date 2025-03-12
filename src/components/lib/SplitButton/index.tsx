@@ -1,11 +1,11 @@
 import type * as Ariakit from '@ariakit/react'
-import clsx from 'clsx'
 import { type ComponentProps, type MouseEventHandler, useRef } from 'react'
 import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
 
 import { Button, type ButtonOwnProps } from '@lib/Button'
 import { Menu, type MenuItem } from '@lib/Menu'
+import { propsWithCn } from '@utils/styles'
 
 interface SplitButtonProps
   extends ComponentProps<'div'>,
@@ -31,20 +31,16 @@ const SplitButton = (props: SplitButtonProps) => {
 
   return (
     <div
-      {...divProps}
+      {...propsWithCn(divProps, 'flex flex-row items-stretch rounded-md')}
       ref={mergeRefs([anchorRef, divProps.ref])}
-      className={clsx(
-        'flex flex-row items-stretch rounded-md',
-        divProps.className,
-      )}
     >
       <Button
         variant={variant}
         round={false}
         size={size}
         onClick={action}
-        {...buttonProps}
-        className={clsx(
+        {...propsWithCn(
+          buttonProps,
           'rounded-l-[inherit] rounded-r-none grow',
           'border-r-1 border-solid border-r-dark-400',
           match(size)
@@ -52,7 +48,6 @@ const SplitButton = (props: SplitButtonProps) => {
             .with('md', () => 'pr-1.5')
             .with('lg', () => 'pr-2')
             .exhaustive(),
-          buttonProps?.className,
         )}
       />
 
@@ -64,15 +59,14 @@ const SplitButton = (props: SplitButtonProps) => {
             variant={variant}
             round={false}
             size={size}
-            {...menuButtonProps}
-            className={clsx(
+            {...propsWithCn(
+              menuButtonProps,
               'group rounded-l-none rounded-r-[inherit]',
               match(size)
-                .with('sm', () => '[&]:px-0.5')
-                .with('md', () => '[&]:px-0.75')
-                .with('lg', () => '[&]:px-1')
+                .with('sm', () => 'px-0.5')
+                .with('md', () => 'px-0.75')
+                .with('lg', () => 'px-1')
                 .exhaustive(),
-              menuButtonProps?.className,
             )}
           />
         }

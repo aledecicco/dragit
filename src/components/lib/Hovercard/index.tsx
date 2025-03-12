@@ -1,9 +1,9 @@
 import * as Ariakit from '@ariakit/react'
-import clsx from 'clsx'
 
 import { Icon } from '@lib/Icon'
 import { Separator } from '@lib/Separator'
 import { IconInfoCircle } from '@tabler/icons-react'
+import { cn, propsWithCn } from '@utils/styles'
 
 interface HovercardProps extends Ariakit.HovercardProps {
   anchor: NonNullable<Ariakit.HovercardAnchorProps['render']>
@@ -22,19 +22,18 @@ const Hovercard = (props: HovercardProps) => {
         portal
         unmountOnHide
         gutter={16}
-        {...hovercardProps}
-        className={clsx(
+        {...propsWithCn(
+          hovercardProps,
           'max-w-sm',
           'shadow-md bg-dark-300',
           'p-3 rounded-md',
-          hovercardProps.className,
         )}
       >
-        <div className={clsx('flex flex-col gap-2')}>
+        <div className={cn('flex flex-col gap-2')}>
           {heading && (
             <>
               <Ariakit.HovercardHeading
-                className={clsx('text-light-200 text-sm')}
+                className={cn('text-light-200 text-sm')}
                 render={heading}
               />
               <Separator />
@@ -54,8 +53,7 @@ const HovercardDisclosure = (props: Ariakit.HovercardDisclosureProps) => {
 
   return (
     <Ariakit.HovercardDisclosure
-      {...hovercardDisclosureProps}
-      className={clsx('text-light-500', hovercardDisclosureProps.className)}
+      {...propsWithCn(hovercardDisclosureProps, 'text-light-500')}
     >
       <Icon Glyph={IconInfoCircle} size="md" />
     </Ariakit.HovercardDisclosure>

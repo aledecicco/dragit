@@ -1,9 +1,9 @@
 import * as Ariakit from '@ariakit/react'
 import { IconChevronDown } from '@tabler/icons-react'
-import clsx from 'clsx'
 import { type ComponentProps, type ReactNode, useState } from 'react'
 
 import { Icon } from '@lib/Icon'
+import { cn, propsWithCn } from '@utils/styles'
 
 interface AccordionSection extends Ariakit.DisclosureContentProps {
   id: string
@@ -25,12 +25,7 @@ const Accordion = (props: AccordionProps) => {
   return (
     <Ariakit.CompositeProvider focusLoop>
       <Ariakit.Composite
-        render={
-          <div
-            {...divProps}
-            className={clsx('flex flex-col bg-dark-600', divProps.className)}
-          />
-        }
+        render={<div {...propsWithCn(divProps, 'flex flex-col bg-dark-600')} />}
       >
         {sections.map((section) => {
           const { id, label, extraInfo, description, ...contentProps } = section
@@ -51,7 +46,7 @@ const Accordion = (props: AccordionProps) => {
               })}
             >
               <div
-                className={clsx(
+                className={cn(
                   'flex flex-row items-center justify-between',
                   'px-2',
                 )}
@@ -60,7 +55,7 @@ const Accordion = (props: AccordionProps) => {
                   tabbable
                   render={
                     <Ariakit.Disclosure
-                      className={clsx(
+                      className={cn(
                         'cursor-pointer w-full group',
                         'text-sm text-light-900 text-start',
                         'p-2 flex flex-row gap-x-2 items-center',
@@ -73,7 +68,7 @@ const Accordion = (props: AccordionProps) => {
                   {showArrows && (
                     <Icon
                       Glyph={IconChevronDown}
-                      className={clsx('group-aria-expanded:rotate-180')}
+                      className={cn('group-aria-expanded:rotate-180')}
                     />
                   )}
                   {label}
@@ -84,11 +79,10 @@ const Accordion = (props: AccordionProps) => {
 
               <Ariakit.DisclosureContent
                 unmountOnHide
-                {...contentProps}
-                className={clsx(
+                {...propsWithCn(
+                  contentProps,
                   'overflow-y-auto grow',
                   'w-full bg-dark-700 rounded-sm p-2',
-                  contentProps.className,
                 )}
               >
                 {description}

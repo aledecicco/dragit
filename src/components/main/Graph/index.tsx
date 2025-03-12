@@ -1,11 +1,11 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
-import clsx from 'clsx'
 import { useEffect, useMemo } from 'react'
 
 import { commitHistoryQuery } from '@api/queries'
 import { getPaginatedLength, useRepositoryInfiniteQuery } from '@api/utils'
 import { useSelectedBranches } from '@context/branches'
 import { SvgOverlay, useSvgOverlay } from '@main/SvgOverlay'
+import { cn } from '@utils/styles'
 import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
 import { BranchMessages } from './Branch/Messages'
@@ -17,9 +17,9 @@ import { useCurrentCommonAncestor } from './utils'
 
 const Graph = () => {
   return (
-    <div className={clsx('h-full w-full min-h-0')}>
+    <div className={cn('h-full w-full min-h-0')}>
       <div
-        className={clsx(
+        className={cn(
           'overflow-hidden w-full h-full relative',
           'grid grid-cols-[1fr_max-content_1fr] grid-rows-[max-content_max-content_1fr]',
           'gap-y-1 gap-x-8 place-items-center py-1',
@@ -30,7 +30,7 @@ const Graph = () => {
         <BranchToolbars />
 
         <SvgOverlay
-          className={clsx('col-span-3 col-start-1 row-start-3 mt-4')}
+          className={cn('col-span-3 col-start-1 row-start-3 mt-4')}
           RenderOverlay={Edges}
         >
           <GraphInner />
@@ -83,12 +83,12 @@ const GraphInner = () => {
   return (
     <div
       ref={svgOverlay.componentRef}
-      className={clsx(
+      className={cn(
         'overflow-hidden contain-strict w-full h-full bg-dark-900/50',
       )}
     >
       <div
-        className={clsx('relative w-full contain-layout')}
+        className={cn('relative w-full contain-layout')}
         style={{ height: virtualizer.getTotalSize() }}
       >
         {branch && (

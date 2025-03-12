@@ -4,11 +4,11 @@ import {
   IconFolderExclamation,
   IconTrash,
 } from '@tabler/icons-react'
-import clsx from 'clsx'
 import { P, match } from 'ts-pattern'
 
 import { useAddToIndex, useRemoveFromTree } from '@api/commands'
 import type { UnmergedFile } from '@api/models'
+import { cn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
 interface UnmergedFileStatusItemProps {
@@ -23,10 +23,10 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
   return (
     <FileStatusItem
       file={file}
-      className={clsx('text-light-600')}
+      className={cn('text-light-600')}
       Glyph={file.isDir ? IconFolderExclamation : IconFileAlert}
       statusMessage={
-        <p className={clsx('text-xs text-warning-400/50')}>
+        <p className={cn('text-xs text-warning-400/50')}>
           {match(file.unstaged)
             .with('addedByThem', () => 'Added by incoming changes')
             .with('addedByUs', () => 'Added by local changes')

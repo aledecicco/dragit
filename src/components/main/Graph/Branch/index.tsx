@@ -1,5 +1,4 @@
 import type { Virtualizer } from '@tanstack/react-virtual'
-import clsx from 'clsx'
 
 import type { AncestorInfo, BranchInfo } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
@@ -8,6 +7,7 @@ import {
   getPaginatedItem,
   useRepositoryInfiniteQuery,
 } from '@api/utils'
+import { cn } from '@utils/styles'
 import { mapFn } from '@utils/types'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import {
@@ -84,7 +84,7 @@ const GraphBranch = (props: GraphBranchProps) => {
               ? 'unconfirmed'
               : 'solid',
         }))}
-        className={clsx('absolute top-0', getCommitPositionClass(isBase))}
+        className={cn('absolute top-0', getCommitPositionClass(isBase))}
         style={{
           transform: `translateY(${getCommitTranslationY(virtualizer, virtualRow.index)}px)`,
         }}

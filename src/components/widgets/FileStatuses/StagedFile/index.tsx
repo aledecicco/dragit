@@ -13,11 +13,11 @@ import {
   IconFolders,
   IconMinus,
 } from '@tabler/icons-react'
-import clsx from 'clsx'
 import { match } from 'ts-pattern'
 
 import { useRemoveFromIndex } from '@api/commands'
 import type { StagedFile } from '@api/models'
+import { cn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
 interface StagedFileStatusItemProps {
@@ -31,9 +31,9 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
   return (
     <FileStatusItem
       file={file}
-      className={clsx('text-light-600')}
+      className={cn('text-light-600')}
       statusMessage={
-        <p className={clsx('text-xs text-success-200')}>
+        <p className={cn('text-xs text-success-200')}>
           {match(file.staged)
             .with('added', () => (file.isDir ? 'Folder added' : 'File added'))
             .with('deleted', () =>

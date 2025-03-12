@@ -1,9 +1,9 @@
 import * as Ariakit from '@ariakit/react'
-import clsx from 'clsx'
 import type { MouseEventHandler } from 'react'
 import { match } from 'ts-pattern'
 
 import { type Glyph, Icon } from '@lib/Icon'
+import { cn, propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
 interface MenuItem extends Ariakit.MenuItemProps {
@@ -25,7 +25,7 @@ const Menu = (props: MenuProps) => {
     <Ariakit.MenuProvider>
       <Ariakit.MenuButton render={anchor}>
         <Ariakit.MenuButtonArrow
-          className={clsx('group-aria-expanded:rotate-180')}
+          className={cn('group-aria-expanded:rotate-180')}
         />
       </Ariakit.MenuButton>
 
@@ -33,12 +33,7 @@ const Menu = (props: MenuProps) => {
         gutter={4}
         portal
         unmountOnHide
-        {...menuProps}
-        className={clsx(
-          'rounded-lg shadow-md p-1',
-          'bg-dark-300',
-          menuProps.className,
-        )}
+        {...propsWithCn(menuProps, 'rounded-lg shadow-md p-1', 'bg-dark-300')}
       >
         {items.map((menuItem) => {
           const { Glyph, label, action, ...menuItemProps } = menuItem
@@ -46,8 +41,8 @@ const Menu = (props: MenuProps) => {
             <Ariakit.MenuItem
               key={label}
               onClick={action}
-              {...menuItemProps}
-              className={clsx(
+              {...propsWithCn(
+                menuItemProps,
                 'flex flex-row items-center gap-x-2 text-nowrap',
                 'rounded-sm text-light-50',
                 match(size)
@@ -56,7 +51,6 @@ const Menu = (props: MenuProps) => {
                   .with('lg', () => 'text-sm p-2')
                   .exhaustive(),
                 'cursor-pointer hover:bg-dark-200 data-[active-item]:bg-dark-200',
-                menuItemProps.className,
               )}
             >
               {Glyph && <Icon Glyph={Glyph} size="sm" />}

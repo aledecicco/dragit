@@ -1,10 +1,10 @@
 import type { Virtualizer } from '@tanstack/react-virtual'
-import clsx from 'clsx'
 import { useMemo } from 'react'
 
 import type { BranchInfo, CommonAncestorInfo } from '@api/models'
 import { commitHistoryQuery } from '@api/queries'
 import { getNextPaginatedItem, useRepositoryInfiniteQuery } from '@api/utils'
+import { cn } from '@utils/styles'
 import { mapFn } from '@utils/types'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import {
@@ -60,7 +60,7 @@ const GraphAnchor = (props: GraphAnchorProps) => {
             id: commonCommitId,
             type: branchIsDivergent ? 'unconfirmed' : 'solid',
           }}
-          className={clsx('absolute top-0', getCommitPositionClass(false))}
+          className={cn('absolute top-0', getCommitPositionClass(false))}
           style={{
             transform: `translateY(${getCommitTranslationY(virtualizer, commonAncestorInfo.lastCommit.distance)}px)`,
           }}
@@ -75,7 +75,7 @@ const GraphAnchor = (props: GraphAnchorProps) => {
           id: COMMIT_ELEMENT_ID(anchorParent.hash, baseBranch.name),
           type: 'solid',
         }))}
-        className={clsx('absolute top-0', getCommitPositionClass(true))}
+        className={cn('absolute top-0', getCommitPositionClass(true))}
         style={{
           transform: `translateY(${getCommitTranslationY(virtualizer, commonAncestorInfo.commonCommit.distance)}px)`,
         }}

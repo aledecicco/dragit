@@ -1,8 +1,8 @@
-import clsx from 'clsx'
 import { match } from 'ts-pattern'
 
 import type { Element, ElementId } from '@main/SvgOverlay/context'
 import { getPosition } from '@main/SvgOverlay/utils'
+import { cn } from '@utils/styles'
 
 export type ParentCommitType = 'solid' | 'dashed' | 'unconfirmed'
 
@@ -59,7 +59,7 @@ const Edges = (props: EdgesProps) => {
         return (
           <path
             key={id}
-            className={clsx(
+            className={cn(
               'fill-none stroke-4',
               match(elem.parent.type)
                 .with('solid', () => 'stroke-primary-600')

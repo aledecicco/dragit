@@ -1,8 +1,8 @@
 import type { IconProps as TablerIconProps } from '@tabler/icons-react'
-import clsx from 'clsx'
 import type { ComponentType } from 'react'
 import { match } from 'ts-pattern'
 
+import { propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
 type Glyph = ComponentType<TablerIconProps>
@@ -17,15 +17,14 @@ const Icon = (props: IconProps) => {
 
   return (
     <Glyph
-      {...iconProps}
-      className={clsx(
+      {...propsWithCn(
+        iconProps,
         'shrink-0',
         match(size)
           .with('sm', () => 'stroke-1.5 size-3')
           .with('md', () => 'stroke-1.5 size-4')
           .with('lg', () => 'stroke-2 size-5')
           .exhaustive(),
-        iconProps.className,
       )}
     />
   )

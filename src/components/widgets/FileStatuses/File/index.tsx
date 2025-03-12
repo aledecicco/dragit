@@ -1,10 +1,10 @@
-import clsx from 'clsx'
 import type { ComponentProps, ReactNode } from 'react'
 
 import type { FileInfo } from '@api/models'
 import { type Glyph, Icon } from '@lib/Icon'
 import { Marquee } from '@lib/Marquee'
 import { Toolbar, type ToolbarTool } from '@lib/Toolbar'
+import { cn, propsWithCn } from '@utils/styles'
 
 interface FileStatusItemProps extends ComponentProps<'div'> {
   file: FileInfo
@@ -18,18 +18,17 @@ const FileStatusItem = (props: FileStatusItemProps) => {
 
   return (
     <div
-      {...divProps}
-      className={clsx(
+      {...propsWithCn(
+        divProps,
         'flex flex-row items-center justify-between gap-4',
         'p-1.5 bg-dark-600 rounded-xs',
-        divProps.className,
       )}
     >
-      <div className={clsx('min-w-0 overflow-x-hidden')}>
-        <div className={clsx('flex flex-row gap-x-1 items-center')}>
+      <div className={cn('min-w-0 overflow-x-hidden')}>
+        <div className={cn('flex flex-row gap-x-1 items-center')}>
           <Icon Glyph={Glyph} size="md" />
 
-          <Marquee className={clsx('text-sm')}>{file.path}</Marquee>
+          <Marquee className={cn('text-sm')}>{file.path}</Marquee>
         </div>
 
         {statusMessage}

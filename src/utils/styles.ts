@@ -1,17 +1,16 @@
-import clsx, { type ClassValue } from 'clsx'
-import type { HTMLProps } from 'react'
+import { type ClassNameValue, twMerge } from 'tailwind-merge'
 
-const cn = (...inputs: ClassValue[]): string => {
-  return clsx(...inputs)
+const cn = (...inputs: ClassNameValue[]): string => {
+  return twMerge(...inputs)
 }
 
-const propsWithCn = <T extends HTMLProps<HTMLElement>>(
+const propsWithCn = <T extends { className?: string } | undefined>(
   props: T,
-  ...inputs: ClassValue[]
+  ...inputs: ClassNameValue[]
 ): T => {
   return {
     ...props,
-    className: cn(...inputs, props.className),
+    className: cn(...inputs, props?.className),
   }
 }
 

@@ -5,7 +5,6 @@ import {
   IconLocationFilled,
   IconUpload,
 } from '@tabler/icons-react'
-import clsx from 'clsx'
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
@@ -17,6 +16,7 @@ import { Icon } from '@lib/Icon'
 import { Marquee } from '@lib/Marquee'
 import { Toolbar } from '@lib/Toolbar'
 import { getRemoteCounterpart } from '@utils/repository'
+import { cn, propsWithCn } from '@utils/styles'
 import { useDateDifference } from '@utils/time'
 
 const BRANCHES_LIST_ITEM_ID = (name: BranchName | RefName) =>
@@ -43,35 +43,34 @@ const BranchesListItem = (props: BranchesListItemProps) => {
       render={
         <div
           aria-selected={isCurrentBranch}
-          {...divProps}
-          className={clsx(
+          {...propsWithCn(
+            divProps,
             'flex flex-row items-center justify-between gap-4',
             'p-1.5 bg-dark-600 rounded-xs',
             'focus:bg-dark-500 data-focus:bg-dark-500',
-            isCurrentBranch && '[&]:bg-dark-500 border-1 border-accent-300',
-            divProps.className,
+            isCurrentBranch && 'bg-dark-500 border-1 border-accent-300',
           )}
         />
       }
     >
-      <div className={clsx('overflow-x-hidden')}>
+      <div className={cn('overflow-x-hidden')}>
         <div
-          className={clsx('flex flex-row gap-x-1 items-center text-light-600')}
+          className={cn('flex flex-row gap-x-1 items-center text-light-600')}
         >
           <Icon Glyph={IconGitBranch} size="md" />
 
-          <Marquee className={clsx('text-sm')}>{branch.name}</Marquee>
+          <Marquee className={cn('text-sm')}>{branch.name}</Marquee>
 
           {isCurrentBranch && (
             <Icon
               Glyph={IconLocationFilled}
               size="sm"
-              className={clsx('text-accent-400/90')}
+              className={cn('text-accent-400/90')}
             />
           )}
         </div>
 
-        <p className={clsx('text-xs text-light-950')}>
+        <p className={cn('text-xs text-light-950')}>
           {match(branch.type)
             .with('local', () => 'Local branch')
             .with('remote', () => 'Remote branch')
@@ -89,7 +88,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
                       ?.focus()
                   }
                 }}
-                className={clsx('inline [&]:p-0.5 [&]:text-light-400')}
+                className={cn('inline p-0.5 text-light-400')}
                 aria-label={`Jump to remote counterpart ${remoteCounterpart}`}
               >
                 {remoteCounterpart}
@@ -97,7 +96,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
             </>
           )}
         </p>
-        <p className={clsx('text-xs text-light-950/50 mt-2')}>
+        <p className={cn('text-xs text-light-950/50 mt-2')}>
           Last modified {lastModified}
         </p>
       </div>
