@@ -54,7 +54,7 @@ const Button = (props: ButtonProps) => {
           'shadow-xs bg-dark-300 text-light-50',
           'hover:bg-dark-200',
           'aria-expanded:bg-dark-200',
-          'aria-disabled:bg-dark-400 aria-disabled:text-light-950',
+          'aria-disabled:bg-dark-400 aria-disabled:text-light-950/50',
         ],
         variant === 'plain' && [
           'hover:shadow-xs bg-transparent text-light-50',

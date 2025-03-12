@@ -88,6 +88,17 @@
   --color-success-950: #022c22;
 
   --spacing-half: 50%;
+
+  --animate-scroll-horizontal: scroll-horizontal 1s linear infinite;
+
+  @keyframes scroll-horizontal {
+    from {
+      transform: translateX(0%);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
 }
 
 :root {

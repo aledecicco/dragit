@@ -125,7 +125,7 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
     [syncSvg],
   )
 
-  const [refresherDep, rerender] = useReducer((n) => n + 1, 0)
+  const [refresherDep, rerender] = useReducer((n) => (n + 1) % 60, 0)
   const refresh = useCallback(() => {
     syncSvg()
     rerender()

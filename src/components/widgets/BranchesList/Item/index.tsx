@@ -14,6 +14,7 @@ import type { BranchInfo, BranchName, RefName } from '@api/models'
 import { useSelectedBranches } from '@context/branches'
 import { Button } from '@lib/Button'
 import { Icon } from '@lib/Icon'
+import { Marquee } from '@lib/Marquee'
 import { Toolbar } from '@lib/Toolbar'
 import { getRemoteCounterpart } from '@utils/repository'
 import { useDateDifference } from '@utils/time'
@@ -53,20 +54,13 @@ const BranchesListItem = (props: BranchesListItemProps) => {
         />
       }
     >
-      <div>
+      <div className={clsx('overflow-x-hidden')}>
         <div
           className={clsx('flex flex-row gap-x-1 items-center text-light-600')}
         >
           <Icon Glyph={IconGitBranch} size="md" />
 
-          <p
-            className={clsx(
-              'flex flex-row-reverse text-sm',
-              'overflow-x-auto pb-2.5 -mb-2.5',
-            )}
-          >
-            {branch.name}
-          </p>
+          <Marquee className={clsx('text-sm')}>{branch.name}</Marquee>
 
           {isCurrentBranch && (
             <Icon

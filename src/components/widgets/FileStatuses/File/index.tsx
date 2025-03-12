@@ -3,6 +3,7 @@ import type { ComponentProps, ReactNode } from 'react'
 
 import type { FileInfo } from '@api/models'
 import { type Glyph, Icon } from '@lib/Icon'
+import { Marquee } from '@lib/Marquee'
 import { Toolbar, type ToolbarTool } from '@lib/Toolbar'
 
 interface FileStatusItemProps extends ComponentProps<'div'> {
@@ -24,18 +25,11 @@ const FileStatusItem = (props: FileStatusItemProps) => {
         divProps.className,
       )}
     >
-      <div>
+      <div className={clsx('min-w-0 overflow-x-hidden')}>
         <div className={clsx('flex flex-row gap-x-1 items-center')}>
           <Icon Glyph={Glyph} size="md" />
 
-          <p
-            className={clsx(
-              'flex flex-row-reverse text-sm',
-              'overflow-x-auto pb-2.5 -mb-2.5',
-            )}
-          >
-            {file.path}
-          </p>
+          <Marquee className={clsx('text-sm')}>{file.path}</Marquee>
         </div>
 
         {statusMessage}
