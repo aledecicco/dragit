@@ -89,14 +89,14 @@
 
   --spacing-half: 50%;
 
-  --animate-scroll-horizontal: scroll-horizontal 1s linear infinite;
+  --animate-scroll-horizontal: scroll-horizontal 1s linear forwards;
 
   @keyframes scroll-horizontal {
     from {
       transform: translateX(0%);
     }
     to {
-      transform: translateX(-100%);
+      transform: translateX(var(--scroll-to));
     }
   }
 }

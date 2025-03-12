@@ -6,12 +6,16 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useReducer,
   useRef,
   useState,
 } from 'react'
 
 import { clamp } from '@utils/number'
+import {
+  useRerender,
+  useThrottle,
+  useThrottleWithAccumulator,
+} from '@utils/performance'
 import type { LiteralUnion } from '@utils/types'
 
 type ElementId = string
@@ -85,51 +89,38 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
     }
   }, [])
 
-  const painting = useRef(false)
-  const accumulator = useRef({ x: 0, y: 0 })
+  const pan = useThrottleWithAccumulator(
+    (distance) => {
+      if (componentRef.current) {
+        componentRef.current.scrollLeft = clamp(
+          componentRef.current.scrollLeft + distance.x,
+          0,
+          componentRef.current.scrollWidth - componentRef.current.clientWidth,
+        )
+        componentRef.current.scrollTop = clamp(
+          componentRef.current.scrollTop + distance.y,
+          0,
+          componentRef.current.scrollHeight - componentRef.current.clientHeight,
+        )
 
-  const pan = useCallback(
-    (dx: number, dy: number) => {
-      accumulator.current.x += dx
-      accumulator.current.y += dy
-
-      if (!painting.current) {
-        const distance = { ...accumulator.current }
-        painting.current = true
-        accumulator.current = { x: 0, y: 0 }
-
-        requestAnimationFrame(() => {
-          if (componentRef.current) {
-            componentRef.current.scrollLeft = clamp(
-              componentRef.current.scrollLeft + distance.x,
-              0,
-              componentRef.current.scrollWidth -
-                componentRef.current.clientWidth,
-            )
-            componentRef.current.scrollTop = clamp(
-              componentRef.current.scrollTop + distance.y,
-              0,
-              componentRef.current.scrollHeight -
-                componentRef.current.clientHeight,
-            )
-
-            syncSvg()
-          }
-
-          setTimeout(() => {
-            painting.current = false
-          }, 1000 / 60)
-        })
+        syncSvg()
       }
     },
-    [syncSvg],
+    1000 / 120,
+    { x: 0, y: 0 },
+    (accum, distance) => ({ x: accum.x + distance.x, y: accum.y + distance.y }),
+    true,
   )
 
-  const [refresherDep, rerender] = useReducer((n) => (n + 1) % 60, 0)
-  const refresh = useCallback(() => {
-    syncSvg()
-    rerender()
-  }, [syncSvg])
+  const { refresherDep, rerender } = useRerender()
+  const refresh = useThrottle(
+    () => {
+      syncSvg()
+      rerender()
+    },
+    1000 / 120,
+    false,
+  )
   const observer = useRef(new ResizeObserver(refresh))
 
   const refreshAfter = useCallback(() => {
@@ -139,7 +130,7 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
   useEffect(() => {
     const scroll = (_event: Event) => {
       const event = _event as WheelEvent
-      pan(event.deltaX, event.deltaY)
+      pan({ x: event.deltaX, y: event.deltaY })
       event.preventDefault()
       event.stopPropagation()
     }
@@ -149,7 +140,6 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
       componentRef.current.addEventListener('focusin', refreshAfter)
       observer.current.observe(componentRef.current)
     }
-    window.addEventListener('resize', refresh)
 
     return () => {
       if (componentRef.current) {
@@ -157,9 +147,8 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
         componentRef.current.removeEventListener('focusin', refreshAfter)
         observer.current.disconnect()
       }
-      window.removeEventListener('resize', refresh)
     }
-  }, [pan, refresh, refreshAfter])
+  }, [pan, refreshAfter])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: need to update context when rerender is forced
   const contextValue: SvgOverlayState = useMemo(() => {

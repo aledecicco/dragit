@@ -1,12 +1,14 @@
 import clsx from 'clsx'
 import {
+  type CSSProperties,
   type ComponentProps,
-  useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react'
 import { mergeRefs } from 'react-merge-refs'
+
+import { useThrottle } from '@utils/performance'
 
 interface MarqueeProps extends ComponentProps<'div'> {
   speed?: number
@@ -15,27 +17,33 @@ interface MarqueeProps extends ComponentProps<'div'> {
 const Marquee = (props: MarqueeProps) => {
   const { speed = 100, children, ...divProps } = props
 
-  const [duration, setDuration] = useState(0)
+  const [overflow, setOverflow] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
-  const refresh = useCallback(() => {
-    if (
-      contentRef.current &&
-      containerRef.current &&
-      contentRef.current.scrollWidth > containerRef.current.clientWidth
-    ) {
-      setDuration((contentRef.current?.scrollWidth ?? 0) * (1 / speed))
-    } else {
-      setDuration(0)
-    }
-  }, [speed])
+  const refresh = useThrottle(
+    () => {
+      if (
+        contentRef.current &&
+        containerRef.current &&
+        contentRef.current.scrollWidth > containerRef.current.clientWidth
+      ) {
+        setOverflow(
+          contentRef.current.scrollWidth - containerRef.current.clientWidth,
+        )
+      } else {
+        setOverflow(0)
+      }
+    },
+    1000 / 30,
+    false,
+  )
 
   const observer = useRef(new ResizeObserver(refresh))
 
   useEffect(() => {
-    if (contentRef.current) {
-      observer.current.observe(contentRef.current)
+    if (containerRef.current) {
+      observer.current.observe(containerRef.current)
     }
 
     return () => {
@@ -50,30 +58,21 @@ const Marquee = (props: MarqueeProps) => {
       className={clsx('group overflow-x-hidden', divProps.className)}
     >
       <div
+        ref={contentRef}
         className={clsx(
-          'w-full min-w-max group-hover:animate-scroll-horizontal',
-          'relative',
+          'text-nowrap whitespace-nowrap mr-8',
+          overflow > 0 && 'group-hover:animate-scroll-horizontal',
+          'min-w-max ',
         )}
         style={{
-          animationDuration: `${duration}s`,
+          ...(overflow > 0 &&
+            ({
+              animationDuration: `${overflow * (1 / speed)}s`,
+              '--scroll-to': `${-overflow}px`,
+            } as CSSProperties)),
         }}
       >
-        <div
-          ref={contentRef}
-          className={clsx('text-nowrap whitespace-nowrap mr-8', 'min-w-max ')}
-        >
-          {children}
-        </div>
-        <div
-          aria-hidden={true}
-          className={clsx(
-            'absolute left-full top-0',
-            'text-nowrap whitespace-nowrap mr-8',
-            'min-w-max',
-          )}
-        >
-          {children}
-        </div>
+        {children}
       </div>
     </div>
   )

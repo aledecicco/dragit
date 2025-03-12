@@ -1,22 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-const useThrottle = (callback: () => void, delay: number) => {
-  const wait = useRef(false)
-
-  return useCallback(() => {
-    if (wait.current) {
-      return
-    }
-
-    callback()
-
-    wait.current = true
-    setTimeout(() => {
-      wait.current = false
-    }, delay)
-  }, [callback, delay])
-}
-
 const MS_IN_SECOND = 1000
 const MS_IN_MINUTE = 60 * MS_IN_SECOND
 const MS_IN_HOUR = 60 * MS_IN_MINUTE
@@ -25,6 +8,9 @@ const MS_IN_WEEK = 7 * MS_IN_DAY
 const MS_IN_MONTH = 30 * MS_IN_DAY
 const MS_IN_YEAR = 365 * MS_IN_DAY
 
+/**
+ * A memoized value that auto-updates with the given frequency.
+ */
 const useTimedMemo = <T>(factory: () => T, interval: number) => {
   const isSet = useRef(false)
   const [value, setValue] = useState(factory())
@@ -86,4 +72,4 @@ const useDateDifference = (date: Date | number): string => {
   return useTimedMemo(getDifference, MS_IN_MINUTE)
 }
 
-export { useThrottle, useTimedMemo, useDateDifference }
+export { useTimedMemo, useDateDifference }
