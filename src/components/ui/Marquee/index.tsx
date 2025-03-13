@@ -20,6 +20,7 @@ const Marquee = (props: MarqueeProps) => {
 
   const [overflow, setOverflow] = useState(0)
   const shouldScroll = overflow > 0
+  const animationDuration = overflow / (speed / (infinite ? 4 : 1))
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -55,7 +56,7 @@ const Marquee = (props: MarqueeProps) => {
 
   return (
     <div
-      {...propsWithCn(divProps, 'group/marquee overflow-x-hidden')}
+      {...propsWithCn(divProps, 'group/marquee overflow-x-hidden relative')}
       ref={mergeRefs([containerRef, divProps.ref])}
     >
       <div
@@ -68,7 +69,7 @@ const Marquee = (props: MarqueeProps) => {
         style={{
           ...(shouldScroll &&
             ({
-              animationDuration: `${overflow * (1 / speed)}s`,
+              animationDuration: `${animationDuration}s`,
               animationFillMode: infinite ? undefined : 'forwards',
               animationIterationCount: infinite ? 'infinite' : 1,
               '--scroll-to': infinite ? '-100%' : `${-overflow}px`,
@@ -89,6 +90,31 @@ const Marquee = (props: MarqueeProps) => {
           children
         )}
       </div>
+
+      {shouldScroll && (
+        <>
+          <div
+            className={cn(
+              'absolute top-0 -left-0.5 h-full',
+              'opacity-0 w-1.5 bg-linear-to-r from-dark-950/70 to-dark-950/40 rounded-r-xs',
+              'group-hover/marquee:animate-fade-in',
+            )}
+            style={{
+              animationDuration: '0.5s',
+            }}
+          />
+          <div
+            className={cn(
+              'absolute top-0 -right-0.5 h-full',
+              'opacity-100 w-1.5 bg-linear-to-l from-dark-950/70 to-dark-950/40 rounded-r-xs',
+              !infinite && 'group-hover/marquee:animate-fade-out',
+            )}
+            style={{
+              animationDuration: `${animationDuration}s`,
+            }}
+          />
+        </>
+      )}
     </div>
   )
 }

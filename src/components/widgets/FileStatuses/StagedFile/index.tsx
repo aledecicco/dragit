@@ -33,24 +33,14 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
       file={file}
       className={cn('text-light-600')}
       statusMessage={
-        <p className={cn('text-xs text-success-200')}>
+        <p className={cn('text-xs text-success-300/50')}>
           {match(file.staged)
-            .with('added', () => (file.isDir ? 'Folder added' : 'File added'))
-            .with('deleted', () =>
-              file.isDir ? 'Folder deleted' : 'File deleted',
-            )
-            .with('modified', () =>
-              file.isDir ? 'Folder modified' : 'File modified',
-            )
-            .with('copied', () =>
-              file.isDir ? 'Folder copied from' : 'File copied from',
-            )
-            .with('renamed', () =>
-              file.isDir ? 'Folder renamed from' : 'File renamed from',
-            )
-            .with('typeChanged', () =>
-              file.isDir ? 'Folder type changed' : 'File type changed',
-            )
+            .with('added', () => 'New')
+            .with('deleted', () => 'Deleted')
+            .with('modified', () => 'Edited')
+            .with('copied', () => 'Copied')
+            .with('renamed', () => 'Renamed')
+            .with('typeChanged', () => 'Converted')
             .exhaustive()}
         </p>
       }

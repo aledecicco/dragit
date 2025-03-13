@@ -31,18 +31,10 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
       statusMessage={
         <p className={cn('text-xs text-light-950')}>
           {match(file.unstaged)
-            .with('added', () =>
-              file.isDir ? 'Directory created' : 'File created',
-            )
-            .with('deleted', () =>
-              file.isDir ? 'Directory deleted' : 'File deleted',
-            )
-            .with('modified', () =>
-              file.isDir ? 'Directory modified' : 'File modified',
-            )
-            .with('typeChanged', () =>
-              file.isDir ? 'Directory type changed' : 'File type changed',
-            )
+            .with('added', () => 'New')
+            .with('deleted', () => 'Deleted')
+            .with('modified', () => 'Edited')
+            .with('typeChanged', () => 'Converted')
             .exhaustive()}
         </p>
       }
