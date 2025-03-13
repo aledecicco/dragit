@@ -11,11 +11,7 @@ import {
 } from 'react'
 
 import { clamp } from '@utils/number'
-import {
-  useRerender,
-  useThrottle,
-  useThrottleWithAccumulator,
-} from '@utils/performance'
+import { useRerender, useThrottledCallback } from '@utils/performance'
 import type { LiteralUnion } from '@utils/types'
 
 type ElementId = string
@@ -89,39 +85,47 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
     }
   }, [])
 
-  const pan = useThrottleWithAccumulator(
-    (distance) => {
-      if (componentRef.current) {
-        componentRef.current.scrollLeft = clamp(
-          componentRef.current.scrollLeft + distance.x,
-          0,
-          componentRef.current.scrollWidth - componentRef.current.clientWidth,
-        )
-        componentRef.current.scrollTop = clamp(
-          componentRef.current.scrollTop + distance.y,
-          0,
-          componentRef.current.scrollHeight - componentRef.current.clientHeight,
-        )
+  const pan = useThrottledCallback({
+    waitForFrame: true,
+    trailingCall: true,
+    delay: 1000 / 60,
+    withAccumulator: {
+      initial: { x: 0, y: 0 },
+      update: (accum, distance) => ({
+        x: accum.x + distance.x,
+        y: accum.y + distance.y,
+      }),
+      callback: (distance) => {
+        if (componentRef.current) {
+          componentRef.current.scrollLeft = clamp(
+            componentRef.current.scrollLeft + distance.x,
+            0,
+            componentRef.current.scrollWidth - componentRef.current.clientWidth,
+          )
+          componentRef.current.scrollTop = clamp(
+            componentRef.current.scrollTop + distance.y,
+            0,
+            componentRef.current.scrollHeight -
+              componentRef.current.clientHeight,
+          )
 
-        syncSvg()
-      }
+          syncSvg()
+        }
+      },
     },
-    1000 / 120,
-    { x: 0, y: 0 },
-    (accum, distance) => ({ x: accum.x + distance.x, y: accum.y + distance.y }),
-    true,
-  )
+  })
 
   const { refresherDep, rerender } = useRerender()
-  const refresh = useThrottle(
-    () => {
+  const refresh = useThrottledCallback({
+    waitForFrame: false,
+    trailingCall: true,
+    delay: 1000 / 60,
+    callback: () => {
       syncSvg()
       rerender()
     },
-    1000 / 120,
-    false,
-  )
-  const observer = useRef(new ResizeObserver(refresh))
+  })
+  const observer = useRef(new ResizeObserver(() => refresh()))
 
   const refreshAfter = useCallback(() => {
     requestAnimationFrame(() => syncSvg())

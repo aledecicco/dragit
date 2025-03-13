@@ -1,78 +1,116 @@
 import { useCallback, useReducer, useRef } from 'react'
 
-/**
- * Returns a throttled callback that can also wait for animation frames.
- */
-const useThrottle = (
-  callback: () => void,
-  delay: number,
-  waitForFrame?: boolean,
-) => {
-  const wait = useRef(false)
-
-  return useCallback(() => {
-    if (wait.current) {
-      return
-    }
-
-    wait.current = true
-
-    if (waitForFrame) {
-      requestAnimationFrame(() => {
-        callback()
-        setTimeout(() => {
-          wait.current = false
-        }, delay)
-      })
-    } else {
-      callback()
-      setTimeout(() => {
-        wait.current = false
-      }, delay)
-    }
-  }, [callback, delay, waitForFrame])
+interface BaseThrottleOptions {
+  delay: number
+  waitForFrame?: boolean
+  trailingCall?: boolean
 }
 
+type ThrottleOptions<T, A> = BaseThrottleOptions &
+  (
+    | {
+        callback?: never
+        withAccumulator: {
+          initial: T
+          update: (accumulator: T, args: A) => T
+          callback: (accumulator: T) => void
+        }
+      }
+    | {
+        callback: () => void
+        withAccumulator?: never
+      }
+  )
+
 /**
- * Returns a throttled callback that keeps track of and accumulates the values it's called with.
- * When it's the given callback's turn to run, it's called with the accumulated value.
+ * Returns a throttled version of the given callback.
+ * Can optionally keep track of the debounced calls and accumulate them.
+ *
+ * @param options Configuration options.
+ * @param options.delay The throttle delay in milliseconds.
+ * @param options.waitForFrame Whether to wait for an animation frame before executing.
+ * @param options.trailingCall Whether to perform trailing callbacks.
+ * @param options.callback The function to throttle, if no accumulation is needed
+ * @param options.withAccumulator Configuration that enables accumulating calls.
+ * @param options.withAccumulator.initial Initial value for the accumulator.
+ * @param options.withAccumulator.update Function that updates the accumulator with new arguments.
+ * @param options.withAccumulator.callback The function to throttle, that gets passed the accumulated value.
  */
-const useThrottleWithAccumulator = <T, A = T>(
-  callback: (accumulator: T) => void,
-  delay: number,
-  initialAccumulator: T,
-  updateAccumulator: (accumulator: T, args: A) => T,
-  waitForFrame?: boolean,
-): ((args: A) => void) => {
-  const accumulator = useRef(initialAccumulator)
+const useThrottledCallback = <T = void, A = T>(
+  options: ThrottleOptions<T, A>,
+) => {
+  const accumulator = useRef(
+    options.withAccumulator
+      ? { value: options.withAccumulator.initial }
+      : undefined,
+  )
   const wait = useRef(false)
+  const pending = useRef(false)
+  const timeoutId = useRef<number>(null)
 
   return useCallback(
     (args: A) => {
-      accumulator.current = updateAccumulator(accumulator.current, args)
+      if (options.withAccumulator && accumulator.current) {
+        accumulator.current = {
+          value: options.withAccumulator.update(
+            accumulator.current.value,
+            args,
+          ),
+        }
+      }
 
       if (wait.current) {
+        pending.current = true
         return
       }
 
       wait.current = true
-      accumulator.current = initialAccumulator
+      pending.current = false
 
-      if (waitForFrame) {
+      const execute = () => {
+        if (options.withAccumulator && accumulator.current) {
+          options.withAccumulator.callback(accumulator.current.value)
+        } else {
+          options.callback?.()
+        }
+
+        if (options.withAccumulator) {
+          accumulator.current = { value: options.withAccumulator.initial }
+        }
+      }
+
+      const executeAndSchedule = () => {
+        execute()
+
+        if (timeoutId.current) {
+          clearTimeout(timeoutId.current)
+        }
+
+        timeoutId.current = setTimeout(() => {
+          timeoutId.current = null
+
+          if (pending.current) {
+            // Trailing call
+            pending.current = false
+
+            if (options.trailingCall) {
+              execute()
+            }
+          }
+
+          wait.current = false
+        }, options.delay)
+      }
+
+      if (options.waitForFrame) {
         requestAnimationFrame(() => {
-          callback(accumulator.current)
-          setTimeout(() => {
-            wait.current = false
-          }, delay)
+          executeAndSchedule()
         })
       } else {
-        callback(accumulator.current)
-        setTimeout(() => {
-          wait.current = false
-        }, delay)
+        executeAndSchedule()
       }
     },
-    [callback, delay, initialAccumulator, updateAccumulator, waitForFrame],
+    [options],
   )
 }
 
@@ -82,4 +120,4 @@ const useRerender = () => {
   return { refresherDep, rerender }
 }
 
-export { useThrottle, useThrottleWithAccumulator, useRerender }
+export { useThrottledCallback, useRerender }
