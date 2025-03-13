@@ -1,8 +1,8 @@
 import * as Ariakit from '@ariakit/react'
 
-import { Icon } from '@lib/Icon'
-import { Separator } from '@lib/Separator'
 import { IconInfoCircle } from '@tabler/icons-react'
+import { Icon } from '@ui/Icon'
+import { Separator } from '@ui/Separator'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface HovercardProps extends Ariakit.HovercardProps {

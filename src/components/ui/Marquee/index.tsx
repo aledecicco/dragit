@@ -12,12 +12,14 @@ import { cn, propsWithCn } from '@utils/styles'
 
 interface MarqueeProps extends ComponentProps<'div'> {
   speed?: number
+  infinite?: boolean
 }
 
 const Marquee = (props: MarqueeProps) => {
-  const { speed = 100, children, ...divProps } = props
+  const { speed = 100, infinite = false, children, ...divProps } = props
 
   const [overflow, setOverflow] = useState(0)
+  const shouldScroll = overflow > 0
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -53,25 +55,39 @@ const Marquee = (props: MarqueeProps) => {
 
   return (
     <div
-      {...propsWithCn(divProps, 'group overflow-x-hidden')}
+      {...propsWithCn(divProps, 'group/marquee overflow-x-hidden')}
       ref={mergeRefs([containerRef, divProps.ref])}
     >
       <div
         ref={contentRef}
         className={cn(
-          'text-nowrap whitespace-nowrap mr-8',
-          overflow > 0 && 'group-hover:animate-scroll-horizontal',
-          'min-w-max ',
+          'text-nowrap whitespace-nowrap min-w-max',
+          shouldScroll && 'group-hover/marquee:animate-scroll-horizontal',
+          infinite && 'relative',
         )}
         style={{
-          ...(overflow > 0 &&
+          ...(shouldScroll &&
             ({
               animationDuration: `${overflow * (1 / speed)}s`,
-              '--scroll-to': `${-overflow}px`,
+              animationFillMode: infinite ? undefined : 'forwards',
+              animationIterationCount: infinite ? 'infinite' : 1,
+              '--scroll-to': infinite ? '-100%' : `${-overflow}px`,
             } as CSSProperties)),
         }}
       >
-        {children}
+        {infinite && shouldScroll ? (
+          <>
+            <div className={cn('mr-8')}>{children}</div>
+            <div
+              className={cn('absolute top-0 left-full mr-8')}
+              aria-hidden={true}
+            >
+              {children}
+            </div>
+          </>
+        ) : (
+          children
+        )}
       </div>
     </div>
   )

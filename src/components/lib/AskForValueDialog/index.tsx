@@ -3,10 +3,10 @@ import type { ReactNode } from 'react'
 
 import { hideDialog, showDialog } from '@context/dialogs'
 import { getUniqueId } from '@context/ids'
-import { Dialog, type DialogProps } from '@lib/Dialog'
-import { Form } from '@lib/Form'
-import { InputField } from '@lib/Form/InputField'
-import { FormSubmitButton } from '@lib/Form/SubmitButton'
+import { Dialog, type DialogProps } from '@ui/Dialog'
+import { Form } from '@ui/Form'
+import { InputField } from '@ui/Form/InputField'
+import { FormSubmitButton } from '@ui/Form/SubmitButton'
 
 type AskForValueVariant = 'input' | 'text'
 
@@ -63,6 +63,7 @@ const askForValue = (
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const dialogKey = getUniqueId()
+
     showDialog(
       dialogKey,
       <AskForValueDialog

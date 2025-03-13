@@ -1,9 +1,9 @@
 import type { ComponentProps, ReactNode } from 'react'
 
 import type { FileInfo } from '@api/models'
-import { type Glyph, Icon } from '@lib/Icon'
-import { Marquee } from '@lib/Marquee'
-import { Toolbar, type ToolbarTool } from '@lib/Toolbar'
+import { type Glyph, Icon } from '@ui/Icon'
+import { Marquee } from '@ui/Marquee'
+import { Toolbar, type ToolbarTool } from '@ui/Toolbar'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface FileStatusItemProps extends ComponentProps<'div'> {

@@ -1,6 +1,6 @@
-import { Button, type ButtonProps } from '@lib/Button'
-import { type Glyph, Icon } from '@lib/Icon'
-import { Tooltip } from '@lib/Tooltip'
+import { Button, type ButtonProps } from '@ui/Button'
+import { type Glyph, Icon } from '@ui/Icon'
+import { Tooltip } from '@ui/Tooltip'
 
 interface IconButtonProps extends ButtonProps {
   Glyph: Glyph

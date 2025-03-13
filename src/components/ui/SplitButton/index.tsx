@@ -3,8 +3,8 @@ import { type ComponentProps, type MouseEventHandler, useRef } from 'react'
 import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
 
-import { Button, type ButtonOwnProps } from '@lib/Button'
-import { Menu, type MenuItem } from '@lib/Menu'
+import { Button, type ButtonOwnProps } from '@ui/Button'
+import { Menu, type MenuItem } from '@ui/Menu'
 import { propsWithCn } from '@utils/styles'
 
 interface SplitButtonProps
@@ -61,7 +61,7 @@ const SplitButton = (props: SplitButtonProps) => {
             size={size}
             {...propsWithCn(
               menuButtonProps,
-              'group rounded-l-none rounded-r-[inherit]',
+              'rounded-l-none rounded-r-[inherit]',
               match(size)
                 .with('sm', () => 'px-0.5')
                 .with('md', () => 'px-0.75')

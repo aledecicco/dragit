@@ -1,7 +1,7 @@
 import { match } from 'ts-pattern'
 
-import type { Element, ElementId } from '@main/SvgOverlay/context'
-import { getPosition } from '@main/SvgOverlay/utils'
+import type { Element, ElementId } from '@lib/SvgOverlay/context'
+import { getPosition } from '@lib/SvgOverlay/utils'
 import { cn } from '@utils/styles'
 
 export type ParentCommitType = 'solid' | 'dashed' | 'unconfirmed'

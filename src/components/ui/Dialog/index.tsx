@@ -1,7 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 
 import { type DialogKey, hideDialog } from '@context/dialogs'
-import { Button } from '@lib/Button'
+import { Button } from '@ui/Button'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface DialogProps extends Ariakit.DialogProps {
@@ -17,11 +17,6 @@ const Dialog = (props: DialogProps) => {
       <Ariakit.Dialog
         modal
         unmountOnHide
-        onClose={(e) => {
-          e.preventDefault()
-          hideDialog(dialogKey)
-          dialogProps.onClose?.(e)
-        }}
         backdrop={<div className={cn('bg-black/50 backdrop-blur-md')} />}
         {...propsWithCn(
           dialogProps,
@@ -31,6 +26,10 @@ const Dialog = (props: DialogProps) => {
           'border-4 border-solid border-dark-700',
           'flex flex-col',
         )}
+        onClose={(e) => {
+          dialogProps.onClose?.(e)
+          hideDialog(dialogKey)
+        }}
       >
         <div className={cn('relative w-full h-full p-8')}>
           <Ariakit.DialogDismiss

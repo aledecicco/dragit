@@ -2,8 +2,9 @@ import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
 import { type ReactNode, startTransition, useMemo, useState } from 'react'
 
-import { Button } from '@lib/Button'
-import { Separator } from '@lib/Separator'
+import { Button } from '@ui/Button'
+import { Marquee } from '@ui/Marquee'
+import { Separator } from '@ui/Separator'
 import { mapOr } from '@utils/array'
 import { cn } from '@utils/styles'
 
@@ -62,7 +63,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
               variant="plain"
               size="lg"
               className={cn(
-                'group gap-2 text-sm',
+                'group/combobox gap-2 text-sm',
                 option === undefined && 'font-thin text-light-300',
                 className,
               )}
@@ -70,9 +71,11 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
           }
           {...selectProps}
         >
-          {option === undefined ? placeholder : renderOption(option)}
+          <Marquee>
+            {option === undefined ? placeholder : renderOption(option)}
+          </Marquee>
           <Ariakit.SelectArrow
-            className={cn('group-aria-expanded:rotate-180')}
+            className={cn('group-aria-expanded/combobox:rotate-180')}
           />
         </Ariakit.Select>
         <Ariakit.SelectPopover

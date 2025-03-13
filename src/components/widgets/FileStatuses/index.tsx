@@ -3,13 +3,13 @@ import type { ComponentProps } from 'react'
 import { useAddToIndex, useRemoveFromIndex } from '@api/commands'
 import { headInfoQuery } from '@api/queries'
 import { useRepositoryQuery } from '@api/utils'
-import { Accordion } from '@lib/Accordion'
-import { IconButton } from '@lib/IconButton'
 import {
   IconListCheck,
   IconPlaylistAdd,
   IconPlaylistX,
 } from '@tabler/icons-react'
+import { Accordion } from '@ui/Accordion'
+import { IconButton } from '@ui/IconButton'
 import { mapOr } from '@utils/array'
 import { cn, propsWithCn } from '@utils/styles'
 import { getFilesByStatus } from '@widgets/FileStatuses/utils'

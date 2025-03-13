@@ -2,7 +2,7 @@ import * as Ariakit from '@ariakit/react'
 import type { MouseEventHandler } from 'react'
 import { match } from 'ts-pattern'
 
-import { type Glyph, Icon } from '@lib/Icon'
+import { type Glyph, Icon } from '@ui/Icon'
 import { cn, propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
@@ -23,9 +23,9 @@ const Menu = (props: MenuProps) => {
 
   return (
     <Ariakit.MenuProvider>
-      <Ariakit.MenuButton render={anchor}>
+      <Ariakit.MenuButton render={anchor} className={cn('group/menu')}>
         <Ariakit.MenuButtonArrow
-          className={cn('group-aria-expanded:rotate-180')}
+          className={cn('group-aria-expanded/menu:rotate-180')}
         />
       </Ariakit.MenuButton>
 

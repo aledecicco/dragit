@@ -1,10 +1,10 @@
 import * as Ariakit from '@ariakit/react'
 import type { HTMLAttributes, MouseEventHandler } from 'react'
 
-import type { Glyph } from '@lib/Icon'
-import { IconButton } from '@lib/IconButton'
-import type { MenuItem } from '@lib/Menu'
-import { SplitButton } from '@lib/SplitButton'
+import type { Glyph } from '@ui/Icon'
+import { IconButton } from '@ui/IconButton'
+import type { MenuItem } from '@ui/Menu'
+import { SplitButton } from '@ui/SplitButton'
 import { cn, propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 

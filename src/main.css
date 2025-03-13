@@ -89,7 +89,7 @@
 
   --spacing-half: 50%;
 
-  --animate-scroll-horizontal: scroll-horizontal 1s linear forwards;
+  --animate-scroll-horizontal: scroll-horizontal 1s linear;
 
   @keyframes scroll-horizontal {
     from {

@@ -1,9 +1,9 @@
 import { IconDownload, IconRefresh, IconUpload } from '@tabler/icons-react'
 
 import { useFetchRemote, usePullBranch, usePushBranch } from '@api/commands'
-import { askForValue } from '@common/AskForValueDialog'
 import { useSelectedBranches } from '@context/branches'
-import { Toolbar } from '@lib/Toolbar'
+import { askForValue } from '@lib/AskForValueDialog'
+import { Toolbar } from '@ui/Toolbar'
 import { cn } from '@utils/styles'
 
 const BranchToolbars = () => {

@@ -3,7 +3,7 @@ import type { ComponentProps } from 'react'
 
 import { branchesQuery } from '@api/queries'
 import { useRepositoryQuery } from '@api/utils'
-import { Accordion } from '@lib/Accordion'
+import { Accordion } from '@ui/Accordion'
 import { mapOr } from '@utils/array'
 import { cn, propsWithCn } from '@utils/styles'
 import { BranchesListItem } from './Item'

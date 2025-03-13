@@ -6,8 +6,8 @@ import type { BranchInfo } from '@api/models'
 import { branchesQuery, headInfoQuery } from '@api/queries'
 import { useRepositoryQuery } from '@api/utils'
 import { changeBaseBranch, useSelectedBranches } from '@context/branches'
-import { Combobox, type ComboboxOption } from '@lib/Combobox'
-import { IconButton } from '@lib/IconButton'
+import { Combobox, type ComboboxOption } from '@ui/Combobox'
+import { IconButton } from '@ui/IconButton'
 import { cn } from '@utils/styles'
 
 const BranchSelectors = () => {

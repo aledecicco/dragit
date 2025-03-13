@@ -1,6 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 
-import { Button, type ButtonProps } from '@lib/Button'
+import { Button, type ButtonProps } from '@ui/Button'
 import { propsWithCn } from '@utils/styles'
 
 interface FormSubmitButtonProps extends Partial<ButtonProps> {

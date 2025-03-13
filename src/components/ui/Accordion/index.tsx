@@ -2,7 +2,7 @@ import * as Ariakit from '@ariakit/react'
 import { IconChevronDown } from '@tabler/icons-react'
 import { type ComponentProps, type ReactNode, useState } from 'react'
 
-import { Icon } from '@lib/Icon'
+import { Icon } from '@ui/Icon'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface AccordionSection extends Ariakit.DisclosureContentProps {
@@ -56,7 +56,7 @@ const Accordion = (props: AccordionProps) => {
                   render={
                     <Ariakit.Disclosure
                       className={cn(
-                        'cursor-pointer w-full group',
+                        'cursor-pointer w-full group/accordion',
                         'text-sm text-light-900 text-start',
                         'p-2 flex flex-row gap-x-2 items-center',
                         'hover:text-light-700 hover:underline',
@@ -68,7 +68,7 @@ const Accordion = (props: AccordionProps) => {
                   {showArrows && (
                     <Icon
                       Glyph={IconChevronDown}
-                      className={cn('group-aria-expanded:rotate-180')}
+                      className={cn('group-aria-expanded/accordion:rotate-180')}
                     />
                   )}
                   {label}

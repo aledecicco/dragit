@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 
 import { useOpenFolder } from '@api/commands'
 import { currentDirQuery } from '@api/queries'
-import { Button, type ButtonProps } from '@lib/Button'
+import { Button, type ButtonProps } from '@ui/Button'
 import { propsWithCn } from '@utils/styles'
 
 interface CurrentDirectoryProps extends Partial<ButtonProps> {}
