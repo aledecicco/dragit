@@ -8,7 +8,11 @@ import {
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import { usePullBranch, usePushBranch } from '@api/commands'
+import {
+  useCheckoutLocalBranch,
+  usePullBranch,
+  usePushBranch,
+} from '@api/commands'
 import type { BranchInfo, BranchName, RefName } from '@api/models'
 import { useSelectedBranches } from '@context/branches'
 import { Button } from '@ui/Button'
@@ -36,6 +40,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
 
   const { branch: currentBranch } = useSelectedBranches()
   const isCurrentBranch = currentBranch && branch.name === currentBranch.name
+  const checkout = useCheckoutLocalBranch()
 
   return (
     <Ariakit.CompositeItem
@@ -47,9 +52,17 @@ const BranchesListItem = (props: BranchesListItemProps) => {
             divProps,
             'flex flex-row items-center justify-between gap-4',
             'p-1.5 bg-dark-600 rounded-xs',
-            'focus:bg-dark-500 data-focus:bg-dark-500',
-            isCurrentBranch && 'bg-dark-500 border-1 border-accent-300',
+            'hover:bg-dark-500 focus:bg-dark-500 data-focus:bg-dark-500',
+            'cursor-pointer border-1 border-solid border-transparent',
+            isCurrentBranch && 'bg-dark-500 border-accent-300',
           )}
+          onClick={(e) => {
+            if (e.detail === 0 || e.detail === 2) {
+              checkout.mutate(branch.name)
+            }
+
+            divProps.onClick?.(e)
+          }}
         />
       }
     >

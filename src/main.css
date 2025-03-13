@@ -100,7 +100,7 @@
     }
   }
 
-  --animate-fade-in: fade-in 1s linear forwards;
+  --animate-fade-in: fade-in 1s ease-in forwards;
 
   @keyframes fade-in {
     from {
@@ -111,13 +111,16 @@
     }
   }
 
-  --animate-fade-out: fade-out 1s linear forwards;
+  --animate-fade-out: fade-out 1s ease-in forwards;
 
   @keyframes fade-out {
-    from {
+    0% {
       opacity: 1;
     }
-    to {
+    80% {
+      opacity: 1;
+    }
+    100% {
       opacity: 0;
     }
   }

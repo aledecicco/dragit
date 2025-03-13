@@ -63,6 +63,10 @@ const Button = (props: ButtonProps) => {
           'aria-disabled:text-light-800',
         ],
       )}
+      onClick={(e) => {
+        e.stopPropagation()
+        buttonProps.onClick?.(e)
+      }}
     />
   )
 }

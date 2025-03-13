@@ -20,7 +20,10 @@ const Marquee = (props: MarqueeProps) => {
 
   const [overflow, setOverflow] = useState(0)
   const shouldScroll = overflow > 0
-  const animationDuration = overflow / (speed / (infinite ? 4 : 1))
+  const animationDuration = Math.max(
+    0.5,
+    overflow / (speed / (infinite ? 4 : 1)),
+  )
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -100,7 +103,7 @@ const Marquee = (props: MarqueeProps) => {
               'group-hover/marquee:animate-fade-in',
             )}
             style={{
-              animationDuration: '0.5s',
+              animationDuration: `${Math.min(0.5, animationDuration / 2)}s`,
             }}
           />
           <div
