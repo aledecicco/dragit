@@ -10,12 +10,15 @@ import { mergeRefs } from 'react-merge-refs'
 import { useThrottledCallback } from '@utils/performance'
 import { cn, propsWithCn } from '@utils/styles'
 
+const INFINITE_SPACING = 32
+
 interface MarqueeProps extends ComponentProps<'div'> {
   speed?: number
+  infinite?: boolean
 }
 
 const Marquee = (props: MarqueeProps) => {
-  const { speed = 100, children, ...divProps } = props
+  const { speed = 100, children, infinite = false, ...divProps } = props
 
   const [overflow, setOverflow] = useState(0)
   const shouldScroll = overflow > 0
@@ -23,34 +26,39 @@ const Marquee = (props: MarqueeProps) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
-  const refresh = useThrottledCallback({
-    waitForFrame: false,
-    trailingCall: true,
-    delay: 1000 / 30,
-    callback: () => {
+  const refresh = useThrottledCallback(
+    () => {
       if (
         contentRef.current &&
         containerRef.current &&
-        contentRef.current.scrollWidth > containerRef.current.clientWidth
+        contentRef.current.clientWidth > containerRef.current.clientWidth
       ) {
         setOverflow(
-          contentRef.current.scrollWidth - containerRef.current.clientWidth,
+          infinite
+            ? contentRef.current.clientWidth + INFINITE_SPACING
+            : contentRef.current.clientWidth - containerRef.current.clientWidth,
         )
       } else {
         setOverflow(0)
       }
     },
-  })
+    [infinite],
+    {
+      waitForFrame: false,
+      trailingCall: true,
+      delay: 1000 / 30,
+    },
+  )
 
-  const observer = useRef(new ResizeObserver(() => refresh()))
+  const observer = useRef(new ResizeObserver(refresh))
 
   useEffect(() => {
-    if (containerRef.current) {
-      observer.current.observe(containerRef.current)
-    }
-
     if (contentRef.current) {
       observer.current.observe(contentRef.current)
+    }
+
+    if (containerRef.current) {
+      observer.current.observe(containerRef.current)
     }
 
     return () => {
@@ -60,7 +68,10 @@ const Marquee = (props: MarqueeProps) => {
 
   return (
     <div
-      {...propsWithCn(divProps, 'group/marquee overflow-x-hidden relative')}
+      {...propsWithCn(
+        divProps,
+        'group/marquee overflow-x-hidden relative max-w-full',
+      )}
       ref={mergeRefs([containerRef, divProps.ref])}
     >
       <div
@@ -68,16 +79,30 @@ const Marquee = (props: MarqueeProps) => {
         className={cn(
           'text-nowrap whitespace-nowrap min-w-max',
           shouldScroll && 'group-hover/marquee:animate-scroll-horizontal',
+          infinite && 'relative',
         )}
         style={{
           ...(shouldScroll &&
             ({
               animationDuration: `${animationDuration}s`,
-              '--scroll-to': `${-overflow}px`,
+              animationFillMode: infinite ? undefined : 'forwards',
+              animationIterationCount: infinite ? 'infinite' : 1,
+              '--scroll-to': infinite
+                ? `calc(-100% - ${INFINITE_SPACING}px)`
+                : `${-overflow}px`,
             } as CSSProperties)),
         }}
       >
         {children}
+        {infinite && shouldScroll && (
+          <div
+            className={cn('absolute top-0 left-full')}
+            style={{ marginLeft: `${INFINITE_SPACING}px` }}
+            aria-hidden={true}
+          >
+            {children}
+          </div>
+        )}
       </div>
 
       {shouldScroll && (
@@ -96,7 +121,7 @@ const Marquee = (props: MarqueeProps) => {
             className={cn(
               'absolute top-0 -right-0.5 h-full',
               'opacity-100 w-1.5 bg-linear-to-l from-dark-950/70 to-dark-950/40 rounded-r-xs',
-              'group-hover/marquee:animate-fade-out',
+              !infinite && 'group-hover/marquee:animate-fade-out',
             )}
             style={{
               animationDuration: `${animationDuration}s`,

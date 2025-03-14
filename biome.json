@@ -22,7 +22,19 @@
       "recommended": true,
       "correctness": {
         "noUnusedVariables": "warn",
-        "noSwitchDeclarations": "warn"
+        "noSwitchDeclarations": "warn",
+        "useExhaustiveDependencies": {
+          "level": "error",
+          "options": {
+            "hooks": [
+              {
+                "closureIndex": 0,
+                "dependenciesIndex": 1,
+                "name": "useThrottledCallback"
+              }
+            ]
+          }
+        }
       },
       "nursery": {
         "useAtIndex": "warn"

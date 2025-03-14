@@ -1,4 +1,4 @@
-import { useCallback, useReducer, useRef } from 'react'
+import { type DependencyList, useCallback, useReducer, useRef } from 'react'
 
 interface BaseThrottleOptions {
   delay: number
@@ -6,39 +6,42 @@ interface BaseThrottleOptions {
   trailingCall?: boolean
 }
 
-type ThrottleOptions<T, A> = BaseThrottleOptions &
-  (
-    | {
-        callback?: never
-        withAccumulator: {
-          initial: T
-          update: (accumulator: T, args: A) => T
-          callback: (accumulator: T) => void
-        }
-      }
-    | {
-        callback: () => void
-        withAccumulator?: never
-      }
-  )
+interface WithAccumulator<T> extends BaseThrottleOptions {
+  withAccumulator: {
+    initial: T
+    update: (accumulator: T, args: T) => T
+  }
+}
 
-/**
- * Returns a throttled version of the given callback.
- * Can optionally keep track of the debounced calls and accumulate them.
- *
- * @param options Configuration options.
- * @param options.delay The throttle delay in milliseconds.
- * @param options.waitForFrame Whether to wait for an animation frame before executing.
- * @param options.trailingCall Whether to perform trailing callbacks.
- * @param options.callback The function to throttle, if no accumulation is needed
- * @param options.withAccumulator Configuration that enables accumulating calls.
- * @param options.withAccumulator.initial Initial value for the accumulator.
- * @param options.withAccumulator.update Function that updates the accumulator with new arguments.
- * @param options.withAccumulator.callback The function to throttle, that gets passed the accumulated value.
- */
-const useThrottledCallback = <T = void, A = T>(
-  options: ThrottleOptions<T, A>,
-) => {
+interface WithoutAccumulator extends BaseThrottleOptions {
+  withAccumulator?: never
+}
+
+type ThrottleOptions<T> = WithoutAccumulator | WithAccumulator<T>
+
+function useThrottledCallback(
+  callback: () => void,
+  deps: DependencyList,
+  options: WithoutAccumulator,
+): () => void
+
+function useThrottledCallback<T>(
+  callback: (args: T) => void,
+  deps: DependencyList,
+  options: WithoutAccumulator,
+): (args: T) => void
+
+function useThrottledCallback<T>(
+  callback: (acc: T) => void,
+  deps: DependencyList,
+  options: WithAccumulator<T>,
+): (args: T) => void
+
+function useThrottledCallback<T>(
+  callback: (acc: T) => void,
+  deps: DependencyList,
+  options: ThrottleOptions<T>,
+): (args: T) => void {
   const accumulator = useRef(
     options.withAccumulator
       ? { value: options.withAccumulator.initial }
@@ -48,70 +51,65 @@ const useThrottledCallback = <T = void, A = T>(
   const pending = useRef(false)
   const timeoutId = useRef<number>(null)
 
-  return useCallback(
-    (args: A) => {
-      if (options.withAccumulator && accumulator.current) {
-        accumulator.current = {
-          value: options.withAccumulator.update(
-            accumulator.current.value,
-            args,
-          ),
-        }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handle function reconstruction manually
+  return useCallback((args: T) => {
+    if (options.withAccumulator && accumulator.current) {
+      accumulator.current = {
+        value: options.withAccumulator.update(accumulator.current.value, args),
       }
+    }
 
-      if (wait.current) {
-        pending.current = true
-        return
-      }
+    if (wait.current) {
+      pending.current = true
+      return
+    }
 
-      wait.current = true
-      pending.current = false
+    wait.current = true
+    pending.current = false
 
-      const execute = () => {
-        if (options.withAccumulator && accumulator.current) {
-          options.withAccumulator.callback(accumulator.current.value)
-        } else {
-          options.callback?.()
+    const execute = () => {
+      if (options.withAccumulator) {
+        if (accumulator.current) {
+          callback(accumulator.current.value)
         }
-
-        if (options.withAccumulator) {
-          accumulator.current = { value: options.withAccumulator.initial }
-        }
-      }
-
-      const executeAndSchedule = () => {
-        execute()
-
-        if (timeoutId.current) {
-          clearTimeout(timeoutId.current)
-        }
-
-        timeoutId.current = setTimeout(() => {
-          timeoutId.current = null
-
-          if (pending.current) {
-            // Trailing call
-            pending.current = false
-
-            if (options.trailingCall) {
-              execute()
-            }
-          }
-
-          wait.current = false
-        }, options.delay)
-      }
-
-      if (options.waitForFrame) {
-        requestAnimationFrame(() => {
-          executeAndSchedule()
-        })
       } else {
-        executeAndSchedule()
+        callback(args)
       }
-    },
-    [options],
-  )
+
+      if (options.withAccumulator) {
+        accumulator.current = { value: options.withAccumulator.initial }
+      }
+    }
+
+    const executeAndSchedule = () => {
+      execute()
+
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current)
+      }
+
+      timeoutId.current = setTimeout(() => {
+        timeoutId.current = null
+        wait.current = false
+
+        if (pending.current) {
+          pending.current = false
+
+          if (options.trailingCall) {
+            execute()
+          }
+        }
+      }, options.delay)
+    }
+
+    if (options.waitForFrame) {
+      requestAnimationFrame(() => {
+        executeAndSchedule()
+      })
+    } else {
+      executeAndSchedule()
+    }
+  }, deps)
 }
 
 const useRerender = () => {
