@@ -1,7 +1,9 @@
 import { type DependencyList, useCallback, useReducer, useRef } from 'react'
 
+import { MS_IN_SECOND } from './time'
+
 interface BaseThrottleOptions {
-  delay: number
+  delay?: number
   waitForFrame?: boolean
   trailingCall?: boolean
 }
@@ -22,13 +24,13 @@ type ThrottleOptions<T> = WithoutAccumulator | WithAccumulator<T>
 function useThrottledCallback(
   callback: () => void,
   deps: DependencyList,
-  options: WithoutAccumulator,
+  options?: WithoutAccumulator,
 ): () => void
 
 function useThrottledCallback<T>(
   callback: (args: T) => void,
   deps: DependencyList,
-  options: WithoutAccumulator,
+  options?: WithoutAccumulator,
 ): (args: T) => void
 
 function useThrottledCallback<T>(
@@ -40,7 +42,7 @@ function useThrottledCallback<T>(
 function useThrottledCallback<T>(
   callback: (acc: T) => void,
   deps: DependencyList,
-  options: ThrottleOptions<T>,
+  options: ThrottleOptions<T> = { delay: MS_IN_SECOND / 60 },
 ): (args: T) => void {
   const accumulator = useRef(
     options.withAccumulator
@@ -113,9 +115,15 @@ function useThrottledCallback<T>(
 }
 
 const useRerender = () => {
-  const [refresherDep, rerender] = useReducer((n) => (n + 1) % 60, 0)
+  const [rerenderTrigger, rerender] = useReducer((n) => (n + 1) % 60, 0)
 
-  return { refresherDep, rerender }
+  return { rerenderTrigger, rerender }
 }
 
 export { useThrottledCallback, useRerender }
+export type {
+  ThrottleOptions,
+  WithAccumulator,
+  WithoutAccumulator,
+  BaseThrottleOptions,
+}

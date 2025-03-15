@@ -84,7 +84,7 @@ const GraphInner = () => {
     <div
       ref={svgOverlay.componentRef}
       className={cn(
-        'overflow-hidden contain-strict w-full h-full bg-dark-900/50',
+        'overflow-scroll contain-strict w-full h-full bg-dark-900/50',
       )}
     >
       <div

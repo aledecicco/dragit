@@ -10,9 +10,8 @@ import {
   useState,
 } from 'react'
 
-import { clamp } from '@utils/number'
-import { useRerender, useThrottledCallback } from '@utils/performance'
 import type { LiteralUnion } from '@utils/types'
+import { scheduleSyncSvg, usePan, useRefreshCanvas } from './utils'
 
 type ElementId = string
 
@@ -70,97 +69,49 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
 
   const unregisterElement = useCallback((id: ElementId) => {
     setElements((prevElements) => {
-      const newElements = new Map(prevElements)
-      newElements.delete(id)
-      return newElements
+      if (prevElements.has(id)) {
+        const newElements = new Map(prevElements)
+        newElements.delete(id)
+        return newElements
+      }
+
+      return prevElements
     })
   }, [])
 
-  const syncSvg = useCallback(() => {
-    if (svgRef.current && componentRef.current) {
-      svgRef.current.setAttribute(
-        'viewBox',
-        `${componentRef.current.scrollLeft} ${componentRef.current.scrollTop} ${componentRef.current.clientWidth} ${componentRef.current.clientHeight}`,
-      )
-    }
-  }, [])
+  const pan = usePan(componentRef, svgRef)
 
-  const pan = useThrottledCallback(
-    (distance) => {
-      if (componentRef.current) {
-        componentRef.current.scrollLeft = clamp(
-          componentRef.current.scrollLeft + distance.x,
-          0,
-          componentRef.current.scrollWidth - componentRef.current.clientWidth,
-        )
-        componentRef.current.scrollTop = clamp(
-          componentRef.current.scrollTop + distance.y,
-          0,
-          componentRef.current.scrollHeight - componentRef.current.clientHeight,
-        )
-
-        syncSvg()
-      }
-    },
-    [syncSvg],
-    {
-      waitForFrame: true,
-      trailingCall: true,
-      delay: 1000 / 60,
-      withAccumulator: {
-        initial: { x: 0, y: 0 },
-        update: (accum, distance) => ({
-          x: accum.x + distance.x,
-          y: accum.y + distance.y,
-        }),
-      },
-    },
-  )
-
-  const { refresherDep, rerender } = useRerender()
-  const refresh = useThrottledCallback(
-    () => {
-      syncSvg()
-      rerender()
-    },
-    [syncSvg, rerender],
-    {
-      waitForFrame: false,
-      trailingCall: true,
-      delay: 1000 / 60,
-    },
-  )
-
+  const { refreshTrigger, refresh } = useRefreshCanvas(componentRef, svgRef)
   const observer = useRef(new ResizeObserver(refresh))
 
-  const refreshAfter = useCallback(() => {
-    requestAnimationFrame(() => syncSvg())
-  }, [syncSvg])
-
   useEffect(() => {
-    const scroll = (_event: Event) => {
+    const onScroll = (_event: Event) => {
       const event = _event as WheelEvent
       pan({ x: event.deltaX, y: event.deltaY })
       event.preventDefault()
       event.stopPropagation()
     }
 
+    const onFocusInside = (_event: Event) => {
+      scheduleSyncSvg(componentRef, svgRef)
+    }
+
     if (componentRef.current) {
-      componentRef.current.addEventListener('wheel', scroll)
-      componentRef.current.addEventListener('focusin', refreshAfter)
+      componentRef.current.addEventListener('wheel', onScroll)
+      componentRef.current.addEventListener('focusin', onFocusInside)
       observer.current.observe(componentRef.current)
     }
 
     return () => {
       if (componentRef.current) {
-        componentRef.current.removeEventListener('wheel', scroll)
-        componentRef.current.removeEventListener('focusin', refreshAfter)
+        componentRef.current.removeEventListener('wheel', onScroll)
+        componentRef.current.removeEventListener('focusin', onFocusInside)
         observer.current.disconnect()
       }
     }
-  }, [pan, refreshAfter])
+  }, [pan])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: need to update context when rerender is forced
+  // biome-ignore lint/correctness/useExhaustiveDependencies(refreshTrigger): refreshTrigger is added to force re-renders
   const contextValue: SvgOverlayState = useMemo(() => {
     return {
       elements,
@@ -170,7 +121,7 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
       componentRef,
       refresh,
     }
-  }, [refresherDep, elements, registerElement, unregisterElement])
+  }, [elements, refresh, registerElement, unregisterElement, refreshTrigger])
 
   return (
     <SvgOverlayContext.Provider value={contextValue}>

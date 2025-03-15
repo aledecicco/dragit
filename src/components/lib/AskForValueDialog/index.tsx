@@ -12,7 +12,7 @@ type AskForValueVariant = 'input' | 'text'
 
 interface AskForValueDialogProps extends DialogProps {
   label: string
-  action: (value: string | undefined) => void
+  submitValue: (value: string | undefined) => void
   variant?: AskForValueVariant
   message?: ReactNode
   defaultValue?: string
@@ -21,7 +21,7 @@ interface AskForValueDialogProps extends DialogProps {
 const AskForValueDialog = (props: AskForValueDialogProps) => {
   const {
     label,
-    action,
+    submitValue,
     variant = 'input',
     message,
     defaultValue,
@@ -35,7 +35,7 @@ const AskForValueDialog = (props: AskForValueDialogProps) => {
   })
 
   form.useSubmit((formState) => {
-    action(formState.values.value)
+    submitValue(formState.values.value)
     hideDialog(dialogProps.dialogKey)
   })
 
@@ -44,7 +44,7 @@ const AskForValueDialog = (props: AskForValueDialogProps) => {
       {...dialogProps}
       onClose={(e) => {
         dialogProps.onClose?.(e)
-        action(undefined)
+        submitValue(undefined)
       }}
     >
       <Form options={{ store: form }}>
@@ -69,7 +69,7 @@ const askForValue = (
       <AskForValueDialog
         label="Value"
         dialogKey={dialogKey}
-        action={(value) => {
+        submitValue={(value) => {
           if (value === undefined) {
             reject(new Error('Value not provided'))
           } else {
