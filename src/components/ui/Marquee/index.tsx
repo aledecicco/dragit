@@ -9,6 +9,7 @@ import { mergeRefs } from 'react-merge-refs'
 
 import { useThrottledCallback } from '@utils/performance'
 import { cn, propsWithCn } from '@utils/styles'
+import { MS_IN_SECOND } from '@utils/time'
 
 const INFINITE_SPACING = 32
 
@@ -46,7 +47,7 @@ const Marquee = (props: MarqueeProps) => {
     {
       waitForFrame: false,
       trailingCall: true,
-      delay: 1000 / 30,
+      delay: MS_IN_SECOND / 30,
     },
   )
 

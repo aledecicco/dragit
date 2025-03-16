@@ -4,7 +4,6 @@ import { MS_IN_SECOND } from './time'
 
 interface BaseThrottleOptions {
   delay?: number
-  waitForFrame?: boolean
   trailingCall?: boolean
 }
 
@@ -42,11 +41,11 @@ function useThrottledCallback<T>(
 function useThrottledCallback<T>(
   callback: (acc: T) => void,
   deps: DependencyList,
-  options: ThrottleOptions<T> = { delay: MS_IN_SECOND / 60 },
+  options?: ThrottleOptions<T>,
 ): (args: T) => void {
   const accumulator = useRef(
-    options.withAccumulator
-      ? { value: options.withAccumulator.initial }
+    options?.withAccumulator
+      ? { value: options?.withAccumulator.initial }
       : undefined,
   )
   const wait = useRef(false)
@@ -55,9 +54,9 @@ function useThrottledCallback<T>(
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: handle function reconstruction manually
   return useCallback((args: T) => {
-    if (options.withAccumulator && accumulator.current) {
+    if (options?.withAccumulator && accumulator.current) {
       accumulator.current = {
-        value: options.withAccumulator.update(accumulator.current.value, args),
+        value: options?.withAccumulator.update(accumulator.current.value, args),
       }
     }
 
@@ -70,7 +69,7 @@ function useThrottledCallback<T>(
     pending.current = false
 
     const execute = () => {
-      if (options.withAccumulator) {
+      if (options?.withAccumulator) {
         if (accumulator.current) {
           callback(accumulator.current.value)
         }
@@ -78,8 +77,8 @@ function useThrottledCallback<T>(
         callback(args)
       }
 
-      if (options.withAccumulator) {
-        accumulator.current = { value: options.withAccumulator.initial }
+      if (options?.withAccumulator) {
+        accumulator.current = { value: options?.withAccumulator.initial }
       }
     }
 
@@ -90,27 +89,24 @@ function useThrottledCallback<T>(
         clearTimeout(timeoutId.current)
       }
 
-      timeoutId.current = setTimeout(() => {
-        timeoutId.current = null
-        wait.current = false
+      timeoutId.current = setTimeout(
+        () => {
+          timeoutId.current = null
+          wait.current = false
 
-        if (pending.current) {
-          pending.current = false
+          if (pending.current) {
+            pending.current = false
 
-          if (options.trailingCall) {
-            execute()
+            if (options?.trailingCall) {
+              execute()
+            }
           }
-        }
-      }, options.delay)
+        },
+        options?.delay ?? MS_IN_SECOND / 60,
+      )
     }
 
-    if (options.waitForFrame) {
-      requestAnimationFrame(() => {
-        executeAndSchedule()
-      })
-    } else {
-      executeAndSchedule()
-    }
+    executeAndSchedule()
   }, deps)
 }
 

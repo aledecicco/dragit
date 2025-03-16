@@ -1,5 +1,5 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
 import { commitHistoryQuery } from '@api/queries'
 import { getPaginatedLength, useRepositoryInfiniteQuery } from '@api/utils'
@@ -29,12 +29,7 @@ const Graph = () => {
 
         <BranchToolbars />
 
-        <SvgOverlay
-          className={cn('col-span-3 col-start-1 row-start-3 mt-4')}
-          RenderOverlay={Edges}
-        >
-          <GraphInner />
-        </SvgOverlay>
+        <GraphInner />
 
         <BranchMessages />
       </div>
@@ -43,15 +38,10 @@ const Graph = () => {
 }
 
 const GraphInner = () => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+
   const { branch, baseBranch } = useSelectedBranches()
   const commonAncestor = useCurrentCommonAncestor()
-
-  const svgOverlay = useSvgOverlay()
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: refresh arrows when branches change
-  useEffect(() => {
-    svgOverlay.refresh()
-  }, [commonAncestor, branch, baseBranch])
 
   const branchHistory = useRepositoryInfiniteQuery(
     commitHistoryQuery,
@@ -76,18 +66,20 @@ const GraphInner = () => {
     estimateSize: () => NODE_SIZE,
     gap: CURVE_SIZE * 2 + EDGE_OFFSET * 2,
     paddingEnd: CURVE_SIZE * 3.5,
-    getScrollElement: () => svgOverlay.componentRef.current,
+    getScrollElement: () => scrollContainerRef.current,
     count: Math.max(branchLength, baseLength),
   })
 
   return (
     <div
-      ref={svgOverlay.componentRef}
+      ref={scrollContainerRef}
       className={cn(
-        'overflow-scroll contain-strict w-full h-full bg-dark-900/50',
+        'col-span-3 col-start-1 row-start-3 mt-4',
+        'overflow-auto contain-strict w-full h-full bg-dark-900/50',
       )}
     >
-      <div
+      <SvgOverlay
+        RenderOverlay={Edges}
         className={cn('relative w-full contain-layout')}
         style={{ height: virtualizer.getTotalSize() }}
       >
@@ -117,7 +109,7 @@ const GraphInner = () => {
             commonAncestorInfo={commonAncestor}
           />
         )}
-      </div>
+      </SvgOverlay>
     </div>
   )
 }

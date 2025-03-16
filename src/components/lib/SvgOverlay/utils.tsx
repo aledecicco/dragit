@@ -1,15 +1,6 @@
-import {
-  type ComponentType,
-  type Ref,
-  type RefObject,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react'
+import { type ComponentType, type Ref, useEffect, useMemo, useRef } from 'react'
 
-import { clamp } from '@utils/number'
 import {
-  type WithAccumulator,
   type WithoutAccumulator,
   useRerender,
   useThrottledCallback,
@@ -42,6 +33,7 @@ const makeTracked = <P, T extends HTMLElement, R extends string = string>(
 
     const ref = useRef<T>(null)
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: manually handle item registration
     useEffect(() => {
       svgOverlay.registerElement(elementId, {
         ref,
@@ -87,94 +79,22 @@ const getPosition = (elem: Element) => {
   return pos
 }
 
-const syncSvg = (
-  componentRef: RefObject<HTMLDivElement | null>,
-  svgRef: RefObject<SVGSVGElement | null>,
-) => {
-  if (svgRef.current && componentRef.current) {
-    svgRef.current.setAttribute(
-      'viewBox',
-      `${componentRef.current.scrollLeft} ${componentRef.current.scrollTop} ${componentRef.current.clientWidth} ${componentRef.current.clientHeight}`,
-    )
-  }
-}
-
-const scheduleSyncSvg = (
-  componentRef: RefObject<HTMLDivElement | null>,
-  svgRef: RefObject<SVGSVGElement | null>,
-) => {
-  requestAnimationFrame(() => syncSvg(componentRef, svgRef))
-}
-
-interface Distance {
-  x: number
-  y: number
-}
-
-const PAN_OPTIONS: WithAccumulator<Distance> = {
-  waitForFrame: true,
-  trailingCall: true,
-  delay: MS_IN_SECOND / 60,
-  withAccumulator: {
-    initial: { x: 0, y: 0 },
-    update: (accum, distance) => ({
-      x: accum.x + distance.x,
-      y: accum.y + distance.y,
-    }),
-  },
-}
-
-const usePan = (
-  componentRef: RefObject<HTMLDivElement | null>,
-  svgRef: RefObject<SVGSVGElement | null>,
-) =>
-  useThrottledCallback(
-    (distance) => {
-      if (componentRef.current) {
-        componentRef.current.scrollLeft = clamp(
-          componentRef.current.scrollLeft + distance.x,
-          0,
-          componentRef.current.scrollWidth - componentRef.current.clientWidth,
-        )
-        componentRef.current.scrollTop = clamp(
-          componentRef.current.scrollTop + distance.y,
-          0,
-          componentRef.current.scrollHeight - componentRef.current.clientHeight,
-        )
-
-        syncSvg(componentRef, svgRef)
-      }
-    },
-    [componentRef, svgRef],
-    PAN_OPTIONS,
-  )
-
 const REFRESH_OPTIONS: WithoutAccumulator = {
   waitForFrame: false,
   trailingCall: true,
   delay: MS_IN_SECOND / 60,
 }
 
-const useRefreshCanvas = (
-  componentRef: RefObject<HTMLDivElement | null>,
-  svgRef: RefObject<SVGSVGElement | null>,
-) => {
+const useRefreshCanvas = () => {
   const { rerenderTrigger, rerender } = useRerender()
 
-  const refresh = useThrottledCallback(
-    () => {
-      syncSvg(componentRef, svgRef)
-      rerender()
-    },
-    [rerender, componentRef, svgRef],
-    REFRESH_OPTIONS,
-  )
+  const refresh = useThrottledCallback(rerender, [], REFRESH_OPTIONS)
 
   return useMemo(
-    () => ({ refreshTrigger: rerenderTrigger, refresh: refresh }),
+    () => ({ refreshTrigger: rerenderTrigger, refresh }),
     [rerenderTrigger, refresh],
   )
 }
 
 export { makeTracked, type TrackRefProps, getPosition }
-export { syncSvg, scheduleSyncSvg, usePan, useRefreshCanvas }
+export { useRefreshCanvas }

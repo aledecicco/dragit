@@ -1,6 +1,7 @@
 import type { ComponentProps, ComponentType } from 'react'
 
 import { cn, propsWithCn } from '@utils/styles'
+import { mergeRefs } from 'react-merge-refs'
 import {
   SvgOverlayContextProvider,
   type SvgOverlayState,
@@ -26,11 +27,8 @@ const SvgOverlayInner = (props: SvgOverlayProps) => {
 
   return (
     <div
-      {...propsWithCn(
-        divProps,
-
-        'relative w-full h-full overflow-hidden',
-      )}
+      {...propsWithCn(divProps, 'relative w-full h-full')}
+      ref={mergeRefs([svgOverlay.componentRef, divProps.ref])}
     >
       {children}
       <svg

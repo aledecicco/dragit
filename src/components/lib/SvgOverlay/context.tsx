@@ -11,7 +11,7 @@ import {
 } from 'react'
 
 import type { LiteralUnion } from '@utils/types'
-import { scheduleSyncSvg, usePan, useRefreshCanvas } from './utils'
+import { useRefreshCanvas } from './utils'
 
 type ElementId = string
 
@@ -55,63 +55,52 @@ interface SvgOverlayContextProviderProps extends PropsWithChildren {}
 
 const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
   const { children } = props
-  const [elements, setElements] = useState<Map<ElementId, Element>>(new Map())
+  const [elemsState, setElemsState] = useState<Map<ElementId, Element>>(
+    new Map(),
+  )
   const svgRef = useRef<SVGSVGElement>(null)
   const componentRef = useRef<HTMLDivElement>(null)
 
   const registerElement = useCallback((id: ElementId, element: Element) => {
-    setElements((prevElements) => {
-      const newElements = new Map(prevElements)
-      newElements.set(id, element)
-      return newElements
+    setElemsState((prevElems) => {
+      const newElems = new Map(prevElems)
+      newElems.set(id, element)
+      return newElems
     })
   }, [])
 
   const unregisterElement = useCallback((id: ElementId) => {
-    setElements((prevElements) => {
-      if (prevElements.has(id)) {
-        const newElements = new Map(prevElements)
-        newElements.delete(id)
-        return newElements
+    setElemsState((prevElems) => {
+      if (prevElems.has(id)) {
+        const newElems = new Map(prevElems)
+        newElems.delete(id)
+        return newElems
       }
 
-      return prevElements
+      return prevElems
     })
   }, [])
 
-  const pan = usePan(componentRef, svgRef)
+  const { refreshTrigger, refresh } = useRefreshCanvas()
 
-  const { refreshTrigger, refresh } = useRefreshCanvas(componentRef, svgRef)
+  // biome-ignore lint/correctness/useExhaustiveDependencies(refreshTrigger): refreshTrigger is added to force re-renders
+  const elements = useMemo(() => {
+    return new Map(elemsState)
+  }, [elemsState, refreshTrigger])
+
   const observer = useRef(new ResizeObserver(refresh))
-
   useEffect(() => {
-    const onScroll = (_event: Event) => {
-      const event = _event as WheelEvent
-      pan({ x: event.deltaX, y: event.deltaY })
-      event.preventDefault()
-      event.stopPropagation()
-    }
-
-    const onFocusInside = (_event: Event) => {
-      scheduleSyncSvg(componentRef, svgRef)
-    }
-
     if (componentRef.current) {
-      componentRef.current.addEventListener('wheel', onScroll)
-      componentRef.current.addEventListener('focusin', onFocusInside)
       observer.current.observe(componentRef.current)
     }
 
     return () => {
       if (componentRef.current) {
-        componentRef.current.removeEventListener('wheel', onScroll)
-        componentRef.current.removeEventListener('focusin', onFocusInside)
         observer.current.disconnect()
       }
     }
-  }, [pan])
+  }, [])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies(refreshTrigger): refreshTrigger is added to force re-renders
   const contextValue: SvgOverlayState = useMemo(() => {
     return {
       elements,
@@ -121,7 +110,7 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
       componentRef,
       refresh,
     }
-  }, [elements, refresh, registerElement, unregisterElement, refreshTrigger])
+  }, [elements, refresh, registerElement, unregisterElement])
 
   return (
     <SvgOverlayContext.Provider value={contextValue}>
