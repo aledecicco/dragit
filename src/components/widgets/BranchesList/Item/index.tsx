@@ -83,7 +83,7 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
           )}
         </div>
 
-        <p className={cn('text-xs text-light-950')}>
+        <Marquee className={cn('text-xs text-light-950')}>
           {match(item.type)
             .with('local', () => 'Local branch')
             .with('remote', () => 'Remote branch')
@@ -94,7 +94,7 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
               <span className={cn('text-light-400')}>{remoteCounterpart}</span>
             </>
           )}
-        </p>
+        </Marquee>
         <p className={cn('text-xs text-light-950/50 mt-2')}>
           Last modified {lastModified}
         </p>

@@ -1,16 +1,40 @@
-import {
-  type DependencyList,
-  useCallback,
-  useMemo,
-  useReducer,
-  useRef,
-} from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
+import { type DependencyList, useCallback, useReducer, useRef } from 'react'
 
-import {
-  type VirtualizerOptions,
-  useVirtualizer,
-} from '@tanstack/react-virtual'
 import { MS_IN_SECOND } from './time'
+
+interface DebounceOptions {
+  delay?: number
+}
+
+function useDebouncedCallback(
+  callback: () => void,
+  deps: DependencyList,
+  options?: DebounceOptions,
+): () => void
+
+function useDebouncedCallback<T>(
+  callback: (args: T) => void,
+  deps: DependencyList,
+  options?: DebounceOptions,
+): (args: T) => void {
+  const timeoutId = useRef<number>(null)
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handle function reconstruction manually
+  return useCallback((args: T) => {
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current)
+    }
+
+    timeoutId.current = setTimeout(
+      () => {
+        timeoutId.current = null
+        callback(args)
+      },
+      options?.delay ?? MS_IN_SECOND / 10,
+    )
+  }, deps)
+}
 
 interface BaseThrottleOptions {
   delay?: number
@@ -28,7 +52,7 @@ interface WithoutAccumulator extends BaseThrottleOptions {
   withAccumulator?: never
 }
 
-type ThrottleOptions<T> = WithoutAccumulator | WithAccumulator<T>
+type ThrottleOptions<T = void> = WithoutAccumulator | WithAccumulator<T>
 
 function useThrottledCallback(
   callback: () => void,
@@ -49,7 +73,7 @@ function useThrottledCallback<T>(
 ): (args: T) => void
 
 function useThrottledCallback<T>(
-  callback: (acc: T) => void,
+  callback: (args: T) => void,
   deps: DependencyList,
   options?: ThrottleOptions<T>,
 ): (args: T) => void {
@@ -153,11 +177,10 @@ const useVirtualList = <T extends HTMLElement>(
   }
 }
 
-export { useThrottledCallback, useRerender, useVirtualList }
-export type {
-  ThrottleOptions,
-  WithAccumulator,
-  WithoutAccumulator,
-  BaseThrottleOptions,
-  VirtualListOptions,
+export {
+  useDebouncedCallback,
+  useThrottledCallback,
+  useRerender,
+  useVirtualList,
 }
+export type { DebounceOptions, ThrottleOptions, VirtualListOptions }

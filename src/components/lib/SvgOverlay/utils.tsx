@@ -1,7 +1,7 @@
 import { type ComponentType, type Ref, useEffect, useMemo, useRef } from 'react'
 
 import {
-  type WithoutAccumulator,
+  type ThrottleOptions,
   useRerender,
   useThrottledCallback,
 } from '@utils/performance'
@@ -79,7 +79,7 @@ const getPosition = (elem: Element) => {
   return pos
 }
 
-const REFRESH_OPTIONS: WithoutAccumulator = {
+const REFRESH_OPTIONS: ThrottleOptions = {
   trailingCall: true,
   delay: MS_IN_SECOND / 60,
 }

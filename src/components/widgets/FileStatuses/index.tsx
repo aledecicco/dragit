@@ -3,7 +3,7 @@ import {
   IconPlaylistAdd,
   IconPlaylistX,
 } from '@tabler/icons-react'
-import { type ComponentProps, useCallback, useMemo } from 'react'
+import { type ComponentProps, useMemo } from 'react'
 
 import { useAddToIndex, useRemoveFromIndex } from '@api/commands'
 import { headInfoQuery } from '@api/queries'

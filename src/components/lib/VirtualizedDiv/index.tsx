@@ -5,8 +5,9 @@ import {
   ScrollShadowDiv,
   type ScrollShadowDivProps,
 } from '@lib/ScrollShadowDiv'
-import { type VirtualListOptions, useVirtualList } from '@utils/performance'
+import { useVirtualList } from '@utils/performance'
 import { cn } from '@utils/styles'
+import { VirtualizedDivItem } from './Item'
 
 interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
   items: T[]
@@ -18,20 +19,20 @@ interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
 const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
   const { items, itemSize, RenderItem, options, ...divProps } = props
 
-  const virtualizerOptions = useMemo<VirtualListOptions<HTMLDivElement>>(() => {
-    return {
-      estimateSize: () => itemSize,
-      paddingStart: 8,
-      paddingEnd: 8,
-      gap: 8,
-      count: items.length,
-      overscan: 2,
-      ...options,
-    }
-  }, [options, items.length, itemSize])
-
   const { scrollContainerRef, virtualizer, isScrolled, hasScrollLeft } =
-    useVirtualList(virtualizerOptions)
+    useVirtualList(
+      useMemo(() => {
+        return {
+          estimateSize: () => itemSize,
+          paddingStart: 8,
+          paddingEnd: 8,
+          gap: 8,
+          count: items.length,
+          overscan: 2,
+          ...options,
+        }
+      }, [options, items.length, itemSize]),
+    )
 
   return (
     <ScrollShadowDiv
@@ -48,15 +49,13 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
           style={{ height: virtualizer.getTotalSize() }}
         >
           {virtualizer.getVirtualItems().map((virtualRow) => (
-            <div
+            <VirtualizedDivItem
               key={virtualRow.key}
-              className={cn('absolute top-0 left-0 w-full')}
-              style={{
-                transform: `translateY(${virtualRow.start}px)`,
-              }}
-            >
-              <RenderItem item={items[virtualRow.index]} />
-            </div>
+              item={items[virtualRow.index]}
+              itemSize={itemSize}
+              position={virtualRow.start}
+              RenderItem={RenderItem}
+            />
           ))}
         </div>
       </div>
