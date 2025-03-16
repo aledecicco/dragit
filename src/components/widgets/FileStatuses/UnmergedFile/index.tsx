@@ -4,26 +4,27 @@ import {
   IconFolderExclamation,
   IconTrash,
 } from '@tabler/icons-react'
+import type { ComponentProps } from 'react'
 import { P, match } from 'ts-pattern'
 
 import { useAddToIndex, useRemoveFromTree } from '@api/commands'
 import type { UnmergedFile } from '@api/models'
-import { cn } from '@utils/styles'
+import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
-interface UnmergedFileStatusItemProps {
+interface UnmergedFileStatusItemProps extends ComponentProps<'div'> {
   file: UnmergedFile
 }
 
 const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
-  const { file } = props
+  const { file, ...divProps } = props
   const stage = useAddToIndex()
   const remove = useRemoveFromTree()
 
   return (
     <FileStatusItem
+      {...propsWithCn(divProps, 'text-light-600')}
       file={file}
-      className={cn('text-light-600')}
       Glyph={file.isDir ? IconFolderExclamation : IconFileAlert}
       statusMessage={
         <p className={cn('text-xs text-warning-400/50')}>

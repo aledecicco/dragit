@@ -80,7 +80,6 @@ const getPosition = (elem: Element) => {
 }
 
 const REFRESH_OPTIONS: WithoutAccumulator = {
-  waitForFrame: false,
   trailingCall: true,
   delay: MS_IN_SECOND / 60,
 }

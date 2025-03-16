@@ -45,7 +45,6 @@ const Marquee = (props: MarqueeProps) => {
     },
     [infinite],
     {
-      waitForFrame: false,
       trailingCall: true,
       delay: MS_IN_SECOND / 30,
     },
@@ -111,8 +110,9 @@ const Marquee = (props: MarqueeProps) => {
           <div
             className={cn(
               'absolute top-0 -left-0.5 h-full',
-              'opacity-0 w-1.5 bg-linear-to-r from-dark-950/70 to-dark-950/40 rounded-r-xs',
+              'opacity-0 w-2 bg-linear-to-r from-dark-950/70 to-[transparent] rounded-r-xs',
               'group-hover/marquee:animate-fade-in',
+              'pointer-events-none',
             )}
             style={{
               animationDuration: `${Math.min(0.5, animationDuration / 2)}s`,
@@ -121,8 +121,9 @@ const Marquee = (props: MarqueeProps) => {
           <div
             className={cn(
               'absolute top-0 -right-0.5 h-full',
-              'opacity-100 w-1.5 bg-linear-to-l from-dark-950/70 to-dark-950/40 rounded-r-xs',
+              'opacity-100 w-2 bg-linear-to-l from-dark-950/70 to-[transparent] rounded-r-xs',
               !infinite && 'group-hover/marquee:animate-fade-out',
+              'pointer-events-none',
             )}
             style={{
               animationDuration: `${animationDuration}s`,

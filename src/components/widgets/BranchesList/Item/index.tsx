@@ -54,6 +54,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
             'p-1.5 bg-dark-600 rounded-xs',
             'hover:bg-dark-500 focus:bg-dark-500 data-focus:bg-dark-500',
             'cursor-pointer border-1 border-solid border-transparent',
+            'shadow-md',
             isCurrentBranch && 'bg-dark-500 border-accent-300',
           )}
           onClick={(e) => {

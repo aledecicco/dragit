@@ -1,8 +1,10 @@
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ComponentType, HTMLProps } from 'react'
 
 import { useAddToIndex, useRemoveFromIndex } from '@api/commands'
+import type { FileInfo } from '@api/models'
 import { headInfoQuery } from '@api/queries'
 import { useRepositoryQuery } from '@api/utils'
+import { ScrollShadowDiv } from '@lib/ScrollShadowDiv'
 import {
   IconListCheck,
   IconPlaylistAdd,
@@ -11,6 +13,7 @@ import {
 import { Accordion } from '@ui/Accordion'
 import { IconButton } from '@ui/IconButton'
 import { mapOr } from '@utils/array'
+import { useVirtualList } from '@utils/performance'
 import { cn, propsWithCn } from '@utils/styles'
 import { getFilesByStatus } from '@widgets/FileStatuses/utils'
 import { StagedFileStatusItem } from './StagedFile'
@@ -64,12 +67,15 @@ const FileStatuses = (props: FileStatusesProps) => {
               }}
             />
           ),
-          description: mapOr(
-            <p className={cn('text-sm text-light-950')}>No untracked files</p>,
-            files.untracked,
-            (file) => <UntrackedFileStatusItem key={file.path} file={file} />,
+          description: files.untracked.length ? (
+            <FileStatusesSection
+              files={files.untracked}
+              Item={UntrackedFileStatusItem}
+            />
+          ) : (
+            <p className={cn('text-sm text-light-950')}>No untracked files</p>
           ),
-          className: 'flex flex-col gap-2 p-2 min-h-30',
+          className: 'min-h-30',
         },
         {
           id: 'unmerged',
@@ -87,12 +93,15 @@ const FileStatuses = (props: FileStatusesProps) => {
               }}
             />
           ),
-          description: mapOr(
-            <p className={cn('text-sm text-light-950')}>No unmerged files</p>,
-            files.unmerged,
-            (file) => <UnmergedFileStatusItem key={file.path} file={file} />,
+          description: files.unmerged.length ? (
+            <FileStatusesSection
+              files={files.unmerged}
+              Item={UnmergedFileStatusItem}
+            />
+          ) : (
+            <p className={cn('text-sm text-light-950')}>No unmerged files</p>
           ),
-          className: 'flex flex-col gap-2 p-2 min-h-30',
+          className: 'min-h-30',
         },
         {
           id: 'unstaged',
@@ -110,12 +119,15 @@ const FileStatuses = (props: FileStatusesProps) => {
               }}
             />
           ),
-          description: mapOr(
-            <p className={cn('text-sm text-light-950')}>No unstaged files</p>,
-            files.unstaged,
-            (file) => <UnstagedFileStatusItem key={file.path} file={file} />,
+          description: files.unstaged.length ? (
+            <FileStatusesSection
+              files={files.unstaged}
+              Item={UnstagedFileStatusItem}
+            />
+          ) : (
+            <p className={cn('text-sm text-light-950')}>No unstaged files</p>
           ),
-          className: 'flex flex-col gap-2 p-2 min-h-30',
+          className: 'min-h-30',
         },
         {
           id: 'staged',
@@ -133,15 +145,69 @@ const FileStatuses = (props: FileStatusesProps) => {
               }}
             />
           ),
-          description: mapOr(
-            <p className={cn('text-sm text-light-950')}>No staged files</p>,
-            files.staged,
-            (file) => <StagedFileStatusItem key={file.path} file={file} />,
+          description: files.staged.length ? (
+            <FileStatusesSection
+              files={files.staged}
+              Item={StagedFileStatusItem}
+            />
+          ) : (
+            <p className={cn('text-sm text-light-950')}>No staged files</p>
           ),
-          className: 'flex flex-col gap-2 p-2 min-h-30',
+          className: 'min-h-30',
         },
       ]}
     />
+  )
+}
+
+interface FileStatusesSectionProps<T extends FileInfo> {
+  files: T[]
+  Item: ComponentType<HTMLProps<HTMLDivElement> & { file: T }>
+}
+
+const FileStatusesSection = <T extends FileInfo>(
+  props: FileStatusesSectionProps<T>,
+) => {
+  const { files, Item } = props
+
+  const { scrollContainerRef, virtualizer, isScrolled, hasScrollLeft } =
+    useVirtualList<HTMLDivElement>({
+      estimateSize: () => 48,
+      paddingStart: 8,
+      paddingEnd: 8,
+      gap: 8,
+      count: files.length,
+    })
+
+  return (
+    <ScrollShadowDiv
+      isScrolled={isScrolled}
+      hasScrollLeft={hasScrollLeft}
+      className={cn('w-full h-full')}
+    >
+      <div
+        ref={scrollContainerRef}
+        className={cn('overflow-auto w-full h-full')}
+      >
+        <div
+          className={cn('w-full relative')}
+          style={{ height: virtualizer.getTotalSize() }}
+        >
+          {virtualizer.getVirtualItems().map((virtualRow) => (
+            <Item
+              ref={virtualizer.measureElement}
+              data-index={virtualRow.index}
+              key={virtualRow.index}
+              file={files[virtualRow.index]}
+              className={cn('absolute top-0 left-2 right-2')}
+              style={{
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </ScrollShadowDiv>
   )
 }
 

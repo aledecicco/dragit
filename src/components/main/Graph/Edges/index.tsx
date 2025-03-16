@@ -54,8 +54,6 @@ const Edges = (props: EdgesProps) => {
             parentPos.y - EDGE_OFFSET,
           ]
 
-          console.log(id, elemX)
-
           const parentIsAbove = parentY <= elemY + CURVE_SIZE // The top of the parent is above the bottom of the element
           const parentIsLevel = Math.abs(parentY - elemY) <= CURVE_SIZE * 3 // The top of the parent is aligned with the bottom of the element
           const parentIsAligned = parentX === elemX // The parent is directly below the element

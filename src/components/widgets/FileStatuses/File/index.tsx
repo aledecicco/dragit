@@ -22,6 +22,7 @@ const FileStatusItem = (props: FileStatusItemProps) => {
         divProps,
         'flex flex-row items-center justify-between gap-4',
         'p-1.5 bg-dark-600 rounded-xs',
+        'shadow-md',
       )}
     >
       <div className={cn('min-w-0 overflow-x-hidden')}>

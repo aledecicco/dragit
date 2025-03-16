@@ -82,7 +82,7 @@ const Accordion = (props: AccordionProps) => {
                 {...propsWithCn(
                   contentProps,
                   'overflow-y-auto grow',
-                  'w-full bg-dark-700 rounded-sm p-2',
+                  'w-full bg-dark-700 rounded-sm',
                 )}
               >
                 {description}

@@ -27,7 +27,7 @@ const SvgOverlayInner = (props: SvgOverlayProps) => {
 
   return (
     <div
-      {...propsWithCn(divProps, 'relative w-full h-full')}
+      {...propsWithCn(divProps, 'relative')}
       ref={mergeRefs([svgOverlay.componentRef, divProps.ref])}
     >
       {children}

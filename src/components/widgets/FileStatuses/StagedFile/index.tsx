@@ -13,25 +13,26 @@ import {
   IconFolders,
   IconMinus,
 } from '@tabler/icons-react'
+import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
 import { useRemoveFromIndex } from '@api/commands'
 import type { StagedFile } from '@api/models'
-import { cn } from '@utils/styles'
+import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
-interface StagedFileStatusItemProps {
+interface StagedFileStatusItemProps extends ComponentProps<'div'> {
   file: StagedFile
 }
 
 const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
-  const { file } = props
+  const { file, ...divProps } = props
   const unstage = useRemoveFromIndex()
 
   return (
     <FileStatusItem
+      {...propsWithCn(divProps, 'text-light-600')}
       file={file}
-      className={cn('text-light-600')}
       statusMessage={
         <p className={cn('text-xs text-success-300/50')}>
           {match(file.staged)

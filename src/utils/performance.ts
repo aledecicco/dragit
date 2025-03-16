@@ -1,5 +1,15 @@
-import { type DependencyList, useCallback, useReducer, useRef } from 'react'
+import {
+  type DependencyList,
+  useCallback,
+  useMemo,
+  useReducer,
+  useRef,
+} from 'react'
 
+import {
+  type VirtualizerOptions,
+  useVirtualizer,
+} from '@tanstack/react-virtual'
 import { MS_IN_SECOND } from './time'
 
 interface BaseThrottleOptions {
@@ -116,10 +126,38 @@ const useRerender = () => {
   return { rerenderTrigger, rerender }
 }
 
-export { useThrottledCallback, useRerender }
+type VirtualListOptions<T extends HTMLElement> = Omit<
+  Parameters<typeof useVirtualizer<T, Element>>['0'],
+  'getScrollElement'
+>
+
+const useVirtualList = <T extends HTMLElement>(
+  options: VirtualListOptions<T>,
+) => {
+  const scrollContainerRef = useRef<T>(null)
+  const virtualizer = useVirtualizer({
+    ...options,
+    getScrollElement: () => scrollContainerRef.current,
+  })
+
+  return {
+    scrollContainerRef,
+    virtualizer,
+    isScrolled:
+      virtualizer.scrollOffset !== null && virtualizer.scrollOffset > 0,
+    hasScrollLeft:
+      virtualizer.scrollOffset !== null &&
+      scrollContainerRef.current !== null &&
+      virtualizer.scrollOffset <
+        virtualizer.getTotalSize() - scrollContainerRef.current?.clientHeight,
+  }
+}
+
+export { useThrottledCallback, useRerender, useVirtualList }
 export type {
   ThrottleOptions,
   WithAccumulator,
   WithoutAccumulator,
   BaseThrottleOptions,
+  VirtualListOptions,
 }

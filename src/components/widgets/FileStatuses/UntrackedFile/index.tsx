@@ -3,24 +3,25 @@ import {
   IconFolderQuestion,
   IconPlus,
 } from '@tabler/icons-react'
+import type { ComponentProps } from 'react'
 
 import { useAddToIndex } from '@api/commands'
 import type { UntrackedFile } from '@api/models'
-import { cn } from '@utils/styles'
+import { propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
-interface UntrackedFileStatusItemProps {
+interface UntrackedFileStatusItemProps extends ComponentProps<'div'> {
   file: UntrackedFile
 }
 
 const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
-  const { file } = props
+  const { file, ...divProps } = props
   const stage = useAddToIndex()
 
   return (
     <FileStatusItem
+      {...propsWithCn(divProps, 'text-light-950/90')}
       file={file}
-      className={cn('text-light-950/90')}
       Glyph={file.isDir ? IconFolderQuestion : IconFileUnknown}
       actions={[
         {
