@@ -31,7 +31,7 @@ const BranchToolbars = () => {
                     branch.remote?.remoteName ??
                     (await askForValue({
                       defaultValue: 'origin',
-                      message: 'Choose a remote to pull from',
+                      Message: 'Choose a remote to pull from',
                       label: 'Remote Name',
                     })),
                   remoteBranch: branch.remote?.branchName ?? branch.name,

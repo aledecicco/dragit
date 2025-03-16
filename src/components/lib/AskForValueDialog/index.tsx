@@ -1,5 +1,5 @@
 import * as Ariakit from '@ariakit/react'
-import type { ReactNode } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 
 import { hideDialog, showDialog } from '@context/dialogs'
 import { getUniqueId } from '@context/ids'
@@ -14,7 +14,7 @@ interface AskForValueDialogProps extends DialogProps {
   label: string
   submitValue: (value: string | undefined) => void
   variant?: AskForValueVariant
-  message?: ReactNode
+  Message?: ComponentType | ReactNode
   defaultValue?: string
 }
 
@@ -23,7 +23,7 @@ const AskForValueDialog = (props: AskForValueDialogProps) => {
     label,
     submitValue,
     variant = 'input',
-    message,
+    Message,
     defaultValue,
     ...dialogProps
   } = props
@@ -48,7 +48,7 @@ const AskForValueDialog = (props: AskForValueDialogProps) => {
       }}
     >
       <Form options={{ store: form }}>
-        {message}
+        {typeof Message === 'function' ? <Message /> : Message}
 
         <InputField required autoFocus name={form.names.value} label={label} />
 

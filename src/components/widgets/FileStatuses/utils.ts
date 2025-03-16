@@ -8,6 +8,9 @@ import type {
   UnstagedFile,
   UntrackedFile,
 } from '@api/models'
+import { headInfoQuery } from '@api/queries'
+import { useRepositoryQuery } from '@api/utils'
+import { mapFn } from '@utils/types'
 
 const getStagedFiles = (files: FileInfo[]): StagedFile[] =>
   files.filter(
@@ -29,17 +32,34 @@ const getUnmergedFiles = (files: FileInfo[]): UnmergedFile[] =>
 const getUntrackedFiles = (files: FileInfo[]): UntrackedFile[] =>
   files.filter((file) => file.status === 'untracked')
 
-const useStagedFiles = (files: FileInfo[]) =>
-  useMemo(() => getStagedFiles(files), [files])
+const useStagedFiles = () => {
+  const headInfo = useRepositoryQuery(headInfoQuery)
+  return useMemo(() => mapFn(headInfo.data?.files, getStagedFiles), [headInfo])
+}
 
-const useUnstagedFiles = (files: FileInfo[]) =>
-  useMemo(() => getUnstagedFiles(files), [files])
+const useUnstagedFiles = () => {
+  const headInfo = useRepositoryQuery(headInfoQuery)
+  return useMemo(
+    () => mapFn(headInfo.data?.files, getUnstagedFiles),
+    [headInfo],
+  )
+}
 
-const useUnmergedFiles = (files: FileInfo[]) =>
-  useMemo(() => getUnmergedFiles(files), [files])
+const useUnmergedFiles = () => {
+  const headInfo = useRepositoryQuery(headInfoQuery)
+  return useMemo(
+    () => mapFn(headInfo.data?.files, getUnmergedFiles),
+    [headInfo],
+  )
+}
 
-const useUntrackedFiles = (files: FileInfo[]) =>
-  useMemo(() => getUntrackedFiles(files), [files])
+const useUntrackedFiles = () => {
+  const headInfo = useRepositoryQuery(headInfoQuery)
+  return useMemo(
+    () => mapFn(headInfo.data?.files, getUntrackedFiles),
+    [headInfo],
+  )
+}
 
 interface FilesByStatus {
   staged: StagedFile[]
@@ -55,11 +75,16 @@ const getFilesByStatus = (headInfo: HeadInfo): FilesByStatus => ({
   untracked: getUntrackedFiles(headInfo.files),
 })
 
+const useFilesByStatus = () => {
+  const headInfo = useRepositoryQuery(headInfoQuery)
+  return useMemo(() => mapFn(headInfo.data, getFilesByStatus), [headInfo])
+}
+
 export {
   useStagedFiles,
   useUnstagedFiles,
   useUnmergedFiles,
   useUntrackedFiles,
-  getFilesByStatus,
+  useFilesByStatus,
   type FilesByStatus,
 }

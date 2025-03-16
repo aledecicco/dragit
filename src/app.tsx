@@ -5,6 +5,7 @@ import { CurrentDirectory } from '@main/CurrentDirectory'
 import { Graph } from '@main/Graph'
 import { cn } from '@utils/styles'
 import { BranchesList } from '@widgets/BranchesList'
+import { CommitButton } from '@widgets/CommitButton'
 import { FileStatuses } from '@widgets/FileStatuses'
 
 const App = () => {
@@ -40,6 +41,7 @@ const AppInner = () => {
       <FileStatuses />
       <Graph />
       <BranchesList />
+      <CommitButton />
     </div>
   )
 }

@@ -6,15 +6,13 @@ import {
 import { type ComponentProps, useMemo } from 'react'
 
 import { useAddToIndex, useRemoveFromIndex } from '@api/commands'
-import { headInfoQuery } from '@api/queries'
-import { useRepositoryQuery } from '@api/utils'
 import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { Accordion } from '@ui/Accordion'
 import { AccordionSection } from '@ui/Accordion/Section'
 import { IconButton } from '@ui/IconButton'
 import { cn, propsWithCn } from '@utils/styles'
 import { mapFn } from '@utils/types'
-import { getFilesByStatus } from '@widgets/FileStatuses/utils'
+import { useFilesByStatus } from '@widgets/FileStatuses/utils'
 import { StagedFileStatusItem } from './StagedFile'
 import { UnmergedFileStatusItem } from './UnmergedFile'
 import { UnstagedFileStatusItem } from './UnstagedFile'
@@ -24,14 +22,11 @@ interface FileStatusesProps extends ComponentProps<'div'> {}
 
 const FileStatuses = (props: FileStatusesProps) => {
   const { ...divProps } = props
-  const headInfo = useRepositoryQuery(headInfoQuery)
 
   const stage = useAddToIndex()
   const unstage = useRemoveFromIndex()
 
-  const files = useMemo(() => {
-    return mapFn(headInfo.data, (headInfo) => getFilesByStatus(headInfo))
-  }, [headInfo.data])
+  const files = useFilesByStatus()
 
   const untrackedOptions = useMemo(() => {
     return mapFn(files, (files) => ({
