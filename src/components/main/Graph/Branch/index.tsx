@@ -72,7 +72,7 @@ const GraphBranch = (props: GraphBranchProps) => {
 
     return (
       <GraphCommit
-        key={virtualRow.index}
+        key={virtualRow.key}
         commitId={commit}
         commitType={isUnconfirmed ? 'unconfirmed' : 'confirmed'}
         elementId={COMMIT_ELEMENT_ID(commit, branch.name)}

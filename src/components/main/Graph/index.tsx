@@ -6,7 +6,7 @@ import { getPaginatedLength, useRepositoryInfiniteQuery } from '@api/utils'
 import { useSelectedBranches } from '@context/branches'
 import { ScrollShadowDiv } from '@lib/ScrollShadowDiv'
 import { SvgOverlay } from '@lib/SvgOverlay'
-import { useVirtualList } from '@utils/performance'
+import { type VirtualListOptions, useVirtualList } from '@utils/performance'
 import { cn } from '@utils/styles'
 import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
@@ -60,14 +60,18 @@ const GraphInner = () => {
     return getPaginatedLength(baseBranchHistory.data)
   }, [baseBranchHistory.data])
 
-  const { scrollContainerRef, virtualizer, isScrolled, hasScrollLeft } =
-    useVirtualList<HTMLDivElement>({
+  const virtualizerOptions = useMemo<VirtualListOptions<HTMLDivElement>>(() => {
+    return {
       estimateSize: () => NODE_SIZE,
       gap: CURVE_SIZE * 2 + EDGE_OFFSET * 2,
       paddingStart: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
       paddingEnd: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
       count: Math.max(branchLength, baseLength),
-    })
+    }
+  }, [branchLength, baseLength])
+
+  const { scrollContainerRef, virtualizer, isScrolled, hasScrollLeft } =
+    useVirtualList(virtualizerOptions)
 
   return (
     <ScrollShadowDiv

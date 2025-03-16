@@ -5,7 +5,7 @@ import {
   IconLocationFilled,
   IconUpload,
 } from '@tabler/icons-react'
-import type { ComponentProps } from 'react'
+import { type ComponentProps, memo } from 'react'
 import { match } from 'ts-pattern'
 
 import {
@@ -15,7 +15,6 @@ import {
 } from '@api/commands'
 import type { BranchInfo, BranchName, RefName } from '@api/models'
 import { useSelectedBranches } from '@context/branches'
-import { Button } from '@ui/Button'
 import { Icon } from '@ui/Icon'
 import { Marquee } from '@ui/Marquee'
 import { Toolbar } from '@ui/Toolbar'
@@ -27,24 +26,24 @@ const BRANCHES_LIST_ITEM_ID = (name: BranchName | RefName) =>
   `branches_list_${name}` as const
 
 interface BranchesListItemProps extends ComponentProps<'div'> {
-  branch: BranchInfo
+  item: BranchInfo
 }
 
-const BranchesListItem = (props: BranchesListItemProps) => {
-  const { branch, ...divProps } = props
-  const lastModified = useDateDifference(branch.timestamp)
+const BranchesListItem = memo((props: BranchesListItemProps) => {
+  const { item, ...divProps } = props
+  const lastModified = useDateDifference(item.timestamp)
 
-  const remoteCounterpart = getRemoteCounterpart(branch)
+  const remoteCounterpart = getRemoteCounterpart(item)
   const pushBranch = usePushBranch()
   const pullBranch = usePullBranch()
 
   const { branch: currentBranch } = useSelectedBranches()
-  const isCurrentBranch = currentBranch && branch.name === currentBranch.name
+  const isCurrentBranch = currentBranch && item.name === currentBranch.name
   const checkout = useCheckoutLocalBranch()
 
   return (
     <Ariakit.CompositeItem
-      id={BRANCHES_LIST_ITEM_ID(branch.name)}
+      id={BRANCHES_LIST_ITEM_ID(item.name)}
       render={
         <div
           aria-selected={isCurrentBranch}
@@ -53,13 +52,13 @@ const BranchesListItem = (props: BranchesListItemProps) => {
             'flex flex-row items-center justify-between gap-4',
             'p-1.5 bg-dark-600 rounded-xs',
             'hover:bg-dark-500 focus:bg-dark-500 data-focus:bg-dark-500',
-            'cursor-pointer border-1 border-solid border-transparent',
+            'border-1 border-solid border-transparent',
             'shadow-md',
             isCurrentBranch && 'bg-dark-500 border-accent-300',
           )}
           onClick={(e) => {
-            if (e.detail === 0 || e.detail === 2) {
-              checkout.mutate(branch.name)
+            if (e.detail === 0) {
+              checkout.mutate(item.name)
             }
 
             divProps.onClick?.(e)
@@ -73,7 +72,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
         >
           <Icon Glyph={IconGitBranch} size="md" />
 
-          <Marquee className={cn('text-sm')}>{branch.name}</Marquee>
+          <Marquee className={cn('text-sm')}>{item.name}</Marquee>
 
           {isCurrentBranch && (
             <Icon
@@ -85,28 +84,14 @@ const BranchesListItem = (props: BranchesListItemProps) => {
         </div>
 
         <p className={cn('text-xs text-light-950')}>
-          {match(branch.type)
+          {match(item.type)
             .with('local', () => 'Local branch')
             .with('remote', () => 'Remote branch')
             .exhaustive()}
           {remoteCounterpart && (
             <>
               , tracking{' '}
-              <Button
-                variant="plain"
-                size="sm"
-                onClick={() => {
-                  if (remoteCounterpart) {
-                    document
-                      .getElementById(BRANCHES_LIST_ITEM_ID(remoteCounterpart))
-                      ?.focus()
-                  }
-                }}
-                className={cn('inline p-0.5 text-light-400')}
-                aria-label={`Jump to remote counterpart ${remoteCounterpart}`}
-              >
-                {remoteCounterpart}
-              </Button>
+              <span className={cn('text-light-400')}>{remoteCounterpart}</span>
             </>
           )}
         </p>
@@ -115,7 +100,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
         </p>
       </div>
 
-      {branch.type === 'local' && (
+      {item.type === 'local' && (
         <Toolbar
           tools={[
             {
@@ -123,9 +108,9 @@ const BranchesListItem = (props: BranchesListItemProps) => {
               label: 'Pull',
               action: () => {
                 pullBranch.mutate({
-                  branch: branch.name,
-                  remote: branch.remote?.remoteName ?? 'origin',
-                  remoteBranch: branch.remote?.branchName ?? branch.name,
+                  branch: item.name,
+                  remote: item.remote?.remoteName ?? 'origin',
+                  remoteBranch: item.remote?.branchName ?? item.name,
                   isRebase: false,
                 })
               },
@@ -136,9 +121,9 @@ const BranchesListItem = (props: BranchesListItemProps) => {
               label: 'Push',
               action: () => {
                 pushBranch.mutate({
-                  branch: branch.name,
-                  remote: branch.remote?.remoteName ?? 'origin',
-                  remoteBranch: branch.remote?.branchName ?? branch.name,
+                  branch: item.name,
+                  remote: item.remote?.remoteName ?? 'origin',
+                  remoteBranch: item.remote?.branchName ?? item.name,
                   isForce: false,
                 })
               },
@@ -148,11 +133,11 @@ const BranchesListItem = (props: BranchesListItemProps) => {
                   Glyph: IconUpload,
                   label: 'Force push',
                   action: () => {
-                    if (branch?.type === 'local') {
+                    if (item?.type === 'local') {
                       pushBranch.mutate({
-                        branch: branch.name,
-                        remote: branch.remote?.remoteName ?? 'origin',
-                        remoteBranch: branch.remote?.branchName ?? branch.name,
+                        branch: item.name,
+                        remote: item.remote?.remoteName ?? 'origin',
+                        remoteBranch: item.remote?.branchName ?? item.name,
                         isForce: true,
                       })
                     }
@@ -167,6 +152,6 @@ const BranchesListItem = (props: BranchesListItemProps) => {
       )}
     </Ariakit.CompositeItem>
   )
-}
+})
 
 export { BranchesListItem, type BranchesListItemProps }

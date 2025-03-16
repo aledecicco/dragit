@@ -13,22 +13,22 @@ import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
 interface UnmergedFileStatusItemProps extends ComponentProps<'div'> {
-  file: UnmergedFile
+  item: UnmergedFile
 }
 
 const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
-  const { file, ...divProps } = props
+  const { item, ...divProps } = props
   const stage = useAddToIndex()
   const remove = useRemoveFromTree()
 
   return (
     <FileStatusItem
       {...propsWithCn(divProps, 'text-light-600')}
-      file={file}
-      Glyph={file.isDir ? IconFolderExclamation : IconFileAlert}
+      file={item}
+      Glyph={item.isDir ? IconFolderExclamation : IconFileAlert}
       statusMessage={
         <p className={cn('text-xs text-warning-400/50')}>
-          {match(file.unstaged)
+          {match(item.unstaged)
             .with('addedByThem', () => 'Added by incoming changes')
             .with('addedByUs', () => 'Added by local changes')
             .with('bothAdded', () => 'Added by local and incoming changes')
@@ -46,15 +46,15 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
         {
           Glyph: IconCheck,
           label: 'Mark as resolved',
-          action: () => stage.mutate([file.path]),
+          action: () => stage.mutate([item.path]),
           disabled: stage.isPending,
         },
-        ...match(file.unstaged)
+        ...match(item.unstaged)
           .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => [
             {
               Glyph: IconTrash,
               label: 'Delete',
-              action: () => remove.mutate([file.path]),
+              action: () => remove.mutate([item.path]),
               disabled: remove.isPending,
             },
           ])

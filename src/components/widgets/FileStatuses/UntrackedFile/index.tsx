@@ -11,23 +11,23 @@ import { propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
 interface UntrackedFileStatusItemProps extends ComponentProps<'div'> {
-  file: UntrackedFile
+  item: UntrackedFile
 }
 
 const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
-  const { file, ...divProps } = props
+  const { item, ...divProps } = props
   const stage = useAddToIndex()
 
   return (
     <FileStatusItem
       {...propsWithCn(divProps, 'text-light-950/90')}
-      file={file}
-      Glyph={file.isDir ? IconFolderQuestion : IconFileUnknown}
+      file={item}
+      Glyph={item.isDir ? IconFolderQuestion : IconFileUnknown}
       actions={[
         {
           Glyph: IconPlus,
           label: 'Start tracking',
-          action: () => stage.mutate([file.path]),
+          action: () => stage.mutate([item.path]),
           disabled: stage.isPending,
         },
       ]}

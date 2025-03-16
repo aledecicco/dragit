@@ -22,20 +22,20 @@ import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
 interface StagedFileStatusItemProps extends ComponentProps<'div'> {
-  file: StagedFile
+  item: StagedFile
 }
 
 const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
-  const { file, ...divProps } = props
+  const { item, ...divProps } = props
   const unstage = useRemoveFromIndex()
 
   return (
     <FileStatusItem
       {...propsWithCn(divProps, 'text-light-600')}
-      file={file}
+      file={item}
       statusMessage={
         <p className={cn('text-xs text-success-300/50')}>
-          {match(file.staged)
+          {match(item.staged)
             .with('added', () => 'New')
             .with('deleted', () => 'Deleted')
             .with('modified', () => 'Edited')
@@ -45,21 +45,21 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
             .exhaustive()}
         </p>
       }
-      Glyph={match(file.staged)
-        .with('added', () => (file.isDir ? IconFolderPlus : IconFilePlus))
-        .with('deleted', () => (file.isDir ? IconFolderMinus : IconFileMinus))
-        .with('modified', () => (file.isDir ? IconFolderCode : IconFilePencil))
-        .with('copied', () => (file.isDir ? IconFolders : IconFiles))
+      Glyph={match(item.staged)
+        .with('added', () => (item.isDir ? IconFolderPlus : IconFilePlus))
+        .with('deleted', () => (item.isDir ? IconFolderMinus : IconFileMinus))
+        .with('modified', () => (item.isDir ? IconFolderCode : IconFilePencil))
+        .with('copied', () => (item.isDir ? IconFolders : IconFiles))
         .with('renamed', () =>
-          file.isDir ? IconFolderShare : IconFileArrowRight,
+          item.isDir ? IconFolderShare : IconFileArrowRight,
         )
-        .with('typeChanged', () => (file.isDir ? IconFolderCog : IconFileCode2))
+        .with('typeChanged', () => (item.isDir ? IconFolderCog : IconFileCode2))
         .exhaustive()}
       actions={[
         {
           Glyph: IconMinus,
           label: 'Unstage',
-          action: () => unstage.mutate([file.path]),
+          action: () => unstage.mutate([item.path]),
           disabled: unstage.isPending,
         },
       ]}

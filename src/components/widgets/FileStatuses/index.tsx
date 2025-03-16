@@ -1,20 +1,19 @@
-import type { ComponentProps, ComponentType, HTMLProps } from 'react'
-
-import { useAddToIndex, useRemoveFromIndex } from '@api/commands'
-import type { FileInfo } from '@api/models'
-import { headInfoQuery } from '@api/queries'
-import { useRepositoryQuery } from '@api/utils'
-import { ScrollShadowDiv } from '@lib/ScrollShadowDiv'
 import {
   IconListCheck,
   IconPlaylistAdd,
   IconPlaylistX,
 } from '@tabler/icons-react'
+import { type ComponentProps, useCallback, useMemo } from 'react'
+
+import { useAddToIndex, useRemoveFromIndex } from '@api/commands'
+import { headInfoQuery } from '@api/queries'
+import { useRepositoryQuery } from '@api/utils'
+import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { Accordion } from '@ui/Accordion'
+import { AccordionSection } from '@ui/Accordion/Section'
 import { IconButton } from '@ui/IconButton'
-import { mapOr } from '@utils/array'
-import { useVirtualList } from '@utils/performance'
 import { cn, propsWithCn } from '@utils/styles'
+import { mapFn } from '@utils/types'
 import { getFilesByStatus } from '@widgets/FileStatuses/utils'
 import { StagedFileStatusItem } from './StagedFile'
 import { UnmergedFileStatusItem } from './UnmergedFile'
@@ -30,7 +29,32 @@ const FileStatuses = (props: FileStatusesProps) => {
   const stage = useAddToIndex()
   const unstage = useRemoveFromIndex()
 
-  if (!headInfo.data) {
+  const files = useMemo(() => {
+    return mapFn(headInfo.data, (headInfo) => getFilesByStatus(headInfo))
+  }, [headInfo.data])
+
+  const untrackedOptions = useMemo(() => {
+    return mapFn(files, (files) => ({
+      getItemKey: (index: number) => files.untracked[index].path,
+    }))
+  }, [files])
+  const unmergedOptions = useMemo(() => {
+    return mapFn(files, (files) => ({
+      getItemKey: (index: number) => files.unmerged[index].path,
+    }))
+  }, [files])
+  const unstagedOptions = useMemo(() => {
+    return mapFn(files, (files) => ({
+      getItemKey: (index: number) => files.unstaged[index].path,
+    }))
+  }, [files])
+  const stagedOptions = useMemo(() => {
+    return mapFn(files, (files) => ({
+      getItemKey: (index: number) => files.staged[index].path,
+    }))
+  }, [files])
+
+  if (!files) {
     return (
       <div
         {...propsWithCn(
@@ -39,175 +63,147 @@ const FileStatuses = (props: FileStatusesProps) => {
           'flex flex-col items-center justify-center',
         )}
       >
-        <p className={cn('text-sm italic text-light-950')}>Loading files...</p>
+        <p className={cn('text-sm italic text-light-950/60')}>
+          Loading files...
+        </p>
       </div>
     )
   }
 
-  const files = getFilesByStatus(headInfo.data)
-
   return (
-    <Accordion
-      {...propsWithCn(divProps, 'overflow-hidden')}
-      showArrows
-      sections={[
-        {
-          id: 'untracked',
-          label: <>Untracked files ({files.untracked.length})</>,
-          extraInfo: (
-            <IconButton
-              round={false}
-              Glyph={IconPlaylistAdd}
-              variant="neutral"
-              label="Start tracking all"
-              size="sm"
-              disabled={files.untracked.length === 0 || stage.isPending}
-              onClick={() => {
-                stage.mutate(files.untracked.map((file) => file.path))
-              }}
-            />
-          ),
-          description: files.untracked.length ? (
-            <FileStatusesSection
-              files={files.untracked}
-              Item={UntrackedFileStatusItem}
-            />
-          ) : (
-            <p className={cn('text-sm text-light-950')}>No untracked files</p>
-          ),
-          className: 'min-h-30',
-        },
-        {
-          id: 'unmerged',
-          label: <>Unmerged changes ({files.unmerged.length})</>,
-          extraInfo: (
-            <IconButton
-              round={false}
-              Glyph={IconListCheck}
-              label="Mark all as resolved"
-              variant="neutral"
-              size="sm"
-              disabled={files.unmerged.length === 0 || stage.isPending}
-              onClick={() => {
-                stage.mutate(files.unmerged.map((file) => file.path))
-              }}
-            />
-          ),
-          description: files.unmerged.length ? (
-            <FileStatusesSection
-              files={files.unmerged}
-              Item={UnmergedFileStatusItem}
-            />
-          ) : (
-            <p className={cn('text-sm text-light-950')}>No unmerged files</p>
-          ),
-          className: 'min-h-30',
-        },
-        {
-          id: 'unstaged',
-          label: <>Unstaged changes ({files.unstaged.length})</>,
-          extraInfo: (
-            <IconButton
-              round={false}
-              Glyph={IconPlaylistAdd}
-              variant="neutral"
-              label="Stage all"
-              size="sm"
-              disabled={files.unstaged.length === 0 || stage.isPending}
-              onClick={() => {
-                stage.mutate(files.unstaged.map((file) => file.path))
-              }}
-            />
-          ),
-          description: files.unstaged.length ? (
-            <FileStatusesSection
-              files={files.unstaged}
-              Item={UnstagedFileStatusItem}
-            />
-          ) : (
-            <p className={cn('text-sm text-light-950')}>No unstaged files</p>
-          ),
-          className: 'min-h-30',
-        },
-        {
-          id: 'staged',
-          label: <>Staged changes ({files.staged.length})</>,
-          extraInfo: (
-            <IconButton
-              round={false}
-              Glyph={IconPlaylistX}
-              label="Unstage all"
-              variant="neutral"
-              size="sm"
-              disabled={files.staged.length === 0 || unstage.isPending}
-              onClick={() => {
-                unstage.mutate(files.staged.map((file) => file.path))
-              }}
-            />
-          ),
-          description: files.staged.length ? (
-            <FileStatusesSection
-              files={files.staged}
-              Item={StagedFileStatusItem}
-            />
-          ) : (
-            <p className={cn('text-sm text-light-950')}>No staged files</p>
-          ),
-          className: 'min-h-30',
-        },
-      ]}
-    />
-  )
-}
-
-interface FileStatusesSectionProps<T extends FileInfo> {
-  files: T[]
-  Item: ComponentType<HTMLProps<HTMLDivElement> & { file: T }>
-}
-
-const FileStatusesSection = <T extends FileInfo>(
-  props: FileStatusesSectionProps<T>,
-) => {
-  const { files, Item } = props
-
-  const { scrollContainerRef, virtualizer, isScrolled, hasScrollLeft } =
-    useVirtualList<HTMLDivElement>({
-      estimateSize: () => 48,
-      paddingStart: 8,
-      paddingEnd: 8,
-      gap: 8,
-      count: files.length,
-    })
-
-  return (
-    <ScrollShadowDiv
-      isScrolled={isScrolled}
-      hasScrollLeft={hasScrollLeft}
-      className={cn('w-full h-full')}
-    >
-      <div
-        ref={scrollContainerRef}
-        className={cn('overflow-auto w-full h-full')}
+    <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>
+      <AccordionSection
+        label={`Untracked files (${files.untracked.length})`}
+        extraInfo={
+          <IconButton
+            round={false}
+            Glyph={IconPlaylistAdd}
+            variant="neutral"
+            label="Start tracking all"
+            size="sm"
+            disabled={files.untracked.length === 0 || stage.isPending}
+            onClick={() => {
+              stage.mutate(files.untracked.map((file) => file.path))
+            }}
+          />
+        }
+        className={'min-h-30 overflow-y-hidden'}
       >
-        <div
-          className={cn('w-full relative')}
-          style={{ height: virtualizer.getTotalSize() }}
-        >
-          {virtualizer.getVirtualItems().map((virtualRow) => (
-            <Item
-              ref={virtualizer.measureElement}
-              data-index={virtualRow.index}
-              key={virtualRow.index}
-              file={files[virtualRow.index]}
-              className={cn('absolute top-0 left-2 right-2')}
-              style={{
-                transform: `translateY(${virtualRow.start}px)`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-    </ScrollShadowDiv>
+        {files.untracked.length ? (
+          <VirtualizedDiv
+            size="sm"
+            items={files.untracked}
+            RenderItem={UntrackedFileStatusItem}
+            itemSize={34}
+            className={cn('w-full h-full')}
+            options={untrackedOptions}
+          />
+        ) : (
+          <p className={cn('text-sm text-light-950/50 italic p-3')}>
+            No untracked files
+          </p>
+        )}
+      </AccordionSection>
+
+      <AccordionSection
+        label={`Unmerged files (${files.unmerged.length})`}
+        extraInfo={
+          <IconButton
+            round={false}
+            Glyph={IconListCheck}
+            label="Mark all as resolved"
+            variant="neutral"
+            size="sm"
+            disabled={files.unmerged.length === 0 || stage.isPending}
+            onClick={() => {
+              stage.mutate(files.unmerged.map((file) => file.path))
+            }}
+          />
+        }
+        className={'min-h-30 overflow-y-hidden'}
+      >
+        {files.unmerged.length ? (
+          <VirtualizedDiv
+            size="sm"
+            items={files.unmerged}
+            RenderItem={UnmergedFileStatusItem}
+            itemSize={48}
+            className={cn('w-full h-full')}
+            options={unmergedOptions}
+          />
+        ) : (
+          <p className={cn('text-sm text-light-950/50 italic p-3')}>
+            No unstaged files
+          </p>
+        )}
+      </AccordionSection>
+
+      <AccordionSection
+        label={`Unstaged files (${files.unstaged.length})`}
+        extraInfo={
+          <IconButton
+            round={false}
+            Glyph={IconPlaylistAdd}
+            variant="neutral"
+            label="Stage all"
+            size="sm"
+            disabled={files.unstaged.length === 0 || stage.isPending}
+            onClick={() => {
+              stage.mutate(files.unstaged.map((file) => file.path))
+            }}
+          />
+        }
+        className={'min-h-30 overflow-y-hidden'}
+      >
+        {files.unstaged.length ? (
+          <VirtualizedDiv
+            size="sm"
+            items={files.unstaged}
+            RenderItem={UnstagedFileStatusItem}
+            itemSize={48}
+            className={cn('w-full h-full')}
+            options={unstagedOptions}
+          />
+        ) : (
+          <p className={cn('text-sm text-light-950/50 italic p-3')}>
+            No unstaged files
+          </p>
+        )}
+      </AccordionSection>
+
+      <AccordionSection
+        label={`Staged files (${files.staged.length})`}
+        extraInfo={
+          <IconButton
+            round={false}
+            Glyph={IconPlaylistX}
+            label="Unstage all"
+            variant="neutral"
+            size="sm"
+            disabled={files.staged.length === 0 || unstage.isPending}
+            onClick={() => {
+              unstage.mutate(files.staged.map((file) => file.path))
+            }}
+          />
+        }
+        className={'min-h-30 overflow-y-hidden'}
+      >
+        {files.staged.length ? (
+          <VirtualizedDiv
+            size="sm"
+            items={files.staged}
+            RenderItem={StagedFileStatusItem}
+            itemSize={48}
+            className={cn('w-full h-full')}
+            options={stagedOptions}
+          />
+        ) : (
+          <p className={cn('text-sm text-light-950/50 italic p-3')}>
+            No staged files
+          </p>
+        )}
+      </AccordionSection>
+    </Accordion>
   )
 }
 
