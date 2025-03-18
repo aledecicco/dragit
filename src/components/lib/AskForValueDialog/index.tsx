@@ -1,16 +1,18 @@
-import * as Ariakit from '@ariakit/react'
 import type { ComponentType, ReactNode } from 'react'
 
 import { hideDialog, showDialog } from '@context/dialogs'
 import { getUniqueId } from '@context/ids'
-import { Dialog, type DialogProps } from '@ui/Dialog'
-import { Form } from '@ui/Form'
 import { InputField } from '@ui/Form/InputField'
-import { FormSubmitButton } from '@ui/Form/SubmitButton'
+import { FormDialog, type FormDialogProps } from '@ui/FormDialog'
+import type { PickPartial } from '@utils/types'
 
 type AskForValueVariant = 'input' | 'text'
 
-interface AskForValueDialogProps extends DialogProps {
+interface AskForValueDialogProps
+  extends PickPartial<
+    FormDialogProps<{ value: string | undefined }>,
+    'dialogKey'
+  > {
   label: string
   submitValue: (value: string | undefined) => void
   variant?: AskForValueVariant
@@ -28,33 +30,27 @@ const AskForValueDialog = (props: AskForValueDialogProps) => {
     ...dialogProps
   } = props
 
-  const form = Ariakit.useFormStore({
-    defaultValues: {
-      value: defaultValue,
-    },
-  })
-
-  form.useSubmit((formState) => {
-    submitValue(formState.values.value)
-    hideDialog(dialogProps.dialogKey)
-  })
-
   return (
-    <Dialog
+    <FormDialog
       {...dialogProps}
+      form={{
+        defaultValues: {
+          value: defaultValue,
+        },
+        onFormSubmit: (formState) => {
+          submitValue(formState.values.value)
+          hideDialog(dialogProps.dialogKey)
+        },
+      }}
       onClose={(e) => {
         dialogProps.onClose?.(e)
         submitValue(undefined)
       }}
     >
-      <Form options={{ store: form }}>
-        {typeof Message === 'function' ? <Message /> : Message}
+      {typeof Message === 'function' ? <Message /> : Message}
 
-        <InputField required autoFocus name={form.names.value} label={label} />
-
-        <FormSubmitButton>Accept</FormSubmitButton>
-      </Form>
-    </Dialog>
+      <InputField required autoFocus name="value" label={label} />
+    </FormDialog>
   )
 }
 

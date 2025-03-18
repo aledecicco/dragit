@@ -1,5 +1,5 @@
 type ReactSetter<T> = React.Dispatch<React.SetStateAction<T>>
-
+Object
 type LiteralUnion<LiteralType extends string> =
   | LiteralType
   | (string & Record<never, never>)
@@ -19,5 +19,9 @@ const mapFn = <T, R>(
   return f(v)
 }
 
-export type { ReactSetter, LiteralUnion, Size }
+type AnyObject = Record<never, never>
+
+type PickPartial<T, K extends keyof T> = Partial<T> & Pick<T, K>
+
+export type { ReactSetter, LiteralUnion, Size, AnyObject, PickPartial }
 export { idFn, mapFn }
