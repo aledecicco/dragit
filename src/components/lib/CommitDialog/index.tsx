@@ -30,7 +30,7 @@ const CommitDialog = (props: CommitDialogProps) => {
       {...dialogProps}
       dialogKey={dialogProps.dialogKey}
     >
-      <TextField label="Commit Message" name="message" />
+      <TextField label="Commit Message" name="message" autoFocus required />
     </FormDialog>
   )
 }

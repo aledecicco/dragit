@@ -20,37 +20,35 @@ const ScrollShadowDiv = (props: ScrollShadowDivProps) => {
   } = props
 
   return (
-    <div {...propsWithCn(divProps, 'relative overflow-y-hidden')}>
+    <div {...propsWithCn(divProps, 'relative overflow-y-hidden py-[1px]')}>
       {children}
 
       <div
         className={cn(
-          'w-full absolute top-0 left-0',
-          'opacity-0 bg-linear-to-b from-dark-950/80 to-[transparent] rounded-b-full',
+          'w-full absolute -top-1 left-0',
+          'opacity-0 bg-linear-to-b from-dark-950/80 to-[transparent] from-50% rounded-b-full',
           match(size)
-            .with('sm', () => 'h-1.5 from-dark-950/70')
-            .with('md', () => 'h-2')
-            .with('lg', () => 'h-3')
+            .with('sm', () => 'h-2.5 from-dark-950/70')
+            .with('md', () => 'h-3')
+            .with('lg', () => 'h-4')
             .exhaustive(),
           isScrolled ? 'animate-fade-in' : 'animate-fade-out',
           'pointer-events-none',
         )}
-        aria-hidden={true}
       />
 
       <div
         className={cn(
-          'w-full absolute bottom-0 left-0',
-          'opacity-0 bg-linear-to-t from-dark-950/80 to-[transparent] rounded-t-full',
+          'w-full absolute -bottom-1 left-0',
+          'opacity-0 bg-linear-to-t from-dark-950/80 to-[transparent] from-50% rounded-t-full',
           match(size)
-            .with('sm', () => 'h-1.5 from-dark-950/70')
-            .with('md', () => 'h-2')
-            .with('lg', () => 'h-3')
+            .with('sm', () => 'h-2.5 from-dark-950/70')
+            .with('md', () => 'h-3')
+            .with('lg', () => 'h-4')
             .exhaustive(),
           hasScrollLeft ? 'animate-fade-in' : 'animate-fade-out',
           'pointer-events-none',
         )}
-        aria-hidden={true}
       />
     </div>
   )

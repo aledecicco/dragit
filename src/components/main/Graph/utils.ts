@@ -37,16 +37,11 @@ const ancestorIsDivergent = (
   return ancestorDistance + 1 <= branchDivergence.ahead
 }
 
-const useInfiniteScroll = (
-  history: HistoryQuery,
-  items: VirtualItem[],
-  fetchCondition?: () => boolean,
-) => {
+const useInfiniteScroll = (history: HistoryQuery, items: VirtualItem[]) => {
   useEffect(() => {
     const lastItem = items.at(-1)
 
     if (
-      (!fetchCondition || fetchCondition()) &&
       lastItem &&
       lastItem.index >= getPaginatedLength(history.data) - 1 &&
       history.hasNextPage &&
@@ -54,7 +49,7 @@ const useInfiniteScroll = (
     ) {
       history.fetchNextPage()
     }
-  }, [items, history, fetchCondition])
+  }, [items, history])
 }
 
 const useCurrentBranch = (): BranchInfo | undefined => {
