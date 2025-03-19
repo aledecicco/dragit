@@ -42,24 +42,28 @@ const Button = (props: ButtonProps) => {
           'shadow-xs bg-primary-700 text-light-50',
           'hover:bg-primary-600',
           'aria-expanded:bg-primary-600',
+          'focus:bg-primary-600 data-focus:bg-primary-600',
           'aria-disabled:bg-primary-500/40 aria-disabled:text-light-800',
         ],
         variant === 'cta' && [
           'shadow-xs bg-accent-600 text-light-50',
           'hover:bg-accent-500',
           'aria-expanded:bg-accent-500',
+          'focus:bg-accent-500 data-focus:bg-accent-500',
           'aria-disabled:bg-accent-600/40 aria-disabled:text-light-700',
         ],
         variant === 'neutral' && [
           'shadow-xs bg-dark-300 text-light-50',
           'hover:bg-dark-200',
           'aria-expanded:bg-dark-200',
+          'focus:bg-dark-200 data-focus:bg-dark-200',
           'aria-disabled:bg-dark-400 aria-disabled:text-light-950/50',
         ],
         variant === 'plain' && [
           'hover:shadow-xs bg-transparent text-light-50',
           'hover:bg-dark-400',
           'aria-expanded:bg-dark-400',
+          'focus:bg-dark-400 data-focus:bg-dark-400',
           'aria-disabled:text-light-800',
         ],
       )}

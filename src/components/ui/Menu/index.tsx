@@ -50,7 +50,7 @@ const Menu = (props: MenuProps) => {
                   .with('md', () => 'text-xs p-1')
                   .with('lg', () => 'text-sm p-2')
                   .exhaustive(),
-                'cursor-pointer hover:bg-dark-200 data-[active-item]:bg-dark-200',
+                'cursor-pointer hover:bg-dark-100 data-[active-item]:bg-dark-100',
               )}
             >
               {Glyph && <Icon Glyph={Glyph} size="sm" />}

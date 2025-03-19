@@ -86,10 +86,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
         >
           <Ariakit.Combobox
             placeholder="Search..."
-            className={cn(
-              'w-full px-2 py-3 rounded-sm',
-              'text-sm bg-dark-950/40',
-            )}
+            className={cn('w-full px-2 py-3 rounded-sm', 'text-sm bg-dark-500')}
             autoSelect
           />
 
@@ -106,30 +103,42 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
                 No matches found
               </div>,
               matchingOptions,
-              (option) => {
-                return (
-                  <Ariakit.SelectItem
-                    key={option.value}
-                    value={option.value}
-                    render={
-                      <Ariakit.ComboboxItem
-                        className={cn(
-                          'text-sm text-center',
-                          'p-2 rounded-sm',
-                          'cursor-pointer data-[active-item]:bg-dark-200 aria-selected:bg-accent-400/8',
-                        )}
-                      />
-                    }
-                  >
-                    {renderOption(option)}
-                  </Ariakit.SelectItem>
-                )
-              },
+              (option) => (
+                <ComboboxItem key={option.value} item={option}>
+                  {renderOption(option)}
+                </ComboboxItem>
+              ),
             )}
           </Ariakit.ComboboxList>
         </Ariakit.SelectPopover>
       </Ariakit.SelectProvider>
     </Ariakit.ComboboxProvider>
+  )
+}
+
+interface ComboboxItemProps<T> extends Ariakit.SelectItemProps {
+  item: ComboboxOption<T>
+}
+
+const ComboboxItem = <T,>(props: ComboboxItemProps<T>) => {
+  const { item, ...itemProps } = props
+
+  return (
+    <Ariakit.SelectItem
+      {...itemProps}
+      value={item.value}
+      render={
+        <Ariakit.ComboboxItem
+          className={cn(
+            'text-sm text-center',
+            'p-2 rounded-sm cursor-pointer',
+            'data-[active-item]:bg-dark-100',
+            'aria-selected:bg-accent-300/15',
+            'data-[active-item]:aria-selected:bg-accent-300/20',
+          )}
+        />
+      }
+    />
   )
 }
 

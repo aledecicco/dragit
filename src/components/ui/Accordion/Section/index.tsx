@@ -25,6 +25,8 @@ const AccordionSection = (props: AccordionSectionProps) => {
                 'text-sm text-light-600 text-start',
                 'p-2 flex flex-row gap-x-2 items-center',
                 'hover:text-light-700 hover:underline',
+                'focus:text-light-700 focus:underline',
+                'data-focus:text-light-700 data-focus:underline',
                 'aria-disabled:text-light-950',
               )}
             />
