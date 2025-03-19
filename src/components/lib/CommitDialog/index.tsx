@@ -20,7 +20,7 @@ const CommitDialog = (props: CommitDialogProps) => {
   return (
     <FormDialog
       heading="Commit"
-      form={{
+      formOptions={{
         defaultValues: { message: '' },
         onFormSubmit: (form) => {
           const message = form.values.message

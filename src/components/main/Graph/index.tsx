@@ -1,5 +1,5 @@
-import { useVirtualizer } from '@tanstack/react-virtual'
-import { useMemo, useRef } from 'react'
+import { type Range, defaultRangeExtractor } from '@tanstack/react-virtual'
+import { useCallback, useMemo } from 'react'
 
 import { commitHistoryQuery } from '@api/queries'
 import { getPaginatedLength, useRepositoryInfiniteQuery } from '@api/utils'
@@ -8,7 +8,6 @@ import { ScrollShadowDiv } from '@lib/ScrollShadowDiv'
 import { SvgOverlay } from '@lib/SvgOverlay'
 import { type VirtualListOptions, useVirtualList } from '@utils/performance'
 import { cn } from '@utils/styles'
-import { GraphAnchor } from './Anchor'
 import { GraphBranch } from './Branch'
 import { BranchMessages } from './Branch/Messages'
 import { BranchSelectors } from './Branch/Selectors'
@@ -60,15 +59,32 @@ const GraphInner = () => {
     return getPaginatedLength(baseBranchHistory.data)
   }, [baseBranchHistory.data])
 
+  const rangeExtractor = useCallback(
+    (range: Range) => {
+      const indexes = new Set(defaultRangeExtractor(range))
+
+      if (commonAncestor?.commonCommit.distance !== undefined) {
+        indexes.add(commonAncestor.commonCommit.distance)
+      }
+      if (commonAncestor?.lastCommit?.distance !== undefined) {
+        indexes.add(commonAncestor.lastCommit.distance)
+      }
+
+      return [...indexes].sort((a, b) => a - b)
+    },
+    [commonAncestor],
+  )
+
   const virtualizerOptions = useMemo<VirtualListOptions<HTMLDivElement>>(() => {
     return {
       estimateSize: () => NODE_SIZE,
+      rangeExtractor: rangeExtractor,
       gap: CURVE_SIZE * 2 + EDGE_OFFSET * 2,
       paddingStart: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
       paddingEnd: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
       count: Math.max(branchLength, baseLength),
     }
-  }, [branchLength, baseLength])
+  }, [branchLength, baseLength, rangeExtractor])
 
   const { scrollContainerRef, virtualizer, isScrolled, hasScrollLeft } =
     useVirtualList(virtualizerOptions)
@@ -96,6 +112,7 @@ const GraphInner = () => {
               branch={branch}
               anchor={commonAncestor?.lastCommit}
               isBase={false}
+              baseBranch={baseBranch}
             />
           )}
 
@@ -103,17 +120,8 @@ const GraphInner = () => {
             <GraphBranch
               virtualizer={virtualizer}
               branch={baseBranch}
-              anchor={commonAncestor?.commonCommit ?? undefined}
-              isBase={true}
-            />
-          )}
-
-          {branch && baseBranch && commonAncestor && (
-            <GraphAnchor
-              virtualizer={virtualizer}
-              branch={branch}
-              baseBranch={baseBranch}
-              commonAncestorInfo={commonAncestor}
+              anchor={commonAncestor?.commonCommit}
+              isBase
             />
           )}
         </SvgOverlay>

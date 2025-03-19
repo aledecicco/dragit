@@ -33,7 +33,7 @@ const AskForValueDialog = (props: AskForValueDialogProps) => {
   return (
     <FormDialog
       {...dialogProps}
-      form={{
+      formOptions={{
         defaultValues: {
           value: defaultValue,
         },

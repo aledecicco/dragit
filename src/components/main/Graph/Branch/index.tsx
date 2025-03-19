@@ -18,15 +18,23 @@ import {
   useRemoteDivergence,
 } from '../utils'
 
-interface GraphBranchProps {
+type GraphBranchProps = {
   virtualizer: Virtualizer<HTMLDivElement, Element>
   branch: BranchInfo
   anchor: AncestorInfo | undefined | null
-  isBase: boolean
-}
+} & (
+  | {
+      isBase?: false
+      baseBranch: BranchInfo | undefined
+    }
+  | {
+      isBase: true
+      baseBranch?: never
+    }
+)
 
 const GraphBranch = (props: GraphBranchProps) => {
-  const { virtualizer, branch, anchor, isBase } = props
+  const { virtualizer, branch, anchor, isBase = false, baseBranch } = props
   const stopAtAnchor = !isBase
 
   const history = useRepositoryInfiniteQuery(commitHistoryQuery, branch.name)
@@ -44,20 +52,20 @@ const GraphBranch = (props: GraphBranchProps) => {
   }
 
   return items.map((virtualRow) => {
-    if (anchor) {
-      if (stopAtAnchor && virtualRow.index > anchor.distance) {
-        return undefined
-      }
-
-      if (virtualRow.index === anchor.distance) {
-        return undefined
-      }
+    if (anchor && stopAtAnchor && virtualRow.index > anchor.distance) {
+      return undefined
     }
 
-    const commit = getPaginatedItem(history.data, virtualRow.index)?.hash
+    const commit =
+      anchor && virtualRow.index === anchor.distance
+        ? anchor.hash
+        : getPaginatedItem(history.data, virtualRow.index)?.hash
+
     if (!commit) {
       return undefined
     }
+
+    const isAnchor = anchor && commit === anchor.hash
 
     const parentCommit =
       getNextPaginatedItem(history.data, virtualRow.index)?.hash ??
@@ -77,7 +85,10 @@ const GraphBranch = (props: GraphBranchProps) => {
         commitType={isUnconfirmed ? 'unconfirmed' : 'confirmed'}
         elementId={COMMIT_ELEMENT_ID(commit, branch.name)}
         parent={mapFn(parentCommit, (parentCommit) => ({
-          id: COMMIT_ELEMENT_ID(parentCommit, branch.name),
+          id: COMMIT_ELEMENT_ID(
+            parentCommit,
+            isAnchor && !!baseBranch ? baseBranch.name : branch.name,
+          ),
           type: parentIsDistantAnchor
             ? 'dashed'
             : isUnconfirmed
