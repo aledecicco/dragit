@@ -22,7 +22,7 @@ const AccordionSection = (props: AccordionSectionProps) => {
             <Ariakit.Disclosure
               className={cn(
                 'cursor-pointer w-full group/accordion',
-                'text-sm text-light-900 text-start',
+                'text-sm text-light-600 text-start',
                 'p-2 flex flex-row gap-x-2 items-center',
                 'hover:text-light-700 hover:underline',
                 'aria-disabled:text-light-950',

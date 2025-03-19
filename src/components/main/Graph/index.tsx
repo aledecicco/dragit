@@ -80,7 +80,7 @@ const GraphInner = () => {
       estimateSize: () => NODE_SIZE,
       rangeExtractor: rangeExtractor,
       gap: CURVE_SIZE * 2 + EDGE_OFFSET * 2,
-      paddingStart: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
+      paddingStart: CURVE_SIZE * 2 + EDGE_OFFSET,
       paddingEnd: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
       count: Math.max(branchLength, baseLength),
     }
@@ -93,7 +93,7 @@ const GraphInner = () => {
     <ScrollShadowDiv
       isScrolled={isScrolled}
       hasScrollLeft={hasScrollLeft}
-      className={cn('w-full h-full col-span-3 col-start-1 row-start-3 mt-4')}
+      className={cn('w-full h-full col-span-3 col-start-1 row-start-3')}
     >
       <div
         ref={scrollContainerRef}

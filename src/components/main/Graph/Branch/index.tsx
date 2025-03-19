@@ -12,8 +12,6 @@ import { mapFn } from '@utils/types'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import {
   ancestorIsDivergent,
-  getCommitPositionClass,
-  getCommitTranslationY,
   useInfiniteScroll,
   useRemoteDivergence,
 } from '../utils'
@@ -95,9 +93,9 @@ const GraphBranch = (props: GraphBranchProps) => {
               ? 'unconfirmed'
               : 'solid',
         }))}
-        className={cn('absolute top-0', getCommitPositionClass(isBase))}
+        className={cn('absolute top-0', isBase ? 'left-[68%]' : 'left-[12%]')}
         style={{
-          transform: `translateY(${getCommitTranslationY(virtualizer, virtualRow.index)}px)`,
+          transform: `translateY(${virtualRow.start}px)`,
         }}
       />
     )

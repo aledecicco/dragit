@@ -86,20 +86,6 @@ const useRemoteDivergence = (
   return divergence.data
 }
 
-const getCommitPositionClass = (isBase: boolean) =>
-  isBase ? 'left-[68%]' : 'left-[12%]'
-
-const getCommitTranslationY = (
-  virtualizer: Virtualizer<HTMLDivElement, Element>,
-  distance: number,
-): number => {
-  return (
-    (virtualizer.options.gap + virtualizer.options.estimateSize(distance)) *
-      distance +
-    CURVE_SIZE * 2.25
-  )
-}
-
 export {
   ancestorNotInRange,
   ancestorIsDivergent,
@@ -107,6 +93,4 @@ export {
   useCurrentBranch,
   useCurrentCommonAncestor,
   useRemoteDivergence,
-  getCommitPositionClass,
-  getCommitTranslationY,
 }

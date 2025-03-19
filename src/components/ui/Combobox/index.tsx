@@ -79,7 +79,6 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
           />
         </Ariakit.Select>
         <Ariakit.SelectPopover
-          unmountOnHide
           portal
           sameWidth
           gutter={4}
@@ -117,7 +116,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
                         className={cn(
                           'text-sm text-center',
                           'p-2 rounded-sm',
-                          'cursor-pointer data-[active-item]:bg-dark-200',
+                          'cursor-pointer data-[active-item]:bg-dark-200 aria-selected:bg-accent-400/8',
                         )}
                       />
                     }

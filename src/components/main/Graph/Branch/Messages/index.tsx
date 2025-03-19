@@ -3,10 +3,7 @@ import type { PropsWithChildren } from 'react'
 import { commitHistoryQuery } from '@api/queries'
 import { useRepositoryInfiniteQuery } from '@api/utils'
 import { useSelectedBranches } from '@context/branches'
-import {
-  getCommitPositionClass,
-  useCurrentCommonAncestor,
-} from '@main/Graph/utils'
+import { useCurrentCommonAncestor } from '@main/Graph/utils'
 import { cn } from '@utils/styles'
 
 const BranchMessages = () => {
@@ -70,7 +67,7 @@ const BranchMessage = (props: PropsWithChildren<{ isBase: boolean }>) => {
       className={cn(
         'text-center text-light-950 italic',
         'absolute top-10 w-max p-1 overflow-visible',
-        getCommitPositionClass(isBase),
+        isBase ? 'left-[68%]' : 'left-[12%]',
       )}
     >
       {children}

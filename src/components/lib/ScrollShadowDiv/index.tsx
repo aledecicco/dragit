@@ -26,7 +26,7 @@ const ScrollShadowDiv = (props: ScrollShadowDivProps) => {
       <div
         className={cn(
           'w-full absolute -top-1 left-0',
-          'opacity-0 bg-linear-to-b from-dark-950/80 to-[transparent] from-50% rounded-b-full',
+          'opacity-0 bg-linear-to-b from-dark-950/80 to-[transparent] from-30% rounded-b-full',
           match(size)
             .with('sm', () => 'h-2.5 from-dark-950/70')
             .with('md', () => 'h-3')
@@ -40,7 +40,7 @@ const ScrollShadowDiv = (props: ScrollShadowDivProps) => {
       <div
         className={cn(
           'w-full absolute -bottom-1 left-0',
-          'opacity-0 bg-linear-to-t from-dark-950/80 to-[transparent] from-50% rounded-t-full',
+          'opacity-0 bg-linear-to-t from-dark-950/80 to-[transparent] from-30% rounded-t-full',
           match(size)
             .with('sm', () => 'h-2.5 from-dark-950/70')
             .with('md', () => 'h-3')
