@@ -10,6 +10,7 @@ export type ParentCommitType = 'solid' | 'dashed' | 'unconfirmed'
 export const EDGE_OFFSET = 8
 export const CURVE_SIZE = 22
 export const CURVE_HANDLES_OFFSET = 15
+export const SHORT_LINE_SIZE = CURVE_SIZE
 
 export const BEGIN_PATH = (X_FROM: number, Y_FROM: number) =>
   `M ${X_FROM} ${Y_FROM}`
@@ -17,13 +18,13 @@ export const CURVE_DOWN_RIGHT = `c 0 ${CURVE_HANDLES_OFFSET}, ${CURVE_SIZE - CUR
 export const CURVE_RIGHT_UP = `c ${CURVE_HANDLES_OFFSET} 0, ${CURVE_SIZE} ${-(CURVE_SIZE - CURVE_HANDLES_OFFSET)}, ${CURVE_SIZE} ${-CURVE_SIZE}`
 export const CURVE_RIGHT_DOWN = `c ${CURVE_HANDLES_OFFSET} 0, ${CURVE_SIZE} ${CURVE_SIZE - CURVE_HANDLES_OFFSET}, ${CURVE_SIZE} ${CURVE_SIZE}`
 export const CURVE_UP_RIGHT = `c 0 ${-CURVE_HANDLES_OFFSET}, ${CURVE_SIZE - CURVE_HANDLES_OFFSET} ${-CURVE_SIZE}, ${CURVE_SIZE} ${-CURVE_SIZE}`
+export const SHORT_LINE_DOWN = `l 0 ${SHORT_LINE_SIZE}`
+export const SHORT_LINE_UP = `l 0 ${-SHORT_LINE_SIZE}`
 export const LINE_UP = (Y_FROM: number, Y_TO: number) => `l 0 ${Y_TO - Y_FROM}`
 export const LINE_DOWN = (Y_FROM: number, Y_TO: number) =>
   `l 0 ${Y_TO - Y_FROM - 4 * CURVE_SIZE}`
-export const LINE_RIGHT = (X_FROM: number, X_TO: number) =>
-  `l ${X_TO - X_FROM - CURVE_SIZE * 2} 0`
-export const HALF_LINE_RIGHT = (X_FROM: number, X_TO: number) =>
-  `l ${(X_TO - X_FROM) / 2 - CURVE_SIZE * 2} 0`
+export const LINE_RIGHT = (X_FROM: number, X_TO: number, fraction = 1) =>
+  `l ${(X_TO - X_FROM) * fraction - CURVE_SIZE * 2} 0`
 
 interface EdgesProps {
   elements: Map<ElementId, Element<ParentCommitType>>
@@ -75,19 +76,28 @@ const Edges = (props: EdgesProps) => {
                 ...(parentIsAligned
                   ? [`L ${parentX} ${parentY}`]
                   : [
+                      SHORT_LINE_DOWN,
                       CURVE_DOWN_RIGHT,
                       ...(parentIsLevel
                         ? [LINE_RIGHT(elemX, parentX)]
                         : [
-                            HALF_LINE_RIGHT(elemX, parentX),
-                            parentIsAbove ? CURVE_RIGHT_UP : CURVE_RIGHT_DOWN,
-                            parentIsAbove
-                              ? LINE_UP(elemY, parentY)
-                              : LINE_DOWN(elemY, parentY),
+                            LINE_RIGHT(elemX, parentX, 0.7),
+                            ...(parentIsAbove
+                              ? [CURVE_RIGHT_UP, SHORT_LINE_UP]
+                              : [CURVE_RIGHT_DOWN]),
+                            ...(parentIsAbove
+                              ? [LINE_UP(elemY, parentY - SHORT_LINE_SIZE)]
+                              : [
+                                  LINE_DOWN(
+                                    elemY,
+                                    parentY - CURVE_SIZE - SHORT_LINE_SIZE,
+                                  ),
+                                ]),
                             parentIsAbove ? CURVE_UP_RIGHT : CURVE_DOWN_RIGHT,
-                            HALF_LINE_RIGHT(elemX, parentX),
+                            LINE_RIGHT(elemX, parentX, 0.3),
                           ]),
                       CURVE_RIGHT_DOWN,
+                      SHORT_LINE_DOWN,
                     ]),
               ].join(' ')}
             />

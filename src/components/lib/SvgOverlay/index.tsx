@@ -30,7 +30,6 @@ const SvgOverlayInner = (props: SvgOverlayProps) => {
       {...propsWithCn(divProps, 'relative')}
       ref={mergeRefs([svgOverlay.componentRef, divProps.ref])}
     >
-      {children}
       <svg
         ref={svgOverlay.svgRef}
         className={cn(
@@ -42,6 +41,8 @@ const SvgOverlayInner = (props: SvgOverlayProps) => {
       >
         <RenderOverlay elements={svgOverlay.elements} />
       </svg>
+
+      {children}
     </div>
   )
 }

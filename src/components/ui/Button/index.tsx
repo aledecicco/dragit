@@ -27,15 +27,15 @@ const Button = (props: ButtonProps) => {
         match(size)
           .with('sm', () => [
             'text-xs gap-2',
-            round ? 'p-1 rounded-4xl' : 'px-2 py-1.25 rounded-md',
+            round ? 'p-1 rounded-full' : 'px-2 py-1.25 rounded-md',
           ])
           .with('md', () => [
             'text-sm gap-2',
-            round ? 'p-1.5 rounded-4xl' : 'px-2.5 py-1.75 rounded-md',
+            round ? 'p-1.5 rounded-full' : 'px-2.5 py-1.75 rounded-md',
           ])
           .with('lg', () => [
             'gap-3',
-            round ? 'p-2 rounded-4xl' : 'px-3.5 py-2 rounded-md',
+            round ? 'p-2 rounded-full' : 'px-3.5 py-2 rounded-md',
           ])
           .exhaustive(),
         variant === 'primary' && [

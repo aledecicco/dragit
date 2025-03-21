@@ -123,6 +123,11 @@
   }
 }
 
+@utility dithered-* {
+  background-image: radial-gradient(transparent 1px, --value(--color-*) 1px);
+  background-size: 3px 3px;
+}
+
 :root {
   font-family: "Inter", sans-serif;
   @apply bg-dark-600 text-light-50;

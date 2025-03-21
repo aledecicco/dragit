@@ -93,7 +93,7 @@ const GraphBranch = (props: GraphBranchProps) => {
               ? 'unconfirmed'
               : 'solid',
         }))}
-        className={cn('absolute top-0', isBase ? 'left-[68%]' : 'left-[12%]')}
+        className={cn('absolute top-0', isBase ? 'left-[55%]' : 'left-[3%]')}
         style={{
           transform: `translateY(${virtualRow.start}px)`,
         }}

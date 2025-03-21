@@ -5,15 +5,15 @@ import { match } from 'ts-pattern'
 import type { BranchName, CommitId } from '@api/models'
 import { commitInfoQuery } from '@api/queries'
 import { useRepositoryQuery } from '@api/utils'
+import { ProfilePicture } from '@lib/ProfilePicture'
 import { makeTracked } from '@lib/SvgOverlay'
-import { Hovercard, HovercardDisclosure } from '@ui/Hovercard'
+import { Marquee } from '@ui/Marquee'
 import { cn, propsWithCn } from '@utils/styles'
-import { GraphCommitInfo } from '../CommitInfo'
 import type { ParentCommitType } from '../Edges'
 
 export type CommitType = 'confirmed' | 'unconfirmed'
 
-export const NODE_SIZE = 20
+export const NODE_SIZE = 26
 export const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
   `commit_${commitId}_${branch}`
 
@@ -31,45 +31,61 @@ const GraphCommit = makeTracked<
   const commitInfo = useRepositoryQuery(commitInfoQuery, commitId)
 
   return (
-    <Hovercard
-      className={cn('p-4')}
-      placement="right"
-      anchor={
+    <div
+      {...divProps}
+      ref={mergeRefs([trackRef, divProps.ref])}
+      {...propsWithCn(divProps, 'relative')}
+    >
+      <div
+        className={cn(
+          'rounded-full shadow-sm p-0.5',
+          'flex items-center justify-center',
+          match(commitType)
+            .with('confirmed', () => 'bg-primary-600')
+            .with('unconfirmed', () => 'bg-accent-400')
+            .exhaustive(),
+        )}
+        style={{ width: NODE_SIZE, height: NODE_SIZE }}
+      >
+        <ProfilePicture
+          username={commitInfo.data?.authorEmail}
+          size="sm"
+          className={cn('w-full h-full')}
+        />
+      </div>
+
+      <div
+        className={cn(
+          'absolute left-full top-half translate-x-2 -translate-y-half w-80',
+          'border-4 border-dark-700/85 rounded-sm shadow-md',
+        )}
+      >
         <div
-          {...divProps}
-          ref={mergeRefs([trackRef, divProps.ref])}
-          {...propsWithCn(
-            divProps,
-            'flex flex-row items-center gap-5',
-            'cursor-pointer',
+          className={cn(
+            'p-2 border-2 border-dark-500 rounded-sm',
+            'bg-dark-700/75 dithered-dark-700',
+            'flex flex-col gap-y-1',
           )}
         >
+          <p
+            className={cn('text-sm text-ellipsis text-nowrap overflow-hidden')}
+          >
+            {commitInfo.data?.message ?? '...'}
+          </p>
           <div
-            className={cn(
-              'rounded-full shadow-sm',
-              match(commitType)
-                .with('confirmed', () => 'bg-primary-600')
-                .with('unconfirmed', () => 'bg-accent-400')
-                .exhaustive(),
-            )}
-            style={{ width: NODE_SIZE, height: NODE_SIZE }}
-          />
-          <div className={cn('flex flex-row gap-1 items-center')}>
-            <p className={cn('text-xs')}>
+            className={cn('flex flex-row items-center justify-between gap-x-1')}
+          >
+            <Marquee className={cn('text-xs text-light-950')}>
+              {commitInfo.data?.authorName ?? '...'}
+            </Marquee>
+
+            <p className={cn('text-xs text-light-600 min-w-max')}>
               {commitInfo.data?.shortHash ?? '...'}
             </p>
-            <HovercardDisclosure />
           </div>
         </div>
-      }
-      description={
-        commitInfo.data ? (
-          <GraphCommitInfo commitInfo={commitInfo.data} />
-        ) : (
-          <p className={cn('text-xs text-light-800')}>...</p>
-        )
-      }
-    />
+      </div>
+    </div>
   )
 })
 
