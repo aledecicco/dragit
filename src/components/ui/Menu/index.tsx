@@ -33,7 +33,11 @@ const Menu = (props: MenuProps) => {
         gutter={4}
         portal
         unmountOnHide
-        {...propsWithCn(menuProps, 'rounded-lg shadow-md p-1', 'bg-dark-300')}
+        {...propsWithCn(
+          menuProps,
+          'rounded-lg shadow-md p-1',
+          'bg-dark-300 min-w-max',
+        )}
       >
         {items.map((menuItem) => {
           const { Glyph, label, action, ...menuItemProps } = menuItem
@@ -43,7 +47,7 @@ const Menu = (props: MenuProps) => {
               onClick={action}
               {...propsWithCn(
                 menuItemProps,
-                'flex flex-row items-center gap-x-2 text-nowrap',
+                'flex flex-row shrink-0 items-center gap-x-2 text-nowrap min-w-max',
                 'rounded-sm text-light-50',
                 match(size)
                   .with('sm', () => 'text-xs p-0.5')

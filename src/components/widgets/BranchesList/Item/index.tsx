@@ -1,23 +1,13 @@
 import * as Ariakit from '@ariakit/react'
-import {
-  IconDownload,
-  IconGitBranch,
-  IconLocationFilled,
-  IconUpload,
-} from '@tabler/icons-react'
+import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
 import { type ComponentProps, memo } from 'react'
 import { match } from 'ts-pattern'
 
-import {
-  useCheckoutLocalBranch,
-  usePullBranch,
-  usePushBranch,
-} from '@api/commands'
+import { useCheckoutLocalBranch } from '@api/commands'
 import type { BranchInfo, BranchName, RefName } from '@api/models'
 import { useSelectedBranches } from '@context/branches'
 import { Icon } from '@ui/Icon'
 import { Marquee } from '@ui/Marquee'
-import { Toolbar } from '@ui/Toolbar'
 import { getRemoteCounterpart } from '@utils/repository'
 import { cn, propsWithCn } from '@utils/styles'
 import { useDateDifference } from '@utils/time'
@@ -34,8 +24,6 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
   const lastModified = useDateDifference(item.timestamp)
 
   const remoteCounterpart = getRemoteCounterpart(item)
-  const pushBranch = usePushBranch()
-  const pullBranch = usePullBranch()
 
   const { branch: currentBranch } = useSelectedBranches()
   const isCurrentBranch = currentBranch && item.name === currentBranch.name
@@ -95,61 +83,10 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
             </>
           )}
         </Marquee>
-        <p className={cn('text-xs text-light-950/50 mt-2')}>
+        <Marquee className={cn('text-xs text-light-950/50 mt-2')}>
           Last modified {lastModified}
-        </p>
+        </Marquee>
       </div>
-
-      {item.type === 'local' && (
-        <Toolbar
-          tools={[
-            {
-              Glyph: IconDownload,
-              label: 'Pull',
-              action: () => {
-                pullBranch.mutate({
-                  branch: item.name,
-                  remote: item.remote?.remoteName ?? 'origin',
-                  remoteBranch: item.remote?.branchName ?? item.name,
-                  isRebase: false,
-                })
-              },
-              disabled: pullBranch.isPending,
-            },
-            {
-              Glyph: IconUpload,
-              label: 'Push',
-              action: () => {
-                pushBranch.mutate({
-                  branch: item.name,
-                  remote: item.remote?.remoteName ?? 'origin',
-                  remoteBranch: item.remote?.branchName ?? item.name,
-                  isForce: false,
-                })
-              },
-              disabled: pushBranch.isPending,
-              alternatives: [
-                {
-                  Glyph: IconUpload,
-                  label: 'Force push',
-                  action: () => {
-                    if (item?.type === 'local') {
-                      pushBranch.mutate({
-                        branch: item.name,
-                        remote: item.remote?.remoteName ?? 'origin',
-                        remoteBranch: item.remote?.branchName ?? item.name,
-                        isForce: true,
-                      })
-                    }
-                  },
-                  disabled: pushBranch.isPending,
-                },
-              ],
-            },
-          ]}
-          size="sm"
-        />
-      )}
     </Ariakit.CompositeItem>
   )
 })

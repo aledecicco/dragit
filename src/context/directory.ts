@@ -14,7 +14,7 @@ const currentDirectory = new Store<CurrentDirectory>({
 
 const useDirectoryIsOpen = () => {
   const currentDir = useStore(currentDirectory)
-  return currentDir.path !== undefined
+  return !!currentDir.path
 }
 
 const useCurrentDirectory = () => {

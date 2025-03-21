@@ -130,8 +130,9 @@ const ComboboxItem = <T,>(props: ComboboxItemProps<T>) => {
       render={
         <Ariakit.ComboboxItem
           className={cn(
-            'text-sm text-center',
+            'text-sm text-center text-light-50',
             'p-2 rounded-sm cursor-pointer',
+            item.value === '' && 'italic not-aria-selected:text-light-800',
             'data-[active-item]:bg-dark-100',
             'aria-selected:bg-accent-300/15',
             'data-[active-item]:aria-selected:bg-accent-300/20',

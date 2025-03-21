@@ -9,18 +9,21 @@ import { CommitButton } from '@widgets/CommitButton'
 import { FileStatuses } from '@widgets/FileStatuses'
 
 const App = () => {
-  const isOpen = useDirectoryIsOpen()
-  const dialog = useDialog()
   useDirectorySync()
+  const dialog = useDialog()
+  const isOpen = useDirectoryIsOpen()
 
   return (
     <div
       className={cn(
         'px-8 py-4 w-full h-full max-h-full',
-        'grid grid-cols-1 grid-rows-[max-content_1fr] gap-4',
+        'grid grid-cols-[max_content_1fr_max-content] grid-rows-[max-content_1fr] gap-4',
       )}
     >
-      <CurrentDirectory className={cn('justify-self-center')} />
+      <CurrentDirectory
+        className={cn('col-start-2 row-start-1', 'justify-self-center')}
+      />
+
       {isOpen && <AppInner />}
 
       {dialog}
@@ -32,17 +35,12 @@ const AppInner = () => {
   useBranchesSync()
 
   return (
-    <div
-      className={cn(
-        'grid grid-cols-[2fr_6fr_2fr] gap-x-4',
-        'min-h-0 max-h-full',
-      )}
-    >
-      <FileStatuses />
-      <Graph />
-      <BranchesList />
-      <CommitButton />
-    </div>
+    <>
+      <CommitButton className={cn('col-start-1 row-start-3')} />
+      <FileStatuses className={cn('col-start-1 row-start-1 row-span-2')} />
+      <Graph className={cn('col-start-2 row-start-2 row-span-2')} />
+      <BranchesList className={cn('col-start-3 row-start-1 row-span-3')} />
+    </>
   )
 }
 

@@ -1,5 +1,5 @@
 import { type Range, defaultRangeExtractor } from '@tanstack/react-virtual'
-import { useCallback, useMemo } from 'react'
+import { type ComponentProps, useCallback, useMemo } from 'react'
 
 import { commitHistoryQuery } from '@api/queries'
 import { getPaginatedLength, useRepositoryInfiniteQuery } from '@api/utils'
@@ -7,7 +7,7 @@ import { useSelectedBranches } from '@context/branches'
 import { ScrollShadowDiv } from '@lib/ScrollShadowDiv'
 import { SvgOverlay } from '@lib/SvgOverlay'
 import { type VirtualListOptions, useVirtualList } from '@utils/performance'
-import { cn } from '@utils/styles'
+import { cn, propsWithCn } from '@utils/styles'
 import { GraphBranch } from './Branch'
 import { BranchMessages } from './Branch/Messages'
 import { BranchSelectors } from './Branch/Selectors'
@@ -16,14 +16,18 @@ import { NODE_SIZE } from './Commit'
 import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
 import { useCurrentCommonAncestor } from './utils'
 
-const Graph = () => {
+interface GraphProps extends ComponentProps<'div'> {}
+
+const Graph = (props: GraphProps) => {
+  const { ...divProps } = props
+
   return (
-    <div className={cn('h-full w-full min-h-0')}>
+    <div {...propsWithCn(divProps, 'h-full w-full min-h-0')}>
       <div
         className={cn(
           'overflow-hidden w-full h-full',
           'grid grid-cols-[1fr_max-content_1fr] grid-rows-[max-content_max-content_1fr]',
-          'gap-y-1 gap-x-8 place-items-center py-1',
+          'gap-y-1 gap-x-8 place-items-center',
         )}
       >
         <BranchSelectors />
@@ -94,16 +98,15 @@ const GraphInner = () => {
       isScrolled={isScrolled}
       hasScrollLeft={hasScrollLeft}
       className={cn('w-full h-full col-span-3 col-start-1 row-start-3')}
+      size="md"
     >
       <div
         ref={scrollContainerRef}
-        className={cn(
-          'overflow-auto contain-strict w-full h-full bg-dark-800/80',
-        )}
+        className={cn('overflow-auto w-full h-full bg-dark-800/80')}
       >
         <SvgOverlay
           RenderOverlay={Edges}
-          className={cn('w-full contain-layout')}
+          className={cn('w-full')}
           style={{ height: virtualizer.getTotalSize() }}
         >
           {branch && (

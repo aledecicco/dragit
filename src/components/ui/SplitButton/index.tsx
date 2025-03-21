@@ -80,7 +80,7 @@ const SplitButton = (props: SplitButtonProps) => {
           return {
             x: rect.x,
             y: rect.y,
-            width: rect.width,
+            width: rect.width * 2,
             height: rect.height,
           }
         }}
