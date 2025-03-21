@@ -4,21 +4,29 @@ import type { ComponentProps } from 'react'
 import { Icon } from '@ui/Icon'
 import { cn, propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
+import { match } from 'ts-pattern'
+
+type ProfilePictureVariant = 'accent' | 'primary' | 'neutral'
 
 interface ProfilePictureProps extends ComponentProps<'div'> {
   username: string | undefined
+  variant?: ProfilePictureVariant
   size?: Size
 }
 
 const ProfilePicture = (props: ProfilePictureProps) => {
-  const { username, size = 'md', ...divProps } = props
+  const { username, variant = 'primary', size = 'md', ...divProps } = props
 
   return (
     <div
       {...propsWithCn(
         divProps,
-        'rounded-full aspect-square',
-        'bg-primary-900 text-primary-600 p-0.5',
+        'rounded-full aspect-square p-0.5',
+        match(variant)
+          .with('accent', () => 'bg-accent-800 text-accent-600')
+          .with('primary', () => 'bg-primary-800 text-primary-600')
+          .with('neutral', () => 'bg-dark-200 text-light-950')
+          .exhaustive(),
         'flex items-center justify-center',
       )}
     >
@@ -27,4 +35,4 @@ const ProfilePicture = (props: ProfilePictureProps) => {
   )
 }
 
-export { ProfilePicture, type ProfilePictureProps }
+export { ProfilePicture, type ProfilePictureProps, type ProfilePictureVariant }

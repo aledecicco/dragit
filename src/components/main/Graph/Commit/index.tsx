@@ -5,7 +5,7 @@ import { match } from 'ts-pattern'
 import type { BranchName, CommitId } from '@api/models'
 import { commitInfoQuery } from '@api/queries'
 import { useRepositoryQuery } from '@api/utils'
-import { ProfilePicture } from '@lib/ProfilePicture'
+import { ProfilePicture, type ProfilePictureVariant } from '@lib/ProfilePicture'
 import { makeTracked } from '@lib/SvgOverlay'
 import { Marquee } from '@ui/Marquee'
 import { cn, propsWithCn } from '@utils/styles'
@@ -50,6 +50,11 @@ const GraphCommit = makeTracked<
         <ProfilePicture
           username={commitInfo.data?.authorEmail}
           size="sm"
+          variant={match(commitType)
+            .returnType<ProfilePictureVariant>()
+            .with('confirmed', () => 'primary')
+            .with('unconfirmed', () => 'accent')
+            .exhaustive()}
           className={cn('w-full h-full')}
         />
       </div>
@@ -57,13 +62,13 @@ const GraphCommit = makeTracked<
       <div
         className={cn(
           'absolute left-full top-half translate-x-2 -translate-y-half w-80',
-          'border-4 border-dark-700/85 rounded-sm shadow-md',
+          'border-4 border-dark-600/85 rounded-sm shadow-md',
         )}
       >
         <div
           className={cn(
-            'p-2 border-2 border-dark-500 rounded-sm',
-            'bg-dark-700/75 dithered-dark-700',
+            'p-2 border-1 border-dark-100 rounded-sm',
+            'bg-dark-700/75 dithered-dark-600',
             'flex flex-col gap-y-1',
           )}
         >
