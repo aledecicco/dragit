@@ -1,7 +1,8 @@
 import * as Ariakit from '@ariakit/react'
 import type { HTMLAttributes, MouseEventHandler } from 'react'
 
-import type { Glyph } from '@ui/Icon'
+import { Button, type ButtonVariant } from '@ui/Button'
+import { type Glyph, Icon } from '@ui/Icon'
 import { IconButton } from '@ui/IconButton'
 import type { MenuItem } from '@ui/Menu'
 import { SplitButton } from '@ui/SplitButton'
@@ -18,12 +19,21 @@ interface ToolbarTool extends HTMLAttributes<HTMLElement> {
 
 interface ToolbarProps extends Ariakit.ToolbarProps {
   tools: ToolbarTool[]
+  variant?: ButtonVariant
   size?: Size
   fixed?: boolean
+  compact?: boolean
 }
 
 const Toolbar = (props: ToolbarProps) => {
-  const { tools, size = 'md', fixed, ...toolbarProps } = props
+  const {
+    tools,
+    variant = 'neutral',
+    size = 'md',
+    fixed = false,
+    compact = true,
+    ...toolbarProps
+  } = props
 
   return (
     <Ariakit.ToolbarProvider>
@@ -49,18 +59,24 @@ const Toolbar = (props: ToolbarProps) => {
                 'not-last:rounded-r-none not-last:border-r-2 not-last:border-solid not-last:border-r-dark-500',
               )}
               buttonProps={{
-                className: cn(fixed && 'pr-0'),
+                className: cn(fixed && compact && 'pr-0'),
                 render: (
                   <Ariakit.ToolbarItem
                     render={
-                      <IconButton
-                        onClick={action}
-                        Glyph={Glyph}
-                        label={label}
-                        variant="neutral"
-                        round={false}
-                        size={size}
-                      />
+                      compact ? (
+                        <IconButton
+                          onClick={action}
+                          Glyph={Glyph}
+                          label={label}
+                          variant={variant}
+                          round={false}
+                          size={size}
+                        />
+                      ) : (
+                        <Button onClick={action} variant={variant} size={size}>
+                          <Icon Glyph={Glyph} size={size} /> {label}
+                        </Button>
+                      )
                     }
                     disabled={toolbarProps.disabled || toolProps.disabled}
                   />
@@ -79,14 +95,20 @@ const Toolbar = (props: ToolbarProps) => {
             <Ariakit.ToolbarItem
               key={label}
               render={
-                <IconButton
-                  onClick={action}
-                  Glyph={Glyph}
-                  label={label}
-                  variant="neutral"
-                  round={false}
-                  size={size}
-                />
+                compact ? (
+                  <IconButton
+                    onClick={action}
+                    Glyph={Glyph}
+                    label={label}
+                    variant={variant}
+                    round={false}
+                    size={size}
+                  />
+                ) : (
+                  <Button onClick={action} variant={variant} size={size}>
+                    <Icon Glyph={Glyph} size={size} /> {label}
+                  </Button>
+                )
               }
               {...propsWithCn(
                 toolProps,

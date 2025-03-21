@@ -5,8 +5,8 @@ import { CurrentDirectory } from '@main/CurrentDirectory'
 import { Graph } from '@main/Graph'
 import { cn } from '@utils/styles'
 import { BranchesList } from '@widgets/BranchesList'
-import { CommitButton } from '@widgets/CommitButton'
 import { FileStatuses } from '@widgets/FileStatuses'
+import { MainToolbar } from '@widgets/MainToolbar'
 
 const App = () => {
   useDirectorySync()
@@ -36,7 +36,7 @@ const AppInner = () => {
 
   return (
     <>
-      <CommitButton className={cn('col-start-1 row-start-3')} />
+      <MainToolbar className={cn('col-start-1 row-start-3')} />
       <FileStatuses className={cn('col-start-1 row-start-1 row-span-2')} />
       <Graph className={cn('col-start-2 row-start-2 row-span-2')} />
       <BranchesList className={cn('col-start-3 row-start-1 row-span-3')} />

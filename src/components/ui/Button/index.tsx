@@ -4,8 +4,10 @@ import { match } from 'ts-pattern'
 import { propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
+type ButtonVariant = 'primary' | 'cta' | 'neutral' | 'plain'
+
 interface ButtonOwnProps {
-  variant: 'primary' | 'cta' | 'neutral' | 'plain'
+  variant: ButtonVariant
   round?: boolean
   size?: Size
 }
@@ -19,7 +21,7 @@ const Button = (props: ButtonProps) => {
     <Ariakit.Button
       {...propsWithCn(
         buttonProps,
-        'w-max',
+        'min-w-max text-nowrap',
         'flex flex-row justify-center items-center text-center',
         'border-none font-semibold',
         'cursor-pointer active:scale-98',
@@ -75,4 +77,4 @@ const Button = (props: ButtonProps) => {
   )
 }
 
-export { Button, type ButtonProps, type ButtonOwnProps }
+export { Button, type ButtonProps, type ButtonOwnProps, type ButtonVariant }
