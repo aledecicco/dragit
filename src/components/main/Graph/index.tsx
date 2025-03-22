@@ -1,3 +1,4 @@
+import * as Ariakit from '@ariakit/react'
 import { type Range, defaultRangeExtractor } from '@tanstack/react-virtual'
 import { type ComponentProps, useCallback, useMemo } from 'react'
 
@@ -13,7 +14,7 @@ import { BranchMessages } from './Branch/Messages'
 import { BranchSelectors } from './Branch/Selectors'
 import { BranchToolbars } from './Branch/Toolbars'
 import { NODE_SIZE } from './Commit'
-import { CURVE_SIZE, EDGE_OFFSET, Edges } from './Edges'
+import { CURVE_SIZE, EDGE_LENGTH, EDGE_OFFSET, Edges } from './Edges'
 import { useCurrentCommonAncestor } from './utils'
 
 interface GraphProps extends ComponentProps<'div'> {}
@@ -83,10 +84,11 @@ const GraphInner = () => {
     return {
       estimateSize: () => NODE_SIZE,
       rangeExtractor: rangeExtractor,
-      gap: CURVE_SIZE * 4 + EDGE_OFFSET * 2,
+      gap: EDGE_LENGTH,
       paddingStart: CURVE_SIZE * 2 + EDGE_OFFSET,
       paddingEnd: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
       count: Math.max(branchLength, baseLength),
+      overscan: 5,
     }
   }, [branchLength, baseLength, rangeExtractor])
 
@@ -94,43 +96,49 @@ const GraphInner = () => {
     useVirtualList(virtualizerOptions)
 
   return (
-    <ScrollShadowDiv
-      isScrolled={isScrolled}
-      hasScrollLeft={hasScrollLeft}
-      className={cn('w-full h-full col-span-3 col-start-1 row-start-3')}
-      size="md"
-    >
-      <div
-        ref={scrollContainerRef}
-        className={cn('overflow-auto w-full h-full bg-dark-800/80')}
+    <Ariakit.CompositeProvider focusLoop="horizontal" focusShift>
+      <Ariakit.Composite
+        render={
+          <ScrollShadowDiv
+            isScrolled={isScrolled}
+            hasScrollLeft={hasScrollLeft}
+            className={cn('w-full h-full col-span-3 col-start-1 row-start-3')}
+            size="md"
+          />
+        }
       >
-        <SvgOverlay
-          RenderOverlay={Edges}
-          className={cn('w-full')}
-          style={{ height: virtualizer.getTotalSize() }}
+        <div
+          ref={scrollContainerRef}
+          className={cn('overflow-auto w-full h-full bg-dark-800/80')}
         >
-          {branch && (
-            <GraphBranch
-              virtualizer={virtualizer}
-              branch={branch}
-              anchor={commonAncestor?.lastCommit}
-              isBase={false}
-              baseBranch={baseBranch}
-            />
-          )}
+          <SvgOverlay
+            RenderOverlay={Edges}
+            className={cn('w-full')}
+            style={{ height: virtualizer.getTotalSize() }}
+          >
+            {branch && (
+              <GraphBranch
+                virtualizer={virtualizer}
+                branch={branch}
+                anchor={commonAncestor?.lastCommit}
+                isBase={false}
+                baseBranch={baseBranch}
+              />
+            )}
 
-          {baseBranch && (
-            <GraphBranch
-              virtualizer={virtualizer}
-              branch={baseBranch}
-              anchor={commonAncestor?.commonCommit}
-              isBase
-            />
-          )}
-        </SvgOverlay>
-      </div>
-      <BranchMessages />
-    </ScrollShadowDiv>
+            {baseBranch && (
+              <GraphBranch
+                virtualizer={virtualizer}
+                branch={baseBranch}
+                anchor={commonAncestor?.commonCommit}
+                isBase
+              />
+            )}
+          </SvgOverlay>
+        </div>
+        <BranchMessages />
+      </Ariakit.Composite>
+    </Ariakit.CompositeProvider>
   )
 }
 

@@ -93,6 +93,7 @@ const GraphBranch = (props: GraphBranchProps) => {
               ? 'unconfirmed'
               : 'solid',
         }))}
+        distance={virtualRow.index}
         className={cn('absolute top-0', isBase ? 'left-[55%]' : 'left-[3%]')}
         style={{
           transform: `translateY(${virtualRow.start}px)`,

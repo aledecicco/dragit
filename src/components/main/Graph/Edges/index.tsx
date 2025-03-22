@@ -10,7 +10,8 @@ export type ParentCommitType = 'solid' | 'dashed' | 'unconfirmed'
 export const EDGE_OFFSET = 8
 export const CURVE_SIZE = 22
 export const CURVE_HANDLES_OFFSET = 15
-export const SHORT_LINE_SIZE = CURVE_SIZE
+export const EDGE_LENGTH = CURVE_SIZE * 4 + EDGE_OFFSET * 2
+export const SHORT_LINE_LENGTH = CURVE_SIZE / 2
 
 export const BEGIN_PATH = (X_FROM: number, Y_FROM: number) =>
   `M ${X_FROM} ${Y_FROM}`
@@ -18,8 +19,8 @@ export const CURVE_DOWN_RIGHT = `c 0 ${CURVE_HANDLES_OFFSET}, ${CURVE_SIZE - CUR
 export const CURVE_RIGHT_UP = `c ${CURVE_HANDLES_OFFSET} 0, ${CURVE_SIZE} ${-(CURVE_SIZE - CURVE_HANDLES_OFFSET)}, ${CURVE_SIZE} ${-CURVE_SIZE}`
 export const CURVE_RIGHT_DOWN = `c ${CURVE_HANDLES_OFFSET} 0, ${CURVE_SIZE} ${CURVE_SIZE - CURVE_HANDLES_OFFSET}, ${CURVE_SIZE} ${CURVE_SIZE}`
 export const CURVE_UP_RIGHT = `c 0 ${-CURVE_HANDLES_OFFSET}, ${CURVE_SIZE - CURVE_HANDLES_OFFSET} ${-CURVE_SIZE}, ${CURVE_SIZE} ${-CURVE_SIZE}`
-export const SHORT_LINE_DOWN = `l 0 ${SHORT_LINE_SIZE}`
-export const SHORT_LINE_UP = `l 0 ${-SHORT_LINE_SIZE}`
+export const SHORT_LINE_DOWN = `l 0 ${SHORT_LINE_LENGTH}`
+export const SHORT_LINE_UP = `l 0 ${-SHORT_LINE_LENGTH}`
 export const LINE_UP = (Y_FROM: number, Y_TO: number) => `l 0 ${Y_TO - Y_FROM}`
 export const LINE_DOWN = (Y_FROM: number, Y_TO: number) =>
   `l 0 ${Y_TO - Y_FROM - 4 * CURVE_SIZE}`
@@ -86,11 +87,11 @@ const Edges = (props: EdgesProps) => {
                               ? [CURVE_RIGHT_UP, SHORT_LINE_UP]
                               : [CURVE_RIGHT_DOWN]),
                             ...(parentIsAbove
-                              ? [LINE_UP(elemY, parentY - SHORT_LINE_SIZE)]
+                              ? [LINE_UP(elemY, parentY - SHORT_LINE_LENGTH)]
                               : [
                                   LINE_DOWN(
                                     elemY,
-                                    parentY - CURVE_SIZE - SHORT_LINE_SIZE,
+                                    parentY - CURVE_SIZE - SHORT_LINE_LENGTH,
                                   ),
                                 ]),
                             parentIsAbove ? CURVE_UP_RIGHT : CURVE_DOWN_RIGHT,

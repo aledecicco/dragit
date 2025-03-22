@@ -1,3 +1,4 @@
+import * as Ariakit from '@ariakit/react'
 import type { ComponentProps } from 'react'
 import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
@@ -20,6 +21,7 @@ export const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
 interface GraphCommitProps extends ComponentProps<'div'> {
   commitId: CommitId
   commitType: CommitType
+  distance: number
 }
 
 const GraphCommit = makeTracked<
@@ -27,7 +29,7 @@ const GraphCommit = makeTracked<
   HTMLDivElement,
   ParentCommitType
 >((props) => {
-  const { commitId, commitType, trackRef, ...divProps } = props
+  const { commitId, commitType, distance, trackRef, ...divProps } = props
   const commitInfo = useRepositoryQuery(commitInfoQuery, commitId)
 
   return (
@@ -59,16 +61,29 @@ const GraphCommit = makeTracked<
         />
       </div>
 
-      <div
-        className={cn(
-          'absolute left-full top-half translate-x-2 -translate-y-half w-80',
-          'border-4 border-dark-600/85 rounded-sm shadow-md',
-        )}
+      <Ariakit.CompositeItem
+        rowId={`${distance}`}
+        onClick={(e) => {
+          if (e.detail === 0) {
+            // TODO: open commit details
+          }
+        }}
+        render={
+          <div
+            aria-selected={true}
+            className={cn(
+              'group/commit',
+              'absolute left-full top-half translate-x-2 -translate-y-half w-80',
+              'border-4 border-dark-600/85 rounded-sm shadow-md',
+            )}
+          />
+        }
       >
         <div
           className={cn(
             'p-2 border-1 border-dark-100 rounded-sm',
-            'bg-dark-700/75 dithered-dark-600',
+            'bg-dark-700/75 dithered-dark-600/1',
+            'group-hover/commit:dithered-dark-400/1 group-focus/commit:dithered-dark-400/1 group-data-focus/commit:dithered-dark-400/1',
             'flex flex-col gap-y-1',
           )}
         >
@@ -89,7 +104,7 @@ const GraphCommit = makeTracked<
             </p>
           </div>
         </div>
-      </div>
+      </Ariakit.CompositeItem>
     </div>
   )
 })
