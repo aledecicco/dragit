@@ -57,6 +57,11 @@ const makeTracked = <P, T extends HTMLElement, R extends string = string>(
   return TrackedComponent
 }
 
+interface Position {
+  x: number
+  y: number
+}
+
 const getPosition = (elem: Element) => {
   const pos = { x: 0, y: 0 }
 
@@ -95,5 +100,5 @@ const useRefreshCanvas = () => {
   )
 }
 
-export { makeTracked, type TrackRefProps, getPosition }
+export { makeTracked, type TrackRefProps, getPosition, type Position }
 export { useRefreshCanvas }

@@ -83,7 +83,7 @@ const GraphCommit = makeTracked<
           className={cn(
             'p-2 border-1 border-dark-100 rounded-sm',
             'bg-dark-700/75 dithered-dark-600/1',
-            'group-hover/commit:dithered-dark-400/1 group-focus/commit:dithered-dark-400/1 group-data-focus/commit:dithered-dark-400/1',
+            'group-hover/commit:dithered-dark-500/1 group-focus/commit:dithered-dark-500/1 group-data-focus/commit:dithered-dark-500/1',
             'flex flex-col gap-y-1',
           )}
         >

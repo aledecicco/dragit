@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import { open } from '@tauri-apps/plugin-dialog'
-import { useEffect, useRef } from 'react'
 
 import { useOpenFolder } from '@api/commands'
 import { currentDirQuery } from '@api/queries'
@@ -14,17 +13,10 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
   const currentDir = useQuery(currentDirQuery)
   const openFolder = useOpenFolder()
 
-  const a = useRef(false)
-  useEffect(() => {
-    if (!a.current) {
-      a.current = true
-      openFolder.mutateAsync('/home/adecicco/Projects/test-git')
-    }
-  }, [openFolder.mutateAsync])
-
   return (
     <Button
       variant="plain"
+      size="sm"
       aria-label="Select and open a folder in your system"
       onClick={() => {
         open({
