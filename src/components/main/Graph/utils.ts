@@ -2,7 +2,7 @@ import type {
   InfiniteData,
   UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import type { VirtualItem, Virtualizer } from '@tanstack/react-virtual'
+import type { VirtualItem } from '@tanstack/react-virtual'
 import { useEffect, useMemo } from 'react'
 
 import type { BranchDivergence, BranchInfo, HistoryItem } from '@api/models'
@@ -15,7 +15,6 @@ import {
 import { getPaginatedLength, useRepositoryQuery } from '@api/utils'
 import { useSelectedBranches } from '@context/branches'
 import { getCurrentBranchInfo, getRemoteCounterpart } from '@utils/repository'
-import { CURVE_SIZE } from './Edges'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<HistoryItem[]>>
 
@@ -76,7 +75,7 @@ const useCurrentCommonAncestor = () => {
 
 const useRemoteDivergence = (
   branch: BranchInfo,
-): BranchDivergence | undefined => {
+): BranchDivergence | undefined | null => {
   const divergence = useRepositoryQuery(
     branchDivergenceQuery,
     branch.name,

@@ -8,8 +8,7 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 
-import { useCurrentDirectory } from '@context/directory'
-import { PAGE_SIZE } from './queries'
+import { PAGE_SIZE, currentDirQuery } from './queries'
 
 const getPaginatedItem = <T>(
   data: InfiniteData<T[]> | undefined,
@@ -32,6 +31,24 @@ const getPaginatedLength = <T>(data: InfiniteData<T[]> | undefined): number => {
   return data?.pages?.reduce((sum, page) => sum + page.length, 0) ?? 0
 }
 
+const useHasCurrentPath = () => {
+  const path = useQuery(currentDirQuery).data?.path
+  console.log(path)
+
+  return !!path
+}
+
+// A hook that returns the path in the currentDir query assuming it's there
+const useCurrentPath = () => {
+  const path = useQuery(currentDirQuery).data?.path
+
+  if (!path) {
+    throw new Error('Repository path is not available')
+  }
+
+  return path
+}
+
 const useRepositoryQuery = <
   A extends unknown[],
   TQueryFnData = unknown,
@@ -45,8 +62,9 @@ const useRepositoryQuery = <
   ) => UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
   ...args: A
 ) => {
-  const directory = useCurrentDirectory()
-  return useQuery(repositoryQuery(directory, ...args))
+  const path = useCurrentPath()
+
+  return useQuery(repositoryQuery(path, ...args))
 }
 
 const useRepositoryInfiniteQuery = <
@@ -70,8 +88,13 @@ const useRepositoryInfiniteQuery = <
   >,
   ...args: A
 ) => {
-  const directory = useCurrentDirectory()
-  return useInfiniteQuery(repositoryQuery(directory, ...args))
+  const path = useCurrentPath()
+
+  if (!path) {
+    throw new Error('Repository path is not available')
+  }
+
+  return useInfiniteQuery(repositoryQuery(path, ...args))
 }
 
 export {
@@ -80,4 +103,6 @@ export {
   getPaginatedLength,
   useRepositoryQuery,
   useRepositoryInfiniteQuery,
+  useHasCurrentPath,
+  useCurrentPath,
 }

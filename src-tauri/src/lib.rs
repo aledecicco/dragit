@@ -19,7 +19,7 @@ pub fn run() {
 
             if load_settings(app_handle).open_last_on_start {
                 if let Some(last) = get_recent_folders(app_handle).last() {
-                    if Path::new(last).is_dir() {
+                    if Path::new(last).exists() {
                         git_handler.open_folder(&last)?;
                         repo_watcher.watch_repository(&last)?;
                     } else {
@@ -46,7 +46,6 @@ pub fn run() {
             api::set_settings,
             api::get_current_dir,
             api::init_repository,
-            api::is_repository,
             api::get_branches,
             api::get_head_info,
             api::checkout_local_branch,

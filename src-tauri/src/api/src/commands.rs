@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
 };
@@ -5,7 +7,7 @@ use tauri::{AppHandle, Emitter, Manager, State};
 
 use models::{
     AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    GitError, GitHandler, HeadInfo, HistoryItem, SafeHandler, Settings, EVENT_ID,
+    CurrentDirInfo, GitError, GitHandler, HeadInfo, HistoryItem, SafeHandler, Settings, EVENT_ID,
 };
 
 fn with_handler<T>(
@@ -18,7 +20,7 @@ fn with_handler<T>(
 
 /// Opens a folder that contains/will contain a git repository.
 #[tauri::command]
-pub async fn open_folder(app_handle: AppHandle, path: &str) -> Result<(), AppError> {
+pub fn open_folder(app_handle: AppHandle, path: &str) -> Result<(), AppError> {
     let state: State<'_, AppState> = app_handle.state::<AppState>();
 
     // Unwatch old repository
@@ -66,10 +68,18 @@ pub async fn set_settings(app_handle: AppHandle, settings: Settings) -> Result<(
     save_settings(&app_handle, &settings).or(Err(AppError::SaveSettingsFailed {}))
 }
 
-/// Returns the current folder being tracked.
+/// Returns information about the current folder being tracked.
 #[tauri::command]
-pub async fn get_current_dir(state: State<'_, AppState>) -> Result<Option<String>, AppError> {
-    with_handler(&state, &|h| Ok(h.get_path().ok()))
+pub async fn get_current_dir(
+    state: State<'_, AppState>,
+) -> Result<Option<CurrentDirInfo>, AppError> {
+    with_handler(&state, &|h| {
+        Ok(h.get_path().ok().map(|path| CurrentDirInfo {
+            path: path.to_string(),
+            is_repository: h.is_repository(),
+            exists: Path::new(&path).exists(),
+        }))
+    })
 }
 
 /// Initializes the current open folder as a git repository.
@@ -78,12 +88,6 @@ pub async fn init_repository(state: State<'_, AppState>) -> Result<(), AppError>
     with_handler(&state, &|h: &Box<dyn GitHandler + Send + Sync>| {
         h.init_repository()
     })
-}
-
-/// Returns whether the current open folder is a git repository.
-#[tauri::command]
-pub async fn is_repository(state: State<'_, AppState>) -> Result<bool, AppError> {
-    with_handler(&state, &|h| Ok(h.is_repository()))
 }
 
 /// Returns a list of the current known local and remote branches.

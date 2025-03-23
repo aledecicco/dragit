@@ -1,5 +1,13 @@
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 #[serde(rename_all(serialize = "camelCase", deserialize = "snake_case"))]
+pub struct CurrentDirInfo {
+    pub path: String,
+    pub is_repository: bool,
+    pub exists: bool,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "snake_case"))]
 pub struct CommitInfo {
     pub hash: String,
     pub short_hash: String,

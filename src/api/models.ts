@@ -3,6 +3,12 @@ export interface Settings {
   openLastOnStart: boolean
 }
 
+export interface CurrentDirInfo {
+  path: string
+  isRepository: boolean
+  exists: boolean
+}
+
 export type CommitId = string
 export type BranchName = string
 export type RemoteName = string

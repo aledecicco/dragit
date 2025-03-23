@@ -37,7 +37,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
         openFolder.isPending || currentDir.isFetching || buttonProps.disabled
       }
     >
-      {currentDir.data ??
+      {currentDir.data?.path ??
         (currentDir.isFetching ? 'Loading directory...' : 'Choose a directory')}
     </Button>
   )

@@ -12,6 +12,7 @@ import type {
   CommitId,
   CommitInfo,
   CommonAncestorInfo,
+  CurrentDirInfo,
   HeadInfo,
   HistoryItem,
   Settings,
@@ -131,7 +132,7 @@ const queryKeys = {
   },
 }
 
-const fetchCurrentDir = (): Promise<string | undefined> =>
+const fetchCurrentDir = (): Promise<CurrentDirInfo | null> =>
   invoke('get_current_dir')
 
 const currentDirQuery = queryOptions({
@@ -153,14 +154,6 @@ const recentlyOpenedQuery = queryOptions({
   queryKey: [queryKeys.recentlyOpened],
   queryFn: fetchRecentlyOpened,
 })
-
-const fetchIsRepository = (): Promise<boolean> => invoke('is_repository')
-
-const isRepositoryQuery = (path: string) =>
-  queryOptions({
-    queryKey: [queryKeys.directory.isRepository(path)],
-    queryFn: fetchIsRepository,
-  })
 
 const fetchHeadInfo = (): Promise<HeadInfo> => invoke('get_head_info')
 
@@ -211,7 +204,7 @@ const commitInfoQuery = (path: string, commitId: CommitId) =>
 const fetchCommonAncestor = (
   branch: BranchName,
   baseBranch: BranchName,
-): Promise<CommonAncestorInfo | undefined> =>
+): Promise<CommonAncestorInfo | null> =>
   invoke('get_common_ancestor', { branch: branch, baseBranch: baseBranch })
 
 const commonAncestorQuery = (
@@ -232,7 +225,7 @@ const commonAncestorQuery = (
 const fetchBranchDivergence = (
   branch: BranchName,
   baseBranch: BranchName,
-): Promise<BranchDivergence | undefined> =>
+): Promise<BranchDivergence | null> =>
   invoke('get_branch_divergence', { branch: branch, baseBranch: baseBranch })
 
 const branchDivergenceQuery = (
@@ -255,7 +248,6 @@ export {
   currentDirQuery,
   settingsQuery,
   recentlyOpenedQuery,
-  isRepositoryQuery,
   headInfoQuery,
   branchesQuery,
   commitHistoryQuery,
