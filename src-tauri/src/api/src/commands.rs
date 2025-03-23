@@ -20,7 +20,7 @@ fn with_handler<T>(
 
 /// Opens a folder that contains/will contain a git repository.
 #[tauri::command]
-pub fn open_folder(app_handle: AppHandle, path: &str) -> Result<(), AppError> {
+pub async fn open_folder(app_handle: AppHandle, path: &str) -> Result<(), AppError> {
     let state: State<'_, AppState> = app_handle.state::<AppState>();
 
     // Unwatch old repository
@@ -28,7 +28,7 @@ pub fn open_folder(app_handle: AppHandle, path: &str) -> Result<(), AppError> {
 
     state.git_handler.lock().open_folder(path)?;
 
-    // Watch repositopry at new path
+    // Watch repository at new path
     state
         .repo_watcher
         .lock()

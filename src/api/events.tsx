@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
+// import { relaunch } from '@tauri-apps/plugin-process'
 import { type PropsWithChildren, useEffect } from 'react'
 import { P, match } from 'ts-pattern'
 
@@ -18,6 +19,7 @@ const EventHandler = (props: PropsWithChildren) => {
     const unlisten = listen(EVENT_ID, (event) => {
       match(event.payload).with({ type: 'dirChanged' }, () => {
         client.resetQueries()
+        // TODO: relaunch()
       })
     })
 
