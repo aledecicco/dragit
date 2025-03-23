@@ -26,6 +26,7 @@ const useCurrentDirectory = () => {
 
   return currentDir.path
 }
+
 const useDirectorySync = () => {
   const currentDir = useQuery(currentDirQuery)
 

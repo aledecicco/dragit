@@ -135,14 +135,14 @@ const fetchCurrentDir = (): Promise<string | undefined> =>
   invoke('get_current_dir')
 
 const currentDirQuery = queryOptions({
-  queryKey: queryKeys.currentDir,
+  queryKey: [queryKeys.currentDir],
   queryFn: fetchCurrentDir,
 })
 
 const fetchSettings = (): Promise<Settings> => invoke('get_setings')
 
 const settingsQuery = queryOptions({
-  queryKey: queryKeys.settings,
+  queryKey: [queryKeys.settings],
   queryFn: fetchSettings,
 })
 
@@ -150,7 +150,7 @@ const fetchRecentlyOpened = (): Promise<string[]> =>
   invoke('get_recently_opened')
 
 const recentlyOpenedQuery = queryOptions({
-  queryKey: queryKeys.recentlyOpened,
+  queryKey: [queryKeys.recentlyOpened],
   queryFn: fetchRecentlyOpened,
 })
 

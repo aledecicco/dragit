@@ -16,15 +16,15 @@ const EventHandler = (props: PropsWithChildren) => {
 
   useEffect(() => {
     const unlisten = listen(EVENT_ID, (event) => {
-      match(event.payload).with({ type: 'gitFolderModified' }, () => {
-        client.invalidateQueries()
+      match(event.payload).with({ type: 'dirChanged' }, () => {
+        client.removeQueries()
       })
     })
 
     return () => {
       unlisten.then((f) => f())
     }
-  }, [client])
+  }, [client.removeQueries])
 
   return isOpen ? <EventHandlerInner>{children}</EventHandlerInner> : children
 }
