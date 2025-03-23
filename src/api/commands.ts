@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { BranchName, RemoteName } from './models'
+import type { BranchName, RemoteName, Settings } from './models'
 
 const mutationKeys = {
   openFolder: ['open_folder'] as const,
+  setSettings: ['set_settings'] as const,
   initRepository: ['init_repository'] as const,
   checkoutLocalBranch: ['checkout_local_branch'] as const,
   fetchRemote: ['fetch_remote'] as const,
@@ -23,6 +24,17 @@ const useOpenFolder = () =>
   useMutation({
     mutationKey: mutationKeys.openFolder,
     mutationFn: executeOpenFolder,
+  })
+
+const executeSetSettings = (args: {
+  path: string
+  settings: Settings
+}): Promise<void> => invoke('set_settings', args)
+
+const useSetSettings = () =>
+  useMutation({
+    mutationKey: mutationKeys.setSettings,
+    mutationFn: executeSetSettings,
   })
 
 const executeInitRepository = (): Promise<void> => invoke('init_repository')
@@ -118,6 +130,7 @@ const usePullBranch = () =>
 export {
   mutationKeys,
   useOpenFolder,
+  useSetSettings,
   useInitRepository,
   useCheckoutLocalBranch,
   useFetchRemote,

@@ -1,3 +1,8 @@
+export interface Settings {
+  recentlyOpened: string[]
+  openLastOnStart: boolean
+}
+
 export type CommitId = string
 export type BranchName = string
 export type RemoteName = string

@@ -1,13 +1,10 @@
-import { useEffect, useRef } from 'react'
-
-import { useOpenFolder } from '@api/commands'
 import { useBranchesSync } from '@context/branches'
 import { useDialog } from '@context/dialogs'
 import { useDirectoryIsOpen, useDirectorySync } from '@context/directory'
-import { CurrentDirectory } from '@main/CurrentDirectory'
 import { Graph } from '@main/Graph'
 import { cn } from '@utils/styles'
 import { BranchesList } from '@widgets/BranchesList'
+import { CurrentDirectory } from '@widgets/CurrentDirectory'
 import { FileStatuses } from '@widgets/FileStatuses'
 import { MainToolbar } from '@widgets/MainToolbar'
 
@@ -15,16 +12,6 @@ const App = () => {
   useDirectorySync()
   const dialog = useDialog()
   const isOpen = useDirectoryIsOpen()
-
-  const open = useOpenFolder()
-
-  const init = useRef(false)
-  useEffect(() => {
-    if (!init.current) {
-      init.current = true
-      open.mutate('/home/adecicco/Projects/test-git')
-    }
-  }, [open])
 
   return (
     <div

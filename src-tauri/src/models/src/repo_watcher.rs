@@ -6,8 +6,8 @@ pub trait RepoWatcher {
     fn get_path(&self) -> Result<String, RepoWatcherError>;
 
     /// Begin listening for events on a path, failing if it doesn't exist.
-    fn watch_repo(&mut self, path: &str) -> Result<(), RepoWatcherError>;
+    fn watch_repository(&mut self, path: &str) -> Result<(), RepoWatcherError>;
 
     /// Stop listening for events on the watched repository, failing if it wasn't being watched.
-    fn unwatch_repo(&mut self) -> Result<(), RepoWatcherError>;
+    fn unwatch_repository(&mut self) -> Result<(), RepoWatcherError>;
 }

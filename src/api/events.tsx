@@ -14,9 +14,7 @@ const EventHandler = (props: PropsWithChildren) => {
 
   useEffect(() => {
     const unlisten = listen('dir-changed', () => {
-      client.invalidateQueries({
-        queryKey: queryKeys.currentDir,
-      })
+      client.invalidateQueries()
     })
 
     return () => {
@@ -37,7 +35,9 @@ const EventHandlerInner = (props: PropsWithChildren) => {
     const unlisten = listen('git-event', (event) => {
       match(event.payload)
         .with({ type: 'gitFolderModified' }, () => {
-          client.invalidateQueries()
+          client.invalidateQueries({
+            queryKey: queryKeys.directory.current(currentDir),
+          })
         })
         .with({ type: 'branchesListUpdated' }, () => {
           client.invalidateQueries({

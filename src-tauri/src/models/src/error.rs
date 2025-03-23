@@ -7,8 +7,8 @@ pub enum GitError {
     #[error("No repository is open")]
     RepositoryNotOpen {},
 
-    #[error("Failed to open folder at \"{path}\"")]
-    OpenFolderFailed { path: String },
+    #[error("The path \"{path}\" is not a directory")]
+    NotADirectory { path: String },
 
     #[error("Failed to retrieve branches")]
     GetBranchesFailed {},
@@ -78,6 +78,9 @@ pub enum RepoWatcherError {
 
     #[error("Failed to unwatch folder at \"{path}\"")]
     UnwatchFolderFailed { path: String },
+
+    #[error("The path \"{path}\" is not a directory")]
+    NotADirectory { path: String },
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug, Clone)]
@@ -90,6 +93,9 @@ pub enum AppError {
     RepoWatcherFailed {
         repo_watcher_error: RepoWatcherError,
     },
+
+    #[error("Failed to save settings")]
+    SaveSettingsFailed {},
 }
 
 impl From<GitError> for AppError {

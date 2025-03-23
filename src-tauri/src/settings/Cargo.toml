@@ -1,10 +1,9 @@
 [package]
-name = "api"
+name = "settings"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-serde = { version = "1.0.210", features = ["derive"] }
 tauri = "2.0.0"
+tauri-plugin-store = "2"
 models = { path = "../models" }
-settings = { path = "../settings" }

@@ -14,12 +14,15 @@ import type {
   CommonAncestorInfo,
   HeadInfo,
   HistoryItem,
+  Settings,
 } from './models'
 
 export const PAGE_SIZE = 50
 
 const queryKeys = {
   currentDir: ['current_dir'] as const,
+  settings: ['settings'] as const,
+  recentlyOpened: ['recently_opened'] as const,
   directory: {
     current: (path: string) => ({ path: path }) as const,
     isRepository: (path: string) =>
@@ -136,6 +139,21 @@ const currentDirQuery = queryOptions({
   queryFn: fetchCurrentDir,
 })
 
+const fetchSettings = (): Promise<Settings> => invoke('get_setings')
+
+const settingsQuery = queryOptions({
+  queryKey: queryKeys.settings,
+  queryFn: fetchSettings,
+})
+
+const fetchRecentlyOpened = (): Promise<string[]> =>
+  invoke('get_recently_opened')
+
+const recentlyOpenedQuery = queryOptions({
+  queryKey: queryKeys.recentlyOpened,
+  queryFn: fetchRecentlyOpened,
+})
+
 const fetchIsRepository = (): Promise<boolean> => invoke('is_repository')
 
 const isRepositoryQuery = (path: string) =>
@@ -235,6 +253,8 @@ const branchDivergenceQuery = (
 export {
   queryKeys,
   currentDirQuery,
+  settingsQuery,
+  recentlyOpenedQuery,
   isRepositoryQuery,
   headInfoQuery,
   branchesQuery,

@@ -39,6 +39,7 @@ impl DebouncedWatcher {
     fn get_event_handler(&self, repo_path: &str) -> impl DebounceEventHandler {
         let repo_path = repo_path.to_string();
         let app_handle = self.app_handle.clone();
+
         move |res: Result<Vec<DebouncedEvent>, Vec<notify::Error>>| {
             let repo_path = Path::new(&repo_path);
             let git_folder = get_git_folder(repo_path);
@@ -198,7 +199,7 @@ impl RepoWatcher for DebouncedWatcher {
         Ok(path.to_string())
     }
 
-    fn watch_repo(&mut self, repo_path: &str) -> Result<(), RepoWatcherError> {
+    fn watch_repository(&mut self, repo_path: &str) -> Result<(), RepoWatcherError> {
         if Path::new(repo_path).is_dir() {
             let event_handler = self.get_event_handler(repo_path);
 
@@ -217,13 +218,13 @@ impl RepoWatcher for DebouncedWatcher {
 
             Ok(())
         } else {
-            Err(RepoWatcherError::WatchFolderFailed {
+            Err(RepoWatcherError::NotADirectory {
                 path: repo_path.to_string(),
             })
         }
     }
 
-    fn unwatch_repo(&mut self) -> Result<(), RepoWatcherError> {
+    fn unwatch_repository(&mut self) -> Result<(), RepoWatcherError> {
         let repo_path = self.get_path()?;
         self.debouncer
             .as_mut()

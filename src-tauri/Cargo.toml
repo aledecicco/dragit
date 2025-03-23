@@ -26,4 +26,7 @@ api = { path = "src/api" }
 git_handler = { path = "src/git_handler" }
 repo_watcher = { path = "src/repo_watcher" }
 models = { path = "src/models" }
+settings = { path = "src/settings" }
 tauri-plugin-dialog = "2"
+tauri-plugin-clipboard-manager = "2.2.2"
+tauri-plugin-store = "2"

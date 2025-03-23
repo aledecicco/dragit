@@ -67,7 +67,7 @@ impl GitHandler for CmdGit {
             self.path = Some(path.to_string());
             Ok(())
         } else {
-            Err(GitError::OpenFolderFailed {
+            Err(GitError::NotADirectory {
                 path: path.to_string(),
             })
         }

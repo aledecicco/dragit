@@ -1,8 +1,9 @@
+use settings::{add_recent_folder, get_recent_folders, load_settings, save_settings};
 use tauri::{AppHandle, Emitter, Manager, State};
 
 use models::{
     AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    GitError, HeadInfo, HistoryItem, SafeHandler,
+    GitError, GitHandler, HeadInfo, HistoryItem, SafeHandler, Settings,
 };
 
 fn with_handler<T>(
@@ -20,7 +21,7 @@ pub async fn open_folder(app_handle: AppHandle, path: &str) -> Result<(), AppErr
 
     // Unwatch old repository
     // It's expected to fail if the previous watcher wasn't properly set-up
-    let _ = state.repo_watcher.lock().unwatch_repo();
+    let _ = state.repo_watcher.lock().unwatch_repository();
 
     state.git_handler.lock().open_folder(path)?;
 
@@ -28,8 +29,11 @@ pub async fn open_folder(app_handle: AppHandle, path: &str) -> Result<(), AppErr
     state
         .repo_watcher
         .lock()
-        .watch_repo(path)
+        .watch_repository(path)
         .map_err(AppError::from)?;
+
+    // Not worth crashing the app if this fails
+    let _ = add_recent_folder(&app_handle, path);
 
     let _ = app_handle.emit(
         "dir-changed",
@@ -41,6 +45,24 @@ pub async fn open_folder(app_handle: AppHandle, path: &str) -> Result<(), AppErr
     Ok(())
 }
 
+/// Returns the list of recently opened folders.
+#[tauri::command]
+pub async fn get_recently_opened(app_handle: AppHandle) -> Result<Vec<String>, AppError> {
+    Ok(get_recent_folders(&app_handle))
+}
+
+/// Returns the stored user settings.
+#[tauri::command]
+pub async fn get_settings(app_handle: AppHandle) -> Result<Settings, AppError> {
+    Ok(load_settings(&app_handle))
+}
+
+/// Saves new user settings.
+#[tauri::command]
+pub async fn set_settings(app_handle: AppHandle, settings: Settings) -> Result<(), AppError> {
+    save_settings(&app_handle, &settings).or(Err(AppError::SaveSettingsFailed {}))
+}
+
 /// Returns the current folder being tracked.
 #[tauri::command]
 pub async fn get_current_dir(state: State<'_, AppState>) -> Result<Option<String>, AppError> {
@@ -50,7 +72,9 @@ pub async fn get_current_dir(state: State<'_, AppState>) -> Result<Option<String
 /// Initializes the current open folder as a git repository.
 #[tauri::command]
 pub async fn init_repository(state: State<'_, AppState>) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.init_repository())
+    with_handler(&state, &|h: &Box<dyn GitHandler + Send + Sync>| {
+        h.init_repository()
+    })
 }
 
 /// Returns whether the current open folder is a git repository.

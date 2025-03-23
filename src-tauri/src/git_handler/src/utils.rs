@@ -7,34 +7,34 @@ use models::{
 
 /// Format used to get the needed information about a commit, as a JSON-parseable string.
 /// The commit message is included raw after a newline to allow parsing it without issues.
-pub const COMMIT_INFO_FORMAT: &str = "--format=format:{\"hash\": \"%H\", \"short_hash\": \"%h\", \"author_name\": \"%an\", \"author_email\": \"%ae\", \"timestamp\": %ct}%n%B";
+pub(crate) const COMMIT_INFO_FORMAT: &str = "--format=format:{\"hash\": \"%H\", \"short_hash\": \"%h\", \"author_name\": \"%an\", \"author_email\": \"%ae\", \"timestamp\": %ct}%n%B";
 /// The prefix of the line with the commit hash when printing the current status.
-pub const HEAD_INFO_COMMIT_PREFIX: &str = "# branch.oid ";
+pub(crate) const HEAD_INFO_COMMIT_PREFIX: &str = "# branch.oid ";
 /// The prefix of the line with the branch name when printing the current status.
-pub const HEAD_INFO_BRANCH_PREFIX: &str = "# branch.head ";
+pub(crate) const HEAD_INFO_BRANCH_PREFIX: &str = "# branch.head ";
 /// The prefix of all lines related to the HEAD info when printing the current status.
-pub const HEAD_INFO_PREFIX: &str = "#";
+pub(crate) const HEAD_INFO_PREFIX: &str = "#";
 /// The string that denotes that the current commit is the initial one when printing the current status.
-pub const HEAD_INFO_INITIAL_COMMIT: &str = "(initial)";
+pub(crate) const HEAD_INFO_INITIAL_COMMIT: &str = "(initial)";
 /// The string that denotes that the HEAD is in a detached state when printing the current status.
-pub const HEAD_INFO_DETACHED_BRANCH: &str = "(detached)";
+pub(crate) const HEAD_INFO_DETACHED_BRANCH: &str = "(detached)";
 /// The number of space-separated segments each line has for modified files.
-pub const MODIFIED_FILE_INFO_SEGMENTS: usize = 9;
+pub(crate) const MODIFIED_FILE_INFO_SEGMENTS: usize = 9;
 /// The number of space-separated segments each line has for moved files.
-pub const MOVED_FILE_INFO_SEGMENTS: usize = 10;
+pub(crate) const MOVED_FILE_INFO_SEGMENTS: usize = 10;
 /// The number of space-separated segments each line has for unmerged files.
-pub const UNMERGED_FILE_INFO_SEGMENTS: usize = 11;
+pub(crate) const UNMERGED_FILE_INFO_SEGMENTS: usize = 11;
 /// The number of space-separated segments each line has for untracked files.
-pub const UNTRACKED_FILE_INFO_SEGMENTS: usize = 2;
+pub(crate) const UNTRACKED_FILE_INFO_SEGMENTS: usize = 2;
 /// Format used to get the needed information about branches.
-pub const BRANCHES_INFO_FORMAT: &str =
+pub(crate) const BRANCHES_INFO_FORMAT: &str =
     "--format=%(refname) %(committerdate:unix) %(upstream:remotename) %(upstream:remoteref)";
 /// The string that denotes that a ref is a branch name when printing its status.
-pub const BRANCH_PREFIX: &str = "refs/heads/";
+pub(crate) const BRANCH_PREFIX: &str = "refs/heads/";
 /// The string that denotes that a branch is local when printing its status.
-pub const REMOTE_BRANCH_PREFIX: &str = "refs/remotes/";
+pub(crate) const REMOTE_BRANCH_PREFIX: &str = "refs/remotes/";
 
-pub fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
+pub(crate) fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
     if let Some((line, rest)) = lines.split_first() {
         let mut info: CommitInfo = serde_json::from_str(line).ok()?;
         info.timestamp *= 1000;
@@ -45,7 +45,7 @@ pub fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
     }
 }
 
-pub fn parse_head_info(dir: &String, lines: &Vec<String>) -> Option<HeadInfo> {
+pub(crate) fn parse_head_info(dir: &String, lines: &Vec<String>) -> Option<HeadInfo> {
     let head_status = parse_head_status(lines)?;
     let files_info = lines
         .iter()
@@ -155,7 +155,7 @@ fn parse_file_info(dir: &String, line: &String) -> Option<FileInfo> {
     })
 }
 
-pub fn parse_history_item(line: &String) -> Option<HistoryItem> {
+pub(crate) fn parse_history_item(line: &String) -> Option<HistoryItem> {
     let mut commits = line.split_ascii_whitespace().map(String::from);
     let hash = commits.next()?;
     let parents = commits.skip(1).collect();
@@ -166,7 +166,7 @@ pub fn parse_history_item(line: &String) -> Option<HistoryItem> {
     })
 }
 
-pub fn parse_branch_info(line: &String) -> Option<BranchInfo> {
+pub(crate) fn parse_branch_info(line: &String) -> Option<BranchInfo> {
     let mut segments = line.split_ascii_whitespace().map(String::from);
     let branch_name = segments.next()?;
     let timestamp = u64::from_str(&segments.next()?).ok()? * 1000;
@@ -199,7 +199,7 @@ pub fn parse_branch_info(line: &String) -> Option<BranchInfo> {
     }
 }
 
-pub fn parse_branch_divergence(line: &String) -> Option<BranchDivergence> {
+pub(crate) fn parse_branch_divergence(line: &String) -> Option<BranchDivergence> {
     let mut divergence = line.split_ascii_whitespace().map(String::from);
     let ahead = u64::from_str(&divergence.next()?).ok()?;
     let behind = u64::from_str(&divergence.next()?).ok()?;
