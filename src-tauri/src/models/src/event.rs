@@ -1,8 +1,13 @@
+pub static EVENT_ID: &str = "app-event";
+
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all(serialize = "camelCase"), tag = "type")]
 pub enum AppEvent {
-    /// The app opened a new directory
-    DirChanged { path: String },
+    /// The app tried to open the last folder used, but it's no longer there.
+    DirDisappeared { path: String },
+
+    /// The app opened a new directory.
+    DirChanged,
 
     /// The .git folder was modified. The result of [`GitHandler::is_repository`] might've changed.
     GitFolderModified,

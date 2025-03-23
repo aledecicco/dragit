@@ -1,9 +1,10 @@
-use tauri::Manager;
+use std::path::Path;
+use tauri::{Emitter, Manager};
 
 use git_handler::cmd_git::CmdGit;
-use models::{AppState, GitHandler, RepoWatcher};
+use models::{AppEvent, AppState, GitHandler, RepoWatcher, EVENT_ID};
 use repo_watcher::debounced_watcher::DebouncedWatcher;
-use settings::{get_recent_folders, load_settings};
+use settings::{get_recent_folders, load_settings, remove_recent_folder};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -12,13 +13,24 @@ pub fn run() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
+            let app_handle = app.handle();
             let mut git_handler = CmdGit::new();
-            let mut repo_watcher = DebouncedWatcher::new(app.handle().clone());
+            let mut repo_watcher = DebouncedWatcher::new(app_handle.clone());
 
-            if load_settings(&app.handle()).open_last_on_start {
-                if let Some(last) = get_recent_folders(&app.handle()).last() {
-                    git_handler.open_folder(&last)?;
-                    repo_watcher.watch_repository(&last)?;
+            if load_settings(app_handle).open_last_on_start {
+                if let Some(last) = get_recent_folders(app_handle).last() {
+                    if Path::new(last).is_dir() {
+                        git_handler.open_folder(&last)?;
+                        repo_watcher.watch_repository(&last)?;
+                    } else {
+                        let _ = app_handle.emit(
+                            EVENT_ID,
+                            AppEvent::DirDisappeared {
+                                path: last.to_string(),
+                            },
+                        );
+                        let _ = remove_recent_folder(app_handle, last);
+                    }
                 }
             }
 
@@ -29,6 +41,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             api::open_folder,
             api::get_recently_opened,
+            api::remove_from_recent,
             api::get_settings,
             api::set_settings,
             api::get_current_dir,

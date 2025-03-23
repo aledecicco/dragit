@@ -5,6 +5,7 @@ import type { BranchName, RemoteName, Settings } from './models'
 
 const mutationKeys = {
   openFolder: ['open_folder'] as const,
+  removeRecentFolder: ['remove_recent_folder'] as const,
   setSettings: ['set_settings'] as const,
   initRepository: ['init_repository'] as const,
   checkoutLocalBranch: ['checkout_local_branch'] as const,
@@ -24,6 +25,15 @@ const useOpenFolder = () =>
   useMutation({
     mutationKey: mutationKeys.openFolder,
     mutationFn: executeOpenFolder,
+  })
+
+const executeRemoveRecentFolder = (path: string): Promise<void> =>
+  invoke('remove_recent', { path: path })
+
+const useRemoveRecentFolder = () =>
+  useMutation({
+    mutationKey: mutationKeys.removeRecentFolder,
+    mutationFn: executeRemoveRecentFolder,
   })
 
 const executeSetSettings = (args: {
@@ -130,6 +140,7 @@ const usePullBranch = () =>
 export {
   mutationKeys,
   useOpenFolder,
+  useRemoveRecentFolder,
   useSetSettings,
   useInitRepository,
   useCheckoutLocalBranch,

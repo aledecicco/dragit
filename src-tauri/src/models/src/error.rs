@@ -96,6 +96,9 @@ pub enum AppError {
 
     #[error("Failed to save settings")]
     SaveSettingsFailed {},
+
+    #[error("Failed to remove \"{path}\" from the recent folders list")]
+    RemoveFromRecentFailed { path: String },
 }
 
 impl From<GitError> for AppError {

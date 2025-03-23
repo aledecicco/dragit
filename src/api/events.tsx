@@ -7,14 +7,18 @@ import { useSelectedBranches } from '@context/branches'
 import { useCurrentDirectory, useDirectoryIsOpen } from '@context/directory'
 import { queryKeys } from './queries'
 
+const EVENT_ID = 'app-event'
+
 const EventHandler = (props: PropsWithChildren) => {
   const { children } = props
   const client = useQueryClient()
   const isOpen = useDirectoryIsOpen()
 
   useEffect(() => {
-    const unlisten = listen('dir-changed', () => {
-      client.invalidateQueries()
+    const unlisten = listen(EVENT_ID, (event) => {
+      match(event.payload).with({ type: 'gitFolderModified' }, () => {
+        client.invalidateQueries()
+      })
     })
 
     return () => {
@@ -32,7 +36,7 @@ const EventHandlerInner = (props: PropsWithChildren) => {
   const currentDir = useCurrentDirectory()
 
   useEffect(() => {
-    const unlisten = listen('git-event', (event) => {
+    const unlisten = listen(EVENT_ID, (event) => {
       match(event.payload)
         .with({ type: 'gitFolderModified' }, () => {
           client.invalidateQueries({

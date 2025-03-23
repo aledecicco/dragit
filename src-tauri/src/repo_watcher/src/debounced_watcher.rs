@@ -11,7 +11,7 @@ use std::{
 };
 use tauri::{AppHandle, Emitter};
 
-use models::{AppEvent, RepoWatcher, RepoWatcherError};
+use models::{AppEvent, RepoWatcher, RepoWatcherError, EVENT_ID};
 
 use crate::{
     get_branches_folder, get_config_folder, get_git_folder, get_head_file, get_index_file,
@@ -24,8 +24,6 @@ pub struct DebouncedWatcher {
     debouncer: Option<Debouncer<RecommendedWatcher, FileIdMap>>,
     path: Option<String>,
 }
-
-static EVENT_ID: &str = "git-event";
 
 impl DebouncedWatcher {
     pub fn new(app_handle: AppHandle) -> Self {
@@ -52,6 +50,7 @@ impl DebouncedWatcher {
 
             match res {
                 Ok(events) => {
+                    let mut folder_modified = false;
                     let mut files_modified = false;
                     let mut head_changed = false;
                     let mut git_folder_modified = false;
@@ -62,6 +61,10 @@ impl DebouncedWatcher {
                     events.iter().for_each(|event| {
                         println!("{:?}", event.kind);
                         event.paths.iter().for_each(|path| println!("{:?}", path));
+
+                        if event.paths.iter().any(|path| path.eq(repo_path)) {
+                            folder_modified = true;
+                        }
 
                         if event
                             .paths
@@ -150,6 +153,9 @@ impl DebouncedWatcher {
                         }
                     });
                     println!("");
+                    if folder_modified {
+                        let _ = app_handle.emit(EVENT_ID, AppEvent::DirChanged);
+                    }
 
                     if files_modified {
                         let _ = app_handle.emit(EVENT_ID, AppEvent::FilesModified);

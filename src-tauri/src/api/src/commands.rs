@@ -1,9 +1,11 @@
-use settings::{add_recent_folder, get_recent_folders, load_settings, save_settings};
+use settings::{
+    add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
+};
 use tauri::{AppHandle, Emitter, Manager, State};
 
 use models::{
     AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    GitError, GitHandler, HeadInfo, HistoryItem, SafeHandler, Settings,
+    GitError, GitHandler, HeadInfo, HistoryItem, SafeHandler, Settings, EVENT_ID,
 };
 
 fn with_handler<T>(
@@ -34,13 +36,7 @@ pub async fn open_folder(app_handle: AppHandle, path: &str) -> Result<(), AppErr
 
     // Not worth crashing the app if this fails
     let _ = add_recent_folder(&app_handle, path);
-
-    let _ = app_handle.emit(
-        "dir-changed",
-        AppEvent::DirChanged {
-            path: path.to_string(),
-        },
-    );
+    let _ = app_handle.emit(EVENT_ID, AppEvent::DirChanged);
 
     Ok(())
 }
@@ -49,6 +45,14 @@ pub async fn open_folder(app_handle: AppHandle, path: &str) -> Result<(), AppErr
 #[tauri::command]
 pub async fn get_recently_opened(app_handle: AppHandle) -> Result<Vec<String>, AppError> {
     Ok(get_recent_folders(&app_handle))
+}
+
+/// Removes a folder from the list of recently opened folders.
+#[tauri::command]
+pub async fn remove_from_recent(app_handle: AppHandle, path: &str) -> Result<(), AppError> {
+    remove_recent_folder(&app_handle, path).or(Err(AppError::RemoveFromRecentFailed {
+        path: path.to_string(),
+    }))
 }
 
 /// Returns the stored user settings.

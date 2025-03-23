@@ -44,6 +44,19 @@ pub fn add_recent_folder(
     saved_recents.save()
 }
 
+pub fn remove_recent_folder(
+    app_handle: &AppHandle,
+    path: &str,
+) -> Result<(), tauri_plugin_store::Error> {
+    let mut recents = get_recent_folders(app_handle);
+    let saved_recents = app_handle.store(RECENTS_FILE_NAME)?;
+
+    recents.retain(|recent| recent != path);
+
+    saved_recents.set("recentlyOpened", recents);
+    saved_recents.save()
+}
+
 pub fn load_settings(app_handle: &AppHandle) -> Settings {
     let saved_settings = app_handle.store(SETTINGS_FILE_NAME);
     let mut settings = Settings::default();
