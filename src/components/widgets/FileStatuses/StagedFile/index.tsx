@@ -19,7 +19,7 @@ import { match } from 'ts-pattern'
 import type { StagedFile } from '@api/models'
 import { useRemoveFromIndex } from '@api/mutations'
 import { cn, propsWithCn } from '@utils/styles'
-import { FileStatusItem } from '../File'
+import { FileStatusItem } from '../Item'
 
 interface StagedFileStatusItemProps extends ComponentProps<'div'> {
   item: StagedFile

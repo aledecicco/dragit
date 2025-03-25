@@ -15,7 +15,7 @@ import { match } from 'ts-pattern'
 import type { UnstagedFile } from '@api/models'
 import { useAddToIndex } from '@api/mutations'
 import { cn, propsWithCn } from '@utils/styles'
-import { FileStatusItem } from '../File'
+import { FileStatusItem } from '../Item'
 
 interface UnstagedFileStatusItemProps extends ComponentProps<'div'> {
   item: UnstagedFile

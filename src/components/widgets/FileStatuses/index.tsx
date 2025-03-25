@@ -1,9 +1,10 @@
+import * as Ariakit from '@ariakit/react'
 import {
   IconListCheck,
   IconPlaylistAdd,
   IconPlaylistX,
 } from '@tabler/icons-react'
-import { type ComponentProps, useMemo } from 'react'
+import { type ComponentProps, type ComponentType, useMemo } from 'react'
 
 import { useAddToIndex, useRemoveFromIndex } from '@api/mutations'
 import { VirtualizedDiv } from '@lib/VirtualizedDiv'
@@ -11,8 +12,10 @@ import { Accordion } from '@ui/Accordion'
 import { AccordionSection } from '@ui/Accordion/Section'
 import { IconButton } from '@ui/IconButton'
 import { cn, propsWithCn } from '@utils/styles'
-import { mapFn } from '@utils/types'
-import { useFilesByStatus } from '@widgets/FileStatuses/utils'
+import {
+  type FilesByStatus,
+  useFilesByStatus,
+} from '@widgets/FileStatuses/utils'
 import { StagedFileStatusItem } from './StagedFile'
 import { UnmergedFileStatusItem } from './UnmergedFile'
 import { UnstagedFileStatusItem } from './UnstagedFile'
@@ -27,27 +30,6 @@ const FileStatuses = (props: FileStatusesProps) => {
   const unstage = useRemoveFromIndex()
 
   const files = useFilesByStatus()
-
-  const untrackedOptions = useMemo(() => {
-    return mapFn(files, (files) => ({
-      getItemKey: (index: number) => files.untracked[index].path,
-    }))
-  }, [files])
-  const unmergedOptions = useMemo(() => {
-    return mapFn(files, (files) => ({
-      getItemKey: (index: number) => files.unmerged[index].path,
-    }))
-  }, [files])
-  const unstagedOptions = useMemo(() => {
-    return mapFn(files, (files) => ({
-      getItemKey: (index: number) => files.unstaged[index].path,
-    }))
-  }, [files])
-  const stagedOptions = useMemo(() => {
-    return mapFn(files, (files) => ({
-      getItemKey: (index: number) => files.staged[index].path,
-    }))
-  }, [files])
 
   if (!files) {
     return (
@@ -84,20 +66,12 @@ const FileStatuses = (props: FileStatusesProps) => {
         }
         className={'min-h-30 overflow-y-hidden'}
       >
-        {files.untracked.length ? (
-          <VirtualizedDiv
-            size="sm"
-            items={files.untracked}
-            RenderItem={UntrackedFileStatusItem}
-            itemSize={34}
-            className={cn('w-full h-full')}
-            options={untrackedOptions}
-          />
-        ) : (
-          <p className={cn('text-sm text-light-950/50 italic p-3')}>
-            No untracked files
-          </p>
-        )}
+        <FileList
+          files={files}
+          status="untracked"
+          RenderItem={UntrackedFileStatusItem}
+          itemSize={34}
+        />
       </AccordionSection>
 
       <AccordionSection
@@ -117,20 +91,12 @@ const FileStatuses = (props: FileStatusesProps) => {
         }
         className={'min-h-30 overflow-y-hidden'}
       >
-        {files.unmerged.length ? (
-          <VirtualizedDiv
-            size="sm"
-            items={files.unmerged}
-            RenderItem={UnmergedFileStatusItem}
-            itemSize={48}
-            className={cn('w-full h-full')}
-            options={unmergedOptions}
-          />
-        ) : (
-          <p className={cn('text-sm text-light-950/50 italic p-3')}>
-            No unstaged files
-          </p>
-        )}
+        <FileList
+          files={files}
+          status="unmerged"
+          RenderItem={UnmergedFileStatusItem}
+          itemSize={48}
+        />
       </AccordionSection>
 
       <AccordionSection
@@ -150,20 +116,12 @@ const FileStatuses = (props: FileStatusesProps) => {
         }
         className={'min-h-30 overflow-y-hidden'}
       >
-        {files.unstaged.length ? (
-          <VirtualizedDiv
-            size="sm"
-            items={files.unstaged}
-            RenderItem={UnstagedFileStatusItem}
-            itemSize={48}
-            className={cn('w-full h-full')}
-            options={unstagedOptions}
-          />
-        ) : (
-          <p className={cn('text-sm text-light-950/50 italic p-3')}>
-            No unstaged files
-          </p>
-        )}
+        <FileList
+          files={files}
+          status="unstaged"
+          RenderItem={UnstagedFileStatusItem}
+          itemSize={48}
+        />
       </AccordionSection>
 
       <AccordionSection
@@ -183,22 +141,47 @@ const FileStatuses = (props: FileStatusesProps) => {
         }
         className={'min-h-30 overflow-y-hidden'}
       >
-        {files.staged.length ? (
-          <VirtualizedDiv
-            size="sm"
-            items={files.staged}
-            RenderItem={StagedFileStatusItem}
-            itemSize={48}
-            className={cn('w-full h-full')}
-            options={stagedOptions}
-          />
-        ) : (
-          <p className={cn('text-sm text-light-950/50 italic p-3')}>
-            No staged files
-          </p>
-        )}
+        <FileList
+          files={files}
+          status="staged"
+          RenderItem={StagedFileStatusItem}
+          itemSize={48}
+        />
       </AccordionSection>
     </Accordion>
+  )
+}
+
+interface FileListProps<T extends keyof FilesByStatus> {
+  files: FilesByStatus
+  status: T
+  RenderItem: ComponentType<{ item: FilesByStatus[T][number] }>
+  itemSize: number
+}
+
+const FileList = <T extends keyof FilesByStatus>(props: FileListProps<T>) => {
+  const { files, status, RenderItem, itemSize } = props
+  const options = useMemo(() => {
+    return {
+      getItemKey: (index: number) => files[status][index].path,
+    }
+  }, [files[status], status])
+
+  return files[status].length ? (
+    <Ariakit.CompositeRow>
+      <VirtualizedDiv<FilesByStatus[T][number]>
+        size="sm"
+        items={files[status]}
+        RenderItem={RenderItem}
+        itemSize={itemSize}
+        className={cn('w-full h-full')}
+        options={options}
+      />
+    </Ariakit.CompositeRow>
+  ) : (
+    <p className={cn('text-sm text-light-950/50 italic p-3')}>
+      No {status} files
+    </p>
   )
 }
 

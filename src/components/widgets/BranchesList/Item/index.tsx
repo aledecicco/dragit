@@ -3,17 +3,15 @@ import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
 import { type ComponentProps, memo } from 'react'
 import { match } from 'ts-pattern'
 
-import type { BranchInfo, BranchName, RefName } from '@api/models'
+import type { BranchInfo } from '@api/models'
 import { useCheckoutLocal } from '@api/mutations'
 import { useSelectedBranches } from '@context/branches'
 import { Icon } from '@ui/Icon'
+import { ListItem } from '@ui/ListItem'
 import { Marquee } from '@ui/Marquee'
 import { getRemoteCounterpart } from '@utils/repository'
 import { cn, propsWithCn } from '@utils/styles'
 import { useDateDifference } from '@utils/time'
-
-const BRANCHES_LIST_ITEM_ID = (name: BranchName | RefName) =>
-  `branches_list_${name}` as const
 
 interface BranchesListItemProps extends ComponentProps<'div'> {
   item: BranchInfo
@@ -31,17 +29,12 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
 
   return (
     <Ariakit.CompositeItem
-      id={BRANCHES_LIST_ITEM_ID(item.name)}
       render={
-        <div
+        <ListItem
           aria-selected={isCurrentBranch}
           {...propsWithCn(
             divProps,
-            'flex flex-row items-center justify-between gap-4',
-            'p-1.5 bg-dark-600 rounded-xs',
-            'hover:bg-dark-500 focus:bg-dark-500 data-focus:bg-dark-500',
             'border-1 border-solid border-transparent',
-            'shadow-md',
             isCurrentBranch && 'bg-dark-500 border-accent-300',
           )}
           onClick={(e) => {

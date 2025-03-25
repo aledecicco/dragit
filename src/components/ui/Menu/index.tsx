@@ -35,7 +35,7 @@ const Menu = (props: MenuProps) => {
         unmountOnHide
         {...propsWithCn(
           menuProps,
-          'rounded-lg shadow-md p-1',
+          'rounded-md shadow-md p-1',
           'bg-dark-300 min-w-max',
         )}
       >

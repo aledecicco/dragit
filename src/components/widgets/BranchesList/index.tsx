@@ -15,7 +15,6 @@ const BranchesList = (props: BranchesListProps) => {
   const { ...divProps } = props
 
   const branchesQuery = useQueryBranches()
-  const composite = Ariakit.useCompositeStore({ focusLoop: true })
 
   const branchesOptions = useMemo(() => {
     return mapFn(branchesQuery.data, (branches) => ({
@@ -43,19 +42,20 @@ const BranchesList = (props: BranchesListProps) => {
     <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>
       <AccordionSection label={`All branches (${branchesQuery.data.length})`}>
         {branchesQuery.data.length ? (
-          <Ariakit.Composite
-            store={composite}
-            render={
-              <VirtualizedDiv
-                size="sm"
-                items={branchesQuery.data}
-                itemSize={74}
-                RenderItem={BranchesListItem}
-                className={cn('w-full h-full')}
-                options={branchesOptions}
-              />
-            }
-          />
+          <Ariakit.CompositeProvider focusLoop>
+            <Ariakit.Composite
+              render={
+                <VirtualizedDiv
+                  size="sm"
+                  items={branchesQuery.data}
+                  itemSize={74}
+                  RenderItem={BranchesListItem}
+                  className={cn('w-full h-full')}
+                  options={branchesOptions}
+                />
+              }
+            />
+          </Ariakit.CompositeProvider>
         ) : (
           <p className={cn('text-sm text-light-950')}>No branches found</p>
         )}

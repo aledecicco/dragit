@@ -15,7 +15,13 @@ const AccordionSection = (props: AccordionSectionProps) => {
 
   return (
     <Ariakit.DisclosureProvider defaultOpen>
-      <div className={cn('flex flex-row items-center justify-between', 'px-2')}>
+      <Ariakit.CompositeRow
+        render={
+          <div
+            className={cn('flex flex-row items-center justify-between', 'px-2')}
+          />
+        }
+      >
         <Ariakit.CompositeItem
           tabbable
           render={
@@ -40,7 +46,7 @@ const AccordionSection = (props: AccordionSectionProps) => {
         </Ariakit.CompositeItem>
 
         {extraInfo}
-      </div>
+      </Ariakit.CompositeRow>
 
       <Ariakit.DisclosureContent
         unmountOnHide
