@@ -4,7 +4,7 @@ use tauri::{Emitter, Manager};
 use git_handler::cmd_git::CmdGit;
 use models::{AppEvent, AppState, RepoWatcher, EVENT_ID};
 use repo_watcher::debounced_watcher::DebouncedWatcher;
-use settings::{get_recent_folders, load_settings, remove_recent_folder};
+use settings::{get_last_opened, load_settings, remove_last_opened, remove_recent_folder};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -20,8 +20,8 @@ pub fn run() {
             let mut repo_watcher = DebouncedWatcher::new(app_handle.clone());
 
             if load_settings(app_handle).open_last_on_start {
-                if let Some(last) = get_recent_folders(app_handle).last() {
-                    if Path::new(last).is_dir() {
+                if let Some(last) = get_last_opened(app_handle) {
+                    if Path::new(&last).is_dir() {
                         repo_watcher.watch_repository(&last)?;
                     } else {
                         let _ = app_handle.emit(
@@ -30,7 +30,8 @@ pub fn run() {
                                 path: last.to_string(),
                             },
                         );
-                        let _ = remove_recent_folder(app_handle, last);
+                        let _ = remove_recent_folder(app_handle, &last);
+                        let _ = remove_last_opened(app_handle);
                     }
                 }
             }

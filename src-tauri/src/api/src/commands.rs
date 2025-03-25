@@ -2,6 +2,7 @@ use std::path::Path;
 
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
+    set_last_opened,
 };
 use tauri::{AppHandle, Emitter, Manager, State};
 
@@ -35,6 +36,7 @@ pub async fn open_folder(app_handle: AppHandle, new_path: &str) -> Result<(), Ap
 
     // Not worth crashing the app if this fails
     let _ = add_recent_folder(&app_handle, new_path);
+    let _ = set_last_opened(&app_handle, new_path);
     let _ = app_handle.emit(EVENT_ID, AppEvent::DirChanged);
 
     Ok(())
