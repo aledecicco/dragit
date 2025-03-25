@@ -1,14 +1,14 @@
 use std::path::Path;
-
-use settings::{
-    add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
-    set_last_opened,
-};
 use tauri::{AppHandle, Emitter, Manager, State};
 
 use models::{
     AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    CurrentDirInfo, GitError, GitHandler, HeadInfo, HistoryItem, SafeHandler, Settings, EVENT_ID,
+    CurrentDirInfo, GitError, GitHandler, HeadInfo, HistoryItem, RepoWatcherError, SafeHandler,
+    Settings, EVENT_ID,
+};
+use settings::{
+    add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
+    set_last_opened,
 };
 
 fn with_handler<T>(
@@ -24,8 +24,11 @@ fn with_handler<T>(
 pub async fn open_folder(app_handle: AppHandle, new_path: &str) -> Result<(), AppError> {
     let state: State<'_, AppState> = app_handle.state::<AppState>();
 
-    // Unwatch old repository
-    state.repo_watcher.lock().unwatch_repository()?;
+    // Unwatch old repository, if any
+    match state.repo_watcher.lock().unwatch_repository() {
+        Err(RepoWatcherError::RepositoryNotWatched {}) => {}
+        res => res?,
+    };
 
     // Watch repository at new path
     state
