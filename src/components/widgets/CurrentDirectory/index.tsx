@@ -1,8 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
 import { open } from '@tauri-apps/plugin-dialog'
 
-import { useOpenFolder } from '@api/commands'
-import { currentDirQuery } from '@api/queries'
+import { useOpenFolder } from '@api/mutations'
+import { useQueryCurrentDir } from '@api/queries'
 import { Button, type ButtonProps } from '@ui/Button'
 import { propsWithCn } from '@utils/styles'
 
@@ -10,7 +9,7 @@ interface CurrentDirectoryProps extends Partial<ButtonProps> {}
 
 const CurrentDirectory = (props: CurrentDirectoryProps) => {
   const { ...buttonProps } = props
-  const currentDir = useQuery(currentDirQuery)
+  const currentDirQuery = useQueryCurrentDir()
   const openFolder = useOpenFolder()
 
   return (
@@ -24,21 +23,25 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
           directory: true,
         }).then((path) => {
           if (path) {
-            openFolder.mutate(path)
+            openFolder.mutate({ newPath: path })
           }
         })
       }}
       {...propsWithCn(
         buttonProps,
         'text-primary-300 font-medium text-sm',
-        !currentDir.data && 'italic',
+        !currentDirQuery.data && 'italic',
       )}
       disabled={
-        openFolder.isPending || currentDir.isFetching || buttonProps.disabled
+        openFolder.isPending ||
+        currentDirQuery.isFetching ||
+        buttonProps.disabled
       }
     >
-      {currentDir.data?.path ??
-        (currentDir.isFetching ? 'Loading directory...' : 'Choose a directory')}
+      {currentDirQuery.data?.path ??
+        (currentDirQuery.isFetching
+          ? 'Loading directory...'
+          : 'Choose a directory')}
     </Button>
   )
 }

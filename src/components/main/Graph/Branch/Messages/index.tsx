@@ -1,32 +1,27 @@
 import type { PropsWithChildren } from 'react'
 
-import { commitHistoryQuery } from '@api/queries'
-import { useRepositoryInfiniteQuery } from '@api/utils'
+import { useQueryCommitHistory } from '@api/queries'
 import { useSelectedBranches } from '@context/branches'
 import { useCurrentCommonAncestor } from '@main/Graph/utils'
 import { cn } from '@utils/styles'
 
 const BranchMessages = () => {
   const { branch, baseBranch } = useSelectedBranches()
-  const commonAncestor = useCurrentCommonAncestor()
-  const branchHistory = useRepositoryInfiniteQuery(
-    commitHistoryQuery,
-    branch?.name,
-  )
-  const baseBranchHistory = useRepositoryInfiniteQuery(
-    commitHistoryQuery,
-    baseBranch?.name,
-  )
+  const commonAncestorQuery = useCurrentCommonAncestor()
+  const branchHistoryQuery = useQueryCommitHistory(branch?.name)
+  const baseBranchHistory = useQueryCommitHistory(baseBranch?.name)
 
   const branchMessages = [
     { when: !branch, message: 'No branch checked out' },
     {
-      when: branchHistory.data?.pages && commonAncestor?.lastCommit === null,
+      when:
+        branchHistoryQuery.data?.pages &&
+        commonAncestorQuery?.lastCommit === null,
       message: 'No new commits',
     },
     {
-      when: !branchHistory.data?.pages,
-      message: branchHistory.isFetching
+      when: !branchHistoryQuery.data?.pages,
+      message: branchHistoryQuery.isFetching
         ? 'Loading history...'
         : 'No commits found',
     },

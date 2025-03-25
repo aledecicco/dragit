@@ -16,8 +16,8 @@ import {
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import { useRemoveFromIndex } from '@api/commands'
 import type { StagedFile } from '@api/models'
+import { useRemoveFromIndex } from '@api/mutations'
 import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
@@ -59,7 +59,7 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
         {
           Glyph: IconMinus,
           label: 'Unstage',
-          action: () => unstage.mutate([item.path]),
+          action: () => unstage.mutate({ files: [item.path] }),
           disabled: unstage.isPending,
         },
       ]}

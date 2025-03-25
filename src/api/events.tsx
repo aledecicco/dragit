@@ -6,81 +6,51 @@ import { P, match } from 'ts-pattern'
 
 import { useSelectedBranches } from '@context/branches'
 import { queryKeys } from './queries'
-import { useCurrentPath, useHasCurrentPath } from './utils'
 
 const EVENT_ID = 'app-event'
 
 const EventHandler = (props: PropsWithChildren) => {
   const { children } = props
   const client = useQueryClient()
-  const hasCurrentPath = useHasCurrentPath()
 
-  useEffect(() => {
-    const unlisten = listen(EVENT_ID, (event) => {
-      match(event.payload).with({ type: 'dirChanged' }, () => {
-        client.resetQueries()
-        // TODO: relaunch()
-      })
-    })
-
-    return () => {
-      unlisten.then((f) => f())
-    }
-  }, [client.resetQueries])
-
-  return hasCurrentPath ? (
-    <EventHandlerInner>{children}</EventHandlerInner>
-  ) : (
-    children
-  )
-}
-
-const EventHandlerInner = (props: PropsWithChildren) => {
-  const { children } = props
-  const client = useQueryClient()
   const { branch: currentBranch } = useSelectedBranches()
-  const currentPath = useCurrentPath()
 
   useEffect(() => {
     const unlisten = listen(EVENT_ID, (event) => {
       match(event.payload)
-        .with({ type: 'gitFolderModified' }, () => {
+        .with({ type: 'dirChanged' }, () => {
+          client.resetQueries()
+          // TODO: relaunch()
+        })
+        .with({ type: 'gitFolderModified', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: queryKeys.directory.current(currentPath),
+            queryKey: queryKeys.directory.current(path),
           })
         })
-        .with({ type: 'branchesListUpdated' }, () => {
+        .with({ type: 'branchesListUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.branches.list(currentPath)],
+            queryKey: [queryKeys.directory.branches.list(path)],
           })
         })
         .with(
-          { type: 'branchUpdated', name: P.string.select() },
-          (branchName) => {
-            console.log(branchName)
-
+          { type: 'branchUpdated', path: P.string, name: P.string },
+          ({ name: branchName, path }) => {
             client.invalidateQueries({
               queryKey: [
-                queryKeys.directory.commitHistory.branch(
-                  currentPath,
-                  branchName,
-                ),
+                queryKeys.directory.commitHistory.branch(path, branchName),
               ],
             })
 
             client.invalidateQueries({
               queryKey: [
-                queryKeys.directory.branchDivergence.branch(
-                  currentPath,
-                  branchName,
-                ),
+                queryKeys.directory.branchDivergence.branch(path, branchName),
               ],
             })
 
             client.invalidateQueries({
               queryKey: [
                 queryKeys.directory.branchDivergence.baseBranch(
-                  currentPath,
+                  path,
                   branchName,
                 ),
               ],
@@ -88,47 +58,41 @@ const EventHandlerInner = (props: PropsWithChildren) => {
 
             client.invalidateQueries({
               queryKey: [
-                queryKeys.directory.commonAncestor.branch(
-                  currentPath,
-                  branchName,
-                ),
+                queryKeys.directory.commonAncestor.branch(path, branchName),
               ],
             })
 
             client.invalidateQueries({
               queryKey: [
-                queryKeys.directory.commonAncestor.baseBranch(
-                  currentPath,
-                  branchName,
-                ),
+                queryKeys.directory.commonAncestor.baseBranch(path, branchName),
               ],
             })
 
             if (currentBranch && currentBranch.name === branchName) {
               client.invalidateQueries({
-                queryKey: [queryKeys.directory.headInfo(currentPath)],
+                queryKey: [queryKeys.directory.headInfo(path)],
               })
             }
           },
         )
-        .with({ type: 'headChanged' }, () => {
+        .with({ type: 'headChanged', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.headInfo(currentPath)],
+            queryKey: [queryKeys.directory.headInfo(path)],
           })
         })
-        .with({ type: 'filesModified' }, () => {
+        .with({ type: 'filesModified', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.headInfo(currentPath)],
+            queryKey: [queryKeys.directory.headInfo(path)],
           })
         })
-        .with({ type: 'configUpdated' }, () => {
+        .with({ type: 'configUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.branches.list(currentPath)],
+            queryKey: [queryKeys.directory.branches.list(path)],
           })
         })
-        .with({ type: 'indexUpdated' }, () => {
+        .with({ type: 'indexUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.headInfo(currentPath)],
+            queryKey: [queryKeys.directory.headInfo(path)],
           })
         })
     })
@@ -136,7 +100,7 @@ const EventHandlerInner = (props: PropsWithChildren) => {
     return () => {
       unlisten.then((f) => f())
     }
-  }, [client, currentPath, currentBranch])
+  }, [client.resetQueries, client.invalidateQueries, currentBranch])
 
   return children
 }

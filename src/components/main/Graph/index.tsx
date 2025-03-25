@@ -2,8 +2,8 @@ import * as Ariakit from '@ariakit/react'
 import { type Range, defaultRangeExtractor } from '@tanstack/react-virtual'
 import { type ComponentProps, useCallback, useMemo } from 'react'
 
-import { commitHistoryQuery } from '@api/queries'
-import { getPaginatedLength, useRepositoryInfiniteQuery } from '@api/utils'
+import { useQueryCommitHistory } from '@api/queries'
+import { getPaginatedLength } from '@api/utils'
 import { useSelectedBranches } from '@context/branches'
 import { ScrollShadowDiv } from '@lib/ScrollShadowDiv'
 import { SvgOverlay } from '@lib/SvgOverlay'
@@ -45,24 +45,19 @@ const GraphInner = () => {
   const { branch, baseBranch } = useSelectedBranches()
   const commonAncestor = useCurrentCommonAncestor()
 
-  const branchHistory = useRepositoryInfiniteQuery(
-    commitHistoryQuery,
-    branch?.name,
-  )
-  const baseBranchHistory = useRepositoryInfiniteQuery(
-    commitHistoryQuery,
-    baseBranch?.name,
-  )
+  const branchHistoryQuery = useQueryCommitHistory(branch?.name)
+  const baseBranchHistoryQuery = useQueryCommitHistory(baseBranch?.name)
 
   const branchLength = useMemo(() => {
     return Math.min(
       (commonAncestor?.lastCommit?.distance ?? Number.POSITIVE_INFINITY) + 1,
-      getPaginatedLength(branchHistory.data),
+      getPaginatedLength(branchHistoryQuery.data),
     )
-  }, [commonAncestor, branchHistory.data])
+  }, [commonAncestor, branchHistoryQuery.data])
+
   const baseLength = useMemo(() => {
-    return getPaginatedLength(baseBranchHistory.data)
-  }, [baseBranchHistory.data])
+    return getPaginatedLength(baseBranchHistoryQuery.data)
+  }, [baseBranchHistoryQuery.data])
 
   const rangeExtractor = useCallback(
     (range: Range) => {

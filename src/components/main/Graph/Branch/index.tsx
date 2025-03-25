@@ -1,12 +1,8 @@
 import type { Virtualizer } from '@tanstack/react-virtual'
 
 import type { AncestorInfo, BranchInfo } from '@api/models'
-import { commitHistoryQuery } from '@api/queries'
-import {
-  getNextPaginatedItem,
-  getPaginatedItem,
-  useRepositoryInfiniteQuery,
-} from '@api/utils'
+import { useQueryCommitHistory } from '@api/queries'
+import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
 import { cn } from '@utils/styles'
 import { mapFn } from '@utils/types'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
@@ -35,9 +31,9 @@ const GraphBranch = (props: GraphBranchProps) => {
   const { virtualizer, branch, anchor, isBase = false, baseBranch } = props
   const stopAtAnchor = !isBase
 
-  const history = useRepositoryInfiniteQuery(commitHistoryQuery, branch.name)
+  const historyQuery = useQueryCommitHistory(branch.name)
   const items = virtualizer.getVirtualItems()
-  useInfiniteScroll(history, items)
+  useInfiniteScroll(historyQuery, items)
 
   const divergence = useRemoteDivergence(branch)
 
@@ -45,7 +41,7 @@ const GraphBranch = (props: GraphBranchProps) => {
     return
   }
 
-  if (!history.data?.pages) {
+  if (!historyQuery.data?.pages) {
     return
   }
 
@@ -57,7 +53,7 @@ const GraphBranch = (props: GraphBranchProps) => {
     const commit =
       anchor && virtualRow.index === anchor.distance
         ? anchor.hash
-        : getPaginatedItem(history.data, virtualRow.index)?.hash
+        : getPaginatedItem(historyQuery.data, virtualRow.index)?.hash
 
     if (!commit) {
       return undefined
@@ -66,7 +62,7 @@ const GraphBranch = (props: GraphBranchProps) => {
     const isAnchor = anchor && commit === anchor.hash
 
     const parentCommit =
-      getNextPaginatedItem(history.data, virtualRow.index)?.hash ??
+      getNextPaginatedItem(historyQuery.data, virtualRow.index)?.hash ??
       (anchor && anchor.distance > virtualRow.index ? anchor.hash : undefined)
     const parentIsDistantAnchor =
       anchor &&

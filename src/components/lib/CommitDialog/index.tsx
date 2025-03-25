@@ -1,4 +1,4 @@
-import { useCommitIndex } from '@api/commands'
+import { useCommitIndex } from '@api/mutations'
 import { showDialog } from '@context/dialogs'
 import { TextField } from '@ui/Form/TextField'
 import { FormDialog, type FormDialogProps } from '@ui/FormDialog'

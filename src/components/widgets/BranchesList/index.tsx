@@ -1,8 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 import { type ComponentProps, useMemo } from 'react'
 
-import { branchesQuery } from '@api/queries'
-import { useRepositoryQuery } from '@api/utils'
+import { useQueryBranches } from '@api/queries'
 import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { Accordion } from '@ui/Accordion'
 import { AccordionSection } from '@ui/Accordion/Section'
@@ -15,16 +14,16 @@ interface BranchesListProps extends ComponentProps<'div'> {}
 const BranchesList = (props: BranchesListProps) => {
   const { ...divProps } = props
 
-  const branches = useRepositoryQuery(branchesQuery)
+  const branchesQuery = useQueryBranches()
   const composite = Ariakit.useCompositeStore({ focusLoop: true })
 
   const branchesOptions = useMemo(() => {
-    return mapFn(branches.data, (branches) => ({
+    return mapFn(branchesQuery.data, (branches) => ({
       getItemKey: (index: number) => branches[index].name,
     }))
-  }, [branches.data])
+  }, [branchesQuery.data])
 
-  if (!branches.data) {
+  if (!branchesQuery.data) {
     return (
       <div
         {...propsWithCn(
@@ -42,14 +41,14 @@ const BranchesList = (props: BranchesListProps) => {
 
   return (
     <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>
-      <AccordionSection label={`All branches (${branches.data.length})`}>
-        {branches.data.length ? (
+      <AccordionSection label={`All branches (${branchesQuery.data.length})`}>
+        {branchesQuery.data.length ? (
           <Ariakit.Composite
             store={composite}
             render={
               <VirtualizedDiv
                 size="sm"
-                items={branches.data}
+                items={branchesQuery.data}
                 itemSize={74}
                 RenderItem={BranchesListItem}
                 className={cn('w-full h-full')}

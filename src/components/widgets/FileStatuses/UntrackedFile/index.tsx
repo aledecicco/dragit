@@ -5,8 +5,8 @@ import {
 } from '@tabler/icons-react'
 import type { ComponentProps } from 'react'
 
-import { useAddToIndex } from '@api/commands'
 import type { UntrackedFile } from '@api/models'
+import { useAddToIndex } from '@api/mutations'
 import { propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
@@ -27,7 +27,7 @@ const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
         {
           Glyph: IconPlus,
           label: 'Start tracking',
-          action: () => stage.mutate([item.path]),
+          action: () => stage.mutate({ files: [item.path] }),
           disabled: stage.isPending,
         },
       ]}

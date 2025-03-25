@@ -4,8 +4,7 @@ import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
 
 import type { BranchName, CommitId } from '@api/models'
-import { commitInfoQuery } from '@api/queries'
-import { useRepositoryQuery } from '@api/utils'
+import { useQueryCommitInfo } from '@api/queries'
 import { ProfilePicture, type ProfilePictureVariant } from '@lib/ProfilePicture'
 import { makeTracked } from '@lib/SvgOverlay'
 import { Marquee } from '@ui/Marquee'
@@ -30,7 +29,7 @@ const GraphCommit = makeTracked<
   ParentCommitType
 >((props) => {
   const { commitId, commitType, distance, trackRef, ...divProps } = props
-  const commitInfo = useRepositoryQuery(commitInfoQuery, commitId)
+  const commitInfoQuery = useQueryCommitInfo(commitId)
 
   return (
     <div
@@ -50,7 +49,7 @@ const GraphCommit = makeTracked<
         style={{ width: NODE_SIZE, height: NODE_SIZE }}
       >
         <ProfilePicture
-          username={commitInfo.data?.authorEmail}
+          username={commitInfoQuery.data?.authorEmail}
           size="sm"
           variant={match(commitType)
             .returnType<ProfilePictureVariant>()
@@ -90,17 +89,17 @@ const GraphCommit = makeTracked<
           <p
             className={cn('text-sm text-ellipsis text-nowrap overflow-hidden')}
           >
-            {commitInfo.data?.message ?? '...'}
+            {commitInfoQuery.data?.message ?? '...'}
           </p>
           <div
             className={cn('flex flex-row items-center justify-between gap-x-1')}
           >
             <Marquee className={cn('text-xs text-light-950')}>
-              {commitInfo.data?.authorName ?? '...'}
+              {commitInfoQuery.data?.authorName ?? '...'}
             </Marquee>
 
             <p className={cn('text-xs text-light-600 min-w-max')}>
-              {commitInfo.data?.shortHash ?? '...'}
+              {commitInfoQuery.data?.shortHash ?? '...'}
             </p>
           </div>
         </div>

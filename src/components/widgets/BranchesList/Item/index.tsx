@@ -3,8 +3,8 @@ import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
 import { type ComponentProps, memo } from 'react'
 import { match } from 'ts-pattern'
 
-import { useCheckoutLocalBranch } from '@api/commands'
 import type { BranchInfo, BranchName, RefName } from '@api/models'
+import { useCheckoutLocal } from '@api/mutations'
 import { useSelectedBranches } from '@context/branches'
 import { Icon } from '@ui/Icon'
 import { Marquee } from '@ui/Marquee'
@@ -27,7 +27,7 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
 
   const { branch: currentBranch } = useSelectedBranches()
   const isCurrentBranch = currentBranch && item.name === currentBranch.name
-  const checkout = useCheckoutLocalBranch()
+  const checkout = useCheckoutLocal()
 
   return (
     <Ariakit.CompositeItem
@@ -46,7 +46,7 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
           )}
           onClick={(e) => {
             if (e.detail === 0) {
-              checkout.mutate(item.name)
+              checkout.mutate({ branch: item.name })
             }
 
             divProps.onClick?.(e)

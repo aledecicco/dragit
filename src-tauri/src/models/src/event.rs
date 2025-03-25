@@ -10,23 +10,23 @@ pub enum AppEvent {
     DirChanged,
 
     /// The .git folder was modified. The result of [`GitHandler::is_repository`] might've changed.
-    GitFolderModified,
+    GitFolderModified { path: String },
 
     /// Branches were created or deleted.
-    BranchesListUpdated,
+    BranchesListUpdated { path: String },
 
     /// The state or history of a branch was updated.
-    BranchUpdated { name: String },
+    BranchUpdated { path: String, name: String },
 
     /// A new reference was checked out.
-    HeadChanged,
+    HeadChanged { path: String },
 
     /// Non-git file/s were created, deleted, or updated.
-    FilesModified,
+    FilesModified { path: String },
 
     /// The config file was updated.
-    ConfigUpdated,
+    ConfigUpdated { path: String },
 
     /// The status of the current commit was updated.
-    IndexUpdated,
+    IndexUpdated { path: String },
 }

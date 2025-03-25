@@ -7,12 +7,12 @@ import { useEffect, useMemo } from 'react'
 
 import type { BranchDivergence, BranchInfo, HistoryItem } from '@api/models'
 import {
-  branchDivergenceQuery,
-  branchesQuery,
-  commonAncestorQuery,
-  headInfoQuery,
+  useQueryBranchDivergence,
+  useQueryBranches,
+  useQueryCommonAncestor,
+  useQueryHeadInfo,
 } from '@api/queries'
-import { getPaginatedLength, useRepositoryQuery } from '@api/utils'
+import { getPaginatedLength } from '@api/utils'
 import { useSelectedBranches } from '@context/branches'
 import { getCurrentBranchInfo, getRemoteCounterpart } from '@utils/repository'
 
@@ -20,12 +20,12 @@ type HistoryQuery = UseInfiniteQueryResult<InfiniteData<HistoryItem[]>>
 
 const ancestorNotInRange = (
   ancestorDistance: number,
-  history: HistoryQuery,
+  historyQuery: HistoryQuery,
   items: VirtualItem[],
 ): boolean => {
   return (
     !items.find((virtualRow) => virtualRow.index === ancestorDistance) ||
-    getPaginatedLength(history.data) <= ancestorDistance
+    getPaginatedLength(historyQuery.data) <= ancestorDistance
   )
 }
 
@@ -36,53 +36,54 @@ const ancestorIsDivergent = (
   return ancestorDistance + 1 <= branchDivergence.ahead
 }
 
-const useInfiniteScroll = (history: HistoryQuery, items: VirtualItem[]) => {
+const useInfiniteScroll = (
+  historyQuery: HistoryQuery,
+  items: VirtualItem[],
+) => {
   useEffect(() => {
     const lastItem = items.at(-1)
 
     if (
       lastItem &&
-      lastItem.index >= getPaginatedLength(history.data) - 1 &&
-      history.hasNextPage &&
-      !history.isFetchingNextPage
+      lastItem.index >= getPaginatedLength(historyQuery.data) - 1 &&
+      historyQuery.hasNextPage &&
+      !historyQuery.isFetchingNextPage
     ) {
-      history.fetchNextPage()
+      historyQuery.fetchNextPage()
     }
-  }, [items, history])
+  }, [items, historyQuery])
 }
 
 const useCurrentBranch = (): BranchInfo | undefined => {
-  const headInfo = useRepositoryQuery(headInfoQuery)
-  const branches = useRepositoryQuery(branchesQuery)
+  const headInfoQuery = useQueryHeadInfo()
+  const branchesQuery = useQueryBranches()
 
   const branch = useMemo(() => {
-    return getCurrentBranchInfo(headInfo.data, branches.data)
-  }, [branches.data, headInfo.data])
+    return getCurrentBranchInfo(headInfoQuery.data, branchesQuery.data)
+  }, [branchesQuery.data, headInfoQuery.data])
 
   return branch
 }
 
 const useCurrentCommonAncestor = () => {
   const { branch, baseBranch } = useSelectedBranches()
-  const commonAncestor = useRepositoryQuery(
-    commonAncestorQuery,
+  const commonAncestorQuery = useQueryCommonAncestor(
     branch?.name,
     baseBranch?.name,
   )
 
-  return commonAncestor.data
+  return commonAncestorQuery.data
 }
 
 const useRemoteDivergence = (
   branch: BranchInfo,
 ): BranchDivergence | undefined | null => {
-  const divergence = useRepositoryQuery(
-    branchDivergenceQuery,
+  const divergenceQuery = useQueryBranchDivergence(
     branch.name,
     getRemoteCounterpart(branch),
   )
 
-  return divergence.data
+  return divergenceQuery.data
 }
 
 export {

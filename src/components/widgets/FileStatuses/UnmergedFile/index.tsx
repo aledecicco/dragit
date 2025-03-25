@@ -7,8 +7,8 @@ import {
 import type { ComponentProps } from 'react'
 import { P, match } from 'ts-pattern'
 
-import { useAddToIndex, useRemoveFromTree } from '@api/commands'
 import type { UnmergedFile } from '@api/models'
+import { useAddToIndex, useRemoveFromTree } from '@api/mutations'
 import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
@@ -46,7 +46,7 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
         {
           Glyph: IconCheck,
           label: 'Mark as resolved',
-          action: () => stage.mutate([item.path]),
+          action: () => stage.mutate({ files: [item.path] }),
           disabled: stage.isPending,
         },
         ...match(item.unstaged)
@@ -54,7 +54,7 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
             {
               Glyph: IconTrash,
               label: 'Delete',
-              action: () => remove.mutate([item.path]),
+              action: () => remove.mutate({ files: [item.path] }),
               disabled: remove.isPending,
             },
           ])

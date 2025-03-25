@@ -2,6 +2,7 @@ import {
   infiniteQueryOptions,
   queryOptions,
   skipToken,
+  useQuery,
 } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
@@ -17,6 +18,7 @@ import type {
   HistoryItem,
   Settings,
 } from './models'
+import { useRepositoryInfiniteQuery, useRepositoryQuery } from './utils'
 
 export const PAGE_SIZE = 50
 
@@ -140,12 +142,16 @@ const currentDirQuery = queryOptions({
   queryFn: fetchCurrentDir,
 })
 
+const useQueryCurrentDir = () => useQuery(currentDirQuery)
+
 const fetchSettings = (): Promise<Settings> => invoke('get_setings')
 
 const settingsQuery = queryOptions({
   queryKey: [queryKeys.settings],
   queryFn: fetchSettings,
 })
+
+const useQuerySettings = () => useQuery(settingsQuery)
 
 const fetchRecentlyOpened = (): Promise<string[]> =>
   invoke('get_recently_opened')
@@ -155,27 +161,37 @@ const recentlyOpenedQuery = queryOptions({
   queryFn: fetchRecentlyOpened,
 })
 
-const fetchHeadInfo = (): Promise<HeadInfo> => invoke('get_head_info')
+const useQueryRecentlyOpened = () => useQuery(recentlyOpenedQuery)
+
+const fetchHeadInfo = (path: string): Promise<HeadInfo> =>
+  invoke('get_head_info', { path: path })
 
 const headInfoQuery = (path: string) =>
   queryOptions({
     queryKey: [queryKeys.directory.headInfo(path)],
-    queryFn: fetchHeadInfo,
+    queryFn: () => fetchHeadInfo(path),
   })
 
-const fetchBranches = (): Promise<BranchInfo[]> => invoke('get_branches')
+const useQueryHeadInfo = () => useRepositoryQuery(headInfoQuery)
+
+const fetchBranches = (path: string): Promise<BranchInfo[]> =>
+  invoke('get_branches', { path: path })
 
 const branchesQuery = (path: string) =>
   queryOptions({
     queryKey: [queryKeys.directory.branches.list(path)],
-    queryFn: fetchBranches,
+    queryFn: () => fetchBranches(path),
   })
 
+const useQueryBranches = () => useRepositoryQuery(branchesQuery)
+
 const fetchCommitHistory = (
+  path: string,
   branch: BranchName,
   page: number,
 ): Promise<HistoryItem[]> =>
   invoke('get_commit_history', {
+    path: path,
     branch: branch,
     startAfter: page * PAGE_SIZE,
     limit: PAGE_SIZE,
@@ -185,27 +201,41 @@ const commitHistoryQuery = (path: string, branch: BranchName | undefined) =>
   infiniteQueryOptions({
     queryKey: [queryKeys.directory.commitHistory.branch(path, branch)],
     queryFn: branch
-      ? ({ pageParam }) => fetchCommitHistory(branch, pageParam)
+      ? ({ pageParam }) => fetchCommitHistory(path, branch, pageParam)
       : skipToken,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _, lastPageParam) =>
       lastPage.length === PAGE_SIZE ? lastPageParam + 1 : undefined,
   })
 
-const fetchCommitInfo = (commitId: CommitId): Promise<CommitInfo> =>
-  invoke('get_commit_info', { reference: commitId })
+const useQueryCommitHistory = (branch: BranchName | undefined) =>
+  useRepositoryInfiniteQuery(commitHistoryQuery, branch)
+
+const fetchCommitInfo = (
+  path: string,
+  commitId: CommitId,
+): Promise<CommitInfo> =>
+  invoke('get_commit_info', { path: path, reference: commitId })
 
 const commitInfoQuery = (path: string, commitId: CommitId) =>
   queryOptions({
     queryKey: [queryKeys.directory.commitInfo.commit(path, commitId)],
-    queryFn: () => fetchCommitInfo(commitId),
+    queryFn: () => fetchCommitInfo(path, commitId),
   })
 
+const useQueryCommitInfo = (commitId: CommitId) =>
+  useRepositoryQuery(commitInfoQuery, commitId)
+
 const fetchCommonAncestor = (
+  path: string,
   branch: BranchName,
   baseBranch: BranchName,
 ): Promise<CommonAncestorInfo | null> =>
-  invoke('get_common_ancestor', { branch: branch, baseBranch: baseBranch })
+  invoke('get_common_ancestor', {
+    path: path,
+    branch: branch,
+    baseBranch: baseBranch,
+  })
 
 const commonAncestorQuery = (
   path: string,
@@ -218,15 +248,25 @@ const commonAncestorQuery = (
     ],
     queryFn:
       branch && baseBranch
-        ? () => fetchCommonAncestor(branch, baseBranch)
+        ? () => fetchCommonAncestor(path, branch, baseBranch)
         : skipToken,
   })
 
+const useQueryCommonAncestor = (
+  branch: BranchName | undefined,
+  baseBranch: BranchName | undefined,
+) => useRepositoryQuery(commonAncestorQuery, branch, baseBranch)
+
 const fetchBranchDivergence = (
+  path: string,
   branch: BranchName,
   baseBranch: BranchName,
 ): Promise<BranchDivergence | null> =>
-  invoke('get_branch_divergence', { branch: branch, baseBranch: baseBranch })
+  invoke('get_branch_divergence', {
+    path: path,
+    branch: branch,
+    baseBranch: baseBranch,
+  })
 
 const branchDivergenceQuery = (
   path: string,
@@ -239,19 +279,24 @@ const branchDivergenceQuery = (
     ],
     queryFn:
       branch && baseBranch
-        ? () => fetchBranchDivergence(branch, baseBranch)
+        ? () => fetchBranchDivergence(path, branch, baseBranch)
         : skipToken,
   })
 
+const useQueryBranchDivergence = (
+  branch: BranchName | undefined,
+  baseBranch: BranchName | undefined,
+) => useRepositoryQuery(branchDivergenceQuery, branch, baseBranch)
+
 export {
   queryKeys,
-  currentDirQuery,
-  settingsQuery,
-  recentlyOpenedQuery,
-  headInfoQuery,
-  branchesQuery,
-  commitHistoryQuery,
-  commitInfoQuery,
-  commonAncestorQuery,
-  branchDivergenceQuery,
+  useQueryCurrentDir,
+  useQuerySettings,
+  useQueryRecentlyOpened,
+  useQueryHeadInfo,
+  useQueryBranches,
+  useQueryCommitHistory,
+  useQueryCommitInfo,
+  useQueryCommonAncestor,
+  useQueryBranchDivergence,
 }

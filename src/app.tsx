@@ -1,9 +1,7 @@
-import { currentDirQuery } from '@api/queries'
-
+import { useQueryCurrentDir } from '@api/queries'
 import { useBranchesSync } from '@context/branches'
 import { useDialog } from '@context/dialogs'
 import { Graph } from '@main/Graph'
-import { useQuery } from '@tanstack/react-query'
 import { cn } from '@utils/styles'
 import { BranchesList } from '@widgets/BranchesList'
 import { CurrentDirectory } from '@widgets/CurrentDirectory'
@@ -12,7 +10,7 @@ import { MainToolbar } from '@widgets/MainToolbar'
 
 const App = () => {
   const dialog = useDialog()
-  const currentDir = useQuery(currentDirQuery)
+  const currentDirQuery = useQueryCurrentDir()
 
   return (
     <div
@@ -25,9 +23,9 @@ const App = () => {
         className={cn('col-start-2 row-start-1', 'justify-self-center')}
       />
 
-      {currentDir.data?.path &&
-        currentDir.data.isRepository &&
-        currentDir.data.exists && <AppInner />}
+      {currentDirQuery.data?.path &&
+        currentDirQuery.data.isRepository &&
+        currentDirQuery.data.exists && <AppInner />}
 
       {dialog}
     </div>

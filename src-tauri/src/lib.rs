@@ -2,7 +2,7 @@ use std::path::Path;
 use tauri::{Emitter, Manager};
 
 use git_handler::cmd_git::CmdGit;
-use models::{AppEvent, AppState, GitHandler, RepoWatcher, EVENT_ID};
+use models::{AppEvent, AppState, RepoWatcher, EVENT_ID};
 use repo_watcher::debounced_watcher::DebouncedWatcher;
 use settings::{get_recent_folders, load_settings, remove_recent_folder};
 
@@ -16,13 +16,12 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let app_handle = app.handle();
-            let mut git_handler = CmdGit::new();
+            let git_handler = CmdGit::new();
             let mut repo_watcher = DebouncedWatcher::new(app_handle.clone());
 
             if load_settings(app_handle).open_last_on_start {
                 if let Some(last) = get_recent_folders(app_handle).last() {
-                    if Path::new(last).exists() {
-                        git_handler.open_folder(&last)?;
+                    if Path::new(last).is_dir() {
                         repo_watcher.watch_repository(&last)?;
                     } else {
                         let _ = app_handle.emit(

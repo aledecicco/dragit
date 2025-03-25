@@ -8,8 +8,7 @@ import type {
   UnstagedFile,
   UntrackedFile,
 } from '@api/models'
-import { headInfoQuery } from '@api/queries'
-import { useRepositoryQuery } from '@api/utils'
+import { useQueryHeadInfo } from '@api/queries'
 import { mapFn } from '@utils/types'
 
 const getStagedFiles = (files: FileInfo[]): StagedFile[] =>
@@ -33,31 +32,34 @@ const getUntrackedFiles = (files: FileInfo[]): UntrackedFile[] =>
   files.filter((file) => file.status === 'untracked')
 
 const useStagedFiles = () => {
-  const headInfo = useRepositoryQuery(headInfoQuery)
-  return useMemo(() => mapFn(headInfo.data?.files, getStagedFiles), [headInfo])
+  const headInfoQuery = useQueryHeadInfo()
+  return useMemo(
+    () => mapFn(headInfoQuery.data?.files, getStagedFiles),
+    [headInfoQuery.data?.files],
+  )
 }
 
 const useUnstagedFiles = () => {
-  const headInfo = useRepositoryQuery(headInfoQuery)
+  const headInfoQuery = useQueryHeadInfo()
   return useMemo(
-    () => mapFn(headInfo.data?.files, getUnstagedFiles),
-    [headInfo],
+    () => mapFn(headInfoQuery.data?.files, getUnstagedFiles),
+    [headInfoQuery.data?.files],
   )
 }
 
 const useUnmergedFiles = () => {
-  const headInfo = useRepositoryQuery(headInfoQuery)
+  const headInfoQuery = useQueryHeadInfo()
   return useMemo(
-    () => mapFn(headInfo.data?.files, getUnmergedFiles),
-    [headInfo],
+    () => mapFn(headInfoQuery.data?.files, getUnmergedFiles),
+    [headInfoQuery.data?.files],
   )
 }
 
 const useUntrackedFiles = () => {
-  const headInfo = useRepositoryQuery(headInfoQuery)
+  const headInfoQuery = useQueryHeadInfo()
   return useMemo(
-    () => mapFn(headInfo.data?.files, getUntrackedFiles),
-    [headInfo],
+    () => mapFn(headInfoQuery.data?.files, getUntrackedFiles),
+    [headInfoQuery.data?.files],
   )
 }
 
@@ -76,8 +78,11 @@ const getFilesByStatus = (headInfo: HeadInfo): FilesByStatus => ({
 })
 
 const useFilesByStatus = () => {
-  const headInfo = useRepositoryQuery(headInfoQuery)
-  return useMemo(() => mapFn(headInfo.data, getFilesByStatus), [headInfo])
+  const headInfoQuery = useQueryHeadInfo()
+  return useMemo(
+    () => mapFn(headInfoQuery.data, getFilesByStatus),
+    [headInfoQuery.data],
+  )
 }
 
 export {

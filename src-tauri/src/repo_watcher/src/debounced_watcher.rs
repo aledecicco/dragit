@@ -34,12 +34,12 @@ impl DebouncedWatcher {
         }
     }
 
-    fn get_event_handler(&self, repo_path: &str) -> impl DebounceEventHandler {
-        let repo_path = repo_path.to_string();
+    fn get_event_handler(&self, pathname: &str) -> impl DebounceEventHandler {
+        let pathname = pathname.to_string();
         let app_handle = self.app_handle.clone();
 
         move |res: Result<Vec<DebouncedEvent>, Vec<notify::Error>>| {
-            let repo_path = Path::new(&repo_path);
+            let repo_path = Path::new(&pathname);
             let git_folder = get_git_folder(repo_path);
             let head_file = get_head_file(repo_path);
             let branches_folder = get_branches_folder(repo_path);
@@ -92,6 +92,7 @@ impl DebouncedWatcher {
                                         EVENT_ID,
                                         AppEvent::BranchUpdated {
                                             name: branch_name.to_string(),
+                                            path: pathname.to_string(),
                                         },
                                     );
                                     println!("branch updated {}", branch_name);
@@ -106,6 +107,7 @@ impl DebouncedWatcher {
                                         EVENT_ID,
                                         AppEvent::BranchUpdated {
                                             name: branch_name.to_string(),
+                                            path: pathname.to_string(),
                                         },
                                     );
                                     println!("remote branch updated {}", branch_name);
@@ -158,27 +160,57 @@ impl DebouncedWatcher {
                     }
 
                     if files_modified {
-                        let _ = app_handle.emit(EVENT_ID, AppEvent::FilesModified);
+                        let _ = app_handle.emit(
+                            EVENT_ID,
+                            AppEvent::FilesModified {
+                                path: pathname.to_string(),
+                            },
+                        );
                     }
 
                     if head_changed {
-                        let _ = app_handle.emit(EVENT_ID, AppEvent::HeadChanged);
+                        let _ = app_handle.emit(
+                            EVENT_ID,
+                            AppEvent::HeadChanged {
+                                path: pathname.to_string(),
+                            },
+                        );
                     }
 
                     if branches_list_updated {
-                        let _ = app_handle.emit(EVENT_ID, AppEvent::BranchesListUpdated);
+                        let _ = app_handle.emit(
+                            EVENT_ID,
+                            AppEvent::BranchesListUpdated {
+                                path: pathname.to_string(),
+                            },
+                        );
                     }
 
                     if git_folder_modified {
-                        let _ = app_handle.emit(EVENT_ID, AppEvent::GitFolderModified);
+                        let _ = app_handle.emit(
+                            EVENT_ID,
+                            AppEvent::GitFolderModified {
+                                path: pathname.to_string(),
+                            },
+                        );
                     }
 
                     if config_updated {
-                        let _ = app_handle.emit(EVENT_ID, AppEvent::ConfigUpdated);
+                        let _ = app_handle.emit(
+                            EVENT_ID,
+                            AppEvent::ConfigUpdated {
+                                path: pathname.to_string(),
+                            },
+                        );
                     }
 
                     if index_updated {
-                        let _ = app_handle.emit(EVENT_ID, AppEvent::IndexUpdated);
+                        let _ = app_handle.emit(
+                            EVENT_ID,
+                            AppEvent::IndexUpdated {
+                                path: pathname.to_string(),
+                            },
+                        );
                     }
 
                     println!(

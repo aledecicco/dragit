@@ -3,12 +3,25 @@ import {
   type InfiniteData,
   type QueryKey,
   type UseInfiniteQueryOptions,
+  type UseMutationOptions,
   type UseQueryOptions,
   useInfiniteQuery,
+  useMutation,
   useQuery,
 } from '@tanstack/react-query'
 
-import { PAGE_SIZE, currentDirQuery } from './queries'
+import { PAGE_SIZE, useQueryCurrentDir } from './queries'
+
+export function mutationOptions<
+  TData = unknown,
+  TError = DefaultError,
+  TVariables = void,
+  TContext = unknown,
+>(
+  options: UseMutationOptions<TData, TError, TVariables, TContext>,
+): UseMutationOptions<TData, TError, TVariables, TContext> {
+  return options
+}
 
 const getPaginatedItem = <T>(
   data: InfiniteData<T[]> | undefined,
@@ -32,15 +45,14 @@ const getPaginatedLength = <T>(data: InfiniteData<T[]> | undefined): number => {
 }
 
 const useHasCurrentPath = () => {
-  const path = useQuery(currentDirQuery).data?.path
-  console.log(path)
+  const path = useQueryCurrentDir().data?.path
 
   return !!path
 }
 
 // A hook that returns the path in the currentDir query assuming it's there
 const useCurrentPath = () => {
-  const path = useQuery(currentDirQuery).data?.path
+  const path = useQueryCurrentDir().data?.path
 
   if (!path) {
     throw new Error('Repository path is not available')
@@ -49,10 +61,28 @@ const useCurrentPath = () => {
   return path
 }
 
+const useRepositoryMutation = <
+  A extends unknown[],
+  TData = unknown,
+  TError = DefaultError,
+  TVariables = void,
+  TContext = unknown,
+>(
+  repositoryMutation: (
+    path: string,
+    ...args: A
+  ) => UseMutationOptions<TData, TError, TVariables, TContext>,
+  ...args: A
+) => {
+  const path = useCurrentPath()
+
+  return useMutation(repositoryMutation(path, ...args))
+}
+
 const useRepositoryQuery = <
   A extends unknown[],
   TQueryFnData = unknown,
-  TError = Error,
+  TError = DefaultError,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = readonly unknown[],
 >(
@@ -105,4 +135,5 @@ export {
   useRepositoryInfiniteQuery,
   useHasCurrentPath,
   useCurrentPath,
+  useRepositoryMutation,
 }

@@ -12,8 +12,8 @@ import {
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import { useAddToIndex } from '@api/commands'
 import type { UnstagedFile } from '@api/models'
+import { useAddToIndex } from '@api/mutations'
 import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '../File'
 
@@ -49,7 +49,7 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
         {
           Glyph: IconPlus,
           label: 'Stage',
-          action: () => stage.mutate([item.path]),
+          action: () => stage.mutate({ files: [item.path] }),
           disabled: stage.isPending,
         },
       ]}

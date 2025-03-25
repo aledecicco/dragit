@@ -1,6 +1,6 @@
 import { IconDownload, IconRefresh, IconUpload } from '@tabler/icons-react'
 
-import { useFetchRemote, usePullBranch, usePushBranch } from '@api/commands'
+import { useFetchRemote, usePullBranch, usePushBranch } from '@api/mutations'
 import { useSelectedBranches } from '@context/branches'
 import { askForValue } from '@lib/AskForValueDialog'
 import { Toolbar } from '@ui/Toolbar'
@@ -51,6 +51,7 @@ const BranchToolbars = () => {
                   remote: branch.remote?.remoteName ?? 'origin',
                   remoteBranch: branch.remote?.branchName ?? branch.name,
                   isForce: false,
+                  setUpstream: !branch.remote,
                 })
               }
             },
@@ -66,6 +67,7 @@ const BranchToolbars = () => {
                       remote: branch.remote?.remoteName ?? 'origin',
                       remoteBranch: branch.remote?.branchName ?? branch.name,
                       isForce: true,
+                      setUpstream: !branch.remote,
                     })
                   }
                 },
@@ -84,7 +86,7 @@ const BranchToolbars = () => {
             Glyph: IconRefresh,
             label: 'Fetch all',
             action: () => {
-              fetchRemote.mutate('origin')
+              fetchRemote.mutate({ remote: 'origin' })
             },
             disabled: fetchRemote.isPending,
           },
@@ -123,6 +125,7 @@ const BranchToolbars = () => {
                   remoteBranch:
                     baseBranch.remote?.branchName ?? baseBranch.name,
                   isForce: false,
+                  setUpstream: !baseBranch.remote,
                 })
               }
             },
@@ -139,6 +142,7 @@ const BranchToolbars = () => {
                       remoteBranch:
                         baseBranch.remote?.branchName ?? baseBranch.name,
                       isForce: true,
+                      setUpstream: !baseBranch.remote,
                     })
                   }
                 },

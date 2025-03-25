@@ -5,7 +5,7 @@ import {
 } from '@tabler/icons-react'
 import { type ComponentProps, useMemo } from 'react'
 
-import { useAddToIndex, useRemoveFromIndex } from '@api/commands'
+import { useAddToIndex, useRemoveFromIndex } from '@api/mutations'
 import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { Accordion } from '@ui/Accordion'
 import { AccordionSection } from '@ui/Accordion/Section'
@@ -78,7 +78,7 @@ const FileStatuses = (props: FileStatusesProps) => {
             size="sm"
             disabled={files.untracked.length === 0 || stage.isPending}
             onClick={() => {
-              stage.mutate(files.untracked.map((file) => file.path))
+              stage.mutate({ files: files.untracked.map((file) => file.path) })
             }}
           />
         }
@@ -111,7 +111,7 @@ const FileStatuses = (props: FileStatusesProps) => {
             size="sm"
             disabled={files.unmerged.length === 0 || stage.isPending}
             onClick={() => {
-              stage.mutate(files.unmerged.map((file) => file.path))
+              stage.mutate({ files: files.unmerged.map((file) => file.path) })
             }}
           />
         }
@@ -144,7 +144,7 @@ const FileStatuses = (props: FileStatusesProps) => {
             size="sm"
             disabled={files.unstaged.length === 0 || stage.isPending}
             onClick={() => {
-              stage.mutate(files.unstaged.map((file) => file.path))
+              stage.mutate({ files: files.unstaged.map((file) => file.path) })
             }}
           />
         }
@@ -177,7 +177,7 @@ const FileStatuses = (props: FileStatusesProps) => {
             size="sm"
             disabled={files.staged.length === 0 || unstage.isPending}
             onClick={() => {
-              unstage.mutate(files.staged.map((file) => file.path))
+              unstage.mutate({ files: files.staged.map((file) => file.path) })
             }}
           />
         }
