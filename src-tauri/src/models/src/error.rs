@@ -71,6 +71,9 @@ pub enum GitError {
 
     #[error("Failed to remove remote \"{name}\"")]
     RemoveRemoteFailed { name: String },
+
+    #[error("Failed to retrieve stashes")]
+    GetStashesFailed {},
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug, Clone)]

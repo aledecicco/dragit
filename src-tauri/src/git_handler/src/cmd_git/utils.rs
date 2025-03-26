@@ -1,13 +1,13 @@
 use std::{fs, path::Path, str::FromStr};
 
 use models::{
-    BranchDivergence, BranchInfo, BranchType, ChangeStatus, CommitInfo, FileInfo, FileStatus,
-    HeadInfo, HeadStatus, HistoryItem, MergeStatus, MovedStatus, RemoteInfo, RemoteRef, StatusType,
+    BranchDivergence, BranchInfo, BranchType, ChangeStatus, CommitInfo, DiffSummary, FileInfo,
+    FileStatus, HeadInfo, HeadStatus, HistoryItem, MergeStatus, MovedStatus, RemoteInfo, RemoteRef,
+    StashInfo, StatusType,
 };
 
-/// Format used to get the needed information about a commit, as a JSON-parseable string.
-/// The commit message is included raw after a newline to allow parsing it without issues.
-pub(crate) const COMMIT_INFO_FORMAT: &str = "--format=format:{\"hash\": \"%H\", \"short_hash\": \"%h\", \"author_name\": \"%an\", \"author_email\": \"%ae\", \"timestamp\": %ct}%n%B";
+/// Format used to get the needed information about a commit.
+pub(crate) const COMMIT_INFO_FORMAT: &str = "--format=format:%H%n%h%n%an%n%ae%n%ct%n%B";
 /// The prefix of the line with the commit hash when printing the current status.
 pub(crate) const HEAD_INFO_COMMIT_PREFIX: &str = "# branch.oid ";
 /// The prefix of the line with the branch name when printing the current status.
@@ -33,16 +33,22 @@ pub(crate) const BRANCHES_INFO_FORMAT: &str =
 pub(crate) const BRANCH_PREFIX: &str = "refs/heads/";
 /// The string that denotes that a branch is local when printing its status.
 pub(crate) const REMOTE_BRANCH_PREFIX: &str = "refs/remotes/";
+/// Format used to get the needed information about a stash.
+pub(crate) const STASH_INFO_FORMAT: &str = "--format=format:%n%p%n%gd%n%ct%n%s";
+/// The string that denotes that a stash was created from a detached state.
+pub(crate) const STASH_INFO_DETACHED: &str = "(no branch)";
+/// The string that denotes that a stash was created using the shorthand, without a message.
+pub(crate) const STASH_INFO_QUICK: &str = "WIP";
 
 pub(crate) fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
-    if let Some((line, rest)) = lines.split_first() {
-        let mut info: CommitInfo = serde_json::from_str(line).ok()?;
-        info.timestamp *= 1000;
-        info.message = Some(rest.join("\n"));
-        Some(info)
-    } else {
-        None
-    }
+    Some(CommitInfo {
+        hash: lines.get(0)?.to_string(),
+        short_hash: lines.get(1)?.to_string(),
+        author_name: lines.get(2)?.to_string(),
+        author_email: lines.get(3)?.to_string(),
+        timestamp: u64::from_str(lines.get(4)?).ok()? * 1000,
+        message: lines.get(5..).map(|message| message.join("\n")),
+    })
 }
 
 pub(crate) fn parse_head_info(dir: &String, lines: &Vec<String>) -> Option<HeadInfo> {
@@ -237,4 +243,68 @@ pub(crate) fn parse_remote_infos(lines: &Vec<String>) -> Vec<RemoteInfo> {
             })
         })
         .collect()
+}
+
+fn parse_diff_summary(line: &String) -> Option<DiffSummary> {
+    if line.is_empty() {
+        return None;
+    }
+
+    let segments: Vec<&str> = line.split(',').collect();
+    let files_count = u64::from_str(segments.get(0)?.trim_ascii()).ok()?;
+    let insertions = u64::from_str(segments.get(1)?.trim_ascii()).ok()?;
+    let deletions = u64::from_str(segments.get(2)?.trim_ascii()).ok()?;
+
+    Some(DiffSummary {
+        files_count,
+        insertions,
+        deletions,
+    })
+}
+
+fn parse_stash_info(body_lines: Vec<&String>, diff_line: Option<&String>) -> Option<StashInfo> {
+    let hashes_line = body_lines.get(0)?;
+    let name_line = body_lines.get(1)?;
+    let timestamp_line = body_lines.get(2)?;
+    let creation_line = body_lines.get(3)?;
+
+    let name = name_line.to_string();
+    let timestamp = u64::from_str(timestamp_line).ok()? * 1000;
+    let (creation_details, message) = creation_line.split_once(':')?;
+    let mut creation_details = creation_details.split_ascii_whitespace();
+    let message = if creation_details.next()?.eq(STASH_INFO_QUICK) {
+        None
+    } else {
+        Some((&message[1..]).to_string())
+    };
+    let created_on = match creation_details.last()? {
+        STASH_INFO_DETACHED => hashes_line.split_ascii_whitespace().last()?,
+        created_on => created_on,
+    }
+    .to_string();
+
+    Some(StashInfo {
+        name,
+        message,
+        timestamp,
+        created_on,
+        changes: diff_line.and_then(parse_diff_summary),
+    })
+}
+
+pub(crate) fn parse_stash_infos(lines: &Vec<String>) -> Vec<StashInfo> {
+    let mut lines = lines.iter().peekable();
+    let mut stashes = Vec::new();
+
+    while lines.peek().is_some() {
+        let lines = lines.by_ref();
+        let body_lines = lines.take(4).collect();
+        let diff_line = lines.next();
+
+        if let Some(stash_info) = parse_stash_info(body_lines, diff_line) {
+            stashes.push(stash_info);
+        }
+    }
+
+    stashes
 }

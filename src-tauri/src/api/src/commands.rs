@@ -4,7 +4,7 @@ use tauri::{AppHandle, Emitter, Manager, State};
 use models::{
     AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
     CurrentDirInfo, GitError, GitHandler, HeadInfo, HistoryItem, RemoteInfo, RepoWatcherError,
-    SafeHandler, Settings, EVENT_ID,
+    SafeHandler, Settings, StashInfo, EVENT_ID,
 };
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
@@ -269,4 +269,12 @@ pub async fn remove_remote(
     name: &str,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| h.remove_remote(path, name))
+}
+
+#[tauri::command]
+pub async fn get_stashes(
+    state: State<'_, AppState>,
+    path: &str,
+) -> Result<Vec<StashInfo>, AppError> {
+    with_handler(&state, &|h| h.get_stashes(path))
 }

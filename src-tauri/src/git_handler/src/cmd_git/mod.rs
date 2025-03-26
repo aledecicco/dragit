@@ -7,7 +7,7 @@ use std::{
 
 use models::{
     AncestorInfo, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError,
-    GitHandler, HeadInfo, HistoryItem, RemoteInfo,
+    GitHandler, HeadInfo, HistoryItem, RemoteInfo, StashInfo,
 };
 mod utils;
 use utils::*;
@@ -362,5 +362,13 @@ impl GitHandler for CmdGit {
         }))?;
 
         Ok(())
+    }
+
+    fn get_stashes(&self, path: &str) -> Result<Vec<StashInfo>, GitError> {
+        command_output(path, ["stash", "list", STASH_INFO_FORMAT, "--shortstat"])
+            .ok()
+            .and_then(|output| self.get_output_lines(output).ok())
+            .and_then(|lines| Some(parse_stash_infos(&lines)))
+            .ok_or(GitError::GetStashesFailed {})
     }
 }

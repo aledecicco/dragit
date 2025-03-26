@@ -1,6 +1,6 @@
 use crate::{
     error::GitError, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, HeadInfo,
-    HistoryItem, RemoteInfo,
+    HistoryItem, RemoteInfo, StashInfo,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -92,4 +92,7 @@ pub trait GitHandler {
 
     /// Removes an existing remote.
     fn remove_remote(&self, path: &str, name: &str) -> Result<(), GitError>;
+
+    /// Returns the list of stashed changes.
+    fn get_stashes(&self, path: &str) -> Result<Vec<StashInfo>, GitError>;
 }

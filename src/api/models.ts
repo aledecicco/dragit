@@ -157,3 +157,17 @@ export interface RemoteInfo {
   fetchUrl: string
   pushUrl: string
 }
+
+export interface DiffSummary {
+  filesCount: number
+  insertions: number
+  deletions: number
+}
+
+export interface StashInfo {
+  name: string
+  message: string | null
+  timestamp: number
+  created_on: CommitId | BranchName
+  changes: DiffSummary | null
+}

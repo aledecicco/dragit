@@ -16,7 +16,9 @@ import type {
   CurrentDirInfo,
   HeadInfo,
   HistoryItem,
+  RemoteInfo,
   Settings,
+  StashInfo,
 } from './models'
 import { useRepositoryInfiniteQuery, useRepositoryQuery } from './utils'
 
@@ -123,6 +125,11 @@ const queryKeys = {
       ({
         ...queryKeys.directory.current(path),
         key: 'remotes',
+      }) as const,
+    stashes: (path: string) =>
+      ({
+        ...queryKeys.directory.current(path),
+        key: 'stashes',
       }) as const,
   },
 }
@@ -281,7 +288,7 @@ const useQueryBranchDivergence = (
   baseBranch: BranchName | undefined,
 ) => useRepositoryQuery(branchDivergenceQuery, branch, baseBranch)
 
-const fetchRemotes = (path: string): Promise<BranchInfo[]> =>
+const fetchRemotes = (path: string): Promise<RemoteInfo[]> =>
   invoke('get_remotes', { path: path })
 
 const remotesQuery = (path: string) =>
@@ -291,6 +298,17 @@ const remotesQuery = (path: string) =>
   })
 
 const useQueryRemotes = () => useRepositoryQuery(remotesQuery)
+
+const fetchStashes = (path: string): Promise<StashInfo[]> =>
+  invoke('get_stashes', { path: path })
+
+const stashesQuery = (path: string) =>
+  queryOptions({
+    queryKey: [queryKeys.directory.stashes(path)],
+    queryFn: () => fetchStashes(path),
+  })
+
+const useQueryStashes = () => useRepositoryQuery(stashesQuery)
 
 export {
   queryKeys,
