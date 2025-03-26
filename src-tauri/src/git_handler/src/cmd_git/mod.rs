@@ -7,10 +7,10 @@ use std::{
 
 use models::{
     AncestorInfo, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError,
-    GitHandler, HeadInfo, HistoryItem,
+    GitHandler, HeadInfo, HistoryItem, RemoteInfo,
 };
-
-use crate::utils::*;
+mod utils;
+use utils::*;
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
 pub struct CmdGit {}
@@ -81,14 +81,6 @@ impl GitHandler for CmdGit {
     fn checkout_local_branch(&self, path: &str, branch: &str) -> Result<(), GitError> {
         command_output(path, ["checkout", branch]).or(Err(GitError::CheckoutBranchFailed {
             branch: branch.to_string(),
-        }))?;
-
-        Ok(())
-    }
-
-    fn fetch_remote(&self, path: &str, remote: &str) -> Result<(), GitError> {
-        command_output(path, ["fetch", remote]).or(Err(GitError::FetchRemoteFailed {
-            remote: remote.to_string(),
         }))?;
 
         Ok(())
@@ -335,6 +327,38 @@ impl GitHandler for CmdGit {
             branch: branch.to_string(),
             remote: remote.to_string(),
             remote_branch: remote_branch.to_string(),
+        }))?;
+
+        Ok(())
+    }
+
+    fn get_remotes(&self, path: &str) -> Result<Vec<RemoteInfo>, GitError> {
+        command_output(path, ["remote", "--verbose"])
+            .ok()
+            .and_then(|output| self.get_output_lines(output).ok())
+            .and_then(|lines| Some(parse_remote_infos(&lines)))
+            .ok_or(GitError::GetRemotesFailed {})
+    }
+
+    fn fetch_remote(&self, path: &str, name: &str) -> Result<(), GitError> {
+        command_output(path, ["fetch", name]).or(Err(GitError::FetchRemoteFailed {
+            name: name.to_string(),
+        }))?;
+
+        Ok(())
+    }
+
+    fn add_remote(&self, path: &str, name: &str, url: &str) -> Result<(), GitError> {
+        command_output(path, ["remote", "add", name, url]).or(Err(GitError::AddRemoteFailed {
+            name: name.to_string(),
+        }))?;
+
+        Ok(())
+    }
+
+    fn remove_remote(&self, path: &str, name: &str) -> Result<(), GitError> {
+        command_output(path, ["remote", "remove", name]).or(Err(GitError::RemoveRemoteFailed {
+            name: name.to_string(),
         }))?;
 
         Ok(())

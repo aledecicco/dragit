@@ -38,23 +38,11 @@ const queryKeys = {
         ...queryKeys.directory.current(path),
         key: 'head_info',
       }) as const,
-    branches: {
-      all: (path: string) =>
-        ({
-          ...queryKeys.directory.current(path),
-          key: 'branches',
-        }) as const,
-      list: (path: string) =>
-        ({
-          ...queryKeys.directory.current(path),
-          key: 'branches_list',
-        }) as const,
-      branch: (path: string, branch: BranchName | undefined) =>
-        ({
-          ...queryKeys.directory.branches.all(path),
-          branch: branch,
-        }) as const,
-    },
+    branches: (path: string) =>
+      ({
+        ...queryKeys.directory.current(path),
+        key: 'branches',
+      }) as const,
     commitHistory: {
       all: (path: string) =>
         ({
@@ -63,8 +51,8 @@ const queryKeys = {
         }) as const,
       branch: (path: string, branch: BranchName | undefined) =>
         ({
-          ...queryKeys.directory.branches.branch(path, branch),
           ...queryKeys.directory.commitHistory.all(path),
+          branch: branch,
         }) as const,
     },
     commitInfo: {
@@ -87,8 +75,8 @@ const queryKeys = {
         }) as const,
       branch: (path: string, branch: BranchName | undefined) =>
         ({
-          ...queryKeys.directory.branches.branch(path, branch),
           ...queryKeys.directory.commonAncestor.all(path),
+          branch: branch,
         }) as const,
       baseBranch: (path: string, baseBranch: BranchName | undefined) =>
         ({
@@ -113,8 +101,8 @@ const queryKeys = {
         }) as const,
       branch: (path: string, branch: BranchName | undefined) =>
         ({
-          ...queryKeys.directory.branches.branch(path, branch),
           ...queryKeys.directory.branchDivergence.all(path),
+          branch: branch,
         }) as const,
       baseBranch: (path: string, baseBranch: BranchName | undefined) =>
         ({
@@ -131,6 +119,11 @@ const queryKeys = {
           ...queryKeys.directory.branchDivergence.baseBranch(path, baseBranch),
         }) as const,
     },
+    remotes: (path: string) =>
+      ({
+        ...queryKeys.directory.current(path),
+        key: 'remotes',
+      }) as const,
   },
 }
 
@@ -179,7 +172,7 @@ const fetchBranches = (path: string): Promise<BranchInfo[]> =>
 
 const branchesQuery = (path: string) =>
   queryOptions({
-    queryKey: [queryKeys.directory.branches.list(path)],
+    queryKey: [queryKeys.directory.branches(path)],
     queryFn: () => fetchBranches(path),
   })
 
@@ -288,6 +281,17 @@ const useQueryBranchDivergence = (
   baseBranch: BranchName | undefined,
 ) => useRepositoryQuery(branchDivergenceQuery, branch, baseBranch)
 
+const fetchRemotes = (path: string): Promise<BranchInfo[]> =>
+  invoke('get_remotes', { path: path })
+
+const remotesQuery = (path: string) =>
+  queryOptions({
+    queryKey: [queryKeys.directory.remotes(path)],
+    queryFn: () => fetchRemotes(path),
+  })
+
+const useQueryRemotes = () => useRepositoryQuery(remotesQuery)
+
 export {
   queryKeys,
   useQueryCurrentDir,
@@ -299,4 +303,5 @@ export {
   useQueryCommitInfo,
   useQueryCommonAncestor,
   useQueryBranchDivergence,
+  useQueryRemotes,
 }

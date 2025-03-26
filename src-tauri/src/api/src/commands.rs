@@ -3,8 +3,8 @@ use tauri::{AppHandle, Emitter, Manager, State};
 
 use models::{
     AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    CurrentDirInfo, GitError, GitHandler, HeadInfo, HistoryItem, RepoWatcherError, SafeHandler,
-    Settings, EVENT_ID,
+    CurrentDirInfo, GitError, GitHandler, HeadInfo, HistoryItem, RemoteInfo, RepoWatcherError,
+    SafeHandler, Settings, EVENT_ID,
 };
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
@@ -115,16 +115,6 @@ pub async fn checkout_local_branch(
     branch: &str,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| h.checkout_local_branch(path, branch))
-}
-
-/// Updates the references of the given remote.
-#[tauri::command]
-pub async fn fetch_remote(
-    state: State<'_, AppState>,
-    path: &str,
-    remote: &str,
-) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.fetch_remote(path, remote))
 }
 
 #[tauri::command]
@@ -242,4 +232,41 @@ pub async fn pull_branch(
     with_handler(&state, &|h| {
         h.pull_branch(path, branch, remote, remote_branch, is_rebase)
     })
+}
+
+#[tauri::command]
+pub async fn get_remotes(
+    state: State<'_, AppState>,
+    path: &str,
+) -> Result<Vec<RemoteInfo>, AppError> {
+    with_handler(&state, &|h| h.get_remotes(path))
+}
+
+/// Updates the references of the given remote.
+#[tauri::command]
+pub async fn fetch_remote(
+    state: State<'_, AppState>,
+    path: &str,
+    remote: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.fetch_remote(path, remote))
+}
+
+#[tauri::command]
+pub async fn add_remote(
+    state: State<'_, AppState>,
+    path: &str,
+    name: &str,
+    url: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.add_remote(path, name, url))
+}
+
+#[tauri::command]
+pub async fn remove_remote(
+    state: State<'_, AppState>,
+    path: &str,
+    name: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.remove_remote(path, name))
 }

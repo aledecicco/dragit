@@ -186,3 +186,11 @@ pub struct BranchDivergence {
     pub ahead: u64,
     pub behind: u64,
 }
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "snake_case"))]
+pub struct RemoteInfo {
+    pub name: String,
+    pub fetch_url: String,
+    pub push_url: String,
+}

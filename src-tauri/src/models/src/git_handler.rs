@@ -1,6 +1,6 @@
 use crate::{
     error::GitError, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, HeadInfo,
-    HistoryItem,
+    HistoryItem, RemoteInfo,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -11,14 +11,11 @@ pub trait GitHandler {
     /// Returns whether the current open folder is a git repository.
     fn is_repository(&self, path: &str) -> bool;
 
-    /// Returns a list of the current known local and remote branches.
+    /// Returns the list of the current known local and remote branches.
     fn get_branches(&self, path: &str) -> Result<Vec<BranchInfo>, GitError>;
 
     /// Switches the current repository to a local branch.
     fn checkout_local_branch(&self, path: &str, branch: &str) -> Result<(), GitError>;
-
-    /// Fetches the given remote, updating the remote references.
-    fn fetch_remote(&self, path: &str, remote: &str) -> Result<(), GitError>;
 
     /// Returns the list of commit hashes leading up to a reference.
     fn get_commit_history(
@@ -83,4 +80,16 @@ pub trait GitHandler {
         remote_branch: &str,
         is_rebase: bool,
     ) -> Result<(), GitError>;
+
+    /// Returns the list of available remotes.
+    fn get_remotes(&self, path: &str) -> Result<Vec<RemoteInfo>, GitError>;
+
+    /// Fetches the given remote, updating the remote references.
+    fn fetch_remote(&self, path: &str, remote: &str) -> Result<(), GitError>;
+
+    /// Adds a new remote.
+    fn add_remote(&self, path: &str, name: &str, url: &str) -> Result<(), GitError>;
+
+    /// Removes an existing remote.
+    fn remove_remote(&self, path: &str, name: &str) -> Result<(), GitError>;
 }

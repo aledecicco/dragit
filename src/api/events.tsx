@@ -29,7 +29,7 @@ const EventHandler = (props: PropsWithChildren) => {
         })
         .with({ type: 'branchesListUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.branches.list(path)],
+            queryKey: [queryKeys.directory.branches(path)],
           })
         })
         .with(
@@ -87,7 +87,11 @@ const EventHandler = (props: PropsWithChildren) => {
         })
         .with({ type: 'configUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.branches.list(path)],
+            queryKey: [queryKeys.directory.branches(path)],
+          })
+
+          client.invalidateQueries({
+            queryKey: [queryKeys.directory.remotes(path)],
           })
         })
         .with({ type: 'indexUpdated', path: P.string }, ({ path }) => {

@@ -46,6 +46,14 @@ const mutationKeys = {
       ...mutationKeys.repository.current(path),
       key: 'pull_branch',
     }),
+    addRemote: (path: string) => ({
+      ...mutationKeys.repository.current(path),
+      key: 'add_remote',
+    }),
+    removeRemote: (path: string) => ({
+      ...mutationKeys.repository.current(path),
+      key: 'remove_remote',
+    }),
   },
 }
 
@@ -99,16 +107,6 @@ const checkoutLocalMutation = (path: string) =>
   })
 
 const useCheckoutLocal = () => useRepositoryMutation(checkoutLocalMutation)
-
-const fetchRemoteMutation = (path: string) =>
-  mutationOptions({
-    mutationKey: [mutationKeys.repository.fetchRemote(path)],
-    mutationFn: (args: { remote: RemoteName }) => {
-      return invoke('fetch_remote', { path: path, ...args })
-    },
-  })
-
-const useFetchRemote = () => useRepositoryMutation(fetchRemoteMutation)
 
 const addToIndexMutation = (path: string) =>
   mutationOptions({
@@ -181,6 +179,41 @@ const pullBranchMutation = (path: string) =>
 
 const usePullBranch = () => useRepositoryMutation(pullBranchMutation)
 
+const fetchRemoteMutation = (path: string) =>
+  mutationOptions({
+    mutationKey: [mutationKeys.repository.fetchRemote(path)],
+    mutationFn: (args: { remote: RemoteName }) => {
+      return invoke('fetch_remote', { path: path, ...args })
+    },
+  })
+
+const useFetchRemote = () => useRepositoryMutation(fetchRemoteMutation)
+
+const addRemoteMutation = (path: string) =>
+  mutationOptions({
+    mutationKey: [mutationKeys.repository.addRemote(path)],
+    mutationFn: (args: {
+      name: RemoteName
+      url: string
+    }) => {
+      return invoke('add_remote', { path: path, ...args })
+    },
+  })
+
+const useAddRemote = () => useRepositoryMutation(addRemoteMutation)
+
+const removeRemoteMutation = (path: string) =>
+  mutationOptions({
+    mutationKey: [mutationKeys.repository.removeRemote(path)],
+    mutationFn: (args: {
+      name: RemoteName
+    }) => {
+      return invoke('remove_remote', { path: path, ...args })
+    },
+  })
+
+const useRemoveRemote = () => useRepositoryMutation(removeRemoteMutation)
+
 export {
   mutationKeys,
   useOpenFolder,
@@ -188,11 +221,13 @@ export {
   useSetSettings,
   useInitRepository,
   useCheckoutLocal,
-  useFetchRemote,
   useAddToIndex,
   useRemoveFromIndex,
   useRemoveFromTree,
   useCommitIndex,
   usePushBranch,
   usePullBranch,
+  useFetchRemote,
+  useAddRemote,
+  useRemoveRemote,
 }

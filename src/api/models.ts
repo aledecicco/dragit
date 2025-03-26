@@ -151,3 +151,9 @@ export type MergeStatus =
   | 'deletedByUs'
   | 'addedByThem'
   | 'deletedByThem'
+
+export interface RemoteInfo {
+  name: RemoteName
+  fetchUrl: string
+  pushUrl: string
+}

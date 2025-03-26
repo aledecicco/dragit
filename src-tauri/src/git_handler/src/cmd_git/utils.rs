@@ -2,7 +2,7 @@ use std::{fs, path::Path, str::FromStr};
 
 use models::{
     BranchDivergence, BranchInfo, BranchType, ChangeStatus, CommitInfo, FileInfo, FileStatus,
-    HeadInfo, HeadStatus, HistoryItem, MergeStatus, MovedStatus, RemoteRef, StatusType,
+    HeadInfo, HeadStatus, HistoryItem, MergeStatus, MovedStatus, RemoteInfo, RemoteRef, StatusType,
 };
 
 /// Format used to get the needed information about a commit, as a JSON-parseable string.
@@ -221,4 +221,20 @@ fn strip_branch_prefix(full_name: &String, prefix: &str) -> String {
         Some(short_name) => short_name.to_string(),
         None => full_name.to_string(),
     }
+}
+
+pub(crate) fn parse_remote_infos(lines: &Vec<String>) -> Vec<RemoteInfo> {
+    lines
+        .chunks_exact(2)
+        .filter_map(|pair| {
+            let fetch_line: Vec<&str> = pair.iter().nth(0)?.split_ascii_whitespace().collect();
+            let push_line: Vec<&str> = pair.iter().nth(1)?.split_ascii_whitespace().collect();
+
+            Some(RemoteInfo {
+                name: fetch_line.get(0)?.to_string(),
+                fetch_url: fetch_line.get(1)?.to_string(),
+                push_url: push_line.get(1)?.to_string(),
+            })
+        })
+        .collect()
 }

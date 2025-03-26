@@ -19,9 +19,6 @@ pub enum GitError {
     #[error("Failed to checkout branch \"{branch}\"")]
     CheckoutBranchFailed { branch: String },
 
-    #[error("Failed to fetch from remote \"{remote}\"")]
-    FetchRemoteFailed { remote: String },
-
     #[error("Failed to get commit history of \"{reference}\"")]
     GetReferenceHistoryFailed { reference: String },
 
@@ -62,6 +59,18 @@ pub enum GitError {
         remote: String,
         remote_branch: String,
     },
+
+    #[error("Failed to retrieve remotes")]
+    GetRemotesFailed {},
+
+    #[error("Failed to fetch from remote \"{name}\"")]
+    FetchRemoteFailed { name: String },
+
+    #[error("Failed to add remote \"{name}\"")]
+    AddRemoteFailed { name: String },
+
+    #[error("Failed to remove remote \"{name}\"")]
+    RemoveRemoteFailed { name: String },
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug, Clone)]

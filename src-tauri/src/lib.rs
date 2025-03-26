@@ -51,7 +51,6 @@ pub fn run() {
             api::get_branches,
             api::get_head_info,
             api::checkout_local_branch,
-            api::fetch_remote,
             api::get_commit_history,
             api::get_commit_info,
             api::add_to_index,
@@ -62,6 +61,10 @@ pub fn run() {
             api::get_branch_divergence,
             api::push_branch,
             api::pull_branch,
+            api::get_remotes,
+            api::fetch_remote,
+            api::add_remote,
+            api::remove_remote,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");
