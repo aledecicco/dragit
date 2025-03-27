@@ -3,7 +3,7 @@ use tauri::{AppHandle, Emitter, Manager, State};
 
 use models::{
     AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    CurrentDirInfo, GitError, GitHandler, HeadInfo, HistoryItem, RemoteInfo, RepoWatcherError,
+    CurrentDirInfo, GitError, GitHandler, HeadInfo, HistoryPage, RemoteInfo, RepoWatcherError,
     SafeHandler, Settings, StashInfo, EVENT_ID,
 };
 use settings::{
@@ -118,15 +118,15 @@ pub async fn checkout_local_branch(
 }
 
 #[tauri::command]
-pub async fn get_commit_history(
+pub async fn get_commit_history_page(
     state: State<'_, AppState>,
     path: &str,
     branch: &str,
     start_after: u8,
     limit: u8,
-) -> Result<Vec<HistoryItem>, AppError> {
+) -> Result<HistoryPage, AppError> {
     with_handler(&state, &|h| {
-        h.get_commit_history(path, branch, start_after, limit)
+        h.get_commit_history_page(path, branch, start_after, limit)
     })
 }
 

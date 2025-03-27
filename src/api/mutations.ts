@@ -62,6 +62,7 @@ const openFolderMutation = mutationOptions({
   mutationFn: (args: { newPath: string }) => {
     return invoke('open_folder', args)
   },
+  networkMode: 'always',
 })
 
 const useOpenFolder = () => useMutation(openFolderMutation)
@@ -73,6 +74,7 @@ const removeRecentFolderMutation = mutationOptions({
   }) => {
     return invoke('remove_recent', args)
   },
+  networkMode: 'always',
 })
 
 const useRemoveRecentFolder = () => useMutation(removeRecentFolderMutation)
@@ -84,6 +86,7 @@ const setSettingsMutation = mutationOptions({
   }) => {
     return invoke('set_settings', args)
   },
+  networkMode: 'always',
 })
 
 const useSetSettings = () => useMutation(setSettingsMutation)
@@ -94,6 +97,7 @@ const initRepositoryMutation = (path: string) =>
     mutationFn: () => {
       return invoke('init_repository', { path: path })
     },
+    networkMode: 'always',
   })
 
 const useInitRepository = () => useRepositoryMutation(initRepositoryMutation)
@@ -104,6 +108,7 @@ const checkoutLocalMutation = (path: string) =>
     mutationFn: (args: { branch: BranchName }) => {
       return invoke('checkout_local_branch', { path: path, ...args })
     },
+    networkMode: 'always',
   })
 
 const useCheckoutLocal = () => useRepositoryMutation(checkoutLocalMutation)
@@ -114,6 +119,7 @@ const addToIndexMutation = (path: string) =>
     mutationFn: (args: { files: string[] }) => {
       return invoke('add_to_index', { path: path, ...args })
     },
+    networkMode: 'always',
   })
 
 const useAddToIndex = () => useRepositoryMutation(addToIndexMutation)
@@ -124,6 +130,7 @@ const removeFromIndexMutation = (path: string) =>
     mutationFn: (args: { files: string[] }) => {
       return invoke('remove_from_index', { path: path, ...args })
     },
+    networkMode: 'always',
   })
 
 const useRemoveFromIndex = () => useRepositoryMutation(removeFromIndexMutation)
@@ -134,6 +141,7 @@ const removeFromTreeMutation = (path: string) =>
     mutationFn: (args: { files: string[] }) => {
       return invoke('remove_from_tree', { path: path, ...args })
     },
+    networkMode: 'always',
   })
 
 const useRemoveFromTree = () => useRepositoryMutation(removeFromTreeMutation)
@@ -144,6 +152,7 @@ const commitIndexMutation = (path: string) =>
     mutationFn: (args: { message: string; isAmend: boolean }) => {
       return invoke('commit_index', { path: path, ...args })
     },
+    networkMode: 'always',
   })
 
 const useCommitIndex = () => useRepositoryMutation(commitIndexMutation)
@@ -160,6 +169,7 @@ const pushBranchMutation = (path: string) =>
     }) => {
       return invoke('push_branch', { path: path, ...args })
     },
+    networkMode: 'online',
   })
 
 const usePushBranch = () => useRepositoryMutation(pushBranchMutation)
@@ -175,6 +185,7 @@ const pullBranchMutation = (path: string) =>
     }) => {
       return invoke('pull_branch', { path: path, ...args })
     },
+    networkMode: 'online',
   })
 
 const usePullBranch = () => useRepositoryMutation(pullBranchMutation)
@@ -185,6 +196,7 @@ const fetchRemoteMutation = (path: string) =>
     mutationFn: (args: { remote: RemoteName }) => {
       return invoke('fetch_remote', { path: path, ...args })
     },
+    networkMode: 'online',
   })
 
 const useFetchRemote = () => useRepositoryMutation(fetchRemoteMutation)
@@ -198,6 +210,7 @@ const addRemoteMutation = (path: string) =>
     }) => {
       return invoke('add_remote', { path: path, ...args })
     },
+    networkMode: 'always',
   })
 
 const useAddRemote = () => useRepositoryMutation(addRemoteMutation)
@@ -210,6 +223,7 @@ const removeRemoteMutation = (path: string) =>
     }) => {
       return invoke('remove_remote', { path: path, ...args })
     },
+    networkMode: 'always',
   })
 
 const useRemoveRemote = () => useRepositoryMutation(removeRemoteMutation)

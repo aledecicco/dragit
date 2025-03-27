@@ -24,24 +24,26 @@ export function mutationOptions<
 }
 
 const getPaginatedItem = <T>(
-  data: InfiniteData<T[]> | undefined,
+  data: InfiniteData<{ items: T[] }> | undefined,
   index: number,
 ): T | undefined => {
   const pageIndex = Math.floor(index / PAGE_SIZE)
   const itemIndex = index % PAGE_SIZE
 
-  return data?.pages?.at(pageIndex)?.at(itemIndex)
+  return data?.pages?.at(pageIndex)?.items.at(itemIndex)
 }
 
 const getNextPaginatedItem = <T>(
-  data: InfiniteData<T[]> | undefined,
+  data: InfiniteData<{ items: T[] }> | undefined,
   index: number,
 ): T | undefined => {
   return getPaginatedItem(data, index + 1)
 }
 
-const getPaginatedLength = <T>(data: InfiniteData<T[]> | undefined): number => {
-  return data?.pages?.reduce((sum, page) => sum + page.length, 0) ?? 0
+const getPaginatedLength = <T>(
+  data: InfiniteData<{ items: T[] }> | undefined,
+): number => {
+  return data?.pages?.reduce((sum, page) => sum + page.items.length, 0) ?? 0
 }
 
 const useHasCurrentPath = () => {

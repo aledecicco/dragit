@@ -51,7 +51,7 @@ pub fn run() {
             api::get_branches,
             api::get_head_info,
             api::checkout_local_branch,
-            api::get_commit_history,
+            api::get_commit_history_page,
             api::get_commit_info,
             api::add_to_index,
             api::remove_from_index,

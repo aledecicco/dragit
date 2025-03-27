@@ -1,6 +1,6 @@
 use crate::{
     error::GitError, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, HeadInfo,
-    HistoryItem, RemoteInfo, StashInfo,
+    HistoryPage, RemoteInfo, StashInfo,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -17,14 +17,14 @@ pub trait GitHandler {
     /// Switches the current repository to a local branch.
     fn checkout_local_branch(&self, path: &str, branch: &str) -> Result<(), GitError>;
 
-    /// Returns the list of commit hashes leading up to a reference.
-    fn get_commit_history(
+    /// Returns (a page of) the list of commit hashes leading up to a reference.
+    fn get_commit_history_page(
         &self,
         path: &str,
         reference: &str,
         start_after: u8,
         limit: u8,
-    ) -> Result<Vec<HistoryItem>, GitError>;
+    ) -> Result<HistoryPage, GitError>;
 
     /// Returns information about the given commit.
     fn get_commit_info(&self, path: &str, reference: &str) -> Result<CommitInfo, GitError>;

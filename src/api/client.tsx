@@ -6,7 +6,9 @@ const client = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: Number.POSITIVE_INFINITY,
+      gcTime: 3000,
       retry: false,
+      networkMode: 'always',
     },
   },
 })

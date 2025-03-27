@@ -5,7 +5,7 @@ import type {
 import type { VirtualItem } from '@tanstack/react-virtual'
 import { useEffect, useMemo } from 'react'
 
-import type { BranchDivergence, BranchInfo, HistoryItem } from '@api/models'
+import type { BranchDivergence, BranchInfo, HistoryPage } from '@api/models'
 import {
   useQueryBranchDivergence,
   useQueryBranches,
@@ -16,7 +16,7 @@ import { getPaginatedLength } from '@api/utils'
 import { useSelectedBranches } from '@context/branches'
 import { getCurrentBranchInfo, getRemoteCounterpart } from '@utils/repository'
 
-type HistoryQuery = UseInfiniteQueryResult<InfiniteData<HistoryItem[]>>
+type HistoryQuery = UseInfiniteQueryResult<InfiniteData<HistoryPage>>
 
 const ancestorNotInRange = (
   ancestorDistance: number,
@@ -51,7 +51,13 @@ const useInfiniteScroll = (
     ) {
       historyQuery.fetchNextPage()
     }
-  }, [items, historyQuery])
+  }, [
+    items,
+    historyQuery.hasNextPage,
+    historyQuery.isFetchingNextPage,
+    historyQuery.fetchNextPage,
+    historyQuery.data,
+  ])
 }
 
 const useCurrentBranch = (): BranchInfo | undefined => {

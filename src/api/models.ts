@@ -43,6 +43,11 @@ export interface HistoryItem {
   otherParents: CommitId[]
 }
 
+export interface HistoryPage {
+  items: HistoryItem[]
+  hasNext: boolean
+}
+
 export interface HeadInfo {
   status: HeadStatus
   files: FileInfo[]

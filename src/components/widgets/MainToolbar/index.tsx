@@ -39,6 +39,7 @@ const MainToolbar = (props: MainToolbarProps) => {
                 remote: branch.remote?.remoteName ?? 'origin',
                 remoteBranch: branch.remote?.branchName ?? branch.name,
                 isForce: false,
+                setUpstream: !branch.remote,
               })
             }
           },

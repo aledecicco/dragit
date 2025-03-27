@@ -7,7 +7,7 @@ use std::{
 
 use models::{
     AncestorInfo, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError,
-    GitHandler, HeadInfo, HistoryItem, RemoteInfo, StashInfo,
+    GitHandler, HeadInfo, HistoryItem, HistoryPage, RemoteInfo, StashInfo,
 };
 mod utils;
 use utils::*;
@@ -86,15 +86,15 @@ impl GitHandler for CmdGit {
         Ok(())
     }
 
-    fn get_commit_history(
+    fn get_commit_history_page(
         &self,
         path: &str,
         branch: &str,
         start_after: u8,
         limit: u8,
-    ) -> Result<Vec<HistoryItem>, GitError> {
+    ) -> Result<HistoryPage, GitError> {
         let page_arg = start_after.to_string();
-        let page_size_arg = limit.to_string();
+        let page_size_arg = (limit + 1).to_string();
         let branch_arg = branch.to_string() + "~" + &page_arg;
 
         let lines = command_output(
@@ -114,15 +114,18 @@ impl GitHandler for CmdGit {
             reference: branch.to_string(),
         })?;
 
-        lines
+        let items: Option<Vec<HistoryItem>> = lines
             .iter()
+            .take(limit.into())
             .map(parse_history_item)
-            .map(|item| {
-                item.ok_or(GitError::GetReferenceHistoryFailed {
-                    reference: branch.to_string(),
-                })
-            })
-            .collect()
+            .collect();
+        let items = items.ok_or(GitError::GetReferenceHistoryFailed {
+            reference: branch.to_string(),
+        })?;
+
+        let has_next = lines.len() > limit.into();
+
+        Ok(HistoryPage { items, has_next })
     }
 
     fn get_commit_info(&self, path: &str, reference: &str) -> Result<CommitInfo, GitError> {

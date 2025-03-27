@@ -151,7 +151,15 @@ pub struct CommonAncestorInfo {
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct HistoryItem {
     pub hash: String,
+    // TODO: could not be needed
     pub other_parents: Vec<String>,
+}
+
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
+pub struct HistoryPage {
+    pub items: Vec<HistoryItem>,
+    pub has_next: bool,
 }
 
 #[derive(serde::Serialize, Debug, Clone)]

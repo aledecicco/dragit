@@ -16,6 +16,7 @@ import type {
   CurrentDirInfo,
   HeadInfo,
   HistoryItem,
+  HistoryPage,
   RemoteInfo,
   Settings,
   StashInfo,
@@ -189,8 +190,8 @@ const fetchCommitHistory = (
   path: string,
   branch: BranchName,
   page: number,
-): Promise<HistoryItem[]> =>
-  invoke('get_commit_history', {
+): Promise<HistoryPage> =>
+  invoke('get_commit_history_page', {
     path: path,
     branch: branch,
     startAfter: page * PAGE_SIZE,
@@ -204,8 +205,9 @@ const commitHistoryQuery = (path: string, branch: BranchName | undefined) =>
       ? ({ pageParam }) => fetchCommitHistory(path, branch, pageParam)
       : skipToken,
     initialPageParam: 0,
-    getNextPageParam: (lastPage, _, lastPageParam) =>
-      lastPage.length === PAGE_SIZE ? lastPageParam + 1 : undefined,
+    getNextPageParam: (lastPage, _, lastPageParam) => {
+      return lastPage.hasNext ? lastPageParam + 1 : undefined
+    },
   })
 
 const useQueryCommitHistory = (branch: BranchName | undefined) =>
@@ -322,4 +324,5 @@ export {
   useQueryCommonAncestor,
   useQueryBranchDivergence,
   useQueryRemotes,
+  useQueryStashes,
 }
