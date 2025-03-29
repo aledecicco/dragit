@@ -22,16 +22,18 @@ const FileStatusList = <T extends FileInfo>(props: FileStatusListProps<T>) => {
   }, [files])
 
   return files.items.length ? (
-    <Ariakit.CompositeRow>
-      <VirtualizedDiv
-        size="sm"
-        items={files.items}
-        RenderItem={RenderItem}
-        itemSize={itemSize}
-        className={cn('w-full h-full')}
-        options={options}
-      />
-    </Ariakit.CompositeRow>
+    <Ariakit.CompositeRow
+      render={
+        <VirtualizedDiv
+          size="sm"
+          items={files.items}
+          RenderItem={RenderItem}
+          itemSize={itemSize}
+          className={cn('w-full h-full')}
+          options={options}
+        />
+      }
+    />
   ) : (
     <p className={cn('text-sm text-light-950/50 italic p-3')}>
       No {status} files

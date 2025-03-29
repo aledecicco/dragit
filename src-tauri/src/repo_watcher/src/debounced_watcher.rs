@@ -82,6 +82,10 @@ impl DebouncedWatcher {
                             index_updated = true;
                         }
 
+                        if event.paths.contains(&index_file) {
+                            index_updated = true;
+                        }
+
                         event.paths.iter().for_each(|path| {
                             if path.starts_with(&branches_folder) && path.is_file() {
                                 if let Ok(Some(branch_name)) = path
@@ -131,10 +135,6 @@ impl DebouncedWatcher {
                                         || path.starts_with(&remotes_folder)
                                 }) {
                                     branches_list_updated = true;
-                                }
-
-                                if event.paths.contains(&index_file) {
-                                    index_updated = true;
                                 }
                             }
                             notify::EventKind::Remove(RemoveKind::Folder) => {
