@@ -40,7 +40,10 @@ const BranchesList = (props: BranchesListProps) => {
 
   return (
     <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>
-      <AccordionSection label={`All branches (${branchesQuery.data.length})`}>
+      <AccordionSection
+        defaultOpen
+        label={`All branches (${branchesQuery.data.length})`}
+      >
         {branchesQuery.data.length ? (
           <Ariakit.CompositeProvider focusLoop>
             <Ariakit.Composite

@@ -1,6 +1,7 @@
 import { useQueryCurrentDir } from '@api/queries'
 import { useBranchesSync } from '@context/branches'
 import { useDialog } from '@context/dialogs'
+import { usePagesSync } from '@context/files'
 import { Graph } from '@main/Graph'
 import { cn } from '@utils/styles'
 import { BranchesList } from '@widgets/BranchesList'
@@ -34,6 +35,7 @@ const App = () => {
 
 const AppInner = () => {
   useBranchesSync()
+  usePagesSync()
 
   return (
     <>

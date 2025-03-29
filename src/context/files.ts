@@ -15,6 +15,8 @@ interface FilesPages {
   untracked: number
 }
 
+type FileType = keyof FilesPages
+
 const filesPages = new Store({
   staged: 0,
   unstaged: 0,
@@ -24,16 +26,16 @@ const filesPages = new Store({
 
 const useFilesPages = () => useStore(filesPages)
 
-const useFilesPage = (type: keyof FilesPages) => useFilesPages()[type]
+const useFilesPage = (type: FileType) => useFilesPages()[type]
 
-const setNextPage = (type: keyof FilesPages) => {
+const setNextPage = (type: FileType) => {
   filesPages.setState((state) => ({
     ...state,
     [type]: state[type] + 1,
   }))
 }
 
-const setPrevPage = (type: keyof FilesPages) => {
+const setPrevPage = (type: FileType) => {
   filesPages.setState((state) => ({
     ...state,
     [type]: Math.max(state[type] - 1, 0),
@@ -89,4 +91,4 @@ const usePagesSync = () => {
   ])
 }
 
-export { useFilesPage, setNextPage, setPrevPage, usePagesSync }
+export { useFilesPage, setNextPage, setPrevPage, usePagesSync, type FileType }

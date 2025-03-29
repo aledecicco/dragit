@@ -54,26 +54,50 @@ const queryKeys = {
           ...queryKeys.directory.current(path),
           key: 'files',
         }) as const,
-      staged: (path: string) =>
-        ({
+      staged: (path: string) => ({
+        all: {
           ...queryKeys.directory.files.all(path),
           status: 'staged',
-        }) as const,
-      unstaged: (path: string) =>
-        ({
+        } as const,
+        page: (page: number) =>
+          ({
+            ...queryKeys.directory.files.staged(path).all,
+            page: page,
+          }) as const,
+      }),
+      unstaged: (path: string) => ({
+        all: {
           ...queryKeys.directory.files.all(path),
           status: 'unstaged',
-        }) as const,
-      unmerged: (path: string) =>
-        ({
+        } as const,
+        page: (page: number) =>
+          ({
+            ...queryKeys.directory.files.unstaged(path).all,
+            page: page,
+          }) as const,
+      }),
+      unmerged: (path: string) => ({
+        all: {
           ...queryKeys.directory.files.all(path),
           status: 'unmerged',
-        }) as const,
-      untracked: (path: string) =>
-        ({
+        } as const,
+        page: (page: number) =>
+          ({
+            ...queryKeys.directory.files.unmerged(path).all,
+            page: page,
+          }) as const,
+      }),
+      untracked: (path: string) => ({
+        all: {
           ...queryKeys.directory.files.all(path),
           status: 'untracked',
-        }) as const,
+        } as const,
+        page: (page: number) =>
+          ({
+            ...queryKeys.directory.files.untracked(path).all,
+            page: page,
+          }) as const,
+      }),
     },
     branches: (path: string) =>
       ({
@@ -221,7 +245,7 @@ const fetchStagedFiles = (
 
 const stagedFilesQuery = (path: string, page: number) =>
   queryOptions({
-    queryKey: [queryKeys.directory.files.staged(path)],
+    queryKey: [queryKeys.directory.files.staged(path).page(page)],
     queryFn: () => fetchStagedFiles(path, page),
   })
 
@@ -240,7 +264,7 @@ const fetchUnstagedFiles = (
 
 const unstagedFilesQuery = (path: string, page: number) =>
   queryOptions({
-    queryKey: [queryKeys.directory.files.unstaged(path)],
+    queryKey: [queryKeys.directory.files.unstaged(path).page(page)],
     queryFn: () => fetchUnstagedFiles(path, page),
   })
 
@@ -259,7 +283,7 @@ const fetchUnmergedFiles = (
 
 const unmergedFilesQuery = (path: string, page: number) =>
   queryOptions({
-    queryKey: [queryKeys.directory.files.unmerged(path)],
+    queryKey: [queryKeys.directory.files.unmerged(path).page(page)],
     queryFn: () => fetchUnmergedFiles(path, page),
   })
 
@@ -278,7 +302,7 @@ const fetchUntrackedFiles = (
 
 const untrackedFilesQuery = (path: string, page: number) =>
   queryOptions({
-    queryKey: [queryKeys.directory.files.untracked(path)],
+    queryKey: [queryKeys.directory.files.untracked(path).page(page)],
     queryFn: () => fetchUntrackedFiles(path, page),
   })
 

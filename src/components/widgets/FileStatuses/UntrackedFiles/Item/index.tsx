@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react'
 import type { UntrackedFileInfo } from '@api/models'
 import { useAddToIndex } from '@api/mutations'
 import { propsWithCn } from '@utils/styles'
-import { FileStatusItem } from '../../Item'
+import { FileStatusItem } from '../../List/Item'
 
 interface UntrackedFileStatusItemProps extends ComponentProps<'div'> {
   item: UntrackedFileInfo

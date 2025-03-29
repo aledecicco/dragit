@@ -5,7 +5,7 @@ import { P, match } from 'ts-pattern'
 import type { UnmergedFileInfo } from '@api/models'
 import { useAddToIndex, useRemoveFromTree } from '@api/mutations'
 import { cn, propsWithCn } from '@utils/styles'
-import { FileStatusItem } from '../../Item'
+import { FileStatusItem } from '../../List/Item'
 
 interface UnmergedFileStatusItemProps extends ComponentProps<'div'> {
   item: UnmergedFileInfo

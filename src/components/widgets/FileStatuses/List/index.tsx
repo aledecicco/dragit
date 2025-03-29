@@ -2,12 +2,13 @@ import * as Ariakit from '@ariakit/react'
 import { type ComponentType, useMemo } from 'react'
 
 import type { FileInfo, Page } from '@api/models'
+import type { FileType } from '@context/files'
 import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { cn } from '@utils/styles'
 
 interface FileStatusListProps<T extends FileInfo> {
-  files: Page<T>
-  status: string
+  files: Page<T> | undefined
+  status: FileType
   RenderItem: ComponentType<{ item: T }>
   itemSize: number
 }
@@ -16,12 +17,14 @@ const FileStatusList = <T extends FileInfo>(props: FileStatusListProps<T>) => {
   const { files, status, RenderItem, itemSize } = props
 
   const options = useMemo(() => {
-    return {
-      getItemKey: (index: number) => files.items[index].path,
-    }
+    return files
+      ? {
+          getItemKey: (index: number) => files.items[index].path,
+        }
+      : undefined
   }, [files])
 
-  return files.items.length ? (
+  return files?.items.length ? (
     <Ariakit.CompositeRow
       render={
         <VirtualizedDiv
