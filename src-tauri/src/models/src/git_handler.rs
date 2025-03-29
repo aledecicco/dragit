@@ -1,6 +1,7 @@
 use crate::{
     error::GitError, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, HeadInfo,
-    HistoryPage, RemoteInfo, StashInfo,
+    HistoryItem, Page, RemoteInfo, StagedFileInfo, StashInfo, UnmergedFileInfo, UnstagedFileInfo,
+    UntrackedFileInfo,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -24,13 +25,45 @@ pub trait GitHandler {
         reference: &str,
         start_after: u8,
         limit: u8,
-    ) -> Result<HistoryPage, GitError>;
+    ) -> Result<Page<HistoryItem>, GitError>;
 
     /// Returns information about the given commit.
     fn get_commit_info(&self, path: &str, reference: &str) -> Result<CommitInfo, GitError>;
 
     /// Returns information about the current state of the HEAD.
     fn get_head_info(&self, path: &str) -> Result<HeadInfo, GitError>;
+
+    /// Returns (a page of) the list of files with staged changes.
+    fn get_staged_files_page(
+        &self,
+        path: &str,
+        start_after: u8,
+        limit: u8,
+    ) -> Result<Page<StagedFileInfo>, GitError>;
+
+    /// Returns (a page of) the list of files with unstaged changes.
+    fn get_unstaged_files_page(
+        &self,
+        path: &str,
+        start_after: u8,
+        limit: u8,
+    ) -> Result<Page<UnstagedFileInfo>, GitError>;
+
+    /// Returns (a page of) the list of files with unmerged changes.
+    fn get_unmerged_files_page(
+        &self,
+        path: &str,
+        start_after: u8,
+        limit: u8,
+    ) -> Result<Page<UnmergedFileInfo>, GitError>;
+
+    /// Returns (a page of) the list of untracked files.
+    fn get_untracked_files_page(
+        &self,
+        path: &str,
+        start_after: u8,
+        limit: u8,
+    ) -> Result<Page<UntrackedFileInfo>, GitError>;
 
     /// Adds the given list of files to the current index.
     fn add_to_index(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError>;

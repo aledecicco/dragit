@@ -1,13 +1,14 @@
 use std::{
     collections::HashMap,
-    io::{self, ErrorKind},
-    process::{Command, Output},
-    string::FromUtf8Error,
+    error::Error,
+    io::{BufRead, BufReader, Lines},
+    process::{ChildStdout, Command, ExitStatus, Stdio},
 };
 
 use models::{
     AncestorInfo, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError,
-    GitHandler, HeadInfo, HistoryItem, HistoryPage, RemoteInfo, StashInfo,
+    GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo, StagedFileInfo, StashInfo,
+    UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo,
 };
 mod utils;
 use utils::*;
@@ -15,73 +16,98 @@ use utils::*;
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
 pub struct CmdGit {}
 
-fn command_output<'a, I>(path: &str, args: I) -> Result<Output, io::Error>
-where
-    I: IntoIterator<Item = &'a str>,
-{
-    let mut cmd = Command::new("git");
-    let output = cmd.current_dir(path).args(args).output();
-
-    output.and_then(|output| {
-        if output.status.code() == Some(0) {
-            Ok(output)
-        } else {
-            println!("{:?}", String::from_utf8(output.stderr));
-            Err(io::Error::from(ErrorKind::Other))
-        }
-    })
-}
-
 impl CmdGit {
     /// Initialize this implementation without a path.
     pub fn new() -> Self {
         CmdGit {}
     }
 
-    /// Returns all the contents of a command's output.
-    fn get_output_string(&self, output: Output) -> Result<String, FromUtf8Error> {
-        String::from_utf8(output.stdout).map(|res| res.trim().to_string())
+    fn create_command<'a, I>(&self, path: &str, args: I) -> Command
+    where
+        I: IntoIterator<Item = &'a str>,
+    {
+        let mut cmd = Command::new("git");
+        cmd.current_dir(path).args(args);
+
+        cmd
     }
 
-    /// Returns the list of lines in a command's output.
-    fn get_output_lines(&self, output: Output) -> Result<Vec<String>, FromUtf8Error> {
-        Ok(self
-            .get_output_string(output)?
-            .lines()
-            .map(|line| line.trim().to_string())
-            .collect())
+    fn run_command<'a, I>(&self, path: &str, args: I) -> Result<ExitStatus, Box<dyn Error>>
+    where
+        I: IntoIterator<Item = &'a str>,
+    {
+        let mut cmd = self.create_command(path, args);
+        let status = cmd.status()?;
+
+        Ok(status)
+    }
+
+    fn get_all_output<'a, I>(&self, path: &str, args: I) -> Result<String, Box<dyn Error>>
+    where
+        I: IntoIterator<Item = &'a str>,
+    {
+        let mut cmd = self.create_command(path, args);
+        let output = cmd.output()?.stdout;
+        let res = String::from_utf8(output)?.trim().to_string();
+
+        Ok(res)
+    }
+
+    fn get_all_output_lines<'a, I>(
+        &self,
+        path: &str,
+        args: I,
+    ) -> Result<Vec<String>, Box<dyn Error>>
+    where
+        I: IntoIterator<Item = &'a str>,
+    {
+        let output = self.get_all_output(path, args)?;
+        let lines = output.lines().map(|line| line.trim().to_string()).collect();
+
+        Ok(lines)
+    }
+
+    fn get_output_lines_stream<'a, I>(&self, path: &str, args: I) -> Lines<BufReader<ChildStdout>>
+    where
+        I: IntoIterator<Item = &'a str>,
+    {
+        let mut cmd = self.create_command(path, args);
+        let stdout = cmd.stdout(Stdio::piped()).spawn().unwrap().stdout.unwrap();
+
+        let reader = BufReader::new(stdout);
+        reader.lines()
     }
 }
 
 impl GitHandler for CmdGit {
     fn init_repository(&self, path: &str) -> Result<(), GitError> {
-        command_output(path, ["init"]).or(Err(GitError::AlreadyARepository {}))?;
+        self.run_command(path, ["init"])
+            .or(Err(GitError::AlreadyARepository {}))?;
 
         Ok(())
     }
 
     fn is_repository(&self, path: &str) -> bool {
-        command_output(&path, ["rev-parse"]).is_ok()
+        self.run_command(&path, ["rev-parse"]).is_ok()
     }
 
     fn get_branches(&self, path: &str) -> Result<Vec<BranchInfo>, GitError> {
-        command_output(path, ["branch", "--list", "-a", BRANCHES_INFO_FORMAT])
-            .ok()
-            .and_then(|output| self.get_output_lines(output).ok())
-            .ok_or(GitError::GetBranchesFailed {})
-            .and_then(|lines| {
-                Ok(lines
+        self.get_all_output_lines(path, ["branch", "--list", "-a", BRANCHES_INFO_FORMAT])
+            .or(Err(GitError::GetBranchesFailed {}))
+            .map(|lines| {
+                lines
                     .iter()
                     .map(parse_branch_info)
                     .filter_map(|x| x)
-                    .collect())
+                    .collect()
             })
     }
 
     fn checkout_local_branch(&self, path: &str, branch: &str) -> Result<(), GitError> {
-        command_output(path, ["checkout", branch]).or(Err(GitError::CheckoutBranchFailed {
-            branch: branch.to_string(),
-        }))?;
+        self.run_command(path, ["checkout", branch])
+            .or(Err(GitError::CheckoutBranchFailed {
+                branch: branch.to_string(),
+            }))?;
 
         Ok(())
     }
@@ -92,46 +118,45 @@ impl GitHandler for CmdGit {
         branch: &str,
         start_after: u8,
         limit: u8,
-    ) -> Result<HistoryPage, GitError> {
+    ) -> Result<Page<HistoryItem>, GitError> {
         let page_arg = start_after.to_string();
         let page_size_arg = (limit + 1).to_string();
         let branch_arg = branch.to_string() + "~" + &page_arg;
 
-        let lines = command_output(
-            path,
-            [
-                "rev-list",
-                &branch_arg,
-                "-n",
-                &page_size_arg,
-                "--first-parent",
-                "--parents",
-            ],
-        )
-        .ok()
-        .and_then(|output| self.get_output_lines(output).ok())
-        .ok_or(GitError::GetReferenceHistoryFailed {
-            reference: branch.to_string(),
-        })?;
+        let lines = self
+            .get_all_output_lines(
+                path,
+                [
+                    "rev-list",
+                    &branch_arg,
+                    "-n",
+                    &page_size_arg,
+                    "--first-parent",
+                    "--parents",
+                ],
+            )
+            .or(Err(GitError::GetReferenceHistoryFailed {
+                reference: branch.to_string(),
+            }))?;
 
         let items: Option<Vec<HistoryItem>> = lines
             .iter()
             .take(limit.into())
             .map(parse_history_item)
             .collect();
+
         let items = items.ok_or(GitError::GetReferenceHistoryFailed {
             reference: branch.to_string(),
         })?;
 
         let has_next = lines.len() > limit.into();
 
-        Ok(HistoryPage { items, has_next })
+        Ok(Page { items, has_next })
     }
 
     fn get_commit_info(&self, path: &str, reference: &str) -> Result<CommitInfo, GitError> {
-        command_output(path, ["show", reference, COMMIT_INFO_FORMAT, "--quiet"])
+        self.get_all_output_lines(path, ["show", reference, COMMIT_INFO_FORMAT, "--quiet"])
             .ok()
-            .and_then(|output| self.get_output_lines(output).ok())
             .and_then(|lines| parse_commit_info(&lines))
             .ok_or(GitError::GetCommitInfoFailed {
                 reference: reference.to_string(),
@@ -139,33 +164,163 @@ impl GitHandler for CmdGit {
     }
 
     fn get_head_info(&self, path: &str) -> Result<HeadInfo, GitError> {
-        command_output(
+        self.get_all_output_lines(
             &path,
-            ["status", "--porcelain=2", "--untracked=normal", "--branch"],
+            [
+                "--no-optional-locks",
+                "status",
+                "--branch",
+                "--porcelain=2",
+                "--no-show-stash",
+                "--no-ahead-behind",
+                ".git",
+            ],
         )
         .ok()
-        .and_then(|output| self.get_output_lines(output).ok())
-        .and_then(|lines| parse_head_info(&path.to_string(), &lines))
+        .and_then(|lines| parse_head_info(&lines))
         .ok_or(GitError::GetHeadInfoFailed {})
+    }
+
+    fn get_staged_files_page(
+        &self,
+        path: &str,
+        start_after: u8,
+        limit: u8,
+    ) -> Result<Page<StagedFileInfo>, GitError> {
+        let lines = self.get_output_lines_stream(
+            path,
+            [
+                "--no-optional-locks",
+                "status",
+                "--untracked-files=no",
+                "--no-branch",
+                "--porcelain=2",
+                "--no-show-stash",
+                "--no-ahead-behind",
+            ],
+        );
+
+        let items: Vec<_> = lines
+            .filter_map(|line| line.ok().and_then(|line| parse_staged_file_info(&line)))
+            .skip(start_after.into())
+            .take((limit + 1).into())
+            .collect();
+
+        let has_next = items.len() > limit.into();
+
+        Ok(Page { items, has_next })
+    }
+
+    fn get_unstaged_files_page(
+        &self,
+        path: &str,
+        start_after: u8,
+        limit: u8,
+    ) -> Result<Page<UnstagedFileInfo>, GitError> {
+        let lines = self.get_output_lines_stream(
+            path,
+            [
+                "--no-optional-locks",
+                "status",
+                "--untracked-files=no",
+                "--no-branch",
+                "--porcelain=2",
+                "--no-show-stash",
+                "--no-ahead-behind",
+            ],
+        );
+
+        let items: Vec<_> = lines
+            .filter_map(|line| line.ok().and_then(|line| parse_unstaged_file_info(&line)))
+            .skip(start_after.into())
+            .take((limit + 1).into())
+            .collect();
+
+        let has_next = items.len() > limit.into();
+
+        Ok(Page { items, has_next })
+    }
+
+    fn get_unmerged_files_page(
+        &self,
+        path: &str,
+        start_after: u8,
+        limit: u8,
+    ) -> Result<Page<UnmergedFileInfo>, GitError> {
+        let lines = self.get_output_lines_stream(
+            path,
+            [
+                "--no-optional-locks",
+                "status",
+                "--untracked-files=no",
+                "--no-branch",
+                "--porcelain=2",
+                "--no-show-stash",
+                "--no-ahead-behind",
+            ],
+        );
+
+        let items: Vec<_> = lines
+            .filter_map(|line| line.ok().and_then(|line| parse_unmerged_file_info(&line)))
+            .skip(start_after.into())
+            .take((limit + 1).into())
+            .collect();
+
+        let has_next = items.len() > limit.into();
+
+        Ok(Page { items, has_next })
+    }
+
+    fn get_untracked_files_page(
+        &self,
+        path: &str,
+        start_after: u8,
+        limit: u8,
+    ) -> Result<Page<UntrackedFileInfo>, GitError> {
+        let lines = self.get_output_lines_stream(
+            path,
+            [
+                "--no-optional-locks",
+                "status",
+                "--untracked-files=all",
+                "--no-branch",
+                "--porcelain=2",
+                "--no-show-stash",
+                "--no-ahead-behind",
+            ],
+        );
+
+        let items: Vec<_> = lines
+            .filter_map(|line| line.ok().and_then(|line| parse_untracked_file_info(&line)))
+            .skip(start_after.into())
+            .take((limit + 1).into())
+            .collect();
+
+        let has_next = items.len() > limit.into();
+
+        Ok(Page { items, has_next })
     }
 
     fn add_to_index(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError> {
         let args = [vec!["add"], files.clone()].concat();
-        command_output(path, args).or(Err(GitError::AddToIndexFailed {}))?;
+        self.run_command(path, args)
+            .or(Err(GitError::AddToIndexFailed {}))?;
 
         Ok(())
     }
 
     fn remove_from_index(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError> {
         let args = [vec!["reset", "--"], files.clone()].concat();
-        command_output(path, args).or(Err(GitError::RemoveFromIndexFailed {}))?;
+        self.run_command(path, args)
+            .or(Err(GitError::RemoveFromIndexFailed {}))?;
 
         Ok(())
     }
 
     fn remove_from_tree(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError> {
         let args = [vec!["rm"], files.clone()].concat();
-        command_output(path, args).or(Err(GitError::RemoveFromTreeFailed {}))?;
+        self.run_command(path, args)
+            .or(Err(GitError::RemoveFromTreeFailed {}))?;
 
         Ok(())
     }
@@ -177,7 +332,8 @@ impl GitHandler for CmdGit {
             args.push("--amend");
         }
 
-        command_output(path, args).or(Err(GitError::CommitFailed {}))?;
+        self.run_command(path, args)
+            .or(Err(GitError::CommitFailed {}))?;
 
         Ok(())
     }
@@ -188,22 +344,14 @@ impl GitHandler for CmdGit {
         branch: &str,
         base_branch: &str,
     ) -> Result<Option<CommonAncestorInfo>, GitError> {
-        let parse_ref = |reference: &str, back: u64| -> Result<Option<String>, GitError> {
-            command_output(path, ["rev-parse", &format!("{}^{}", reference, back)])
+        let parse_ref = |reference: &str, back: u64| -> Option<String> {
+            self.get_all_output(path, ["rev-parse", &format!("{}^{}", reference, back)])
                 .ok()
-                .map(|output| {
-                    self.get_output_string(output)
-                        .map_err(|_| GitError::GetCommonAncestorFailed {
-                            branch: branch.to_string(),
-                            base_branch: base_branch.to_string(),
-                        })
-                })
-                .transpose()
         };
 
         let mut prev_branch_pointer = None;
-        let mut branch_pointer = parse_ref(branch, 0)?.map(|hash| (hash, 0));
-        let mut base_pointer = parse_ref(base_branch, 0)?.map(|hash| (hash, 0));
+        let mut branch_pointer = parse_ref(branch, 0).map(|hash| (hash, 0));
+        let mut base_pointer = parse_ref(base_branch, 0).map(|hash| (hash, 0));
 
         // For each commit in the branch, keep track of the commit that comes immediately next and its depth.
         let mut found_in_branch: HashMap<String, Option<(String, u64)>> = HashMap::new();
@@ -229,7 +377,7 @@ impl GitHandler for CmdGit {
 
                 found_in_branch.insert(branch_hash.to_owned(), prev_branch_pointer);
                 prev_branch_pointer = Some((branch_hash.to_string(), branch_distance));
-                branch_pointer = parse_ref(&branch_hash, 1)?.map(|hash| (hash, branch_distance + 1))
+                branch_pointer = parse_ref(&branch_hash, 1).map(|hash| (hash, branch_distance + 1))
             }
 
             if let Some((base_hash, base_distance)) = base_pointer {
@@ -249,7 +397,7 @@ impl GitHandler for CmdGit {
                 }
 
                 found_in_base.insert(base_hash.to_owned(), base_distance);
-                base_pointer = parse_ref(&base_hash, 1)?.map(|hash| (hash, base_distance + 1))
+                base_pointer = parse_ref(&base_hash, 1).map(|hash| (hash, base_distance + 1))
             }
 
             if branch_pointer.is_none() && base_pointer.is_none() {
@@ -264,7 +412,7 @@ impl GitHandler for CmdGit {
         branch: &str,
         base_branch: &str,
     ) -> Result<BranchDivergence, GitError> {
-        command_output(
+        self.get_all_output(
             path,
             [
                 "rev-list",
@@ -274,7 +422,6 @@ impl GitHandler for CmdGit {
             ],
         )
         .ok()
-        .and_then(|output| self.get_output_string(output).ok())
         .and_then(|line| parse_branch_divergence(&line))
         .ok_or(GitError::GetBranchDivergenceFailed {
             branch: branch.to_string(),
@@ -302,11 +449,12 @@ impl GitHandler for CmdGit {
             args.push("--set-upstream");
         }
 
-        command_output(path, args).or(Err(GitError::PushBranchFailed {
-            branch: branch.to_string(),
-            remote: remote.to_string(),
-            remote_branch: remote_branch.to_string(),
-        }))?;
+        self.run_command(path, args)
+            .or(Err(GitError::PushBranchFailed {
+                branch: branch.to_string(),
+                remote: remote.to_string(),
+                remote_branch: remote_branch.to_string(),
+            }))?;
 
         Ok(())
     }
@@ -326,51 +474,54 @@ impl GitHandler for CmdGit {
             args.push("--rebase");
         }
 
-        command_output(path, args).or(Err(GitError::PullBranchFailed {
-            branch: branch.to_string(),
-            remote: remote.to_string(),
-            remote_branch: remote_branch.to_string(),
-        }))?;
+        self.run_command(path, args)
+            .or(Err(GitError::PullBranchFailed {
+                branch: branch.to_string(),
+                remote: remote.to_string(),
+                remote_branch: remote_branch.to_string(),
+            }))?;
 
         Ok(())
     }
 
     fn get_remotes(&self, path: &str) -> Result<Vec<RemoteInfo>, GitError> {
-        command_output(path, ["remote", "--verbose"])
+        self.get_all_output_lines(path, ["remote", "--verbose"])
             .ok()
-            .and_then(|output| self.get_output_lines(output).ok())
             .and_then(|lines| Some(parse_remote_infos(&lines)))
             .ok_or(GitError::GetRemotesFailed {})
     }
 
     fn fetch_remote(&self, path: &str, name: &str) -> Result<(), GitError> {
-        command_output(path, ["fetch", name]).or(Err(GitError::FetchRemoteFailed {
-            name: name.to_string(),
-        }))?;
+        self.run_command(path, ["fetch", name])
+            .or(Err(GitError::FetchRemoteFailed {
+                name: name.to_string(),
+            }))?;
 
         Ok(())
     }
 
     fn add_remote(&self, path: &str, name: &str, url: &str) -> Result<(), GitError> {
-        command_output(path, ["remote", "add", name, url]).or(Err(GitError::AddRemoteFailed {
-            name: name.to_string(),
-        }))?;
+        self.run_command(path, ["remote", "add", name, url])
+            .or(Err(GitError::AddRemoteFailed {
+                name: name.to_string(),
+            }))?;
 
         Ok(())
     }
 
     fn remove_remote(&self, path: &str, name: &str) -> Result<(), GitError> {
-        command_output(path, ["remote", "remove", name]).or(Err(GitError::RemoveRemoteFailed {
-            name: name.to_string(),
-        }))?;
+        self.run_command(path, ["remote", "remove", name]).or(Err(
+            GitError::RemoveRemoteFailed {
+                name: name.to_string(),
+            },
+        ))?;
 
         Ok(())
     }
 
     fn get_stashes(&self, path: &str) -> Result<Vec<StashInfo>, GitError> {
-        command_output(path, ["stash", "list", STASH_INFO_FORMAT, "--shortstat"])
+        self.get_all_output_lines(path, ["stash", "list", STASH_INFO_FORMAT, "--shortstat"])
             .ok()
-            .and_then(|output| self.get_output_lines(output).ok())
             .and_then(|lines| Some(parse_stash_infos(&lines)))
             .ok_or(GitError::GetStashesFailed {})
     }

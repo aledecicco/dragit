@@ -1,9 +1,9 @@
 use std::{fs, path::Path, str::FromStr};
 
 use models::{
-    BranchDivergence, BranchInfo, BranchType, ChangeStatus, CommitInfo, DiffSummary, FileInfo,
-    FileStatus, HeadInfo, HeadStatus, HistoryItem, MergeStatus, MovedStatus, RemoteInfo, RemoteRef,
-    StashInfo, StatusType,
+    BranchDivergence, BranchInfo, BranchType, ChangeStatus, CommitInfo, DiffSummary, HeadInfo,
+    HistoryItem, MergeStatus, MovedStatus, RemoteInfo, RemoteRef, StagedFileInfo, StagedFileStatus,
+    StashInfo, StatusType, UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo,
 };
 
 /// Format used to get the needed information about a commit.
@@ -51,113 +51,113 @@ pub(crate) fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
     })
 }
 
-pub(crate) fn parse_head_info(dir: &String, lines: &Vec<String>) -> Option<HeadInfo> {
-    let head_status = parse_head_status(lines)?;
-    let files_info = lines
-        .iter()
-        .skip_while(|line| line.starts_with(HEAD_INFO_PREFIX))
-        .map(|line| parse_file_info(dir, line))
-        .flatten();
+pub(crate) fn parse_head_info(lines: &Vec<String>) -> Option<HeadInfo> {
+    let commit = lines.get(0)?.strip_prefix(HEAD_INFO_COMMIT_PREFIX)?;
+    let branch = lines.get(1)?.strip_prefix(HEAD_INFO_BRANCH_PREFIX)?;
 
-    Some(HeadInfo {
-        status: head_status,
-        files: files_info.collect(),
-    })
-}
-
-fn parse_head_status(lines: &Vec<String>) -> Option<HeadStatus> {
-    let mut commit_line = lines
-        .iter()
-        .find(|line| line.starts_with(HEAD_INFO_COMMIT_PREFIX))?
-        .clone();
-    let mut branch_line = lines
-        .iter()
-        .find(|line| line.starts_with(HEAD_INFO_BRANCH_PREFIX))?
-        .clone();
-
-    commit_line.drain(0..HEAD_INFO_COMMIT_PREFIX.len());
-    branch_line.drain(0..HEAD_INFO_BRANCH_PREFIX.len());
-
-    match (commit_line.as_str(), branch_line.as_str()) {
+    match (commit, branch) {
         (HEAD_INFO_INITIAL_COMMIT, HEAD_INFO_DETACHED_BRANCH) => None,
-        (commit_id, HEAD_INFO_DETACHED_BRANCH) => Some(HeadStatus::Detached {
+        (commit_id, HEAD_INFO_DETACHED_BRANCH) => Some(HeadInfo::Detached {
             commit: commit_id.to_string(),
         }),
-        (HEAD_INFO_INITIAL_COMMIT, branch_name) => Some(HeadStatus::Initial {
-            branch: branch_name.to_string(),
-        }),
-        (_, branch_name) => Some(HeadStatus::Branch {
+        (_, branch_name) => Some(HeadInfo::Branch {
             name: branch_name.to_string(),
         }),
     }
 }
 
-fn parse_file_info(dir: &String, line: &String) -> Option<FileInfo> {
+pub(crate) fn parse_staged_file_info(line: &String) -> Option<StagedFileInfo> {
     let status_str = line.chars().nth(0)?.to_string();
     let status_type = StatusType::from_str(&status_str).ok()?;
 
     Some(match status_type {
         StatusType::Modified => {
             let segments: Vec<&str> = line.splitn(MODIFIED_FILE_INFO_SEGMENTS, ' ').collect();
-            let (staged_str, unstaged_str) = segments.get(1)?.split_at(1);
+            let staged_str = segments.get(1)?.get(..1)?;
             let staged_status = ChangeStatus::from_str(staged_str).ok()?;
-            let unstaged_status = ChangeStatus::from_str(unstaged_str).ok()?;
             let path = segments.last()?;
 
-            FileInfo {
+            StagedFileInfo {
                 path: path.to_string(),
-                status: FileStatus::Modified {
-                    staged: staged_status,
-                    unstaged: unstaged_status,
+                status: StagedFileStatus::Changed {
+                    changes: staged_status,
                 },
-                is_dir: is_dir(dir, path),
             }
         }
 
         StatusType::Moved => {
             let segments: Vec<&str> = line.splitn(MOVED_FILE_INFO_SEGMENTS, ' ').collect();
-            let (staged_str, unstaged_str) = segments.get(1)?.split_at(1);
+            let staged_str = segments.get(1)?.get(..1)?;
             let moved_status = MovedStatus::from_str(staged_str).ok()?;
-            let unstaged_status = ChangeStatus::from_str(unstaged_str).ok()?;
 
             let path_segment = segments.last()?;
             let (path, old_path) = path_segment.split_once('\t')?;
 
-            FileInfo {
+            StagedFileInfo {
                 path: path.to_string(),
-                status: FileStatus::Moved {
-                    from: old_path.to_string(),
-                    staged: moved_status,
-                    unstaged: unstaged_status,
+                status: StagedFileStatus::Moved {
+                    changes: moved_status,
+                    old_path: old_path.to_string(),
                 },
-                is_dir: is_dir(dir, path),
             }
         }
+        _ => None?,
+    })
+}
 
+pub(crate) fn parse_unstaged_file_info(line: &String) -> Option<UnstagedFileInfo> {
+    let status_str = line.chars().nth(0)?.to_string();
+    let status_type = StatusType::from_str(&status_str).ok()?;
+
+    Some(match status_type {
+        StatusType::Modified => {
+            let segments: Vec<&str> = line.splitn(MODIFIED_FILE_INFO_SEGMENTS, ' ').collect();
+            let unstaged_str = segments.get(1)?.get(1..)?;
+            let unstaged_status = ChangeStatus::from_str(unstaged_str).ok()?;
+            let path = segments.last()?;
+
+            UnstagedFileInfo {
+                path: path.to_string(),
+                status: unstaged_status,
+            }
+        }
+        _ => None?,
+    })
+}
+
+pub(crate) fn parse_unmerged_file_info(line: &String) -> Option<UnmergedFileInfo> {
+    let status_str = line.chars().nth(0)?.to_string();
+    let status_type = StatusType::from_str(&status_str).ok()?;
+
+    Some(match status_type {
         StatusType::Unmerged => {
             let segments: Vec<&str> = line.splitn(UNMERGED_FILE_INFO_SEGMENTS, ' ').collect();
             let merge_status = MergeStatus::from_str(segments.get(1)?).ok()?;
             let path = segments.last()?;
 
-            FileInfo {
+            UnmergedFileInfo {
                 path: path.to_string(),
-                status: FileStatus::Unmerged {
-                    unstaged: merge_status,
-                },
-                is_dir: is_dir(dir, path),
+                status: merge_status,
             }
         }
+        _ => None?,
+    })
+}
 
+pub(crate) fn parse_untracked_file_info(line: &String) -> Option<UntrackedFileInfo> {
+    let status_str = line.chars().nth(0)?.to_string();
+    let status_type = StatusType::from_str(&status_str).ok()?;
+
+    Some(match status_type {
         StatusType::Untracked => {
             let segments: Vec<&str> = line.splitn(UNTRACKED_FILE_INFO_SEGMENTS, ' ').collect();
             let path = segments.last()?;
 
-            FileInfo {
+            UntrackedFileInfo {
                 path: path.to_string(),
-                status: FileStatus::Untracked {},
-                is_dir: is_dir(dir, path),
             }
         }
+        _ => None?,
     })
 }
 

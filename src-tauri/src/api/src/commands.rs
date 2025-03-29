@@ -3,8 +3,9 @@ use tauri::{AppHandle, Emitter, Manager, State};
 
 use models::{
     AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    CurrentDirInfo, GitError, GitHandler, HeadInfo, HistoryPage, RemoteInfo, RepoWatcherError,
-    SafeHandler, Settings, StashInfo, EVENT_ID,
+    CurrentDirInfo, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
+    RepoWatcherError, SafeHandler, Settings, StagedFileInfo, StashInfo, UnmergedFileInfo,
+    UnstagedFileInfo, UntrackedFileInfo, EVENT_ID,
 };
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
@@ -124,7 +125,7 @@ pub async fn get_commit_history_page(
     branch: &str,
     start_after: u8,
     limit: u8,
-) -> Result<HistoryPage, AppError> {
+) -> Result<Page<HistoryItem>, AppError> {
     with_handler(&state, &|h| {
         h.get_commit_history_page(path, branch, start_after, limit)
     })
@@ -142,6 +143,54 @@ pub async fn get_commit_info(
 #[tauri::command]
 pub async fn get_head_info(state: State<'_, AppState>, path: &str) -> Result<HeadInfo, AppError> {
     with_handler(&state, &|h| h.get_head_info(path))
+}
+
+#[tauri::command]
+pub async fn get_staged_files_page(
+    state: State<'_, AppState>,
+    path: &str,
+    start_after: u8,
+    limit: u8,
+) -> Result<Page<StagedFileInfo>, AppError> {
+    with_handler(&state, &|h| {
+        h.get_staged_files_page(path, start_after, limit)
+    })
+}
+
+#[tauri::command]
+pub async fn get_unstaged_files_page(
+    state: State<'_, AppState>,
+    path: &str,
+    start_after: u8,
+    limit: u8,
+) -> Result<Page<UnstagedFileInfo>, AppError> {
+    with_handler(&state, &|h| {
+        h.get_unstaged_files_page(path, start_after, limit)
+    })
+}
+
+#[tauri::command]
+pub async fn get_unmerged_files_page(
+    state: State<'_, AppState>,
+    path: &str,
+    start_after: u8,
+    limit: u8,
+) -> Result<Page<UnmergedFileInfo>, AppError> {
+    with_handler(&state, &|h| {
+        h.get_unmerged_files_page(path, start_after, limit)
+    })
+}
+
+#[tauri::command]
+pub async fn get_untracked_files_page(
+    state: State<'_, AppState>,
+    path: &str,
+    start_after: u8,
+    limit: u8,
+) -> Result<Page<UntrackedFileInfo>, AppError> {
+    with_handler(&state, &|h| {
+        h.get_untracked_files_page(path, start_after, limit)
+    })
 }
 
 #[tauri::command]

@@ -6,6 +6,7 @@ import {
 } from '@tabler/icons-react'
 import { type ComponentProps, type ComponentType, useMemo } from 'react'
 
+import type { FileInfo, Page } from '@api/models'
 import { useAddToIndex, useRemoveFromIndex } from '@api/mutations'
 import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { Accordion } from '@ui/Accordion'
@@ -152,20 +153,14 @@ const FileStatuses = (props: FileStatusesProps) => {
   )
 }
 
-interface FileListProps<T extends keyof FilesByStatus> {
-  files: FilesByStatus
-  status: T
+interface FileListProps<T extends FileInfo> {
+  files: Page<T>
   RenderItem: ComponentType<{ item: FilesByStatus[T][number] }>
   itemSize: number
 }
 
-const FileList = <T extends keyof FilesByStatus>(props: FileListProps<T>) => {
-  const { files, status, RenderItem, itemSize } = props
-  const options = useMemo(() => {
-    return {
-      getItemKey: (index: number) => files[status][index].path,
-    }
-  }, [files[status], status])
+const FileList = <T extends FileInfo>(props: FileListProps<T>) => {
+  const { files, RenderItem, itemSize } = props
 
   return files[status].length ? (
     <Ariakit.CompositeRow>

@@ -1,3 +1,10 @@
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
+pub struct Page<T> {
+    pub items: Vec<T>,
+    pub has_next: bool,
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 #[serde(rename_all(serialize = "camelCase", deserialize = "snake_case"))]
 pub struct CurrentDirInfo {
@@ -17,20 +24,24 @@ pub struct CommitInfo {
     pub message: Option<String>,
 }
 
-#[derive(serde::Serialize, Debug, Clone)]
-#[serde(rename_all(serialize = "camelCase"), tag = "type")]
-pub enum HeadStatus {
-    Initial { branch: String },
-    Detached { commit: String },
-    Branch { name: String },
+#[derive(strum::EnumString, Debug, Clone)]
+pub enum StatusType {
+    #[strum(serialize = "1")]
+    Modified,
+
+    #[strum(serialize = "2")]
+    Moved,
+
+    #[strum(serialize = "u")]
+    Unmerged,
+
+    #[strum(serialize = "?")]
+    Untracked,
 }
 
 #[derive(serde::Serialize, strum::EnumString, Debug, Clone)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub enum ChangeStatus {
-    #[strum(serialize = ".")]
-    Unmodified,
-
     #[strum(serialize = "M")]
     Modified,
 
@@ -42,6 +53,16 @@ pub enum ChangeStatus {
 
     #[strum(serialize = "D")]
     Deleted,
+}
+
+#[derive(serde::Serialize, strum::EnumString, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
+pub enum MovedStatus {
+    #[strum(serialize = "R")]
+    Renamed,
+
+    #[strum(serialize = "C")]
+    Copied,
 }
 
 #[derive(serde::Serialize, strum::EnumString, Debug, Clone)]
@@ -69,68 +90,53 @@ pub enum MergeStatus {
     DeletedByThem,
 }
 
-#[derive(serde::Serialize, strum::EnumString, Debug, Clone)]
-#[serde(rename_all(serialize = "camelCase"))]
-pub enum MovedStatus {
-    #[strum(serialize = "R")]
-    Renamed,
-
-    #[strum(serialize = "C")]
-    Copied,
-}
-
-#[derive(strum::EnumString, Debug, Clone)]
-pub enum StatusType {
-    #[strum(serialize = "1")]
-    Modified,
-
-    #[strum(serialize = "2")]
-    Moved,
-
-    #[strum(serialize = "u")]
-    Unmerged,
-
-    #[strum(serialize = "?")]
-    Untracked,
-}
-
 #[derive(serde::Serialize, Debug, Clone)]
 #[serde(rename_all(serialize = "camelCase"), tag = "status")]
-pub enum FileStatus {
-    Modified {
-        staged: ChangeStatus,
-        unstaged: ChangeStatus,
+pub enum StagedFileStatus {
+    Changed {
+        changes: ChangeStatus,
     },
 
     Moved {
-        from: String,
-        staged: MovedStatus,
-        unstaged: ChangeStatus,
+        changes: MovedStatus,
+        old_path: String,
     },
-
-    Unmerged {
-        unstaged: MergeStatus,
-    },
-
-    Untracked {},
 }
 
 #[derive(serde::Serialize, Debug, Clone)]
 #[serde(rename_all(serialize = "camelCase"))]
-pub struct FileInfo {
+pub struct StagedFileInfo {
     pub path: String,
 
-    pub is_dir: bool,
-
     #[serde(flatten)]
-    pub status: FileStatus,
+    pub status: StagedFileStatus,
 }
 
 #[derive(serde::Serialize, Debug, Clone)]
 #[serde(rename_all(serialize = "camelCase"))]
-pub struct HeadInfo {
-    pub status: HeadStatus,
-    pub files: Vec<FileInfo>,
+pub struct UnstagedFileInfo {
+    pub path: String,
+    pub status: ChangeStatus,
+}
+
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
+pub struct UnmergedFileInfo {
+    pub path: String,
+    pub status: MergeStatus,
+}
+
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
+pub struct UntrackedFileInfo {
+    pub path: String,
+}
+
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"), tag = "type")]
+pub enum HeadInfo {
+    Detached { commit: String },
+    Branch { name: String },
 }
 
 #[derive(serde::Serialize, Debug, Clone)]
@@ -153,13 +159,6 @@ pub struct HistoryItem {
     pub hash: String,
     // TODO: could not be needed
     pub other_parents: Vec<String>,
-}
-
-#[derive(serde::Serialize, Debug, Clone)]
-#[serde(rename_all(serialize = "camelCase"))]
-pub struct HistoryPage {
-    pub items: Vec<HistoryItem>,
-    pub has_next: bool,
 }
 
 #[derive(serde::Serialize, Debug, Clone)]

@@ -16,7 +16,7 @@ import type {
   CurrentDirInfo,
   HeadInfo,
   HistoryItem,
-  HistoryPage,
+  Page,
   RemoteInfo,
   Settings,
   StashInfo,
@@ -41,6 +41,34 @@ const queryKeys = {
         ...queryKeys.directory.current(path),
         key: 'head_info',
       }) as const,
+
+    files: {
+      all: (path: string) =>
+        ({
+          ...queryKeys.directory.current(path),
+          key: 'files',
+        }) as const,
+      staged: (path: string) =>
+        ({
+          ...queryKeys.directory.files.all(path),
+          status: 'staged',
+        }) as const,
+      unstaged: (path: string) =>
+        ({
+          ...queryKeys.directory.files.all(path),
+          status: 'unstaged',
+        }) as const,
+      unmerged: (path: string) =>
+        ({
+          ...queryKeys.directory.files.all(path),
+          status: 'unmerged',
+        }) as const,
+      untracked: (path: string) =>
+        ({
+          ...queryKeys.directory.files.all(path),
+          status: 'untracked',
+        }) as const,
+    },
     branches: (path: string) =>
       ({
         ...queryKeys.directory.current(path),
@@ -175,6 +203,97 @@ const headInfoQuery = (path: string) =>
 
 const useQueryHeadInfo = () => useRepositoryQuery(headInfoQuery)
 
+const fetchStagedFiles = (
+  path: string,
+  page: number,
+): Promise<Page<HistoryItem>> =>
+  invoke('get_staged_files', {
+    path: path,
+    startAfter: page * PAGE_SIZE,
+    limit: PAGE_SIZE,
+  })
+
+const stagedFilesQuery = (path: string) =>
+  infiniteQueryOptions({
+    queryKey: [queryKeys.directory.files.staged(path)],
+    queryFn: ({ pageParam }) => fetchStagedFiles(path, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _, lastPageParam) => {
+      return lastPage.hasNext ? lastPageParam + 1 : undefined
+    },
+  })
+
+const useQueryStagedFiles = () => useRepositoryInfiniteQuery(stagedFilesQuery)
+
+const fetchUnstagedFiles = (
+  path: string,
+  page: number,
+): Promise<Page<HistoryItem>> =>
+  invoke('get_unstaged_files', {
+    path: path,
+    startAfter: page * PAGE_SIZE,
+    limit: PAGE_SIZE,
+  })
+
+const unstagedFilesQuery = (path: string) =>
+  infiniteQueryOptions({
+    queryKey: [queryKeys.directory.files.unstaged(path)],
+    queryFn: ({ pageParam }) => fetchUnstagedFiles(path, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _, lastPageParam) => {
+      return lastPage.hasNext ? lastPageParam + 1 : undefined
+    },
+  })
+
+const useQueryUnstagedFiles = () =>
+  useRepositoryInfiniteQuery(unstagedFilesQuery)
+
+const fetchUnmergedFiles = (
+  path: string,
+  page: number,
+): Promise<Page<HistoryItem>> =>
+  invoke('get_unmerged_files', {
+    path: path,
+    startAfter: page * PAGE_SIZE,
+    limit: PAGE_SIZE,
+  })
+
+const unmergedFilesQuery = (path: string) =>
+  infiniteQueryOptions({
+    queryKey: [queryKeys.directory.files.unmerged(path)],
+    queryFn: ({ pageParam }) => fetchUnmergedFiles(path, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _, lastPageParam) => {
+      return lastPage.hasNext ? lastPageParam + 1 : undefined
+    },
+  })
+
+const useQueryUnmergedFiles = () =>
+  useRepositoryInfiniteQuery(unmergedFilesQuery)
+
+const fetchUntrackedFiles = (
+  path: string,
+  page: number,
+): Promise<Page<HistoryItem>> =>
+  invoke('get_untracked_files', {
+    path: path,
+    startAfter: page * PAGE_SIZE,
+    limit: PAGE_SIZE,
+  })
+
+const untrackedFilesQuery = (path: string) =>
+  infiniteQueryOptions({
+    queryKey: [queryKeys.directory.files.untracked(path)],
+    queryFn: ({ pageParam }) => fetchUntrackedFiles(path, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _, lastPageParam) => {
+      return lastPage.hasNext ? lastPageParam + 1 : undefined
+    },
+  })
+
+const useQueryUntrackedFiles = () =>
+  useRepositoryInfiniteQuery(untrackedFilesQuery)
+
 const fetchBranches = (path: string): Promise<BranchInfo[]> =>
   invoke('get_branches', { path: path })
 
@@ -190,7 +309,7 @@ const fetchCommitHistory = (
   path: string,
   branch: BranchName,
   page: number,
-): Promise<HistoryPage> =>
+): Promise<Page<HistoryItem>> =>
   invoke('get_commit_history_page', {
     path: path,
     branch: branch,
@@ -318,6 +437,10 @@ export {
   useQuerySettings,
   useQueryRecentlyOpened,
   useQueryHeadInfo,
+  useQueryStagedFiles,
+  useQueryUnstagedFiles,
+  useQueryUnmergedFiles,
+  useQueryUntrackedFiles,
   useQueryBranches,
   useQueryCommitHistory,
   useQueryCommitInfo,

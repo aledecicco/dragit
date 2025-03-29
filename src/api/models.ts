@@ -1,3 +1,8 @@
+export interface Page<T> {
+  items: T[]
+  hasNext: boolean
+}
+
 export interface Settings {
   recentlyOpened: string[]
   openLastOnStart: boolean
@@ -43,18 +48,7 @@ export interface HistoryItem {
   otherParents: CommitId[]
 }
 
-export interface HistoryPage {
-  items: HistoryItem[]
-  hasNext: boolean
-}
-
-export interface HeadInfo {
-  status: HeadStatus
-  files: FileInfo[]
-}
-
-export type HeadStatus =
-  | { type: 'initial'; branch: BranchName }
+export type HeadInfo =
   | { type: 'detached'; commit: CommitId }
   | { type: 'branch'; name: BranchName }
 
@@ -76,77 +70,9 @@ export interface RemoteBranch {
 
 export type BranchInfo = LocalBranch | RemoteBranch
 
-interface BaseFile {
-  path: string
-  isDir: boolean
-}
-
-export interface StagedOnlyFile extends BaseFile {
-  status: 'modified'
-  staged: Exclude<ChangeStatus, 'unmodified'>
-  unstaged: Extract<ChangeStatus, 'unmodified'>
-}
-
-export interface UnstagedOnlyFile extends BaseFile {
-  status: 'modified'
-  staged: Extract<ChangeStatus, 'unmodified'>
-  unstaged: Exclude<ChangeStatus, 'unmodified'>
-}
-
-export interface StagedAndUnstagedFile extends BaseFile {
-  status: 'modified'
-  staged: Exclude<ChangeStatus, 'unmodified'>
-  unstaged: Exclude<ChangeStatus, 'unmodified'>
-}
-
-export type ModifiedFile =
-  | StagedOnlyFile
-  | UnstagedOnlyFile
-  | StagedAndUnstagedFile
-
-export interface MovedOnlyFile extends BaseFile {
-  status: 'moved'
-  from: string
-  staged: MovedStatus
-  unstaged: Extract<ChangeStatus, 'unmodified'>
-}
-
-export interface MovedAndModifiedFile extends BaseFile {
-  status: 'moved'
-  from: string
-  staged: MovedStatus
-  unstaged: Exclude<ChangeStatus, 'unmodified'>
-}
-
-export type MovedFile = MovedOnlyFile | MovedAndModifiedFile
-
-export type StagedFile = Exclude<ModifiedFile, UnstagedOnlyFile> | MovedFile
-
-export type UnstagedFile =
-  | Exclude<ModifiedFile, StagedOnlyFile>
-  | MovedAndModifiedFile
-
-export interface UnmergedFile extends BaseFile {
-  status: 'unmerged'
-  unstaged: MergeStatus
-}
-
-export interface UntrackedFile extends BaseFile {
-  status: 'untracked'
-}
-
-export type FileInfo = ModifiedFile | MovedFile | UnmergedFile | UntrackedFile
-
-export type ChangeStatus =
-  | 'unmodified'
-  | 'modified'
-  | 'typeChanged'
-  | 'added'
-  | 'deleted'
+export type ChangeStatus = 'modified' | 'typeChanged' | 'added' | 'deleted'
 
 export type MovedStatus = 'renamed' | 'copied'
-
-export type ModifiedStatus = ChangeStatus | MovedStatus
 
 export type MergeStatus =
   | 'bothAdded'
@@ -156,6 +82,41 @@ export type MergeStatus =
   | 'deletedByUs'
   | 'addedByThem'
   | 'deletedByThem'
+
+interface BaseFileInfo {
+  path: string
+}
+
+export interface ChangedFileInfo extends BaseFileInfo {
+  status: 'changed'
+  changes: ChangeStatus
+}
+
+export interface MovedFileInfo extends BaseFileInfo {
+  status: 'moved'
+  changes: MovedStatus
+  old_path: string
+}
+
+export type StagedFileInfo = ChangedFileInfo | MovedFileInfo
+
+export interface UnstagedFileInfo extends BaseFileInfo {
+  status: 'unstaged'
+  changes: ChangeStatus
+}
+
+export interface UnmergedFileInfo extends BaseFileInfo {
+  status: 'unmerged'
+  changes: MergeStatus
+}
+
+export interface UntrackedFileInfo extends BaseFileInfo {}
+
+export type FileInfo =
+  | StagedFileInfo
+  | UnstagedFileInfo
+  | UnmergedFileInfo
+  | UntrackedFileInfo
 
 export interface RemoteInfo {
   name: RemoteName
