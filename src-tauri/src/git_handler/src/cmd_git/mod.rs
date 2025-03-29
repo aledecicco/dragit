@@ -116,8 +116,8 @@ impl GitHandler for CmdGit {
         &self,
         path: &str,
         branch: &str,
-        start_after: u8,
-        limit: u8,
+        start_after: usize,
+        limit: usize,
     ) -> Result<Page<HistoryItem>, GitError> {
         let page_arg = start_after.to_string();
         let page_size_arg = (limit + 1).to_string();
@@ -139,17 +139,14 @@ impl GitHandler for CmdGit {
                 reference: branch.to_string(),
             }))?;
 
-        let items: Option<Vec<HistoryItem>> = lines
-            .iter()
-            .take(limit.into())
-            .map(parse_history_item)
-            .collect();
+        let items: Option<Vec<HistoryItem>> =
+            lines.iter().take(limit).map(parse_history_item).collect();
 
         let items = items.ok_or(GitError::GetReferenceHistoryFailed {
             reference: branch.to_string(),
         })?;
 
-        let has_next = lines.len() > limit.into();
+        let has_next = lines.len() > limit;
 
         Ok(Page { items, has_next })
     }
@@ -184,8 +181,8 @@ impl GitHandler for CmdGit {
     fn get_staged_files_page(
         &self,
         path: &str,
-        start_after: u8,
-        limit: u8,
+        start_after: usize,
+        limit: usize,
     ) -> Result<Page<StagedFileInfo>, GitError> {
         let lines = self.get_output_lines_stream(
             path,
@@ -200,13 +197,11 @@ impl GitHandler for CmdGit {
             ],
         );
 
-        let items: Vec<_> = lines
+        let mut items_iter = lines
             .filter_map(|line| line.ok().and_then(|line| parse_staged_file_info(&line)))
-            .skip(start_after.into())
-            .take((limit + 1).into())
-            .collect();
-
-        let has_next = items.len() > limit.into();
+            .skip(start_after);
+        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
+        let has_next = items_iter.next().is_some();
 
         Ok(Page { items, has_next })
     }
@@ -214,8 +209,8 @@ impl GitHandler for CmdGit {
     fn get_unstaged_files_page(
         &self,
         path: &str,
-        start_after: u8,
-        limit: u8,
+        start_after: usize,
+        limit: usize,
     ) -> Result<Page<UnstagedFileInfo>, GitError> {
         let lines = self.get_output_lines_stream(
             path,
@@ -230,13 +225,11 @@ impl GitHandler for CmdGit {
             ],
         );
 
-        let items: Vec<_> = lines
+        let mut items_iter = lines
             .filter_map(|line| line.ok().and_then(|line| parse_unstaged_file_info(&line)))
-            .skip(start_after.into())
-            .take((limit + 1).into())
-            .collect();
-
-        let has_next = items.len() > limit.into();
+            .skip(start_after);
+        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
+        let has_next = items_iter.next().is_some();
 
         Ok(Page { items, has_next })
     }
@@ -244,8 +237,8 @@ impl GitHandler for CmdGit {
     fn get_unmerged_files_page(
         &self,
         path: &str,
-        start_after: u8,
-        limit: u8,
+        start_after: usize,
+        limit: usize,
     ) -> Result<Page<UnmergedFileInfo>, GitError> {
         let lines = self.get_output_lines_stream(
             path,
@@ -260,13 +253,11 @@ impl GitHandler for CmdGit {
             ],
         );
 
-        let items: Vec<_> = lines
+        let mut items_iter = lines
             .filter_map(|line| line.ok().and_then(|line| parse_unmerged_file_info(&line)))
-            .skip(start_after.into())
-            .take((limit + 1).into())
-            .collect();
-
-        let has_next = items.len() > limit.into();
+            .skip(start_after);
+        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
+        let has_next = items_iter.next().is_some();
 
         Ok(Page { items, has_next })
     }
@@ -274,8 +265,8 @@ impl GitHandler for CmdGit {
     fn get_untracked_files_page(
         &self,
         path: &str,
-        start_after: u8,
-        limit: u8,
+        start_after: usize,
+        limit: usize,
     ) -> Result<Page<UntrackedFileInfo>, GitError> {
         let lines = self.get_output_lines_stream(
             path,
@@ -290,13 +281,11 @@ impl GitHandler for CmdGit {
             ],
         );
 
-        let items: Vec<_> = lines
+        let mut items_iter = lines
             .filter_map(|line| line.ok().and_then(|line| parse_untracked_file_info(&line)))
-            .skip(start_after.into())
-            .take((limit + 1).into())
-            .collect();
-
-        let has_next = items.len() > limit.into();
+            .skip(start_after);
+        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
+        let has_next = items_iter.next().is_some();
 
         Ok(Page { items, has_next })
     }

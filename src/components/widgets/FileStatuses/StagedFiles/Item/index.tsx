@@ -5,24 +5,18 @@ import {
   IconFilePencil,
   IconFilePlus,
   IconFiles,
-  IconFolderCode,
-  IconFolderCog,
-  IconFolderMinus,
-  IconFolderPlus,
-  IconFolderShare,
-  IconFolders,
   IconMinus,
 } from '@tabler/icons-react'
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import type { StagedFile } from '@api/models'
+import type { StagedFileInfo } from '@api/models'
 import { useRemoveFromIndex } from '@api/mutations'
 import { cn, propsWithCn } from '@utils/styles'
-import { FileStatusItem } from '../Item'
+import { FileStatusItem } from '../../Item'
 
 interface StagedFileStatusItemProps extends ComponentProps<'div'> {
-  item: StagedFile
+  item: StagedFileInfo
 }
 
 const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
@@ -35,7 +29,7 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
       file={item}
       statusMessage={
         <p className={cn('text-xs text-success-300/50')}>
-          {match(item.staged)
+          {match(item.changes)
             .with('added', () => 'New')
             .with('deleted', () => 'Deleted')
             .with('modified', () => 'Edited')
@@ -45,15 +39,13 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
             .exhaustive()}
         </p>
       }
-      Glyph={match(item.staged)
-        .with('added', () => (item.isDir ? IconFolderPlus : IconFilePlus))
-        .with('deleted', () => (item.isDir ? IconFolderMinus : IconFileMinus))
-        .with('modified', () => (item.isDir ? IconFolderCode : IconFilePencil))
-        .with('copied', () => (item.isDir ? IconFolders : IconFiles))
-        .with('renamed', () =>
-          item.isDir ? IconFolderShare : IconFileArrowRight,
-        )
-        .with('typeChanged', () => (item.isDir ? IconFolderCog : IconFileCode2))
+      Glyph={match(item.changes)
+        .with('added', () => IconFilePlus)
+        .with('deleted', () => IconFileMinus)
+        .with('modified', () => IconFilePencil)
+        .with('copied', () => IconFiles)
+        .with('renamed', () => IconFileArrowRight)
+        .with('typeChanged', () => IconFileCode2)
         .exhaustive()}
       actions={[
         {

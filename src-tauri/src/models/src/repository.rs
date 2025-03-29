@@ -116,13 +116,15 @@ pub struct StagedFileInfo {
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct UnstagedFileInfo {
     pub path: String,
-    pub status: ChangeStatus,
+
+    pub changes: ChangeStatus,
 }
 
 #[derive(serde::Serialize, Debug, Clone)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct UnmergedFileInfo {
     pub path: String,
+
     pub status: MergeStatus,
 }
 

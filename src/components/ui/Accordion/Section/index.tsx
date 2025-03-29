@@ -8,13 +8,14 @@ import { cn, propsWithCn } from '@utils/styles'
 interface AccordionSectionProps extends Ariakit.DisclosureContentProps {
   label: string
   extraInfo?: ReactNode
+  defaultOpen?: boolean
 }
 
 const AccordionSection = (props: AccordionSectionProps) => {
-  const { label, extraInfo, ...contentProps } = props
+  const { label, extraInfo, defaultOpen, ...contentProps } = props
 
   return (
-    <Ariakit.DisclosureProvider defaultOpen>
+    <Ariakit.DisclosureProvider defaultOpen={defaultOpen}>
       <Ariakit.CompositeRow
         render={
           <div

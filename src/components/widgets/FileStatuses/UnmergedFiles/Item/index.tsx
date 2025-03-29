@@ -1,19 +1,14 @@
-import {
-  IconCheck,
-  IconFileAlert,
-  IconFolderExclamation,
-  IconTrash,
-} from '@tabler/icons-react'
+import { IconCheck, IconFileAlert, IconTrash } from '@tabler/icons-react'
 import type { ComponentProps } from 'react'
 import { P, match } from 'ts-pattern'
 
-import type { UnmergedFile } from '@api/models'
+import type { UnmergedFileInfo } from '@api/models'
 import { useAddToIndex, useRemoveFromTree } from '@api/mutations'
 import { cn, propsWithCn } from '@utils/styles'
-import { FileStatusItem } from '../Item'
+import { FileStatusItem } from '../../Item'
 
 interface UnmergedFileStatusItemProps extends ComponentProps<'div'> {
-  item: UnmergedFile
+  item: UnmergedFileInfo
 }
 
 const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
@@ -25,10 +20,10 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
     <FileStatusItem
       {...propsWithCn(divProps, 'text-light-600')}
       file={item}
-      Glyph={item.isDir ? IconFolderExclamation : IconFileAlert}
+      Glyph={IconFileAlert}
       statusMessage={
         <p className={cn('text-xs text-warning-400/50')}>
-          {match(item.unstaged)
+          {match(item.status)
             .with('addedByThem', () => 'Added by incoming changes')
             .with('addedByUs', () => 'Added by local changes')
             .with('bothAdded', () => 'Added by local and incoming changes')
@@ -49,7 +44,7 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
           action: () => stage.mutate({ files: [item.path] }),
           disabled: stage.isPending,
         },
-        ...match(item.unstaged)
+        ...match(item.status)
           .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => [
             {
               Glyph: IconTrash,

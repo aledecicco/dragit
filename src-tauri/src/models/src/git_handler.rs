@@ -23,8 +23,8 @@ pub trait GitHandler {
         &self,
         path: &str,
         reference: &str,
-        start_after: u8,
-        limit: u8,
+        start_after: usize,
+        limit: usize,
     ) -> Result<Page<HistoryItem>, GitError>;
 
     /// Returns information about the given commit.
@@ -37,32 +37,32 @@ pub trait GitHandler {
     fn get_staged_files_page(
         &self,
         path: &str,
-        start_after: u8,
-        limit: u8,
+        start_after: usize,
+        limit: usize,
     ) -> Result<Page<StagedFileInfo>, GitError>;
 
     /// Returns (a page of) the list of files with unstaged changes.
     fn get_unstaged_files_page(
         &self,
         path: &str,
-        start_after: u8,
-        limit: u8,
+        start_after: usize,
+        limit: usize,
     ) -> Result<Page<UnstagedFileInfo>, GitError>;
 
     /// Returns (a page of) the list of files with unmerged changes.
     fn get_unmerged_files_page(
         &self,
         path: &str,
-        start_after: u8,
-        limit: u8,
+        start_after: usize,
+        limit: usize,
     ) -> Result<Page<UnmergedFileInfo>, GitError>;
 
     /// Returns (a page of) the list of untracked files.
     fn get_untracked_files_page(
         &self,
         path: &str,
-        start_after: u8,
-        limit: u8,
+        start_after: usize,
+        limit: usize,
     ) -> Result<Page<UntrackedFileInfo>, GitError>;
 
     /// Adds the given list of files to the current index.

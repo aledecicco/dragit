@@ -1,17 +1,13 @@
-import {
-  IconFileUnknown,
-  IconFolderQuestion,
-  IconPlus,
-} from '@tabler/icons-react'
+import { IconFileUnknown, IconPlus } from '@tabler/icons-react'
 import type { ComponentProps } from 'react'
 
-import type { UntrackedFile } from '@api/models'
+import type { UntrackedFileInfo } from '@api/models'
 import { useAddToIndex } from '@api/mutations'
 import { propsWithCn } from '@utils/styles'
-import { FileStatusItem } from '../Item'
+import { FileStatusItem } from '../../Item'
 
 interface UntrackedFileStatusItemProps extends ComponentProps<'div'> {
-  item: UntrackedFile
+  item: UntrackedFileInfo
 }
 
 const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
@@ -22,7 +18,7 @@ const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
     <FileStatusItem
       {...propsWithCn(divProps, 'text-light-950/90')}
       file={item}
-      Glyph={item.isDir ? IconFolderQuestion : IconFileUnknown}
+      Glyph={IconFileUnknown}
       actions={[
         {
           Glyph: IconPlus,

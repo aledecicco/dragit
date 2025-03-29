@@ -1,7 +1,7 @@
 import type { Virtualizer } from '@tanstack/react-virtual'
 
 import type { AncestorInfo, BranchInfo } from '@api/models'
-import { useQueryCommitHistory } from '@api/queries'
+import { HISTORY_PAGE_SIZE, useQueryCommitHistory } from '@api/queries'
 import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
 import { cn } from '@utils/styles'
 import { mapFn } from '@utils/types'
@@ -53,7 +53,11 @@ const GraphBranch = (props: GraphBranchProps) => {
     const commit =
       anchor && virtualRow.index === anchor.distance
         ? anchor.hash
-        : getPaginatedItem(historyQuery.data, virtualRow.index)?.hash
+        : getPaginatedItem(
+            historyQuery.data,
+            virtualRow.index,
+            HISTORY_PAGE_SIZE,
+          )?.hash
 
     if (!commit) {
       return undefined
@@ -62,7 +66,11 @@ const GraphBranch = (props: GraphBranchProps) => {
     const isAnchor = anchor && commit === anchor.hash
 
     const parentCommit =
-      getNextPaginatedItem(historyQuery.data, virtualRow.index)?.hash ??
+      getNextPaginatedItem(
+        historyQuery.data,
+        virtualRow.index,
+        HISTORY_PAGE_SIZE,
+      )?.hash ??
       (anchor && anchor.distance > virtualRow.index ? anchor.hash : undefined)
     const parentIsDistantAnchor =
       anchor &&

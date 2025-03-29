@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
+import { useFilesPage } from '@context/files'
 import type {
   BranchDivergence,
   BranchInfo,
@@ -19,11 +20,16 @@ import type {
   Page,
   RemoteInfo,
   Settings,
+  StagedFileInfo,
   StashInfo,
+  UnmergedFileInfo,
+  UnstagedFileInfo,
+  UntrackedFileInfo,
 } from './models'
 import { useRepositoryInfiniteQuery, useRepositoryQuery } from './utils'
 
-export const PAGE_SIZE = 50
+export const HISTORY_PAGE_SIZE = 50
+export const FILE_STATUSES_PAGE_SIZE = 1000
 
 const queryKeys = {
   currentDir: ['current_dir'] as const,
@@ -206,93 +212,78 @@ const useQueryHeadInfo = () => useRepositoryQuery(headInfoQuery)
 const fetchStagedFiles = (
   path: string,
   page: number,
-): Promise<Page<HistoryItem>> =>
-  invoke('get_staged_files', {
+): Promise<Page<StagedFileInfo>> =>
+  invoke('get_staged_files_page', {
     path: path,
-    startAfter: page * PAGE_SIZE,
-    limit: PAGE_SIZE,
+    startAfter: page * FILE_STATUSES_PAGE_SIZE,
+    limit: FILE_STATUSES_PAGE_SIZE,
   })
 
-const stagedFilesQuery = (path: string) =>
-  infiniteQueryOptions({
+const stagedFilesQuery = (path: string, page: number) =>
+  queryOptions({
     queryKey: [queryKeys.directory.files.staged(path)],
-    queryFn: ({ pageParam }) => fetchStagedFiles(path, pageParam),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, _, lastPageParam) => {
-      return lastPage.hasNext ? lastPageParam + 1 : undefined
-    },
+    queryFn: () => fetchStagedFiles(path, page),
   })
 
-const useQueryStagedFiles = () => useRepositoryInfiniteQuery(stagedFilesQuery)
+const useQueryStagedFiles = () =>
+  useRepositoryQuery(stagedFilesQuery, useFilesPage('staged'))
 
 const fetchUnstagedFiles = (
   path: string,
   page: number,
-): Promise<Page<HistoryItem>> =>
-  invoke('get_unstaged_files', {
+): Promise<Page<UnstagedFileInfo>> =>
+  invoke('get_unstaged_files_page', {
     path: path,
-    startAfter: page * PAGE_SIZE,
-    limit: PAGE_SIZE,
+    startAfter: page * FILE_STATUSES_PAGE_SIZE,
+    limit: FILE_STATUSES_PAGE_SIZE,
   })
 
-const unstagedFilesQuery = (path: string) =>
-  infiniteQueryOptions({
+const unstagedFilesQuery = (path: string, page: number) =>
+  queryOptions({
     queryKey: [queryKeys.directory.files.unstaged(path)],
-    queryFn: ({ pageParam }) => fetchUnstagedFiles(path, pageParam),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, _, lastPageParam) => {
-      return lastPage.hasNext ? lastPageParam + 1 : undefined
-    },
+    queryFn: () => fetchUnstagedFiles(path, page),
   })
 
 const useQueryUnstagedFiles = () =>
-  useRepositoryInfiniteQuery(unstagedFilesQuery)
+  useRepositoryQuery(unstagedFilesQuery, useFilesPage('unstaged'))
 
 const fetchUnmergedFiles = (
   path: string,
   page: number,
-): Promise<Page<HistoryItem>> =>
-  invoke('get_unmerged_files', {
+): Promise<Page<UnmergedFileInfo>> =>
+  invoke('get_unmerged_files_page', {
     path: path,
-    startAfter: page * PAGE_SIZE,
-    limit: PAGE_SIZE,
+    startAfter: page * FILE_STATUSES_PAGE_SIZE,
+    limit: FILE_STATUSES_PAGE_SIZE,
   })
 
-const unmergedFilesQuery = (path: string) =>
-  infiniteQueryOptions({
+const unmergedFilesQuery = (path: string, page: number) =>
+  queryOptions({
     queryKey: [queryKeys.directory.files.unmerged(path)],
-    queryFn: ({ pageParam }) => fetchUnmergedFiles(path, pageParam),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, _, lastPageParam) => {
-      return lastPage.hasNext ? lastPageParam + 1 : undefined
-    },
+    queryFn: () => fetchUnmergedFiles(path, page),
   })
 
 const useQueryUnmergedFiles = () =>
-  useRepositoryInfiniteQuery(unmergedFilesQuery)
+  useRepositoryQuery(unmergedFilesQuery, useFilesPage('unmerged'))
 
 const fetchUntrackedFiles = (
   path: string,
   page: number,
-): Promise<Page<HistoryItem>> =>
-  invoke('get_untracked_files', {
+): Promise<Page<UntrackedFileInfo>> =>
+  invoke('get_untracked_files_page', {
     path: path,
-    startAfter: page * PAGE_SIZE,
-    limit: PAGE_SIZE,
+    startAfter: page * FILE_STATUSES_PAGE_SIZE,
+    limit: FILE_STATUSES_PAGE_SIZE,
   })
 
-const untrackedFilesQuery = (path: string) =>
-  infiniteQueryOptions({
+const untrackedFilesQuery = (path: string, page: number) =>
+  queryOptions({
     queryKey: [queryKeys.directory.files.untracked(path)],
-    queryFn: ({ pageParam }) => fetchUntrackedFiles(path, pageParam),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, _, lastPageParam) => {
-      return lastPage.hasNext ? lastPageParam + 1 : undefined
-    },
+    queryFn: () => fetchUntrackedFiles(path, page),
   })
 
 const useQueryUntrackedFiles = () =>
-  useRepositoryInfiniteQuery(untrackedFilesQuery)
+  useRepositoryQuery(untrackedFilesQuery, useFilesPage('untracked'))
 
 const fetchBranches = (path: string): Promise<BranchInfo[]> =>
   invoke('get_branches', { path: path })
@@ -313,8 +304,8 @@ const fetchCommitHistory = (
   invoke('get_commit_history_page', {
     path: path,
     branch: branch,
-    startAfter: page * PAGE_SIZE,
-    limit: PAGE_SIZE,
+    startAfter: page * HISTORY_PAGE_SIZE,
+    limit: HISTORY_PAGE_SIZE,
   })
 
 const commitHistoryQuery = (path: string, branch: BranchName | undefined) =>

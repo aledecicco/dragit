@@ -3,22 +3,18 @@ import {
   IconFileMinus,
   IconFilePencil,
   IconFilePlus,
-  IconFolderCode,
-  IconFolderCog,
-  IconFolderMinus,
-  IconFolderPlus,
   IconPlus,
 } from '@tabler/icons-react'
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import type { UnstagedFile } from '@api/models'
+import type { UnstagedFileInfo } from '@api/models'
 import { useAddToIndex } from '@api/mutations'
 import { cn, propsWithCn } from '@utils/styles'
-import { FileStatusItem } from '../Item'
+import { FileStatusItem } from '../../Item'
 
 interface UnstagedFileStatusItemProps extends ComponentProps<'div'> {
-  item: UnstagedFile
+  item: UnstagedFileInfo
 }
 
 const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
@@ -31,7 +27,7 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
       file={item}
       statusMessage={
         <p className={cn('text-xs text-light-950')}>
-          {match(item.unstaged)
+          {match(item.changes)
             .with('added', () => 'New')
             .with('deleted', () => 'Deleted')
             .with('modified', () => 'Edited')
@@ -39,11 +35,11 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
             .exhaustive()}
         </p>
       }
-      Glyph={match(item.unstaged)
-        .with('added', () => (item.isDir ? IconFolderPlus : IconFilePlus))
-        .with('deleted', () => (item.isDir ? IconFolderMinus : IconFileMinus))
-        .with('modified', () => (item.isDir ? IconFolderCode : IconFilePencil))
-        .with('typeChanged', () => (item.isDir ? IconFolderCog : IconFileCode2))
+      Glyph={match(item.changes)
+        .with('added', () => IconFilePlus)
+        .with('deleted', () => IconFileMinus)
+        .with('modified', () => IconFilePencil)
+        .with('typeChanged', () => IconFileCode2)
         .exhaustive()}
       actions={[
         {

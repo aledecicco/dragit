@@ -1,17 +1,17 @@
 import { IconMessageCheck, IconUpload } from '@tabler/icons-react'
 
 import { useCommitIndex, usePushBranch } from '@api/mutations'
+import { useQueryStagedFiles } from '@api/queries'
 import { useSelectedBranches } from '@context/branches'
 import { showCommitDialog } from '@lib/CommitDialog'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
-import { useStagedFiles } from '@widgets/FileStatuses/utils'
 
 interface MainToolbarProps extends Partial<ToolbarProps> {}
 
 const MainToolbar = (props: MainToolbarProps) => {
   const { ...toolbarProps } = props
 
-  const staged = useStagedFiles()
+  const staged = useQueryStagedFiles()
   const commit = useCommitIndex()
   const push = usePushBranch()
   const { branch } = useSelectedBranches()
@@ -29,7 +29,7 @@ const MainToolbar = (props: MainToolbarProps) => {
           },
           label: commit.isPending ? 'Committing...' : 'Commit',
           Glyph: IconMessageCheck,
-          disabled: !staged?.length || commit.isPending,
+          disabled: !staged?.data?.items.length || commit.isPending,
         },
         {
           action: () => {

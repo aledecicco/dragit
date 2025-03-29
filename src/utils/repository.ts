@@ -7,9 +7,8 @@ const getCurrentBranchName = (
   headInfo: HeadInfo | undefined,
 ): BranchName | undefined => {
   return match(headInfo)
-    .with({ status: { type: 'initial', branch: P.select() } }, idFn)
-    .with({ status: { type: 'branch', name: P.select() } }, idFn)
-    .with({ status: { type: 'detached' } }, () => undefined)
+    .with({ type: 'branch', name: P.select() }, idFn)
+    .with({ type: 'detached' }, () => undefined)
     .with(undefined, () => undefined)
     .exhaustive()
 }

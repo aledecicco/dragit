@@ -123,8 +123,8 @@ pub async fn get_commit_history_page(
     state: State<'_, AppState>,
     path: &str,
     branch: &str,
-    start_after: u8,
-    limit: u8,
+    start_after: usize,
+    limit: usize,
 ) -> Result<Page<HistoryItem>, AppError> {
     with_handler(&state, &|h| {
         h.get_commit_history_page(path, branch, start_after, limit)
@@ -149,8 +149,8 @@ pub async fn get_head_info(state: State<'_, AppState>, path: &str) -> Result<Hea
 pub async fn get_staged_files_page(
     state: State<'_, AppState>,
     path: &str,
-    start_after: u8,
-    limit: u8,
+    start_after: usize,
+    limit: usize,
 ) -> Result<Page<StagedFileInfo>, AppError> {
     with_handler(&state, &|h| {
         h.get_staged_files_page(path, start_after, limit)
@@ -161,8 +161,8 @@ pub async fn get_staged_files_page(
 pub async fn get_unstaged_files_page(
     state: State<'_, AppState>,
     path: &str,
-    start_after: u8,
-    limit: u8,
+    start_after: usize,
+    limit: usize,
 ) -> Result<Page<UnstagedFileInfo>, AppError> {
     with_handler(&state, &|h| {
         h.get_unstaged_files_page(path, start_after, limit)
@@ -173,8 +173,8 @@ pub async fn get_unstaged_files_page(
 pub async fn get_unmerged_files_page(
     state: State<'_, AppState>,
     path: &str,
-    start_after: u8,
-    limit: u8,
+    start_after: usize,
+    limit: usize,
 ) -> Result<Page<UnmergedFileInfo>, AppError> {
     with_handler(&state, &|h| {
         h.get_unmerged_files_page(path, start_after, limit)
@@ -185,8 +185,8 @@ pub async fn get_unmerged_files_page(
 pub async fn get_untracked_files_page(
     state: State<'_, AppState>,
     path: &str,
-    start_after: u8,
-    limit: u8,
+    start_after: usize,
+    limit: usize,
 ) -> Result<Page<UntrackedFileInfo>, AppError> {
     with_handler(&state, &|h| {
         h.get_untracked_files_page(path, start_after, limit)

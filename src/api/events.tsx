@@ -82,7 +82,11 @@ const EventHandler = (props: PropsWithChildren) => {
         })
         .with({ type: 'filesModified', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.headInfo(path)],
+            queryKey: [queryKeys.directory.files.unstaged(path)],
+          })
+
+          client.invalidateQueries({
+            queryKey: [queryKeys.directory.files.untracked(path)],
           })
         })
         .with({ type: 'configUpdated', path: P.string }, ({ path }) => {
@@ -96,7 +100,7 @@ const EventHandler = (props: PropsWithChildren) => {
         })
         .with({ type: 'indexUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.headInfo(path)],
+            queryKey: [queryKeys.directory.files.all(path)],
           })
         })
     })

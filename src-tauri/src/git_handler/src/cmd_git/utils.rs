@@ -1,4 +1,4 @@
-use std::{fs, path::Path, str::FromStr};
+use std::str::FromStr;
 
 use models::{
     BranchDivergence, BranchInfo, BranchType, ChangeStatus, CommitInfo, DiffSummary, HeadInfo,
@@ -12,8 +12,6 @@ pub(crate) const COMMIT_INFO_FORMAT: &str = "--format=format:%H%n%h%n%an%n%ae%n%
 pub(crate) const HEAD_INFO_COMMIT_PREFIX: &str = "# branch.oid ";
 /// The prefix of the line with the branch name when printing the current status.
 pub(crate) const HEAD_INFO_BRANCH_PREFIX: &str = "# branch.head ";
-/// The prefix of all lines related to the HEAD info when printing the current status.
-pub(crate) const HEAD_INFO_PREFIX: &str = "#";
 /// The string that denotes that the current commit is the initial one when printing the current status.
 pub(crate) const HEAD_INFO_INITIAL_COMMIT: &str = "(initial)";
 /// The string that denotes that the HEAD is in a detached state when printing the current status.
@@ -118,7 +116,7 @@ pub(crate) fn parse_unstaged_file_info(line: &String) -> Option<UnstagedFileInfo
 
             UnstagedFileInfo {
                 path: path.to_string(),
-                status: unstaged_status,
+                changes: unstaged_status,
             }
         }
         _ => None?,
@@ -211,15 +209,6 @@ pub(crate) fn parse_branch_divergence(line: &String) -> Option<BranchDivergence>
     let behind = u64::from_str(&divergence.next()?).ok()?;
 
     Some(BranchDivergence { ahead, behind })
-}
-
-fn is_dir(dir: &String, path: &str) -> bool {
-    let full_path = Path::new(dir).join(path);
-    if let Ok(metadata) = fs::metadata(full_path) {
-        metadata.is_dir()
-    } else {
-        false
-    }
 }
 
 fn strip_branch_prefix(full_name: &String, prefix: &str) -> String {

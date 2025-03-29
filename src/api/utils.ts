@@ -10,7 +10,7 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 
-import { PAGE_SIZE, useQueryCurrentDir } from './queries'
+import { useQueryCurrentDir } from './queries'
 
 export function mutationOptions<
   TData = unknown,
@@ -26,9 +26,10 @@ export function mutationOptions<
 const getPaginatedItem = <T>(
   data: InfiniteData<{ items: T[] }> | undefined,
   index: number,
+  pageSize: number,
 ): T | undefined => {
-  const pageIndex = Math.floor(index / PAGE_SIZE)
-  const itemIndex = index % PAGE_SIZE
+  const pageIndex = Math.floor(index / pageSize)
+  const itemIndex = index % pageSize
 
   return data?.pages?.at(pageIndex)?.items.at(itemIndex)
 }
@@ -36,8 +37,9 @@ const getPaginatedItem = <T>(
 const getNextPaginatedItem = <T>(
   data: InfiniteData<{ items: T[] }> | undefined,
   index: number,
+  pageSize: number,
 ): T | undefined => {
-  return getPaginatedItem(data, index + 1)
+  return getPaginatedItem(data, index + 1, pageSize)
 }
 
 const getPaginatedLength = <T>(

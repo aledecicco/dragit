@@ -101,13 +101,11 @@ export interface MovedFileInfo extends BaseFileInfo {
 export type StagedFileInfo = ChangedFileInfo | MovedFileInfo
 
 export interface UnstagedFileInfo extends BaseFileInfo {
-  status: 'unstaged'
   changes: ChangeStatus
 }
 
 export interface UnmergedFileInfo extends BaseFileInfo {
-  status: 'unmerged'
-  changes: MergeStatus
+  status: MergeStatus
 }
 
 export interface UntrackedFileInfo extends BaseFileInfo {}
