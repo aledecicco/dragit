@@ -104,7 +104,9 @@ const GraphInner = () => {
       >
         <div
           ref={scrollContainerRef}
-          className={cn('overflow-auto w-full h-full bg-dark-800/80')}
+          className={cn(
+            'overflow-auto scroll-smooth w-full h-full bg-dark-800/80',
+          )}
         >
           <SvgOverlay
             RenderOverlay={Edges}

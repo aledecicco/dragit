@@ -1,3 +1,5 @@
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
+
 import type { FileInfo, Page } from '@api/models'
 import {
   type FileType,
@@ -5,7 +7,6 @@ import {
   setPrevPage,
   useFilesPage,
 } from '@context/files'
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import { Button } from '@ui/Button'
 import { Icon } from '@ui/Icon'
 import { cn } from '@utils/styles'
