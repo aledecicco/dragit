@@ -1,4 +1,6 @@
 import {
+  type UseQueryOptions,
+  type UseQueryResult,
   infiniteQueryOptions,
   queryOptions,
   skipToken,
@@ -6,7 +8,8 @@ import {
 } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import { useFilesPage } from '@context/files'
+import { useFilesPage } from '@context/pages'
+import { match } from 'ts-pattern'
 import type {
   BranchDivergence,
   BranchInfo,
@@ -15,6 +18,8 @@ import type {
   CommitInfo,
   CommonAncestorInfo,
   CurrentDirInfo,
+  FileType,
+  FileTypes,
   HeadInfo,
   HistoryItem,
   Page,
@@ -233,81 +238,36 @@ const headInfoQuery = (path: string) =>
 
 const useQueryHeadInfo = () => useRepositoryQuery(headInfoQuery)
 
-const fetchStagedFiles = (
+const fetchFiles = <T extends FileType>(
   path: string,
+  type: T,
   page: number,
-): Promise<Page<StagedFileInfo>> =>
-  invoke('get_staged_files_page', {
+): Promise<Page<FileTypes[T]>> => {
+  const command = match<FileType>(type)
+    .with('staged', () => 'get_staged_files_page')
+    .with('unstaged', () => 'get_unstaged_files_page')
+    .with('unmerged', () => 'get_unmerged_files_page')
+    .with('untracked', () => 'get_untracked_files_page')
+    .exhaustive()
+
+  return invoke(command, {
     path: path,
     startAfter: page * FILE_STATUSES_PAGE_SIZE,
     limit: FILE_STATUSES_PAGE_SIZE,
   })
+}
 
-const stagedFilesQuery = (path: string, page: number) =>
+const filesQuery = <T extends FileType>(path: string, type: T, page: number) =>
   queryOptions({
-    queryKey: [queryKeys.directory.files.staged(path).page(page)],
-    queryFn: () => fetchStagedFiles(path, page),
+    queryKey: [queryKeys.directory.files[type](path).page(page)],
+    queryFn: () => fetchFiles(path, type, page),
   })
 
-const useQueryStagedFiles = () =>
-  useRepositoryQuery(stagedFilesQuery, useFilesPage('staged'))
-
-const fetchUnstagedFiles = (
-  path: string,
-  page: number,
-): Promise<Page<UnstagedFileInfo>> =>
-  invoke('get_unstaged_files_page', {
-    path: path,
-    startAfter: page * FILE_STATUSES_PAGE_SIZE,
-    limit: FILE_STATUSES_PAGE_SIZE,
-  })
-
-const unstagedFilesQuery = (path: string, page: number) =>
-  queryOptions({
-    queryKey: [queryKeys.directory.files.unstaged(path).page(page)],
-    queryFn: () => fetchUnstagedFiles(path, page),
-  })
-
-const useQueryUnstagedFiles = () =>
-  useRepositoryQuery(unstagedFilesQuery, useFilesPage('unstaged'))
-
-const fetchUnmergedFiles = (
-  path: string,
-  page: number,
-): Promise<Page<UnmergedFileInfo>> =>
-  invoke('get_unmerged_files_page', {
-    path: path,
-    startAfter: page * FILE_STATUSES_PAGE_SIZE,
-    limit: FILE_STATUSES_PAGE_SIZE,
-  })
-
-const unmergedFilesQuery = (path: string, page: number) =>
-  queryOptions({
-    queryKey: [queryKeys.directory.files.unmerged(path).page(page)],
-    queryFn: () => fetchUnmergedFiles(path, page),
-  })
-
-const useQueryUnmergedFiles = () =>
-  useRepositoryQuery(unmergedFilesQuery, useFilesPage('unmerged'))
-
-const fetchUntrackedFiles = (
-  path: string,
-  page: number,
-): Promise<Page<UntrackedFileInfo>> =>
-  invoke('get_untracked_files_page', {
-    path: path,
-    startAfter: page * FILE_STATUSES_PAGE_SIZE,
-    limit: FILE_STATUSES_PAGE_SIZE,
-  })
-
-const untrackedFilesQuery = (path: string, page: number) =>
-  queryOptions({
-    queryKey: [queryKeys.directory.files.untracked(path).page(page)],
-    queryFn: () => fetchUntrackedFiles(path, page),
-  })
-
-const useQueryUntrackedFiles = () =>
-  useRepositoryQuery(untrackedFilesQuery, useFilesPage('untracked'))
+function useQueryFiles<T extends FileType>(
+  type: T,
+): UseQueryResult<Page<FileTypes[T]>> {
+  return useRepositoryQuery(filesQuery, type, useFilesPage(type))
+}
 
 const fetchBranches = (path: string): Promise<BranchInfo[]> =>
   invoke('get_branches', { path: path })
@@ -452,10 +412,7 @@ export {
   useQuerySettings,
   useQueryRecentlyOpened,
   useQueryHeadInfo,
-  useQueryStagedFiles,
-  useQueryUnstagedFiles,
-  useQueryUnmergedFiles,
-  useQueryUntrackedFiles,
+  useQueryFiles,
   useQueryBranches,
   useQueryCommitHistory,
   useQueryCommitInfo,

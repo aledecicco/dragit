@@ -28,6 +28,7 @@ const AccordionSection = (props: AccordionSectionProps) => {
           render={
             <Ariakit.Disclosure
               className={cn(
+                'capitalize',
                 'cursor-pointer w-full group/accordion',
                 'text-sm text-light-600 text-start',
                 'p-2 flex flex-row gap-x-2 items-center',

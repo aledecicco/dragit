@@ -1,21 +1,8 @@
 import { Store, useStore } from '@tanstack/react-store'
 import { useEffect } from 'react'
 
-import {
-  useQueryStagedFiles,
-  useQueryUnmergedFiles,
-  useQueryUnstagedFiles,
-  useQueryUntrackedFiles,
-} from '@api/queries'
-
-interface FilesPages {
-  staged: number
-  unstaged: number
-  unmerged: number
-  untracked: number
-}
-
-type FileType = keyof FilesPages
+import type { FileType } from '@api/models'
+import { useQueryFiles } from '@api/queries'
 
 const filesPages = new Store({
   staged: 0,
@@ -27,6 +14,13 @@ const filesPages = new Store({
 const useFilesPages = () => useStore(filesPages)
 
 const useFilesPage = (type: FileType) => useFilesPages()[type]
+
+const clearPage = (type: FileType) => {
+  filesPages.setState((state) => ({
+    ...state,
+    [type]: 0,
+  }))
+}
 
 const setNextPage = (type: FileType) => {
   filesPages.setState((state) => ({
@@ -44,10 +38,10 @@ const setPrevPage = (type: FileType) => {
 
 const usePagesSync = () => {
   const pages = useFilesPages()
-  const stagedFiles = useQueryStagedFiles()
-  const unstagedFiles = useQueryUnstagedFiles()
-  const unmergedFiles = useQueryUnmergedFiles()
-  const untrackedFiles = useQueryUntrackedFiles()
+  const stagedFiles = useQueryFiles('staged')
+  const unstagedFiles = useQueryFiles('unstaged')
+  const unmergedFiles = useQueryFiles('unmerged')
+  const untrackedFiles = useQueryFiles('untracked')
 
   useEffect(() => {
     if (
@@ -55,28 +49,31 @@ const usePagesSync = () => {
       !stagedFiles.isLoading &&
       !stagedFiles.data?.items.length
     ) {
-      setPrevPage('staged')
+      clearPage('staged')
     }
+
     if (
       pages.unstaged > 0 &&
       !unstagedFiles.isLoading &&
       !unstagedFiles.data?.items.length
     ) {
-      setPrevPage('unstaged')
+      clearPage('unstaged')
     }
+
     if (
       pages.unmerged > 0 &&
       !unmergedFiles.isLoading &&
       !unmergedFiles.data?.items.length
     ) {
-      setPrevPage('unmerged')
+      clearPage('unmerged')
     }
+
     if (
       pages.untracked > 0 &&
       !untrackedFiles.isLoading &&
       !untrackedFiles.data?.items.length
     ) {
-      setPrevPage('untracked')
+      clearPage('untracked')
     }
   }, [
     stagedFiles.data,

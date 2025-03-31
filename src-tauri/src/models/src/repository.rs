@@ -5,16 +5,16 @@ pub struct Page<T> {
     pub has_next: bool,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-#[serde(rename_all(serialize = "camelCase", deserialize = "snake_case"))]
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
 pub struct CurrentDirInfo {
     pub path: String,
     pub is_repository: bool,
     pub exists: bool,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-#[serde(rename_all(serialize = "camelCase", deserialize = "snake_case"))]
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
 pub struct CommitInfo {
     pub hash: String,
     pub short_hash: String,
@@ -196,24 +196,24 @@ pub struct BranchDivergence {
     pub behind: u64,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-#[serde(rename_all(serialize = "camelCase", deserialize = "snake_case"))]
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
 pub struct RemoteInfo {
     pub name: String,
     pub fetch_url: String,
     pub push_url: String,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-#[serde(rename_all(serialize = "camelCase", deserialize = "snake_case"))]
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
 pub struct DiffSummary {
     pub files_count: u64,
     pub insertions: u64,
     pub deletions: u64,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-#[serde(rename_all(serialize = "camelCase", deserialize = "snake_case"))]
+#[derive(serde::Serialize, Debug, Clone)]
+#[serde(rename_all(serialize = "camelCase"))]
 pub struct StashInfo {
     pub name: String,
     pub message: Option<String>,

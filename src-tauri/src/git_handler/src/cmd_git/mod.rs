@@ -2,6 +2,7 @@ use std::{
     collections::HashMap,
     error::Error,
     io::{BufRead, BufReader, Lines},
+    os::unix::process,
     process::{ChildStdout, Command, ExitStatus, Stdio},
 };
 
@@ -67,15 +68,55 @@ impl CmdGit {
         Ok(lines)
     }
 
-    fn get_output_lines_stream<'a, I>(&self, path: &str, args: I) -> Lines<BufReader<ChildStdout>>
+    fn get_output_lines_stream<'a, I>(
+        &self,
+        path: &str,
+        args: I,
+    ) -> Result<Lines<BufReader<ChildStdout>>, Box<dyn Error>>
     where
         I: IntoIterator<Item = &'a str>,
     {
         let mut cmd = self.create_command(path, args);
-        let stdout = cmd.stdout(Stdio::piped()).spawn().unwrap().stdout.unwrap();
+        let child = cmd.stdout(Stdio::piped()).spawn()?;
+        let id = child.id();
+        let stdout = child.stdout.unwrap();
 
         let reader = BufReader::new(stdout);
-        reader.lines()
+        Ok(reader.lines())
+    }
+
+    fn get_files_page<T>(
+        &self,
+        path: &str,
+        include_untracked: bool,
+        parse_file_info: fn(&String) -> Option<T>,
+        start_after: usize,
+        limit: usize,
+    ) -> Result<Page<T>, Box<dyn Error>> {
+        let mut args = vec![
+            "--no-optional-locks",
+            "status",
+            "--no-branch",
+            "--porcelain=2",
+            "--no-show-stash",
+            "--no-ahead-behind",
+        ];
+
+        if (include_untracked) {
+            args.push("--untracked-files=all");
+        } else {
+            args.push("--untracked-files=no");
+        }
+
+        let lines = self.get_output_lines_stream(path, args);
+
+        let mut items_iter = lines?
+            .filter_map(|line| line.ok().and_then(|line| parse_file_info(&line)))
+            .skip(start_after);
+        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
+        let has_next = items_iter.next().is_some();
+
+        Ok(Page { items, has_next })
     }
 }
 
@@ -184,26 +225,8 @@ impl GitHandler for CmdGit {
         start_after: usize,
         limit: usize,
     ) -> Result<Page<StagedFileInfo>, GitError> {
-        let lines = self.get_output_lines_stream(
-            path,
-            [
-                "--no-optional-locks",
-                "status",
-                "--untracked-files=no",
-                "--no-branch",
-                "--porcelain=2",
-                "--no-show-stash",
-                "--no-ahead-behind",
-            ],
-        );
-
-        let mut items_iter = lines
-            .filter_map(|line| line.ok().and_then(|line| parse_staged_file_info(&line)))
-            .skip(start_after);
-        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
-        let has_next = items_iter.next().is_some();
-
-        Ok(Page { items, has_next })
+        self.get_files_page(path, false, parse_staged_file_info, start_after, limit)
+            .or(Err(GitError::GetStagedFilesFailed {}))
     }
 
     fn get_unstaged_files_page(
@@ -212,26 +235,8 @@ impl GitHandler for CmdGit {
         start_after: usize,
         limit: usize,
     ) -> Result<Page<UnstagedFileInfo>, GitError> {
-        let lines = self.get_output_lines_stream(
-            path,
-            [
-                "--no-optional-locks",
-                "status",
-                "--untracked-files=no",
-                "--no-branch",
-                "--porcelain=2",
-                "--no-show-stash",
-                "--no-ahead-behind",
-            ],
-        );
-
-        let mut items_iter = lines
-            .filter_map(|line| line.ok().and_then(|line| parse_unstaged_file_info(&line)))
-            .skip(start_after);
-        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
-        let has_next = items_iter.next().is_some();
-
-        Ok(Page { items, has_next })
+        self.get_files_page(path, false, parse_unstaged_file_info, start_after, limit)
+            .or(Err(GitError::GetUnstagedFilesFailed {}))
     }
 
     fn get_unmerged_files_page(
@@ -240,26 +245,8 @@ impl GitHandler for CmdGit {
         start_after: usize,
         limit: usize,
     ) -> Result<Page<UnmergedFileInfo>, GitError> {
-        let lines = self.get_output_lines_stream(
-            path,
-            [
-                "--no-optional-locks",
-                "status",
-                "--untracked-files=no",
-                "--no-branch",
-                "--porcelain=2",
-                "--no-show-stash",
-                "--no-ahead-behind",
-            ],
-        );
-
-        let mut items_iter = lines
-            .filter_map(|line| line.ok().and_then(|line| parse_unmerged_file_info(&line)))
-            .skip(start_after);
-        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
-        let has_next = items_iter.next().is_some();
-
-        Ok(Page { items, has_next })
+        self.get_files_page(path, false, parse_unmerged_file_info, start_after, limit)
+            .or(Err(GitError::GetUnmergedFilesFailed {}))
     }
 
     fn get_untracked_files_page(
@@ -268,26 +255,8 @@ impl GitHandler for CmdGit {
         start_after: usize,
         limit: usize,
     ) -> Result<Page<UntrackedFileInfo>, GitError> {
-        let lines = self.get_output_lines_stream(
-            path,
-            [
-                "--no-optional-locks",
-                "status",
-                "--untracked-files=all",
-                "--no-branch",
-                "--porcelain=2",
-                "--no-show-stash",
-                "--no-ahead-behind",
-            ],
-        );
-
-        let mut items_iter = lines
-            .filter_map(|line| line.ok().and_then(|line| parse_untracked_file_info(&line)))
-            .skip(start_after);
-        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
-        let has_next = items_iter.next().is_some();
-
-        Ok(Page { items, has_next })
+        self.get_files_page(path, true, parse_untracked_file_info, start_after, limit)
+            .or(Err(GitError::GetUntrackedFilesFailed {}))
     }
 
     fn add_to_index(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError> {

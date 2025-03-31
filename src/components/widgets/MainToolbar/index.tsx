@@ -1,7 +1,7 @@
 import { IconMessageCheck, IconUpload } from '@tabler/icons-react'
 
 import { useCommitIndex, usePushBranch } from '@api/mutations'
-import { useQueryStagedFiles } from '@api/queries'
+import { useQueryFiles } from '@api/queries'
 import { useSelectedBranches } from '@context/branches'
 import { showCommitDialog } from '@lib/CommitDialog'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
@@ -11,7 +11,7 @@ interface MainToolbarProps extends Partial<ToolbarProps> {}
 const MainToolbar = (props: MainToolbarProps) => {
   const { ...toolbarProps } = props
 
-  const staged = useQueryStagedFiles()
+  const staged = useQueryFiles('staged')
   const commit = useCommitIndex()
   const push = usePushBranch()
   const { branch } = useSelectedBranches()

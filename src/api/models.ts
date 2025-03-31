@@ -110,11 +110,13 @@ export interface UnmergedFileInfo extends BaseFileInfo {
 
 export interface UntrackedFileInfo extends BaseFileInfo {}
 
-export type FileInfo =
-  | StagedFileInfo
-  | UnstagedFileInfo
-  | UnmergedFileInfo
-  | UntrackedFileInfo
+export type FileType = 'staged' | 'unstaged' | 'unmerged' | 'untracked'
+export type FileTypes = {
+  staged: StagedFileInfo
+  unstaged: UnstagedFileInfo
+  unmerged: UnmergedFileInfo
+  untracked: UntrackedFileInfo
+}
 
 export interface RemoteInfo {
   name: RemoteName

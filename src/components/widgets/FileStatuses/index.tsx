@@ -2,10 +2,7 @@ import type { ComponentProps } from 'react'
 
 import { Accordion } from '@ui/Accordion'
 import { propsWithCn } from '@utils/styles'
-import { StagedFiles } from './StagedFiles'
-import { UnmergedFiles } from './UnmergedFiles'
-import { UnstagedFiles } from './UnstagedFiles'
-import { UntrackedFiles } from './UntrackedFiles'
+import { FileStatusesSection } from './Section'
 
 interface FileStatusesProps extends ComponentProps<'div'> {}
 
@@ -14,13 +11,10 @@ const FileStatuses = (props: FileStatusesProps) => {
 
   return (
     <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>
-      <UntrackedFiles />
-
-      <UnmergedFiles />
-
-      <UnstagedFiles />
-
-      <StagedFiles />
+      <FileStatusesSection type="untracked" defaultOpen={false} />
+      <FileStatusesSection type="unstaged" defaultOpen />
+      <FileStatusesSection type="unmerged" defaultOpen />
+      <FileStatusesSection type="staged" defaultOpen />
     </Accordion>
   )
 }

@@ -3,15 +3,13 @@ import {
   IconFileMinus,
   IconFilePencil,
   IconFilePlus,
-  IconPlus,
 } from '@tabler/icons-react'
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
 import type { UnstagedFileInfo } from '@api/models'
-import { useAddToIndex } from '@api/mutations'
 import { cn, propsWithCn } from '@utils/styles'
-import { FileStatusItem } from '../../List/Item'
+import { FileStatusItem } from '..'
 
 interface UnstagedFileStatusItemProps extends ComponentProps<'div'> {
   item: UnstagedFileInfo
@@ -19,12 +17,12 @@ interface UnstagedFileStatusItemProps extends ComponentProps<'div'> {
 
 const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
   const { item, ...divProps } = props
-  const stage = useAddToIndex()
 
   return (
     <FileStatusItem
       {...propsWithCn(divProps, 'text-light-600')}
       file={item}
+      type="unstaged"
       statusMessage={
         <p className={cn('text-xs text-light-950')}>
           {match(item.changes)
@@ -41,14 +39,6 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
         .with('modified', () => IconFilePencil)
         .with('typeChanged', () => IconFileCode2)
         .exhaustive()}
-      actions={[
-        {
-          Glyph: IconPlus,
-          label: 'Stage',
-          action: () => stage.mutate({ files: [item.path] }),
-          disabled: stage.isPending,
-        },
-      ]}
     />
   )
 }

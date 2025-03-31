@@ -28,6 +28,18 @@ pub enum GitError {
     #[error("Failed to get current HEAD info")]
     GetHeadInfoFailed {},
 
+    #[error("Failed to get current staged files")]
+    GetStagedFilesFailed {},
+
+    #[error("Failed to get current unstaged files")]
+    GetUnstagedFilesFailed {},
+
+    #[error("Failed to get current unmerged files")]
+    GetUnmergedFilesFailed {},
+
+    #[error("Failed to get current untracked files")]
+    GetUntrackedFilesFailed {},
+
     #[error("Failed to add files to the index")]
     AddToIndexFailed {},
 
