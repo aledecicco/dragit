@@ -1,157 +1,39 @@
-import { IconDownload, IconRefresh, IconUpload } from '@tabler/icons-react'
+import { IconRefresh } from '@tabler/icons-react'
 
-import { useFetchRemote, usePullBranch, usePushBranch } from '@api/mutations'
+import { useFetchRemote } from '@api/mutations'
+import { BranchToolbar } from '@common/BranchToolbar'
 import { useSelectedBranches } from '@context/branches'
-import { askForValue } from '@lib/AskForValueDialog'
-import { Toolbar } from '@ui/Toolbar'
+import { IconButton } from '@ui/IconButton'
 import { cn } from '@utils/styles'
 
 const BranchToolbars = () => {
-  const pushBranch = usePushBranch()
-  const pullBranch = usePullBranch()
   const fetchRemote = useFetchRemote()
 
   const { branch, baseBranch } = useSelectedBranches()
 
   return (
     <>
-      <Toolbar
+      <BranchToolbar
+        branch={branch}
         fixed
         className={cn('col-start-1 row-start-2 w-40')}
-        disabled={!branch || branch.type !== 'local'}
-        tools={[
-          {
-            Glyph: IconDownload,
-            label: 'Pull',
-            action: async () => {
-              if (branch?.type === 'local') {
-                pullBranch.mutate({
-                  branch: branch.name,
-                  remote:
-                    branch.remote?.remoteName ??
-                    (await askForValue({
-                      defaultValue: 'origin',
-                      Message: 'Choose a remote to pull from',
-                      label: 'Remote Name',
-                    })),
-                  remoteBranch: branch.remote?.branchName ?? branch.name,
-                  isRebase: false,
-                })
-              }
-            },
-            disabled: pullBranch.isPending,
-          },
-          {
-            Glyph: IconUpload,
-            label: 'Push',
-            action: () => {
-              if (branch?.type === 'local') {
-                pushBranch.mutate({
-                  branch: branch.name,
-                  remote: branch.remote?.remoteName ?? 'origin',
-                  remoteBranch: branch.remote?.branchName ?? branch.name,
-                  isForce: false,
-                  setUpstream: !branch.remote,
-                })
-              }
-            },
-            disabled: pushBranch.isPending,
-            alternatives: [
-              {
-                Glyph: IconUpload,
-                label: 'Force push',
-                action: () => {
-                  if (branch?.type === 'local') {
-                    pushBranch.mutate({
-                      branch: branch.name,
-                      remote: branch.remote?.remoteName ?? 'origin',
-                      remoteBranch: branch.remote?.branchName ?? branch.name,
-                      isForce: true,
-                      setUpstream: !branch.remote,
-                    })
-                  }
-                },
-                disabled: pushBranch.isPending,
-              },
-            ],
-          },
-        ]}
       />
 
-      <Toolbar
-        fixed
+      <IconButton
+        variant="neutral"
+        Glyph={IconRefresh}
+        label="Fetch all"
+        onClick={() => {
+          fetchRemote.mutate({ remote: 'origin' })
+        }}
         className={cn('col-start-2 row-start-2 w-20')}
-        tools={[
-          {
-            Glyph: IconRefresh,
-            label: 'Fetch all',
-            action: () => {
-              fetchRemote.mutate({ remote: 'origin' })
-            },
-            disabled: fetchRemote.isPending,
-          },
-        ]}
+        round={false}
       />
 
-      <Toolbar
+      <BranchToolbar
+        branch={baseBranch}
         fixed
         className={cn('col-start-3 row-start-2 w-40')}
-        disabled={!baseBranch || baseBranch.type !== 'local'}
-        tools={[
-          {
-            Glyph: IconDownload,
-            label: 'Pull',
-            action: () => {
-              if (baseBranch?.type === 'local') {
-                pullBranch.mutate({
-                  branch: baseBranch.name,
-                  remote: baseBranch.remote?.remoteName ?? 'origin',
-                  remoteBranch:
-                    baseBranch.remote?.branchName ?? baseBranch.name,
-                  isRebase: false,
-                })
-              }
-            },
-            disabled: pullBranch.isPending,
-          },
-          {
-            Glyph: IconUpload,
-            label: 'Push',
-            action: () => {
-              if (baseBranch?.type === 'local') {
-                pushBranch.mutate({
-                  branch: baseBranch.name,
-                  remote: baseBranch.remote?.remoteName ?? 'origin',
-                  remoteBranch:
-                    baseBranch.remote?.branchName ?? baseBranch.name,
-                  isForce: false,
-                  setUpstream: !baseBranch.remote,
-                })
-              }
-            },
-            disabled: pushBranch.isPending,
-            alternatives: [
-              {
-                Glyph: IconUpload,
-                label: 'Force push',
-                action: () => {
-                  if (baseBranch?.type === 'local') {
-                    pushBranch.mutate({
-                      branch: baseBranch.name,
-                      remote: baseBranch.remote?.remoteName ?? 'origin',
-                      remoteBranch:
-                        baseBranch.remote?.branchName ?? baseBranch.name,
-                      isForce: true,
-                      setUpstream: !baseBranch.remote,
-                    })
-                  }
-                },
-                className: 'w-17',
-                disabled: pushBranch.isPending,
-              },
-            ],
-          },
-        ]}
       />
     </>
   )

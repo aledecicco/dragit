@@ -1,11 +1,9 @@
 import { IconSwitchHorizontal } from '@tabler/icons-react'
-import { useMemo } from 'react'
 
-import type { BranchInfo } from '@api/models'
 import { useCheckoutLocal } from '@api/mutations'
 import { useQueryBranches, useQueryHeadInfo } from '@api/queries'
+import { BranchSelector } from '@common/BranchSelector'
 import { changeBaseBranch, useSelectedBranches } from '@context/branches'
-import { Combobox, type ComboboxOption } from '@ui/Combobox'
 import { IconButton } from '@ui/IconButton'
 import { cn } from '@utils/styles'
 
@@ -16,34 +14,16 @@ const BranchSelectors = () => {
   const { branch, baseBranch } = useSelectedBranches()
   const checkout = useCheckoutLocal()
 
-  const branchOptions = useMemo(() => {
-    const options: ComboboxOption<BranchInfo>[] =
-      branchesQuery.data?.map((option) => ({
-        value: option.name,
-        data: option,
-      })) ?? []
-
-    return options
-  }, [branchesQuery.data])
-
-  const baseBranchOptions = useMemo(() => {
-    const options: ComboboxOption<BranchInfo | undefined>[] =
-      branchOptions.filter((option) => option.value !== branch?.name)
-    options.unshift({ value: '', data: undefined })
-
-    return options
-  }, [branch, branchOptions])
-
   return (
     <>
-      <Combobox
+      <BranchSelector
         className={cn('w-65 col-start-1 row-start-1')}
-        option={branch ? { value: branch.name, data: branch } : undefined}
-        options={branchOptions}
-        setOption={(newOption) => {
+        branch={branch}
+        branches={branchesQuery.data}
+        allowEmpty={false}
+        onBranchChange={(newOption) => {
           checkout.mutate({ branch: newOption.data.name })
         }}
-        renderOption={(option) => option.data.name}
         placeholder="Checkout a branch..."
         disabled={headInfoQuery.isLoading || branchesQuery.isLoading}
       />
@@ -62,16 +42,15 @@ const BranchSelectors = () => {
         }}
       />
 
-      <Combobox
+      <BranchSelector
         className={cn('w-65 col-start-3 row-start-1')}
-        option={
-          baseBranch ? { value: baseBranch.name, data: baseBranch } : undefined
-        }
-        options={baseBranchOptions}
-        setOption={(newOption) => {
+        branch={baseBranch}
+        branches={branchesQuery.data}
+        allowEmpty
+        exclude={branch?.name}
+        onBranchChange={(newOption) => {
           changeBaseBranch(newOption.data)
         }}
-        renderOption={(option) => option.data?.name ?? 'No base branch'}
         placeholder="Choose a base branch..."
         disabled={headInfoQuery.isLoading || branchesQuery.isLoading}
       />
