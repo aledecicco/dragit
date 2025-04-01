@@ -18,11 +18,13 @@ const UntrackedFileToolbar = (props: UntrackedFileToolbarProps) => {
       {
         Glyph: IconPlus,
         label: 'Stage',
-        action: () => stage.mutate({ files: [file.path] }),
+        action: () => {
+          stage.mutateAsync({ files: [file.path] })
+        },
         disabled: stage.isPending,
       },
     ]
-  }, [file.path, stage.mutate, stage.isPending])
+  }, [file.path, stage.mutateAsync, stage.isPending])
 
   return <Toolbar size="sm" tools={tools} {...toolbarProps} />
 }

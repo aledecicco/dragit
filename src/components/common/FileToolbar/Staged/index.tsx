@@ -18,11 +18,13 @@ const StagedFileToolbar = (props: StagedFileToolbarProps) => {
       {
         Glyph: IconMinus,
         label: 'Unstage',
-        action: () => unstage.mutate({ files: [file.path] }),
+        action: () => {
+          unstage.mutateAsync({ files: [file.path] })
+        },
         disabled: unstage.isPending,
       },
     ]
-  }, [file.path, unstage.mutate, unstage.isPending])
+  }, [file.path, unstage.mutateAsync, unstage.isPending])
 
   return <Toolbar size="sm" tools={tools} {...toolbarProps} />
 }

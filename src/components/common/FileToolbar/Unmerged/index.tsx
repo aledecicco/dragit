@@ -20,7 +20,9 @@ const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
       {
         Glyph: IconCheck,
         label: 'Mark as resolved',
-        action: () => stage.mutate({ files: [file.path] }),
+        action: () => {
+          stage.mutateAsync({ files: [file.path] })
+        },
         disabled: stage.isPending,
       },
       ...match(file.status)
@@ -28,7 +30,9 @@ const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
           {
             Glyph: IconTrash,
             label: 'Delete',
-            action: () => remove.mutate({ files: [file.path] }),
+            action: () => {
+              remove.mutateAsync({ files: [file.path] })
+            },
             disabled: remove.isPending,
           },
         ])
@@ -37,9 +41,9 @@ const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
   }, [
     file.path,
     file.status,
-    stage.mutate,
+    stage.mutateAsync,
     stage.isPending,
-    remove.mutate,
+    remove.mutateAsync,
     remove.isPending,
   ])
 

@@ -23,7 +23,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
           directory: true,
         }).then((path) => {
           if (path) {
-            openFolder.mutate({ newPath: path })
+            openFolder.mutateAsync({ newPath: path })
           }
         })
       }}

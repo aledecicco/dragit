@@ -34,7 +34,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         {
           action: () => {
             if (branch?.type === 'local') {
-              push.mutate({
+              push.mutateAsync({
                 branch: branch.name,
                 remote: branch.remote?.remoteName ?? 'origin',
                 remoteBranch: branch.remote?.branchName ?? branch.name,

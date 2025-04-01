@@ -24,7 +24,7 @@ const CommitDialog = (props: CommitDialogProps) => {
         defaultValues: { message: '' },
         onFormSubmit: (form) => {
           const message = form.values.message
-          commit.mutate({ message, isAmend: false })
+          commit.mutateAsync({ message, isAmend: false })
         },
       }}
       {...dialogProps}

@@ -23,7 +23,7 @@ const BranchToolbar = (props: BranchToolbarProps) => {
         label: 'Pull',
         action: async () => {
           if (branch?.type === 'local') {
-            pull.mutate({
+            pull.mutateAsync({
               branch: branch.name,
               remote:
                 branch.remote?.remoteName ??
@@ -37,14 +37,14 @@ const BranchToolbar = (props: BranchToolbarProps) => {
             })
           }
         },
-        disabled: pull.isPending,
+        disabled: pull.isPending || !branch,
       },
       {
         Glyph: IconUpload,
         label: 'Push',
         action: () => {
           if (branch?.type === 'local') {
-            push.mutate({
+            push.mutateAsync({
               branch: branch.name,
               remote: branch.remote?.remoteName ?? 'origin',
               remoteBranch: branch.remote?.branchName ?? branch.name,
@@ -53,14 +53,14 @@ const BranchToolbar = (props: BranchToolbarProps) => {
             })
           }
         },
-        disabled: push.isPending,
+        disabled: push.isPending || !branch,
         alternatives: [
           {
             Glyph: IconUpload,
             label: 'Force push',
             action: () => {
               if (branch?.type === 'local') {
-                push.mutate({
+                push.mutateAsync({
                   branch: branch.name,
                   remote: branch.remote?.remoteName ?? 'origin',
                   remoteBranch: branch.remote?.branchName ?? branch.name,
@@ -69,12 +69,18 @@ const BranchToolbar = (props: BranchToolbarProps) => {
                 })
               }
             },
-            disabled: push.isPending,
+            disabled: push.isPending || !branch,
           },
         ],
       },
     ]
-  }, [branch, pull.mutate, pull.isPending, push.mutate, push.isPending])
+  }, [
+    branch,
+    pull.mutateAsync,
+    pull.isPending,
+    push.mutateAsync,
+    push.isPending,
+  ])
 
   return (
     <Toolbar

@@ -39,7 +39,7 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
           )}
           onClick={(e) => {
             if (e.detail === 0) {
-              checkout.mutate({ branch: item.name })
+              checkout.mutateAsync({ branch: item.name })
             }
 
             divProps.onClick?.(e)

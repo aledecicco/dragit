@@ -22,7 +22,7 @@ const BranchSelectors = () => {
         branches={branchesQuery.data}
         allowEmpty={false}
         onBranchChange={(newOption) => {
-          checkout.mutate({ branch: newOption.data.name })
+          checkout.mutateAsync({ branch: newOption.data.name })
         }}
         placeholder="Checkout a branch..."
         disabled={headInfoQuery.isLoading || branchesQuery.isLoading}
@@ -37,7 +37,7 @@ const BranchSelectors = () => {
         size="md"
         onClick={() => {
           if (baseBranch) {
-            checkout.mutate({ branch: baseBranch.name })
+            checkout.mutateAsync({ branch: baseBranch.name })
           }
         }}
       />

@@ -24,7 +24,7 @@ const BranchToolbars = () => {
         Glyph={IconRefresh}
         label="Fetch all"
         onClick={() => {
-          fetchRemote.mutate({ remote: 'origin' })
+          fetchRemote.mutateAsync({ remote: 'origin' })
         }}
         className={cn('col-start-2 row-start-2 w-20')}
         round={false}
