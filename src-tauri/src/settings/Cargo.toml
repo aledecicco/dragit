@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tauri = "2.0.0"
+tauri = "2.4.0"
 tauri-plugin-store = "2"
 models = { path = "../models" }

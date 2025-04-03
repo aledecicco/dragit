@@ -1,4 +1,5 @@
 use parking_lot::Mutex;
+use std::sync::Arc;
 
 use crate::{git_handler::GitHandler, repo_watcher::RepoWatcher};
 
@@ -9,7 +10,7 @@ pub type SafeWatcher = Box<dyn RepoWatcher + Send + Sync>;
 
 /// The state tracked by the app, which should be shareable by many threads.
 pub struct AppState {
-    pub git_handler: Mutex<SafeHandler>,
+    pub git_handler: Arc<SafeHandler>,
     pub repo_watcher: Mutex<SafeWatcher>,
 }
 
@@ -17,7 +18,7 @@ impl AppState {
     /// Initialize the app state with the given implementations.
     pub fn new(git_handler: SafeHandler, repo_watcher: SafeWatcher) -> Self {
         AppState {
-            git_handler: Mutex::new(git_handler),
+            git_handler: Arc::new(git_handler),
             repo_watcher: Mutex::new(repo_watcher),
         }
     }

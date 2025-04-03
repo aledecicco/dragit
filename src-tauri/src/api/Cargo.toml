@@ -5,6 +5,6 @@ edition = "2021"
 
 [dependencies]
 serde = { version = "1.0.210", features = ["derive"] }
-tauri = "2.0.0"
+tauri = "2.4.0"
 models = { path = "../models" }
 settings = { path = "../settings" }

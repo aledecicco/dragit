@@ -1,5 +1,4 @@
 import {
-  type UseQueryOptions,
   type UseQueryResult,
   infiniteQueryOptions,
   queryOptions,
@@ -7,9 +6,9 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
+import { match } from 'ts-pattern'
 
 import { useFilesPage } from '@context/pages'
-import { match } from 'ts-pattern'
 import type {
   BranchDivergence,
   BranchInfo,
@@ -25,11 +24,7 @@ import type {
   Page,
   RemoteInfo,
   Settings,
-  StagedFileInfo,
   StashInfo,
-  UnmergedFileInfo,
-  UnstagedFileInfo,
-  UntrackedFileInfo,
 } from './models'
 import { useRepositoryInfiniteQuery, useRepositoryQuery } from './utils'
 

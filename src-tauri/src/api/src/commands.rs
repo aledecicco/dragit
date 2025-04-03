@@ -16,8 +16,7 @@ fn with_handler<T>(
     state: &State<AppState>,
     fun: &dyn Fn(&SafeHandler) -> Result<T, GitError>,
 ) -> Result<T, AppError> {
-    let handler = state.git_handler.lock();
-    fun(&handler).map_err(AppError::from)
+    fun(&state.git_handler).map_err(AppError::from)
 }
 
 /// Opens a folder that contains/will contain a git repository.

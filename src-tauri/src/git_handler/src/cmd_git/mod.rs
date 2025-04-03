@@ -2,7 +2,6 @@ use std::{
     collections::HashMap,
     error::Error,
     io::{BufRead, BufReader, Lines},
-    os::unix::process,
     process::{ChildStdout, Command, ExitStatus, Stdio},
 };
 
@@ -102,7 +101,7 @@ impl CmdGit {
             "--no-ahead-behind",
         ];
 
-        if (include_untracked) {
+        if include_untracked {
             args.push("--untracked-files=all");
         } else {
             args.push("--untracked-files=no");

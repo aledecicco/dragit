@@ -1,6 +1,6 @@
 use crate::{
-    error::GitError, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, HeadInfo,
-    HistoryItem, Page, RemoteInfo, StagedFileInfo, StashInfo, UnmergedFileInfo, UnstagedFileInfo,
+    BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError, HeadInfo, HistoryItem,
+    Page, RemoteInfo, StagedFileInfo, StashInfo, UnmergedFileInfo, UnstagedFileInfo,
     UntrackedFileInfo,
 };
 
