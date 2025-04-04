@@ -145,7 +145,10 @@ function useThrottledCallback<T>(
 }
 
 const useRerender = () => {
-  const [rerenderTrigger, rerender] = useReducer((n) => (n + 1) % 60, 0)
+  const [rerenderTrigger, rerender] = useReducer(
+    (n) => (n + 1) % Number.MAX_SAFE_INTEGER,
+    0,
+  )
 
   return { rerenderTrigger, rerender }
 }

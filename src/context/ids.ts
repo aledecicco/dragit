@@ -11,7 +11,10 @@ const ids = new Store<Ids>({
 
 const getUniqueId = () => {
   const id = ids.state.nextId
-  ids.setState((ids) => ({ ...ids, nextId: ids.nextId + 1 }))
+  ids.setState((ids) => ({
+    ...ids,
+    nextId: (ids.nextId + 1) % Number.MAX_SAFE_INTEGER,
+  }))
 
   return id.toString(16)
 }

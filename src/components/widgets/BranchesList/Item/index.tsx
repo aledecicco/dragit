@@ -47,7 +47,7 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
         />
       }
     >
-      <div className={cn('overflow-x-hidden')}>
+      <div className={cn('min-w-0 w-full')}>
         <div
           className={cn('flex flex-row gap-x-1 items-center text-light-600')}
         >

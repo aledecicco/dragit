@@ -26,7 +26,7 @@ const FileStatusItem = <T extends FileType>(props: FileStatusItemProps<T>) => {
 
   return (
     <Ariakit.CompositeItem render={<ListItem {...divProps} />}>
-      <div className={cn('min-w-0 overflow-x-hidden')}>
+      <div className={cn('min-w-0 w-full')}>
         <div className={cn('flex flex-row gap-x-1 items-center')}>
           <Icon Glyph={Glyph} size="md" />
 

@@ -16,10 +16,19 @@ const INFINITE_SPACING = 32
 interface MarqueeProps extends ComponentProps<'div'> {
   speed?: number
   infinite?: boolean
+  reverse?: boolean
+  withShadows?: boolean
 }
 
 const Marquee = (props: MarqueeProps) => {
-  const { speed = 100, children, infinite = false, ...divProps } = props
+  const {
+    speed = 100,
+    infinite = false,
+    reverse = true,
+    withShadows = true,
+    children,
+    ...divProps
+  } = props
 
   const [overflow, setOverflow] = useState(0)
   const shouldScroll = overflow > 0
@@ -66,11 +75,25 @@ const Marquee = (props: MarqueeProps) => {
     }
   }, [])
 
+  const childrenCopy = infinite && shouldScroll && (
+    <div
+      className={cn('absolute top-0', reverse ? 'right-full' : 'left-full')}
+      style={
+        reverse
+          ? { marginRight: `${INFINITE_SPACING}px` }
+          : { marginLeft: `${INFINITE_SPACING}px` }
+      }
+      aria-hidden={true}
+    >
+      {children}
+    </div>
+  )
+
   return (
     <div
       {...propsWithCn(
         divProps,
-        'group/marquee overflow-x-hidden relative max-w-full',
+        'group/marquee overflow-x-hidden relative max-w-full flex flex-row justify-end',
       )}
       ref={mergeRefs([containerRef, divProps.ref])}
     >
@@ -88,29 +111,40 @@ const Marquee = (props: MarqueeProps) => {
               animationFillMode: infinite ? undefined : 'forwards',
               animationIterationCount: infinite ? 'infinite' : 1,
               '--scroll-to': infinite
-                ? `calc(-100% - ${INFINITE_SPACING}px)`
-                : `${-overflow}px`,
+                ? reverse
+                  ? `calc(100% + ${INFINITE_SPACING}px)`
+                  : `calc(-100% - ${INFINITE_SPACING}px)`
+                : reverse
+                  ? `${overflow}px`
+                  : `${-overflow}px`,
             } as CSSProperties)),
         }}
       >
-        {children}
-        {infinite && shouldScroll && (
-          <div
-            className={cn('absolute top-0 left-full')}
-            style={{ marginLeft: `${INFINITE_SPACING}px` }}
-            aria-hidden={true}
-          >
+        {reverse ? (
+          <>
             {children}
-          </div>
+            {childrenCopy}
+          </>
+        ) : (
+          <>
+            {children}
+            {childrenCopy}
+          </>
         )}
       </div>
 
-      {shouldScroll && (
+      {shouldScroll && withShadows && (
         <>
           <div
             className={cn(
               'absolute top-0 -left-0.5 h-full',
-              'opacity-0 w-2 bg-linear-to-r from-dark-950/70 to-[transparent] rounded-r-xs',
+              'w-2 bg-linear-to-r from-dark-950/70 to-[transparent] rounded-r-xs',
+              reverse
+                ? [
+                    'opacity-100',
+                    !infinite && 'group-hover/marquee:animate-fade-out',
+                  ]
+                : 'opacity-0 group-hover/marquee:animate-fade-in',
               'group-hover/marquee:animate-fade-in',
               'pointer-events-none',
             )}
@@ -122,8 +156,12 @@ const Marquee = (props: MarqueeProps) => {
             className={cn(
               'absolute top-0 -right-0.5 h-full',
               'opacity-100 w-2 bg-linear-to-l from-dark-950/70 to-[transparent] rounded-r-xs',
-              !infinite && 'group-hover/marquee:animate-fade-out',
-              'pointer-events-none',
+              reverse
+                ? 'opacity-0 group-hover/marquee:animate-fade-in'
+                : [
+                    'opacity-100',
+                    !infinite && 'group-hover/marquee:animate-fade-out',
+                  ],
             )}
             style={{
               animationDuration: `${animationDuration}s`,
