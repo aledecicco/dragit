@@ -1,6 +1,7 @@
 import {
   type DefaultError,
   type InfiniteData,
+  type QueryFunctionContext,
   type QueryKey,
   type UseInfiniteQueryOptions,
   type UseMutationOptions,
@@ -9,7 +10,12 @@ import {
   useMutation,
   useQuery,
 } from '@tanstack/react-query'
+import { Child } from '@tauri-apps/plugin-shell'
 
+import { Channel, invoke } from '@tauri-apps/api/core'
+import { type BorshSchema, borshDeserialize } from 'borsher'
+import { match } from 'ts-pattern'
+import type { AppMessage } from './models'
 import { useQueryCurrentDir } from './queries'
 
 export function mutationOptions<
@@ -50,7 +56,6 @@ const getPaginatedLength = <T>(
 
 const useHasCurrentPath = () => {
   const path = useQueryCurrentDir().data?.path
-
   return !!path
 }
 
@@ -79,7 +84,6 @@ const useRepositoryMutation = <
   ...args: A
 ) => {
   const path = useCurrentPath()
-
   return useMutation(repositoryMutation(path, ...args))
 }
 
@@ -97,7 +101,6 @@ const useRepositoryQuery = <
   ...args: A
 ) => {
   const path = useCurrentPath()
-
   return useQuery(repositoryQuery(path, ...args))
 }
 
@@ -123,12 +126,57 @@ const useRepositoryInfiniteQuery = <
   ...args: A
 ) => {
   const path = useCurrentPath()
+  return useInfiniteQuery(repositoryQuery(path, ...args))
+}
 
-  if (!path) {
-    throw new Error('Repository path is not available')
+const fetchAndDeserialize = async <T>(
+  command: string,
+  args: Record<string, unknown>,
+  schema: BorshSchema<T>,
+  context: QueryFunctionContext,
+): Promise<T> => {
+  const processIds: [number | null, number | null] = [null, null]
+
+  const abortSignal = context.signal
+  abortSignal.addEventListener('abort', () => {
+    console.log(
+      `Aborting ${command} with ${JSON.stringify(args)} for processes "${processIds[0]}" and "${processIds[1]}"`,
+    )
+
+    if (processIds[0] !== null) {
+      new Child(processIds[0]).kill()
+    }
+    if (processIds[1] !== null) {
+      new Child(processIds[1]).kill()
+    }
+
+    // TODO: account for AppMessage delay
+  })
+
+  const channel = new Channel<AppMessage>()
+  channel.onmessage = (event) => {
+    match(event)
+      .with(
+        {
+          type: 'processStarted',
+        },
+        ({ pid, subprocess }) => {
+          processIds[0] = pid
+          processIds[1] = subprocess
+        },
+      )
+      .exhaustive()
   }
 
-  return useInfiniteQuery(repositoryQuery(path, ...args))
+  const buffer: ArrayBuffer = await invoke(command, {
+    ...args,
+    channel,
+  })
+
+  console.log(buffer)
+
+  const res = borshDeserialize(schema, new Uint8Array(buffer))
+  return res
 }
 
 export {
@@ -140,4 +188,5 @@ export {
   useHasCurrentPath,
   useCurrentPath,
   useRepositoryMutation,
+  fetchAndDeserialize,
 }

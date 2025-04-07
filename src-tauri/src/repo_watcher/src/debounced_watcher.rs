@@ -11,12 +11,11 @@ use std::{
 };
 use tauri::{AppHandle, Emitter};
 
-use models::{AppEvent, RepoWatcher, RepoWatcherError, EVENT_ID};
-
 use crate::{
     get_branches_folder, get_config_folder, get_git_folder, get_head_file, get_index_file,
     get_objects_folder, get_remotes_folder,
 };
+use models::{AppEvent, RepoWatcher, RepoWatcherError, EVENT_ID};
 
 /// Implementation of [`RepoWatcher`] that uses a debouncer to group events.
 pub struct DebouncedWatcher {

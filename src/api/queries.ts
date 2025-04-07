@@ -1,4 +1,5 @@
 import {
+  type QueryFunctionContext,
   type UseQueryResult,
   infiniteQueryOptions,
   queryOptions,
@@ -26,7 +27,24 @@ import type {
   Settings,
   StashInfo,
 } from './models'
-import { useRepositoryInfiniteQuery, useRepositoryQuery } from './utils'
+import {
+  BRANCHES_SCHEMA,
+  BRANCH_DIVERGENCE_SCHEMA,
+  COMMIT_INFO_SCHEMA,
+  COMMON_ANCESTOR_INFO_SCHEMA,
+  CURRENT_DIR_INFO_SCHEMA,
+  FILE_INFO_SCHEMAS,
+  HEAD_INFO_SCHEMA,
+  HISTORY_PAGE_SCHEMA,
+  PAGE_SCHEMA,
+  REMOTES_SCHEMA,
+  STASHES_SCHEMA,
+} from './schemas'
+import {
+  fetchAndDeserialize,
+  useRepositoryInfiniteQuery,
+  useRepositoryQuery,
+} from './utils'
 
 export const HISTORY_PAGE_SIZE = 50
 export const FILE_STATUSES_PAGE_SIZE = 1000
@@ -193,16 +211,6 @@ const queryKeys = {
   },
 }
 
-const fetchCurrentDir = (): Promise<CurrentDirInfo | null> =>
-  invoke('get_current_dir')
-
-const currentDirQuery = queryOptions({
-  queryKey: [queryKeys.currentDir],
-  queryFn: fetchCurrentDir,
-})
-
-const useQueryCurrentDir = () => useQuery(currentDirQuery)
-
 const fetchSettings = (): Promise<Settings> => invoke('get_setings')
 
 const settingsQuery = queryOptions({
@@ -211,6 +219,24 @@ const settingsQuery = queryOptions({
 })
 
 const useQuerySettings = () => useQuery(settingsQuery)
+
+const fetchCurrentDir = (
+  context: QueryFunctionContext,
+): Promise<CurrentDirInfo | null> => {
+  return fetchAndDeserialize(
+    'get_current_dir',
+    {},
+    CURRENT_DIR_INFO_SCHEMA,
+    context,
+  )
+}
+
+const currentDirQuery = queryOptions({
+  queryKey: [queryKeys.currentDir],
+  queryFn: fetchCurrentDir,
+})
+
+const useQueryCurrentDir = () => useQuery(currentDirQuery)
 
 const fetchRecentlyOpened = (): Promise<string[]> =>
   invoke('get_recently_opened')
@@ -222,21 +248,31 @@ const recentlyOpenedQuery = queryOptions({
 
 const useQueryRecentlyOpened = () => useQuery(recentlyOpenedQuery)
 
-const fetchHeadInfo = (path: string): Promise<HeadInfo> =>
-  invoke('get_head_info', { path: path })
+const fetchHeadInfo = (
+  path: string,
+  context: QueryFunctionContext,
+): Promise<HeadInfo> => {
+  return fetchAndDeserialize(
+    'get_head_info',
+    { path },
+    HEAD_INFO_SCHEMA,
+    context,
+  )
+}
 
 const headInfoQuery = (path: string) =>
   queryOptions({
     queryKey: [queryKeys.directory.headInfo(path)],
-    queryFn: () => fetchHeadInfo(path),
+    queryFn: (context) => fetchHeadInfo(path, context),
   })
 
 const useQueryHeadInfo = () => useRepositoryQuery(headInfoQuery)
 
-const fetchFiles = <T extends FileType>(
+const fetchFilesPage = <T extends FileType>(
   path: string,
   type: T,
   page: number,
+  context: QueryFunctionContext,
 ): Promise<Page<FileTypes[T]>> => {
   const command = match<FileType>(type)
     .with('staged', () => 'get_staged_files_page')
@@ -245,17 +281,22 @@ const fetchFiles = <T extends FileType>(
     .with('untracked', () => 'get_untracked_files_page')
     .exhaustive()
 
-  return invoke(command, {
-    path: path,
-    startAfter: page * FILE_STATUSES_PAGE_SIZE,
-    limit: FILE_STATUSES_PAGE_SIZE,
-  })
+  return fetchAndDeserialize(
+    command,
+    {
+      path,
+      startAfter: page * FILE_STATUSES_PAGE_SIZE,
+      limit: FILE_STATUSES_PAGE_SIZE,
+    },
+    PAGE_SCHEMA(FILE_INFO_SCHEMAS[type]),
+    context,
+  )
 }
 
 const filesQuery = <T extends FileType>(path: string, type: T, page: number) =>
   queryOptions({
     queryKey: [queryKeys.directory.files[type](path).page(page)],
-    queryFn: () => fetchFiles(path, type, page),
+    queryFn: (context) => fetchFilesPage(path, type, page, context),
   })
 
 function useQueryFiles<T extends FileType>(
@@ -264,34 +305,45 @@ function useQueryFiles<T extends FileType>(
   return useRepositoryQuery(filesQuery, type, useFilesPage(type))
 }
 
-const fetchBranches = (path: string): Promise<BranchInfo[]> =>
-  invoke('get_branches', { path: path })
+const fetchBranches = (
+  path: string,
+  context: QueryFunctionContext,
+): Promise<BranchInfo[]> =>
+  fetchAndDeserialize('get_branches', { path }, BRANCHES_SCHEMA, context)
 
 const branchesQuery = (path: string) =>
   queryOptions({
     queryKey: [queryKeys.directory.branches(path)],
-    queryFn: () => fetchBranches(path),
+    queryFn: (context) => fetchBranches(path, context),
   })
 
 const useQueryBranches = () => useRepositoryQuery(branchesQuery)
 
-const fetchCommitHistory = (
+const fetchCommitHistoryPage = (
   path: string,
   branch: BranchName,
   page: number,
-): Promise<Page<HistoryItem>> =>
-  invoke('get_commit_history_page', {
-    path: path,
-    branch: branch,
-    startAfter: page * HISTORY_PAGE_SIZE,
-    limit: HISTORY_PAGE_SIZE,
-  })
+  context: QueryFunctionContext,
+): Promise<Page<HistoryItem>> => {
+  return fetchAndDeserialize(
+    'get_commit_history_page',
+    {
+      path,
+      branch,
+      startAfter: page * HISTORY_PAGE_SIZE,
+      limit: HISTORY_PAGE_SIZE,
+    },
+    HISTORY_PAGE_SCHEMA,
+    context,
+  )
+}
 
 const commitHistoryQuery = (path: string, branch: BranchName | undefined) =>
   infiniteQueryOptions({
     queryKey: [queryKeys.directory.commitHistory.branch(path, branch)],
     queryFn: branch
-      ? ({ pageParam }) => fetchCommitHistory(path, branch, pageParam)
+      ? (context) =>
+          fetchCommitHistoryPage(path, branch, context.pageParam, context)
       : skipToken,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _, lastPageParam) => {
@@ -305,13 +357,20 @@ const useQueryCommitHistory = (branch: BranchName | undefined) =>
 const fetchCommitInfo = (
   path: string,
   commitId: CommitId,
-): Promise<CommitInfo> =>
-  invoke('get_commit_info', { path: path, reference: commitId })
+  context: QueryFunctionContext,
+): Promise<CommitInfo> => {
+  return fetchAndDeserialize(
+    'get_commit_info',
+    { path, reference: commitId },
+    COMMIT_INFO_SCHEMA,
+    context,
+  )
+}
 
 const commitInfoQuery = (path: string, commitId: CommitId) =>
   queryOptions({
     queryKey: [queryKeys.directory.commitInfo.commit(path, commitId)],
-    queryFn: () => fetchCommitInfo(path, commitId),
+    queryFn: (context) => fetchCommitInfo(path, commitId, context),
   })
 
 const useQueryCommitInfo = (commitId: CommitId) =>
@@ -321,12 +380,15 @@ const fetchCommonAncestor = (
   path: string,
   branch: BranchName,
   baseBranch: BranchName,
-): Promise<CommonAncestorInfo | null> =>
-  invoke('get_common_ancestor', {
-    path: path,
-    branch: branch,
-    baseBranch: baseBranch,
-  })
+  context: QueryFunctionContext,
+): Promise<CommonAncestorInfo> => {
+  return fetchAndDeserialize(
+    'get_common_ancestor',
+    { path, branch, baseBranch },
+    COMMON_ANCESTOR_INFO_SCHEMA,
+    context,
+  )
+}
 
 const commonAncestorQuery = (
   path: string,
@@ -339,7 +401,7 @@ const commonAncestorQuery = (
     ],
     queryFn:
       branch && baseBranch
-        ? () => fetchCommonAncestor(path, branch, baseBranch)
+        ? (context) => fetchCommonAncestor(path, branch, baseBranch, context)
         : skipToken,
   })
 
@@ -352,12 +414,15 @@ const fetchBranchDivergence = (
   path: string,
   branch: BranchName,
   baseBranch: BranchName,
-): Promise<BranchDivergence | null> =>
-  invoke('get_branch_divergence', {
-    path: path,
-    branch: branch,
-    baseBranch: baseBranch,
-  })
+  context: QueryFunctionContext,
+): Promise<BranchDivergence> => {
+  return fetchAndDeserialize(
+    'get_branch_divergence',
+    { path, branch, baseBranch },
+    BRANCH_DIVERGENCE_SCHEMA,
+    context,
+  )
+}
 
 const branchDivergenceQuery = (
   path: string,
@@ -370,7 +435,7 @@ const branchDivergenceQuery = (
     ],
     queryFn:
       branch && baseBranch
-        ? () => fetchBranchDivergence(path, branch, baseBranch)
+        ? (context) => fetchBranchDivergence(path, branch, baseBranch, context)
         : skipToken,
   })
 
@@ -379,32 +444,40 @@ const useQueryBranchDivergence = (
   baseBranch: BranchName | undefined,
 ) => useRepositoryQuery(branchDivergenceQuery, branch, baseBranch)
 
-const fetchRemotes = (path: string): Promise<RemoteInfo[]> =>
-  invoke('get_remotes', { path: path })
+const fetchRemotes = (
+  path: string,
+  context: QueryFunctionContext,
+): Promise<RemoteInfo[]> => {
+  return fetchAndDeserialize('get_remotes', { path }, REMOTES_SCHEMA, context)
+}
 
 const remotesQuery = (path: string) =>
   queryOptions({
     queryKey: [queryKeys.directory.remotes(path)],
-    queryFn: () => fetchRemotes(path),
+    queryFn: (context) => fetchRemotes(path, context),
   })
 
 const useQueryRemotes = () => useRepositoryQuery(remotesQuery)
 
-const fetchStashes = (path: string): Promise<StashInfo[]> =>
-  invoke('get_stashes', { path: path })
+const fetchStashes = (
+  path: string,
+  context: QueryFunctionContext,
+): Promise<StashInfo[]> => {
+  return fetchAndDeserialize('get_stashes', { path }, STASHES_SCHEMA, context)
+}
 
 const stashesQuery = (path: string) =>
   queryOptions({
     queryKey: [queryKeys.directory.stashes(path)],
-    queryFn: () => fetchStashes(path),
+    queryFn: (context) => fetchStashes(path, context),
   })
 
 const useQueryStashes = () => useRepositoryQuery(stashesQuery)
 
 export {
   queryKeys,
-  useQueryCurrentDir,
   useQuerySettings,
+  useQueryCurrentDir,
   useQueryRecentlyOpened,
   useQueryHeadInfo,
   useQueryFiles,

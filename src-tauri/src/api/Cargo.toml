@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+borsh = { version = "1.5.7", features = ["derive"] }
 serde = { version = "1.0.210", features = ["derive"] }
 tauri = "2.4.0"
 models = { path = "../models" }

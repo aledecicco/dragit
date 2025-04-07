@@ -66,6 +66,7 @@ checksum = "dcfed56ad506cb2c684a14971b8861fdc3baaaae314b9e5f9bb532cbe3ba7a4f"
 name = "api"
 version = "0.1.0"
 dependencies = [
+ "borsh",
  "models",
  "serde",
  "settings",
@@ -239,6 +240,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1d59b4c170e16f0405a2e95aff44432a0d41aa97675f3d52623effe95792a037"
 dependencies = [
  "objc2 0.6.0",
+]
+
+[[package]]
+name = "borsh"
+version = "1.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ad8646f98db542e39fc66e68a20b2144f6a732636df7c2354e74645faaa433ce"
+dependencies = [
+ "borsh-derive",
+ "cfg_aliases 0.2.1",
+]
+
+[[package]]
+name = "borsh-derive"
+version = "1.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fdd1d3c0c2f5833f22386f252fe8ed005c7f59fdcddeef025c01b4c3b9fd9ac3"
+dependencies = [
+ "once_cell",
+ "proc-macro-crate 3.3.0",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.100",
 ]
 
 [[package]]
@@ -1362,8 +1386,9 @@ dependencies = [
 name = "git_handler"
 version = "0.1.0"
 dependencies = [
+ "borsh",
  "models",
- "serde_json",
+ "tauri",
 ]
 
 [[package]]
@@ -2191,6 +2216,7 @@ dependencies = [
 name = "models"
 version = "0.1.0"
 dependencies = [
+ "borsh",
  "parking_lot",
  "serde",
  "serde_json",

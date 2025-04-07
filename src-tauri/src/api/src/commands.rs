@@ -1,23 +1,18 @@
 use std::path::Path;
-use tauri::{AppHandle, Emitter, Manager, State};
+use tauri::{
+    ipc::{Channel, Response},
+    AppHandle, Emitter, Manager, State,
+};
 
+use crate::{serialize_response, with_handler};
 use models::{
-    AppError, AppEvent, AppState, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    CurrentDirInfo, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
-    RepoWatcherError, SafeHandler, Settings, StagedFileInfo, StashInfo, UnmergedFileInfo,
-    UnstagedFileInfo, UntrackedFileInfo, EVENT_ID,
+    AppError, AppEvent, AppMessage, AppState, CurrentDirInfo, GitHandler, RepoWatcherError,
+    Settings, EVENT_ID,
 };
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
     set_last_opened,
 };
-
-fn with_handler<T>(
-    state: &State<AppState>,
-    fun: &dyn Fn(&SafeHandler) -> Result<T, GitError>,
-) -> Result<T, AppError> {
-    fun(&state.git_handler).map_err(AppError::from)
-}
 
 /// Opens a folder that contains/will contain a git repository.
 #[tauri::command]
@@ -47,8 +42,8 @@ pub async fn open_folder(app_handle: AppHandle, new_path: &str) -> Result<(), Ap
 
 /// Returns the list of recently opened folders.
 #[tauri::command]
-pub async fn get_recently_opened(app_handle: AppHandle) -> Result<Vec<String>, AppError> {
-    Ok(get_recent_folders(&app_handle))
+pub async fn get_recently_opened(app_handle: AppHandle) -> Result<Response, AppError> {
+    Ok(get_recent_folders(&app_handle)).and_then(serialize_response)
 }
 
 /// Removes a folder from the list of recently opened folders.
@@ -73,9 +68,7 @@ pub async fn set_settings(app_handle: AppHandle, settings: Settings) -> Result<(
 
 /// Returns information about the current folder being tracked.
 #[tauri::command]
-pub async fn get_current_dir(
-    state: State<'_, AppState>,
-) -> Result<Option<CurrentDirInfo>, AppError> {
+pub async fn get_current_dir(state: State<'_, AppState>) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
         Ok(state
             .repo_watcher
@@ -88,6 +81,7 @@ pub async fn get_current_dir(
                 exists: Path::new(&path).exists(),
             }))
     })
+    .and_then(serialize_response)
 }
 
 /// Initializes the current open folder as a git repository.
@@ -102,9 +96,10 @@ pub async fn init_repository(state: State<'_, AppState>, path: &str) -> Result<(
 #[tauri::command]
 pub async fn get_branches(
     state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
     path: &str,
-) -> Result<Vec<BranchInfo>, AppError> {
-    with_handler(&state, &|h| h.get_branches(path))
+) -> Result<Response, AppError> {
+    with_handler(&state, &|h| h.get_branches(&channel, path)).and_then(serialize_response)
 }
 
 /// Switches the current repository to a local branch.
@@ -120,76 +115,88 @@ pub async fn checkout_local_branch(
 #[tauri::command]
 pub async fn get_commit_history_page(
     state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
     path: &str,
     branch: &str,
     start_after: usize,
     limit: usize,
-) -> Result<Page<HistoryItem>, AppError> {
+) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_commit_history_page(path, branch, start_after, limit)
+        h.get_commit_history_page(&channel, path, branch, start_after, limit)
     })
+    .and_then(serialize_response)
 }
 
 #[tauri::command]
 pub async fn get_commit_info(
     state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
     path: &str,
     reference: &str,
-) -> Result<CommitInfo, AppError> {
-    with_handler(&state, &|h| h.get_commit_info(path, reference))
+) -> Result<Response, AppError> {
+    with_handler(&state, &|h| h.get_commit_info(&channel, path, reference))
+        .and_then(serialize_response)
 }
 
 #[tauri::command]
-pub async fn get_head_info(state: State<'_, AppState>, path: &str) -> Result<HeadInfo, AppError> {
-    with_handler(&state, &|h| h.get_head_info(path))
+pub async fn get_head_info(state: State<'_, AppState>, path: &str) -> Result<Response, AppError> {
+    with_handler(&state, &|h| h.get_head_info(path)).and_then(serialize_response)
 }
 
 #[tauri::command]
 pub async fn get_staged_files_page(
     state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
     path: &str,
     start_after: usize,
     limit: usize,
-) -> Result<Page<StagedFileInfo>, AppError> {
+) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_staged_files_page(path, start_after, limit)
+        h.get_staged_files_page(&channel, path, start_after, limit)
     })
+    .and_then(serialize_response)
 }
 
 #[tauri::command]
 pub async fn get_unstaged_files_page(
     state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
     path: &str,
     start_after: usize,
     limit: usize,
-) -> Result<Page<UnstagedFileInfo>, AppError> {
+) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_unstaged_files_page(path, start_after, limit)
+        h.get_unstaged_files_page(&channel, path, start_after, limit)
     })
+    .and_then(serialize_response)
 }
 
 #[tauri::command]
 pub async fn get_unmerged_files_page(
     state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
     path: &str,
     start_after: usize,
     limit: usize,
-) -> Result<Page<UnmergedFileInfo>, AppError> {
+) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_unmerged_files_page(path, start_after, limit)
+        h.get_unmerged_files_page(&channel, path, start_after, limit)
     })
+    .and_then(serialize_response)
 }
 
 #[tauri::command]
 pub async fn get_untracked_files_page(
     state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
     path: &str,
     start_after: usize,
     limit: usize,
-) -> Result<Page<UntrackedFileInfo>, AppError> {
+) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_untracked_files_page(path, start_after, limit)
+        h.get_untracked_files_page(&channel, path, start_after, limit)
     })
+    .and_then(serialize_response)
 }
 
 #[tauri::command]
@@ -232,25 +239,29 @@ pub async fn commit_index(
 #[tauri::command]
 pub async fn get_common_ancestor(
     state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
     path: &str,
     branch: &str,
     base_branch: &str,
-) -> Result<Option<CommonAncestorInfo>, AppError> {
+) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_common_ancestor(path, branch, base_branch)
+        h.get_common_ancestor(&channel, path, branch, base_branch)
     })
+    .and_then(serialize_response)
 }
 
 #[tauri::command]
 pub async fn get_branch_divergence(
     state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
     path: &str,
     branch: &str,
     base_branch: &str,
-) -> Result<BranchDivergence, AppError> {
+) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_branch_divergence(path, branch, base_branch)
+        h.get_branch_divergence(&channel, path, branch, base_branch)
     })
+    .and_then(serialize_response)
 }
 
 #[tauri::command]
@@ -283,11 +294,8 @@ pub async fn pull_branch(
 }
 
 #[tauri::command]
-pub async fn get_remotes(
-    state: State<'_, AppState>,
-    path: &str,
-) -> Result<Vec<RemoteInfo>, AppError> {
-    with_handler(&state, &|h| h.get_remotes(path))
+pub async fn get_remotes(state: State<'_, AppState>, path: &str) -> Result<Response, AppError> {
+    with_handler(&state, &|h| h.get_remotes(path)).and_then(serialize_response)
 }
 
 /// Updates the references of the given remote.
@@ -320,9 +328,6 @@ pub async fn remove_remote(
 }
 
 #[tauri::command]
-pub async fn get_stashes(
-    state: State<'_, AppState>,
-    path: &str,
-) -> Result<Vec<StashInfo>, AppError> {
-    with_handler(&state, &|h| h.get_stashes(path))
+pub async fn get_stashes(state: State<'_, AppState>, path: &str) -> Result<Response, AppError> {
+    with_handler(&state, &|h| h.get_stashes(path)).and_then(serialize_response)
 }

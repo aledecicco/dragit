@@ -1,13 +1,13 @@
 use std::{
     collections::HashMap,
-    error::Error,
     io::{BufRead, BufReader, Lines},
-    process::{ChildStdout, Command, ExitStatus, Stdio},
+    process::{id, Child, ChildStdout, Command},
 };
+use tauri::ipc::Channel;
 
 use models::{
-    AncestorInfo, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError,
-    GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo, StagedFileInfo, StashInfo,
+    AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
+    GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo, StagedFileInfo, StashInfo,
     UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo,
 };
 mod utils;
@@ -17,81 +17,83 @@ use utils::*;
 pub struct CmdGit {}
 
 impl CmdGit {
-    /// Initialize this implementation without a path.
     pub fn new() -> Self {
         CmdGit {}
     }
 
-    fn create_command<'a, I>(&self, path: &str, args: I) -> Command
+    fn spawn_command<'a, I>(&self, path: &str, args: I) -> Result<Child, GitError>
     where
         I: IntoIterator<Item = &'a str>,
     {
         let mut cmd = Command::new("git");
-        cmd.current_dir(path).args(args);
-
-        cmd
+        let args_vec: Vec<_> = args.into_iter().collect();
+        cmd.current_dir(path).args(&args_vec);
+        cmd.spawn().or(Err(GitError::StartCommandFailed {
+            args: args_vec.into_iter().map(String::from).collect(),
+        }))
     }
 
-    fn run_command<'a, I>(&self, path: &str, args: I) -> Result<ExitStatus, Box<dyn Error>>
-    where
-        I: IntoIterator<Item = &'a str>,
-    {
-        let mut cmd = self.create_command(path, args);
-        let status = cmd.status()?;
-
-        Ok(status)
-    }
-
-    fn get_all_output<'a, I>(&self, path: &str, args: I) -> Result<String, Box<dyn Error>>
-    where
-        I: IntoIterator<Item = &'a str>,
-    {
-        let mut cmd = self.create_command(path, args);
-        let output = cmd.output()?.stdout;
-        let res = String::from_utf8(output)?.trim().to_string();
-
-        Ok(res)
-    }
-
-    fn get_all_output_lines<'a, I>(
+    fn spawn_and_emmit<'a, I>(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         args: I,
-    ) -> Result<Vec<String>, Box<dyn Error>>
+    ) -> Result<Child, GitError>
     where
         I: IntoIterator<Item = &'a str>,
     {
-        let output = self.get_all_output(path, args)?;
-        let lines = output.lines().map(|line| line.trim().to_string()).collect();
+        let process = self.spawn_command(path, args)?;
 
-        Ok(lines)
+        let _ = channel.send(AppMessage::ProcessStarted {
+            pid: id(),
+            subprocess: Some(process.id()),
+        });
+
+        Ok(process)
     }
 
-    fn get_output_lines_stream<'a, I>(
-        &self,
-        path: &str,
-        args: I,
-    ) -> Result<Lines<BufReader<ChildStdout>>, Box<dyn Error>>
+    fn spawn_and_await<'a, I>(&self, path: &str, args: I) -> Result<(), GitError>
     where
         I: IntoIterator<Item = &'a str>,
     {
-        let mut cmd = self.create_command(path, args);
-        let child = cmd.stdout(Stdio::piped()).spawn()?;
-        let id = child.id();
-        let stdout = child.stdout.unwrap();
+        let res = self.spawn_command(path, args)?.wait();
+
+        match res.map(|res| res.success()) {
+            Ok(true) => Ok(()),
+            _ => Err(GitError::GetCommandOutputFailed {}),
+        }
+    }
+
+    fn get_output_lines_stream<'a>(
+        &self,
+        process: Child,
+    ) -> Result<Lines<BufReader<ChildStdout>>, GitError> {
+        let stdout = process.stdout.unwrap();
 
         let reader = BufReader::new(stdout);
         Ok(reader.lines())
     }
 
+    fn get_all_output_lines<'a>(&self, process: Child) -> Result<Vec<String>, GitError> {
+        let lines = self.get_output_lines_stream(process)?;
+        let lines: Result<_, _> = lines.collect();
+
+        lines.or(Err(GitError::GetCommandOutputFailed {}))
+    }
+
+    fn get_all_output<'a>(&self, process: Child) -> Result<String, GitError> {
+        Ok(self.get_all_output_lines(process)?.join("\n"))
+    }
+
     fn get_files_page<T>(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         include_untracked: bool,
         parse_file_info: fn(&String) -> Option<T>,
         start_after: usize,
         limit: usize,
-    ) -> Result<Page<T>, Box<dyn Error>> {
+    ) -> Result<Page<T>, GitError> {
         let mut args = vec![
             "--no-optional-locks",
             "status",
@@ -107,9 +109,10 @@ impl CmdGit {
             args.push("--untracked-files=no");
         }
 
-        let lines = self.get_output_lines_stream(path, args);
+        let process = self.spawn_and_emmit(channel, path, args)?;
+        let lines = self.get_output_lines_stream(process)?;
 
-        let mut items_iter = lines?
+        let mut items_iter = lines
             .filter_map(|line| line.ok().and_then(|line| parse_file_info(&line)))
             .skip(start_after);
         let items: Vec<_> = items_iter.by_ref().take(limit).collect();
@@ -121,39 +124,39 @@ impl CmdGit {
 
 impl GitHandler for CmdGit {
     fn init_repository(&self, path: &str) -> Result<(), GitError> {
-        self.run_command(path, ["init"])
-            .or(Err(GitError::AlreadyARepository {}))?;
-
-        Ok(())
+        self.spawn_and_await(path, ["init"])
     }
 
     fn is_repository(&self, path: &str) -> bool {
-        self.run_command(&path, ["rev-parse"]).is_ok()
+        self.spawn_and_await(path, ["rev-parse"]).is_ok()
     }
 
-    fn get_branches(&self, path: &str) -> Result<Vec<BranchInfo>, GitError> {
-        self.get_all_output_lines(path, ["branch", "--list", "-a", BRANCHES_INFO_FORMAT])
-            .or(Err(GitError::GetBranchesFailed {}))
-            .map(|lines| {
-                lines
-                    .iter()
-                    .map(parse_branch_info)
-                    .filter_map(|x| x)
-                    .collect()
-            })
+    fn get_branches(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+    ) -> Result<Vec<BranchInfo>, GitError> {
+        let process = self.spawn_and_emmit(
+            channel,
+            path,
+            ["branch", "--list", "-a", BRANCHES_INFO_FORMAT],
+        )?;
+        let lines = self.get_output_lines_stream(process)?;
+        let branches = lines.filter_map(|line| line.ok().and_then(|line| parse_branch_info(&line)));
+
+        Ok(branches.collect())
     }
 
     fn checkout_local_branch(&self, path: &str, branch: &str) -> Result<(), GitError> {
-        self.run_command(path, ["checkout", branch])
+        self.spawn_and_await(path, ["checkout", branch])
             .or(Err(GitError::CheckoutBranchFailed {
                 branch: branch.to_string(),
-            }))?;
-
-        Ok(())
+            }))
     }
 
     fn get_commit_history_page(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         branch: &str,
         start_after: usize,
@@ -163,45 +166,53 @@ impl GitHandler for CmdGit {
         let page_size_arg = (limit + 1).to_string();
         let branch_arg = branch.to_string() + "~" + &page_arg;
 
-        let lines = self
-            .get_all_output_lines(
-                path,
-                [
-                    "rev-list",
-                    &branch_arg,
-                    "-n",
-                    &page_size_arg,
-                    "--first-parent",
-                    "--parents",
-                ],
-            )
-            .or(Err(GitError::GetReferenceHistoryFailed {
-                reference: branch.to_string(),
-            }))?;
+        let process = self.spawn_and_emmit(
+            channel,
+            path,
+            [
+                "rev-list",
+                &branch_arg,
+                "-n",
+                &page_size_arg,
+                "--first-parent",
+                "--parents",
+            ],
+        )?;
+        let lines = self.get_output_lines_stream(process)?;
+        let mut items_iter = lines
+            .take(limit)
+            .map(|line| line.ok().and_then(|line| parse_history_item(&line)));
 
-        let items: Option<Vec<HistoryItem>> =
-            lines.iter().take(limit).map(parse_history_item).collect();
-
+        let items: Option<_> = items_iter.by_ref().collect();
         let items = items.ok_or(GitError::GetReferenceHistoryFailed {
             reference: branch.to_string(),
         })?;
 
-        let has_next = lines.len() > limit;
+        let has_next = items_iter.next().is_some();
 
         Ok(Page { items, has_next })
     }
 
-    fn get_commit_info(&self, path: &str, reference: &str) -> Result<CommitInfo, GitError> {
-        self.get_all_output_lines(path, ["show", reference, COMMIT_INFO_FORMAT, "--quiet"])
-            .ok()
-            .and_then(|lines| parse_commit_info(&lines))
-            .ok_or(GitError::GetCommitInfoFailed {
-                reference: reference.to_string(),
-            })
+    fn get_commit_info(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+        reference: &str,
+    ) -> Result<CommitInfo, GitError> {
+        let process = self.spawn_and_emmit(
+            channel,
+            path,
+            ["show", reference, COMMIT_INFO_FORMAT, "--quiet"],
+        )?;
+        let lines = self.get_all_output_lines(process)?;
+
+        parse_commit_info(&lines).ok_or(GitError::GetCommitInfoFailed {
+            reference: reference.to_string(),
+        })
     }
 
     fn get_head_info(&self, path: &str) -> Result<HeadInfo, GitError> {
-        self.get_all_output_lines(
+        let process = self.spawn_command(
             &path,
             [
                 "--no-optional-locks",
@@ -212,74 +223,100 @@ impl GitHandler for CmdGit {
                 "--no-ahead-behind",
                 ".git",
             ],
-        )
-        .ok()
-        .and_then(|lines| parse_head_info(&lines))
-        .ok_or(GitError::GetHeadInfoFailed {})
+        )?;
+        let lines = self.get_all_output_lines(process)?;
+
+        parse_head_info(&lines).ok_or(GitError::GetHeadInfoFailed {})
     }
 
     fn get_staged_files_page(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<StagedFileInfo>, GitError> {
-        self.get_files_page(path, false, parse_staged_file_info, start_after, limit)
-            .or(Err(GitError::GetStagedFilesFailed {}))
+        self.get_files_page(
+            channel,
+            path,
+            false,
+            parse_staged_file_info,
+            start_after,
+            limit,
+        )
+        .or(Err(GitError::GetStagedFilesFailed {}))
     }
 
     fn get_unstaged_files_page(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<UnstagedFileInfo>, GitError> {
-        self.get_files_page(path, false, parse_unstaged_file_info, start_after, limit)
-            .or(Err(GitError::GetUnstagedFilesFailed {}))
+        self.get_files_page(
+            channel,
+            path,
+            false,
+            parse_unstaged_file_info,
+            start_after,
+            limit,
+        )
+        .or(Err(GitError::GetUnstagedFilesFailed {}))
     }
 
     fn get_unmerged_files_page(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<UnmergedFileInfo>, GitError> {
-        self.get_files_page(path, false, parse_unmerged_file_info, start_after, limit)
-            .or(Err(GitError::GetUnmergedFilesFailed {}))
+        self.get_files_page(
+            channel,
+            path,
+            false,
+            parse_unmerged_file_info,
+            start_after,
+            limit,
+        )
+        .or(Err(GitError::GetUnmergedFilesFailed {}))
     }
 
     fn get_untracked_files_page(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<UntrackedFileInfo>, GitError> {
-        self.get_files_page(path, true, parse_untracked_file_info, start_after, limit)
-            .or(Err(GitError::GetUntrackedFilesFailed {}))
+        self.get_files_page(
+            channel,
+            path,
+            true,
+            parse_untracked_file_info,
+            start_after,
+            limit,
+        )
+        .or(Err(GitError::GetUntrackedFilesFailed {}))
     }
 
     fn add_to_index(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError> {
         let args = [vec!["add"], files.clone()].concat();
-        self.run_command(path, args)
-            .or(Err(GitError::AddToIndexFailed {}))?;
-
-        Ok(())
+        self.spawn_and_await(path, args)
+            .or(Err(GitError::AddToIndexFailed {}))
     }
 
     fn remove_from_index(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError> {
         let args = [vec!["reset", "--"], files.clone()].concat();
-        self.run_command(path, args)
-            .or(Err(GitError::RemoveFromIndexFailed {}))?;
-
-        Ok(())
+        self.spawn_and_await(path, args)
+            .or(Err(GitError::RemoveFromIndexFailed {}))
     }
 
     fn remove_from_tree(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError> {
         let args = [vec!["rm"], files.clone()].concat();
-        self.run_command(path, args)
-            .or(Err(GitError::RemoveFromTreeFailed {}))?;
-
-        Ok(())
+        self.spawn_and_await(path, args)
+            .or(Err(GitError::RemoveFromTreeFailed {}))
     }
 
     fn commit_index(&self, path: &str, message: &str, is_amend: bool) -> Result<(), GitError> {
@@ -289,21 +326,27 @@ impl GitHandler for CmdGit {
             args.push("--amend");
         }
 
-        self.run_command(path, args)
-            .or(Err(GitError::CommitFailed {}))?;
-
-        Ok(())
+        self.spawn_and_await(path, args)
+            .or(Err(GitError::CommitFailed {}))
     }
 
     fn get_common_ancestor(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         branch: &str,
         base_branch: &str,
     ) -> Result<Option<CommonAncestorInfo>, GitError> {
+        let _ = channel.send(AppMessage::ProcessStarted {
+            pid: id(),
+            subprocess: None,
+        });
+
         let parse_ref = |reference: &str, back: u64| -> Option<String> {
-            self.get_all_output(path, ["rev-parse", &format!("{}^{}", reference, back)])
-                .ok()
+            let process = self
+                .spawn_command(path, ["rev-parse", &format!("{}^{}", reference, back)])
+                .ok()?;
+            self.get_all_output(process).ok()
         };
 
         let mut prev_branch_pointer = None;
@@ -365,11 +408,13 @@ impl GitHandler for CmdGit {
 
     fn get_branch_divergence(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         branch: &str,
         base_branch: &str,
     ) -> Result<BranchDivergence, GitError> {
-        self.get_all_output(
+        let process = self.spawn_and_emmit(
+            channel,
             path,
             [
                 "rev-list",
@@ -377,10 +422,10 @@ impl GitHandler for CmdGit {
                 "--count",
                 &format!("{}...{}", branch, base_branch),
             ],
-        )
-        .ok()
-        .and_then(|line| parse_branch_divergence(&line))
-        .ok_or(GitError::GetBranchDivergenceFailed {
+        )?;
+
+        let output = self.get_all_output(process)?;
+        parse_branch_divergence(&output).ok_or(GitError::GetBranchDivergenceFailed {
             branch: branch.to_string(),
             base_branch: base_branch.to_string(),
         })
@@ -406,14 +451,12 @@ impl GitHandler for CmdGit {
             args.push("--set-upstream");
         }
 
-        self.run_command(path, args)
+        self.spawn_and_await(path, args)
             .or(Err(GitError::PushBranchFailed {
                 branch: branch.to_string(),
                 remote: remote.to_string(),
                 remote_branch: remote_branch.to_string(),
-            }))?;
-
-        Ok(())
+            }))
     }
 
     fn pull_branch(
@@ -431,55 +474,47 @@ impl GitHandler for CmdGit {
             args.push("--rebase");
         }
 
-        self.run_command(path, args)
+        self.spawn_and_await(path, args)
             .or(Err(GitError::PullBranchFailed {
                 branch: branch.to_string(),
                 remote: remote.to_string(),
                 remote_branch: remote_branch.to_string(),
-            }))?;
-
-        Ok(())
+            }))
     }
 
     fn get_remotes(&self, path: &str) -> Result<Vec<RemoteInfo>, GitError> {
-        self.get_all_output_lines(path, ["remote", "--verbose"])
-            .ok()
-            .and_then(|lines| Some(parse_remote_infos(&lines)))
-            .ok_or(GitError::GetRemotesFailed {})
+        let process = self.spawn_command(path, ["remote", "--verbose"])?;
+        let lines = self.get_all_output_lines(process)?;
+
+        Ok(parse_remote_infos(&lines))
     }
 
     fn fetch_remote(&self, path: &str, name: &str) -> Result<(), GitError> {
-        self.run_command(path, ["fetch", name])
+        self.spawn_and_await(path, ["fetch", name])
             .or(Err(GitError::FetchRemoteFailed {
                 name: name.to_string(),
-            }))?;
-
-        Ok(())
+            }))
     }
 
     fn add_remote(&self, path: &str, name: &str, url: &str) -> Result<(), GitError> {
-        self.run_command(path, ["remote", "add", name, url])
+        self.spawn_and_await(path, ["remote", "add", name, url])
             .or(Err(GitError::AddRemoteFailed {
                 name: name.to_string(),
-            }))?;
-
-        Ok(())
+            }))
     }
 
     fn remove_remote(&self, path: &str, name: &str) -> Result<(), GitError> {
-        self.run_command(path, ["remote", "remove", name]).or(Err(
-            GitError::RemoveRemoteFailed {
+        self.spawn_and_await(path, ["remote", "remove", name])
+            .or(Err(GitError::RemoveRemoteFailed {
                 name: name.to_string(),
-            },
-        ))?;
-
-        Ok(())
+            }))
     }
 
     fn get_stashes(&self, path: &str) -> Result<Vec<StashInfo>, GitError> {
-        self.get_all_output_lines(path, ["stash", "list", STASH_INFO_FORMAT, "--shortstat"])
-            .ok()
-            .and_then(|lines| Some(parse_stash_infos(&lines)))
-            .ok_or(GitError::GetStashesFailed {})
+        let process =
+            self.spawn_command(path, ["stash", "list", STASH_INFO_FORMAT, "--shortstat"])?;
+        let lines = self.get_all_output_lines(process)?;
+
+        Ok(parse_stash_infos(&lines))
     }
 }

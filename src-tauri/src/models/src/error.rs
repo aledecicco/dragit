@@ -1,11 +1,17 @@
 #[derive(thiserror::Error, serde::Serialize, Debug, Clone)]
-#[serde(tag = "type")]
+#[serde(rename_all(serialize = "camelCase"), tag = "type")]
 pub enum GitError {
-    #[error("Current folder is already a repository")]
-    AlreadyARepository {},
+    #[error("Failed to start git process \"{args:?}\"")]
+    StartCommandFailed { args: Vec<String> },
+
+    #[error("Failed to get command output")]
+    GetCommandOutputFailed {},
 
     #[error("No repository is open")]
     RepositoryNotOpen {},
+
+    #[error("Failed to init repository at \"{path}\"")]
+    InitRepositoryFailed { path: String },
 
     #[error("The path \"{path}\" is not a directory")]
     NotADirectory { path: String },
@@ -89,7 +95,7 @@ pub enum GitError {
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug, Clone)]
-#[serde(tag = "type")]
+#[serde(rename_all(serialize = "camelCase"), tag = "type")]
 pub enum RepoWatcherError {
     #[error("Failed to setup file watcher")]
     SetupFailed {},
@@ -108,7 +114,7 @@ pub enum RepoWatcherError {
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug, Clone)]
-#[serde(tag = "type")]
+#[serde(rename_all(serialize = "camelCase"), tag = "type")]
 pub enum AppError {
     #[error("Error with git operation: {git_error}")]
     GitOperationFailed { git_error: GitError },
@@ -123,6 +129,9 @@ pub enum AppError {
 
     #[error("Failed to remove \"{path}\" from the recent folders list")]
     RemoveFromRecentFailed { path: String },
+
+    #[error("Failed to serialize the result")]
+    SerializationFailed,
 }
 
 impl From<GitError> for AppError {

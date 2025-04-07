@@ -1,6 +1,8 @@
+use tauri::ipc::Channel;
+
 use crate::{
-    BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError, HeadInfo, HistoryItem,
-    Page, RemoteInfo, StagedFileInfo, StashInfo, UnmergedFileInfo, UnstagedFileInfo,
+    AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError, HeadInfo,
+    HistoryItem, Page, RemoteInfo, StagedFileInfo, StashInfo, UnmergedFileInfo, UnstagedFileInfo,
     UntrackedFileInfo,
 };
 
@@ -13,7 +15,11 @@ pub trait GitHandler {
     fn is_repository(&self, path: &str) -> bool;
 
     /// Returns the list of the current known local and remote branches.
-    fn get_branches(&self, path: &str) -> Result<Vec<BranchInfo>, GitError>;
+    fn get_branches(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+    ) -> Result<Vec<BranchInfo>, GitError>;
 
     /// Switches the current repository to a local branch.
     fn checkout_local_branch(&self, path: &str, branch: &str) -> Result<(), GitError>;
@@ -21,6 +27,7 @@ pub trait GitHandler {
     /// Returns (a page of) the list of commit hashes leading up to a reference.
     fn get_commit_history_page(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         reference: &str,
         start_after: usize,
@@ -28,7 +35,12 @@ pub trait GitHandler {
     ) -> Result<Page<HistoryItem>, GitError>;
 
     /// Returns information about the given commit.
-    fn get_commit_info(&self, path: &str, reference: &str) -> Result<CommitInfo, GitError>;
+    fn get_commit_info(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+        reference: &str,
+    ) -> Result<CommitInfo, GitError>;
 
     /// Returns information about the current state of the HEAD.
     fn get_head_info(&self, path: &str) -> Result<HeadInfo, GitError>;
@@ -36,6 +48,7 @@ pub trait GitHandler {
     /// Returns (a page of) the list of files with staged changes.
     fn get_staged_files_page(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         start_after: usize,
         limit: usize,
@@ -44,6 +57,7 @@ pub trait GitHandler {
     /// Returns (a page of) the list of files with unstaged changes.
     fn get_unstaged_files_page(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         start_after: usize,
         limit: usize,
@@ -52,6 +66,7 @@ pub trait GitHandler {
     /// Returns (a page of) the list of files with unmerged changes.
     fn get_unmerged_files_page(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         start_after: usize,
         limit: usize,
@@ -60,6 +75,7 @@ pub trait GitHandler {
     /// Returns (a page of) the list of untracked files.
     fn get_untracked_files_page(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         start_after: usize,
         limit: usize,
@@ -80,6 +96,7 @@ pub trait GitHandler {
     /// Returns the commit hash of the latest common ancestor between the two given branches.
     fn get_common_ancestor(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         branch_a: &str,
         branch_b: &str,
@@ -88,6 +105,7 @@ pub trait GitHandler {
     /// Returns the number of commits that the given branch is ahead/behind another (possibly its remote counterpart).
     fn get_branch_divergence(
         &self,
+        channel: &Channel<AppMessage>,
         path: &str,
         branch: &str,
         base_branch: &str,

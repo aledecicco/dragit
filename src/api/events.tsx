@@ -1,10 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
-// import { relaunch } from '@tauri-apps/plugin-process'
 import { type PropsWithChildren, useEffect } from 'react'
 import { P, match } from 'ts-pattern'
 
 import { useSelectedBranches } from '@context/branches'
+import type { AppEvent } from './models'
 import { queryKeys } from './queries'
 
 const EVENT_ID = 'app-event'
@@ -16,11 +16,13 @@ const EventHandler = (props: PropsWithChildren) => {
   const { branch: currentBranch } = useSelectedBranches()
 
   useEffect(() => {
-    const unlisten = listen(EVENT_ID, (event) => {
+    const unlisten = listen<AppEvent>(EVENT_ID, (event) => {
       match(event.payload)
+        .with({ type: 'dirDisappeared' }, () => {
+          // TODO: show a notification that the directory is gone
+        })
         .with({ type: 'dirChanged' }, () => {
           client.resetQueries()
-          // TODO: relaunch()
         })
         .with({ type: 'gitFolderModified', path: P.string }, ({ path }) => {
           client.invalidateQueries({
@@ -103,6 +105,7 @@ const EventHandler = (props: PropsWithChildren) => {
             queryKey: [queryKeys.directory.files.all(path)],
           })
         })
+        .exhaustive()
     })
 
     return () => {

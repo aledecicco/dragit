@@ -1,139 +1,84 @@
-export interface Page<T> {
-  items: T[]
-  hasNext: boolean
-}
+import type { Infer } from 'borsher'
+
+import type {
+  ANCESTOR_INFO_SCHEMA,
+  BRANCH_DIVERGENCE_SCHEMA,
+  BRANCH_INFO_SCHEMA,
+  COMMIT_INFO_SCHEMA,
+  COMMON_ANCESTOR_INFO_SCHEMA,
+  CURRENT_DIR_INFO_SCHEMA,
+  DIFF_SUMMARY_SCHEMA,
+  HEAD_INFO_SCHEMA,
+  HISTORY_ITEM_SCHEMA,
+  PAGE_SCHEMA,
+  REMOTE_INFO_SCHEMA,
+  STAGED_FILE_INFO_SCHEMA,
+  STASH_INFO_SCHEMA,
+  UNMERGED_FILE_INFO_SCHEMA,
+  UNSTAGED_FILE_INFO_SCHEMA,
+  UNTRACKED_FILE_INFO_SCHEMA,
+} from './schemas'
 
 export interface Settings {
   recentlyOpened: string[]
   openLastOnStart: boolean
 }
 
-export interface CurrentDirInfo {
-  path: string
-  isRepository: boolean
-  exists: boolean
-}
+export type Page<T> = Infer<ReturnType<typeof PAGE_SCHEMA<T>>>
+
+export type CurrentDirInfo = NonNullable<Infer<typeof CURRENT_DIR_INFO_SCHEMA>>
 
 export type CommitId = string
 export type BranchName = string
 export type RemoteName = string
 export type RefName = `${RemoteName}/${BranchName}`
 
-export interface CommitInfo {
-  hash: CommitId
-  shortHash: string
-  authorName: string
-  authorEmail: string
-  timestamp: number
-  message: string | null
-}
+export type CommitInfo = Infer<typeof COMMIT_INFO_SCHEMA>
 
-export interface AncestorInfo {
-  distance: number
-  hash: CommitId
-}
+export type AncestorInfo = Infer<typeof ANCESTOR_INFO_SCHEMA>
 
-export interface CommonAncestorInfo {
-  lastCommit: AncestorInfo | null
-  commonCommit: AncestorInfo
-}
+export type CommonAncestorInfo = Infer<typeof COMMON_ANCESTOR_INFO_SCHEMA>
 
-export interface BranchDivergence {
-  ahead: number
-  behind: number
-}
+export type BranchDivergence = Infer<typeof BRANCH_DIVERGENCE_SCHEMA>
 
-export interface HistoryItem {
-  hash: CommitId
-  otherParents: CommitId[]
-}
+export type HistoryItem = Infer<typeof HISTORY_ITEM_SCHEMA>
 
-export type HeadInfo =
-  | { type: 'detached'; commit: CommitId }
-  | { type: 'branch'; name: BranchName }
+export type HeadInfo = Infer<typeof HEAD_INFO_SCHEMA>
 
-export interface LocalBranch {
-  name: BranchName
-  timestamp: number
-  type: 'local'
-  remote: {
-    remoteName: RemoteName
-    branchName: BranchName
-  } | null
-}
+export type BranchInfo = Infer<typeof BRANCH_INFO_SCHEMA>
 
-export interface RemoteBranch {
-  name: RefName
-  timestamp: number
-  type: 'remote'
-}
+export type StagedFileInfo = Infer<typeof STAGED_FILE_INFO_SCHEMA>
+export type UnstagedFileInfo = Infer<typeof UNSTAGED_FILE_INFO_SCHEMA>
+export type UnmergedFileInfo = Infer<typeof UNMERGED_FILE_INFO_SCHEMA>
+export type UntrackedFileInfo = Infer<typeof UNTRACKED_FILE_INFO_SCHEMA>
 
-export type BranchInfo = LocalBranch | RemoteBranch
-
-export type ChangeStatus = 'modified' | 'typeChanged' | 'added' | 'deleted'
-
-export type MovedStatus = 'renamed' | 'copied'
-
-export type MergeStatus =
-  | 'bothAdded'
-  | 'bothDeleted'
-  | 'bothModified'
-  | 'addedByUs'
-  | 'deletedByUs'
-  | 'addedByThem'
-  | 'deletedByThem'
-
-interface BaseFileInfo {
-  path: string
-}
-
-export interface ChangedFileInfo extends BaseFileInfo {
-  status: 'changed'
-  changes: ChangeStatus
-}
-
-export interface MovedFileInfo extends BaseFileInfo {
-  status: 'moved'
-  changes: MovedStatus
-  old_path: string
-}
-
-export type StagedFileInfo = ChangedFileInfo | MovedFileInfo
-
-export interface UnstagedFileInfo extends BaseFileInfo {
-  changes: ChangeStatus
-}
-
-export interface UnmergedFileInfo extends BaseFileInfo {
-  status: MergeStatus
-}
-
-export interface UntrackedFileInfo extends BaseFileInfo {}
-
-export type FileType = 'staged' | 'unstaged' | 'unmerged' | 'untracked'
 export type FileTypes = {
   staged: StagedFileInfo
   unstaged: UnstagedFileInfo
   unmerged: UnmergedFileInfo
   untracked: UntrackedFileInfo
 }
+export type FileType = keyof FileTypes
 
-export interface RemoteInfo {
-  name: RemoteName
-  fetchUrl: string
-  pushUrl: string
+export type RemoteInfo = Infer<typeof REMOTE_INFO_SCHEMA>
+
+export type DiffSummary = Infer<typeof DIFF_SUMMARY_SCHEMA>
+
+export type StashInfo = Infer<typeof STASH_INFO_SCHEMA>
+
+export type AppMessage = {
+  type: 'processStarted'
+  pid: number
+  subprocess: number | null
 }
 
-export interface DiffSummary {
-  filesCount: number
-  insertions: number
-  deletions: number
-}
-
-export interface StashInfo {
-  name: string
-  message: string | null
-  timestamp: number
-  created_on: CommitId | BranchName
-  changes: DiffSummary | null
-}
+export type AppEvent =
+  | { type: 'dirDisappeared'; path: string }
+  | { type: 'dirChanged' }
+  | { type: 'gitFolderModified'; path: string }
+  | { type: 'branchesListUpdated'; path: string }
+  | { type: 'branchUpdated'; path: string; name: string }
+  | { type: 'headChanged'; path: string }
+  | { type: 'filesModified'; path: string }
+  | { type: 'configUpdated'; path: string }
+  | { type: 'indexUpdated'; path: string }

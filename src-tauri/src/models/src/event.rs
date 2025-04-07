@@ -30,3 +30,9 @@ pub enum AppEvent {
     /// The status of the current commit was updated.
     IndexUpdated { path: String },
 }
+
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all(serialize = "camelCase"), tag = "type")]
+pub enum AppMessage {
+    ProcessStarted { pid: u32, subprocess: Option<u32> },
+}
