@@ -1,7 +1,5 @@
 import { BorshSchema } from 'borsher'
 
-import type { FileType, FileTypes } from './models'
-
 export const PAGE_SCHEMA = <T>(ITEM_SCHEMA: BorshSchema<T>) =>
   BorshSchema.Struct({
     items: BorshSchema.Vec(ITEM_SCHEMA),
@@ -21,12 +19,12 @@ export const COMMIT_INFO_SCHEMA = BorshSchema.Struct({
   shortHash: BorshSchema.String,
   authorName: BorshSchema.String,
   authorEmail: BorshSchema.String,
-  timestamp: BorshSchema.u64,
+  timestamp: BorshSchema.u32,
   message: BorshSchema.Option(BorshSchema.String),
 })
 
 export const ANCESTOR_INFO_SCHEMA = BorshSchema.Struct({
-  distance: BorshSchema.u64,
+  distance: BorshSchema.u32,
   hash: BorshSchema.String,
 })
 
@@ -36,8 +34,8 @@ export const COMMON_ANCESTOR_INFO_SCHEMA = BorshSchema.Struct({
 })
 
 export const BRANCH_DIVERGENCE_SCHEMA = BorshSchema.Struct({
-  ahead: BorshSchema.u64,
-  behind: BorshSchema.u64,
+  ahead: BorshSchema.u32,
+  behind: BorshSchema.u32,
 })
 
 export const HISTORY_ITEM_SCHEMA = BorshSchema.Struct({
@@ -55,19 +53,20 @@ export const HEAD_INFO_SCHEMA = BorshSchema.Enum({
   }),
 })
 
-export const BRANCH_INFO_SCHEMA = BorshSchema.Struct({
-  name: BorshSchema.String,
-  timestamp: BorshSchema.u64,
-  type: BorshSchema.Enum({
-    Local: BorshSchema.Struct({
-      remote: BorshSchema.Option(
-        BorshSchema.Struct({
-          remoteName: BorshSchema.String,
-          branchName: BorshSchema.String,
-        }),
-      ),
-    }),
-    Remote: BorshSchema.Unit,
+export const BRANCH_INFO_SCHEMA = BorshSchema.Enum({
+  Local: BorshSchema.Struct({
+    name: BorshSchema.String,
+    remote: BorshSchema.Option(
+      BorshSchema.Struct({
+        remoteName: BorshSchema.String,
+        branchName: BorshSchema.String,
+      }),
+    ),
+    timestamp: BorshSchema.u32,
+  }),
+  Remote: BorshSchema.Struct({
+    name: BorshSchema.String,
+    timestamp: BorshSchema.u32,
   }),
 })
 export const BRANCHES_SCHEMA = BorshSchema.Vec(BRANCH_INFO_SCHEMA)
@@ -102,7 +101,7 @@ export const STAGED_FILE_INFO_SCHEMA = BorshSchema.Struct({
     }),
     Moved: BorshSchema.Struct({
       changes: MOVED_STATUS_SCHEMA,
-      old_path: BorshSchema.String,
+      oldPath: BorshSchema.String,
     }),
   }),
 })
@@ -110,7 +109,7 @@ export const STAGED_FILE_PAGE_SCHEMA = PAGE_SCHEMA(STAGED_FILE_INFO_SCHEMA)
 
 export const UNSTAGED_FILE_INFO_SCHEMA = BorshSchema.Struct({
   path: BorshSchema.String,
-  changes: CHANGE_STATUS_SCHEMA,
+  status: CHANGE_STATUS_SCHEMA,
 })
 export const UNSTAGED_FILE_PAGE_SCHEMA = PAGE_SCHEMA(UNSTAGED_FILE_INFO_SCHEMA)
 
@@ -127,9 +126,7 @@ export const UNTRACKED_FILE_PAGE_SCHEMA = PAGE_SCHEMA(
   UNTRACKED_FILE_INFO_SCHEMA,
 )
 
-export const FILE_INFO_SCHEMAS: {
-  [P in FileType]: BorshSchema<FileTypes[P]>
-} = {
+export const FILE_INFO_SCHEMA = {
   staged: STAGED_FILE_INFO_SCHEMA,
   unstaged: UNSTAGED_FILE_INFO_SCHEMA,
   unmerged: UNMERGED_FILE_INFO_SCHEMA,
@@ -144,16 +141,16 @@ export const REMOTE_INFO_SCHEMA = BorshSchema.Struct({
 export const REMOTES_SCHEMA = BorshSchema.Vec(REMOTE_INFO_SCHEMA)
 
 export const DIFF_SUMMARY_SCHEMA = BorshSchema.Struct({
-  filesCount: BorshSchema.u64,
-  insertions: BorshSchema.u64,
-  deletions: BorshSchema.u64,
+  filesCount: BorshSchema.u32,
+  insertions: BorshSchema.u32,
+  deletions: BorshSchema.u32,
 })
 
 export const STASH_INFO_SCHEMA = BorshSchema.Struct({
   name: BorshSchema.String,
   message: BorshSchema.Option(BorshSchema.String),
-  timestamp: BorshSchema.u64,
-  created_on: BorshSchema.String,
+  timestamp: BorshSchema.u32,
+  createdOn: BorshSchema.String,
   changes: BorshSchema.Option(DIFF_SUMMARY_SCHEMA),
 })
 export const STASHES_SCHEMA = BorshSchema.Vec(STASH_INFO_SCHEMA)

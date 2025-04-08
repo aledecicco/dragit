@@ -1,56 +1,88 @@
-import type { Infer } from 'borsher'
-
-import type {
-  ANCESTOR_INFO_SCHEMA,
-  BRANCH_DIVERGENCE_SCHEMA,
-  BRANCH_INFO_SCHEMA,
-  COMMIT_INFO_SCHEMA,
-  COMMON_ANCESTOR_INFO_SCHEMA,
-  CURRENT_DIR_INFO_SCHEMA,
-  DIFF_SUMMARY_SCHEMA,
-  HEAD_INFO_SCHEMA,
-  HISTORY_ITEM_SCHEMA,
-  PAGE_SCHEMA,
-  REMOTE_INFO_SCHEMA,
-  STAGED_FILE_INFO_SCHEMA,
-  STASH_INFO_SCHEMA,
-  UNMERGED_FILE_INFO_SCHEMA,
-  UNSTAGED_FILE_INFO_SCHEMA,
-  UNTRACKED_FILE_INFO_SCHEMA,
-} from './schemas'
+export interface Page<T> {
+  items: T[]
+  hasNext: boolean
+}
 
 export interface Settings {
   recentlyOpened: string[]
   openLastOnStart: boolean
 }
 
-export type Page<T> = Infer<ReturnType<typeof PAGE_SCHEMA<T>>>
-
-export type CurrentDirInfo = NonNullable<Infer<typeof CURRENT_DIR_INFO_SCHEMA>>
+export interface CurrentDirInfo {
+  path: string
+  isRepository: boolean
+  exists: boolean
+}
 
 export type CommitId = string
 export type BranchName = string
 export type RemoteName = string
 export type RefName = `${RemoteName}/${BranchName}`
 
-export type CommitInfo = Infer<typeof COMMIT_INFO_SCHEMA>
+export interface CommitInfo {
+  hash: CommitId
+  shortHash: string
+  authorName: string
+  authorEmail: string
+  timestamp: number
+  message: string | null
+}
 
-export type AncestorInfo = Infer<typeof ANCESTOR_INFO_SCHEMA>
+export interface AncestorInfo {
+  distance: number
+  hash: CommitId
+}
 
-export type CommonAncestorInfo = Infer<typeof COMMON_ANCESTOR_INFO_SCHEMA>
+export interface CommonAncestorInfo {
+  lastCommit: AncestorInfo | null
+  commonCommit: AncestorInfo
+}
 
-export type BranchDivergence = Infer<typeof BRANCH_DIVERGENCE_SCHEMA>
+export interface BranchDivergence {
+  ahead: number
+  behind: number
+}
 
-export type HistoryItem = Infer<typeof HISTORY_ITEM_SCHEMA>
+export interface HistoryItem {
+  hash: CommitId
+  otherParents: CommitId[]
+}
 
-export type HeadInfo = Infer<typeof HEAD_INFO_SCHEMA>
+export type ChangeStatus = 'modified' | 'typeChanged' | 'added' | 'deleted'
 
-export type BranchInfo = Infer<typeof BRANCH_INFO_SCHEMA>
+export type MovedStatus = 'renamed' | 'copied'
 
-export type StagedFileInfo = Infer<typeof STAGED_FILE_INFO_SCHEMA>
-export type UnstagedFileInfo = Infer<typeof UNSTAGED_FILE_INFO_SCHEMA>
-export type UnmergedFileInfo = Infer<typeof UNMERGED_FILE_INFO_SCHEMA>
-export type UntrackedFileInfo = Infer<typeof UNTRACKED_FILE_INFO_SCHEMA>
+export type MergeStatus =
+  | 'bothAdded'
+  | 'bothDeleted'
+  | 'bothModified'
+  | 'addedByUs'
+  | 'deletedByUs'
+  | 'addedByThem'
+  | 'deletedByThem'
+
+interface BaseFileInfo {
+  path: string
+}
+
+export type StagedFileInfo = {
+  status: 'staged'
+} & BaseFileInfo &
+  ({ changes: ChangeStatus } | { changes: MovedStatus; oldPath: string })
+
+export interface UnstagedFileInfo extends BaseFileInfo {
+  status: 'unstaged'
+  changes: ChangeStatus
+}
+
+export interface UnmergedFileInfo extends BaseFileInfo {
+  status: 'unmerged'
+  changes: MergeStatus
+}
+
+export interface UntrackedFileInfo extends BaseFileInfo {
+  status: 'untracked'
+}
 
 export type FileTypes = {
   staged: StagedFileInfo
@@ -60,11 +92,51 @@ export type FileTypes = {
 }
 export type FileType = keyof FileTypes
 
-export type RemoteInfo = Infer<typeof REMOTE_INFO_SCHEMA>
+export interface RemoteInfo {
+  name: RemoteName
+  fetchUrl: string
+  pushUrl: string
+}
 
-export type DiffSummary = Infer<typeof DIFF_SUMMARY_SCHEMA>
+export interface DiffSummary {
+  filesCount: number
+  insertions: number
+  deletions: number
+}
 
-export type StashInfo = Infer<typeof STASH_INFO_SCHEMA>
+export interface StashInfo {
+  name: string
+  message: string | null
+  timestamp: number
+  createdOn: CommitId | BranchName
+  changes: DiffSummary | null
+}
+
+export interface Settings {
+  recentlyOpened: string[]
+  openLastOnStart: boolean
+}
+
+export type HeadInfo =
+  | { type: 'detached'; commit: CommitId }
+  | { type: 'branch'; name: BranchName }
+
+export interface LocalBranch {
+  name: BranchName
+  timestamp: number
+  type: 'local'
+  remote: {
+    remoteName: RemoteName
+    branchName: BranchName
+  } | null
+}
+
+export interface RemoteBranch {
+  name: RefName
+  timestamp: number
+  type: 'remote'
+}
+export type BranchInfo = LocalBranch | RemoteBranch
 
 export type AppMessage = {
   type: 'processStarted'

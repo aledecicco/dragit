@@ -1,9 +1,9 @@
+import { IconDownload, IconUpload } from '@tabler/icons-react'
 import { useMemo } from 'react'
 
 import type { BranchInfo } from '@api/models'
 import { usePullBranch, usePushBranch } from '@api/mutations'
 import { askForValue } from '@lib/AskForValueDialog'
-import { IconDownload, IconUpload } from '@tabler/icons-react'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 
 interface BranchToolbarProps extends Partial<ToolbarProps> {

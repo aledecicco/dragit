@@ -17,7 +17,7 @@ pub struct CommitInfo {
     pub short_hash: String,
     pub author_name: String,
     pub author_email: String,
-    pub timestamp: u64,
+    pub timestamp: u32,
     pub message: Option<String>,
 }
 
@@ -107,7 +107,7 @@ pub struct StagedFileInfo {
 pub struct UnstagedFileInfo {
     pub path: String,
 
-    pub changes: ChangeStatus,
+    pub status: ChangeStatus,
 }
 
 #[derive(borsh::BorshSerialize, Debug, Clone)]
@@ -131,7 +131,7 @@ pub enum HeadInfo {
 #[derive(borsh::BorshSerialize, Debug, Clone)]
 pub struct AncestorInfo {
     pub hash: String,
-    pub distance: u64,
+    pub distance: u32,
 }
 
 #[derive(borsh::BorshSerialize, Debug, Clone)]
@@ -148,17 +148,16 @@ pub struct HistoryItem {
 }
 
 #[derive(borsh::BorshSerialize, Debug, Clone)]
-pub struct BranchInfo {
-    pub name: String,
-    pub timestamp: u64,
-    pub branch_type: BranchType,
-}
-
-#[derive(borsh::BorshSerialize, Debug, Clone)]
-pub enum BranchType {
-    Remote,
-
-    Local { remote: Option<RemoteRef> },
+pub enum BranchInfo {
+    Remote {
+        name: String,
+        timestamp: u32,
+    },
+    Local {
+        name: String,
+        timestamp: u32,
+        remote: Option<RemoteRef>,
+    },
 }
 
 #[derive(borsh::BorshSerialize, Debug, Clone)]
@@ -169,8 +168,8 @@ pub struct RemoteRef {
 
 #[derive(borsh::BorshSerialize, Debug, Clone)]
 pub struct BranchDivergence {
-    pub ahead: u64,
-    pub behind: u64,
+    pub ahead: u32,
+    pub behind: u32,
 }
 
 #[derive(borsh::BorshSerialize, Debug, Clone)]
@@ -182,16 +181,16 @@ pub struct RemoteInfo {
 
 #[derive(borsh::BorshSerialize, Debug, Clone)]
 pub struct DiffSummary {
-    pub files_count: u64,
-    pub insertions: u64,
-    pub deletions: u64,
+    pub files_count: u32,
+    pub insertions: u32,
+    pub deletions: u32,
 }
 
 #[derive(borsh::BorshSerialize, Debug, Clone)]
 pub struct StashInfo {
     pub name: String,
     pub message: Option<String>,
-    pub timestamp: u64,
+    pub timestamp: u32,
     pub created_on: String,
     pub changes: Option<DiffSummary>,
 }

@@ -1,9 +1,9 @@
 use std::str::FromStr;
 
 use models::{
-    BranchDivergence, BranchInfo, BranchType, ChangeStatus, CommitInfo, DiffSummary, HeadInfo,
-    HistoryItem, MergeStatus, MovedStatus, RemoteInfo, RemoteRef, StagedFileInfo, StagedFileStatus,
-    StashInfo, StatusType, UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo,
+    BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, DiffSummary, HeadInfo, HistoryItem,
+    MergeStatus, MovedStatus, RemoteInfo, RemoteRef, StagedFileInfo, StagedFileStatus, StashInfo,
+    StatusType, UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo,
 };
 
 /// Format used to get the needed information about a commit.
@@ -44,7 +44,7 @@ pub(crate) fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
         short_hash: lines.get(1)?.to_string(),
         author_name: lines.get(2)?.to_string(),
         author_email: lines.get(3)?.to_string(),
-        timestamp: u64::from_str(lines.get(4)?).ok()? * 1000,
+        timestamp: u32::from_str(lines.get(4)?).ok()? * 1000,
         message: lines.get(5..).map(|message| message.join("\n")),
     })
 }
@@ -116,7 +116,7 @@ pub(crate) fn parse_unstaged_file_info(line: &String) -> Option<UnstagedFileInfo
 
             UnstagedFileInfo {
                 path: path.to_string(),
-                changes: unstaged_status,
+                status: unstaged_status,
             }
         }
         _ => None?,
@@ -173,30 +173,27 @@ pub(crate) fn parse_history_item(line: &String) -> Option<HistoryItem> {
 pub(crate) fn parse_branch_info(line: &String) -> Option<BranchInfo> {
     let mut segments = line.split_ascii_whitespace().map(String::from);
     let branch_name = segments.next()?;
-    let timestamp = u64::from_str(&segments.next()?).ok()? * 1000;
+    let timestamp = u32::from_str(&segments.next()?).ok()? * 1000;
 
     if branch_name.starts_with(BRANCH_PREFIX) {
         let remote_name = segments.next();
         let remote_branch_name = segments.next();
 
-        Some(BranchInfo {
+        Some(BranchInfo::Local {
             name: strip_branch_prefix(&branch_name, BRANCH_PREFIX),
             timestamp: timestamp,
-            branch_type: BranchType::Local {
-                remote: match (remote_name, remote_branch_name) {
-                    (Some(remote_name), Some(remote_branch_name)) => Some(RemoteRef {
-                        remote_name,
-                        branch_name: strip_branch_prefix(&remote_branch_name, BRANCH_PREFIX),
-                    }),
-                    _ => None,
-                },
+            remote: match (remote_name, remote_branch_name) {
+                (Some(remote_name), Some(remote_branch_name)) => Some(RemoteRef {
+                    remote_name,
+                    branch_name: strip_branch_prefix(&remote_branch_name, BRANCH_PREFIX),
+                }),
+                _ => None,
             },
         })
     } else if branch_name.starts_with(REMOTE_BRANCH_PREFIX) {
-        Some(BranchInfo {
+        Some(BranchInfo::Remote {
             name: strip_branch_prefix(&branch_name, REMOTE_BRANCH_PREFIX),
             timestamp: timestamp,
-            branch_type: BranchType::Remote {},
         })
     } else {
         None
@@ -205,8 +202,8 @@ pub(crate) fn parse_branch_info(line: &String) -> Option<BranchInfo> {
 
 pub(crate) fn parse_branch_divergence(line: &String) -> Option<BranchDivergence> {
     let mut divergence = line.split_ascii_whitespace().map(String::from);
-    let ahead = u64::from_str(&divergence.next()?).ok()?;
-    let behind = u64::from_str(&divergence.next()?).ok()?;
+    let ahead = u32::from_str(&divergence.next()?).ok()?;
+    let behind = u32::from_str(&divergence.next()?).ok()?;
 
     Some(BranchDivergence { ahead, behind })
 }
@@ -240,9 +237,9 @@ fn parse_diff_summary(line: &String) -> Option<DiffSummary> {
     }
 
     let segments: Vec<&str> = line.split(',').collect();
-    let files_count = u64::from_str(segments.get(0)?.trim_ascii()).ok()?;
-    let insertions = u64::from_str(segments.get(1)?.trim_ascii()).ok()?;
-    let deletions = u64::from_str(segments.get(2)?.trim_ascii()).ok()?;
+    let files_count = u32::from_str(segments.get(0)?.trim_ascii()).ok()?;
+    let insertions = u32::from_str(segments.get(1)?.trim_ascii()).ok()?;
+    let deletions = u32::from_str(segments.get(2)?.trim_ascii()).ok()?;
 
     Some(DiffSummary {
         files_count,
@@ -258,7 +255,7 @@ fn parse_stash_info(body_lines: Vec<&String>, diff_line: Option<&String>) -> Opt
     let creation_line = body_lines.get(3)?;
 
     let name = name_line.to_string();
-    let timestamp = u64::from_str(timestamp_line).ok()? * 1000;
+    let timestamp = u32::from_str(timestamp_line).ok()? * 1000;
     let (creation_details, message) = creation_line.split_once(':')?;
     let mut creation_details = creation_details.split_ascii_whitespace();
     let message = if creation_details.next()?.eq(STASH_INFO_QUICK) {

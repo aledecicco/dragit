@@ -11,10 +11,10 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 import { Child } from '@tauri-apps/plugin-shell'
+import { match } from 'ts-pattern'
 
 import { Channel, invoke } from '@tauri-apps/api/core'
 import { type BorshSchema, borshDeserialize } from 'borsher'
-import { match } from 'ts-pattern'
 import type { AppMessage } from './models'
 import { useQueryCurrentDir } from './queries'
 
@@ -144,7 +144,7 @@ const fetchAndDeserialize = async <T>(
     )
 
     if (processIds[0] !== null) {
-      new Child(processIds[0]).kill()
+      //new Child(processIds[0]).kill()
     }
     if (processIds[1] !== null) {
       new Child(processIds[1]).kill()
@@ -155,6 +155,7 @@ const fetchAndDeserialize = async <T>(
 
   const channel = new Channel<AppMessage>()
   channel.onmessage = (event) => {
+    console.log('Received message', event)
     match(event)
       .with(
         {

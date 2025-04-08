@@ -7,13 +7,14 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
-import { match } from 'ts-pattern'
+import { P, match } from 'ts-pattern'
 
 import { useFilesPage } from '@context/pages'
 import type {
   BranchDivergence,
   BranchInfo,
   BranchName,
+  ChangeStatus,
   CommitId,
   CommitInfo,
   CommonAncestorInfo,
@@ -22,10 +23,17 @@ import type {
   FileTypes,
   HeadInfo,
   HistoryItem,
+  MergeStatus,
+  MovedStatus,
   Page,
+  RefName,
   RemoteInfo,
   Settings,
+  StagedFileInfo,
   StashInfo,
+  UnmergedFileInfo,
+  UnstagedFileInfo,
+  UntrackedFileInfo,
 } from './models'
 import {
   BRANCHES_SCHEMA,
@@ -33,12 +41,14 @@ import {
   COMMIT_INFO_SCHEMA,
   COMMON_ANCESTOR_INFO_SCHEMA,
   CURRENT_DIR_INFO_SCHEMA,
-  FILE_INFO_SCHEMAS,
   HEAD_INFO_SCHEMA,
   HISTORY_PAGE_SCHEMA,
-  PAGE_SCHEMA,
   REMOTES_SCHEMA,
+  STAGED_FILE_PAGE_SCHEMA,
   STASHES_SCHEMA,
+  UNMERGED_FILE_PAGE_SCHEMA,
+  UNSTAGED_FILE_PAGE_SCHEMA,
+  UNTRACKED_FILE_PAGE_SCHEMA,
 } from './schemas'
 import {
   fetchAndDeserialize,
@@ -248,16 +258,28 @@ const recentlyOpenedQuery = queryOptions({
 
 const useQueryRecentlyOpened = () => useQuery(recentlyOpenedQuery)
 
-const fetchHeadInfo = (
+const fetchHeadInfo = async (
   path: string,
   context: QueryFunctionContext,
 ): Promise<HeadInfo> => {
-  return fetchAndDeserialize(
+  const res = await fetchAndDeserialize(
     'get_head_info',
     { path },
     HEAD_INFO_SCHEMA,
     context,
   )
+
+  return match(res)
+    .returnType<HeadInfo>()
+    .with({ Branch: { name: P.select() } }, (branchName) => ({
+      type: 'branch',
+      name: branchName,
+    }))
+    .with({ Detached: { commit: P.select() } }, (commit) => ({
+      type: 'detached',
+      commit: commit,
+    }))
+    .exhaustive()
 }
 
 const headInfoQuery = (path: string) =>
@@ -268,35 +290,162 @@ const headInfoQuery = (path: string) =>
 
 const useQueryHeadInfo = () => useRepositoryQuery(headInfoQuery)
 
-const fetchFilesPage = <T extends FileType>(
+const fetchStagedFilesPage = async (
   path: string,
-  type: T,
   page: number,
   context: QueryFunctionContext,
-): Promise<Page<FileTypes[T]>> => {
-  const command = match<FileType>(type)
-    .with('staged', () => 'get_staged_files_page')
-    .with('unstaged', () => 'get_unstaged_files_page')
-    .with('unmerged', () => 'get_unmerged_files_page')
-    .with('untracked', () => 'get_untracked_files_page')
-    .exhaustive()
-
-  return fetchAndDeserialize(
-    command,
+): Promise<Page<StagedFileInfo>> => {
+  const res = await fetchAndDeserialize(
+    'get_staged_files_page',
     {
       path,
       startAfter: page * FILE_STATUSES_PAGE_SIZE,
       limit: FILE_STATUSES_PAGE_SIZE,
     },
-    PAGE_SCHEMA(FILE_INFO_SCHEMAS[type]),
+    STAGED_FILE_PAGE_SCHEMA,
     context,
   )
+
+  return {
+    hasNext: res.hasNext,
+    items: res.items.map((item) =>
+      match(item)
+        .returnType<StagedFileInfo>()
+        .with({ status: { Changed: P.select() } }, (status) => ({
+          path: item.path,
+          status: 'staged',
+          changes: match(status.changes)
+            .returnType<ChangeStatus>()
+            .with({ Added: P.any }, () => 'added')
+            .with({ Deleted: P.any }, () => 'deleted')
+            .with({ Modified: P.any }, () => 'modified')
+            .with({ TypeChanged: P.any }, () => 'typeChanged')
+            .exhaustive(),
+        }))
+        .with({ status: { Moved: P.select() } }, (status) => ({
+          path: item.path,
+          status: 'staged',
+          oldPath: status.oldPath,
+          changes: match(status.changes)
+            .returnType<MovedStatus>()
+            .with({ Copied: P.any }, () => 'copied')
+            .with({ Renamed: P.any }, () => 'renamed')
+            .exhaustive(),
+        }))
+        .exhaustive(),
+    ),
+  }
 }
+
+const fetchUnstagedFilesPage = async (
+  path: string,
+  page: number,
+  context: QueryFunctionContext,
+): Promise<Page<UnstagedFileInfo>> => {
+  const res = await fetchAndDeserialize(
+    'get_unstaged_files_page',
+    {
+      path,
+      startAfter: page * FILE_STATUSES_PAGE_SIZE,
+      limit: FILE_STATUSES_PAGE_SIZE,
+    },
+    UNSTAGED_FILE_PAGE_SCHEMA,
+    context,
+  )
+
+  return {
+    hasNext: res.hasNext,
+    items: res.items.map((item) => ({
+      path: item.path,
+      status: 'unstaged',
+      changes: match(item.status)
+        .returnType<ChangeStatus>()
+        .with({ Added: P.any }, () => 'added')
+        .with({ Deleted: P.any }, () => 'deleted')
+        .with({ Modified: P.any }, () => 'modified')
+        .with({ TypeChanged: P.any }, () => 'typeChanged')
+        .exhaustive(),
+    })),
+  }
+}
+
+const fetchUnmergedFilesPage = async (
+  path: string,
+  page: number,
+  context: QueryFunctionContext,
+): Promise<Page<UnmergedFileInfo>> => {
+  const res = await fetchAndDeserialize(
+    'get_unmerged_files_page',
+    {
+      path,
+      startAfter: page * FILE_STATUSES_PAGE_SIZE,
+      limit: FILE_STATUSES_PAGE_SIZE,
+    },
+    UNMERGED_FILE_PAGE_SCHEMA,
+    context,
+  )
+
+  return {
+    hasNext: res.hasNext,
+    items: res.items.map((item) => ({
+      path: item.path,
+      status: 'unmerged',
+      changes: match(item.status)
+        .returnType<MergeStatus>()
+        .with({ BothAdded: P.any }, () => 'bothAdded')
+        .with({ BothDeleted: P.any }, () => 'bothDeleted')
+        .with({ BothModified: P.any }, () => 'bothModified')
+        .with({ AddedByThem: P.any }, () => 'addedByThem')
+        .with({ AddedByUs: P.any }, () => 'addedByUs')
+        .with({ DeletedByThem: P.any }, () => 'deletedByThem')
+        .with({ DeletedByUs: P.any }, () => 'deletedByUs')
+        .exhaustive(),
+    })),
+  }
+}
+
+const fetchUntrackedFilesPage = async (
+  path: string,
+  page: number,
+  context: QueryFunctionContext,
+): Promise<Page<UntrackedFileInfo>> => {
+  const res = await fetchAndDeserialize(
+    'get_untracked_files_page',
+    {
+      path,
+      startAfter: page * FILE_STATUSES_PAGE_SIZE,
+      limit: FILE_STATUSES_PAGE_SIZE,
+    },
+    UNTRACKED_FILE_PAGE_SCHEMA,
+    context,
+  )
+
+  return {
+    hasNext: res.hasNext,
+    items: res.items.map((item) => ({
+      path: item.path,
+      status: 'untracked',
+    })),
+  }
+}
+
+const FETCH_FILES_PAGE_MAP: {
+  [T in FileType]: (
+    path: string,
+    page: number,
+    context: QueryFunctionContext,
+  ) => Promise<Page<FileTypes[T]>>
+} = {
+  staged: fetchStagedFilesPage,
+  unstaged: fetchUnstagedFilesPage,
+  unmerged: fetchUnmergedFilesPage,
+  untracked: fetchUntrackedFilesPage,
+} as const
 
 const filesQuery = <T extends FileType>(path: string, type: T, page: number) =>
   queryOptions({
     queryKey: [queryKeys.directory.files[type](path).page(page)],
-    queryFn: (context) => fetchFilesPage(path, type, page, context),
+    queryFn: (context) => FETCH_FILES_PAGE_MAP[type](path, page, context),
   })
 
 function useQueryFiles<T extends FileType>(
@@ -305,11 +454,34 @@ function useQueryFiles<T extends FileType>(
   return useRepositoryQuery(filesQuery, type, useFilesPage(type))
 }
 
-const fetchBranches = (
+const fetchBranches = async (
   path: string,
   context: QueryFunctionContext,
-): Promise<BranchInfo[]> =>
-  fetchAndDeserialize('get_branches', { path }, BRANCHES_SCHEMA, context)
+): Promise<BranchInfo[]> => {
+  const res = await fetchAndDeserialize(
+    'get_branches',
+    { path },
+    BRANCHES_SCHEMA,
+    context,
+  )
+
+  return res.map((resItem) =>
+    match(resItem)
+      .returnType<BranchInfo>()
+      .with({ Local: P.select() }, (branch) => ({
+        type: 'local',
+        name: branch.name,
+        timestamp: branch.timestamp,
+        remote: branch.remote,
+      }))
+      .with({ Remote: P.select() }, (branch) => ({
+        type: 'remote',
+        name: branch.name as RefName,
+        timestamp: branch.timestamp,
+      }))
+      .exhaustive(),
+  )
+}
 
 const branchesQuery = (path: string) =>
   queryOptions({

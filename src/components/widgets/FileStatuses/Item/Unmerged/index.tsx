@@ -21,7 +21,7 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
       Glyph={IconFileAlert}
       statusMessage={
         <p className={cn('text-xs text-warning-400/50')}>
-          {match(item.status)
+          {match(item.changes)
             .with('addedByThem', () => 'Added by incoming changes')
             .with('addedByUs', () => 'Added by local changes')
             .with('bothAdded', () => 'Added by local and incoming changes')

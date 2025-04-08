@@ -33,7 +33,7 @@ impl CmdGit {
         }))
     }
 
-    fn spawn_and_emmit<'a, I>(
+    fn spawn_and_notify<'a, I>(
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
@@ -68,7 +68,7 @@ impl CmdGit {
         &self,
         process: Child,
     ) -> Result<Lines<BufReader<ChildStdout>>, GitError> {
-        let stdout = process.stdout.unwrap();
+        let stdout = process.stdout.ok_or(GitError::GetCommandOutputFailed {})?;
 
         let reader = BufReader::new(stdout);
         Ok(reader.lines())
@@ -109,7 +109,7 @@ impl CmdGit {
             args.push("--untracked-files=no");
         }
 
-        let process = self.spawn_and_emmit(channel, path, args)?;
+        let process = self.spawn_and_notify(channel, path, args)?;
         let lines = self.get_output_lines_stream(process)?;
 
         let mut items_iter = lines
@@ -136,7 +136,7 @@ impl GitHandler for CmdGit {
         channel: &Channel<AppMessage>,
         path: &str,
     ) -> Result<Vec<BranchInfo>, GitError> {
-        let process = self.spawn_and_emmit(
+        let process = self.spawn_and_notify(
             channel,
             path,
             ["branch", "--list", "-a", BRANCHES_INFO_FORMAT],
@@ -166,7 +166,7 @@ impl GitHandler for CmdGit {
         let page_size_arg = (limit + 1).to_string();
         let branch_arg = branch.to_string() + "~" + &page_arg;
 
-        let process = self.spawn_and_emmit(
+        let process = self.spawn_and_notify(
             channel,
             path,
             [
@@ -199,7 +199,7 @@ impl GitHandler for CmdGit {
         path: &str,
         reference: &str,
     ) -> Result<CommitInfo, GitError> {
-        let process = self.spawn_and_emmit(
+        let process = self.spawn_and_notify(
             channel,
             path,
             ["show", reference, COMMIT_INFO_FORMAT, "--quiet"],
@@ -342,7 +342,7 @@ impl GitHandler for CmdGit {
             subprocess: None,
         });
 
-        let parse_ref = |reference: &str, back: u64| -> Option<String> {
+        let parse_ref = |reference: &str, back: u32| -> Option<String> {
             let process = self
                 .spawn_command(path, ["rev-parse", &format!("{}^{}", reference, back)])
                 .ok()?;
@@ -354,9 +354,9 @@ impl GitHandler for CmdGit {
         let mut base_pointer = parse_ref(base_branch, 0).map(|hash| (hash, 0));
 
         // For each commit in the branch, keep track of the commit that comes immediately next and its depth.
-        let mut found_in_branch: HashMap<String, Option<(String, u64)>> = HashMap::new();
+        let mut found_in_branch: HashMap<String, Option<(String, u32)>> = HashMap::new();
         // For each commit in the base branch, keep track of the depth it was found at.
-        let mut found_in_base: HashMap<String, u64> = HashMap::new();
+        let mut found_in_base: HashMap<String, u32> = HashMap::new();
 
         loop {
             if let Some((branch_hash, branch_distance)) = branch_pointer {
@@ -413,7 +413,7 @@ impl GitHandler for CmdGit {
         branch: &str,
         base_branch: &str,
     ) -> Result<BranchDivergence, GitError> {
-        let process = self.spawn_and_emmit(
+        let process = self.spawn_and_notify(
             channel,
             path,
             [

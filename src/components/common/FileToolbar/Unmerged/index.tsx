@@ -25,7 +25,7 @@ const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
         },
         disabled: stage.isPending,
       },
-      ...match(file.status)
+      ...match(file.changes)
         .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => [
           {
             Glyph: IconTrash,
@@ -40,7 +40,7 @@ const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
     ]
   }, [
     file.path,
-    file.status,
+    file.changes,
     stage.mutateAsync,
     stage.isPending,
     remove.mutateAsync,
