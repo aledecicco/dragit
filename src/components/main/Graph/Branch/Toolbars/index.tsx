@@ -26,6 +26,7 @@ const BranchToolbars = () => {
         onClick={() => {
           fetchRemote.mutateAsync({ remote: 'origin' })
         }}
+        disabled={fetchRemote.isPending}
         className={cn('col-start-2 row-start-2 w-20')}
         round={false}
       />

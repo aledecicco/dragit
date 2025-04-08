@@ -10,6 +10,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { P, match } from 'ts-pattern'
 
 import { useFilesPage } from '@context/pages'
+import { MS_IN_SECOND } from '@utils/time'
 import type {
   BranchDivergence,
   BranchInfo,
@@ -57,7 +58,7 @@ import {
 } from './utils'
 
 export const HISTORY_PAGE_SIZE = 50
-export const FILE_STATUSES_PAGE_SIZE = 1000
+export const FILE_STATUSES_PAGE_SIZE = MS_IN_SECOND
 
 const queryKeys = {
   currentDir: ['current_dir'] as const,
@@ -471,13 +472,13 @@ const fetchBranches = async (
       .with({ Local: P.select() }, (branch) => ({
         type: 'local',
         name: branch.name,
-        timestamp: branch.timestamp,
+        timestamp: branch.timestamp * MS_IN_SECOND,
         remote: branch.remote,
       }))
       .with({ Remote: P.select() }, (branch) => ({
         type: 'remote',
         name: branch.name as RefName,
-        timestamp: branch.timestamp,
+        timestamp: branch.timestamp * MS_IN_SECOND,
       }))
       .exhaustive(),
   )
@@ -526,17 +527,22 @@ const commitHistoryQuery = (path: string, branch: BranchName | undefined) =>
 const useQueryCommitHistory = (branch: BranchName | undefined) =>
   useRepositoryInfiniteQuery(commitHistoryQuery, branch)
 
-const fetchCommitInfo = (
+const fetchCommitInfo = async (
   path: string,
   commitId: CommitId,
   context: QueryFunctionContext,
 ): Promise<CommitInfo> => {
-  return fetchAndDeserialize(
+  const res = await fetchAndDeserialize(
     'get_commit_info',
     { path, reference: commitId },
     COMMIT_INFO_SCHEMA,
     context,
   )
+
+  return {
+    ...res,
+    timestamp: res.timestamp * MS_IN_SECOND,
+  }
 }
 
 const commitInfoQuery = (path: string, commitId: CommitId) =>
@@ -631,11 +637,21 @@ const remotesQuery = (path: string) =>
 
 const useQueryRemotes = () => useRepositoryQuery(remotesQuery)
 
-const fetchStashes = (
+const fetchStashes = async (
   path: string,
   context: QueryFunctionContext,
 ): Promise<StashInfo[]> => {
-  return fetchAndDeserialize('get_stashes', { path }, STASHES_SCHEMA, context)
+  const res = await fetchAndDeserialize(
+    'get_stashes',
+    { path },
+    STASHES_SCHEMA,
+    context,
+  )
+
+  return res.map((resItem) => ({
+    ...resItem,
+    timestamp: resItem.timestamp * MS_IN_SECOND,
+  }))
 }
 
 const stashesQuery = (path: string) =>

@@ -93,7 +93,8 @@ const Marquee = (props: MarqueeProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'group/marquee overflow-x-hidden relative max-w-full flex flex-row justify-end',
+        'group/marquee overflow-x-hidden relative max-w-full flex flex-row',
+        reverse && 'justify-end',
       )}
       ref={mergeRefs([containerRef, divProps.ref])}
     >

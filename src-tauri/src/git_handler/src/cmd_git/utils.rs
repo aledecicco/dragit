@@ -44,7 +44,7 @@ pub(crate) fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
         short_hash: lines.get(1)?.to_string(),
         author_name: lines.get(2)?.to_string(),
         author_email: lines.get(3)?.to_string(),
-        timestamp: u32::from_str(lines.get(4)?).ok()? * 1000,
+        timestamp: u32::from_str(lines.get(4)?).ok()?,
         message: lines.get(5..).map(|message| message.join("\n")),
     })
 }
@@ -173,7 +173,7 @@ pub(crate) fn parse_history_item(line: &String) -> Option<HistoryItem> {
 pub(crate) fn parse_branch_info(line: &String) -> Option<BranchInfo> {
     let mut segments = line.split_ascii_whitespace().map(String::from);
     let branch_name = segments.next()?;
-    let timestamp = u32::from_str(&segments.next()?).ok()? * 1000;
+    let timestamp = u32::from_str(&segments.next()?).ok()?;
 
     if branch_name.starts_with(BRANCH_PREFIX) {
         let remote_name = segments.next();
@@ -255,7 +255,7 @@ fn parse_stash_info(body_lines: Vec<&String>, diff_line: Option<&String>) -> Opt
     let creation_line = body_lines.get(3)?;
 
     let name = name_line.to_string();
-    let timestamp = u32::from_str(timestamp_line).ok()? * 1000;
+    let timestamp = u32::from_str(timestamp_line).ok()?;
     let (creation_details, message) = creation_line.split_once(':')?;
     let mut creation_details = creation_details.split_ascii_whitespace();
     let message = if creation_details.next()?.eq(STASH_INFO_QUICK) {

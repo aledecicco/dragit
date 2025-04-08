@@ -54,19 +54,19 @@ export const HEAD_INFO_SCHEMA = BorshSchema.Enum({
 })
 
 export const BRANCH_INFO_SCHEMA = BorshSchema.Enum({
+  Remote: BorshSchema.Struct({
+    name: BorshSchema.String,
+    timestamp: BorshSchema.u32,
+  }),
   Local: BorshSchema.Struct({
     name: BorshSchema.String,
+    timestamp: BorshSchema.u32,
     remote: BorshSchema.Option(
       BorshSchema.Struct({
         remoteName: BorshSchema.String,
         branchName: BorshSchema.String,
       }),
     ),
-    timestamp: BorshSchema.u32,
-  }),
-  Remote: BorshSchema.Struct({
-    name: BorshSchema.String,
-    timestamp: BorshSchema.u32,
   }),
 })
 export const BRANCHES_SCHEMA = BorshSchema.Vec(BRANCH_INFO_SCHEMA)

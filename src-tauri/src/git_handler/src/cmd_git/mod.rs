@@ -1,17 +1,18 @@
 use std::{
     collections::HashMap,
     io::{BufRead, BufReader, Lines},
-    process::{id, Child, ChildStdout, Command},
+    process::{id, Child, ChildStdout, Command, Stdio},
 };
 use tauri::ipc::Channel;
+
+mod utils;
+use utils::*;
 
 use models::{
     AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
     GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo, StagedFileInfo, StashInfo,
     UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo,
 };
-mod utils;
-use utils::*;
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
 pub struct CmdGit {}
@@ -27,10 +28,14 @@ impl CmdGit {
     {
         let mut cmd = Command::new("git");
         let args_vec: Vec<_> = args.into_iter().collect();
-        cmd.current_dir(path).args(&args_vec);
-        cmd.spawn().or(Err(GitError::StartCommandFailed {
-            args: args_vec.into_iter().map(String::from).collect(),
-        }))
+
+        cmd.current_dir(path)
+            .args(&args_vec)
+            .stdout(Stdio::piped())
+            .spawn()
+            .or(Err(GitError::StartCommandFailed {
+                args: args_vec.into_iter().map(String::from).collect(),
+            }))
     }
 
     fn spawn_and_notify<'a, I>(
@@ -142,9 +147,11 @@ impl GitHandler for CmdGit {
             ["branch", "--list", "-a", BRANCHES_INFO_FORMAT],
         )?;
         let lines = self.get_output_lines_stream(process)?;
-        let branches = lines.filter_map(|line| line.ok().and_then(|line| parse_branch_info(&line)));
+        let branches: Vec<_> = lines
+            .filter_map(|line| line.ok().and_then(|line| parse_branch_info(&line)))
+            .collect();
 
-        Ok(branches.collect())
+        Ok(branches)
     }
 
     fn checkout_local_branch(&self, path: &str, branch: &str) -> Result<(), GitError> {
