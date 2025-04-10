@@ -15,7 +15,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
   return (
     <Button
       variant="plain"
-      size="sm"
+      size="md"
       aria-label="Select and open a folder in your system"
       onClick={() => {
         open({

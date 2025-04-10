@@ -26,9 +26,9 @@
       "@api/*": ["api/*"],
       "@config/*": ["config/*"],
       "@context/*": ["context/*"],
+      "@common/*": ["components/common/*"],
       "@lib/*": ["components/lib/*"],
       "@main/*": ["components/main/*"],
-      "@common/*": ["components/common/*"],
       "@ui/*": ["components/ui/*"],
       "@widgets/*": ["components/widgets/*"],
       "@utils/*": ["utils/*"]

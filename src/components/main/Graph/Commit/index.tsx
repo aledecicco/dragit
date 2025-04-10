@@ -5,7 +5,10 @@ import { match } from 'ts-pattern'
 
 import type { BranchName, CommitId } from '@api/models'
 import { useQueryCommitInfo } from '@api/queries'
-import { ProfilePicture, type ProfilePictureVariant } from '@lib/ProfilePicture'
+import {
+  ProfilePicture,
+  type ProfilePictureVariant,
+} from '@common/ProfilePicture'
 import { makeTracked } from '@lib/SvgOverlay'
 import { Marquee } from '@ui/Marquee'
 import { cn, propsWithCn } from '@utils/styles'

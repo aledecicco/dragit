@@ -1,29 +1,29 @@
 import * as Ariakit from '@ariakit/react'
 import { type ComponentProps, useMemo } from 'react'
 
-import { useQueryBranches } from '@api/queries'
+import { useQueryStashes } from '@api/queries'
 import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { Accordion } from '@ui/Accordion'
 import { AccordionSection } from '@ui/Accordion/Section'
 import { Chip } from '@ui/Chip'
 import { cn, propsWithCn } from '@utils/styles'
 import { mapFn } from '@utils/types'
-import { BranchesListItem } from './Item'
+import { StashesListItem } from './Item'
 
-interface BranchesListProps extends ComponentProps<'div'> {}
+interface StashesListProps extends ComponentProps<'div'> {}
 
-const BranchesList = (props: BranchesListProps) => {
+const StashesList = (props: StashesListProps) => {
   const { ...divProps } = props
 
-  const branchesQuery = useQueryBranches()
+  const stashesQuery = useQueryStashes()
 
   const virtualizerOptions = useMemo(() => {
-    return mapFn(branchesQuery.data, (branches) => ({
+    return mapFn(stashesQuery.data, (branches) => ({
       getItemKey: (index: number) => branches[index].name,
     }))
-  }, [branchesQuery.data])
+  }, [stashesQuery.data])
 
-  if (!branchesQuery.data) {
+  if (!stashesQuery.data) {
     return (
       <div
         {...propsWithCn(
@@ -33,7 +33,7 @@ const BranchesList = (props: BranchesListProps) => {
         )}
       >
         <p className={cn('text-sm italic text-light-950/60')}>
-          Loading branches...
+          Loading stashes...
         </p>
       </div>
     )
@@ -43,18 +43,18 @@ const BranchesList = (props: BranchesListProps) => {
     <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>
       <AccordionSection
         defaultOpen
-        label="All branches"
-        extraInfo={<Chip size="sm">{branchesQuery.data.length}</Chip>}
+        label="Stashes"
+        extraInfo={<Chip size="sm">{stashesQuery.data.length}</Chip>}
       >
-        {branchesQuery.data.length ? (
+        {stashesQuery.data.length ? (
           <Ariakit.CompositeProvider focusLoop>
             <Ariakit.Composite
               render={
                 <VirtualizedDiv
                   size="sm"
-                  items={branchesQuery.data}
+                  items={stashesQuery.data}
                   itemSize={74}
-                  RenderItem={BranchesListItem}
+                  RenderItem={StashesListItem}
                   className={cn('w-full h-full')}
                   options={virtualizerOptions}
                 />
@@ -63,7 +63,7 @@ const BranchesList = (props: BranchesListProps) => {
           </Ariakit.CompositeProvider>
         ) : (
           <p className={cn('text-sm text-light-950/50 italic p-3')}>
-            No branches found
+            No stashes found
           </p>
         )}
       </AccordionSection>
@@ -71,4 +71,4 @@ const BranchesList = (props: BranchesListProps) => {
   )
 }
 
-export { BranchesList, type BranchesListProps }
+export { StashesList, type StashesListProps }

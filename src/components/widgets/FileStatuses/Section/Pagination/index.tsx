@@ -9,6 +9,7 @@ import {
   useFilesPage,
 } from '@context/pages'
 import { Button } from '@ui/Button'
+import { Chip } from '@ui/Chip'
 import { Icon } from '@ui/Icon'
 import { cn } from '@utils/styles'
 
@@ -24,42 +25,38 @@ const FileStatusSectionPagination = <T extends FileType>(
   const page = useFilesPage(type)
   const showPagination = !hasNoPagination(files, page)
 
-  return (
+  return showPagination ? (
     <div className={cn('flex flex-row gap-1 items-center')}>
-      {showPagination && (
-        <Button
-          size="sm"
-          round
-          variant="neutral"
-          aria-label={`Previous page of ${type} files`}
-          disabled={page === 0}
-          onClick={() => {
-            setPrevPage(type)
-          }}
-        >
-          <Icon Glyph={IconChevronLeft} size="sm" />
-        </Button>
-      )}
+      <Button
+        size="sm"
+        round
+        variant="neutral"
+        aria-label={`Previous page of ${type} files`}
+        disabled={page === 0}
+        onClick={() => {
+          setPrevPage(type)
+        }}
+      >
+        <Icon Glyph={IconChevronLeft} size="sm" />
+      </Button>
       <span className={cn('text-xs text-nowrap text-light-950')}>
-        {showPagination
-          ? `${page * FILE_STATUSES_PAGE_SIZE + 1} - ${(page + 1) * FILE_STATUSES_PAGE_SIZE}`
-          : (files?.items.length ?? '...')}
+        {`${page * FILE_STATUSES_PAGE_SIZE + 1} - ${(page + 1) * FILE_STATUSES_PAGE_SIZE}`}
       </span>
-      {showPagination && (
-        <Button
-          size="sm"
-          round
-          variant="neutral"
-          aria-label={`Next page of ${type} files`}
-          disabled={!files || !files.hasNext}
-          onClick={() => {
-            setNextPage(type)
-          }}
-        >
-          <Icon Glyph={IconChevronRight} size="sm" />
-        </Button>
-      )}
+      <Button
+        size="sm"
+        round
+        variant="neutral"
+        aria-label={`Next page of ${type} files`}
+        disabled={!files || !files.hasNext}
+        onClick={() => {
+          setNextPage(type)
+        }}
+      >
+        <Icon Glyph={IconChevronRight} size="sm" />
+      </Button>
     </div>
+  ) : (
+    <Chip size="sm">{files?.items.length ?? '...'}</Chip>
   )
 }
 

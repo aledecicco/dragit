@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{str::FromStr, u32};
 
 use models::{
     BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, DiffSummary, HeadInfo, HistoryItem,
@@ -37,6 +37,10 @@ pub(crate) const STASH_INFO_FORMAT: &str = "--format=format:%n%p%n%gd%n%ct%n%s";
 pub(crate) const STASH_INFO_DETACHED: &str = "(no branch)";
 /// The string that denotes that a stash was created using the shorthand, without a message.
 pub(crate) const STASH_INFO_QUICK: &str = "WIP";
+/// The suffix that denotes that a string contains the number of insertions in a stash.
+pub(crate) const STASH_INSERTIONS: &str = "insertions(+)";
+/// The suffix that denotes that a string contains the number of deletions in a stash.
+pub(crate) const STASH_DELETIONS: &str = "deletions(-)";
 
 pub(crate) fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
     Some(CommitInfo {
@@ -232,14 +236,43 @@ pub(crate) fn parse_remote_infos(lines: &Vec<String>) -> Vec<RemoteInfo> {
 }
 
 fn parse_diff_summary(line: &String) -> Option<DiffSummary> {
-    if line.is_empty() {
-        return None;
-    }
+    let files_count;
+    let mut insertions = 0;
+    let mut deletions = 0;
 
-    let segments: Vec<&str> = line.split(',').collect();
-    let files_count = u32::from_str(segments.get(0)?.trim_ascii()).ok()?;
-    let insertions = u32::from_str(segments.get(1)?.trim_ascii()).ok()?;
-    let deletions = u32::from_str(segments.get(2)?.trim_ascii()).ok()?;
+    let mut sections = line.split(',');
+
+    let files_segment = sections
+        .next()?
+        .trim_ascii()
+        .split_ascii_whitespace()
+        .next()?;
+    files_count = u32::from_str(files_segment).ok()?;
+
+    let mut parse_section = |section: &str| -> Option<()> {
+        println!("{:?}", section);
+        let section = section
+            .trim_ascii()
+            .split_ascii_whitespace()
+            .collect::<Vec<_>>();
+        if let (Some(section_number), Some(section_type)) = (section.get(0), section.get(1)) {
+            println!("{:?} {:?}", section_number, section_type);
+            if (*section_type).eq(STASH_INSERTIONS) {
+                insertions = u32::from_str(section_number).ok()?;
+            } else if (*section_type).eq(STASH_DELETIONS) {
+                deletions = u32::from_str(section_number).ok()?;
+            }
+        }
+
+        Some(())
+    };
+
+    let first_section = sections.next()?;
+    parse_section(first_section)?;
+    let second_section = sections.next();
+    if let Some(second_section) = second_section {
+        parse_section(second_section)?;
+    }
 
     Some(DiffSummary {
         files_count,
@@ -248,11 +281,12 @@ fn parse_diff_summary(line: &String) -> Option<DiffSummary> {
     })
 }
 
-fn parse_stash_info(body_lines: Vec<&String>, diff_line: Option<&String>) -> Option<StashInfo> {
-    let hashes_line = body_lines.get(0)?;
-    let name_line = body_lines.get(1)?;
-    let timestamp_line = body_lines.get(2)?;
-    let creation_line = body_lines.get(3)?;
+pub(crate) fn parse_stash_info(lines: &Vec<String>) -> Option<StashInfo> {
+    let hashes_line = lines.get(0)?;
+    let name_line = lines.get(1)?;
+    let timestamp_line = lines.get(2)?;
+    let creation_line = lines.get(3)?;
+    let diff_line = lines.get(4);
 
     let name = name_line.to_string();
     let timestamp = u32::from_str(timestamp_line).ok()?;
@@ -276,21 +310,4 @@ fn parse_stash_info(body_lines: Vec<&String>, diff_line: Option<&String>) -> Opt
         created_on,
         changes: diff_line.and_then(parse_diff_summary),
     })
-}
-
-pub(crate) fn parse_stash_infos(lines: &Vec<String>) -> Vec<StashInfo> {
-    let mut lines = lines.iter().peekable();
-    let mut stashes = Vec::new();
-
-    while lines.peek().is_some() {
-        let lines = lines.by_ref();
-        let body_lines = lines.take(4).collect();
-        let diff_line = lines.next();
-
-        if let Some(stash_info) = parse_stash_info(body_lines, diff_line) {
-            stashes.push(stash_info);
-        }
-    }
-
-    stashes
 }

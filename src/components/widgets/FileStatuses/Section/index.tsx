@@ -9,6 +9,7 @@ import {
   type AccordionSectionProps,
 } from '@ui/Accordion/Section'
 import { cn, propsWithCn } from '@utils/styles'
+import { mapFn } from '@utils/types'
 import { StagedFileStatusItem } from '../Item/Staged'
 import { UnmergedFileStatusItem } from '../Item/Unmerged'
 import { UnstagedFileStatusItem } from '../Item/Unstaged'
@@ -24,33 +25,48 @@ const FileStatusesSection = <T extends FileType>(
   props: FileStatusesSectionProps<T>,
 ) => {
   const { type, ...accordionSectionProps } = props
-  const files = useQueryFiles(type)
+  const filesQuery = useQueryFiles(type)
 
-  const options = useMemo(() => {
-    return files.data
-      ? {
-          getItemKey: (index: number) => files.data.items[index].path,
-        }
-      : undefined
-  }, [files])
+  const virtualizerOptions = useMemo(() => {
+    return mapFn(filesQuery.data, (files) => ({
+      getItemKey: (index: number) => files.items[index].path,
+    }))
+  }, [filesQuery.data])
+
+  if (!filesQuery.data) {
+    return (
+      <div
+        className={cn(
+          'h-full bg-dark-500',
+          'flex flex-col items-center justify-center',
+        )}
+      >
+        <p className={cn('text-sm italic text-light-950/60')}>
+          Loading branches...
+        </p>
+      </div>
+    )
+  }
 
   return (
     <AccordionSection
       defaultOpen
       label={`${type} files`}
-      extraInfo={<FileStatusSectionPagination type={type} files={files.data} />}
+      extraInfo={
+        <FileStatusSectionPagination type={type} files={filesQuery.data} />
+      }
       {...propsWithCn(accordionSectionProps, 'min-h-30 overflow-y-hidden')}
     >
-      {files.data?.items.length ? (
+      {filesQuery.data.items.length ? (
         <Ariakit.CompositeRow
           render={
             <VirtualizedDiv
               size="sm"
-              items={files.data.items}
+              items={filesQuery.data.items}
               RenderItem={FileStatusItem[type]}
               itemSize={ItemSize[type]}
               className={cn('w-full h-full')}
-              options={options}
+              options={virtualizerOptions}
             />
           }
         />

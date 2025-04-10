@@ -5,7 +5,6 @@ import { propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
 interface ChipProps extends ComponentProps<'div'> {
-  round?: boolean
   size?: Size
 }
 
@@ -16,13 +15,13 @@ const Chip = (props: ChipProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'w-max h-max',
-        'p-1 text-center font-semibold rounded-4xl',
+        'w-max h-max text-nowrap flex-nowrap',
+        'p-1 text-center rounded-4xl',
         'shadow-xs bg-dark-50 text-light-500',
         match(size)
           .with('sm', () => 'text-xs px-1.5 py-0.5')
-          .with('md', () => 'text-sm px-2 py-1')
-          .with('lg', () => 'text-md px-2.5 py-1.5')
+          .with('md', () => 'text-xs px-2 py-1')
+          .with('lg', () => 'text-sm px-2.5 py-1.5')
           .exhaustive(),
       )}
     />

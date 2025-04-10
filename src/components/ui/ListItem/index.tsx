@@ -11,7 +11,7 @@ const ListItem = (props: ListItemProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'flex flex-row items-center justify-between gap-4',
+        'flex flex-row items-start justify-between gap-4',
         'p-1.5 bg-dark-600 rounded-xs',
         'shadow-md',
         'hover:bg-dark-500 focus:bg-dark-500 data-focus:bg-dark-500',

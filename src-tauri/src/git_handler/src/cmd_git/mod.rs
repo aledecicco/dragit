@@ -520,8 +520,34 @@ impl GitHandler for CmdGit {
     fn get_stashes(&self, path: &str) -> Result<Vec<StashInfo>, GitError> {
         let process =
             self.spawn_command(path, ["stash", "list", STASH_INFO_FORMAT, "--shortstat"])?;
-        let lines = self.get_all_output_lines(process)?;
+        let mut lines = self.get_output_lines_stream(process)?.peekable();
+        let mut stashes = Vec::new();
 
-        Ok(parse_stash_infos(&lines))
+        lines.next(); // Skip the first line
+        while lines.peek().is_some() {
+            let mut stash_lines = lines
+                .by_ref()
+                .take(4)
+                .collect::<Result<Vec<String>, _>>()
+                .or(Err(GitError::GetCommandOutputFailed {}))?;
+
+            let diff_line = lines
+                .next()
+                .transpose()
+                .or(Err(GitError::GetCommandOutputFailed {}))?;
+
+            if let Some(diff_line) = diff_line {
+                if !diff_line.is_empty() {
+                    stash_lines.push(diff_line);
+                    lines.next();
+                    lines.next();
+                }
+            }
+
+            let stash_info = parse_stash_info(&stash_lines).ok_or(GitError::GetStashesFailed {})?;
+            stashes.push(stash_info);
+        }
+
+        Ok(stashes)
     }
 }
