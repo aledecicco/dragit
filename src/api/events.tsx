@@ -111,6 +111,8 @@ const EventHandler = (props: PropsWithChildren) => {
           client.invalidateQueries({
             queryKey: [queryKeys.directory.files.all(path)],
           })
+        })
+        .with({ type: 'stashesUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
             queryKey: [queryKeys.directory.stashes(path)],
           })

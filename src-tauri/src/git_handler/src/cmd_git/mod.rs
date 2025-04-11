@@ -1,9 +1,7 @@
 use std::{
     collections::HashMap,
     io::{BufRead, BufReader, Lines},
-    process::{id, Child, ChildStdout, Command, Stdio},
-    thread::sleep,
-    time::Duration,
+    process::{Child, ChildStdout, Command, Stdio},
 };
 use tauri::ipc::Channel;
 
@@ -50,11 +48,7 @@ impl CmdGit {
         I: IntoIterator<Item = &'a str>,
     {
         let process = self.spawn_command(path, args)?;
-
-        let _ = channel.send(AppMessage::ProcessStarted {
-            pid: id(),
-            subprocess: Some(process.id()),
-        });
+        let _ = channel.send(AppMessage::ProcessStarted { pid: process.id() });
 
         Ok(process)
     }
@@ -214,7 +208,6 @@ impl GitHandler for CmdGit {
             ["show", reference, COMMIT_INFO_FORMAT, "--quiet"],
         )?;
         let lines = self.get_all_output_lines(process)?;
-        sleep(Duration::from_secs(3));
         parse_commit_info(&lines).ok_or(GitError::GetCommitInfoFailed {
             reference: reference.to_string(),
         })
@@ -342,15 +335,12 @@ impl GitHandler for CmdGit {
     // TODO: optimize this. It can be very slow in some cases.
     fn get_common_ancestor(
         &self,
-        channel: &Channel<AppMessage>,
+        _: &Channel<AppMessage>,
         path: &str,
         reference_a: &str,
         reference_b: &str,
     ) -> Result<Option<CommonAncestorInfo>, GitError> {
-        let _ = channel.send(AppMessage::ProcessStarted {
-            pid: id(),
-            subprocess: None,
-        });
+        // TODO: handle cancelation
 
         let parse_ref = |reference: &str, back: u32| -> Option<String> {
             let process = self

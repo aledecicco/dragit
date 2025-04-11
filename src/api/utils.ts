@@ -10,11 +10,11 @@ import {
   useMutation,
   useQuery,
 } from '@tanstack/react-query'
+import { Channel, invoke } from '@tauri-apps/api/core'
 import { Child } from '@tauri-apps/plugin-shell'
+import { type BorshSchema, borshDeserialize } from 'borsher'
 import { match } from 'ts-pattern'
 
-import { Channel, invoke } from '@tauri-apps/api/core'
-import { type BorshSchema, borshDeserialize } from 'borsher'
 import type { AppMessage } from './models'
 import { useQueryCurrentDir } from './queries'
 
@@ -135,19 +135,22 @@ const fetchAndDeserialize = async <T>(
   schema: BorshSchema<T>,
   context: QueryFunctionContext,
 ): Promise<T> => {
-  const processIds: [number | null, number | null] = [null, null]
+  let shouldStop = false
+  let processId: number | undefined = undefined
 
   const abortSignal = context.signal
   abortSignal.onabort = () => {
-    console.log(
-      `Aborting ${command} with ${JSON.stringify(args)} for processes "${processIds[0]}" and "${processIds[1]}"`,
-    )
-
-    if (processIds[1] !== null) {
-      new Child(processIds[1]).kill()
+    if (processId !== undefined) {
+      console.log(`Received abort signal and going to stop ${processId}`)
+      new Child(processId).kill()
+    } else {
+      console.log('Received abort signal but no pid yet')
+      shouldStop = true
     }
+  }
 
-    // TODO: account for AppMessage delay
+  if (shouldStop) {
+    throw new Error('Aborted')
   }
 
   const channel = new Channel<AppMessage>()
@@ -157,10 +160,13 @@ const fetchAndDeserialize = async <T>(
         {
           type: 'processStarted',
         },
-        ({ pid, subprocess }) => {
-          console.log('setting', subprocess, JSON.stringify(args))
-          processIds[0] = pid
-          processIds[1] = subprocess
+        ({ pid }) => {
+          processId = pid
+
+          if (shouldStop) {
+            console.log(`Received start message but already should stop ${pid}`)
+            new Child(pid).kill()
+          }
         },
       )
       .exhaustive()

@@ -252,13 +252,11 @@ fn parse_diff_summary(line: &String) -> Option<DiffSummary> {
     files_count = u32::from_str(files_segment).ok()?;
 
     let mut parse_section = |section: &str| -> Option<()> {
-        println!("{:?}", section);
         let section = section
             .trim_ascii()
             .split_ascii_whitespace()
             .collect::<Vec<_>>();
         if let (Some(section_number), Some(section_type)) = (section.get(0), section.get(1)) {
-            println!("{:?} {:?}", section_number, section_type);
             if (*section_type).eq(STASH_INSERTIONS) {
                 insertions = u32::from_str(section_number).ok()?;
             } else if (*section_type).eq(STASH_DELETIONS) {

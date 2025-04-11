@@ -13,7 +13,7 @@ use tauri::{AppHandle, Emitter};
 
 use crate::{
     get_branches_folder, get_config_folder, get_git_folder, get_head_file, get_index_file,
-    get_objects_folder, get_remotes_folder,
+    get_objects_folder, get_remotes_folder, get_stashes_file,
 };
 use models::{AppEvent, RepoWatcher, RepoWatcherError, EVENT_ID};
 
@@ -46,6 +46,7 @@ impl DebouncedWatcher {
             let config_folder = get_config_folder(repo_path);
             let objects_folder = get_objects_folder(repo_path);
             let index_file = get_index_file(repo_path);
+            let stashes_file = get_stashes_file(repo_path);
 
             match res {
                 Ok(events) => {
@@ -55,6 +56,7 @@ impl DebouncedWatcher {
                     let mut git_folder_modified = false;
                     let mut config_updated = false;
                     let mut index_updated = false;
+                    let mut stashes_updated = false;
                     let mut branches_list_updated = false;
 
                     events.iter().for_each(|event| {
@@ -83,6 +85,10 @@ impl DebouncedWatcher {
 
                         if event.paths.contains(&index_file) {
                             index_updated = true;
+                        }
+
+                        if event.paths.contains(&stashes_file) {
+                            stashes_updated = true;
                         }
 
                         event.paths.iter().for_each(|path| {
@@ -212,14 +218,14 @@ impl DebouncedWatcher {
                         );
                     }
 
-                    println!(
-                        "files: {} head: {} branches: {} gitfolder: {} index: {}\n\n",
-                        files_modified,
-                        head_changed,
-                        branches_list_updated,
-                        git_folder_modified,
-                        index_updated,
-                    );
+                    if stashes_updated {
+                        let _ = app_handle.emit(
+                            EVENT_ID,
+                            AppEvent::StashesUpdated {
+                                path: pathname.to_string(),
+                            },
+                        );
+                    }
                 }
                 Err(_) => {} // TODO: warn frontend about possible unsync
             };

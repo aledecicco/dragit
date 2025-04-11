@@ -151,7 +151,6 @@ export type Reference =
 export type AppMessage = {
   type: 'processStarted'
   pid: number
-  subprocess: number | null
 }
 
 export type AppEvent =
@@ -164,3 +163,4 @@ export type AppEvent =
   | { type: 'filesModified'; path: string }
   | { type: 'configUpdated'; path: string }
   | { type: 'indexUpdated'; path: string }
+  | { type: 'stashesUpdated'; path: string }
