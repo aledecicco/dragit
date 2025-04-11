@@ -27,8 +27,8 @@ import type {
   MergeStatus,
   MovedStatus,
   Page,
-  RefName,
   RemoteInfo,
+  RemoteRef,
   Settings,
   StagedFileInfo,
   StashInfo,
@@ -139,10 +139,10 @@ const queryKeys = {
           ...queryKeys.directory.current(path),
           key: 'commit_history',
         }) as const,
-      branch: (path: string, branch: BranchName | undefined) =>
+      reference: (path: string, reference: string | undefined) =>
         ({
           ...queryKeys.directory.commitHistory.all(path),
-          branch: branch,
+          reference: reference,
         }) as const,
     },
     commitInfo: {
@@ -163,24 +163,27 @@ const queryKeys = {
           ...queryKeys.directory.current(path),
           key: 'common_ancestor',
         }) as const,
-      branch: (path: string, branch: BranchName | undefined) =>
+      reference: (path: string, reference: string | undefined) =>
         ({
           ...queryKeys.directory.commonAncestor.all(path),
-          branch: branch,
+          reference: reference,
         }) as const,
-      baseBranch: (path: string, baseBranch: BranchName | undefined) =>
+      baseReference: (path: string, baseReference: string | undefined) =>
         ({
           ...queryKeys.directory.commonAncestor.all(path),
-          baseBranch: baseBranch,
+          baseReference: baseReference,
         }) as const,
       pair: (
         path: string,
-        branch: BranchName | undefined,
-        baseBranch: BranchName | undefined,
+        reference: string | undefined,
+        baseReference: string | undefined,
       ) =>
         ({
-          ...queryKeys.directory.commonAncestor.branch(path, branch),
-          ...queryKeys.directory.commonAncestor.baseBranch(path, baseBranch),
+          ...queryKeys.directory.commonAncestor.reference(path, reference),
+          ...queryKeys.directory.commonAncestor.baseReference(
+            path,
+            baseReference,
+          ),
         }) as const,
     },
     branchDivergence: {
@@ -477,7 +480,7 @@ const fetchBranches = async (
       }))
       .with({ Remote: P.select() }, (branch) => ({
         type: 'remote',
-        name: branch.name as RefName,
+        name: branch.name as RemoteRef,
         timestamp: branch.timestamp * MS_IN_SECOND,
       }))
       .exhaustive(),
@@ -494,7 +497,7 @@ const useQueryBranches = () => useRepositoryQuery(branchesQuery)
 
 const fetchCommitHistoryPage = (
   path: string,
-  branch: BranchName,
+  refName: string,
   page: number,
   context: QueryFunctionContext,
 ): Promise<Page<HistoryItem>> => {
@@ -502,7 +505,7 @@ const fetchCommitHistoryPage = (
     'get_commit_history_page',
     {
       path,
-      branch,
+      reference: refName,
       startAfter: page * HISTORY_PAGE_SIZE,
       limit: HISTORY_PAGE_SIZE,
     },
@@ -511,12 +514,12 @@ const fetchCommitHistoryPage = (
   )
 }
 
-const commitHistoryQuery = (path: string, branch: BranchName | undefined) =>
+const commitHistoryQuery = (path: string, refName: string | undefined) =>
   infiniteQueryOptions({
-    queryKey: [queryKeys.directory.commitHistory.branch(path, branch)],
-    queryFn: branch
+    queryKey: [queryKeys.directory.commitHistory.reference(path, refName)],
+    queryFn: refName
       ? (context) =>
-          fetchCommitHistoryPage(path, branch, context.pageParam, context)
+          fetchCommitHistoryPage(path, refName, context.pageParam, context)
       : skipToken,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _, lastPageParam) => {
@@ -524,8 +527,8 @@ const commitHistoryQuery = (path: string, branch: BranchName | undefined) =>
     },
   })
 
-const useQueryCommitHistory = (branch: BranchName | undefined) =>
-  useRepositoryInfiniteQuery(commitHistoryQuery, branch)
+const useQueryCommitHistory = (refName: string | undefined) =>
+  useRepositoryInfiniteQuery(commitHistoryQuery, refName)
 
 const fetchCommitInfo = async (
   path: string,
@@ -556,13 +559,13 @@ const useQueryCommitInfo = (commitId: CommitId) =>
 
 const fetchCommonAncestor = (
   path: string,
-  branch: BranchName,
-  baseBranch: BranchName,
+  refName: string,
+  baseRefName: string,
   context: QueryFunctionContext,
 ): Promise<CommonAncestorInfo> => {
   return fetchAndDeserialize(
     'get_common_ancestor',
-    { path, branch, baseBranch },
+    { path, reference: refName, baseReference: baseRefName },
     COMMON_ANCESTOR_INFO_SCHEMA,
     context,
   )
@@ -570,23 +573,23 @@ const fetchCommonAncestor = (
 
 const commonAncestorQuery = (
   path: string,
-  branch: BranchName | undefined,
-  baseBranch: BranchName | undefined,
+  refName: string | undefined,
+  baseRefName: string | undefined,
 ) =>
   queryOptions({
     queryKey: [
-      queryKeys.directory.commonAncestor.pair(path, branch, baseBranch),
+      queryKeys.directory.commonAncestor.pair(path, refName, baseRefName),
     ],
     queryFn:
-      branch && baseBranch
-        ? (context) => fetchCommonAncestor(path, branch, baseBranch, context)
+      refName && baseRefName
+        ? (context) => fetchCommonAncestor(path, refName, baseRefName, context)
         : skipToken,
   })
 
 const useQueryCommonAncestor = (
-  branch: BranchName | undefined,
-  baseBranch: BranchName | undefined,
-) => useRepositoryQuery(commonAncestorQuery, branch, baseBranch)
+  refName: string | undefined,
+  baseRefName: string | undefined,
+) => useRepositoryQuery(commonAncestorQuery, refName, baseRefName)
 
 const fetchBranchDivergence = (
   path: string,
@@ -604,23 +607,24 @@ const fetchBranchDivergence = (
 
 const branchDivergenceQuery = (
   path: string,
-  branch: BranchName | undefined,
-  baseBranch: BranchName | undefined,
+  refName: string | undefined,
+  baseRefName: string | undefined,
 ) =>
   queryOptions({
     queryKey: [
-      queryKeys.directory.branchDivergence.pair(path, branch, baseBranch),
+      queryKeys.directory.branchDivergence.pair(path, refName, baseRefName),
     ],
     queryFn:
-      branch && baseBranch
-        ? (context) => fetchBranchDivergence(path, branch, baseBranch, context)
+      refName && baseRefName
+        ? (context) =>
+            fetchBranchDivergence(path, refName, baseRefName, context)
         : skipToken,
   })
 
 const useQueryBranchDivergence = (
-  branch: BranchName | undefined,
-  baseBranch: BranchName | undefined,
-) => useRepositoryQuery(branchDivergenceQuery, branch, baseBranch)
+  refName: string | undefined,
+  baseRefName: string | undefined,
+) => useRepositoryQuery(branchDivergenceQuery, refName, baseRefName)
 
 const fetchRemotes = (
   path: string,

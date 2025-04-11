@@ -102,16 +102,16 @@ const initRepositoryMutation = (path: string) =>
 
 const useInitRepository = () => useRepositoryMutation(initRepositoryMutation)
 
-const checkoutLocalMutation = (path: string) =>
+const checkout = (path: string) =>
   mutationOptions({
     mutationKey: [mutationKeys.repository.checkoutLocal(path)],
-    mutationFn: (args: { branch: BranchName }) => {
-      return invoke('checkout_local_branch', { path: path, ...args })
+    mutationFn: (args: { reference: string }) => {
+      return invoke('checkout', { path: path, ...args })
     },
     networkMode: 'always',
   })
 
-const useCheckoutLocal = () => useRepositoryMutation(checkoutLocalMutation)
+const useCheckout = () => useRepositoryMutation(checkout)
 
 const addToIndexMutation = (path: string) =>
   mutationOptions({
@@ -234,7 +234,7 @@ export {
   useRemoveRecentFolder,
   useSetSettings,
   useInitRepository,
-  useCheckoutLocal,
+  useCheckout,
   useAddToIndex,
   useRemoveFromIndex,
   useRemoveFromTree,

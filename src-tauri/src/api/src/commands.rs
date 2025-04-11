@@ -104,12 +104,12 @@ pub async fn get_branches(
 
 /// Switches the current repository to a local branch.
 #[tauri::command]
-pub async fn checkout_local_branch(
+pub async fn checkout(
     state: State<'_, AppState>,
     path: &str,
-    branch: &str,
+    reference: &str,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.checkout_local_branch(path, branch))
+    with_handler(&state, &|h| h.checkout(path, reference))
 }
 
 #[tauri::command]
@@ -117,12 +117,12 @@ pub async fn get_commit_history_page(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
     path: &str,
-    branch: &str,
+    reference: &str,
     start_after: usize,
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_commit_history_page(&channel, path, branch, start_after, limit)
+        h.get_commit_history_page(&channel, path, reference, start_after, limit)
     })
     .and_then(serialize_response)
 }
@@ -241,11 +241,11 @@ pub async fn get_common_ancestor(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
     path: &str,
-    branch: &str,
-    base_branch: &str,
+    reference_a: &str,
+    reference_b: &str,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_common_ancestor(&channel, path, branch, base_branch)
+        h.get_common_ancestor(&channel, path, reference_a, reference_b)
     })
     .and_then(serialize_response)
 }

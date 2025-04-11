@@ -22,8 +22,8 @@ pub enum GitError {
     #[error("Failed to retrieve current branch")]
     GetCurrentBranchFailed {},
 
-    #[error("Failed to checkout branch \"{branch}\"")]
-    CheckoutBranchFailed { branch: String },
+    #[error("Failed to checkout \"{reference}\"")]
+    CheckoutFailed { reference: String },
 
     #[error("Failed to get commit history of \"{reference}\"")]
     GetReferenceHistoryFailed { reference: String },

@@ -3,23 +3,18 @@ import type {
   UseInfiniteQueryResult,
 } from '@tanstack/react-query'
 import type { VirtualItem } from '@tanstack/react-virtual'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
 import type {
   BranchDivergence,
-  BranchInfo,
   HistoryItem,
   Page,
+  Reference,
 } from '@api/models'
-import {
-  useQueryBranchDivergence,
-  useQueryBranches,
-  useQueryCommonAncestor,
-  useQueryHeadInfo,
-} from '@api/queries'
+import { useQueryBranchDivergence, useQueryCommonAncestor } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
-import { useSelectedBranches } from '@context/branches'
-import { getCurrentBranchInfo, getRemoteCounterpart } from '@utils/repository'
+import { useSelectedRefs } from '@context/branches'
+import { getRemoteCounterpart, useBranch } from '@utils/repository'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<Page<HistoryItem>>>
 
@@ -65,33 +60,24 @@ const useInfiniteScroll = (
   ])
 }
 
-const useCurrentBranch = (): BranchInfo | undefined => {
-  const headInfoQuery = useQueryHeadInfo()
-  const branchesQuery = useQueryBranches()
-
-  const branch = useMemo(() => {
-    return getCurrentBranchInfo(headInfoQuery.data, branchesQuery.data)
-  }, [branchesQuery.data, headInfoQuery.data])
-
-  return branch
-}
-
 const useCurrentCommonAncestor = () => {
-  const { branch, baseBranch } = useSelectedBranches()
+  const { reference, baseReference } = useSelectedRefs()
   const commonAncestorQuery = useQueryCommonAncestor(
-    branch?.name,
-    baseBranch?.name,
+    reference?.refName,
+    baseReference?.refName,
   )
 
   return commonAncestorQuery.data
 }
 
 const useRemoteDivergence = (
-  branch: BranchInfo,
+  reference: Reference,
 ): BranchDivergence | undefined | null => {
+  const branch = useBranch(reference)
+
   const divergenceQuery = useQueryBranchDivergence(
-    branch.name,
-    getRemoteCounterpart(branch),
+    branch?.name,
+    branch ? getRemoteCounterpart(branch) : undefined,
   )
 
   return divergenceQuery.data
@@ -101,7 +87,6 @@ export {
   ancestorNotInRange,
   ancestorIsDivergent,
   useInfiniteScroll,
-  useCurrentBranch,
   useCurrentCommonAncestor,
   useRemoteDivergence,
 }

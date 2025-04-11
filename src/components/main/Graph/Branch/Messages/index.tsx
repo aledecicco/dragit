@@ -1,18 +1,18 @@
 import type { PropsWithChildren } from 'react'
 
 import { useQueryCommitHistory } from '@api/queries'
-import { useSelectedBranches } from '@context/branches'
+import { useSelectedRefs } from '@context/branches'
 import { useCurrentCommonAncestor } from '@main/Graph/utils'
 import { cn } from '@utils/styles'
 
 const BranchMessages = () => {
-  const { branch, baseBranch } = useSelectedBranches()
+  const { reference, baseReference } = useSelectedRefs()
   const commonAncestorQuery = useCurrentCommonAncestor()
-  const branchHistoryQuery = useQueryCommitHistory(branch?.name)
-  const baseBranchHistory = useQueryCommitHistory(baseBranch?.name)
+  const branchHistoryQuery = useQueryCommitHistory(reference?.refName)
+  const baseBranchHistory = useQueryCommitHistory(baseReference?.refName)
 
   const branchMessages = [
-    { when: !branch, message: 'No branch checked out' },
+    { when: !reference, message: 'No branch checked out' },
     {
       when:
         branchHistoryQuery.data?.pages &&
@@ -28,7 +28,7 @@ const BranchMessages = () => {
   ]
 
   const baseBranchMessages = [
-    { when: !baseBranch, message: 'No base branch selected' },
+    { when: !baseReference, message: 'No base branch selected' },
     {
       when: !baseBranchHistory.data?.pages,
       message: baseBranchHistory.isFetching

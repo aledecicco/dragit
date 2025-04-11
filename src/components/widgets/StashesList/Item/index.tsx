@@ -1,5 +1,5 @@
 import * as Ariakit from '@ariakit/react'
-import { IconArchiveFilled } from '@tabler/icons-react'
+import { IconArchive } from '@tabler/icons-react'
 import { type ComponentProps, memo } from 'react'
 
 import type { StashInfo } from '@api/models'
@@ -30,7 +30,7 @@ const StashesListItem = memo((props: StashesListItemProps) => {
         <div
           className={cn('flex flex-row gap-x-1 items-center text-light-600')}
         >
-          <Icon Glyph={IconArchiveFilled} size="md" />
+          <Icon Glyph={IconArchive} size="md" />
 
           <Marquee className={cn('text-sm')} reverse={false}>
             {item.name} - on{' '}
@@ -46,7 +46,7 @@ const StashesListItem = memo((props: StashesListItemProps) => {
         </Marquee>
 
         <Marquee
-          className={cn('text-xs text-light-950/50 mt-2')}
+          className={cn('text-xs text-light-950/60 mt-2')}
           reverse={false}
         >
           Stashed {stashedTime}
@@ -56,7 +56,7 @@ const StashesListItem = memo((props: StashesListItemProps) => {
       <div className={cn('h-full flex flex-col justify-between items-end')}>
         <StashToolbar stash={item} size="sm" />
 
-        <div className={cn('text-xs text-light-950/50 text-nowrap')}>
+        <div className={cn('text-xs text-light-950/60 text-nowrap')}>
           {item.changes?.filesCount} files - +{item.changes?.insertions} - -
           {item.changes?.deletions}
         </div>

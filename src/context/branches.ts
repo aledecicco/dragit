@@ -1,46 +1,41 @@
 import { Store, useStore } from '@tanstack/react-store'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
-import type { BranchInfo } from '@api/models'
-import { useCurrentBranch } from '@main/Graph/utils'
+import type { Reference } from '@api/models'
+import { useBranch, useCurrentRef } from '@utils/repository'
 
-interface SelectedBranches {
-  branch: BranchInfo | undefined
-  baseBranch: BranchInfo | undefined
+interface SelectedRefs {
+  reference: Reference | undefined
+  baseReference: Reference | undefined
 }
 
-const selectedBranches = new Store<SelectedBranches>({
-  branch: undefined,
-  baseBranch: undefined,
+const selectedRefs = new Store<SelectedRefs>({
+  reference: undefined,
+  baseReference: undefined,
 })
 
-const useSelectedBranches = () => useStore(selectedBranches)
+const useSelectedRefs = () => useStore(selectedRefs)
 
-const changeBaseBranch = (baseBranch: BranchInfo | undefined) => {
-  selectedBranches.setState((state) => ({
+const changeBaseRef = (baseReference: Reference | undefined) => {
+  selectedRefs.setState((state) => ({
     ...state,
-    baseBranch,
+    baseReference,
   }))
 }
 
-const useBranchesSync = () => {
-  const currentBranch = useCurrentBranch()
+const useReferencesSync = () => {
+  const currentRef = useCurrentRef()
 
   useEffect(() => {
-    selectedBranches.setState((oldBranches) => ({
-      branch: currentBranch,
-      baseBranch:
-        oldBranches.baseBranch &&
-        oldBranches.baseBranch.name === currentBranch?.name
-          ? oldBranches.branch
-          : oldBranches.baseBranch,
+    selectedRefs.setState((oldReferencees) => ({
+      reference: currentRef,
+      baseReference:
+        oldReferencees.baseReference &&
+        oldReferencees.baseReference.refName === currentRef?.refName
+          ? oldReferencees.reference
+          : oldReferencees.baseReference,
     }))
-  }, [currentBranch])
+  }, [currentRef])
 }
 
-export {
-  useSelectedBranches,
-  changeBaseBranch,
-  useBranchesSync,
-  type SelectedBranches,
-}
+export { useSelectedRefs, changeBaseRef, useReferencesSync, type SelectedRefs }

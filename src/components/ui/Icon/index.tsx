@@ -21,7 +21,7 @@ const Icon = (props: IconProps) => {
         iconProps,
         'shrink-0',
         match(size)
-          .with('sm', () => 'stroke-1.5 size-3')
+          .with('sm', () => 'stroke-1.5 size-3.5')
           .with('md', () => 'stroke-1.5 size-4')
           .with('lg', () => 'stroke-2 size-5')
           .exhaustive(),

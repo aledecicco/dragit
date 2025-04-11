@@ -17,7 +17,7 @@ export interface CurrentDirInfo {
 export type CommitId = string
 export type BranchName = string
 export type RemoteName = string
-export type RefName = `${RemoteName}/${BranchName}`
+export type RemoteRef = `${RemoteName}/${BranchName}`
 
 export interface CommitInfo {
   hash: CommitId
@@ -132,11 +132,21 @@ export interface LocalBranch {
 }
 
 export interface RemoteBranch {
-  name: RefName
+  name: RemoteRef
   timestamp: number
   type: 'remote'
 }
 export type BranchInfo = LocalBranch | RemoteBranch
+
+export type Reference =
+  | {
+      type: 'commit'
+      refName: CommitId
+    }
+  | {
+      type: 'branch'
+      refName: BranchName
+    }
 
 export type AppMessage = {
   type: 'processStarted'

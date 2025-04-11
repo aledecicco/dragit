@@ -21,8 +21,8 @@ pub trait GitHandler {
         path: &str,
     ) -> Result<Vec<BranchInfo>, GitError>;
 
-    /// Switches the current repository to a local branch.
-    fn checkout_local_branch(&self, path: &str, branch: &str) -> Result<(), GitError>;
+    /// Switches the current repository to the given ref.
+    fn checkout(&self, path: &str, reference: &str) -> Result<(), GitError>;
 
     /// Returns (a page of) the list of commit hashes leading up to a reference.
     fn get_commit_history_page(
@@ -98,8 +98,8 @@ pub trait GitHandler {
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
-        branch_a: &str,
-        branch_b: &str,
+        reference_a: &str,
+        reference_b: &str,
     ) -> Result<Option<CommonAncestorInfo>, GitError>;
 
     /// Returns the number of commits that the given branch is ahead/behind another (possibly its remote counterpart).

@@ -154,10 +154,10 @@ impl GitHandler for CmdGit {
         Ok(branches)
     }
 
-    fn checkout_local_branch(&self, path: &str, branch: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["checkout", branch])
-            .or(Err(GitError::CheckoutBranchFailed {
-                branch: branch.to_string(),
+    fn checkout(&self, path: &str, reference: &str) -> Result<(), GitError> {
+        self.spawn_and_await(path, ["checkout", reference])
+            .or(Err(GitError::CheckoutFailed {
+                reference: reference.to_string(),
             }))
     }
 
@@ -165,37 +165,37 @@ impl GitHandler for CmdGit {
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
-        branch: &str,
+        reference: &str,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<HistoryItem>, GitError> {
         let page_arg = start_after.to_string();
         let page_size_arg = (limit + 1).to_string();
-        let branch_arg = branch.to_string() + "~" + &page_arg;
+        let reference_arg = reference.to_string() + "~" + &page_arg;
 
         let process = self.spawn_and_notify(
             channel,
             path,
             [
                 "rev-list",
-                &branch_arg,
+                &reference_arg,
                 "-n",
                 &page_size_arg,
                 "--first-parent",
                 "--parents",
             ],
         )?;
-        let lines = self.get_output_lines_stream(process)?;
-        let mut items_iter = lines
+        let mut lines = self.get_output_lines_stream(process)?;
+
+        let items = lines
+            .by_ref()
             .take(limit)
-            .map(|line| line.ok().and_then(|line| parse_history_item(&line)));
-
-        let items: Option<_> = items_iter.by_ref().collect();
-        let items = items.ok_or(GitError::GetReferenceHistoryFailed {
-            reference: branch.to_string(),
-        })?;
-
-        let has_next = items_iter.next().is_some();
+            .map(|line| line.ok().and_then(|line| parse_history_item(&line)))
+            .collect::<Option<_>>()
+            .ok_or(GitError::GetReferenceHistoryFailed {
+                reference: reference.to_string(),
+            })?;
+        let has_next = lines.next().is_some();
 
         Ok(Page { items, has_next })
     }
@@ -337,12 +337,13 @@ impl GitHandler for CmdGit {
             .or(Err(GitError::CommitFailed {}))
     }
 
+    // TODO: optimize this. It can be very slow in some cases.
     fn get_common_ancestor(
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
-        branch: &str,
-        base_branch: &str,
+        reference_a: &str,
+        reference_b: &str,
     ) -> Result<Option<CommonAncestorInfo>, GitError> {
         let _ = channel.send(AppMessage::ProcessStarted {
             pid: id(),
@@ -356,58 +357,58 @@ impl GitHandler for CmdGit {
             self.get_all_output(process).ok()
         };
 
-        let mut prev_branch_pointer = None;
-        let mut branch_pointer = parse_ref(branch, 0).map(|hash| (hash, 0));
-        let mut base_pointer = parse_ref(base_branch, 0).map(|hash| (hash, 0));
+        let mut prev_ref_a_pointer = None;
+        let mut ref_a_pointer = parse_ref(reference_a, 0).map(|hash| (hash, 0));
+        let mut ref_b_pointer = parse_ref(reference_b, 0).map(|hash| (hash, 0));
 
-        // For each commit in the branch, keep track of the commit that comes immediately next and its depth.
-        let mut found_in_branch: HashMap<String, Option<(String, u32)>> = HashMap::new();
-        // For each commit in the base branch, keep track of the depth it was found at.
-        let mut found_in_base: HashMap<String, u32> = HashMap::new();
+        // For each ancestor of reference_a, keep track of the commit that comes immediately next and its depth.
+        let mut found_in_ref_a: HashMap<String, Option<(String, u32)>> = HashMap::new();
+        // For each ancestor of reference_b, keep track of the depth it was found at.
+        let mut found_in_ref_b: HashMap<String, u32> = HashMap::new();
 
         loop {
-            if let Some((branch_hash, branch_distance)) = branch_pointer {
-                if let Some(base_distance) = found_in_base.get(&branch_hash) {
+            if let Some((ref_a_hash, ref_a_distance)) = ref_a_pointer {
+                if let Some(ref_b_distance) = found_in_ref_b.get(&ref_a_hash) {
                     return Ok(Some(CommonAncestorInfo {
-                        last_commit: prev_branch_pointer.map(
-                            |(prev_branch_hash, prev_branch_distance)| AncestorInfo {
-                                hash: prev_branch_hash,
-                                distance: prev_branch_distance,
+                        last_commit: prev_ref_a_pointer.map(
+                            |(prev_ref_a_hash, prev_ref_a_distance)| AncestorInfo {
+                                hash: prev_ref_a_hash,
+                                distance: prev_ref_a_distance,
                             },
                         ),
                         common_commit: AncestorInfo {
-                            hash: branch_hash,
-                            distance: *base_distance,
+                            hash: ref_a_hash,
+                            distance: *ref_b_distance,
                         },
                     }));
                 }
 
-                found_in_branch.insert(branch_hash.to_owned(), prev_branch_pointer);
-                prev_branch_pointer = Some((branch_hash.to_string(), branch_distance));
-                branch_pointer = parse_ref(&branch_hash, 1).map(|hash| (hash, branch_distance + 1))
+                found_in_ref_a.insert(ref_a_hash.to_owned(), prev_ref_a_pointer);
+                prev_ref_a_pointer = Some((ref_a_hash.to_string(), ref_a_distance));
+                ref_a_pointer = parse_ref(&ref_a_hash, 1).map(|hash| (hash, ref_a_distance + 1))
             }
 
-            if let Some((base_hash, base_distance)) = base_pointer {
-                if let Some(prev_branch_pointer) = found_in_branch.get(&base_hash) {
+            if let Some((ref_b_hash, ref_b_distance)) = ref_b_pointer {
+                if let Some(prev_ref_a_pointer) = found_in_ref_a.get(&ref_b_hash) {
                     return Ok(Some(CommonAncestorInfo {
-                        last_commit: prev_branch_pointer.as_ref().map(
-                            |(prev_branch_hash, prev_branch_distance)| AncestorInfo {
-                                hash: prev_branch_hash.to_string(),
-                                distance: *prev_branch_distance,
+                        last_commit: prev_ref_a_pointer.as_ref().map(
+                            |(prev_ref_a_hash, prev_ref_a_distance)| AncestorInfo {
+                                hash: prev_ref_a_hash.to_string(),
+                                distance: *prev_ref_a_distance,
                             },
                         ),
                         common_commit: AncestorInfo {
-                            hash: base_hash,
-                            distance: base_distance,
+                            hash: ref_b_hash,
+                            distance: ref_b_distance,
                         },
                     }));
                 }
 
-                found_in_base.insert(base_hash.to_owned(), base_distance);
-                base_pointer = parse_ref(&base_hash, 1).map(|hash| (hash, base_distance + 1))
+                found_in_ref_b.insert(ref_b_hash.to_owned(), ref_b_distance);
+                ref_b_pointer = parse_ref(&ref_b_hash, 1).map(|hash| (hash, ref_b_distance + 1))
             }
 
-            if branch_pointer.is_none() && base_pointer.is_none() {
+            if ref_a_pointer.is_none() && ref_b_pointer.is_none() {
                 return Ok(None);
             }
         }

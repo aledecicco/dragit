@@ -54,7 +54,7 @@ pub fn run() {
             api::get_unstaged_files_page,
             api::get_unmerged_files_page,
             api::get_untracked_files_page,
-            api::checkout_local_branch,
+            api::checkout,
             api::get_commit_history_page,
             api::get_commit_info,
             api::add_to_index,

@@ -4,7 +4,7 @@ import { type ComponentProps, useCallback, useMemo } from 'react'
 
 import { useQueryCommitHistory } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
-import { useSelectedBranches } from '@context/branches'
+import { useSelectedRefs } from '@context/branches'
 import { ScrollShadowDiv } from '@lib/ScrollShadowDiv'
 import { SvgOverlay } from '@lib/SvgOverlay'
 import { type VirtualListOptions, useVirtualList } from '@utils/performance'
@@ -42,11 +42,11 @@ const Graph = (props: GraphProps) => {
 }
 
 const GraphInner = () => {
-  const { branch, baseBranch } = useSelectedBranches()
+  const { reference, baseReference } = useSelectedRefs()
   const commonAncestor = useCurrentCommonAncestor()
 
-  const branchHistoryQuery = useQueryCommitHistory(branch?.name)
-  const baseBranchHistoryQuery = useQueryCommitHistory(baseBranch?.name)
+  const branchHistoryQuery = useQueryCommitHistory(reference?.refName)
+  const baseBranchHistoryQuery = useQueryCommitHistory(baseReference?.refName)
 
   const branchLength = useMemo(() => {
     return Math.min(
@@ -113,20 +113,20 @@ const GraphInner = () => {
             className={cn('w-full')}
             style={{ height: virtualizer.getTotalSize() }}
           >
-            {branch && (
+            {reference && (
               <GraphBranch
                 virtualizer={virtualizer}
-                branch={branch}
+                reference={reference}
                 anchor={commonAncestor?.lastCommit}
                 isBase={false}
-                baseBranch={baseBranch}
+                baseReference={baseReference}
               />
             )}
 
-            {baseBranch && (
+            {baseReference && (
               <GraphBranch
                 virtualizer={virtualizer}
-                branch={baseBranch}
+                reference={baseReference}
                 anchor={commonAncestor?.commonCommit}
                 isBase
               />

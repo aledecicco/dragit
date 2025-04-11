@@ -3,7 +3,7 @@ import type { ComponentProps } from 'react'
 import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
 
-import type { BranchName, CommitId } from '@api/models'
+import type { CommitId } from '@api/models'
 import { useQueryCommitInfo } from '@api/queries'
 import {
   ProfilePicture,
@@ -17,8 +17,8 @@ import type { ParentCommitType } from '../Edges'
 export type CommitType = 'confirmed' | 'unconfirmed'
 
 export const NODE_SIZE = 26
-export const COMMIT_ELEMENT_ID = (commitId: CommitId, branch: BranchName) =>
-  `commit_${commitId}_${branch}`
+export const COMMIT_ELEMENT_ID = (commitId: CommitId, refName: string) =>
+  `commit_${commitId}_${refName}`
 
 interface GraphCommitProps extends ComponentProps<'div'> {
   commitId: CommitId

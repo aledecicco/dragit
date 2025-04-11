@@ -1,6 +1,6 @@
 import type { Virtualizer } from '@tanstack/react-virtual'
 
-import type { AncestorInfo, BranchInfo } from '@api/models'
+import type { AncestorInfo, Reference } from '@api/models'
 import { HISTORY_PAGE_SIZE, useQueryCommitHistory } from '@api/queries'
 import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
 import { cn } from '@utils/styles'
@@ -14,28 +14,34 @@ import {
 
 type GraphBranchProps = {
   virtualizer: Virtualizer<HTMLDivElement, Element>
-  branch: BranchInfo
+  reference: Reference
   anchor: AncestorInfo | undefined | null
 } & (
   | {
       isBase?: false
-      baseBranch: BranchInfo | undefined
+      baseReference: Reference | undefined
     }
   | {
       isBase: true
-      baseBranch?: never
+      baseReference?: never
     }
 )
 
 const GraphBranch = (props: GraphBranchProps) => {
-  const { virtualizer, branch, anchor, isBase = false, baseBranch } = props
+  const {
+    virtualizer,
+    reference,
+    anchor,
+    isBase = false,
+    baseReference,
+  } = props
   const stopAtAnchor = !isBase
 
-  const historyQuery = useQueryCommitHistory(branch.name)
+  const historyQuery = useQueryCommitHistory(reference.refName)
   const items = virtualizer.getVirtualItems()
   useInfiniteScroll(historyQuery, items)
 
-  const divergence = useRemoteDivergence(branch)
+  const divergence = useRemoteDivergence(reference)
 
   if (stopAtAnchor && anchor === null) {
     return
@@ -85,11 +91,13 @@ const GraphBranch = (props: GraphBranchProps) => {
         key={commit}
         commitId={commit}
         commitType={isUnconfirmed ? 'unconfirmed' : 'confirmed'}
-        elementId={COMMIT_ELEMENT_ID(commit, branch.name)}
+        elementId={COMMIT_ELEMENT_ID(commit, reference.refName)}
         parent={mapFn(parentCommit, (parentCommit) => ({
           id: COMMIT_ELEMENT_ID(
             parentCommit,
-            isAnchor && !!baseBranch ? baseBranch.name : branch.name,
+            isAnchor && !!baseReference
+              ? baseReference.refName
+              : reference.refName,
           ),
           type: parentIsDistantAnchor
             ? 'dashed'

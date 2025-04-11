@@ -1,18 +1,20 @@
 import { IconSwitchHorizontal } from '@tabler/icons-react'
 
-import { useCheckoutLocal } from '@api/mutations'
+import { useCheckout } from '@api/mutations'
 import { useQueryBranches, useQueryHeadInfo } from '@api/queries'
 import { BranchSelector } from '@common/BranchSelector'
-import { changeBaseBranch, useSelectedBranches } from '@context/branches'
+import { changeBaseRef } from '@context/branches'
 import { IconButton } from '@ui/IconButton'
+import { useSelectedBranches } from '@utils/repository'
 import { cn } from '@utils/styles'
+import { mapFn } from '@utils/types'
 
 const BranchSelectors = () => {
   const headInfoQuery = useQueryHeadInfo()
   const branchesQuery = useQueryBranches()
 
   const { branch, baseBranch } = useSelectedBranches()
-  const checkout = useCheckoutLocal()
+  const checkout = useCheckout()
 
   return (
     <>
@@ -22,7 +24,7 @@ const BranchSelectors = () => {
         branches={branchesQuery.data}
         allowEmpty={false}
         onBranchChange={(newOption) => {
-          checkout.mutateAsync({ branch: newOption.data.name })
+          checkout.mutateAsync({ reference: newOption.data.name })
         }}
         placeholder="Checkout a branch..."
         disabled={headInfoQuery.isLoading || branchesQuery.isLoading}
@@ -37,7 +39,7 @@ const BranchSelectors = () => {
         size="md"
         onClick={() => {
           if (baseBranch) {
-            checkout.mutateAsync({ branch: baseBranch.name })
+            checkout.mutateAsync({ reference: baseBranch.name })
           }
         }}
       />
@@ -49,7 +51,12 @@ const BranchSelectors = () => {
         allowEmpty
         exclude={branch?.name}
         onBranchChange={(newOption) => {
-          changeBaseBranch(newOption.data)
+          changeBaseRef(
+            mapFn(newOption.data, (newOption) => ({
+              type: 'branch',
+              refName: newOption.name,
+            })),
+          )
         }}
         placeholder="Choose a base branch..."
         disabled={headInfoQuery.isLoading || branchesQuery.isLoading}

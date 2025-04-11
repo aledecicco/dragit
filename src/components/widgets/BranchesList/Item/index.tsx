@@ -4,12 +4,11 @@ import { type ComponentProps, memo } from 'react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@api/models'
-import { useCheckoutLocal } from '@api/mutations'
-import { useSelectedBranches } from '@context/branches'
+import { useCheckout } from '@api/mutations'
 import { Icon } from '@ui/Icon'
 import { ListItem } from '@ui/ListItem'
 import { Marquee } from '@ui/Marquee'
-import { getRemoteCounterpart } from '@utils/repository'
+import { getRemoteCounterpart, useSelectedBranches } from '@utils/repository'
 import { cn, propsWithCn } from '@utils/styles'
 import { useDateDifference } from '@utils/time'
 
@@ -23,9 +22,9 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
 
   const remoteCounterpart = getRemoteCounterpart(item)
 
-  const { branch: currentBranch } = useSelectedBranches()
-  const isCurrentBranch = currentBranch && item.name === currentBranch.name
-  const checkout = useCheckoutLocal()
+  const { branch } = useSelectedBranches()
+  const isCurrentBranch = branch && item.name === branch.name
+  const checkout = useCheckout()
 
   return (
     <Ariakit.CompositeItem
@@ -39,7 +38,7 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
           )}
           onClick={(e) => {
             if (e.detail === 0) {
-              checkout.mutateAsync({ branch: item.name })
+              checkout.mutateAsync({ reference: item.name })
             }
 
             divProps.onClick?.(e)
@@ -77,7 +76,7 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
           )}
         </Marquee>
         <Marquee
-          className={cn('text-xs text-light-950/50 mt-2')}
+          className={cn('text-xs text-light-950/60 mt-2')}
           reverse={false}
         >
           Last modified {lastModified}

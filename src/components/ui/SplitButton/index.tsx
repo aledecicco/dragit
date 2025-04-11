@@ -61,6 +61,7 @@ const SplitButton = (props: SplitButtonProps) => {
             size={size}
             {...propsWithCn(
               menuButtonProps,
+              'h-full',
               'rounded-l-none rounded-r-[inherit]',
               match(size)
                 .with('sm', () => 'px-0.5')

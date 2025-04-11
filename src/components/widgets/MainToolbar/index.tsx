@@ -3,8 +3,8 @@ import { IconMessageCheck, IconUpload } from '@tabler/icons-react'
 import { useCommitIndex, usePushBranch } from '@api/mutations'
 import { useQueryFiles } from '@api/queries'
 import { showCommitDialog } from '@common/CommitDialog'
-import { useSelectedBranches } from '@context/branches'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
+import { useSelectedBranches } from '@utils/repository'
 
 interface MainToolbarProps extends Partial<ToolbarProps> {}
 

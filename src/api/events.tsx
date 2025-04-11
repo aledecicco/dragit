@@ -3,7 +3,7 @@ import { listen } from '@tauri-apps/api/event'
 import { type PropsWithChildren, useEffect } from 'react'
 import { P, match } from 'ts-pattern'
 
-import { useSelectedBranches } from '@context/branches'
+import { useSelectedRefs } from '@context/branches'
 import type { AppEvent } from './models'
 import { queryKeys } from './queries'
 
@@ -13,7 +13,7 @@ const EventHandler = (props: PropsWithChildren) => {
   const { children } = props
   const client = useQueryClient()
 
-  const { branch: currentBranch } = useSelectedBranches()
+  const { reference } = useSelectedRefs()
 
   useEffect(() => {
     const unlisten = listen<AppEvent>(EVENT_ID, (event) => {
@@ -39,7 +39,7 @@ const EventHandler = (props: PropsWithChildren) => {
           ({ name: branchName, path }) => {
             client.invalidateQueries({
               queryKey: [
-                queryKeys.directory.commitHistory.branch(path, branchName),
+                queryKeys.directory.commitHistory.reference(path, branchName),
               ],
             })
 
@@ -60,17 +60,24 @@ const EventHandler = (props: PropsWithChildren) => {
 
             client.invalidateQueries({
               queryKey: [
-                queryKeys.directory.commonAncestor.branch(path, branchName),
+                queryKeys.directory.commonAncestor.reference(path, branchName),
               ],
             })
 
             client.invalidateQueries({
               queryKey: [
-                queryKeys.directory.commonAncestor.baseBranch(path, branchName),
+                queryKeys.directory.commonAncestor.baseReference(
+                  path,
+                  branchName,
+                ),
               ],
             })
 
-            if (currentBranch && currentBranch.name === branchName) {
+            if (
+              reference &&
+              reference.type === 'branch' &&
+              reference.refName === branchName
+            ) {
               client.invalidateQueries({
                 queryKey: [queryKeys.directory.headInfo(path)],
               })
@@ -114,7 +121,7 @@ const EventHandler = (props: PropsWithChildren) => {
     return () => {
       unlisten.then((f) => f())
     }
-  }, [client.resetQueries, client.invalidateQueries, currentBranch])
+  }, [client.resetQueries, client.invalidateQueries, reference])
 
   return children
 }

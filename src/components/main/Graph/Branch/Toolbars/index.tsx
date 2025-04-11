@@ -2,8 +2,8 @@ import { IconRefresh } from '@tabler/icons-react'
 
 import { useFetchRemote } from '@api/mutations'
 import { BranchToolbar } from '@common/BranchToolbar'
-import { useSelectedBranches } from '@context/branches'
 import { IconButton } from '@ui/IconButton'
+import { useSelectedBranches } from '@utils/repository'
 import { cn } from '@utils/styles'
 
 const BranchToolbars = () => {
