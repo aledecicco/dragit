@@ -105,7 +105,7 @@ export interface DiffSummary {
 }
 
 export interface StashInfo {
-  name: string
+  id: string
   message: string | null
   timestamp: number
   createdOn: CommitId | BranchName

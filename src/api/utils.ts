@@ -138,30 +138,27 @@ const fetchAndDeserialize = async <T>(
   const processIds: [number | null, number | null] = [null, null]
 
   const abortSignal = context.signal
-  abortSignal.addEventListener('abort', () => {
+  abortSignal.onabort = () => {
     console.log(
       `Aborting ${command} with ${JSON.stringify(args)} for processes "${processIds[0]}" and "${processIds[1]}"`,
     )
 
-    if (processIds[0] !== null) {
-      //new Child(processIds[0]).kill()
-    }
     if (processIds[1] !== null) {
       new Child(processIds[1]).kill()
     }
 
     // TODO: account for AppMessage delay
-  })
+  }
 
   const channel = new Channel<AppMessage>()
   channel.onmessage = (event) => {
-    console.log('Received message', event)
     match(event)
       .with(
         {
           type: 'processStarted',
         },
         ({ pid, subprocess }) => {
+          console.log('setting', subprocess, JSON.stringify(args))
           processIds[0] = pid
           processIds[1] = subprocess
         },
@@ -173,8 +170,6 @@ const fetchAndDeserialize = async <T>(
     ...args,
     channel,
   })
-
-  console.log(buffer)
 
   const res = borshDeserialize(schema, new Uint8Array(buffer))
   return res

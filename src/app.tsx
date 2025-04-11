@@ -18,7 +18,7 @@ const App = () => {
     <div
       className={cn(
         'px-8 py-4 w-full h-full max-h-full',
-        'grid grid-cols-[max_content_1fr_max-content] grid-rows-[150px_1fr_max-content] gap-4',
+        'grid grid-cols-[max_content_1fr_max-content] grid-rows-[max-content_1fr_max-content] gap-4',
       )}
     >
       <CurrentDirectory

@@ -33,6 +33,8 @@ pub(crate) const BRANCH_PREFIX: &str = "refs/heads/";
 pub(crate) const REMOTE_BRANCH_PREFIX: &str = "refs/remotes/";
 /// Format used to get the needed information about a stash.
 pub(crate) const STASH_INFO_FORMAT: &str = "--format=format:%n%p%n%gd%n%ct%n%s";
+/// The string that precedes the stash identifier.
+pub(crate) const STASH_NAME_PREFIX: &str = "stash@{";
 /// The string that denotes that a stash was created from a detached state.
 pub(crate) const STASH_INFO_DETACHED: &str = "(no branch)";
 /// The string that denotes that a stash was created using the shorthand, without a message.
@@ -288,7 +290,10 @@ pub(crate) fn parse_stash_info(lines: &Vec<String>) -> Option<StashInfo> {
     let creation_line = lines.get(3)?;
     let diff_line = lines.get(4);
 
-    let name = name_line.to_string();
+    let id = name_line
+        .strip_prefix(STASH_NAME_PREFIX)?
+        .strip_suffix('}')?
+        .to_string();
     let timestamp = u32::from_str(timestamp_line).ok()?;
     let (creation_details, message) = creation_line.split_once(':')?;
     let mut creation_details = creation_details.split_ascii_whitespace();
@@ -304,7 +309,7 @@ pub(crate) fn parse_stash_info(lines: &Vec<String>) -> Option<StashInfo> {
     .to_string();
 
     Some(StashInfo {
-        name,
+        id,
         message,
         timestamp,
         created_on,

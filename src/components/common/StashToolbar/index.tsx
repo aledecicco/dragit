@@ -1,4 +1,4 @@
-import { IconPackageExport } from '@tabler/icons-react'
+import { IconPackageExport, IconTrash } from '@tabler/icons-react'
 import { useMemo } from 'react'
 
 import type { StashInfo } from '@api/models'
@@ -16,6 +16,12 @@ const StashToolbar = (props: StashToolbarProps) => {
       {
         Glyph: IconPackageExport,
         label: 'Pop',
+        action: async () => {},
+        disabled: false,
+      },
+      {
+        Glyph: IconTrash,
+        label: 'Delete',
         action: async () => {},
         disabled: false,
       },

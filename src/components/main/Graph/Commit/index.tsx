@@ -102,7 +102,7 @@ const GraphCommit = makeTracked<
             </Marquee>
 
             <p className={cn('text-xs text-light-600 min-w-max')}>
-              {commitInfoQuery.data?.shortHash ?? '...'}
+              #{commitInfoQuery.data?.shortHash ?? '...'}
             </p>
           </div>
         </div>

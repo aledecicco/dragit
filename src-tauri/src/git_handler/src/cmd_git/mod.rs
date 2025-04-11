@@ -2,6 +2,8 @@ use std::{
     collections::HashMap,
     io::{BufRead, BufReader, Lines},
     process::{id, Child, ChildStdout, Command, Stdio},
+    thread::sleep,
+    time::Duration,
 };
 use tauri::ipc::Channel;
 
@@ -212,7 +214,7 @@ impl GitHandler for CmdGit {
             ["show", reference, COMMIT_INFO_FORMAT, "--quiet"],
         )?;
         let lines = self.get_all_output_lines(process)?;
-
+        sleep(Duration::from_secs(3));
         parse_commit_info(&lines).ok_or(GitError::GetCommitInfoFailed {
             reference: reference.to_string(),
         })

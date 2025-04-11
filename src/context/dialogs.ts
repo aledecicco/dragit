@@ -21,7 +21,6 @@ const useDialog = (): ReactNode | undefined => {
 }
 
 const showDialog = (key: DialogKey, dialog: ReactNode) => {
-  console.log('show', key)
   dialogs.setState((dialogs) => {
     const newDialogs = new Map(dialogs.mounted)
     newDialogs.delete(key)
@@ -31,11 +30,9 @@ const showDialog = (key: DialogKey, dialog: ReactNode) => {
 }
 
 const hideDialog = (key: DialogKey) => {
-  console.log('hide', key)
   dialogs.setState((dialogs) => {
     const newDialogs = new Map(dialogs.mounted)
     newDialogs.delete(key)
-    console.log(newDialogs)
     return { mounted: newDialogs }
   })
 }

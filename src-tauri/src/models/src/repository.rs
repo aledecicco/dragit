@@ -188,7 +188,7 @@ pub struct DiffSummary {
 
 #[derive(borsh::BorshSerialize, Debug, Clone)]
 pub struct StashInfo {
-    pub name: String,
+    pub id: String,
     pub message: Option<String>,
     pub timestamp: u32,
     pub created_on: String,

@@ -147,7 +147,7 @@ export const DIFF_SUMMARY_SCHEMA = BorshSchema.Struct({
 })
 
 export const STASH_INFO_SCHEMA = BorshSchema.Struct({
-  name: BorshSchema.String,
+  id: BorshSchema.String,
   message: BorshSchema.Option(BorshSchema.String),
   timestamp: BorshSchema.u32,
   createdOn: BorshSchema.String,
