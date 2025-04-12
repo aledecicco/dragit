@@ -102,7 +102,7 @@ pub async fn get_branches(
     with_handler(&state, &|h| h.get_branches(&channel, path)).and_then(serialize_response)
 }
 
-/// Switches the current repository to a local branch.
+/// Switches the current repository to a different branch.
 #[tauri::command]
 pub async fn checkout(
     state: State<'_, AppState>,
@@ -330,4 +330,35 @@ pub async fn remove_remote(
 #[tauri::command]
 pub async fn get_stashes(state: State<'_, AppState>, path: &str) -> Result<Response, AppError> {
     with_handler(&state, &|h| h.get_stashes(path)).and_then(serialize_response)
+}
+
+#[tauri::command]
+pub async fn stash(
+    state: State<'_, AppState>,
+    path: &str,
+    message: Option<&str>,
+    files: Vec<&str>,
+    include_untracked: bool,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| {
+        h.stash(path, message, &files, include_untracked)
+    })
+}
+
+#[tauri::command]
+pub async fn apply_stash(
+    state: State<'_, AppState>,
+    path: &str,
+    stash_id: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.apply_stash(path, stash_id))
+}
+
+#[tauri::command]
+pub async fn discard_stash(
+    state: State<'_, AppState>,
+    path: &str,
+    stash_id: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.discard_stash(path, stash_id))
 }

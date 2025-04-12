@@ -18,8 +18,8 @@ const StashesList = (props: StashesListProps) => {
   const stashesQuery = useQueryStashes()
 
   const virtualizerOptions = useMemo(() => {
-    return mapFn(stashesQuery.data, (branches) => ({
-      getItemKey: (index: number) => branches[index].name,
+    return mapFn(stashesQuery.data, (stashes) => ({
+      getItemKey: (index: number) => stashes[index].id,
     }))
   }, [stashesQuery.data])
 

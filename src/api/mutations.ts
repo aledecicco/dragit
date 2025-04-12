@@ -54,6 +54,18 @@ const mutationKeys = {
       ...mutationKeys.repository.current(path),
       key: 'remove_remote',
     }),
+    saveStash: (path: string) => ({
+      ...mutationKeys.repository.current(path),
+      key: 'stash',
+    }),
+    applyStash: (path: string) => ({
+      ...mutationKeys.repository.current(path),
+      key: 'apply_stash',
+    }),
+    discardStash: (path: string) => ({
+      ...mutationKeys.repository.current(path),
+      key: 'discard_stash',
+    }),
   },
 }
 
@@ -228,6 +240,47 @@ const removeRemoteMutation = (path: string) =>
 
 const useRemoveRemote = () => useRepositoryMutation(removeRemoteMutation)
 
+const saveStashMutation = (path: string) =>
+  mutationOptions({
+    mutationKey: [mutationKeys.repository.saveStash(path)],
+    mutationFn: (args: {
+      message: string | null
+      files: string[]
+      includeUntracked: boolean
+    }) => {
+      return invoke('stash', { path: path, ...args })
+    },
+    networkMode: 'always',
+  })
+
+const useSaveStash = () => useRepositoryMutation(saveStashMutation)
+
+const applyStashMutation = (path: string) =>
+  mutationOptions({
+    mutationKey: [mutationKeys.repository.applyStash(path)],
+    mutationFn: (args: {
+      stashId: string
+    }) => {
+      return invoke('apply_stash', { path: path, ...args })
+    },
+    networkMode: 'always',
+  })
+
+const useApplyStash = () => useRepositoryMutation(applyStashMutation)
+
+const discardStashMutation = (path: string) =>
+  mutationOptions({
+    mutationKey: [mutationKeys.repository.discardStash(path)],
+    mutationFn: (args: {
+      stashId: string
+    }) => {
+      return invoke('discard_stash', { path: path, ...args })
+    },
+    networkMode: 'always',
+  })
+
+const useDiscardStash = () => useRepositoryMutation(discardStashMutation)
+
 export {
   mutationKeys,
   useOpenFolder,
@@ -244,4 +297,7 @@ export {
   useFetchRemote,
   useAddRemote,
   useRemoveRemote,
+  useSaveStash,
+  useApplyStash,
+  useDiscardStash,
 }

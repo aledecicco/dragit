@@ -565,7 +565,7 @@ const fetchCommonAncestor = (
 ): Promise<CommonAncestorInfo> => {
   return fetchAndDeserialize(
     'get_common_ancestor',
-    { path, reference: refName, baseReference: baseRefName },
+    { path, referenceA: refName, referenceB: baseRefName },
     COMMON_ANCESTOR_INFO_SCHEMA,
     context,
   )

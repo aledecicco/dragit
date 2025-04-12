@@ -70,6 +70,9 @@ pub fn run() {
             api::add_remote,
             api::remove_remote,
             api::get_stashes,
+            api::stash,
+            api::apply_stash,
+            api::discard_stash,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

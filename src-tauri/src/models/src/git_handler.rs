@@ -146,4 +146,19 @@ pub trait GitHandler {
 
     /// Returns the list of stashed changes.
     fn get_stashes(&self, path: &str) -> Result<Vec<StashInfo>, GitError>;
+
+    /// Stashes the given files with an optional message.
+    fn stash(
+        &self,
+        path: &str,
+        message: Option<&str>,
+        files: &Vec<&str>,
+        include_untracked: bool,
+    ) -> Result<(), GitError>;
+
+    /// Applies the given stash to the current working directory.
+    fn apply_stash(&self, path: &str, stash_id: &str) -> Result<(), GitError>;
+
+    /// Discards the given stash.
+    fn discard_stash(&self, path: &str, stash_id: &str) -> Result<(), GitError>;
 }

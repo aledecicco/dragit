@@ -92,6 +92,15 @@ pub enum GitError {
 
     #[error("Failed to retrieve stashes")]
     GetStashesFailed {},
+
+    #[error("Failed to create stash")]
+    CreateStashFailed {},
+
+    #[error("Failed to apply stash #{stash_id}")]
+    ApplyStashFailed { stash_id: String },
+
+    #[error("Failed to drop stash #{stash_id}")]
+    DiscardStashFailed { stash_id: String },
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug, Clone)]

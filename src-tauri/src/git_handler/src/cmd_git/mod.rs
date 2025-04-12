@@ -543,4 +543,43 @@ impl GitHandler for CmdGit {
 
         Ok(stashes)
     }
+
+    fn stash(
+        &self,
+        path: &str,
+        message: Option<&str>,
+        files: &Vec<&str>,
+        include_untracked: bool,
+    ) -> Result<(), GitError> {
+        let mut args = vec!["stash", "push"];
+
+        if include_untracked {
+            args.push("-u");
+        }
+
+        if let Some(message) = message {
+            args.push("-m");
+            args.push(message);
+        }
+
+        args.push("--");
+        args.extend(files);
+
+        self.spawn_and_await(path, args)
+            .or(Err(GitError::CreateStashFailed {}))
+    }
+
+    fn apply_stash(&self, path: &str, stash_id: &str) -> Result<(), GitError> {
+        self.spawn_and_await(path, ["stash", "pop", &format!("stash@{{{stash_id}}}")])
+            .or(Err(GitError::ApplyStashFailed {
+                stash_id: stash_id.to_string(),
+            }))
+    }
+
+    fn discard_stash(&self, path: &str, stash_id: &str) -> Result<(), GitError> {
+        self.spawn_and_await(path, ["stash", "drop", &format!("stash@{{{stash_id}}}")])
+            .or(Err(GitError::DiscardStashFailed {
+                stash_id: stash_id.to_string(),
+            }))
+    }
 }
