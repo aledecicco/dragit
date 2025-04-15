@@ -1,79 +1,90 @@
 import { Store, useStore } from '@tanstack/react-store'
 import { useEffect } from 'react'
 
-import type { FileType } from '@api/models'
+import type { FileType, FileTypeFilter } from '@api/models'
 import { useQueryFiles } from '@api/queries'
 
-const filesPages = new Store({
-  staged: 0,
-  unstaged: 0,
-  unmerged: 0,
-  untracked: 0,
-})
+type FilePages = Map<FileTypeFilter, number>
+export const filesPages = new Store<FilePages>(new Map())
 
 const useFilesPages = () => useStore(filesPages)
 
-const useFilesPage = (type: FileType) => useFilesPages()[type]
+const useFilesPage = (types: FileTypeFilter) => {
+  const pages = useFilesPages()
 
-const clearPage = (type: FileType) => {
-  filesPages.setState((state) => ({
-    ...state,
-    [type]: 0,
-  }))
+  const page = pages.get(types)
+
+  if (page === undefined) {
+    pages.set(types, 0)
+    return 0
+  }
+
+  return page
 }
 
-const setNextPage = (type: FileType) => {
-  filesPages.setState((state) => ({
-    ...state,
-    [type]: state[type] + 1,
-  }))
+const clearPage = (types: FileTypeFilter) => {
+  filesPages.setState((state) => {
+    const newState = new Map(state)
+    newState.set(types, 0)
+    return newState
+  })
 }
 
-const setPrevPage = (type: FileType) => {
-  filesPages.setState((state) => ({
-    ...state,
-    [type]: Math.max(state[type] - 1, 0),
-  }))
+const setNextPage = (types: FileTypeFilter) => {
+  filesPages.setState((state) => {
+    const newState = new Map(state)
+    newState.set(types, (newState.get(types) ?? 0) + 1)
+    return newState
+  })
 }
 
+const setPrevPage = (types: FileTypeFilter) => {
+  filesPages.setState((state) => {
+    const newState = new Map(state)
+    newState.set(types, Math.max(0, (newState.get(types) ?? 0) - 1))
+    return newState
+  })
+}
+
+// TODO: re-check if this is necessary
 const usePagesSync = () => {
   const pages = useFilesPages()
-  const stagedFiles = useQueryFiles('staged')
-  const unstagedFiles = useQueryFiles('unstaged')
-  const unmergedFiles = useQueryFiles('unmerged')
-  const untrackedFiles = useQueryFiles('untracked')
+  const stagedFiles = useQueryFiles({ staged: true })
+  const unstagedFiles = useQueryFiles({ unstaged: true })
+  const unmergedFiles = useQueryFiles({ unmerged: true })
+  const untrackedFiles = useQueryFiles({ untracked: true })
 
   useEffect(() => {
     if (
-      pages.staged > 0 &&
+      pages.get({ staged: true }) &&
       !stagedFiles.isLoading &&
       !stagedFiles.data?.items.length
     ) {
-      clearPage('staged')
+      clearPage({ staged: true })
     }
 
     if (
-      pages.unstaged > 0 &&
+      pages.get({ unstaged: true }) &&
       !unstagedFiles.isLoading &&
       !unstagedFiles.data?.items.length
     ) {
-      clearPage('unstaged')
+      clearPage({ unstaged: true })
     }
 
     if (
-      pages.unmerged > 0 &&
+      pages.get({ unmerged: true }) &&
       !unmergedFiles.isLoading &&
       !unmergedFiles.data?.items.length
     ) {
-      clearPage('unmerged')
+      clearPage({ unmerged: true })
     }
 
     if (
-      pages.untracked > 0 &&
+      pages.get({ untracked: true }) &&
       !untrackedFiles.isLoading &&
       !untrackedFiles.data?.items.length
     ) {
-      clearPage('untracked')
+      clearPage({ untracked: true })
     }
   }, [
     stagedFiles.data,

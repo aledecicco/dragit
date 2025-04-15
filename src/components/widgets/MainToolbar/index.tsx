@@ -1,7 +1,18 @@
-import { IconMessageCheck, IconPackage, IconUpload } from '@tabler/icons-react'
+import {
+  IconListCheck,
+  IconMessageCheck,
+  IconPackage,
+  IconUpload,
+} from '@tabler/icons-react'
 
-import { useCommitIndex, usePushBranch, useSaveStash } from '@api/mutations'
+import {
+  useAddToIndex,
+  useCommitIndex,
+  usePushBranch,
+  useSaveStash,
+} from '@api/mutations'
 import { showCommitDialog } from '@common/CommitDialog'
+import { selectFiles } from '@lib/FileSelectorDialog'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 import { useSelectedBranches } from '@utils/repository'
 import { useMemo } from 'react'
@@ -11,6 +22,7 @@ interface MainToolbarProps extends Partial<ToolbarProps> {}
 const MainToolbar = (props: MainToolbarProps) => {
   const { ...toolbarProps } = props
 
+  const add = useAddToIndex()
   const commit = useCommitIndex()
   const push = usePushBranch()
   const stash = useSaveStash()
@@ -18,6 +30,19 @@ const MainToolbar = (props: MainToolbarProps) => {
 
   const tools = useMemo(() => {
     return [
+      {
+        action: async () => {
+          const path = await selectFiles({
+            types: { unstaged: true, unmerged: true, untracked: true },
+          })
+          await add.mutateAsync({
+            files: [path],
+          })
+        },
+        label: add.isPending ? 'Adding...' : 'Manage Files',
+        Glyph: IconListCheck,
+        disabled: add.isPending,
+      },
       {
         action: () => {
           stash.mutateAsync({
@@ -57,6 +82,8 @@ const MainToolbar = (props: MainToolbarProps) => {
     ]
   }, [
     branch,
+    add.isPending,
+    add.mutateAsync,
     commit.isPending,
     push.mutateAsync,
     push.isPending,

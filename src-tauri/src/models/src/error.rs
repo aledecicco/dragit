@@ -1,4 +1,4 @@
-#[derive(thiserror::Error, serde::Serialize, Debug, Clone)]
+#[derive(thiserror::Error, serde::Serialize, Debug)]
 #[serde(rename_all(serialize = "camelCase"), tag = "type")]
 pub enum GitError {
     #[error("Failed to start git process \"{args:?}\"")]
@@ -103,7 +103,7 @@ pub enum GitError {
     DiscardStashFailed { stash_id: String },
 }
 
-#[derive(thiserror::Error, serde::Serialize, Debug, Clone)]
+#[derive(thiserror::Error, serde::Serialize, Debug)]
 #[serde(rename_all(serialize = "camelCase"), tag = "type")]
 pub enum RepoWatcherError {
     #[error("Failed to setup file watcher")]
@@ -122,7 +122,7 @@ pub enum RepoWatcherError {
     NotADirectory { path: String },
 }
 
-#[derive(thiserror::Error, serde::Serialize, Debug, Clone)]
+#[derive(thiserror::Error, serde::Serialize, Debug)]
 #[serde(rename_all(serialize = "camelCase"), tag = "type")]
 pub enum AppError {
     #[error("Error with git operation: {git_error}")]

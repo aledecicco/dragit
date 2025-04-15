@@ -10,8 +10,8 @@ use utils::*;
 
 use models::{
     AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo, StagedFileInfo, StashInfo,
-    UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo,
+    FileInfo, FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
+    StashInfo,
 };
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
@@ -84,42 +84,6 @@ impl CmdGit {
 
     fn get_all_output<'a>(&self, process: Child) -> Result<String, GitError> {
         Ok(self.get_all_output_lines(process)?.join("\n"))
-    }
-
-    fn get_files_page<T>(
-        &self,
-        channel: &Channel<AppMessage>,
-        path: &str,
-        include_untracked: bool,
-        parse_file_info: fn(&String) -> Option<T>,
-        start_after: usize,
-        limit: usize,
-    ) -> Result<Page<T>, GitError> {
-        let mut args = vec![
-            "--no-optional-locks",
-            "status",
-            "--no-branch",
-            "--porcelain=2",
-            "--no-show-stash",
-            "--no-ahead-behind",
-        ];
-
-        if include_untracked {
-            args.push("--untracked-files=all");
-        } else {
-            args.push("--untracked-files=no");
-        }
-
-        let process = self.spawn_and_notify(channel, path, args)?;
-        let lines = self.get_output_lines_stream(process)?;
-
-        let mut items_iter = lines
-            .filter_map(|line| line.ok().and_then(|line| parse_file_info(&line)))
-            .skip(start_after);
-        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
-        let has_next = items_iter.next().is_some();
-
-        Ok(Page { items, has_next })
     }
 }
 
@@ -231,76 +195,64 @@ impl GitHandler for CmdGit {
         parse_head_info(&lines).ok_or(GitError::GetHeadInfoFailed {})
     }
 
-    fn get_staged_files_page(
+    fn get_files_page(
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
+        filter: &FileTypesFilter,
         start_after: usize,
         limit: usize,
-    ) -> Result<Page<StagedFileInfo>, GitError> {
-        self.get_files_page(
-            channel,
-            path,
-            false,
-            parse_staged_file_info,
-            start_after,
-            limit,
-        )
-        .or(Err(GitError::GetStagedFilesFailed {}))
-    }
+    ) -> Result<Page<FileInfo>, GitError> {
+        let mut args = vec![
+            "--no-optional-locks",
+            "status",
+            "--no-branch",
+            "--porcelain=2",
+            "--no-show-stash",
+            "--no-ahead-behind",
+        ];
 
-    fn get_unstaged_files_page(
-        &self,
-        channel: &Channel<AppMessage>,
-        path: &str,
-        start_after: usize,
-        limit: usize,
-    ) -> Result<Page<UnstagedFileInfo>, GitError> {
-        self.get_files_page(
-            channel,
-            path,
-            false,
-            parse_unstaged_file_info,
-            start_after,
-            limit,
-        )
-        .or(Err(GitError::GetUnstagedFilesFailed {}))
-    }
+        if filter.untracked.unwrap_or(false) {
+            args.push("--untracked-files=all");
+        } else {
+            args.push("--untracked-files=no");
+        }
 
-    fn get_unmerged_files_page(
-        &self,
-        channel: &Channel<AppMessage>,
-        path: &str,
-        start_after: usize,
-        limit: usize,
-    ) -> Result<Page<UnmergedFileInfo>, GitError> {
-        self.get_files_page(
-            channel,
-            path,
-            false,
-            parse_unmerged_file_info,
-            start_after,
-            limit,
-        )
-        .or(Err(GitError::GetUnmergedFilesFailed {}))
-    }
+        let parse_line = |line: String| -> Option<FileInfo> {
+            if filter.staged.unwrap_or(false) {
+                if let Some(info) = parse_staged_file_info(&line) {
+                    return Some(FileInfo::Staged(info));
+                }
+            }
+            if filter.unstaged.unwrap_or(false) {
+                if let Some(info) = parse_unstaged_file_info(&line) {
+                    return Some(FileInfo::Unstaged(info));
+                }
+            }
+            if filter.unmerged.unwrap_or(false) {
+                if let Some(info) = parse_unmerged_file_info(&line) {
+                    return Some(FileInfo::Unmerged(info));
+                }
+            }
+            if filter.untracked.unwrap_or(false) {
+                if let Some(info) = parse_untracked_file_info(&line) {
+                    return Some(FileInfo::Untracked(info));
+                }
+            }
 
-    fn get_untracked_files_page(
-        &self,
-        channel: &Channel<AppMessage>,
-        path: &str,
-        start_after: usize,
-        limit: usize,
-    ) -> Result<Page<UntrackedFileInfo>, GitError> {
-        self.get_files_page(
-            channel,
-            path,
-            true,
-            parse_untracked_file_info,
-            start_after,
-            limit,
-        )
-        .or(Err(GitError::GetUntrackedFilesFailed {}))
+            None
+        };
+
+        let process = self.spawn_and_notify(channel, path, args)?;
+        let lines = self.get_output_lines_stream(process)?;
+
+        let mut items_iter = lines
+            .filter_map(|line| line.ok().and_then(parse_line))
+            .skip(start_after);
+        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
+        let has_next = items_iter.next().is_some();
+
+        Ok(Page { items, has_next })
     }
 
     fn add_to_index(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError> {

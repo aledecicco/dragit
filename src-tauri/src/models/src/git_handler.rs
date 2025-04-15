@@ -1,9 +1,8 @@
 use tauri::ipc::Channel;
 
 use crate::{
-    AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError, HeadInfo,
-    HistoryItem, Page, RemoteInfo, StagedFileInfo, StashInfo, UnmergedFileInfo, UnstagedFileInfo,
-    UntrackedFileInfo,
+    AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, FileInfo, GitError,
+    HeadInfo, HistoryItem, Page, RemoteInfo, StashInfo,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -45,41 +44,15 @@ pub trait GitHandler {
     /// Returns information about the current state of the HEAD.
     fn get_head_info(&self, path: &str) -> Result<HeadInfo, GitError>;
 
-    /// Returns (a page of) the list of files with staged changes.
-    fn get_staged_files_page(
+    /// Returns (a page of) the list of files with the given types.
+    fn get_files_page(
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
+        filter: &FileTypesFilter,
         start_after: usize,
         limit: usize,
-    ) -> Result<Page<StagedFileInfo>, GitError>;
-
-    /// Returns (a page of) the list of files with unstaged changes.
-    fn get_unstaged_files_page(
-        &self,
-        channel: &Channel<AppMessage>,
-        path: &str,
-        start_after: usize,
-        limit: usize,
-    ) -> Result<Page<UnstagedFileInfo>, GitError>;
-
-    /// Returns (a page of) the list of files with unmerged changes.
-    fn get_unmerged_files_page(
-        &self,
-        channel: &Channel<AppMessage>,
-        path: &str,
-        start_after: usize,
-        limit: usize,
-    ) -> Result<Page<UnmergedFileInfo>, GitError>;
-
-    /// Returns (a page of) the list of untracked files.
-    fn get_untracked_files_page(
-        &self,
-        channel: &Channel<AppMessage>,
-        path: &str,
-        start_after: usize,
-        limit: usize,
-    ) -> Result<Page<UntrackedFileInfo>, GitError>;
+    ) -> Result<Page<FileInfo>, GitError>;
 
     /// Adds the given list of files to the current index.
     fn add_to_index(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError>;
@@ -161,4 +134,12 @@ pub trait GitHandler {
 
     /// Discards the given stash.
     fn discard_stash(&self, path: &str, stash_id: &str) -> Result<(), GitError>;
+}
+
+#[derive(serde::Deserialize, Debug)]
+pub struct FileTypesFilter {
+    pub staged: Option<bool>,
+    pub unstaged: Option<bool>,
+    pub unmerged: Option<bool>,
+    pub untracked: Option<bool>,
 }

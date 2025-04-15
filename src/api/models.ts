@@ -84,6 +84,12 @@ export interface UntrackedFileInfo extends BaseFileInfo {
   status: 'untracked'
 }
 
+export type FileInfo =
+  | StagedFileInfo
+  | UnstagedFileInfo
+  | UnmergedFileInfo
+  | UntrackedFileInfo
+
 export type FileTypes = {
   staged: StagedFileInfo
   unstaged: UnstagedFileInfo
@@ -91,6 +97,10 @@ export type FileTypes = {
   untracked: UntrackedFileInfo
 }
 export type FileType = keyof FileTypes
+
+export type FileTypeFilter = {
+  [T in FileType]?: boolean
+}
 
 export interface RemoteInfo {
   name: RemoteName
@@ -113,7 +123,6 @@ export interface StashInfo {
 }
 
 export interface Settings {
-  recentlyOpened: string[]
   openLastOnStart: boolean
 }
 

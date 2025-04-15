@@ -7,10 +7,17 @@ import { cn, propsWithCn } from '@utils/styles'
 interface DialogProps extends Ariakit.DialogProps {
   dialogKey: DialogKey
   heading?: string
+  showClose?: boolean
 }
 
 const Dialog = (props: DialogProps) => {
-  const { dialogKey, heading, children, ...dialogProps } = props
+  const {
+    dialogKey,
+    heading,
+    showClose = true,
+    children,
+    ...dialogProps
+  } = props
 
   return (
     <Ariakit.DialogProvider defaultOpen>
@@ -32,19 +39,21 @@ const Dialog = (props: DialogProps) => {
         }}
       >
         <div className={cn('relative w-full h-full p-8')}>
-          <Ariakit.DialogDismiss
-            render={
-              <Button
-                round
-                variant="plain"
-                size="lg"
-                className={cn(
-                  'absolute top-1 right-1',
-                  'text-xl text-light-900',
-                )}
-              />
-            }
-          />
+          {showClose && (
+            <Ariakit.DialogDismiss
+              render={
+                <Button
+                  round
+                  variant="plain"
+                  size="lg"
+                  className={cn(
+                    'absolute top-1 right-1',
+                    'text-xl text-light-900',
+                  )}
+                />
+              }
+            />
+          )}
 
           {heading && (
             <Ariakit.DialogHeading

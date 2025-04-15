@@ -1,8 +1,8 @@
 import { Store, useStore } from '@tanstack/react-store'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
 import type { Reference } from '@api/models'
-import { useBranch, useCurrentRef } from '@utils/repository'
+import { useCurrentRef } from '@utils/repository'
 
 interface SelectedRefs {
   reference: Reference | undefined

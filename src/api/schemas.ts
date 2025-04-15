@@ -1,5 +1,7 @@
 import { BorshSchema } from 'borsher'
 
+export const RECENTLY_OPENED_SCHEMA = BorshSchema.Vec(BorshSchema.String)
+
 export const PAGE_SCHEMA = <T>(ITEM_SCHEMA: BorshSchema<T>) =>
   BorshSchema.Struct({
     items: BorshSchema.Vec(ITEM_SCHEMA),
@@ -105,33 +107,28 @@ export const STAGED_FILE_INFO_SCHEMA = BorshSchema.Struct({
     }),
   }),
 })
-export const STAGED_FILE_PAGE_SCHEMA = PAGE_SCHEMA(STAGED_FILE_INFO_SCHEMA)
 
 export const UNSTAGED_FILE_INFO_SCHEMA = BorshSchema.Struct({
   path: BorshSchema.String,
   status: CHANGE_STATUS_SCHEMA,
 })
-export const UNSTAGED_FILE_PAGE_SCHEMA = PAGE_SCHEMA(UNSTAGED_FILE_INFO_SCHEMA)
 
 export const UNMERGED_FILE_INFO_SCHEMA = BorshSchema.Struct({
   path: BorshSchema.String,
   status: MERGE_STATUS_SCHEMA,
 })
-export const UNMERGED_FILE_PAGE_SCHEMA = PAGE_SCHEMA(UNMERGED_FILE_INFO_SCHEMA)
 
 export const UNTRACKED_FILE_INFO_SCHEMA = BorshSchema.Struct({
   path: BorshSchema.String,
 })
-export const UNTRACKED_FILE_PAGE_SCHEMA = PAGE_SCHEMA(
-  UNTRACKED_FILE_INFO_SCHEMA,
-)
 
-export const FILE_INFO_SCHEMA = {
-  staged: STAGED_FILE_INFO_SCHEMA,
-  unstaged: UNSTAGED_FILE_INFO_SCHEMA,
-  unmerged: UNMERGED_FILE_INFO_SCHEMA,
-  untracked: UNTRACKED_FILE_INFO_SCHEMA,
-}
+export const FILE_INFO_SCHEMA = BorshSchema.Enum({
+  Staged: STAGED_FILE_INFO_SCHEMA,
+  Unstaged: UNSTAGED_FILE_INFO_SCHEMA,
+  Unmerged: UNMERGED_FILE_INFO_SCHEMA,
+  Untracked: UNTRACKED_FILE_INFO_SCHEMA,
+})
+export const FILES_PAGE_SCHEMA = PAGE_SCHEMA(FILE_INFO_SCHEMA)
 
 export const REMOTE_INFO_SCHEMA = BorshSchema.Struct({
   name: BorshSchema.String,

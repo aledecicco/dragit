@@ -22,7 +22,7 @@ const FileStatusSectionPagination = <T extends FileType>(
   props: FileStatusSectionPaginationProps<T>,
 ) => {
   const { type, files } = props
-  const page = useFilesPage(type)
+  const page = useFilesPage({ [type]: true })
   const showPagination = !hasNoPagination(files, page)
 
   return showPagination ? (
@@ -34,7 +34,7 @@ const FileStatusSectionPagination = <T extends FileType>(
         aria-label={`Previous page of ${type} files`}
         disabled={page === 0}
         onClick={() => {
-          setPrevPage(type)
+          setPrevPage({ [type]: true })
         }}
       >
         <Icon Glyph={IconChevronLeft} size="sm" />
@@ -49,7 +49,7 @@ const FileStatusSectionPagination = <T extends FileType>(
         aria-label={`Next page of ${type} files`}
         disabled={!files || !files.hasNext}
         onClick={() => {
-          setNextPage(type)
+          setNextPage({ [type]: true })
         }}
       >
         <Icon Glyph={IconChevronRight} size="sm" />

@@ -1,10 +1,10 @@
 import { IconUserFilled } from '@tabler/icons-react'
 import type { ComponentProps } from 'react'
+import { match } from 'ts-pattern'
 
 import { Icon } from '@ui/Icon'
 import { cn, propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
-import { match } from 'ts-pattern'
 
 type ProfilePictureVariant = 'accent' | 'primary' | 'neutral'
 

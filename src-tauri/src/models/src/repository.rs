@@ -1,17 +1,17 @@
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct Page<T> {
     pub items: Vec<T>,
     pub has_next: bool,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct CurrentDirInfo {
     pub path: String,
     pub is_repository: bool,
     pub exists: bool,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct CommitInfo {
     pub hash: String,
     pub short_hash: String,
@@ -21,7 +21,7 @@ pub struct CommitInfo {
     pub message: Option<String>,
 }
 
-#[derive(strum::EnumString, Debug, Clone)]
+#[derive(strum::EnumString, Debug)]
 pub enum StatusType {
     #[strum(serialize = "1")]
     Modified,
@@ -36,7 +36,7 @@ pub enum StatusType {
     Untracked,
 }
 
-#[derive(borsh::BorshSerialize, strum::EnumString, Debug, Clone)]
+#[derive(borsh::BorshSerialize, strum::EnumString, Debug)]
 pub enum ChangeStatus {
     #[strum(serialize = "M")]
     Modified,
@@ -51,7 +51,7 @@ pub enum ChangeStatus {
     Deleted,
 }
 
-#[derive(borsh::BorshSerialize, strum::EnumString, Debug, Clone)]
+#[derive(borsh::BorshSerialize, strum::EnumString, Debug)]
 pub enum MovedStatus {
     #[strum(serialize = "R")]
     Renamed,
@@ -60,7 +60,7 @@ pub enum MovedStatus {
     Copied,
 }
 
-#[derive(borsh::BorshSerialize, strum::EnumString, Debug, Clone)]
+#[derive(borsh::BorshSerialize, strum::EnumString, Debug)]
 pub enum MergeStatus {
     #[strum(serialize = "AA")]
     BothAdded,
@@ -84,7 +84,7 @@ pub enum MergeStatus {
     DeletedByThem,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub enum StagedFileStatus {
     Changed {
         changes: ChangeStatus,
@@ -96,58 +96,66 @@ pub enum StagedFileStatus {
     },
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct StagedFileInfo {
     pub path: String,
 
     pub status: StagedFileStatus,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct UnstagedFileInfo {
     pub path: String,
 
     pub status: ChangeStatus,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct UnmergedFileInfo {
     pub path: String,
 
     pub status: MergeStatus,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct UntrackedFileInfo {
     pub path: String,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
+pub enum FileInfo {
+    Staged(StagedFileInfo),
+    Unstaged(UnstagedFileInfo),
+    Unmerged(UnmergedFileInfo),
+    Untracked(UntrackedFileInfo),
+}
+
+#[derive(borsh::BorshSerialize, Debug)]
 pub enum HeadInfo {
     Detached { commit: String },
     Branch { name: String },
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct AncestorInfo {
     pub hash: String,
     pub distance: u32,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct CommonAncestorInfo {
     pub last_commit: Option<AncestorInfo>,
     pub common_commit: AncestorInfo,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct HistoryItem {
     pub hash: String,
     // TODO: could not be needed
     pub other_parents: Vec<String>,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub enum BranchInfo {
     Remote {
         name: String,
@@ -160,33 +168,33 @@ pub enum BranchInfo {
     },
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct RemoteRef {
     pub remote_name: String,
     pub branch_name: String,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct BranchDivergence {
     pub ahead: u32,
     pub behind: u32,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct RemoteInfo {
     pub name: String,
     pub fetch_url: String,
     pub push_url: String,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct DiffSummary {
     pub files_count: u32,
     pub insertions: u32,
     pub deletions: u32,
 }
 
-#[derive(borsh::BorshSerialize, Debug, Clone)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct StashInfo {
     pub id: String,
     pub message: Option<String>,

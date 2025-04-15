@@ -6,8 +6,8 @@ use tauri::{
 
 use crate::{serialize_response, with_handler};
 use models::{
-    AppError, AppEvent, AppMessage, AppState, CurrentDirInfo, GitHandler, RepoWatcherError,
-    Settings, EVENT_ID,
+    AppError, AppEvent, AppMessage, AppState, CurrentDirInfo, FileTypesFilter, GitHandler,
+    RepoWatcherError, Settings, EVENT_ID,
 };
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
@@ -144,57 +144,16 @@ pub async fn get_head_info(state: State<'_, AppState>, path: &str) -> Result<Res
 }
 
 #[tauri::command]
-pub async fn get_staged_files_page(
+pub async fn get_files_page(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
     path: &str,
+    filter: FileTypesFilter,
     start_after: usize,
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_staged_files_page(&channel, path, start_after, limit)
-    })
-    .and_then(serialize_response)
-}
-
-#[tauri::command]
-pub async fn get_unstaged_files_page(
-    state: State<'_, AppState>,
-    channel: Channel<AppMessage>,
-    path: &str,
-    start_after: usize,
-    limit: usize,
-) -> Result<Response, AppError> {
-    with_handler(&state, &|h| {
-        h.get_unstaged_files_page(&channel, path, start_after, limit)
-    })
-    .and_then(serialize_response)
-}
-
-#[tauri::command]
-pub async fn get_unmerged_files_page(
-    state: State<'_, AppState>,
-    channel: Channel<AppMessage>,
-    path: &str,
-    start_after: usize,
-    limit: usize,
-) -> Result<Response, AppError> {
-    with_handler(&state, &|h| {
-        h.get_unmerged_files_page(&channel, path, start_after, limit)
-    })
-    .and_then(serialize_response)
-}
-
-#[tauri::command]
-pub async fn get_untracked_files_page(
-    state: State<'_, AppState>,
-    channel: Channel<AppMessage>,
-    path: &str,
-    start_after: usize,
-    limit: usize,
-) -> Result<Response, AppError> {
-    with_handler(&state, &|h| {
-        h.get_untracked_files_page(&channel, path, start_after, limit)
+        h.get_files_page(&channel, path, &filter, start_after, limit)
     })
     .and_then(serialize_response)
 }
