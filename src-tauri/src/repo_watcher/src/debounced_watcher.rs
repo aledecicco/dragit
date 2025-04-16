@@ -104,7 +104,7 @@ impl DebouncedWatcher {
                                             path: pathname.to_string(),
                                         },
                                     );
-                                    println!("branch updated {}", branch_name);
+                                    //println!("branch updated {}", branch_name);
                                 }
                             }
 
@@ -119,7 +119,7 @@ impl DebouncedWatcher {
                                             path: pathname.to_string(),
                                         },
                                     );
-                                    println!("remote branch updated {}", branch_name);
+                                    //println!("remote branch updated {}", branch_name);
                                 }
                             }
                         });
@@ -246,7 +246,7 @@ impl RepoWatcher for DebouncedWatcher {
         if Path::new(repo_path).is_dir() {
             let event_handler = self.get_event_handler(repo_path);
 
-            let mut debouncer = new_debouncer(Duration::from_millis(100), None, event_handler)
+            let mut debouncer = new_debouncer(Duration::from_millis(300), None, event_handler)
                 .or(Err(RepoWatcherError::SetupFailed {}))?;
 
             debouncer

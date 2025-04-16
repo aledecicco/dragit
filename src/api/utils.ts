@@ -155,10 +155,6 @@ const fetchAndDeserialize = async <T>(
     }
   }
 
-  if (shouldStop) {
-    throw new Error('Aborted')
-  }
-
   const channel = new Channel<AppMessage>()
   channel.onmessage = (event) => {
     match(event)
@@ -182,6 +178,13 @@ const fetchAndDeserialize = async <T>(
         },
       )
       .exhaustive()
+  }
+
+  if (shouldStop) {
+    console.log(
+      `"Should stop" was set before invoking (${command} with ${JSON.stringify(args)})`,
+    )
+    throw new Error('Aborted')
   }
 
   const buffer: ArrayBuffer = await invoke(command, {

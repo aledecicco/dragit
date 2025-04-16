@@ -1,5 +1,6 @@
 use std::{
     collections::HashMap,
+    fmt::Debug,
     io::{BufRead, BufReader, Lines},
     process::{Child, ChildStdout, Command, Stdio},
 };
@@ -55,11 +56,10 @@ impl CmdGit {
 
     fn spawn_and_await<'a, I>(&self, path: &str, args: I) -> Result<(), GitError>
     where
-        I: IntoIterator<Item = &'a str>,
+        I: IntoIterator<Item = &'a str> + Debug,
     {
-        let res = self.spawn_command(path, args)?.wait();
-
-        match res.map(|res| res.success()) {
+        let res = self.spawn_command(path, args)?.wait_with_output();
+        match res.map(|res| res.status.success()) {
             Ok(true) => Ok(()),
             _ => Err(GitError::GetCommandOutputFailed {}),
         }

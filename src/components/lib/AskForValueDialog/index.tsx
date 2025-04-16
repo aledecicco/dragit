@@ -6,8 +6,6 @@ import { InputField } from '@ui/Form/InputField'
 import { FormDialog, type FormDialogProps } from '@ui/FormDialog'
 import type { PickPartial } from '@utils/types'
 
-type AskForValueVariant = 'input' | 'text'
-
 interface AskForValueDialogProps
   extends PickPartial<
     FormDialogProps<{ value: string | undefined }>,
@@ -15,20 +13,12 @@ interface AskForValueDialogProps
   > {
   label: string
   submitValue: (value: string | undefined) => void
-  variant?: AskForValueVariant
   Message?: ComponentType | ReactNode
   defaultValue?: string
 }
 
 const AskForValueDialog = (props: AskForValueDialogProps) => {
-  const {
-    label,
-    submitValue,
-    variant = 'input',
-    Message,
-    defaultValue,
-    ...dialogProps
-  } = props
+  const { label, submitValue, Message, defaultValue, ...dialogProps } = props
 
   return (
     <FormDialog

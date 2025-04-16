@@ -17,6 +17,7 @@ const EventHandler = (props: PropsWithChildren) => {
 
   useEffect(() => {
     const unlisten = listen<AppEvent>(EVENT_ID, (event) => {
+      console.log(`Received event: ${JSON.stringify(event)}`)
       match(event.payload)
         .with({ type: 'dirDisappeared' }, () => {
           // TODO: show a notification that the directory is gone

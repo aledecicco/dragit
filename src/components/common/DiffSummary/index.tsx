@@ -22,18 +22,13 @@ const ChangesSumary = (props: ChangesSumaryProps) => {
         <>
           {' '}
           •{' '}
-          <span className={cn('text-success-300/80')}>
-            +{pluralize('insertion', diff.insertions, true)}
-          </span>
+          <span className={cn('text-success-300/80')}>+{diff.insertions}</span>
         </>
       )}
       {diff.deletions > 0 && (
         <>
           {' '}
-          •{' '}
-          <span className={cn('text-danger-300/80')}>
-            -{pluralize('deletion', diff.deletions, true)}
-          </span>
+          • <span className={cn('text-danger-300/80')}>-{diff.deletions}</span>
         </>
       )}
     </span>
