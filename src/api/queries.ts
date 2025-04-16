@@ -281,6 +281,7 @@ export type FileOfType<T extends FileTypeFilter> =
 const fetchFilesPage = async <T extends FileTypeFilter>(
   path: string,
   filter: T,
+  pathspec: string | null,
   page: number,
   context: QueryFunctionContext,
 ): Promise<Page<FileOfType<T>>> => {
@@ -289,6 +290,7 @@ const fetchFilesPage = async <T extends FileTypeFilter>(
     {
       path,
       filter,
+      pathspec,
       startAfter: page * FILE_STATUSES_PAGE_SIZE,
       limit: FILE_STATUSES_PAGE_SIZE,
     },
@@ -379,9 +381,12 @@ const filesQuery = <T extends FileTypeFilter>(
 ) =>
   queryOptions({
     queryKey: [
-      queryKeys.directory.files.status(path, types).page(pathspec, page),
+      queryKeys.directory.files
+        .status(path, types)
+        .page(pathspec ? pathspec : undefined, page),
     ],
-    queryFn: (context) => fetchFilesPage(path, types, page, context),
+    queryFn: (context) =>
+      fetchFilesPage(path, types, pathspec ? pathspec : null, page, context),
   })
 
 function useQueryFiles<T extends FileTypeFilter>(

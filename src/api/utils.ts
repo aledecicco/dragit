@@ -138,13 +138,19 @@ const fetchAndDeserialize = async <T>(
   let shouldStop = false
   let processId: number | undefined = undefined
 
+  console.log(`Starting ${command} (${JSON.stringify(args)})`)
+
   const abortSignal = context.signal
   abortSignal.onabort = () => {
     if (processId !== undefined) {
-      console.log(`Received abort signal and going to stop ${processId}`)
+      console.log(
+        `Received abort signal and going to stop ${processId} (${command} with ${JSON.stringify(args)})'))})`,
+      )
       new Child(processId).kill()
     } else {
-      console.log('Received abort signal but no pid yet')
+      console.log(
+        `Received abort signal but no pid yet (${command} with ${JSON.stringify(args)})`,
+      )
       shouldStop = true
     }
   }
@@ -164,8 +170,14 @@ const fetchAndDeserialize = async <T>(
           processId = pid
 
           if (shouldStop) {
-            console.log(`Received start message but already should stop ${pid}`)
+            console.log(
+              `Received start message but already should stop ${pid} (${command} with ${JSON.stringify(args)})`,
+            )
             new Child(pid).kill()
+          } else {
+            console.log(
+              `Received start message with no stop yet ${pid} (${command} with ${JSON.stringify(args)})`,
+            )
           }
         },
       )
@@ -178,6 +190,9 @@ const fetchAndDeserialize = async <T>(
   })
 
   const res = borshDeserialize(schema, new Uint8Array(buffer))
+  console.log(
+    `Finished ${command} (${JSON.stringify(args)}) (shouldStop ${shouldStop} - pid ${processId})`,
+  )
   return res
 }
 

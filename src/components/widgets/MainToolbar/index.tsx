@@ -4,6 +4,7 @@ import {
   IconPackage,
   IconUpload,
 } from '@tabler/icons-react'
+import { useMemo } from 'react'
 
 import {
   useAddToIndex,
@@ -15,7 +16,6 @@ import { showCommitDialog } from '@common/CommitDialog'
 import { selectFiles } from '@lib/FileSelectorDialog'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 import { useSelectedBranches } from '@utils/repository'
-import { useMemo } from 'react'
 
 interface MainToolbarProps extends Partial<ToolbarProps> {}
 

@@ -200,6 +200,7 @@ impl GitHandler for CmdGit {
         channel: &Channel<AppMessage>,
         path: &str,
         filter: &FileTypesFilter,
+        pathspec: Option<&str>,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<FileInfo>, GitError> {
@@ -216,6 +217,11 @@ impl GitHandler for CmdGit {
             args.push("--untracked-files=all");
         } else {
             args.push("--untracked-files=no");
+        }
+
+        if let Some(pathspec) = pathspec {
+            args.push("--");
+            args.push(pathspec);
         }
 
         let parse_line = |line: String| -> Option<FileInfo> {

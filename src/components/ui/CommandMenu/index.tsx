@@ -1,12 +1,15 @@
 import * as Ariakit from '@ariakit/react'
-import type { ReactNode } from 'react'
+import { type ReactNode, useCallback, useMemo } from 'react'
 
 import { type DialogKey, hideDialog } from '@context/dialogs'
+import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { Dialog, type DialogProps } from '@ui/Dialog'
-import { cn } from '@utils/styles'
-import type { PickPartial } from '@utils/types'
+import { Separator } from '@ui/Separator'
+import { cn, propsWithCn } from '@utils/styles'
+import { type PickPartial, mapFn } from '@utils/types'
 
-interface CommandMenuProps extends PickPartial<DialogProps, 'dialogKey'> {
+interface CommandMenuProps
+  extends Omit<PickPartial<DialogProps, 'dialogKey'>, 'heading' | 'showClose'> {
   items: CommandMenuCommand[] | undefined
   shortcuts: CommandMenuShortcut[]
   onSearchChange: (value: string) => void
@@ -26,10 +29,33 @@ const CommandMenu = (props: CommandMenuProps) => {
   const { items, shortcuts, onSearchChange, submitValue, ...dialogProps } =
     props
 
+  const virtualizerOptions = useMemo(() => {
+    return mapFn(items, (items) => ({
+      getItemKey: (index: number) => items[index].value,
+      gap: 0,
+      paddingStart: 4,
+      paddingEnd: 4,
+    }))
+  }, [items])
+
+  const Item = useCallback(
+    (props: { item: CommandMenuCommand }) => {
+      return (
+        <CommandMenuItem
+          value={props.item.value}
+          submitValue={submitValue}
+          dialogKey={dialogProps.dialogKey}
+        />
+      )
+    },
+    [submitValue, dialogProps.dialogKey],
+  )
+
   return (
     <Dialog
+      {...propsWithCn(dialogProps, 'p-0 rounded-md bg-dark-300')}
       showClose={false}
-      {...dialogProps}
+      heading={undefined}
       onClose={(e) => {
         dialogProps.onClose?.(e)
         submitValue(undefined)
@@ -38,40 +64,45 @@ const CommandMenu = (props: CommandMenuProps) => {
       <Ariakit.ComboboxProvider
         includesBaseElement={false}
         setValue={onSearchChange}
+        resetValueOnHide
       >
         <Ariakit.Combobox
           placeholder="Search..."
-          className={cn('w-full px-2 py-3 rounded-sm', 'text-sm bg-dark-500')}
+          className={cn('w-full px-2 py-3 rounded-none', 'text-sm bg-dark-500')}
           autoSelect
         />
 
-        <Ariakit.ComboboxList
-          className={cn('max-h-80 overflow-y-auto')}
-          alwaysVisible
-        >
+        <Separator className={cn('border-dark-700')} />
+
+        <div className={cn('py-1')}>
           {items === undefined ? (
             <div
-              className={cn('text-center p-2', 'text-sm italic text-light-950')}
+              className={cn('p-2 text-center', 'text-sm italic text-light-950')}
             >
               Loading
             </div>
           ) : items.length === 0 ? (
             <div
-              className={cn('text-center p-2', 'text-sm italic text-light-950')}
+              className={cn('p-2 text-center', 'text-sm italic text-light-950')}
             >
               No matches found
             </div>
           ) : (
-            items.map((item) => (
-              <CommandMenuItem
-                key={item.value}
-                value={item.value}
-                submitValue={submitValue}
-                dialogKey={dialogProps.dialogKey}
-              />
-            ))
+            <Ariakit.ComboboxList
+              alwaysVisible
+              className={cn('h-80')}
+              render={
+                <VirtualizedDiv
+                  size="sm"
+                  items={items}
+                  itemSize={36}
+                  RenderItem={Item}
+                  options={virtualizerOptions}
+                />
+              }
+            />
           )}
-        </Ariakit.ComboboxList>
+        </div>
       </Ariakit.ComboboxProvider>
     </Dialog>
   )
@@ -102,13 +133,13 @@ const CommandMenuItem = (props: CommandMenuItemProps) => {
       value={value}
       className={cn(
         'text-sm text-center text-light-50',
-        'p-2 rounded-sm cursor-pointer',
+        'p-2 rounded-none cursor-pointer',
         'data-[active-item]:bg-dark-100',
       )}
     >
       <Ariakit.ComboboxItemValue
         className={cn(
-          ' tracking-widest',
+          'tracking-wider',
           '[&>[data-autocomplete-value]]:font-thin [&>[data-autocomplete-value]]:text-light-300',
           '[&>[data-user-value]]:font-bold [&>[data-user-value]]:text-light-50',
         )}

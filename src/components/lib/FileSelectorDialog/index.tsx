@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
-import type { FileInfo, FileType, FileTypeFilter, Page } from '@api/models'
-import { type FileOfType, useQueryFiles } from '@api/queries'
+import type { FileInfo, FileTypeFilter, Page } from '@api/models'
+import { useQueryFiles } from '@api/queries'
 import { showDialog } from '@context/dialogs'
 import { getUniqueId } from '@context/ids'
 import type { UseQueryResult } from '@tanstack/react-query'

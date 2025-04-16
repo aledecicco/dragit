@@ -24,13 +24,13 @@ const Dialog = (props: DialogProps) => {
       <Ariakit.Dialog
         modal
         unmountOnHide
-        backdrop={<div className={cn('bg-black/50 backdrop-blur-md')} />}
+        backdrop={<div className={cn('bg-black/50', 'backdrop-blur-md')} />}
         {...propsWithCn(
           dialogProps,
           'fixed z-50 top-half left-half -translate-half',
-          'bg-dark-600 rounded-lg',
-          'w-150 max-w-full max-h-full overflow-auto',
-          'border-4 border-solid border-dark-700',
+          'w-150 max-w-[70%] max-h-[70%] overflow-auto',
+          'p-8 bg-dark-600 rounded-lg',
+          'border-2 border-solid border-dark-900',
           'flex flex-col',
         )}
         onClose={(e) => {
@@ -38,33 +38,28 @@ const Dialog = (props: DialogProps) => {
           hideDialog(dialogKey)
         }}
       >
-        <div className={cn('relative w-full h-full p-8')}>
-          {showClose && (
-            <Ariakit.DialogDismiss
-              render={
-                <Button
-                  round
-                  variant="plain"
-                  size="lg"
-                  className={cn(
-                    'absolute top-1 right-1',
-                    'text-xl text-light-900',
-                  )}
-                />
-              }
-            />
-          )}
+        {showClose && (
+          <Ariakit.DialogDismiss
+            render={
+              <Button
+                round
+                variant="plain"
+                size="lg"
+                className={cn('text-xl text-light-900 absolute top-1 left-1')}
+              />
+            }
+          />
+        )}
 
-          {heading && (
-            <Ariakit.DialogHeading
-              className={cn('text-2xl font-bold text-center -mt-4 mb-4')}
-            >
-              {heading}
-            </Ariakit.DialogHeading>
-          )}
+        {heading && (
+          <Ariakit.DialogHeading
+            className={cn('text-2xl font-bold text-center -mt-4 mb-4')}
+          >
+            {heading}
+          </Ariakit.DialogHeading>
+        )}
 
-          {children}
-        </div>
+        {children}
       </Ariakit.Dialog>
     </Ariakit.DialogProvider>
   )

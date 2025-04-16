@@ -50,6 +50,7 @@ pub trait GitHandler {
         channel: &Channel<AppMessage>,
         path: &str,
         filter: &FileTypesFilter,
+        pathspec: Option<&str>,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<FileInfo>, GitError>;

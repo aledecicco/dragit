@@ -149,11 +149,12 @@ pub async fn get_files_page(
     channel: Channel<AppMessage>,
     path: &str,
     filter: FileTypesFilter,
+    pathspec: Option<&str>,
     start_after: usize,
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_files_page(&channel, path, &filter, start_after, limit)
+        h.get_files_page(&channel, path, &filter, pathspec, start_after, limit)
     })
     .and_then(serialize_response)
 }
