@@ -21,7 +21,9 @@ import type {
   CommonAncestorInfo,
   CurrentDirInfo,
   FileInfo,
-  FileTypeFilter,
+  FileOfType,
+  FileType,
+  FileTypes,
   HeadInfo,
   HistoryItem,
   MergeStatus,
@@ -32,9 +34,6 @@ import type {
   Settings,
   StagedFileInfo,
   StashInfo,
-  UnmergedFileInfo,
-  UnstagedFileInfo,
-  UntrackedFileInfo,
 } from './models'
 import {
   BRANCHES_SCHEMA,
@@ -51,6 +50,7 @@ import {
 } from './schemas'
 import {
   fetchAndDeserialize,
+  getFileTypeFilter,
   useRepositoryInfiniteQuery,
   useRepositoryQuery,
 } from './utils'
@@ -81,10 +81,10 @@ const queryKeys = {
           ...queryKeys.directory.current(path),
           key: 'files',
         }) as const,
-      status: (path: string, types: FileTypeFilter) => ({
+      status: (path: string, types: FileType | FileType[]) => ({
         all: {
           ...queryKeys.directory.files.all(path),
-          ...types,
+          ...getFileTypeFilter(types),
         } as const,
         pathspec: (pathspec: string | undefined) =>
           ({
@@ -272,19 +272,14 @@ const headInfoQuery = (path: string) =>
 
 const useQueryHeadInfo = () => useRepositoryQuery(headInfoQuery)
 
-export type FileOfType<T extends FileTypeFilter> =
-  | (T['staged'] extends true ? StagedFileInfo : never)
-  | (T['unstaged'] extends true ? UnstagedFileInfo : never)
-  | (T['unmerged'] extends true ? UnmergedFileInfo : never)
-  | (T['untracked'] extends true ? UntrackedFileInfo : never)
-
-const fetchFilesPage = async <T extends FileTypeFilter>(
+const fetchFilesPage = async <T extends FileType>(
   path: string,
-  filter: T,
+  types: T | T[],
   pathspec: string | null,
   page: number,
   context: QueryFunctionContext,
 ): Promise<Page<FileOfType<T>>> => {
+  const filter = getFileTypeFilter(types)
   const res = await fetchAndDeserialize(
     'get_files_page',
     {
@@ -359,7 +354,7 @@ const fetchFilesPage = async <T extends FileTypeFilter>(
       .exhaustive(),
   )
 
-  const matchingFiles: FileOfType<T>[] = files.filter(
+  const matchingFiles = files.filter(
     (file): file is FileOfType<T> =>
       (!!filter.staged && file.status === 'staged') ||
       (!!filter.unstaged && file.status === 'unstaged') ||
@@ -373,9 +368,9 @@ const fetchFilesPage = async <T extends FileTypeFilter>(
   }
 }
 
-const filesQuery = <T extends FileTypeFilter>(
+const filesQuery = <T extends FileType>(
   path: string,
-  types: T,
+  types: T | T[],
   page: number,
   pathspec?: string,
 ) =>
@@ -389,10 +384,10 @@ const filesQuery = <T extends FileTypeFilter>(
       fetchFilesPage(path, types, pathspec ? pathspec : null, page, context),
   })
 
-function useQueryFiles<T extends FileTypeFilter>(
-  types: T,
+function useQueryFiles<T extends FileType>(
+  types: T | T[],
   pathspec?: string,
-): UseQueryResult<Page<FileOfType<T>>> {
+): UseQueryResult<Page<FileTypes[T]>> {
   return useRepositoryQuery(filesQuery, types, useFilesPage(types), pathspec)
 }
 

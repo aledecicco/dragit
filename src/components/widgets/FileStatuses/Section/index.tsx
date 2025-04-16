@@ -1,10 +1,10 @@
-import type { FileType, FileTypeFilter, FileTypes, Page } from '@api/models'
 import * as Ariakit from '@ariakit/react'
 import { type ComponentType, useMemo } from 'react'
 
+import type { FileType, FileTypes } from '@api/models'
 import { useQueryFiles } from '@api/queries'
+import { usePagesSync } from '@context/pages'
 import { VirtualizedDiv } from '@lib/VirtualizedDiv'
-import type { UseQueryResult } from '@tanstack/react-query'
 import {
   AccordionSection,
   type AccordionSectionProps,
@@ -26,8 +26,8 @@ const FileStatusesSection = <T extends FileType>(
   props: FileStatusesSectionProps<T>,
 ) => {
   const { type, ...accordionSectionProps } = props
-  const filter: FileTypeFilter = { [type]: true }
-  const filesQuery: UseQueryResult<Page<FileTypes[T]>> = useQueryFiles(filter)
+  const filesQuery = useQueryFiles([type])
+  usePagesSync(type)
 
   const virtualizerOptions = useMemo(() => {
     return mapFn(filesQuery.data, (files) => ({

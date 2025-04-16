@@ -98,6 +98,8 @@ export type FileTypes = {
 }
 export type FileType = keyof FileTypes
 
+export type FileOfType<T extends FileType> = FileTypes[T]
+
 export type FileTypeFilter = {
   [T in FileType]?: boolean
 }

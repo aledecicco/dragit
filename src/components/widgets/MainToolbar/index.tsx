@@ -33,7 +33,7 @@ const MainToolbar = (props: MainToolbarProps) => {
       {
         action: async () => {
           const path = await selectFiles({
-            types: { unstaged: true, unmerged: true, untracked: true },
+            types: ['unstaged', 'unmerged', 'untracked'],
           })
           await add.mutateAsync({
             files: [path],

@@ -1,27 +1,27 @@
 import { useState } from 'react'
 
-import type { FileInfo, FileTypeFilter, Page } from '@api/models'
+import type { FileType } from '@api/models'
 import { useQueryFiles } from '@api/queries'
 import { showDialog } from '@context/dialogs'
 import { getUniqueId } from '@context/ids'
-import type { UseQueryResult } from '@tanstack/react-query'
+import { usePagesSync } from '@context/pages'
 import { CommandMenu } from '@ui/CommandMenu'
 import type { DialogProps } from '@ui/Dialog'
 import type { PickPartial } from '@utils/types'
 
-interface FileSelectorDialogProps extends DialogProps {
-  types: FileTypeFilter
+interface FileSelectorDialogProps<T extends FileType> extends DialogProps {
+  types: T | T[]
   submitPath: (path: string | undefined) => void
 }
 
-const FileSelectorDialog = (props: FileSelectorDialogProps) => {
+const FileSelectorDialog = <T extends FileType>(
+  props: FileSelectorDialogProps<T>,
+) => {
   const { types, submitPath, ...dialogProps } = props
 
   const [search, setSearch] = useState('')
-  const filesQuery: UseQueryResult<Page<FileInfo>> = useQueryFiles(
-    types,
-    search,
-  )
+  const filesQuery = useQueryFiles(types, search)
+  usePagesSync(types, search)
 
   return (
     <CommandMenu
@@ -37,7 +37,10 @@ const FileSelectorDialog = (props: FileSelectorDialogProps) => {
 }
 
 const selectFiles = (
-  dialogProps: PickPartial<Omit<FileSelectorDialogProps, 'dialogKey'>, 'types'>,
+  dialogProps: PickPartial<
+    Omit<FileSelectorDialogProps<FileType>, 'dialogKey'>,
+    'types'
+  >,
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const dialogKey = getUniqueId()

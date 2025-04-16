@@ -15,7 +15,7 @@ import { Child } from '@tauri-apps/plugin-shell'
 import { type BorshSchema, borshDeserialize } from 'borsher'
 import { match } from 'ts-pattern'
 
-import type { AppMessage } from './models'
+import type { AppMessage, FileType, FileTypeFilter } from './models'
 import { useQueryCurrentDir } from './queries'
 
 export function mutationOptions<
@@ -196,6 +196,20 @@ const fetchAndDeserialize = async <T>(
   return res
 }
 
+const getFileTypeFilter = (types: FileType | FileType[]): FileTypeFilter => {
+  const filter: FileTypeFilter = {}
+
+  if (typeof types === 'string') {
+    filter[types] = true
+  } else {
+    for (const fileType of types) {
+      filter[fileType] = true
+    }
+  }
+
+  return filter
+}
+
 export {
   getPaginatedItem,
   getNextPaginatedItem,
@@ -206,4 +220,5 @@ export {
   useCurrentPath,
   useRepositoryMutation,
   fetchAndDeserialize,
+  getFileTypeFilter,
 }

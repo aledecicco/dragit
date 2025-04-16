@@ -91,15 +91,11 @@ const EventHandler = (props: PropsWithChildren) => {
         })
         .with({ type: 'filesModified', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [
-              queryKeys.directory.files.status(path, { unstaged: true }).all,
-            ],
+            queryKey: [queryKeys.directory.files.status(path, 'unstaged').all],
           })
 
           client.invalidateQueries({
-            queryKey: [
-              queryKeys.directory.files.status(path, { untracked: true }).all,
-            ],
+            queryKey: [queryKeys.directory.files.status(path, 'untracked').all],
           })
         })
         .with({ type: 'configUpdated', path: P.string }, ({ path }) => {

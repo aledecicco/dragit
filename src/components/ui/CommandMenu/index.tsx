@@ -90,7 +90,7 @@ const CommandMenu = (props: CommandMenuProps) => {
           ) : (
             <Ariakit.ComboboxList
               alwaysVisible
-              className={cn('h-80')}
+              className={cn('h-80 min-h-0')}
               render={
                 <VirtualizedDiv
                   size="sm"
@@ -132,8 +132,8 @@ const CommandMenuItem = (props: CommandMenuItemProps) => {
       focusOnHover
       value={value}
       className={cn(
-        'text-sm text-center text-light-50',
-        'p-2 rounded-none cursor-pointer',
+        'text-xs text-center text-light-500',
+        'px-2 py-3 rounded-none cursor-pointer',
         'data-[active-item]:bg-dark-100',
       )}
     >
