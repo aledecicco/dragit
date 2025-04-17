@@ -1,7 +1,8 @@
 import * as Ariakit from '@ariakit/react'
-import { type ReactNode, useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { type DialogKey, hideDialog } from '@context/dialogs'
+import { type Shortcut, ShortcutCheatsheet } from '@lib/ShortcutsCheatsheet'
 import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { Dialog, type DialogProps } from '@ui/Dialog'
 import { Separator } from '@ui/Separator'
@@ -11,7 +12,7 @@ import { type PickPartial, mapFn } from '@utils/types'
 interface CommandMenuProps
   extends Omit<PickPartial<DialogProps, 'dialogKey'>, 'heading' | 'showClose'> {
   items: CommandMenuCommand[] | undefined
-  shortcuts: CommandMenuShortcut[]
+  extraShortcuts?: Shortcut[]
   onSearchChange: (value: string) => void
   submitValue: (value: string | undefined) => void
 }
@@ -20,21 +21,39 @@ interface CommandMenuCommand {
   value: string
 }
 
-interface CommandMenuShortcut {
-  label: string
-  keys: ReactNode[]
-}
+const DEFAULT_SHORTCUTS: Shortcut[] = [
+  { keys: [{ symbol: '↵', keyName: 'Enter' }], label: 'Select' },
+  { keys: [{ symbol: 'Esc', keyName: 'Escape' }], label: 'Cancel' },
+  {
+    keys: [
+      { symbol: '▲', keyName: 'ArrowUp' },
+      { symbol: '◄', keyName: 'ArrowLeft' },
+      { symbol: '▼', keyName: 'ArrowDown' },
+      { symbol: '►', keyName: 'ArrowRight' },
+    ],
+    label: 'Navigate',
+  },
+]
 
 const CommandMenu = (props: CommandMenuProps) => {
-  const { items, shortcuts, onSearchChange, submitValue, ...dialogProps } =
-    props
+  const {
+    items,
+    extraShortcuts = [],
+    onSearchChange,
+    submitValue,
+    ...dialogProps
+  } = props
+
+  const shortcuts = useMemo(() => {
+    return [...extraShortcuts, ...DEFAULT_SHORTCUTS]
+  }, [extraShortcuts])
 
   const virtualizerOptions = useMemo(() => {
     return mapFn(items, (items) => ({
       getItemKey: (index: number) => items[index].value,
       gap: 0,
       paddingStart: 4,
-      paddingEnd: 4,
+      paddingEnd: 12,
     }))
   }, [items])
 
@@ -74,7 +93,7 @@ const CommandMenu = (props: CommandMenuProps) => {
 
         <Separator className={cn('border-dark-700')} />
 
-        <div className={cn('py-1')}>
+        <div className={cn('pt-1')}>
           {items === undefined ? (
             <div
               className={cn('p-2 text-center', 'text-sm italic text-light-950')}
@@ -104,6 +123,12 @@ const CommandMenu = (props: CommandMenuProps) => {
           )}
         </div>
       </Ariakit.ComboboxProvider>
+
+      <Separator className={cn('w-[95%] border-light-950/10 mb-1')} />
+      <ShortcutCheatsheet
+        shortcuts={shortcuts}
+        className={cn('p-1 self-center')}
+      />
     </Dialog>
   )
 }
@@ -148,9 +173,4 @@ const CommandMenuItem = (props: CommandMenuItemProps) => {
   )
 }
 
-export {
-  CommandMenu,
-  type CommandMenuProps,
-  type CommandMenuItemProps,
-  type CommandMenuShortcut,
-}
+export { CommandMenu, type CommandMenuProps, type CommandMenuItemProps }

@@ -6,7 +6,7 @@ A convenient and modern UI to interact with Git repositories.
 
 Stash of ideas in ~planned implementation order:
 
-- [ ] Keyboard shortcuts cheatsheet component
+- [x] Keyboard shortcuts cheatsheet component
 - [ ] Toasts
 - [ ] Loading indicators
 - [ ] Remotes manipulation widgets

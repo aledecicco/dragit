@@ -23,7 +23,6 @@ const FileStatusSectionPagination = <T extends FileType>(
 ) => {
   const { type, files } = props
   const page = useFilesPage(type)
-  console.log('a', page)
   const showPagination = !hasNoPagination(files, page)
 
   return showPagination ? (

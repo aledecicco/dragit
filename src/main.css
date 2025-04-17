@@ -89,6 +89,8 @@
 
   --spacing-half: 50%;
 
+  --text-2xs: 9px;
+
   --animate-scroll-horizontal: scroll-horizontal 1s linear;
 
   @keyframes scroll-horizontal {
