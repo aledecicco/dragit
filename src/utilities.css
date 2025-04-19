@@ -1,0 +1,71 @@
+/*
+ * Sets a dithered background on the target element.
+ * Takes a color for the background, and optionally an opacity modifier.
+ * Can be modified through the extra utilities at the bottom.
+ *
+ * @examples
+ * ... className="dithered-bg-green-400" ...
+ * ... className="dithered-bg-green-400/50" ...
+ * ... className="dithered-bg-green-400/[25.5]" ...
+ */
+ @utility dithered-bg-* {
+  --dithering-inner-color: var(--dithering-color, transparent);
+  --dithering-inner-radius: var(--dithering-size, 2px);
+
+  --dithering-outer-radius: var(--dithering-spacing, 1px);
+  --dithering-outer-color: --value(--color-*, [color]);
+  --dithering-outer-color: color-mix(in oklab, --value(--color-*, [color]) --modifier(number, [number])%, transparent);
+
+  --dithering-diameter: calc(2 * (var(--dithering-inner-radius) + var(--dithering-outer-radius)) - 1px);
+
+  background-image: radial-gradient(
+    var(--dithering-inner-color) var(--dithering-inner-radius),
+    var(--dithering-outer-color) var(--dithering-outer-radius)
+  );
+  background-size: var(--dithering-diameter) var(--dithering-diameter);
+}
+
+/*
+ * Overrides the color of the dithering circles (transparent by default).
+ * Accepts colors from Tailwind's palette, or any color defined in your theme.
+ * Can also receive an arbitrary color.
+ *
+ * @examples
+ * ... className="dithering-color-black-100" ...
+ * ... className="dithering-color-black-100/50" ...
+ * ... className="dithering-color-[#1a1a1a]" ...
+ */
+@utility dithering-color-* {
+  --dithering-color: --value(--color-*, [color]);
+  --dithering-color: color-mix(in oklab, --value(--color-*, [color]) --modifier(number, [number])%, transparent);
+}
+
+/*
+ * Overrides the size of the dithering circles (2px by default).
+ * If the parameter is a number, it follows Tailwind's spacing scale.
+ * Otherwise, an arbitrary length can be specified.
+ *
+ * @examples
+ * ... className="dithering-size-1" ...
+ * ... className="dithering-size-[0.5]" ...
+ * ... className="dithering-size-[4px]" ...
+ */
+@utility dithering-size-* {
+  --dithering-size: calc(var(--spacing) * --value(number, [number]));
+  --dithering-size: --value([length]);
+}
+
+/*
+ * Overrides the space between the dithering circles (1px by default).
+ * If the parameter is a number, it follows Tailwind's spacing scale.
+ * Otherwise, an arbitrary length can be specified.
+ *
+ * @examples
+ * ... className="dithering-spacing-1" ...
+ * ... className="dithering-spacing-[0.5]" ...
+ * ... className="dithering-spacing-[4px]" ...
+ */
+@utility dithering-spacing-* {
+  --dithering-spacing: calc(var(--spacing) * --value(number, [number]));
+  --dithering-spacing: --value([length]);
+}

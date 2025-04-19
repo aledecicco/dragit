@@ -1,6 +1,8 @@
 @import "@fontsource/inter";
 @import "tailwindcss";
 
+@import "./utilities.css";
+
 @theme {
   --color-light-50: #fcfcfc;
   --color-light-100: #f2f2f2;
@@ -125,13 +127,6 @@
   }
 }
 
-@utility dithered-* {
-  background-image: radial-gradient(transparent 1px, --value(--color-*) 1px);
-  background-size: 3px 3px;
-
-  background-image: radial-gradient(transparent calc(1px * --modifier(integer)), --value(--color-*) 1px);
-  background-size: calc(3px * --modifier(integer)) calc(3px * --modifier(integer));
-}
 :root {
   font-family: "Inter", sans-serif;
   @apply bg-dark-600 text-light-50;

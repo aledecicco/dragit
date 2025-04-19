@@ -76,7 +76,7 @@ const GraphCommit = makeTracked<
             className={cn(
               'group/commit',
               'absolute left-full top-half translate-x-2 -translate-y-half w-80',
-              'border-4 border-dark-600/85 rounded-sm shadow-md',
+              'border-4 border-dark-600 rounded-lg shadow-md',
             )}
           />
         }
@@ -84,8 +84,8 @@ const GraphCommit = makeTracked<
         <div
           className={cn(
             'p-2 border-1 border-dark-100 rounded-sm',
-            'bg-dark-700/75 dithered-dark-600/1',
-            'group-hover/commit:dithered-dark-500/1 group-focus/commit:dithered-dark-500/1 group-data-focus/commit:dithered-dark-500/1',
+            'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
+            'group-hover/commit:dithered-bg-dark-500 group-focus/commit:dithered-bg-dark-500 group-data-focus/commit:dithered-bg-dark-500',
             'flex flex-col gap-y-1',
           )}
         >

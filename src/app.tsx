@@ -1,11 +1,11 @@
 import { useQueryCurrentDir } from '@api/queries'
 import { useReferencesSync } from '@context/branches'
 import { useDialog } from '@context/dialogs'
-import { Graph } from '@main/Graph'
 import { cn } from '@utils/styles'
 import { BranchesList } from '@widgets/BranchesList'
 import { CurrentDirectory } from '@widgets/CurrentDirectory'
 import { FileStatuses } from '@widgets/FileStatuses'
+import { Graph } from '@widgets/Graph'
 import { MainToolbar } from '@widgets/MainToolbar'
 import { StashesList } from '@widgets/StashesList'
 
@@ -14,26 +14,28 @@ const App = () => {
   const currentDirQuery = useQueryCurrentDir()
 
   return (
-    <div
-      className={cn(
-        'px-8 py-4 w-full h-full max-h-full',
-        'grid grid-cols-[max_content_1fr_max-content] grid-rows-[max-content_1fr_max-content] gap-4',
-      )}
-    >
-      <CurrentDirectory
-        className={cn('col-start-2 row-start-1', 'justify-self-center')}
-      />
+    <>
+      <div
+        className={cn(
+          'px-8 py-4 w-full h-full max-h-full',
+          'grid grid-cols-[max_content_1fr_max-content] grid-rows-[max-content_1fr_max-content] gap-4',
+        )}
+      >
+        <CurrentDirectory
+          className={cn('col-start-2 row-start-1', 'justify-self-center')}
+        />
 
-      {currentDirQuery.data?.path &&
-        currentDirQuery.data.isRepository &&
-        currentDirQuery.data.exists && <AppInner />}
+        {currentDirQuery.data?.path &&
+          currentDirQuery.data.isRepository &&
+          currentDirQuery.data.exists && <InRepository />}
 
-      {dialog}
-    </div>
+        {dialog}
+      </div>
+    </>
   )
 }
 
-const AppInner = () => {
+const InRepository = () => {
   useReferencesSync()
 
   return (

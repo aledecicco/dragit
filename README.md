@@ -7,15 +7,18 @@ A convenient and modern UI to interact with Git repositories.
 Stash of ideas in ~planned implementation order:
 
 - [x] Keyboard shortcuts cheatsheet component
-- [ ] Toasts
 - [ ] Loading indicators
 - [ ] Remotes manipulation widgets
+- [ ] Documentation pass
+- [ ] Performance pass
 - [ ] Checkout of remote branches, create branch from commit
 - [ ] Paginate pathspec searches
 - [ ] Highlight matches during pathspec search
 - [ ] Drag and drop shortcuts
 - [ ] Global keyboard shortcuts
 - [ ] Settings screen
+- [ ] Another pass
+- [ ] Toasts (with lib)
 - [ ] Decide on polling vs file watcher
 - [ ] Implement git operations in Rust?
 

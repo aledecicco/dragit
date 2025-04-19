@@ -2,8 +2,8 @@ import type { PropsWithChildren } from 'react'
 
 import { useQueryCommitHistory } from '@api/queries'
 import { useSelectedRefs } from '@context/branches'
-import { useCurrentCommonAncestor } from '@main/Graph/utils'
 import { cn } from '@utils/styles'
+import { useCurrentCommonAncestor } from '@widgets/Graph/utils'
 
 const BranchMessages = () => {
   const { reference, baseReference } = useSelectedRefs()
