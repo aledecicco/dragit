@@ -44,6 +44,7 @@ const Dialog = (props: DialogProps) => {
               <Button
                 round
                 variant="plain"
+                status="neutral"
                 size="lg"
                 className={cn('text-xl text-light-900 absolute top-1 left-1')}
               />

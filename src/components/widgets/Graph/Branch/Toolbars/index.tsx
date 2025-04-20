@@ -20,7 +20,8 @@ const BranchToolbars = () => {
       />
 
       <IconButton
-        variant="neutral"
+        variant="filled"
+        status="neutral"
         Glyph={IconRefresh}
         label="Fetch all"
         onClick={() => {

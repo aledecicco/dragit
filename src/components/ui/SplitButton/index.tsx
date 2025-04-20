@@ -21,6 +21,7 @@ const SplitButton = (props: SplitButtonProps) => {
     action,
     items,
     variant,
+    status,
     size = 'md',
     buttonProps,
     menuButtonProps,
@@ -36,6 +37,7 @@ const SplitButton = (props: SplitButtonProps) => {
     >
       <Button
         variant={variant}
+        status={status}
         round={false}
         size={size}
         onClick={action}
@@ -57,6 +59,7 @@ const SplitButton = (props: SplitButtonProps) => {
         anchor={
           <Button
             variant={variant}
+            status={status}
             round={false}
             size={size}
             {...propsWithCn(

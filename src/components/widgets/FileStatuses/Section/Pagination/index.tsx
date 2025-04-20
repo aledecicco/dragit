@@ -30,7 +30,8 @@ const FileStatusSectionPagination = <T extends FileType>(
       <Button
         size="sm"
         round
-        variant="neutral"
+        variant="filled"
+        status="neutral"
         aria-label={`Previous page of ${type} files`}
         disabled={page === 0}
         onClick={() => {
@@ -45,7 +46,8 @@ const FileStatusSectionPagination = <T extends FileType>(
       <Button
         size="sm"
         round
-        variant="neutral"
+        variant="filled"
+        status="neutral"
         aria-label={`Next page of ${type} files`}
         disabled={!files || !files.hasNext}
         onClick={() => {

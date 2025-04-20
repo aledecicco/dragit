@@ -93,7 +93,7 @@ const MainToolbar = (props: MainToolbarProps) => {
 
   return (
     <Toolbar
-      variant="primary"
+      status="primary"
       size="md"
       compact={false}
       fixed

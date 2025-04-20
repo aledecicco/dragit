@@ -34,7 +34,8 @@ const BranchSelectors = () => {
         Glyph={IconSwitchHorizontal}
         label="Switch branch and base branch"
         className={cn('mx-1 col-start-2 row-start-1')}
-        variant="neutral"
+        variant="filled"
+        status="neutral"
         disabled={!branch || !baseBranch}
         size="md"
         onClick={() => {

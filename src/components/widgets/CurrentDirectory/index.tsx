@@ -15,6 +15,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
   return (
     <Button
       variant="plain"
+      status="primary"
       size="md"
       aria-label="Select and open a folder in your system"
       onClick={() => {
@@ -29,7 +30,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
       }}
       {...propsWithCn(
         buttonProps,
-        'text-primary-300 font-medium text-sm',
+        'font-medium',
         !currentDirQuery.data && 'italic',
       )}
       disabled={

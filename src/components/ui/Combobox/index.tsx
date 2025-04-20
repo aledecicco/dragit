@@ -61,6 +61,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
           render={
             <Button
               variant="plain"
+              status="neutral"
               size="lg"
               className={cn(
                 'group/combobox gap-2 text-sm',

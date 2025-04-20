@@ -1,7 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 import type { HTMLAttributes, MouseEventHandler } from 'react'
 
-import { Button, type ButtonVariant } from '@ui/Button'
+import { Button, type ButtonStatus, type ButtonVariant } from '@ui/Button'
 import { type Glyph, Icon } from '@ui/Icon'
 import { IconButton } from '@ui/IconButton'
 import type { MenuItem } from '@ui/Menu'
@@ -20,6 +20,7 @@ interface ToolbarTool extends HTMLAttributes<HTMLElement> {
 interface ToolbarProps extends Ariakit.ToolbarProps {
   tools: ToolbarTool[]
   variant?: ButtonVariant
+  status?: ButtonStatus
   size?: Size
   fixed?: boolean
   compact?: boolean
@@ -28,7 +29,8 @@ interface ToolbarProps extends Ariakit.ToolbarProps {
 const Toolbar = (props: ToolbarProps) => {
   const {
     tools,
-    variant = 'neutral',
+    variant = 'filled',
+    status = 'neutral',
     size = 'md',
     fixed = false,
     compact = true,
@@ -49,7 +51,8 @@ const Toolbar = (props: ToolbarProps) => {
             <SplitButton
               key={label}
               action={action}
-              variant="neutral"
+              status={status}
+              variant={variant}
               items={alternatives}
               size={size}
               {...propsWithCn(
@@ -68,12 +71,11 @@ const Toolbar = (props: ToolbarProps) => {
                           onClick={action}
                           Glyph={Glyph}
                           label={label}
-                          variant={variant}
                           round={false}
                           size={size}
                         />
                       ) : (
-                        <Button onClick={action} variant={variant} size={size}>
+                        <Button onClick={action} size={size}>
                           <Icon Glyph={Glyph} size={size} /> {label}
                         </Button>
                       )
@@ -101,11 +103,17 @@ const Toolbar = (props: ToolbarProps) => {
                     Glyph={Glyph}
                     label={label}
                     variant={variant}
+                    status={status}
                     round={false}
                     size={size}
                   />
                 ) : (
-                  <Button onClick={action} variant={variant} size={size}>
+                  <Button
+                    onClick={action}
+                    variant={variant}
+                    status={status}
+                    size={size}
+                  >
                     <Icon Glyph={Glyph} size={size} /> {label}
                   </Button>
                 )

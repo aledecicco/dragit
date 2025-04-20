@@ -13,7 +13,11 @@ const FormSubmitButton = (props: FormSubmitButtonProps) => {
   return (
     <Ariakit.FormSubmit
       render={
-        <Button variant="primary" {...propsWithCn(buttonProps, 'w-full')} />
+        <Button
+          variant="filled"
+          status="primary"
+          {...propsWithCn(buttonProps, 'w-full')}
+        />
       }
       {...options}
     />
