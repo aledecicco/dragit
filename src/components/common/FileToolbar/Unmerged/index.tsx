@@ -18,36 +18,37 @@ const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
   const tools = useMemo(() => {
     return [
       {
-        Glyph: IconCheck,
-        label: 'Mark as resolved',
-        action: () => {
-          stage.mutateAsync({ files: [file.path] })
+        action: {
+          run: () => stage.mutateAsync({ files: [file.path] }),
+          label: {
+            idle: 'Mark as resolved',
+            running: 'Staging',
+            success: 'Staged',
+            error: 'Failed',
+          },
+          Glyph: IconCheck,
         },
-        disabled: stage.isPending,
       },
       ...match(file.changes)
         .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => [
           {
-            Glyph: IconTrash,
-            label: 'Delete',
-            action: () => {
-              remove.mutateAsync({ files: [file.path] })
+            action: {
+              run: () => remove.mutateAsync({ files: [file.path] }),
+              label: {
+                idle: 'Delete',
+                running: 'Deleting',
+                success: 'Deleted',
+                error: 'Failed',
+              },
+              Glyph: IconTrash,
             },
-            disabled: remove.isPending,
           },
         ])
         .otherwise(() => []),
     ]
-  }, [
-    file.path,
-    file.changes,
-    stage.mutateAsync,
-    stage.isPending,
-    remove.mutateAsync,
-    remove.isPending,
-  ])
+  }, [file.path, file.changes, stage.mutateAsync, remove.mutateAsync])
 
-  return <Toolbar size="sm" tools={tools} {...toolbarProps} />
+  return <Toolbar size="sm" tools={tools} compact {...toolbarProps} />
 }
 
 export { UnmergedFileToolbar }

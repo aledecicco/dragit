@@ -1,5 +1,4 @@
 import * as Ariakit from '@ariakit/react'
-import type { MouseEventHandler } from 'react'
 import { match } from 'ts-pattern'
 
 import { type Glyph, Icon } from '@ui/Icon'
@@ -8,8 +7,7 @@ import type { Size } from '@utils/types'
 
 interface MenuItem extends Ariakit.MenuItemProps {
   Glyph?: Glyph
-  label: string
-  action: MouseEventHandler<HTMLDivElement>
+  label?: string
 }
 
 interface MenuProps extends Ariakit.MenuProps {
@@ -40,11 +38,10 @@ const Menu = (props: MenuProps) => {
         )}
       >
         {items.map((menuItem) => {
-          const { Glyph, label, action, ...menuItemProps } = menuItem
+          const { Glyph, label, ...menuItemProps } = menuItem
           return (
             <Ariakit.MenuItem
               key={label}
-              onClick={action}
               {...propsWithCn(
                 menuItemProps,
                 'flex flex-row shrink-0 items-center gap-x-2 text-nowrap min-w-max',
@@ -57,7 +54,7 @@ const Menu = (props: MenuProps) => {
                 'cursor-pointer hover:bg-dark-100 data-[active-item]:bg-dark-100',
               )}
             >
-              {Glyph && <Icon Glyph={Glyph} size="sm" />}
+              {Glyph && <Icon Glyph={Glyph} size={size} />}
               {label}
             </Ariakit.MenuItem>
           )

@@ -1,6 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
+import { Tooltip } from '@ui/Tooltip'
 import { propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
@@ -8,17 +9,17 @@ type ButtonVariant = 'filled' | 'plain'
 
 type ButtonStatus = 'primary' | 'cta' | 'neutral' | 'success' | 'error'
 
-interface ButtonOwnProps {
+interface ButtonProps extends Ariakit.ButtonProps {
+  description?: string
   variant?: ButtonVariant
   status?: ButtonStatus
   round?: boolean
   size?: Size
 }
 
-type ButtonProps = ButtonOwnProps & Ariakit.ButtonProps
-
 const Button = (props: ButtonProps) => {
   const {
+    description,
     variant = 'filled',
     status = 'neutral',
     round = false,
@@ -26,7 +27,7 @@ const Button = (props: ButtonProps) => {
     ...buttonProps
   } = props
 
-  return (
+  const button = (
     <Ariakit.Button
       {...propsWithCn(
         buttonProps,
@@ -136,12 +137,12 @@ const Button = (props: ButtonProps) => {
       }}
     />
   )
+
+  return description ? (
+    <Tooltip description={description} anchor={button} />
+  ) : (
+    button
+  )
 }
 
-export {
-  Button,
-  type ButtonProps,
-  type ButtonOwnProps,
-  type ButtonVariant,
-  type ButtonStatus,
-}
+export { Button, type ButtonProps, type ButtonVariant, type ButtonStatus }

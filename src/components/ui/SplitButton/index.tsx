@@ -1,48 +1,35 @@
-import type * as Ariakit from '@ariakit/react'
-import { type ComponentProps, type MouseEventHandler, useRef } from 'react'
-import { mergeRefs } from 'react-merge-refs'
+import { useRef } from 'react'
 import { match } from 'ts-pattern'
 
-import { Button, type ButtonOwnProps } from '@ui/Button'
+import { Button, type ButtonProps } from '@ui/Button'
 import { Menu, type MenuItem } from '@ui/Menu'
-import { propsWithCn } from '@utils/styles'
+import { cn, propsWithCn } from '@utils/styles'
 
-interface SplitButtonProps
-  extends ComponentProps<'div'>,
-    Omit<ButtonOwnProps, 'round'> {
-  action: MouseEventHandler<HTMLButtonElement>
+interface SplitButtonProps extends Omit<ButtonProps, 'round'> {
   items: MenuItem[]
-  buttonProps?: Partial<Ariakit.ButtonProps>
-  menuButtonProps?: Partial<Ariakit.ButtonProps>
+  menuButtonProps?: Partial<ButtonProps>
 }
 
 const SplitButton = (props: SplitButtonProps) => {
   const {
-    action,
     items,
-    variant,
-    status,
-    size = 'md',
-    buttonProps,
     menuButtonProps,
-    ...divProps
+    size = 'md',
+    className,
+    ...buttonProps
   } = props
 
   const anchorRef = useRef<HTMLDivElement>(null)
 
   return (
     <div
-      {...propsWithCn(divProps, 'flex flex-row items-stretch rounded-md')}
-      ref={mergeRefs([anchorRef, divProps.ref])}
+      className={cn('flex flex-row items-stretch rounded-md', className)}
+      ref={anchorRef}
     >
       <Button
-        variant={variant}
-        status={status}
-        round={false}
         size={size}
-        onClick={action}
-        {...propsWithCn(
-          buttonProps,
+        {...buttonProps}
+        className={cn(
           'rounded-l-[inherit] rounded-r-none grow',
           'border-r-1 border-solid border-r-dark-400',
           match(size)
@@ -58,10 +45,12 @@ const SplitButton = (props: SplitButtonProps) => {
         size={size}
         anchor={
           <Button
-            variant={variant}
-            status={status}
-            round={false}
+            disabled={buttonProps.disabled}
+            variant={buttonProps.variant}
+            status={buttonProps.status}
             size={size}
+            round={false}
+            description="View alternatives"
             {...propsWithCn(
               menuButtonProps,
               'h-full',

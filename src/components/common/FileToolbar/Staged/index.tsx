@@ -16,17 +16,21 @@ const StagedFileToolbar = (props: StagedFileToolbarProps) => {
   const tools = useMemo(() => {
     return [
       {
-        Glyph: IconMinus,
-        label: 'Unstage',
-        action: () => {
-          unstage.mutateAsync({ files: [file.path] })
+        action: {
+          run: () => unstage.mutateAsync({ files: [file.path] }),
+          label: {
+            idle: 'Unstage',
+            running: 'Unstaging',
+            success: 'Unstaged',
+            error: 'Failed',
+          },
+          Glyph: IconMinus,
         },
-        disabled: unstage.isPending,
       },
     ]
-  }, [file.path, unstage.mutateAsync, unstage.isPending])
+  }, [file.path, unstage.mutateAsync])
 
-  return <Toolbar size="sm" tools={tools} {...toolbarProps} />
+  return <Toolbar size="sm" tools={tools} compact {...toolbarProps} />
 }
 
 export { StagedFileToolbar }

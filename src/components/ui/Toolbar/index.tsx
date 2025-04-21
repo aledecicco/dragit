@@ -1,20 +1,13 @@
 import * as Ariakit from '@ariakit/react'
-import type { HTMLAttributes, MouseEventHandler } from 'react'
 
-import { Button, type ButtonStatus, type ButtonVariant } from '@ui/Button'
-import { type Glyph, Icon } from '@ui/Icon'
-import { IconButton } from '@ui/IconButton'
-import type { MenuItem } from '@ui/Menu'
-import { SplitButton } from '@ui/SplitButton'
+import { type Action, ActionButton } from '@lib/ActionButton'
+import type { ButtonStatus, ButtonVariant } from '@ui/Button'
 import { cn, propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
-interface ToolbarTool extends HTMLAttributes<HTMLElement> {
-  Glyph: Glyph
-  label: string
-  action: MouseEventHandler<HTMLButtonElement>
-  alternatives?: MenuItem[]
-  disabled?: boolean
+interface ToolbarTool {
+  action: Action
+  alternatives?: Action[]
 }
 
 interface ToolbarProps extends Ariakit.ToolbarProps {
@@ -46,88 +39,25 @@ const Toolbar = (props: ToolbarProps) => {
           fixed ? 'auto-cols-fr' : 'auto-cols-max',
         )}
       >
-        {tools.map(({ Glyph, label, action, alternatives, ...toolProps }) =>
-          alternatives?.length ? (
-            <SplitButton
-              key={label}
-              action={action}
-              status={status}
-              variant={variant}
-              items={alternatives}
-              size={size}
-              {...propsWithCn(
-                toolProps,
-                fixed && 'w-full',
-                'not-first:rounded-l-none',
-                'not-last:rounded-r-none not-last:border-r-2 not-last:border-solid not-last:border-r-dark-500',
-              )}
-              buttonProps={{
-                className: cn(fixed && compact && 'pr-0'),
-                render: (
-                  <Ariakit.ToolbarItem
-                    render={
-                      compact ? (
-                        <IconButton
-                          onClick={action}
-                          Glyph={Glyph}
-                          label={label}
-                          round={false}
-                          size={size}
-                        />
-                      ) : (
-                        <Button onClick={action} size={size}>
-                          <Icon Glyph={Glyph} size={size} /> {label}
-                        </Button>
-                      )
-                    }
-                    disabled={toolbarProps.disabled || toolProps.disabled}
-                  />
-                ),
-              }}
-              menuButtonProps={{
-                render: (
-                  <Ariakit.ToolbarItem
-                    disabled={toolbarProps.disabled || toolProps.disabled}
-                  />
-                ),
-                'aria-label': `View alternatives to ${label}`,
-              }}
-            />
-          ) : (
-            <Ariakit.ToolbarItem
-              key={label}
-              render={
-                compact ? (
-                  <IconButton
-                    onClick={action}
-                    Glyph={Glyph}
-                    label={label}
-                    variant={variant}
-                    status={status}
-                    round={false}
-                    size={size}
-                  />
-                ) : (
-                  <Button
-                    onClick={action}
-                    variant={variant}
-                    status={status}
-                    size={size}
-                  >
-                    <Icon Glyph={Glyph} size={size} /> {label}
-                  </Button>
-                )
-              }
-              {...propsWithCn(
-                toolProps,
-                fixed && 'w-full',
-                'not-first:rounded-l-none',
-                'not-last:rounded-r-none not-last:border-r-2 not-last:border-solid not-last:border-r-dark-500',
-              )}
-              disabled={toolbarProps.disabled || toolProps.disabled}
-            />
-          ),
-        )}
+        {tools.map((tool) => (
+          <ActionButton
+            key={tool.action.label.idle}
+            className={cn(
+              fixed && 'w-full',
+              'not-first:rounded-l-none',
+              'not-last:rounded-r-none not-last:border-r-2 not-last:border-solid not-last:border-r-dark-500',
+            )}
+            action={tool.action}
+            alternatives={tool.alternatives}
+            size={size}
+            variant={variant}
+            status={status}
+            compact={compact}
+            disabled={toolbarProps.disabled}
+            render={<Ariakit.ToolbarItem />}
+            menuButtonProps={{ render: <Ariakit.ToolbarItem /> }}
+          />
+        ))}
       </Ariakit.Toolbar>
     </Ariakit.ToolbarProvider>
   )

@@ -18,31 +18,33 @@ const StashToolbar = (props: StashToolbarProps) => {
   const tools = useMemo(() => {
     return [
       {
-        Glyph: IconPackageExport,
-        label: 'Pop',
-        action: () => {
-          apply.mutateAsync({ stashId: stash.id })
+        action: {
+          run: () => apply.mutateAsync({ stashId: stash.id }),
+          label: {
+            idle: 'Pop',
+            running: 'Popping',
+            success: 'Popped',
+            error: 'Failed',
+          },
+          Glyph: IconPackageExport,
         },
-        disabled: apply.isPending,
       },
       {
-        Glyph: IconTrash,
-        label: 'Discard',
-        action: () => {
-          discard.mutateAsync({ stashId: stash.id })
+        action: {
+          run: () => discard.mutateAsync({ stashId: stash.id }),
+          label: {
+            idle: 'Discard',
+            running: 'Discarding',
+            success: 'Discarded',
+            error: 'Failed',
+          },
+          Glyph: IconTrash,
         },
-        disabled: discard.isPending,
       },
     ]
-  }, [
-    stash.id,
-    apply.mutateAsync,
-    apply.isPending,
-    discard.mutateAsync,
-    discard.isPending,
-  ])
+  }, [stash.id, apply.mutateAsync, discard.mutateAsync])
 
-  return <Toolbar tools={tools} {...toolbarProps} />
+  return <Toolbar tools={tools} size="sm" compact {...toolbarProps} />
 }
 
 export { StashToolbar, type StashToolbarProps }

@@ -4,7 +4,7 @@ import { useCheckout } from '@api/mutations'
 import { useQueryBranches, useQueryHeadInfo } from '@api/queries'
 import { BranchSelector } from '@common/BranchSelector'
 import { changeBaseRef } from '@context/branches'
-import { IconButton } from '@ui/IconButton'
+import { ActionButton } from '@lib/ActionButton'
 import { useSelectedBranches } from '@utils/repository'
 import { cn } from '@utils/styles'
 import { mapFn } from '@utils/types'
@@ -30,19 +30,30 @@ const BranchSelectors = () => {
         disabled={headInfoQuery.isLoading || branchesQuery.isLoading}
       />
 
-      <IconButton
-        Glyph={IconSwitchHorizontal}
-        label="Switch branch and base branch"
+      <ActionButton
+        action={{
+          run: async () => {
+            if (baseBranch) {
+              await checkout.mutateAsync({ reference: baseBranch.name })
+            } else {
+              throw new Error('No base branch selected')
+            }
+          },
+          Glyph: IconSwitchHorizontal,
+          label: {
+            idle: 'Switch branch and base branch',
+            running: 'Switching branches',
+            success: 'Branches switched',
+            error: 'Failed to switch',
+          },
+        }}
         className={cn('mx-1 col-start-2 row-start-1')}
         variant="filled"
         status="neutral"
         disabled={!branch || !baseBranch}
         size="md"
-        onClick={() => {
-          if (baseBranch) {
-            checkout.mutateAsync({ reference: baseBranch.name })
-          }
-        }}
+        round
+        compact
       />
 
       <BranchSelector
