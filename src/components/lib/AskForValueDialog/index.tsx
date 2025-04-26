@@ -1,34 +1,35 @@
-import type { ComponentType, ReactNode } from 'react'
+import type { ComponentType } from 'react'
 
-import { hideDialog, showDialog } from '@context/dialogs'
+import { type DialogKey, hideDialog, showDialog } from '@context/dialogs'
 import { getUniqueId } from '@context/ids'
-import { InputField } from '@ui/Form/InputField'
 import { FormDialog, type FormDialogProps } from '@ui/FormDialog'
-import type { PickPartial } from '@utils/types'
+import type { AnyObject, PickPartial } from '@utils/types'
 
-interface AskForValueDialogProps
-  extends PickPartial<
-    FormDialogProps<{ value: string | undefined }>,
-    'dialogKey'
-  > {
-  label: string
-  submitValue: (value: string | undefined) => void
-  Message?: ComponentType | ReactNode
-  defaultValue?: string
+interface AskProps<T extends AnyObject> {
+  dialogKey: DialogKey
+  submitValue: (value: T | undefined) => void
 }
 
-const AskForValueDialog = (props: AskForValueDialogProps) => {
-  const { label, submitValue, Message, defaultValue, ...dialogProps } = props
+interface AskForValueDialogProps<T extends AnyObject>
+  extends PickPartial<FormDialogProps<T>, 'dialogKey'> {
+  submitValue: (value: T | undefined) => void
+  defaultValues: T
+}
+
+const AskForValueDialog = <T extends AnyObject>(
+  props: AskForValueDialogProps<T>,
+) => {
+  const { submitValue, defaultValues, ...dialogProps } = props
 
   return (
     <FormDialog
       {...dialogProps}
       formOptions={{
-        defaultValues: {
-          value: defaultValue,
-        },
-        onFormSubmit: (formState) => {
-          submitValue(formState.values.value)
+        defaultValues,
+        ...dialogProps.formOptions,
+        onFormSubmit: (formState, form) => {
+          dialogProps.formOptions?.onFormSubmit?.(formState, form)
+          submitValue(formState.values)
           hideDialog(dialogProps.dialogKey)
         },
       }}
@@ -36,24 +37,30 @@ const AskForValueDialog = (props: AskForValueDialogProps) => {
         dialogProps.onClose?.(e)
         submitValue(undefined)
       }}
-    >
-      {typeof Message === 'function' ? <Message /> : Message}
-
-      <InputField required autoFocus name="value" label={label} />
-    </FormDialog>
+    />
   )
 }
 
-const askForValue = (
-  dialogProps?: Partial<AskForValueDialogProps>,
-): Promise<string> => {
+function askForValue<T extends AnyObject>(
+  AskDialog: ComponentType<AskProps<T>>,
+): Promise<T>
+
+function askForValue<T extends AnyObject, P>(
+  AskDialog: ComponentType<AskProps<T> & P>,
+  dialogProps: P,
+): Promise<T>
+
+function askForValue<T extends AnyObject, P>(
+  AskDialog: ComponentType<AskProps<T> & P>,
+  dialogProps?: P,
+): Promise<T> {
   return new Promise((resolve, reject) => {
     const dialogKey = getUniqueId()
 
     showDialog(
       dialogKey,
-      <AskForValueDialog
-        label="Value"
+      <AskDialog
+        {...(dialogProps as P)}
         dialogKey={dialogKey}
         submitValue={(value) => {
           if (value === undefined) {
@@ -62,10 +69,14 @@ const askForValue = (
             resolve(value)
           }
         }}
-        {...dialogProps}
       />,
     )
   })
 }
 
-export { AskForValueDialog, type AskForValueDialogProps, askForValue }
+export {
+  AskForValueDialog,
+  type AskForValueDialogProps,
+  type AskProps,
+  askForValue,
+}

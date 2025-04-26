@@ -1,4 +1,5 @@
 import { IconSwitchHorizontal } from '@tabler/icons-react'
+import { useMemo } from 'react'
 
 import { useCheckout } from '@api/mutations'
 import { useQueryBranches, useQueryHeadInfo } from '@api/queries'
@@ -16,6 +17,25 @@ const BranchSelectors = () => {
   const { branch, baseBranch } = useSelectedBranches()
   const checkout = useCheckout()
 
+  const switchAction = useMemo(() => {
+    return {
+      run: async () => {
+        if (baseBranch) {
+          await checkout.mutateAsync({ reference: baseBranch.name })
+        } else {
+          throw new Error('No base branch selected')
+        }
+      },
+      Glyph: IconSwitchHorizontal,
+      label: {
+        idle: 'Switch branch and base branch',
+        running: 'Switching branches',
+        success: 'Branches switched',
+        error: 'Failed to switch',
+      },
+    }
+  }, [baseBranch, checkout.mutateAsync])
+
   return (
     <>
       <BranchSelector
@@ -31,22 +51,7 @@ const BranchSelectors = () => {
       />
 
       <ActionButton
-        action={{
-          run: async () => {
-            if (baseBranch) {
-              await checkout.mutateAsync({ reference: baseBranch.name })
-            } else {
-              throw new Error('No base branch selected')
-            }
-          },
-          Glyph: IconSwitchHorizontal,
-          label: {
-            idle: 'Switch branch and base branch',
-            running: 'Switching branches',
-            success: 'Branches switched',
-            error: 'Failed to switch',
-          },
-        }}
+        mainAction={switchAction}
         className={cn('mx-1 col-start-2 row-start-1')}
         variant="filled"
         status="neutral"

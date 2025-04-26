@@ -1,9 +1,9 @@
+import { useMemo } from 'react'
 import { P, match } from 'ts-pattern'
 
 import type { BranchInfo, Reference, RemoteRef } from '@api/models'
 import { useQueryBranches, useQueryHeadInfo } from '@api/queries'
 import { useSelectedRefs } from '@context/branches'
-import { useMemo } from 'react'
 import { mapFn } from './types'
 
 const getBranchInfo = (

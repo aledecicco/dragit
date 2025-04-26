@@ -14,6 +14,7 @@ Stash of ideas in ~planned implementation order:
 - [ ] Checkout of remote branches, create branch from commit
 - [ ] Paginate pathspec searches
 - [ ] Highlight matches during pathspec search
+- [ ] Init, empty dir, and not a repository screens
 - [ ] Animations pass
 - [ ] Drag and drop shortcuts
 - [ ] Global keyboard shortcuts

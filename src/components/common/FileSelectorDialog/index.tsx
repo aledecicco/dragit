@@ -2,17 +2,15 @@ import { useMemo, useState } from 'react'
 
 import type { FileType } from '@api/models'
 import { useQueryFiles } from '@api/queries'
-import { showDialog } from '@context/dialogs'
-import { getUniqueId } from '@context/ids'
+import { hideDialog } from '@context/dialogs'
 import { usePagesSync } from '@context/pages'
+import type { AskProps } from '@lib/AskForValueDialog'
 import type { Shortcut } from '@lib/ShortcutsCheatsheet'
 import { CommandMenu } from '@ui/CommandMenu'
-import type { DialogProps } from '@ui/Dialog'
-import type { PickPartial } from '@utils/types'
 
-interface FileSelectorDialogProps<T extends FileType> extends DialogProps {
+interface FileSelectorDialogProps<T extends FileType>
+  extends AskProps<{ path: string }> {
   types: T | T[]
-  submitPath: (path: string | undefined) => void
 }
 
 const EXTRA_SHORTCUTS: Shortcut[] = [
@@ -29,7 +27,7 @@ const EXTRA_SHORTCUTS: Shortcut[] = [
 const FileSelectorDialog = <T extends FileType>(
   props: FileSelectorDialogProps<T>,
 ) => {
-  const { types, submitPath, ...dialogProps } = props
+  const { types, submitValue, ...askProps } = props
 
   const [search, setSearch] = useState('')
   const filesQuery = useQueryFiles(types, search)
@@ -46,44 +44,18 @@ const FileSelectorDialog = <T extends FileType>(
       items={items}
       extraShortcuts={EXTRA_SHORTCUTS}
       onSearchChange={setSearch}
-      submitValue={submitPath}
       onKeyDown={(e) => {
         if (e.ctrlKey && e.key === 'Enter') {
           e.preventDefault()
           e.stopPropagation()
-          submitPath(search.length ? search : '.')
+          submitValue({ path: search.length ? search : '.' })
+          hideDialog(askProps.dialogKey)
         }
       }}
-      {...dialogProps}
+      {...askProps}
+      submitValue={(path) => submitValue(path ? { path } : undefined)}
     />
   )
 }
 
-const selectFiles = (
-  dialogProps: PickPartial<
-    Omit<FileSelectorDialogProps<FileType>, 'dialogKey'>,
-    'types'
-  >,
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const dialogKey = getUniqueId()
-
-    showDialog(
-      dialogKey,
-      <FileSelectorDialog
-        dialogKey={dialogKey}
-        {...dialogProps}
-        submitPath={(path) => {
-          dialogProps.submitPath?.(path)
-          if (path === undefined) {
-            reject(new Error('Path not provided'))
-          } else {
-            resolve(path)
-          }
-        }}
-      />,
-    )
-  })
-}
-
-export { FileSelectorDialog, type FileSelectorDialogProps, selectFiles }
+export { FileSelectorDialog, type FileSelectorDialogProps }

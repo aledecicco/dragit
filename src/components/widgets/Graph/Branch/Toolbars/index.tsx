@@ -1,4 +1,5 @@
 import { IconRefresh } from '@tabler/icons-react'
+import { useMemo } from 'react'
 
 import { useFetchRemote } from '@api/mutations'
 import { BranchToolbar } from '@common/BranchToolbar'
@@ -10,6 +11,20 @@ const BranchToolbars = () => {
   const fetchRemote = useFetchRemote()
 
   const { branch, baseBranch } = useSelectedBranches()
+  const fetchAction = useMemo(() => {
+    return {
+      run: () => {
+        return fetchRemote.mutateAsync({ remote: 'origin' })
+      },
+      Glyph: IconRefresh,
+      label: {
+        idle: 'Fetch All',
+        running: 'Fetching',
+        success: 'Fetched',
+        error: 'Failed',
+      },
+    }
+  }, [fetchRemote.mutateAsync])
 
   return (
     <>
@@ -22,18 +37,7 @@ const BranchToolbars = () => {
       <ActionButton
         variant="filled"
         status="neutral"
-        action={{
-          run: () => {
-            return fetchRemote.mutateAsync({ remote: 'origin' })
-          },
-          Glyph: IconRefresh,
-          label: {
-            idle: 'Fetch All',
-            running: 'Fetching',
-            success: 'Fetched',
-            error: 'Failed',
-          },
-        }}
+        mainAction={fetchAction}
         className={cn('col-start-2 row-start-2 w-20')}
         round={false}
         compact

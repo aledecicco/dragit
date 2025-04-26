@@ -3,7 +3,6 @@ import { useMemo } from 'react'
 
 import type { BranchInfo } from '@api/models'
 import { usePullBranch, usePushBranch } from '@api/mutations'
-import { askForValue } from '@lib/AskForValueDialog'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 
 interface BranchToolbarProps extends Partial<ToolbarProps> {
@@ -31,13 +30,7 @@ const BranchToolbar = (props: BranchToolbarProps) => {
             if (branch?.type === 'local') {
               await pull.mutateAsync({
                 branch: branch.name,
-                remote:
-                  branch.remote?.remoteName ??
-                  (await askForValue({
-                    defaultValue: 'origin',
-                    Message: 'Choose a remote to pull from',
-                    label: 'Remote Name',
-                  })),
+                remote: branch.remote?.remoteName ?? 'origin',
                 remoteBranch: branch.remote?.branchName ?? branch.name,
                 isRebase: false,
               })

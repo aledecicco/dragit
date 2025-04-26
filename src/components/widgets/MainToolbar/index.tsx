@@ -5,9 +5,11 @@ import {
 } from '@tabler/icons-react'
 import { useMemo } from 'react'
 
-import { useAddToIndex, useSaveStash } from '@api/mutations'
-import { showCommitDialog } from '@common/CommitDialog'
-import { selectFiles } from '@lib/FileSelectorDialog'
+import type { FileType } from '@api/models'
+import { useAddToIndex, useCommitIndex, useSaveStash } from '@api/mutations'
+import { CommitDialog } from '@common/CommitDialog'
+import { askForValue } from '@lib/AskForValueDialog'
+import { FileSelectorDialog } from '@lib/FileSelectorDialog'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 
 interface MainToolbarProps extends Partial<ToolbarProps> {}
@@ -16,6 +18,7 @@ const MainToolbar = (props: MainToolbarProps) => {
   const { ...toolbarProps } = props
 
   const add = useAddToIndex()
+  const commit = useCommitIndex()
   const stash = useSaveStash()
 
   const tools = useMemo(() => {
@@ -23,11 +26,12 @@ const MainToolbar = (props: MainToolbarProps) => {
       {
         action: {
           run: async () => {
-            const path = await selectFiles({
-              types: ['unstaged', 'unmerged', 'untracked'],
+            const types: FileType[] = ['unstaged', 'unmerged', 'untracked']
+            const fileParams = await askForValue(FileSelectorDialog, {
+              types,
             })
             await add.mutateAsync({
-              files: [path],
+              files: [fileParams.path],
             })
           },
           label: {
@@ -60,8 +64,11 @@ const MainToolbar = (props: MainToolbarProps) => {
       {
         action: {
           run: async () => {
-            // TODO
-            showCommitDialog()
+            const commitParams = await askForValue(CommitDialog)
+            return await commit.mutateAsync({
+              message: commitParams.message,
+              isAmend: false,
+            })
           },
           label: {
             idle: 'Commit',
@@ -73,7 +80,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         },
       },
     ]
-  }, [add.mutateAsync, stash.mutateAsync])
+  }, [add.mutateAsync, commit.mutateAsync, stash.mutateAsync])
 
   return (
     <Toolbar

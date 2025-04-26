@@ -10,9 +10,10 @@ import { Button, type ButtonProps } from '@ui/Button'
 import { type Glyph, Icon } from '@ui/Icon'
 import { SplitButton } from '@ui/SplitButton'
 import { cn } from '@utils/styles'
+import { MS_IN_SECOND } from '@utils/time'
 
 interface ActionButtonProps extends ButtonProps {
-  action: Action
+  mainAction: Action
   alternatives?: Action[]
   compact?: boolean
   menuButtonProps?: Partial<ButtonProps>
@@ -27,10 +28,10 @@ interface Action {
 type ActionState = 'idle' | 'running' | 'success' | 'error'
 
 const ActionButton = (props: ActionButtonProps) => {
-  const { action, alternatives, compact, menuButtonProps, ...buttonProps } =
+  const { mainAction, alternatives, compact, menuButtonProps, ...buttonProps } =
     props
 
-  const [activeAction, setActiveAction] = useState<Action>(action)
+  const [activeAction, setActiveAction] = useState<Action>(mainAction)
   const [state, setState] = useState<ActionState>('idle')
   const timeoutId = useRef<number>(null)
 
@@ -63,25 +64,26 @@ const ActionButton = (props: ActionButtonProps) => {
   }, [state, buttonProps.status])
 
   const runAction = useCallback(
-    (a: Action) => {
+    (action: Action) => {
       if (state !== 'running') {
         if (timeoutId.current !== null) {
           clearTimeout(timeoutId.current)
         }
 
         setState('running')
-        a.run()
+        action
+          .run()
           .then(() => setState('success'))
           .catch(() => setState('error'))
           .finally(() => {
             timeoutId.current = setTimeout(() => {
               setState('idle')
-              setActiveAction(action)
-            }, 2000)
+              setActiveAction(mainAction)
+            }, MS_IN_SECOND * 2)
           })
       }
     },
-    [action, state],
+    [mainAction, state],
   )
 
   const menuItems = useMemo(() => {
@@ -103,7 +105,7 @@ const ActionButton = (props: ActionButtonProps) => {
       items={menuItems}
       onClick={(e) => {
         buttonProps.onClick?.(e)
-        runAction(action)
+        runAction(mainAction)
       }}
       description={compact ? label : undefined}
       status={status}
@@ -121,7 +123,7 @@ const ActionButton = (props: ActionButtonProps) => {
       {...buttonProps}
       onClick={(e) => {
         buttonProps.onClick?.(e)
-        runAction(action)
+        runAction(mainAction)
       }}
       description={compact ? label : undefined}
       status={status}

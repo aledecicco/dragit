@@ -47,7 +47,7 @@ const Toolbar = (props: ToolbarProps) => {
               'not-first:rounded-l-none',
               'not-last:rounded-r-none not-last:border-r-2 not-last:border-solid not-last:border-r-dark-500',
             )}
-            action={tool.action}
+            mainAction={tool.action}
             alternatives={tool.alternatives}
             size={size}
             variant={variant}
