@@ -42,7 +42,10 @@ const Hovercard = (props: HovercardProps) => {
 
           <Ariakit.HovercardDescription render={description} />
         </div>
-        <Ariakit.HovercardArrow className="[&>svg]:fill-dark-300" size={20} />
+        <Ariakit.HovercardArrow
+          className={cn('[&>svg]:fill-dark-300')}
+          size={20}
+        />
       </Ariakit.Hovercard>
     </Ariakit.HovercardProvider>
   )

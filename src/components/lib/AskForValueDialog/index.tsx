@@ -5,11 +5,6 @@ import { getUniqueId } from '@context/ids'
 import { FormDialog, type FormDialogProps } from '@ui/FormDialog'
 import type { AnyObject, PickPartial } from '@utils/types'
 
-interface AskProps<T extends AnyObject> {
-  dialogKey: DialogKey
-  submitValue: (value: T | undefined) => void
-}
-
 interface AskForValueDialogProps<T extends AnyObject>
   extends PickPartial<FormDialogProps<T>, 'dialogKey'> {
   submitValue: (value: T | undefined) => void
@@ -41,17 +36,22 @@ const AskForValueDialog = <T extends AnyObject>(
   )
 }
 
+interface AskForValueProps<T extends AnyObject> {
+  dialogKey: DialogKey
+  submitValue: (value: T | undefined) => void
+}
+
 function askForValue<T extends AnyObject>(
-  AskDialog: ComponentType<AskProps<T>>,
+  AskDialog: ComponentType<AskForValueProps<T>>,
 ): Promise<T>
 
 function askForValue<T extends AnyObject, P>(
-  AskDialog: ComponentType<AskProps<T> & P>,
+  AskDialog: ComponentType<AskForValueProps<T> & P>,
   dialogProps: P,
 ): Promise<T>
 
 function askForValue<T extends AnyObject, P>(
-  AskDialog: ComponentType<AskProps<T> & P>,
+  AskDialog: ComponentType<AskForValueProps<T> & P>,
   dialogProps?: P,
 ): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -77,6 +77,6 @@ function askForValue<T extends AnyObject, P>(
 export {
   AskForValueDialog,
   type AskForValueDialogProps,
-  type AskProps,
+  type AskForValueProps,
   askForValue,
 }

@@ -1,7 +1,6 @@
 import {
   AskForValueDialog,
-  type AskForValueDialogProps,
-  type AskProps,
+  type AskForValueProps,
 } from '@lib/AskForValueDialog'
 import { TextField } from '@ui/Form/TextField'
 
@@ -9,19 +8,18 @@ interface CommitFormValues {
   message: string
 }
 
-interface CommitDialogProps extends AskProps<CommitFormValues> {}
+interface CommitDialogProps extends AskForValueProps<CommitFormValues> {}
 
 // TODO: https://ariakit.org/examples/combobox-textarea
 
 const CommitDialog = (props: CommitDialogProps) => {
-  const { ...dialogProps } = props
+  const { ...askForValueProps } = props
 
   return (
     <AskForValueDialog
       heading="Commit"
       defaultValues={{ message: '' }}
-      {...dialogProps}
-      dialogKey={dialogProps.dialogKey}
+      {...askForValueProps}
     >
       <TextField label="Commit Message" name="message" autoFocus required />
     </AskForValueDialog>

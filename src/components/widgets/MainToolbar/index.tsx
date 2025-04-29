@@ -8,8 +8,8 @@ import { useMemo } from 'react'
 import type { FileType } from '@api/models'
 import { useAddToIndex, useCommitIndex, useSaveStash } from '@api/mutations'
 import { CommitDialog } from '@common/CommitDialog'
+import { FileSelectorDialog } from '@common/FileSelectorDialog'
 import { askForValue } from '@lib/AskForValueDialog'
-import { FileSelectorDialog } from '@lib/FileSelectorDialog'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 
 interface MainToolbarProps extends Partial<ToolbarProps> {}

@@ -1,15 +1,15 @@
-import * as Ariakit from '@ariakit/react'
 import { type ComponentType, useMemo } from 'react'
 
 import type { FileType, FileTypes } from '@api/models'
 import { useQueryFiles } from '@api/queries'
+import { getPageItems } from '@api/utils'
 import { usePagesSync } from '@context/pages'
-import { VirtualizedDiv } from '@lib/VirtualizedDiv'
+import { QueryList } from '@lib/QueryList'
 import {
   AccordionSection,
   type AccordionSectionProps,
 } from '@ui/Accordion/Section'
-import { cn, propsWithCn } from '@utils/styles'
+import { propsWithCn } from '@utils/styles'
 import { mapFn } from '@utils/types'
 import { StagedFileStatusItem } from '../Item/Staged'
 import { UnmergedFileStatusItem } from '../Item/Unmerged'
@@ -35,21 +35,6 @@ const FileStatusesSection = <T extends FileType>(
     }))
   }, [filesQuery.data])
 
-  if (!filesQuery.data) {
-    return (
-      <div
-        className={cn(
-          'h-full bg-dark-500',
-          'flex flex-col items-center justify-center',
-        )}
-      >
-        <p className={cn('text-sm italic text-light-950/60')}>
-          Loading {type} files...
-        </p>
-      </div>
-    )
-  }
-
   return (
     <AccordionSection
       defaultOpen
@@ -59,24 +44,16 @@ const FileStatusesSection = <T extends FileType>(
       }
       {...propsWithCn(accordionSectionProps, 'min-h-30 overflow-y-hidden')}
     >
-      {filesQuery.data.items.length ? (
-        <Ariakit.CompositeRow
-          render={
-            <VirtualizedDiv
-              size="sm"
-              items={filesQuery.data.items}
-              RenderItem={FileStatusItem[type]}
-              itemSize={ItemSize[type]}
-              className={cn('w-full h-full')}
-              options={virtualizerOptions}
-            />
-          }
-        />
-      ) : (
-        <p className={cn('text-sm text-light-950/50 italic p-3')}>
-          No {type} files
-        </p>
-      )}
+      <QueryList
+        query={filesQuery}
+        getItems={getPageItems}
+        name={`${type} files`}
+        size="sm"
+        itemSize={ItemSize[type]}
+        RenderItem={FileStatusItem[type]}
+        options={virtualizerOptions}
+        isStandalone={false}
+      />
     </AccordionSection>
   )
 }

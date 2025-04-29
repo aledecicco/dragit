@@ -7,7 +7,7 @@ A convenient and modern UI to interact with Git repositories.
 Stash of ideas in ~planned implementation order:
 
 - [x] Keyboard shortcuts cheatsheet component
-- [ ] Loading indicators
+- [x] Loading indicators
 - [ ] Remotes manipulation widgets
 - [ ] Documentation pass
 - [ ] Performance pass

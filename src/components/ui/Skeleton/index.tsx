@@ -16,9 +16,9 @@ const Skeleton = (props: SkeletonProps) => {
         divProps,
         'animate-pulse bg-dark-400',
         'flex flex-col items-center justify-center text-center text-sm text-light-950',
-        'rounded-md',
+        'rounded-xs',
         match(variant)
-          .with('fill', () => 'w-full h-full rounded-[inherit]')
+          .with('fill', () => 'w-full h-full')
           .otherwise(() => undefined),
       )}
     />

@@ -9,8 +9,10 @@ import {
   ProfilePicture,
   type ProfilePictureVariant,
 } from '@common/ProfilePicture'
+import { QueryLoader } from '@lib/Loader/Query'
 import { makeTracked } from '@lib/SvgOverlay'
 import { Marquee } from '@ui/Marquee'
+import { Skeleton } from '@ui/Skeleton'
 import { cn, propsWithCn } from '@utils/styles'
 import type { ParentCommitType } from '../Edges'
 
@@ -19,6 +21,9 @@ export type CommitType = 'confirmed' | 'unconfirmed'
 export const NODE_SIZE = 26
 export const COMMIT_ELEMENT_ID = (commitId: CommitId, refName: string) =>
   `commit_${commitId}_${refName}`
+
+const COMMIT_WIDTH = 320
+const COMMIT_HEIGHT = 66
 
 interface GraphCommitProps extends ComponentProps<'div'> {
   commitId: CommitId
@@ -75,37 +80,52 @@ const GraphCommit = makeTracked<
             aria-selected={true}
             className={cn(
               'group/commit',
-              'absolute left-full top-half translate-x-2 -translate-y-half w-80',
+              'absolute left-full top-half translate-x-2 -translate-y-half',
               'border-4 border-dark-600 rounded-lg shadow-md',
             )}
+            style={{
+              width: COMMIT_WIDTH,
+              height: COMMIT_HEIGHT,
+            }}
           />
         }
       >
-        <div
-          className={cn(
-            'p-2 border-1 border-dark-100 rounded-sm',
-            'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
-            'group-hover/commit:dithered-bg-dark-500 group-focus/commit:dithered-bg-dark-500 group-data-focus/commit:dithered-bg-dark-500',
-            'flex flex-col gap-y-1',
-          )}
+        <QueryLoader
+          query={commitInfoQuery}
+          loadingFallback={<Skeleton variant="fill" />}
         >
-          <p
-            className={cn('text-sm text-ellipsis text-nowrap overflow-hidden')}
-          >
-            {commitInfoQuery.data?.message ?? '...'}
-          </p>
-          <div
-            className={cn('flex flex-row items-center justify-between gap-x-1')}
-          >
-            <Marquee className={cn('text-xs text-light-950')}>
-              {commitInfoQuery.data?.authorName ?? '...'}
-            </Marquee>
+          {(commitInfo) => (
+            <div
+              className={cn(
+                'p-2 border-1 border-dark-100 rounded-sm',
+                'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
+                'group-hover/commit:dithered-bg-dark-500 group-focus/commit:dithered-bg-dark-500 group-data-focus/commit:dithered-bg-dark-500',
+                'flex flex-col gap-y-1',
+              )}
+            >
+              <p
+                className={cn(
+                  'text-sm text-ellipsis text-nowrap overflow-hidden',
+                )}
+              >
+                {commitInfo.message}
+              </p>
+              <div
+                className={cn(
+                  'flex flex-row items-center justify-between gap-x-1',
+                )}
+              >
+                <Marquee className={cn('text-xs text-light-950')}>
+                  {commitInfo.authorName}
+                </Marquee>
 
-            <p className={cn('text-xs text-light-600 min-w-max')}>
-              #{commitInfoQuery.data?.shortHash ?? '...'}
-            </p>
-          </div>
-        </div>
+                <p className={cn('text-xs text-light-600 min-w-max')}>
+                  #{commitInfo.shortHash}
+                </p>
+              </div>
+            </div>
+          )}
+        </QueryLoader>
       </Ariakit.CompositeItem>
     </div>
   )

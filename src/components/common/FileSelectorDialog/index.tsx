@@ -4,12 +4,12 @@ import type { FileType } from '@api/models'
 import { useQueryFiles } from '@api/queries'
 import { hideDialog } from '@context/dialogs'
 import { usePagesSync } from '@context/pages'
-import type { AskProps } from '@lib/AskForValueDialog'
+import type { AskForValueProps } from '@lib/AskForValueDialog'
 import type { Shortcut } from '@lib/ShortcutsCheatsheet'
 import { CommandMenu } from '@ui/CommandMenu'
 
 interface FileSelectorDialogProps<T extends FileType>
-  extends AskProps<{ path: string }> {
+  extends AskForValueProps<{ path: string }> {
   types: T | T[]
 }
 
@@ -27,7 +27,7 @@ const EXTRA_SHORTCUTS: Shortcut[] = [
 const FileSelectorDialog = <T extends FileType>(
   props: FileSelectorDialogProps<T>,
 ) => {
-  const { types, submitValue, ...askProps } = props
+  const { types, submitValue, ...askForValueProps } = props
 
   const [search, setSearch] = useState('')
   const filesQuery = useQueryFiles(types, search)
@@ -49,10 +49,10 @@ const FileSelectorDialog = <T extends FileType>(
           e.preventDefault()
           e.stopPropagation()
           submitValue({ path: search.length ? search : '.' })
-          hideDialog(askProps.dialogKey)
+          hideDialog(askForValueProps.dialogKey)
         }
       }}
-      {...askProps}
+      {...askForValueProps}
       submitValue={(path) => submitValue(path ? { path } : undefined)}
     />
   )

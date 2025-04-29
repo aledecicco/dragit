@@ -1,7 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 import type { ReactNode } from 'react'
 
-import { propsWithCn } from '@utils/styles'
+import { cn, propsWithCn } from '@utils/styles'
 
 interface TooltipProps extends Ariakit.TooltipProps {
   anchor: NonNullable<Ariakit.TooltipAnchorProps['render']>
@@ -25,7 +25,10 @@ const Tooltip = (props: TooltipProps) => {
         )}
       >
         {description}
-        <Ariakit.TooltipArrow className="[&>svg]:fill-dark-400" size={12} />
+        <Ariakit.TooltipArrow
+          className={cn('[&>svg]:fill-dark-400')}
+          size={12}
+        />
       </Ariakit.Tooltip>
     </Ariakit.TooltipProvider>
   )

@@ -41,7 +41,7 @@ const Button = (props: ButtonProps) => {
         match(size)
           .with('sm', () => [
             'text-xs gap-2',
-            round ? 'p-1 rounded-full' : 'px-1.75 py-1 rounded-md',
+            round ? 'p-1 rounded-full' : 'px-1.75 py-1 rounded-sm',
           ])
           .with('md', () => [
             'text-sm gap-2',
