@@ -1,10 +1,19 @@
 import { useMemo } from 'react'
 import { P, match } from 'ts-pattern'
 
-import type { BranchInfo, Reference, RemoteRef } from '@api/models'
-import { useQueryBranches, useQueryHeadInfo } from '@api/queries'
+import type {
+  BranchInfo,
+  Reference,
+  RemoteBranch,
+  RemoteInfo,
+  RemoteName,
+  RemoteRef,
+} from '@api/models'
+import { useQueryBranches, useQueryRemotes } from '@api/queries'
 import { useSelectedRefs } from '@context/branches'
 import { mapFn } from './types'
+
+export const DEFAULT_REMOTE_NAME = 'origin'
 
 const getBranchInfo = (
   refName: string,
@@ -25,27 +34,6 @@ const getRemoteCounterpart = (branch: BranchInfo): RemoteRef | undefined => {
     .exhaustive()
 }
 
-const useCurrentRef = (): Reference | undefined => {
-  const headInfo = useQueryHeadInfo()
-
-  const currentRef = useMemo(() => {
-    return match(headInfo.data)
-      .returnType<Reference | undefined>()
-      .with({ type: 'branch' }, (reference) => ({
-        type: 'branch',
-        refName: reference.name,
-      }))
-      .with({ type: 'detached' }, (reference) => ({
-        type: 'commit',
-        refName: reference.commit,
-      }))
-      .with(undefined, () => undefined)
-      .exhaustive()
-  }, [headInfo.data])
-
-  return currentRef
-}
-
 const useBranch = (
   reference: Reference | undefined,
 ): BranchInfo | undefined => {
@@ -62,6 +50,30 @@ const useBranch = (
   return branch
 }
 
+const useTrackedBranch = (
+  branch: BranchInfo | undefined,
+): RemoteBranch | undefined => {
+  const branchesQuery = useQueryBranches()
+
+  const trackedBranch = useMemo(() => {
+    if (!branch || !branchesQuery.data?.length) {
+      return undefined
+    }
+
+    const remoteRef = getRemoteCounterpart(branch)
+
+    if (!remoteRef) {
+      return undefined
+    }
+
+    return branchesQuery.data
+      .filter((branch) => branch.type === 'remote')
+      .find((branch) => branch.name === remoteRef)
+  }, [branchesQuery.data, branch])
+
+  return trackedBranch
+}
+
 const useSelectedBranches = () => {
   const { reference, baseReference } = useSelectedRefs()
   const branch = useBranch(reference)
@@ -76,10 +88,44 @@ const useSelectedBranches = () => {
   )
 }
 
+const getRemoteInfo = (
+  remoteName: string,
+  remotes: RemoteInfo[],
+): RemoteInfo | undefined => {
+  return remotes.find((remote) => remote.name === remoteName)
+}
+
+const useRemote = (remoteName: RemoteName | undefined) => {
+  const remotesQuery = useQueryRemotes()
+
+  const remote = useMemo(() => {
+    if (!remoteName || !remotesQuery.data?.length) {
+      return undefined
+    }
+
+    return getRemoteInfo(remoteName, remotesQuery.data)
+  }, [remotesQuery.data, remoteName])
+
+  return remote
+}
+
+const useCurrentRemote = () => {
+  const { branch } = useSelectedBranches()
+
+  const remote = useRemote(
+    branch?.type === 'local' ? branch.remote?.remoteName : undefined,
+  )
+
+  return remote
+}
+
 export {
   getBranchInfo,
   getRemoteCounterpart,
-  useCurrentRef,
+  useTrackedBranch,
   useBranch,
   useSelectedBranches,
+  getRemoteInfo,
+  useRemote,
+  useCurrentRemote,
 }

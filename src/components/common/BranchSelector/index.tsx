@@ -54,11 +54,11 @@ type BranchOptionType<T extends boolean> = T extends true
   ? BranchInfo | undefined
   : BranchInfo
 
-function getBranchOptions<T extends boolean>(
+const getBranchOptions = <T extends boolean>(
   branches: BranchInfo[] | undefined,
   allowEmpty: T,
   exclude?: BranchName,
-): ComboboxOption<BranchOptionType<T>>[] {
+): ComboboxOption<BranchOptionType<T>>[] => {
   let options: ComboboxOption<BranchOptionType<T>>[] =
     branches?.map((branch) => {
       const option = {

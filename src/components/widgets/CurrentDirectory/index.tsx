@@ -18,7 +18,14 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
       status="primary"
       size="md"
       aria-label="Select and open a folder in your system"
-      onClick={() => {
+      {...propsWithCn(
+        buttonProps,
+        'font-medium',
+        !currentDirQuery.data && 'italic',
+      )}
+      onClick={(e) => {
+        buttonProps.onClick?.(e)
+
         open({
           multiple: false,
           directory: true,
@@ -28,11 +35,6 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
           }
         })
       }}
-      {...propsWithCn(
-        buttonProps,
-        'font-medium',
-        !currentDirQuery.data && 'italic',
-      )}
       disabled={
         openFolder.isPending ||
         currentDirQuery.isFetching ||

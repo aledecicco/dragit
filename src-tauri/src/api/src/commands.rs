@@ -258,7 +258,6 @@ pub async fn get_remotes(state: State<'_, AppState>, path: &str) -> Result<Respo
     with_handler(&state, &|h| h.get_remotes(path)).and_then(serialize_response)
 }
 
-/// Updates the references of the given remote.
 #[tauri::command]
 pub async fn fetch_remote(
     state: State<'_, AppState>,
@@ -266,6 +265,16 @@ pub async fn fetch_remote(
     remote: &str,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| h.fetch_remote(path, remote))
+}
+
+#[tauri::command]
+pub async fn set_upstream(
+    state: State<'_, AppState>,
+    path: &str,
+    branch: &str,
+    remote_ref: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.set_upstream(path, branch, remote_ref))
 }
 
 #[tauri::command]
@@ -285,6 +294,26 @@ pub async fn remove_remote(
     name: &str,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| h.remove_remote(path, name))
+}
+
+#[tauri::command]
+pub async fn rename_remote(
+    state: State<'_, AppState>,
+    path: &str,
+    name: &str,
+    new_name: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.rename_remote(path, name, new_name))
+}
+
+#[tauri::command]
+pub async fn change_remote_url(
+    state: State<'_, AppState>,
+    path: &str,
+    name: &str,
+    new_url: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.change_remote_url(path, name, new_url))
 }
 
 #[tauri::command]

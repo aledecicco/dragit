@@ -84,11 +84,20 @@ pub enum GitError {
     #[error("Failed to fetch from remote \"{name}\"")]
     FetchRemoteFailed { name: String },
 
+    #[error("Failed to set upstream of \"{branch}\" to \"{remote_ref}\"")]
+    SetUpstreamFailed { branch: String, remote_ref: String },
+
     #[error("Failed to add remote \"{name}\"")]
     AddRemoteFailed { name: String },
 
     #[error("Failed to remove remote \"{name}\"")]
     RemoveRemoteFailed { name: String },
+
+    #[error("Failed to rename remote \"{name}\"")]
+    RenameRemoteFailed { name: String },
+
+    #[error("Failed to change URL of remote \"{name}\"")]
+    ChangeRemoteUrlFailed { name: String },
 
     #[error("Failed to retrieve stashes")]
     GetStashesFailed {},

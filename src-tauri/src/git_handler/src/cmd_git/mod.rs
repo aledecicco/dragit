@@ -454,6 +454,14 @@ impl GitHandler for CmdGit {
             }))
     }
 
+    fn set_upstream(&self, path: &str, branch: &str, remote_ref: &str) -> Result<(), GitError> {
+        self.spawn_and_await(path, ["branch", "-u", remote_ref, branch])
+            .or(Err(GitError::SetUpstreamFailed {
+                branch: branch.to_string(),
+                remote_ref: remote_ref.to_string(),
+            }))
+    }
+
     fn add_remote(&self, path: &str, name: &str, url: &str) -> Result<(), GitError> {
         self.spawn_and_await(path, ["remote", "add", name, url])
             .or(Err(GitError::AddRemoteFailed {
@@ -464,6 +472,20 @@ impl GitHandler for CmdGit {
     fn remove_remote(&self, path: &str, name: &str) -> Result<(), GitError> {
         self.spawn_and_await(path, ["remote", "remove", name])
             .or(Err(GitError::RemoveRemoteFailed {
+                name: name.to_string(),
+            }))
+    }
+
+    fn rename_remote(&self, path: &str, name: &str, new_name: &str) -> Result<(), GitError> {
+        self.spawn_and_await(path, ["remote", "rename", name, new_name])
+            .or(Err(GitError::RenameRemoteFailed {
+                name: name.to_string(),
+            }))
+    }
+
+    fn change_remote_url(&self, path: &str, name: &str, new_url: &str) -> Result<(), GitError> {
+        self.spawn_and_await(path, ["remote", "set-url", name, new_url])
+            .or(Err(GitError::ChangeRemoteUrlFailed {
                 name: name.to_string(),
             }))
     }

@@ -112,11 +112,20 @@ pub trait GitHandler {
     /// Fetches the given remote, updating the remote references.
     fn fetch_remote(&self, path: &str, remote: &str) -> Result<(), GitError>;
 
+    /// Sets the remote reference of an existing branch.
+    fn set_upstream(&self, path: &str, branch: &str, remote_ref: &str) -> Result<(), GitError>;
+
     /// Adds a new remote.
     fn add_remote(&self, path: &str, name: &str, url: &str) -> Result<(), GitError>;
 
     /// Removes an existing remote.
     fn remove_remote(&self, path: &str, name: &str) -> Result<(), GitError>;
+
+    /// Changes the name of an existing remote.
+    fn rename_remote(&self, path: &str, name: &str, new_name: &str) -> Result<(), GitError>;
+
+    /// Changes the URL of an existing remote.
+    fn change_remote_url(&self, path: &str, name: &str, new_url: &str) -> Result<(), GitError>;
 
     /// Returns the list of stashed changes.
     fn get_stashes(&self, path: &str) -> Result<Vec<StashInfo>, GitError>;

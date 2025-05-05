@@ -1,8 +1,9 @@
 import { Store, useStore } from '@tanstack/react-store'
 import { useEffect } from 'react'
+import { match } from 'ts-pattern'
 
 import type { Reference } from '@api/models'
-import { useCurrentRef } from '@utils/repository'
+import { useQueryHeadInfo } from '@api/queries'
 
 interface SelectedRefs {
   reference: Reference | undefined
@@ -24,9 +25,22 @@ const changeBaseRef = (baseReference: Reference | undefined) => {
 }
 
 const useReferencesSync = () => {
-  const currentRef = useCurrentRef()
+  const headInfoQuery = useQueryHeadInfo()
 
   useEffect(() => {
+    const currentRef = match(headInfoQuery.data)
+      .returnType<Reference | undefined>()
+      .with({ type: 'branch' }, (reference) => ({
+        type: 'branch',
+        refName: reference.name,
+      }))
+      .with({ type: 'detached' }, (reference) => ({
+        type: 'commit',
+        refName: reference.commit,
+      }))
+      .with(undefined, () => undefined)
+      .exhaustive()
+
     selectedRefs.setState((oldReferencees) => ({
       reference: currentRef,
       baseReference:
@@ -35,7 +49,7 @@ const useReferencesSync = () => {
           ? oldReferencees.reference
           : oldReferencees.baseReference,
     }))
-  }, [currentRef])
+  }, [headInfoQuery.data])
 }
 
 export { useSelectedRefs, changeBaseRef, useReferencesSync, type SelectedRefs }

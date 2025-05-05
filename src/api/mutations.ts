@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { BranchName, RemoteName, Settings } from './models'
+import type { BranchName, RemoteName, RemoteRef, Settings } from './models'
 import { mutationOptions, useRepositoryMutation } from './utils'
 
 const mutationKeys = {
@@ -21,6 +21,10 @@ const mutationKeys = {
     fetchRemote: (path: string) => ({
       ...mutationKeys.repository.current(path),
       key: 'fetch_remote',
+    }),
+    setUpstream: (path: string) => ({
+      ...mutationKeys.repository.current(path),
+      key: 'set_upstream',
     }),
     addToIndex: (path: string) => ({
       ...mutationKeys.repository.current(path),
@@ -213,6 +217,20 @@ const fetchRemoteMutation = (path: string) =>
 
 const useFetchRemote = () => useRepositoryMutation(fetchRemoteMutation)
 
+const setUpstreamMutation = (path: string) =>
+  mutationOptions({
+    mutationKey: [mutationKeys.repository.setUpstream(path)],
+    mutationFn: (args: {
+      branch: BranchName
+      remoteRef: RemoteRef
+    }) => {
+      return invoke('set_upstream', { path: path, ...args })
+    },
+    networkMode: 'always',
+  })
+
+const useSetUpstream = () => useRepositoryMutation(setUpstreamMutation)
+
 const addRemoteMutation = (path: string) =>
   mutationOptions({
     mutationKey: [mutationKeys.repository.addRemote(path)],
@@ -295,6 +313,7 @@ export {
   usePushBranch,
   usePullBranch,
   useFetchRemote,
+  useSetUpstream,
   useAddRemote,
   useRemoveRemote,
   useSaveStash,

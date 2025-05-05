@@ -2,7 +2,8 @@ import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
 import { type ReactNode, startTransition, useMemo, useState } from 'react'
 
-import { Button } from '@ui/Button'
+import { Button, type ButtonStatus } from '@ui/Button'
+import { type Glyph, Icon } from '@ui/Icon'
 import { Marquee } from '@ui/Marquee'
 import { Separator } from '@ui/Separator'
 import { mapOr } from '@utils/array'
@@ -16,18 +17,22 @@ interface ComboboxOption<T> {
 interface ComboboxProps<T> extends Omit<Ariakit.SelectProps, 'value'> {
   option: ComboboxOption<T> | undefined
   options: ComboboxOption<T>[]
+  Glyph?: Glyph
   renderOption: (option: ComboboxOption<T>) => ReactNode
   setOption: (option: ComboboxOption<T>) => void
   placeholder?: string
+  status?: ButtonStatus
 }
 
 const Combobox = <T,>(props: ComboboxProps<T>) => {
   const {
     option,
     options,
+    Glyph,
     renderOption,
     setOption,
     placeholder = 'Select...',
+    status,
     className,
     ...selectProps
   } = props
@@ -61,10 +66,10 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
           render={
             <Button
               variant="plain"
-              status="neutral"
+              status={status}
               size="lg"
               className={cn(
-                'group/combobox gap-2 text-sm',
+                'min-w-0 group/combobox gap-2 text-sm',
                 option === undefined && 'font-thin text-light-300',
                 className,
               )}
@@ -72,7 +77,8 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
           }
           {...selectProps}
         >
-          <Marquee>
+          {Glyph && <Icon Glyph={Glyph} size="md" />}
+          <Marquee reverse={false}>
             {option === undefined ? placeholder : renderOption(option)}
           </Marquee>
           <Ariakit.SelectArrow
@@ -87,7 +93,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
         >
           <Ariakit.Combobox
             placeholder="Search..."
-            className={cn('w-full px-2 py-3 rounded-sm', 'text-sm bg-dark-500')}
+            className={cn('w-full p-2 rounded-sm', 'text-sm bg-dark-500')}
             autoSelect
           />
 
@@ -133,6 +139,7 @@ const ComboboxItem = <T,>(props: ComboboxItemProps<T>) => {
           className={cn(
             'text-sm text-center text-light-50',
             'p-2 rounded-sm cursor-pointer',
+            'wrap-anywhere',
             item.value === '' && 'italic not-aria-selected:text-light-800',
             'data-[active-item]:bg-dark-100',
             'aria-selected:bg-accent-300/15',

@@ -21,9 +21,9 @@ const StashToolbar = (props: StashToolbarProps) => {
         action: {
           run: () => apply.mutateAsync({ stashId: stash.id }),
           label: {
-            idle: 'Pop',
-            running: 'Popping',
-            success: 'Popped',
+            idle: 'Apply',
+            running: 'Applying',
+            success: 'Applied',
             error: 'Failed',
           },
           Glyph: IconPackageExport,

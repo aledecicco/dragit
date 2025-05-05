@@ -109,7 +109,7 @@ const Button = (props: ButtonProps) => {
             'aria-disabled:bg-success-300/30 aria-disabled:text-light-900',
           ])
           .with({ variant: 'plain', status: 'success' }, () => [
-            'text-success-400',
+            'text-success-300',
             'hover:bg-success-300/4',
             'aria-expanded:bg-success-300/4',
             'focus:bg-success-300/4 data-focus:bg-success-300/4',
@@ -127,7 +127,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-danger-300/4',
             'aria-expanded:bg-danger-300/4',
             'focus:bg-danger-300/4 data-focus:bg-danger-300/4',
-            'aria-disabled:text-danger-200/30',
+            'aria-disabled:text-danger-300/50',
           ])
           .exhaustive(),
       )}

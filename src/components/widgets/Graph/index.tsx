@@ -4,15 +4,16 @@ import { type ComponentProps, useCallback, useMemo } from 'react'
 
 import { useQueryCommitHistory } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
+import { BranchToolbar } from '@common/BranchToolbar'
 import { useSelectedRefs } from '@context/branches'
 import { ScrollShadowDiv } from '@lib/ScrollShadowDiv'
 import { SvgOverlay } from '@lib/SvgOverlay'
 import { type VirtualListOptions, useVirtualList } from '@utils/performance'
+import { useSelectedBranches } from '@utils/repository'
 import { cn, propsWithCn } from '@utils/styles'
 import { GraphBranch } from './Branch'
 import { BranchMessages } from './Branch/Messages'
 import { BranchSelectors } from './Branch/Selectors'
-import { BranchToolbars } from './Branch/Toolbars'
 import { NODE_SIZE } from './Commit'
 import { CURVE_SIZE, EDGE_LENGTH, EDGE_OFFSET, Edges } from './Edges'
 import { useCurrentCommonAncestor } from './utils'
@@ -21,6 +22,7 @@ interface GraphProps extends ComponentProps<'div'> {}
 
 const Graph = (props: GraphProps) => {
   const { ...divProps } = props
+  const { branch, baseBranch } = useSelectedBranches()
 
   return (
     <div {...propsWithCn(divProps, 'h-full w-full min-h-0')}>
@@ -33,7 +35,17 @@ const Graph = (props: GraphProps) => {
       >
         <BranchSelectors />
 
-        <BranchToolbars />
+        <BranchToolbar
+          branch={branch}
+          fixed
+          className={cn('col-start-1 row-start-2 w-40')}
+        />
+
+        <BranchToolbar
+          branch={baseBranch}
+          fixed
+          className={cn('col-start-3 row-start-2 w-40')}
+        />
 
         <GraphInner />
       </div>

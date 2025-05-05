@@ -4,9 +4,9 @@ import { useMemo } from 'react'
 import { useCheckout } from '@api/mutations'
 import { useQueryBranches, useQueryHeadInfo } from '@api/queries'
 import { BranchSelector } from '@common/BranchSelector'
-import { changeBaseRef } from '@context/branches'
+import { changeBaseRef, useSelectedRefs } from '@context/branches'
 import { ActionButton } from '@lib/ActionButton'
-import { useSelectedBranches } from '@utils/repository'
+import { useBranch } from '@utils/repository'
 import { cn } from '@utils/styles'
 import { mapFn } from '@utils/types'
 
@@ -14,7 +14,10 @@ const BranchSelectors = () => {
   const headInfoQuery = useQueryHeadInfo()
   const branchesQuery = useQueryBranches()
 
-  const { branch, baseBranch } = useSelectedBranches()
+  const { reference, baseReference } = useSelectedRefs()
+  const branch = useBranch(reference)
+  const baseBranch = useBranch(baseReference)
+
   const checkout = useCheckout()
 
   const switchAction = useMemo(() => {
@@ -46,8 +49,12 @@ const BranchSelectors = () => {
         onBranchChange={(newOption) => {
           checkout.mutateAsync({ reference: newOption.data.name })
         }}
-        placeholder="Checkout a branch..."
-        disabled={headInfoQuery.isLoading || branchesQuery.isLoading}
+        placeholder={
+          reference?.type === 'commit'
+            ? `Detached at #${reference.refName}`
+            : 'Checkout a branch...'
+        }
+        disabled={!headInfoQuery.data || !branchesQuery.data}
       />
 
       <ActionButton
@@ -55,7 +62,7 @@ const BranchSelectors = () => {
         className={cn('mx-1 col-start-2 row-start-1')}
         variant="filled"
         status="neutral"
-        disabled={!branch || !baseBranch}
+        disabled={!reference || !baseReference}
         size="md"
         round
         compact
@@ -75,8 +82,12 @@ const BranchSelectors = () => {
             })),
           )
         }}
-        placeholder="Choose a base branch..."
-        disabled={headInfoQuery.isLoading || branchesQuery.isLoading}
+        placeholder={
+          baseReference?.type === 'commit'
+            ? `#${baseReference.refName}`
+            : 'Choose a base branch...'
+        }
+        disabled={!headInfoQuery.data || !branchesQuery.data}
       />
     </>
   )

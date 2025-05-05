@@ -9,12 +9,14 @@ Stash of ideas in ~planned implementation order:
 - [x] Keyboard shortcuts cheatsheet component
 - [x] Loading indicators
 - [ ] Remotes manipulation widgets
+- [ ] Commit details
 - [ ] Documentation pass
 - [ ] Performance pass
 - [ ] Checkout of remote branches, create branch from commit
+- [ ] "Create" option on empty comboboxes
 - [ ] Paginate pathspec searches
 - [ ] Highlight matches during pathspec search
-- [ ] Init, empty dir, and not a repository screens
+- [ ] "Init", "empty dir", and "not a repository" screens
 - [ ] Animations pass
 - [ ] Drag and drop shortcuts
 - [ ] Global keyboard shortcuts
