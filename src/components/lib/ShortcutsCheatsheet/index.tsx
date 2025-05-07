@@ -1,5 +1,5 @@
-import { type ComponentProps, Fragment, useState } from 'react'
-import { useEventListener } from 'usehooks-ts'
+import { type ComponentProps, Fragment } from 'react'
+import { useKeyPress } from 'react-use'
 
 import { cn, propsWithCn } from '@utils/styles'
 
@@ -63,19 +63,7 @@ const ShortcutKey = (props: {
   shortcutKey: ShortcutKey
   withLabel: boolean
 }) => {
-  const [pressed, setPressed] = useState(false)
-
-  useEventListener('keydown', (e) => {
-    if (e.key === props.shortcutKey.keyName) {
-      setPressed(true)
-    }
-  })
-
-  useEventListener('keyup', (e) => {
-    if (e.key === props.shortcutKey.keyName) {
-      setPressed(false)
-    }
-  })
+  const [pressed] = useKeyPress(props.shortcutKey.keyName)
 
   return (
     <kbd

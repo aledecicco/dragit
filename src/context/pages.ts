@@ -19,12 +19,7 @@ const useFilesPage = (types: FileType | FileType[]) => {
   const key = getMapKey(types)
   const page = pages.get(key)
 
-  if (page === undefined) {
-    clearPage(types)
-    return 0
-  }
-
-  return page
+  return page ?? 0
 }
 
 const clearPage = (types: FileType | FileType[]) => {
@@ -60,6 +55,7 @@ const usePagesSync = (types: FileType | FileType[], pathspec?: string) => {
 
   useEffect(() => {
     if (page && !filesQuery.isLoading && !filesQuery.data?.items.length) {
+      console.log('No items, resetting page')
       clearPage(types)
     }
   }, [types, page, filesQuery.data, filesQuery.isLoading])

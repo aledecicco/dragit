@@ -2,26 +2,25 @@ import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
 import { type ReactNode, startTransition, useMemo, useState } from 'react'
 
-import { Button, type ButtonStatus } from '@ui/Button'
+import { Button, type ButtonProps } from '@ui/Button'
 import { type Glyph, Icon } from '@ui/Icon'
 import { Marquee } from '@ui/Marquee'
 import { Separator } from '@ui/Separator'
 import { mapOr } from '@utils/array'
-import { cn } from '@utils/styles'
+import { cn, propsWithCn } from '@utils/styles'
 
 interface ComboboxOption<T> {
   value: string
   data: T
 }
 
-interface ComboboxProps<T> extends Omit<Ariakit.SelectProps, 'value'> {
+interface ComboboxProps<T> extends Partial<ButtonProps> {
   option: ComboboxOption<T> | undefined
   options: ComboboxOption<T>[]
   Glyph?: Glyph
   renderOption: (option: ComboboxOption<T>) => ReactNode
   setOption: (option: ComboboxOption<T>) => void
   placeholder?: string
-  status?: ButtonStatus
 }
 
 const Combobox = <T,>(props: ComboboxProps<T>) => {
@@ -32,9 +31,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
     renderOption,
     setOption,
     placeholder = 'Select...',
-    status,
-    className,
-    ...selectProps
+    ...buttonProps
   } = props
 
   const [search, setSearch] = useState('')
@@ -66,16 +63,15 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
           render={
             <Button
               variant="plain"
-              status={status}
+              status="neutral"
               size="lg"
-              className={cn(
+              {...propsWithCn(
+                buttonProps,
                 'min-w-0 group/combobox gap-2 text-sm',
                 option === undefined && 'font-thin text-light-300',
-                className,
               )}
             />
           }
-          {...selectProps}
         >
           {Glyph && <Icon Glyph={Glyph} size="md" />}
           <Marquee reverse={false}>

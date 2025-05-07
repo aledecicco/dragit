@@ -56,7 +56,7 @@ const BranchToolbar = (props: BranchToolbarProps) => {
                 remote: branch.remote?.remoteName ?? 'origin',
                 remoteBranch: branch.remote?.branchName ?? branch.name,
                 isForce: false,
-                setUpstream: !branch.remote,
+                setUpstream: true,
               })
             } else {
               throw new Error('Branch is not local')
@@ -79,7 +79,7 @@ const BranchToolbar = (props: BranchToolbarProps) => {
                   remote: branch.remote?.remoteName ?? 'origin',
                   remoteBranch: branch.remote?.branchName ?? branch.name,
                   isForce: true,
-                  setUpstream: !branch.remote,
+                  setUpstream: true,
                 })
               } else {
                 throw new Error('Branch is not local')

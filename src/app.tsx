@@ -1,6 +1,7 @@
 import { useQueryCurrentDir } from '@api/queries'
 import { useReferencesSync } from '@context/branches'
 import { useDialog } from '@context/dialogs'
+import { useUpstreamSync } from '@context/upstream'
 import { cn } from '@utils/styles'
 import { BranchesList } from '@widgets/BranchesList'
 import { CurrentDirectory } from '@widgets/CurrentDirectory'
@@ -19,7 +20,7 @@ const App = () => {
       <div
         className={cn(
           'px-8 py-4 w-full h-full max-h-full',
-          'grid grid-cols-[1fr_3fr_1fr] grid-rows-[max-content_1fr_max-content] gap-4',
+          'grid grid-cols-[1fr_2fr_1fr] grid-rows-[max-content_1fr_max-content] gap-4',
         )}
       >
         <CurrentDirectory
@@ -38,6 +39,7 @@ const App = () => {
 
 const InRepository = () => {
   useReferencesSync()
+  useUpstreamSync()
 
   return (
     <>
