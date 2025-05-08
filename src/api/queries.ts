@@ -495,7 +495,7 @@ const fetchCommonAncestor = (
   refName: string,
   baseRefName: string,
   context: QueryFunctionContext,
-): Promise<CommonAncestorInfo> => {
+): Promise<CommonAncestorInfo | null> => {
   return fetchAndDeserialize(
     'get_common_ancestor',
     { path, referenceA: refName, referenceB: baseRefName },

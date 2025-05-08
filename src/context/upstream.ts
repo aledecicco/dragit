@@ -1,10 +1,10 @@
 import { Store, useStore } from '@tanstack/react-store'
 import { useEffect } from 'react'
+import { usePrevious } from 'react-use'
 
 import type { BranchName, RemoteInfo } from '@api/models'
 import { useQueryRemotes } from '@api/queries'
 import { DEFAULT_REMOTE_NAME, useSelectedBranches } from '@utils/repository'
-import { usePrevious } from 'react-use'
 
 interface SelectedUpstream {
   remote: RemoteInfo | undefined
@@ -41,6 +41,8 @@ const useUpstreamSync = () => {
 
   useEffect(() => {
     if (branch?.type !== 'local') {
+      changeUpstreamRemote(undefined)
+      changeUpstreamBranch(undefined)
       return
     }
 
@@ -54,15 +56,16 @@ const useUpstreamSync = () => {
   }, [branch, prevBranch])
 
   useEffect(() => {
-    if (remotesQuery.data) {
+    if (branch?.type === 'local' && remotesQuery.data) {
       const exists =
         remote &&
         remotesQuery.data.some((_remote) => _remote.name === remote.name)
 
       if (!exists) {
-        if (branch?.type === 'local' && branch.remote) {
+        if (branch.remote) {
+          const branchRemote = branch.remote
           const newRemote = remotesQuery.data.find(
-            (_remote) => _remote.name === branch.remote?.remoteName,
+            (_remote) => _remote.name === branchRemote.remoteName,
           )
 
           if (newRemote) {

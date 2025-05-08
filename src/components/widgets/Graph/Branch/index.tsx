@@ -90,7 +90,7 @@ const GraphBranch = (props: GraphBranchProps) => {
       <GraphCommit
         key={commit}
         commitId={commit}
-        commitType={isUnconfirmed ? 'unconfirmed' : 'confirmed'}
+        commitType={!isBase && isUnconfirmed ? 'unconfirmed' : 'confirmed'}
         elementId={COMMIT_ELEMENT_ID(commit, reference.refName)}
         parent={mapFn(parentCommit, (parentCommit) => ({
           id: COMMIT_ELEMENT_ID(

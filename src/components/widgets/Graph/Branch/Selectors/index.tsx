@@ -1,4 +1,4 @@
-import { IconSwitchHorizontal } from '@tabler/icons-react'
+import { IconLoader2, IconSwitchHorizontal } from '@tabler/icons-react'
 import { useMemo } from 'react'
 
 import { useCheckout } from '@api/mutations'
@@ -54,7 +54,9 @@ const BranchSelectors = () => {
             ? `Detached at #${reference.refName}`
             : 'Checkout a branch...'
         }
-        disabled={!headInfoQuery.data || !branchesQuery.data}
+        disabled={
+          checkout.isPending || !headInfoQuery.data || !branchesQuery.data
+        }
       />
 
       <ActionButton

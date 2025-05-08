@@ -26,14 +26,15 @@ export const COMMIT_INFO_SCHEMA = BorshSchema.Struct({
 })
 
 export const ANCESTOR_INFO_SCHEMA = BorshSchema.Struct({
-  distance: BorshSchema.u32,
   hash: BorshSchema.String,
+  distance: BorshSchema.u32,
 })
-
-export const COMMON_ANCESTOR_INFO_SCHEMA = BorshSchema.Struct({
-  lastCommit: BorshSchema.Option(ANCESTOR_INFO_SCHEMA),
-  commonCommit: ANCESTOR_INFO_SCHEMA,
-})
+export const COMMON_ANCESTOR_INFO_SCHEMA = BorshSchema.Option(
+  BorshSchema.Struct({
+    lastCommit: BorshSchema.Option(ANCESTOR_INFO_SCHEMA),
+    commonCommit: ANCESTOR_INFO_SCHEMA,
+  }),
+)
 
 export const BRANCH_DIVERGENCE_SCHEMA = BorshSchema.Struct({
   ahead: BorshSchema.u32,

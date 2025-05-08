@@ -7,7 +7,6 @@ import { type ComponentProps, useMemo } from 'react'
 
 import type { RemoteInfo } from '@api/models'
 import { useQueryBranches, useQueryRemotes } from '@api/queries'
-import { useSelectedRefs } from '@context/branches'
 import {
   changeUpstreamBranch,
   changeUpstreamRemote,
@@ -15,6 +14,7 @@ import {
 } from '@context/upstream'
 import { Combobox, type ComboboxOption } from '@ui/Combobox'
 import { EditableText } from '@ui/EditableText'
+import { useSelectedBranches } from '@utils/repository'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface CurrentRemoteProps extends ComponentProps<'div'> {}
@@ -22,7 +22,7 @@ interface CurrentRemoteProps extends ComponentProps<'div'> {}
 const CurrentRemote = (props: CurrentRemoteProps) => {
   const { ...divProps } = props
 
-  const { reference } = useSelectedRefs()
+  const { branch } = useSelectedBranches()
   const { remote, remoteBranch } = useSelectedUpstream()
 
   const remotesQuery = useQueryRemotes()
@@ -59,24 +59,24 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         option={remote ? { value: remote.name, data: remote } : undefined}
         options={remoteOptions}
         Glyph={
-          reference !== undefined && remote === undefined
-            ? reference.type === 'branch'
+          branch?.type === 'local'
+            ? remote === undefined
               ? IconWorldQuestion
-              : IconWorldCancel
-            : IconWorld
+              : IconWorld
+            : IconWorldCancel
         }
         setOption={(newOption) => {
           changeUpstreamRemote(newOption.data)
         }}
         renderOption={(option) => option.data?.name ?? 'No remote'}
-        placeholder={reference?.type === 'branch' ? 'Remote...' : '-'}
-        disabled={!remotesQuery.data}
+        placeholder={branch?.type === 'local' ? 'Remote...' : '-'}
+        disabled={!remotesQuery.data || branch?.type !== 'local'}
         status={
-          reference !== undefined && remote === undefined
-            ? reference.type === 'branch'
-              ? 'neutral'
-              : 'error'
-            : 'primary'
+          branch?.type === 'local'
+            ? remote === undefined
+              ? 'error'
+              : 'primary'
+            : 'neutral'
         }
         className={cn('max-w-half -mr-[2px] pr-4 rounded-r-none font-medium')}
         style={{
@@ -91,16 +91,17 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         label="Remote branch"
         suggestions={remoteBranchOptions}
         setValue={changeUpstreamBranch}
-        placeholder={reference?.type === 'branch' ? 'Branch...' : '-'}
+        placeholder={branch?.type === 'local' ? 'Branch...' : '-'}
         className={cn('pl-5 rounded-l-none flex-1')}
         style={{
           clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%)',
         }}
         buttonProps={{
+          disabled: branch?.type !== 'local',
           variant: 'plain',
           className: cn(
-            'text-light-100',
-            remoteBranch === undefined && 'text-light-600',
+            'text-light-700',
+            remoteBranch === undefined && 'text-light-950',
             'pl-5 rounded-l-none flex-1 font-medium justify-start',
           ),
           style: {

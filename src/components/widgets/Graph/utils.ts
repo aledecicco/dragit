@@ -67,7 +67,7 @@ const useCurrentCommonAncestor = () => {
     baseReference?.refName,
   )
 
-  return commonAncestorQuery.data
+  return commonAncestorQuery.data ?? undefined
 }
 
 const useRemoteDivergence = (
