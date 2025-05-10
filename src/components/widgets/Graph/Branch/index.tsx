@@ -1,103 +1,86 @@
 import type { Virtualizer } from '@tanstack/react-virtual'
 
-import type { AncestorInfo, Reference } from '@api/models'
-import { HISTORY_PAGE_SIZE, useQueryCommitHistory } from '@api/queries'
-import { getNextPaginatedItem, getPaginatedItem } from '@api/utils'
+import { useQueryBranchDivergence, useQueryCommitHistory } from '@api/queries'
+import { useSelectedRefs } from '@context/branches'
+import { useSelectedUpstream } from '@context/upstream'
+import { useBranch } from '@utils/repository'
 import { cn } from '@utils/styles'
 import { mapFn } from '@utils/types'
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import {
   ancestorIsDivergent,
+  getGraphCommitData,
+  useCurrentCommonAncestor,
   useInfiniteScroll,
-  useRemoteDivergence,
 } from '../utils'
 
 type GraphBranchProps = {
   virtualizer: Virtualizer<HTMLDivElement, Element>
-  reference: Reference
-  anchor: AncestorInfo | undefined | null
-} & (
-  | {
-      isBase?: false
-      baseReference: Reference | undefined
-    }
-  | {
-      isBase: true
-      baseReference?: never
-    }
-)
+  isBase: boolean
+}
 
 const GraphBranch = (props: GraphBranchProps) => {
-  const {
-    virtualizer,
-    reference,
-    anchor,
-    isBase = false,
-    baseReference,
-  } = props
-  const stopAtAnchor = !isBase
+  const { virtualizer, isBase } = props
 
-  const historyQuery = useQueryCommitHistory(reference.refName)
+  const { reference, baseReference } = useSelectedRefs()
+  const currentRef = isBase ? baseReference : reference
+
+  const historyQuery = useQueryCommitHistory(currentRef?.refName)
   const items = virtualizer.getVirtualItems()
   useInfiniteScroll(historyQuery, items)
 
-  const divergence = useRemoteDivergence(reference)
+  const { remote, remoteBranch } = useSelectedUpstream()
+  const mainBranch = useBranch(reference)
+  const mainDivergenceQuery = useQueryBranchDivergence(
+    mainBranch?.type === 'local' ? mainBranch.name : undefined,
+    remote && remoteBranch ? `${remote.name}/${remoteBranch}` : undefined,
+  )
 
-  if (stopAtAnchor && anchor === null) {
+  const commonAncestor = useCurrentCommonAncestor()
+  const anchor = isBase
+    ? commonAncestor?.commonCommit
+    : commonAncestor?.lastCommit
+  const stopAtAnchor = !isBase
+  if (stopAtAnchor && commonAncestor && anchor === null) {
     return
   }
 
-  if (!historyQuery.data?.pages) {
+  if (!historyQuery.data?.pages || !currentRef) {
     return
   }
+  const currentRefName = currentRef.refName
 
   return items.map((virtualRow) => {
     if (anchor && stopAtAnchor && virtualRow.index > anchor.distance) {
       return undefined
     }
 
-    const commit =
-      anchor && virtualRow.index === anchor.distance
-        ? anchor.hash
-        : getPaginatedItem(
-            historyQuery.data,
-            virtualRow.index,
-            HISTORY_PAGE_SIZE,
-          )?.hash
-
-    if (!commit) {
+    const commitData = getGraphCommitData(virtualRow, historyQuery.data, anchor)
+    if (!commitData) {
       return undefined
     }
 
-    const isAnchor = anchor && commit === anchor.hash
-
-    const parentCommit =
-      getNextPaginatedItem(
-        historyQuery.data,
-        virtualRow.index,
-        HISTORY_PAGE_SIZE,
-      )?.hash ??
-      (anchor && anchor.distance > virtualRow.index ? anchor.hash : undefined)
     const parentIsDistantAnchor =
       anchor &&
-      anchor.hash === parentCommit &&
+      commitData.parent === anchor.hash &&
       anchor.distance > virtualRow.index + 1
 
     const isUnconfirmed =
-      divergence && ancestorIsDivergent(virtualRow.index, divergence)
+      !!mainDivergenceQuery.data &&
+      ancestorIsDivergent(virtualRow.index, mainDivergenceQuery.data)
 
     return (
       <GraphCommit
-        key={commit}
-        commitId={commit}
+        key={commitData.hash}
+        commitId={commitData.hash}
         commitType={!isBase && isUnconfirmed ? 'unconfirmed' : 'confirmed'}
-        elementId={COMMIT_ELEMENT_ID(commit, reference.refName)}
-        parent={mapFn(parentCommit, (parentCommit) => ({
+        elementId={COMMIT_ELEMENT_ID(commitData.hash, currentRefName)}
+        parent={mapFn(commitData.parent, (parentCommit) => ({
           id: COMMIT_ELEMENT_ID(
             parentCommit,
-            isAnchor && !!baseReference
+            commitData.isAnchor && !!baseReference
               ? baseReference.refName
-              : reference.refName,
+              : currentRefName,
           ),
           type: parentIsDistantAnchor
             ? 'dashed'

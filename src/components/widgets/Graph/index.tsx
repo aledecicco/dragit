@@ -126,23 +126,10 @@ const GraphInner = () => {
             style={{ height: virtualizer.getTotalSize() }}
           >
             {reference && (
-              <GraphBranch
-                virtualizer={virtualizer}
-                reference={reference}
-                anchor={commonAncestor?.lastCommit}
-                isBase={false}
-                baseReference={baseReference}
-              />
+              <GraphBranch virtualizer={virtualizer} isBase={false} />
             )}
 
-            {baseReference && (
-              <GraphBranch
-                virtualizer={virtualizer}
-                reference={baseReference}
-                anchor={commonAncestor?.commonCommit}
-                isBase
-              />
-            )}
+            {baseReference && <GraphBranch virtualizer={virtualizer} isBase />}
           </SvgOverlay>
         </div>
         <BranchMessages />

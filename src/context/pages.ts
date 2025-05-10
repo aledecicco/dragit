@@ -55,7 +55,6 @@ const usePagesSync = (types: FileType | FileType[], pathspec?: string) => {
 
   useEffect(() => {
     if (page && !filesQuery.isLoading && !filesQuery.data?.items.length) {
-      console.log('No items, resetting page')
       clearPage(types)
     }
   }, [types, page, filesQuery.data, filesQuery.isLoading])

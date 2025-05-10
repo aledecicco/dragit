@@ -82,6 +82,9 @@ const EventHandler = (props: PropsWithChildren) => {
               client.invalidateQueries({
                 queryKey: [queryKeys.directory.headInfo(path)],
               })
+              client.invalidateQueries({
+                queryKey: [queryKeys.directory.files.all(path)],
+              })
             }
           },
         )

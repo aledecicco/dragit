@@ -6,15 +6,18 @@ import type { VirtualItem } from '@tanstack/react-virtual'
 import { useEffect } from 'react'
 
 import type {
+  AncestorInfo,
   BranchDivergence,
   HistoryItem,
   Page,
-  Reference,
 } from '@api/models'
-import { useQueryBranchDivergence, useQueryCommonAncestor } from '@api/queries'
-import { getPaginatedLength } from '@api/utils'
+import { HISTORY_PAGE_SIZE, useQueryCommonAncestor } from '@api/queries'
+import {
+  getNextPaginatedItem,
+  getPaginatedItem,
+  getPaginatedLength,
+} from '@api/utils'
 import { useSelectedRefs } from '@context/branches'
-import { getRemoteCounterpart, useBranch } from '@utils/repository'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<Page<HistoryItem>>>
 
@@ -70,17 +73,27 @@ const useCurrentCommonAncestor = () => {
   return commonAncestorQuery.data ?? undefined
 }
 
-const useRemoteDivergence = (
-  reference: Reference,
-): BranchDivergence | undefined | null => {
-  const branch = useBranch(reference)
+const getGraphCommitData = (
+  row: VirtualItem,
+  history: InfiniteData<Page<HistoryItem>>,
+  anchor: AncestorInfo | undefined | null,
+) => {
+  const hash =
+    anchor && row.index === anchor.distance
+      ? anchor.hash
+      : getPaginatedItem(history, row.index, HISTORY_PAGE_SIZE)?.hash
 
-  const divergenceQuery = useQueryBranchDivergence(
-    branch?.name,
-    branch ? getRemoteCounterpart(branch) : undefined,
-  )
+  if (!hash) {
+    return undefined
+  }
 
-  return divergenceQuery.data
+  const isAnchor = !!anchor && hash === anchor.hash
+
+  const parent =
+    getNextPaginatedItem(history, row.index, HISTORY_PAGE_SIZE)?.hash ??
+    (anchor && anchor.distance > row.index ? anchor.hash : undefined)
+
+  return { hash, isAnchor, parent }
 }
 
 export {
@@ -88,5 +101,5 @@ export {
   ancestorIsDivergent,
   useInfiniteScroll,
   useCurrentCommonAncestor,
-  useRemoteDivergence,
+  getGraphCommitData,
 }
