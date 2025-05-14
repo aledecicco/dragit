@@ -8,7 +8,7 @@ import { cn, propsWithCn } from '@utils/styles'
 
 interface AutosuggestProps extends Ariakit.ComboboxProps {
   value: string | undefined
-  suggestions: string[]
+  suggestions?: string[]
   Glyph?: Glyph
   setValue: (value: string | undefined) => void
   placeholder?: string
@@ -17,10 +17,11 @@ interface AutosuggestProps extends Ariakit.ComboboxProps {
 const Autosuggest = (props: AutosuggestProps) => {
   const {
     value,
-    suggestions,
+    suggestions = [],
     Glyph,
     setValue,
     placeholder = 'Select...',
+    store,
     ...comboboxProps
   } = props
 
@@ -32,7 +33,7 @@ const Autosuggest = (props: AutosuggestProps) => {
   }, [deferredSearch, suggestions])
 
   return (
-    <Ariakit.ComboboxProvider value={search} setValue={setSearch}>
+    <Ariakit.ComboboxProvider store={store} value={search} setValue={setSearch}>
       <Ariakit.Combobox
         autoComplete="both"
         placeholder={placeholder}
@@ -50,32 +51,38 @@ const Autosuggest = (props: AutosuggestProps) => {
           }
         }}
       />
-      <Ariakit.ComboboxPopover
-        portal
-        sameWidth
-        gutter={4}
-        className={cn('rounded-lg shadow-md', 'bg-dark-300 p-2')}
-      >
-        <Ariakit.ComboboxList className={cn('max-h-80 overflow-y-auto')}>
-          {mapOr(
-            <div
-              className={cn('text-center p-2', 'text-sm italic text-light-950')}
-            >
-              No matches found
-            </div>,
-            matchingSuggestions,
-            (suggestion) => (
-              <AutosuggestItem
-                key={suggestion}
-                value={suggestion}
-                onClick={() => {
-                  setValue(suggestion)
-                }}
-              />
-            ),
-          )}
-        </Ariakit.ComboboxList>
-      </Ariakit.ComboboxPopover>
+
+      {suggestions.length > 0 && (
+        <Ariakit.ComboboxPopover
+          portal
+          sameWidth
+          gutter={4}
+          className={cn('rounded-lg shadow-md', 'bg-dark-300 p-2')}
+        >
+          <Ariakit.ComboboxList className={cn('max-h-80 overflow-y-auto')}>
+            {mapOr(
+              <div
+                className={cn(
+                  'text-center p-2',
+                  'text-sm italic text-light-950',
+                )}
+              >
+                No matches found
+              </div>,
+              matchingSuggestions,
+              (suggestion) => (
+                <AutosuggestItem
+                  key={suggestion}
+                  value={suggestion}
+                  onClick={() => {
+                    setValue(suggestion)
+                  }}
+                />
+              ),
+            )}
+          </Ariakit.ComboboxList>
+        </Ariakit.ComboboxPopover>
+      )}
     </Ariakit.ComboboxProvider>
   )
 }

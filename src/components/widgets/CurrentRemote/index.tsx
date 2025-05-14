@@ -1,4 +1,9 @@
 import {
+  IconDeviceRemote,
+  IconMenu2,
+  IconMenu3,
+  IconMenu4,
+  IconMenuDeep,
   IconWorld,
   IconWorldCancel,
   IconWorldQuestion,
@@ -7,13 +12,17 @@ import { type ComponentProps, useMemo } from 'react'
 
 import type { RemoteInfo } from '@api/models'
 import { useQueryBranches, useQueryRemotes } from '@api/queries'
+import { REMOTES_DIALOG_KEY, RemotesDialog } from '@common/RemotesDialog'
+import { showDialog } from '@context/dialogs'
 import {
   changeUpstreamBranch,
   changeUpstreamRemote,
   useSelectedUpstream,
 } from '@context/upstream'
+import { Button } from '@ui/Button'
 import { Combobox, type ComboboxOption } from '@ui/Combobox'
 import { EditableText } from '@ui/EditableText'
+import { Icon } from '@ui/Icon'
 import { useSelectedBranches } from '@utils/repository'
 import { cn, propsWithCn } from '@utils/styles'
 
@@ -78,7 +87,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
               : 'primary'
             : 'neutral'
         }
-        className={cn('max-w-half -mr-[2px] pr-4 rounded-r-none font-medium')}
+        className={cn('max-w-half -mr-[2px] pr-4 rounded-r-none')}
         style={{
           clipPath: 'polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
         }}
@@ -102,13 +111,23 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
           className: cn(
             'text-light-700',
             remoteBranch === undefined && 'text-light-950',
-            'pl-5 rounded-l-none flex-1 font-medium justify-start',
+            'pl-5 rounded-l-none flex-1 justify-start',
           ),
           style: {
             clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%)',
           },
         }}
       />
+
+      <Button
+        className={cn('ml-2')}
+        round
+        onClick={() => {
+          showDialog(REMOTES_DIALOG_KEY, <RemotesDialog />)
+        }}
+      >
+        <Icon Glyph={IconMenuDeep} />
+      </Button>
     </div>
   )
 }

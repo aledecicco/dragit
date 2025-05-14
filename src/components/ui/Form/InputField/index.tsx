@@ -11,7 +11,8 @@ const InputField = (props: InputFieldProps) => {
       placeholder={`Enter a ${fieldProps.label}`}
       {...propsWithCn(
         fieldProps,
-        'p-3 bg-dark-800 rounded-sm text-sm text-light-800',
+        'p-3 text-sm bg-dark-800 rounded-sm text-light-800',
+        fieldProps.compact && 'px-2 py-1',
         'border-1 border-transparent',
         'aria-invalid:border-danger-300',
       )}

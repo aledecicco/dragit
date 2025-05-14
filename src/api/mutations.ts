@@ -58,6 +58,14 @@ const mutationKeys = {
       ...mutationKeys.repository.current(path),
       key: 'remove_remote',
     }),
+    renameRemote: (path: string) => ({
+      ...mutationKeys.repository.current(path),
+      key: 'rename_remote',
+    }),
+    changeRemoteUrl: (path: string) => ({
+      ...mutationKeys.repository.current(path),
+      key: 'change_remote_url',
+    }),
     saveStash: (path: string) => ({
       ...mutationKeys.repository.current(path),
       key: 'stash',
@@ -258,6 +266,34 @@ const removeRemoteMutation = (path: string) =>
 
 const useRemoveRemote = () => useRepositoryMutation(removeRemoteMutation)
 
+const renameRemoteMutation = (path: string) =>
+  mutationOptions({
+    mutationKey: [mutationKeys.repository.renameRemote(path)],
+    mutationFn: (args: {
+      name: RemoteName
+      newName: RemoteName
+    }) => {
+      return invoke('rename_remote', { path: path, ...args })
+    },
+    networkMode: 'always',
+  })
+
+const useRenameRemote = () => useRepositoryMutation(renameRemoteMutation)
+
+const changeRemoteUrlMutation = (path: string) =>
+  mutationOptions({
+    mutationKey: [mutationKeys.repository.changeRemoteUrl(path)],
+    mutationFn: (args: {
+      name: RemoteName
+      newUrl: string
+    }) => {
+      return invoke('change_remote_url', { path: path, ...args })
+    },
+    networkMode: 'always',
+  })
+
+const useChangeRemoteUrl = () => useRepositoryMutation(changeRemoteUrlMutation)
+
 const saveStashMutation = (path: string) =>
   mutationOptions({
     mutationKey: [mutationKeys.repository.saveStash(path)],
@@ -316,6 +352,8 @@ export {
   useSetUpstream,
   useAddRemote,
   useRemoveRemote,
+  useRenameRemote,
+  useChangeRemoteUrl,
   useSaveStash,
   useApplyStash,
   useDiscardStash,

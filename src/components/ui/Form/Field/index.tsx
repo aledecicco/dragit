@@ -6,13 +6,18 @@ import { cn, propsWithCn } from '@utils/styles'
 interface FormFieldProps extends Ariakit.FormInputProps {
   name: Ariakit.FormInputProps['name']
   label: string
+  compact?: boolean
   containerProps?: ComponentProps<'div'>
 }
 
 const FormField = (props: FormFieldProps) => {
-  const { name, label, containerProps, ...inputProps } = props
+  const { name, label, compact = false, containerProps, ...inputProps } = props
 
-  return (
+  const field = <Ariakit.FormInput name={name} {...inputProps} />
+
+  return compact ? (
+    field
+  ) : (
     <div
       {...propsWithCn(
         containerProps,
@@ -25,7 +30,7 @@ const FormField = (props: FormFieldProps) => {
         {inputProps.required && ' *'}
       </Ariakit.FormLabel>
 
-      <Ariakit.FormInput name={name} {...inputProps} />
+      {field}
 
       <Ariakit.FormError
         name={name}

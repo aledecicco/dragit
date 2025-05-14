@@ -27,7 +27,7 @@ const Dialog = (props: DialogProps) => {
         backdrop={<div className={cn('bg-black/50', 'backdrop-blur-md')} />}
         {...propsWithCn(
           dialogProps,
-          'fixed z-50 top-half left-half -translate-half',
+          'fixed top-half left-half -translate-half',
           'w-150 max-w-[70%] max-h-[70%] overflow-auto',
           'p-8 bg-dark-600 rounded-lg',
           'border-2 border-solid border-dark-900',
