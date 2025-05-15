@@ -20,7 +20,7 @@ const Form = <T extends AnyObject>(props: FormProps<T>) => {
   const form = Ariakit.useFormStore({ defaultValues })
 
   form.useSubmit((formState) => {
-    onFormSubmit(formState, form)
+    return onFormSubmit(formState, form)
   })
 
   form.useValidate((formState) => {

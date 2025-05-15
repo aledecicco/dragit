@@ -13,11 +13,7 @@ interface FormFieldProps extends Ariakit.FormInputProps {
 const FormField = (props: FormFieldProps) => {
   const { name, label, compact = false, containerProps, ...inputProps } = props
 
-  const field = <Ariakit.FormInput name={name} {...inputProps} />
-
-  return compact ? (
-    field
-  ) : (
+  return (
     <div
       {...propsWithCn(
         containerProps,
@@ -25,12 +21,14 @@ const FormField = (props: FormFieldProps) => {
         'relative mb-2',
       )}
     >
-      <Ariakit.FormLabel name={name} className={cn('text-sm text-light-400')}>
-        {label}
-        {inputProps.required && ' *'}
-      </Ariakit.FormLabel>
+      {!compact && (
+        <Ariakit.FormLabel name={name} className={cn('text-sm text-light-400')}>
+          {label}
+          {inputProps.required && ' *'}
+        </Ariakit.FormLabel>
+      )}
 
-      {field}
+      <Ariakit.FormInput name={name} {...inputProps} />
 
       <Ariakit.FormError
         name={name}

@@ -1,8 +1,4 @@
 import {
-  IconDeviceRemote,
-  IconMenu2,
-  IconMenu3,
-  IconMenu4,
   IconMenuDeep,
   IconWorld,
   IconWorldCancel,

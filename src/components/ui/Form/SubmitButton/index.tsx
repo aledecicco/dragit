@@ -1,25 +1,47 @@
 import * as Ariakit from '@ariakit/react'
+import { IconCheck } from '@tabler/icons-react'
 
-import { Button, type ButtonProps } from '@ui/Button'
+import {
+  type Action,
+  ActionButton,
+  type ActionButtonProps,
+} from '@lib/ActionButton'
 import { propsWithCn } from '@utils/styles'
 
-interface FormSubmitButtonProps extends Partial<ButtonProps> {
-  options?: Ariakit.FormSubmitProps
+interface FormSubmitButtonProps extends Partial<ActionButtonProps> {
+  action?: Partial<Action>
 }
 
 const FormSubmitButton = (props: FormSubmitButtonProps) => {
-  const { options, ...buttonProps } = props
+  const { action, ...buttonProps } = props
+
+  const store = Ariakit.useFormContext()
 
   return (
-    <Ariakit.FormSubmit
-      render={
-        <Button
-          variant="filled"
-          status="primary"
-          {...propsWithCn(buttonProps, 'w-full')}
-        />
-      }
-      {...options}
+    <ActionButton
+      status="primary"
+      type="submit"
+      variant="filled"
+      mainAction={{
+        run: async () => {
+          const res = await store?.submit()
+
+          if (!res) {
+            throw new Error('Form submission failed')
+          }
+
+          return true
+        },
+        Glyph: IconCheck,
+        label: {
+          idle: 'Submit',
+          running: 'Submitting',
+          success: 'Submitted',
+          error: 'Failed',
+        },
+        ...action,
+      }}
+      {...propsWithCn(buttonProps, buttonProps.compact ? 'w-max' : 'w-full')}
     />
   )
 }

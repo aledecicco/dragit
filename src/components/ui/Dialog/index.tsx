@@ -29,9 +29,10 @@ const Dialog = (props: DialogProps) => {
           dialogProps,
           'fixed top-half left-half -translate-half',
           'w-150 max-w-[70%] max-h-[70%] overflow-auto',
-          'p-8 bg-dark-600 rounded-lg',
+          'py-8 px-6 bg-dark-600 rounded-lg',
           'border-2 border-solid border-dark-900',
           'flex flex-col',
+          heading && 'pb-6',
         )}
         onClose={(e) => {
           dialogProps.onClose?.(e)
@@ -54,7 +55,7 @@ const Dialog = (props: DialogProps) => {
 
         {heading && (
           <Ariakit.DialogHeading
-            className={cn('text-2xl font-bold text-center -mt-4 mb-4')}
+            className={cn('text-2xl font-bold text-center -mt-2 mb-6')}
           >
             {heading}
           </Ariakit.DialogHeading>
