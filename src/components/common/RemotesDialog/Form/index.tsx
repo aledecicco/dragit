@@ -1,8 +1,7 @@
-import { useAddRemote } from '@api/mutations'
-import { useQueryRemotes } from '@api/queries'
-import { useFormContext } from '@ariakit/react'
 import { IconDeviceFloppy, IconX } from '@tabler/icons-react'
 
+import { useAddRemote } from '@api/mutations'
+import { useQueryRemotes } from '@api/queries'
 import { Button } from '@ui/Button'
 import { Form, type FormProps } from '@ui/Form'
 import { InputField } from '@ui/Form/InputField'
@@ -16,7 +15,10 @@ interface RemoteFormValues {
 }
 
 interface RemoteFormProps
-  extends Omit<FormProps<RemoteFormValues>, 'onFormSubmit'> {
+  extends Omit<
+    FormProps<RemoteFormValues>,
+    'onFormSubmit' | 'actionDescription'
+  > {
   onCancel: () => void
 }
 
@@ -30,6 +32,15 @@ const RemoteForm = (props: RemoteFormProps) => {
     <Form
       {...propsWithCn(formProps, 'flex flex-row gap-1')}
       defaultValues={{ name: '', url: '' }}
+      actionDescription={{
+        Glyph: IconDeviceFloppy,
+        label: {
+          idle: 'Save',
+          running: 'Saving',
+          success: 'Saved',
+          error: 'Failed',
+        },
+      }}
       onFormSubmit={async (formState) => {
         if (formState.values.name && formState.values.url) {
           await addRemote.mutateAsync({
@@ -48,38 +59,41 @@ const RemoteForm = (props: RemoteFormProps) => {
         }
       }}
     >
-      <InputField name="name" label="Remote name" required autoFocus compact />
-      <InputField
-        name="url"
-        label="Remote URL"
-        containerProps={{ className: cn('flex-1') }}
-        required
-        compact
-      />
+      {(actionTracker) => (
+        <>
+          <InputField
+            name="name"
+            label="Remote name"
+            required
+            autoFocus
+            compact
+          />
+          <InputField
+            name="url"
+            label="Remote URL"
+            containerProps={{ className: cn('flex-1') }}
+            required
+            compact
+          />
 
-      <FormSubmitButton
-        className={cn('w-max')}
-        compact
-        action={{
-          Glyph: IconDeviceFloppy,
-          label: {
-            idle: 'Create',
-            running: 'Creating',
-            success: 'Created',
-            error: 'Failed',
-          },
-        }}
-      />
+          <FormSubmitButton
+            className={cn('w-max')}
+            actionTracker={actionTracker}
+            compact
+          />
 
-      <Button
-        disabled={useFormContext()?.getState().submitting}
-        className={cn('w-max')}
-        onClick={() => {
-          onCancel()
-        }}
-      >
-        <Icon Glyph={IconX} />
-      </Button>
+          <Button
+            disabled={actionTracker.actionState === 'running'}
+            className={cn('w-max')}
+            onClick={() => {
+              onCancel()
+            }}
+            description="Cancel"
+          >
+            <Icon Glyph={IconX} />
+          </Button>
+        </>
+      )}
     </Form>
   )
 }

@@ -8,7 +8,7 @@ Stash of ideas in ~planned implementation order:
 
 - [x] Keyboard shortcuts cheatsheet component
 - [x] Loading indicators
-- [ ] Remotes manipulation widgets
+- [x] Remotes manipulation widgets
 - [ ] Commit details
 - [ ] Documentation pass
 - [ ] Performance pass

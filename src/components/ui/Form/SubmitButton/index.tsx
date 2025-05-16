@@ -1,47 +1,49 @@
 import * as Ariakit from '@ariakit/react'
-import { IconCheck } from '@tabler/icons-react'
+import { match } from 'ts-pattern'
 
-import {
-  type Action,
-  ActionButton,
-  type ActionButtonProps,
-} from '@lib/ActionButton'
-import { propsWithCn } from '@utils/styles'
+import type { ActionTracker } from '@lib/ActionButton/utils'
+import { Button, type ButtonProps, type ButtonStatus } from '@ui/Button'
+import { Icon } from '@ui/Icon'
+import { cn, propsWithCn } from '@utils/styles'
 
-interface FormSubmitButtonProps extends Partial<ActionButtonProps> {
-  action?: Partial<Action>
+interface FormSubmitButtonProps extends Partial<ButtonProps> {
+  actionTracker: ActionTracker
+  compact?: boolean
 }
 
 const FormSubmitButton = (props: FormSubmitButtonProps) => {
-  const { action, ...buttonProps } = props
-
-  const store = Ariakit.useFormContext()
+  const {
+    actionTracker,
+    compact = false,
+    status = 'primary',
+    ...buttonProps
+  } = props
 
   return (
-    <ActionButton
-      status="primary"
-      type="submit"
-      variant="filled"
-      mainAction={{
-        run: async () => {
-          const res = await store?.submit()
-
-          if (!res) {
-            throw new Error('Form submission failed')
-          }
-
-          return true
-        },
-        Glyph: IconCheck,
-        label: {
-          idle: 'Submit',
-          running: 'Submitting',
-          success: 'Submitted',
-          error: 'Failed',
-        },
-        ...action,
-      }}
-      {...propsWithCn(buttonProps, buttonProps.compact ? 'w-max' : 'w-full')}
+    <Ariakit.FormSubmit
+      render={
+        <Button
+          description={compact ? actionTracker.label : undefined}
+          status={match(actionTracker.actionState)
+            .returnType<ButtonStatus>()
+            .with('idle', () => status)
+            .with('running', () => status)
+            .with('success', () => 'success')
+            .with('error', () => 'error')
+            .exhaustive()}
+          variant="filled"
+          {...propsWithCn(buttonProps, compact ? 'w-max' : 'w-full')}
+        >
+          <Icon
+            size={buttonProps.size}
+            Glyph={actionTracker.Glyph}
+            className={cn(
+              actionTracker.actionState === 'running' && 'animate-spin',
+            )}
+          />
+          {!compact && actionTracker.label}
+        </Button>
+      }
     />
   )
 }

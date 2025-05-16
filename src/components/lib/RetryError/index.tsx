@@ -3,7 +3,7 @@ import type { ComponentProps } from 'react'
 import { IconReload } from '@tabler/icons-react'
 import { Button } from '@ui/Button'
 import { Icon } from '@ui/Icon'
-import { propsWithCn } from '@utils/styles'
+import { cn, propsWithCn } from '@utils/styles'
 
 interface RetryErrorProps extends ComponentProps<'div'> {
   message: string
@@ -23,7 +23,7 @@ const RetryError = (props: RetryErrorProps) => {
     >
       <p>{message}</p>
       <Button
-        className="bg-none"
+        className={cn('bg-none')}
         size="sm"
         variant="plain"
         status="error"

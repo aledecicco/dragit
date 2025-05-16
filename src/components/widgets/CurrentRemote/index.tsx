@@ -1,5 +1,6 @@
 import {
   IconMenuDeep,
+  IconRefresh,
   IconWorld,
   IconWorldCancel,
   IconWorldQuestion,
@@ -7,6 +8,7 @@ import {
 import { type ComponentProps, useMemo } from 'react'
 
 import type { RemoteInfo } from '@api/models'
+import { useFetchRemote } from '@api/mutations'
 import { useQueryBranches, useQueryRemotes } from '@api/queries'
 import { REMOTES_DIALOG_KEY, RemotesDialog } from '@common/RemotesDialog'
 import { showDialog } from '@context/dialogs'
@@ -15,6 +17,7 @@ import {
   changeUpstreamRemote,
   useSelectedUpstream,
 } from '@context/upstream'
+import { ActionButton } from '@lib/ActionButton'
 import { Button } from '@ui/Button'
 import { Combobox, type ComboboxOption } from '@ui/Combobox'
 import { EditableText } from '@ui/EditableText'
@@ -30,6 +33,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
   const { branch } = useSelectedBranches()
   const { remote, remoteBranch } = useSelectedUpstream()
 
+  const fetchRemote = useFetchRemote()
   const remotesQuery = useQueryRemotes()
   const branchesQuery = useQueryBranches()
 
@@ -115,9 +119,32 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         }}
       />
 
-      <Button
-        className={cn('ml-2')}
+      <ActionButton
+        compact
         round
+        disabled={!remote}
+        className={cn('mx-2')}
+        mainAction={{
+          Glyph: IconRefresh,
+          label: {
+            idle: 'Fetch remote',
+            running: 'Fetching remote',
+            success: 'Remote fetched',
+            error: 'Failed',
+          },
+          run: async () => {
+            if (remote) {
+              await fetchRemote.mutateAsync({
+                remote: remote.name,
+              })
+            }
+          },
+        }}
+      />
+
+      <Button
+        round
+        description="Manage remotes"
         onClick={() => {
           showDialog(REMOTES_DIALOG_KEY, <RemotesDialog />)
         }}

@@ -29,9 +29,15 @@ const FormDialog = <T extends AnyObject>(props: FormDialogProps<T>) => {
           }
         }}
       >
-        {children}
+        {(actionTracker) => (
+          <>
+            {children}
 
-        <FormSubmitButton {...submitProps}>Accept</FormSubmitButton>
+            <FormSubmitButton {...submitProps} actionTracker={actionTracker}>
+              Accept
+            </FormSubmitButton>
+          </>
+        )}
       </Form>
     </Dialog>
   )
