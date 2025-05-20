@@ -23,6 +23,7 @@ const Dialog = (props: DialogProps) => {
     <Ariakit.DialogProvider defaultOpen>
       <Ariakit.Dialog
         modal
+        portal
         unmountOnHide
         backdrop={<div className={cn('bg-black/50', 'backdrop-blur-md')} />}
         {...propsWithCn(
@@ -46,8 +47,12 @@ const Dialog = (props: DialogProps) => {
                 round
                 variant="plain"
                 status="neutral"
-                size="lg"
-                className={cn('text-xl text-light-900 absolute top-1 left-1')}
+                size="md"
+                className={cn(
+                  'text-lg text-light-950',
+                  'absolute top-1.5 left-1.5',
+                )}
+                description="Close dialog"
               />
             }
           />
@@ -55,7 +60,7 @@ const Dialog = (props: DialogProps) => {
 
         {heading && (
           <Ariakit.DialogHeading
-            className={cn('text-2xl font-bold text-center -mt-2 mb-6')}
+            className={cn('text-xl font-bold text-center -mt-2 mb-6')}
           >
             {heading}
           </Ariakit.DialogHeading>

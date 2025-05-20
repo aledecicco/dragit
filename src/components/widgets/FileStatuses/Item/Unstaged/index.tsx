@@ -21,7 +21,7 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
   return (
     <FileStatusItem
       {...propsWithCn(divProps, 'text-light-600')}
-      file={item}
+      item={item}
       type="unstaged"
       statusMessage={
         <p className={cn('text-xs text-light-950')}>

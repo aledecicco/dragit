@@ -10,8 +10,7 @@ import { type ComponentProps, useMemo } from 'react'
 import type { RemoteInfo } from '@api/models'
 import { useFetchRemote } from '@api/mutations'
 import { useQueryBranches, useQueryRemotes } from '@api/queries'
-import { REMOTES_DIALOG_KEY, RemotesDialog } from '@common/RemotesDialog'
-import { showDialog } from '@context/dialogs'
+import { showRemotesDialog } from '@common/RemotesDialog'
 import {
   changeUpstreamBranch,
   changeUpstreamRemote,
@@ -146,7 +145,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         round
         description="Manage remotes"
         onClick={() => {
-          showDialog(REMOTES_DIALOG_KEY, <RemotesDialog />)
+          showRemotesDialog()
         }}
       >
         <Icon Glyph={IconMenuDeep} />

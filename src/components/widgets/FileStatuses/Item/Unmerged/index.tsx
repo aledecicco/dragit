@@ -16,7 +16,7 @@ const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
   return (
     <FileStatusItem
       {...propsWithCn(divProps, 'text-light-600')}
-      file={item}
+      item={item}
       type="unmerged"
       Glyph={IconFileAlert}
       statusMessage={

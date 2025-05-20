@@ -16,6 +16,12 @@ export const CURRENT_DIR_INFO_SCHEMA = BorshSchema.Option(
   }),
 )
 
+export const DIFF_SUMMARY_SCHEMA = BorshSchema.Struct({
+  filesCount: BorshSchema.u32,
+  insertions: BorshSchema.u32,
+  deletions: BorshSchema.u32,
+})
+
 export const COMMIT_INFO_SCHEMA = BorshSchema.Struct({
   hash: BorshSchema.String,
   shortHash: BorshSchema.String,
@@ -23,6 +29,7 @@ export const COMMIT_INFO_SCHEMA = BorshSchema.Struct({
   authorEmail: BorshSchema.String,
   timestamp: BorshSchema.u32,
   message: BorshSchema.Option(BorshSchema.String),
+  changes: BorshSchema.Option(DIFF_SUMMARY_SCHEMA),
 })
 
 export const ANCESTOR_INFO_SCHEMA = BorshSchema.Struct({
@@ -131,18 +138,27 @@ export const FILE_INFO_SCHEMA = BorshSchema.Enum({
 })
 export const FILES_PAGE_SCHEMA = PAGE_SCHEMA(FILE_INFO_SCHEMA)
 
+export const COMMITTED_STATUS_SCHEMA = BorshSchema.Enum({
+  Modified: BorshSchema.Unit,
+  TypeChanged: BorshSchema.Unit,
+  Added: BorshSchema.Unit,
+  Deleted: BorshSchema.Unit,
+  Renamed: BorshSchema.Unit,
+  Copied: BorshSchema.Unit,
+})
+
+export const COMMITTED_FILE_INFO_SCHEMA = BorshSchema.Struct({
+  path: BorshSchema.String,
+  status: COMMITTED_STATUS_SCHEMA,
+})
+export const COMMIT_FILES_PAGE_SCHEMA = PAGE_SCHEMA(COMMITTED_FILE_INFO_SCHEMA)
+
 export const REMOTE_INFO_SCHEMA = BorshSchema.Struct({
   name: BorshSchema.String,
   fetchUrl: BorshSchema.String,
   pushUrl: BorshSchema.String,
 })
 export const REMOTES_SCHEMA = BorshSchema.Vec(REMOTE_INFO_SCHEMA)
-
-export const DIFF_SUMMARY_SCHEMA = BorshSchema.Struct({
-  filesCount: BorshSchema.u32,
-  insertions: BorshSchema.u32,
-  deletions: BorshSchema.u32,
-})
 
 export const STASH_INFO_SCHEMA = BorshSchema.Struct({
   id: BorshSchema.String,

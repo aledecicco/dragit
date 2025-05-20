@@ -12,6 +12,13 @@ pub struct CurrentDirInfo {
 }
 
 #[derive(borsh::BorshSerialize, Debug)]
+pub struct DiffSummary {
+    pub files_count: u32,
+    pub insertions: u32,
+    pub deletions: u32,
+}
+
+#[derive(borsh::BorshSerialize, Debug)]
 pub struct CommitInfo {
     pub hash: String,
     pub short_hash: String,
@@ -19,6 +26,7 @@ pub struct CommitInfo {
     pub author_email: String,
     pub timestamp: u32,
     pub message: Option<String>,
+    pub changes: Option<DiffSummary>,
 }
 
 #[derive(strum::EnumString, Debug)]
@@ -130,6 +138,33 @@ pub enum FileInfo {
     Untracked(UntrackedFileInfo),
 }
 
+#[derive(borsh::BorshSerialize, strum::EnumString, Debug)]
+pub enum CommittedStatus {
+    #[strum(serialize = "M")]
+    Modified,
+
+    #[strum(serialize = "T")]
+    TypeChanged,
+
+    #[strum(serialize = "A")]
+    Added,
+
+    #[strum(serialize = "D")]
+    Deleted,
+
+    #[strum(serialize = "R")]
+    Renamed,
+
+    #[strum(serialize = "C")]
+    Copied,
+}
+
+#[derive(borsh::BorshSerialize, Debug)]
+pub struct CommittedFileInfo {
+    pub path: String,
+    pub status: CommittedStatus,
+}
+
 #[derive(borsh::BorshSerialize, Debug)]
 pub enum HeadInfo {
     Detached { commit: String },
@@ -185,13 +220,6 @@ pub struct RemoteInfo {
     pub name: String,
     pub fetch_url: String,
     pub push_url: String,
-}
-
-#[derive(borsh::BorshSerialize, Debug)]
-pub struct DiffSummary {
-    pub files_count: u32,
-    pub insertions: u32,
-    pub deletions: u32,
 }
 
 #[derive(borsh::BorshSerialize, Debug)]

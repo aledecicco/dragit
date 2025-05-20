@@ -160,6 +160,21 @@ pub async fn get_files_page(
 }
 
 #[tauri::command]
+pub async fn get_commit_files_page(
+    state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
+    path: &str,
+    reference: &str,
+    start_after: usize,
+    limit: usize,
+) -> Result<Response, AppError> {
+    with_handler(&state, &|h| {
+        h.get_commit_files_page(&channel, path, reference, start_after, limit)
+    })
+    .and_then(serialize_response)
+}
+
+#[tauri::command]
 pub async fn add_to_index(
     state: State<'_, AppState>,
     path: &str,

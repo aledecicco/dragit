@@ -1,24 +1,19 @@
 import * as Ariakit from '@ariakit/react'
 import type { ComponentProps } from 'react'
 import { mergeRefs } from 'react-merge-refs'
-import { match } from 'ts-pattern'
 
 import type { CommitId } from '@api/models'
 import { useQueryCommitInfo } from '@api/queries'
-import {
-  ProfilePicture,
-  type ProfilePictureVariant,
-} from '@common/ProfilePicture'
 import { QueryLoader } from '@lib/Loader/Query'
 import { makeTracked } from '@lib/SvgOverlay'
-import { Marquee } from '@ui/Marquee'
 import { Skeleton } from '@ui/Skeleton'
 import { cn, propsWithCn } from '@utils/styles'
 import type { ParentCommitType } from '../Edges'
+import { GraphCommitCard } from './Card'
+import { GraphCommitNode } from './Node'
 
 export type CommitType = 'confirmed' | 'unconfirmed'
 
-export const NODE_SIZE = 26
 export const COMMIT_ELEMENT_ID = (commitId: CommitId, refName: string) =>
   `commit_${commitId}_${refName}`
 
@@ -41,92 +36,36 @@ const GraphCommit = makeTracked<
 
   return (
     <div
-      {...divProps}
-      ref={mergeRefs([trackRef, divProps.ref])}
       {...propsWithCn(divProps, 'relative')}
+      ref={mergeRefs([trackRef, divProps.ref])}
     >
+      <GraphCommitNode
+        commitType={commitType}
+        commitInfo={commitInfoQuery.data}
+      />
+
       <div
         className={cn(
-          'rounded-full shadow-sm p-0.5',
-          'flex items-center justify-center',
-          match(commitType)
-            .with('confirmed', () => 'bg-primary-600')
-            .with('unconfirmed', () => 'bg-accent-400')
-            .exhaustive(),
+          'absolute left-full top-half translate-x-2 -translate-y-half',
+          'border-4 border-dark-600 rounded-lg shadow-md',
         )}
-        style={{ width: NODE_SIZE, height: NODE_SIZE }}
-      >
-        <ProfilePicture
-          username={commitInfoQuery.data?.authorEmail}
-          size="sm"
-          variant={match(commitType)
-            .returnType<ProfilePictureVariant>()
-            .with('confirmed', () => 'primary')
-            .with('unconfirmed', () => 'accent')
-            .exhaustive()}
-          className={cn('w-full h-full')}
-        />
-      </div>
-
-      <Ariakit.CompositeItem
-        rowId={`${distance}`}
-        onClick={(e) => {
-          if (e.detail === 0) {
-            // TODO: open commit details
-          }
+        style={{
+          width: COMMIT_WIDTH,
+          height: COMMIT_HEIGHT,
         }}
-        render={
-          <div
-            aria-selected={true}
-            className={cn(
-              'group/commit',
-              'absolute left-full top-half translate-x-2 -translate-y-half',
-              'border-4 border-dark-600 rounded-lg shadow-md',
-            )}
-            style={{
-              width: COMMIT_WIDTH,
-              height: COMMIT_HEIGHT,
-            }}
-          />
-        }
       >
         <QueryLoader
           query={commitInfoQuery}
           loadingFallback={<Skeleton variant="fill" />}
         >
           {(commitInfo) => (
-            <div
-              className={cn(
-                'p-2 border-1 border-dark-100 rounded-sm',
-                'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
-                'group-hover/commit:dithered-bg-dark-500 group-focus/commit:dithered-bg-dark-500 group-data-focus/commit:dithered-bg-dark-500',
-                'flex flex-col gap-y-1',
-              )}
-            >
-              <p
-                className={cn(
-                  'text-sm text-ellipsis text-nowrap overflow-hidden',
-                )}
-              >
-                {commitInfo.message}
-              </p>
-              <div
-                className={cn(
-                  'flex flex-row items-center justify-between gap-x-1',
-                )}
-              >
-                <Marquee className={cn('text-xs text-light-950')}>
-                  {commitInfo.authorName}
-                </Marquee>
-
-                <p className={cn('text-xs text-light-600 min-w-max')}>
-                  #{commitInfo.shortHash}
-                </p>
-              </div>
-            </div>
+            <Ariakit.CompositeItem
+              rowId={`${distance}`}
+              render={<GraphCommitCard commitInfo={commitInfo} />}
+            />
           )}
         </QueryLoader>
-      </Ariakit.CompositeItem>
+      </div>
     </div>
   )
 })

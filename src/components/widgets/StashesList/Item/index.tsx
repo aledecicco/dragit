@@ -3,7 +3,7 @@ import { IconArchive, IconGitBranch } from '@tabler/icons-react'
 import { type ComponentProps, memo } from 'react'
 
 import type { StashInfo } from '@api/models'
-import { ChangesSumary } from '@common/DiffSummary'
+import { ChangesSummary } from '@common/DiffSummary'
 import { StashToolbar } from '@common/StashToolbar'
 import { Icon } from '@ui/Icon'
 import { ListItem } from '@ui/ListItem'
@@ -79,7 +79,7 @@ const StashesListItem = memo((props: StashesListItemProps) => {
 
         <Marquee className={cn('text-xs')} reverse={false}>
           {item.changes ? (
-            <ChangesSumary diff={item.changes} />
+            <ChangesSummary diff={item.changes} />
           ) : (
             <span className={cn('text-light-950')}>Untracked changes</span>
           )}

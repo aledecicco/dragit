@@ -1,13 +1,15 @@
 use std::{str::FromStr, u32};
 
 use models::{
-    BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, DiffSummary, HeadInfo, HistoryItem,
-    MergeStatus, MovedStatus, RemoteInfo, RemoteRef, StagedFileInfo, StagedFileStatus, StashInfo,
-    StatusType, UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo,
+    BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, CommittedFileInfo, CommittedStatus,
+    DiffSummary, HeadInfo, HistoryItem, MergeStatus, MovedStatus, RemoteInfo, RemoteRef,
+    StagedFileInfo, StagedFileStatus, StashInfo, StatusType, UnmergedFileInfo, UnstagedFileInfo,
+    UntrackedFileInfo,
 };
 
 /// Format used to get the needed information about a commit.
-pub(crate) const COMMIT_INFO_FORMAT: &str = "--format=format:%H%n%h%n%an%n%ae%n%ct%n%B";
+pub(crate) const COMMIT_INFO_FORMAT: &str =
+    "--format=format:%H%x00%h%x00%an%x00%ae%x00%ct%x00%B%x00";
 /// The prefix of the line with the commit hash when printing the current status.
 pub(crate) const HEAD_INFO_COMMIT_PREFIX: &str = "# branch.oid ";
 /// The prefix of the line with the branch name when printing the current status.
@@ -39,19 +41,24 @@ pub(crate) const STASH_NAME_PREFIX: &str = "stash@{";
 pub(crate) const STASH_INFO_DETACHED: &str = "(no branch)";
 /// The string that denotes that a stash was created using the shorthand, without a message.
 pub(crate) const STASH_INFO_QUICK: &str = "WIP";
-/// The suffix that denotes that a string contains the number of insertions in a stash.
-pub(crate) const STASH_INSERTIONS: &str = "insertions(+)";
-/// The suffix that denotes that a string contains the number of deletions in a stash.
-pub(crate) const STASH_DELETIONS: &str = "deletions(-)";
+/// The suffix that denotes that a string contains the number of insertions in a revision.
+pub(crate) const DIFF_INSERTIONS: &str = "insertions(+)";
+/// The suffix that denotes that a string contains the number of deletions in a revision.
+pub(crate) const DIFF_DELETIONS: &str = "deletions(-)";
 
-pub(crate) fn parse_commit_info(lines: &Vec<String>) -> Option<CommitInfo> {
+pub(crate) fn parse_commit_info(line: &String) -> Option<CommitInfo> {
+    let mut segments = line.split('\0');
+
     Some(CommitInfo {
-        hash: lines.get(0)?.to_string(),
-        short_hash: lines.get(1)?.to_string(),
-        author_name: lines.get(2)?.to_string(),
-        author_email: lines.get(3)?.to_string(),
-        timestamp: u32::from_str(lines.get(4)?).ok()?,
-        message: lines.get(5..).map(|message| message.join("\n")),
+        hash: segments.next()?.to_string(),
+        short_hash: segments.next()?.to_string(),
+        author_name: segments.next()?.to_string(),
+        author_email: segments.next()?.to_string(),
+        timestamp: u32::from_str(segments.next()?).ok()?,
+        message: segments.next().map(str::to_string),
+        changes: segments
+            .next()
+            .and_then(|line| parse_diff_summary(&line.trim_ascii().to_string())),
     })
 }
 
@@ -165,6 +172,18 @@ pub(crate) fn parse_untracked_file_info(line: &String) -> Option<UntrackedFileIn
     })
 }
 
+pub(crate) fn parse_committed_file_info(line: &String) -> Option<CommittedFileInfo> {
+    let committed_str = line.chars().nth(0)?.to_string();
+    let committed_status = CommittedStatus::from_str(&committed_str).ok()?;
+
+    let path = line.split_ascii_whitespace().last()?;
+
+    Some(CommittedFileInfo {
+        path: path.to_string(),
+        status: committed_status,
+    })
+}
+
 pub(crate) fn parse_history_item(line: &String) -> Option<HistoryItem> {
     let mut commits = line.split_ascii_whitespace().map(String::from);
     let hash = commits.next()?;
@@ -238,6 +257,7 @@ pub(crate) fn parse_remote_infos(lines: &Vec<String>) -> Vec<RemoteInfo> {
 }
 
 fn parse_diff_summary(line: &String) -> Option<DiffSummary> {
+    println!("{}", line);
     let files_count;
     let mut insertions = 0;
     let mut deletions = 0;
@@ -257,10 +277,10 @@ fn parse_diff_summary(line: &String) -> Option<DiffSummary> {
             .split_ascii_whitespace()
             .collect::<Vec<_>>();
         if let (Some(section_number), Some(section_type)) = (section.get(0), section.get(1)) {
-            if (*section_type).eq(STASH_INSERTIONS) {
-                insertions = u32::from_str(section_number).ok()?;
-            } else if (*section_type).eq(STASH_DELETIONS) {
-                deletions = u32::from_str(section_number).ok()?;
+            if (*section_type).eq(DIFF_INSERTIONS) {
+                insertions = u32::from_str(section_number).ok().unwrap_or(0);
+            } else if (*section_type).eq(DIFF_DELETIONS) {
+                deletions = u32::from_str(section_number).ok().unwrap_or(0);
             }
         }
 

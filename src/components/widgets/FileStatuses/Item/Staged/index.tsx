@@ -23,7 +23,7 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
   return (
     <FileStatusItem
       {...propsWithCn(divProps, 'text-light-600')}
-      file={item}
+      item={item}
       type="staged"
       statusMessage={
         <p className={cn('text-xs text-success-300/50')}>

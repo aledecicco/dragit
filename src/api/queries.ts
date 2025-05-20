@@ -18,6 +18,8 @@ import type {
   ChangeStatus,
   CommitId,
   CommitInfo,
+  CommitedFileInfo,
+  CommitedFileStatus,
   CommonAncestorInfo,
   CurrentDirInfo,
   FileInfo,
@@ -38,6 +40,8 @@ import type {
 import {
   BRANCHES_SCHEMA,
   BRANCH_DIVERGENCE_SCHEMA,
+  COMMITTED_FILE_INFO_SCHEMA,
+  COMMIT_FILES_PAGE_SCHEMA,
   COMMIT_INFO_SCHEMA,
   COMMON_ANCESTOR_INFO_SCHEMA,
   CURRENT_DIR_INFO_SCHEMA,
@@ -56,7 +60,8 @@ import {
 } from './utils'
 
 export const HISTORY_PAGE_SIZE = 50
-export const FILE_STATUSES_PAGE_SIZE = MS_IN_SECOND
+export const FILE_STATUSES_PAGE_SIZE = 1000
+export const COMMIT_FILES_PAGE_SIZE = 1000
 
 const queryKeys = {
   currentDir: ['current_dir'] as const,
@@ -126,6 +131,17 @@ const queryKeys = {
           ...queryKeys.directory.commitInfo.all(path),
           commit: commit,
         }) as const,
+      files: (path: string, commit: CommitId) => ({
+        all: {
+          ...queryKeys.directory.commitInfo.commit(path, commit),
+          data: 'files',
+        } as const,
+        page: (page: number) =>
+          ({
+            ...queryKeys.directory.commitInfo.files(path, commit).all,
+            page: page,
+          }) as const,
+      }),
     },
     commonAncestor: {
       all: (path: string) =>
@@ -391,6 +407,58 @@ function useQueryFiles<T extends FileType>(
   return useRepositoryQuery(filesQuery, types, useFilesPage(types), pathspec)
 }
 
+const fetchCommitFilesPage = async (
+  path: string,
+  reference: CommitId,
+  page: number,
+  context: QueryFunctionContext,
+): Promise<Page<CommitedFileInfo>> => {
+  const res = await fetchAndDeserialize(
+    'get_commit_files_page',
+    {
+      path,
+      reference,
+      startAfter: page * COMMIT_FILES_PAGE_SIZE,
+      limit: COMMIT_FILES_PAGE_SIZE,
+    },
+    COMMIT_FILES_PAGE_SCHEMA,
+    context,
+  )
+
+  const files: CommitedFileInfo[] = res.items.map((item) => ({
+    path: item.path,
+    status: match(item.status)
+      .returnType<CommitedFileStatus>()
+      .with({ Modified: P._ }, () => 'modified')
+      .with({ TypeChanged: P._ }, () => 'typeChanged')
+      .with({ Added: P._ }, () => 'added')
+      .with({ Deleted: P._ }, () => 'deleted')
+      .with({ Renamed: P._ }, () => 'renamed')
+      .with({ Copied: P._ }, () => 'copied')
+      .exhaustive(),
+  }))
+
+  return {
+    hasNext: res.hasNext,
+    items: files,
+  }
+}
+
+const commitFilesQuery = (path: string, page: number, reference: CommitId) =>
+  queryOptions({
+    queryKey: [
+      queryKeys.directory.commitInfo.files(path, reference).page(page),
+    ],
+    queryFn: (context) => fetchCommitFilesPage(path, reference, page, context),
+  })
+
+function useQueryCommitFiles(
+  reference: CommitId,
+  page: number,
+): UseQueryResult<Page<CommitedFileInfo>> {
+  return useRepositoryQuery(commitFilesQuery, page, reference)
+}
+
 const fetchBranches = async (
   path: string,
   context: QueryFunctionContext,
@@ -606,6 +674,7 @@ export {
   useQueryRecentlyOpened,
   useQueryHeadInfo,
   useQueryFiles,
+  useQueryCommitFiles,
   useQueryBranches,
   useQueryCommitHistory,
   useQueryCommitInfo,

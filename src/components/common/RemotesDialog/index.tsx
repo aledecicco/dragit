@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 
 import { useQueryRemotes } from '@api/queries'
+import { showDialog } from '@context/dialogs'
 import { QueryList } from '@lib/QueryList'
 import { Button } from '@ui/Button'
 import { Dialog, type DialogProps } from '@ui/Dialog'
@@ -61,4 +62,8 @@ const RemotesDialog = (props: RemotesDialogProps) => {
   )
 }
 
-export { RemotesDialog, type RemotesDialogProps }
+const showRemotesDialog = (props?: Partial<RemotesDialogProps>) => {
+  showDialog(REMOTES_DIALOG_KEY, <RemotesDialog {...props} />)
+}
+
+export { RemotesDialog, showRemotesDialog, type RemotesDialogProps }

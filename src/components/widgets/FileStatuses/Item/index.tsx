@@ -14,14 +14,14 @@ import { cn } from '@utils/styles'
 
 interface FileStatusItemProps<T extends FileType>
   extends ComponentProps<'div'> {
-  file: FileTypes[T]
+  item: FileTypes[T]
   type: T
   statusMessage?: ReactNode
   Glyph: Glyph
 }
 
 const FileStatusItem = <T extends FileType>(props: FileStatusItemProps<T>) => {
-  const { file, type, statusMessage, Glyph, ...divProps } = props
+  const { item, type, statusMessage, Glyph, ...divProps } = props
   const FileToolbar: ToolbarComponent<T> = FileItemToolbar[type]
 
   return (
@@ -30,13 +30,13 @@ const FileStatusItem = <T extends FileType>(props: FileStatusItemProps<T>) => {
         <div className={cn('flex flex-row gap-x-1 items-center')}>
           <Icon Glyph={Glyph} size="md" />
 
-          <Marquee className={cn('text-sm')}>{file.path}</Marquee>
+          <Marquee className={cn('text-sm')}>{item.path}</Marquee>
         </div>
 
         {statusMessage}
       </div>
 
-      <FileToolbar file={file} size="sm" />
+      <FileToolbar file={item} size="sm" />
     </Ariakit.CompositeItem>
   )
 }

@@ -15,7 +15,7 @@ const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
   return (
     <FileStatusItem
       {...propsWithCn(divProps, 'text-light-950/90')}
-      file={item}
+      item={item}
       type="untracked"
       Glyph={IconFileUnknown}
     />

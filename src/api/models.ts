@@ -26,6 +26,7 @@ export interface CommitInfo {
   authorEmail: string
   timestamp: number
   message: string | null
+  changes: DiffSummary | null
 }
 
 export interface AncestorInfo {
@@ -102,6 +103,19 @@ export type FileOfType<T extends FileType> = FileTypes[T]
 
 export type FileTypeFilter = {
   [T in FileType]?: boolean
+}
+
+export type CommitedFileStatus =
+  | 'modified'
+  | 'typeChanged'
+  | 'added'
+  | 'deleted'
+  | 'renamed'
+  | 'copied'
+
+export interface CommitedFileInfo {
+  path: string
+  status: CommitedFileStatus
 }
 
 export interface RemoteInfo {

@@ -10,9 +10,9 @@ mod utils;
 use utils::*;
 
 use models::{
-    AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    FileInfo, FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
-    StashInfo,
+    AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommittedFileInfo,
+    CommonAncestorInfo, FileInfo, FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem,
+    Page, RemoteInfo, StashInfo,
 };
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
@@ -169,10 +169,16 @@ impl GitHandler for CmdGit {
         let process = self.spawn_and_notify(
             channel,
             path,
-            ["show", reference, COMMIT_INFO_FORMAT, "--quiet"],
+            [
+                "show",
+                reference,
+                COMMIT_INFO_FORMAT,
+                "--quiet",
+                "--shortstat",
+            ],
         )?;
-        let lines = self.get_all_output_lines(process)?;
-        parse_commit_info(&lines).ok_or(GitError::GetCommitInfoFailed {
+        let output = self.get_all_output(process)?;
+        parse_commit_info(&output).ok_or(GitError::GetCommitInfoFailed {
             reference: reference.to_string(),
         })
     }
@@ -254,6 +260,37 @@ impl GitHandler for CmdGit {
 
         let mut items_iter = lines
             .filter_map(|line| line.ok().and_then(parse_line))
+            .skip(start_after);
+        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
+        let has_next = items_iter.next().is_some();
+
+        Ok(Page { items, has_next })
+    }
+
+    fn get_commit_files_page(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+        reference: &str,
+        start_after: usize,
+        limit: usize,
+    ) -> Result<Page<CommittedFileInfo>, GitError> {
+        let args = vec![
+            "diff-tree",
+            "-r",
+            "-m",
+            "--root",
+            "--name-status",
+            "--find-copies",
+            "--no-commit-id",
+            reference,
+        ];
+
+        let process = self.spawn_and_notify(channel, path, args)?;
+        let lines = self.get_output_lines_stream(process)?;
+
+        let mut items_iter = lines
+            .filter_map(|line| line.ok().and_then(|line| parse_committed_file_info(&line)))
             .skip(start_after);
         let items: Vec<_> = items_iter.by_ref().take(limit).collect();
         let has_next = items_iter.next().is_some();

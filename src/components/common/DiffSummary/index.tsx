@@ -4,12 +4,13 @@ import type { DiffSummary } from '@api/models'
 import { pluralize } from '@utils/string'
 import { cn, propsWithCn } from '@utils/styles'
 
-interface ChangesSumaryProps extends ComponentProps<'span'> {
+interface ChangesSummaryProps extends ComponentProps<'span'> {
   diff: DiffSummary
+  compact?: boolean
 }
 
-const ChangesSumary = (props: ChangesSumaryProps) => {
-  const { diff, ...spanProps } = props
+const ChangesSummary = (props: ChangesSummaryProps) => {
+  const { diff, compact = true, ...spanProps } = props
 
   return (
     <span {...propsWithCn(spanProps, 'text-light-950/60')}>
@@ -22,17 +23,24 @@ const ChangesSumary = (props: ChangesSumaryProps) => {
         <>
           {' '}
           •{' '}
-          <span className={cn('text-success-300/80')}>+{diff.insertions}</span>
+          <span className={cn('text-success-300/80')}>
+            +{diff.insertions}{' '}
+            {!compact && pluralize('insertion', diff.insertions)}
+          </span>
         </>
       )}
       {diff.deletions > 0 && (
         <>
           {' '}
-          • <span className={cn('text-danger-300/80')}>-{diff.deletions}</span>
+          •{' '}
+          <span className={cn('text-danger-300/80')}>
+            -{diff.deletions}{' '}
+            {!compact && pluralize('deletion', diff.deletions)}
+          </span>
         </>
       )}
     </span>
   )
 }
 
-export { ChangesSumary, type ChangesSumaryProps }
+export { ChangesSummary, type ChangesSummaryProps }

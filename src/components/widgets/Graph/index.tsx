@@ -14,7 +14,7 @@ import { cn, propsWithCn } from '@utils/styles'
 import { GraphBranch } from './Branch'
 import { BranchMessages } from './Branch/Messages'
 import { BranchSelectors } from './Branch/Selectors'
-import { NODE_SIZE } from './Commit'
+import { NODE_SIZE } from './Commit/Node'
 import { CURVE_SIZE, EDGE_LENGTH, EDGE_OFFSET, Edges } from './Edges'
 import { useCurrentCommonAncestor } from './utils'
 

@@ -11,12 +11,12 @@ interface RetryErrorProps extends ComponentProps<'div'> {
 }
 
 const RetryError = (props: RetryErrorProps) => {
-  const { message, retry } = props
+  const { message, retry, ...divProps } = props
 
   return (
     <div
       {...propsWithCn(
-        props,
+        divProps,
         'flex flex-row gap-x-1 p-2',
         'text-sm text-danger-600',
       )}
