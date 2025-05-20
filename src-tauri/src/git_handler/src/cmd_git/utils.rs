@@ -55,7 +55,9 @@ pub(crate) fn parse_commit_info(line: &String) -> Option<CommitInfo> {
         author_name: segments.next()?.to_string(),
         author_email: segments.next()?.to_string(),
         timestamp: u32::from_str(segments.next()?).ok()?,
-        message: segments.next().map(str::to_string),
+        message: segments
+            .next()
+            .and_then(|s| (!s.is_empty()).then_some(s.to_string())),
         changes: segments
             .next()
             .and_then(|line| parse_diff_summary(&line.trim_ascii().to_string())),

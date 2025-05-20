@@ -175,6 +175,7 @@ impl GitHandler for CmdGit {
                 COMMIT_INFO_FORMAT,
                 "--quiet",
                 "--shortstat",
+                "--first-parent",
             ],
         )?;
         let output = self.get_all_output(process)?;
@@ -275,15 +276,16 @@ impl GitHandler for CmdGit {
         start_after: usize,
         limit: usize,
     ) -> Result<Page<CommittedFileInfo>, GitError> {
+        let parent = format!("{}^1", reference);
         let args = vec![
             "diff-tree",
             "-r",
-            "-m",
             "--root",
             "--name-status",
             "--find-copies",
             "--no-commit-id",
             reference,
+            &parent,
         ];
 
         let process = self.spawn_and_notify(channel, path, args)?;

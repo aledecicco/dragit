@@ -33,9 +33,10 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
       <p
         className={cn(
           'text-start text-sm text-ellipsis text-nowrap overflow-hidden',
+          !commitInfo.message && 'italic text-light-800',
         )}
       >
-        {commitInfo.message}
+        {commitInfo.message ?? 'No message.'}
       </p>
       <div className={cn('flex flex-row items-center justify-between gap-x-1')}>
         <Marquee className={cn('text-xs text-light-950')} reverse={false}>

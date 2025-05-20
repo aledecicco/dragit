@@ -44,11 +44,22 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
         />
       )}
 
-      <div className={cn('h-60 bg-dark-700 overflow-y-hidden mb-4')}>
+      <div
+        className={cn(
+          'border-1 border-dark-50 rounded-sm',
+          'bg-dark-500 text-light-400 text-sm whitespace-pre-wrap',
+          'p-3 max-h-40 overflow-y-auto',
+          !commitInfo.message && 'italic text-light-950',
+        )}
+      >
+        {commitInfo.message ?? 'No message.'}
+      </div>
+
+      <div className={cn('h-60 bg-dark-700 overflow-y-hidden mt-4')}>
         <QueryList
           query={filesQuery}
           RenderItem={CommitDetailsDialogItem}
-          name="files"
+          name="modified files"
           getItems={getPageItems}
           itemSize={48}
           size="sm"
