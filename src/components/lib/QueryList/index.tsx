@@ -11,6 +11,7 @@ interface QueryListProps<T, I> extends Omit<VirtualizedDivProps<I>, 'items'> {
   name: string
   getItems: (data: T) => I[]
   isStandalone?: boolean
+  placeholdersCount?: number
 }
 
 const QueryList = <T, I>(props: QueryListProps<T, I>) => {
@@ -19,6 +20,7 @@ const QueryList = <T, I>(props: QueryListProps<T, I>) => {
     name,
     getItems,
     isStandalone = true,
+    placeholdersCount = 3,
     ...virtualizedDivProps
   } = props
 
@@ -26,8 +28,15 @@ const QueryList = <T, I>(props: QueryListProps<T, I>) => {
     <QueryLoader
       query={query}
       loadingFallback={
-        <div className={cn('flex flex-col gap-2 p-2')}>
-          {[1, 2, 3].map((i) => (
+        <div
+          className={cn('flex flex-col px-2')}
+          style={{
+            paddingTop: virtualizedDivProps.options?.paddingStart ?? 8,
+            paddingBottom: virtualizedDivProps.options?.paddingEnd ?? 8,
+            gap: virtualizedDivProps.options?.gap ?? 8,
+          }}
+        >
+          {[...Array(placeholdersCount).keys()].map((i) => (
             <Skeleton
               key={i}
               style={{ height: virtualizedDivProps.itemSize }}
@@ -52,7 +61,7 @@ const QueryList = <T, I>(props: QueryListProps<T, I>) => {
           <VirtualizedDiv
             size="sm"
             items={items}
-            {...propsWithCn(virtualizedDivProps, 'w-full h-full')}
+            {...propsWithCn(virtualizedDivProps, 'h-full')}
           />
         )
 

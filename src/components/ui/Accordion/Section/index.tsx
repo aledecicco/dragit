@@ -54,7 +54,7 @@ const AccordionSection = (props: AccordionSectionProps) => {
         unmountOnHide
         {...propsWithCn(
           contentProps,
-          'overflow-y-auto grow',
+          'overflow-y-hidden grow',
           'w-full bg-dark-700 rounded-sm',
         )}
       />

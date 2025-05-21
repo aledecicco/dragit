@@ -4,10 +4,12 @@ import type { CommitId, CommitInfo } from '@api/models'
 import { useQueryCommitFiles } from '@api/queries'
 import { getPageItems } from '@api/utils'
 import { ChangesSummary } from '@common/DiffSummary'
+import { ProfilePicture } from '@common/ProfilePicture'
 import { showDialog } from '@context/dialogs'
 import { QueryList } from '@lib/QueryList'
 import { Dialog, type DialogProps } from '@ui/Dialog'
-import { cn } from '@utils/styles'
+import { cn, propsWithCn } from '@utils/styles'
+import { useDateDifference } from '@utils/time'
 import { mapFn } from '@utils/types'
 import { CommitDetailsDialogItem } from './Item'
 
@@ -20,6 +22,7 @@ interface CommitDetailsDialogProps extends Omit<DialogProps, 'dialogKey'> {
 
 const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
   const { commitInfo, ...dialogProps } = props
+  const timeAgo = useDateDifference(commitInfo.timestamp)
 
   const [page, setPage] = useState(0)
   const filesQuery = useQueryCommitFiles(commitInfo.hash, page)
@@ -36,35 +39,58 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
       heading={`#${commitInfo.shortHash}`}
       {...dialogProps}
     >
-      {commitInfo.changes && (
-        <ChangesSummary
-          diff={commitInfo.changes}
-          compact={false}
-          className={cn(' self-center -mt-6 mb-4')}
-        />
-      )}
-
-      <div
-        className={cn(
-          'border-1 border-dark-50 rounded-sm',
-          'bg-dark-500 text-light-400 text-sm whitespace-pre-wrap',
-          'p-3 max-h-40 overflow-y-auto',
-          !commitInfo.message && 'italic text-light-950',
+      <div className={cn('grid auto-rows-auto gap-y-6')}>
+        {commitInfo.changes && (
+          <ChangesSummary
+            diff={commitInfo.changes}
+            compact={false}
+            className={cn('text-sm justify-self-center -mt-6')}
+          />
         )}
-      >
-        {commitInfo.message ?? 'No message.'}
-      </div>
 
-      <div className={cn('h-60 bg-dark-700 overflow-y-hidden mt-4')}>
-        <QueryList
-          query={filesQuery}
-          RenderItem={CommitDetailsDialogItem}
-          name="modified files"
-          getItems={getPageItems}
-          itemSize={48}
-          size="sm"
-          options={virtualizerOptions}
-        />
+        <div>
+          <div
+            className={cn(
+              'border-1 border-dark-50 rounded-sm',
+              'bg-dark-500 text-light-400 text-sm whitespace-pre-wrap',
+              'p-3 max-h-40 overflow-y-auto',
+              'mb-2',
+              !commitInfo.message && 'italic text-light-950',
+            )}
+          >
+            {commitInfo.message ?? 'No message.'}
+          </div>
+
+          <div className={cn('flex flex-row items-center gap-x-1')}>
+            <ProfilePicture username={commitInfo.authorEmail} size="sm" />
+            <p className={cn('text-xs text-light-950')}>
+              {commitInfo.authorName}, {timeAgo}
+            </p>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            'max-h-60 overflow-y-hidden',
+            'bg-dark-700 border-1 border-dark-300 rounded-lg',
+          )}
+        >
+          <QueryList
+            query={filesQuery}
+            RenderItem={CommitDetailsDialogItem}
+            name="modified files"
+            getItems={getPageItems}
+            itemSize={48}
+            size="md"
+            options={virtualizerOptions}
+            placeholdersCount={Math.min(
+              10,
+              commitInfo.changes?.filesCount
+                ? commitInfo.changes.filesCount
+                : 1,
+            )}
+          />
+        </div>
       </div>
     </Dialog>
   )

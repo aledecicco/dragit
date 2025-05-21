@@ -50,7 +50,7 @@ const Dialog = (props: DialogProps) => {
                 size="md"
                 className={cn(
                   'text-lg text-light-950',
-                  'absolute top-1.5 left-1.5',
+                  'absolute top-1.5 right-1.5',
                 )}
                 description="Close dialog"
               />

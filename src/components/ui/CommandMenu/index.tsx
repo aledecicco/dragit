@@ -93,7 +93,7 @@ const CommandMenu = (props: CommandMenuProps) => {
 
         <Separator className={cn('border-dark-700')} />
 
-        <div className={cn('pt-1')}>
+        <div className={cn('pt-1 grid max-h-70')}>
           {items === undefined ? (
             <div
               className={cn('p-2 text-center', 'text-sm italic text-light-950')}
@@ -109,7 +109,7 @@ const CommandMenu = (props: CommandMenuProps) => {
           ) : (
             <Ariakit.ComboboxList
               alwaysVisible
-              className={cn('h-80 min-h-0')}
+              className={cn('h-full')}
               render={
                 <VirtualizedDiv
                   size="sm"

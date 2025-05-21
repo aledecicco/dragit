@@ -28,14 +28,19 @@ const RemotesDialog = (props: RemotesDialogProps) => {
 
   return (
     <Dialog dialogKey={REMOTES_DIALOG_KEY} heading="Remotes" {...dialogProps}>
-      <div className={cn('h-60 bg-dark-700 overflow-y-hidden mb-4')}>
+      <div
+        className={cn(
+          'grid max-h-60 overflow-y-hidden mb-4',
+          'bg-dark-700 border-1 border-dark-300 rounded-lg',
+        )}
+      >
         <QueryList
           query={remotesQuery}
           RenderItem={RemotesDialogItem}
           name="remotes"
           getItems={idFn}
           itemSize={36}
-          size="sm"
+          size="md"
           options={virtualizerOptions}
         />
       </div>

@@ -20,7 +20,12 @@ const ScrollShadowDiv = (props: ScrollShadowDivProps) => {
   } = props
 
   return (
-    <div {...propsWithCn(divProps, 'relative overflow-y-hidden py-[1px]')}>
+    <div
+      {...propsWithCn(
+        divProps,
+        'relative overflow-y-hidden max-h-full py-[1px]',
+      )}
+    >
       {children}
 
       <div

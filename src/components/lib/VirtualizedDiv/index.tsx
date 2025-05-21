@@ -42,7 +42,7 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
     >
       <div
         ref={scrollContainerRef}
-        className={cn('overflow-y-auto w-full h-full px-2 scroll-smooth')}
+        className={cn('overflow-y-auto w-full max-h-full px-2 scroll-smooth')}
       >
         <div
           className={cn('w-full relative')}

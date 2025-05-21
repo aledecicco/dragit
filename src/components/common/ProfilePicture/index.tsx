@@ -15,7 +15,7 @@ interface ProfilePictureProps extends ComponentProps<'div'> {
 }
 
 const ProfilePicture = (props: ProfilePictureProps) => {
-  const { username, variant = 'primary', size = 'md', ...divProps } = props
+  const { username, variant = 'neutral', size = 'md', ...divProps } = props
 
   return (
     <div
