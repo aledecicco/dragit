@@ -124,7 +124,9 @@ const CommandMenu = (props: CommandMenuProps) => {
         </div>
       </Ariakit.ComboboxProvider>
 
-      <Separator className={cn('w-[95%] border-light-950/10 mb-1')} />
+      <Separator
+        className={cn('w-[95%] border-light-950/10 mb-1 self-center')}
+      />
       <ShortcutCheatsheet
         shortcuts={shortcuts}
         className={cn('p-1 self-center')}

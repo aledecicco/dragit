@@ -14,12 +14,12 @@ const githubProfilePictureQueryKeys = {
 
 const fetchGithubProfilePicture = async (
   username: string,
-): Promise<string | undefined> => {
+): Promise<string | null> => {
   const res = await fetch(
     `https://api.github.com/search/users?q=${encodeURIComponent(`${username} in:name`)}`,
   )
 
-  return (await res.json())?.items?.at(0)?.avatar_url
+  return (await res.json())?.items?.at(0)?.avatar_url ?? null
 }
 
 const githubProfilePictureQuery = (username: string | undefined) =>

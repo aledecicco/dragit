@@ -36,9 +36,9 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
         }}
         label="Remote Name"
         buttonProps={{
-          className: cn('rounded-r-none'),
+          className: cn('rounded-l-sm rounded-r-none'),
         }}
-        className={cn('rounded-r-none')}
+        className={cn('rounded-l-sm rounded-r-none')}
       />
 
       <EditableText
@@ -76,7 +76,7 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
         compact
         variant="filled"
         status="neutral"
-        className={cn('rounded-l-none h-auto')}
+        className={cn('rounded-l-none rounded-r-sm h-auto')}
       />
     </div>
   )

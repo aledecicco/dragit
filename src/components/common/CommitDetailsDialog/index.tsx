@@ -1,11 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import type { CommitId, CommitInfo } from '@api/models'
-import { useQueryCommitFiles } from '@api/queries'
+import { COMMIT_FILES_PAGE_SIZE, useQueryCommitFiles } from '@api/queries'
 import { getPageItems } from '@api/utils'
 import { ChangesSummary } from '@common/DiffSummary'
 import { ProfilePicture } from '@common/ProfilePicture'
 import { showDialog } from '@context/dialogs'
+import { Pagination, useNeedsPagination } from '@lib/Pagination'
 import { QueryList } from '@lib/QueryList'
 import { Dialog, type DialogProps } from '@ui/Dialog'
 import { cn } from '@utils/styles'
@@ -26,12 +27,20 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
 
   const [page, setPage] = useState(0)
   const filesQuery = useQueryCommitFiles(commitInfo.hash, page)
+  const showPagination = useNeedsPagination(page, filesQuery.data?.hasNext)
 
   const virtualizerOptions = useMemo(() => {
     return mapFn(filesQuery.data, (page) => ({
       getItemKey: (index: number) => page.items[index].path,
     }))
   }, [filesQuery.data])
+
+  // TODO: extraxt into hook
+  useEffect(() => {
+    if (page && !filesQuery.isLoading && !filesQuery.data?.items.length) {
+      setPage(0)
+    }
+  }, [page, filesQuery.data, filesQuery.isLoading])
 
   return (
     <Dialog
@@ -69,27 +78,44 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
           </div>
         </div>
 
-        <div
-          className={cn(
-            'max-h-60 overflow-y-hidden',
-            'bg-dark-700 border-1 border-dark-300 rounded-lg',
-          )}
-        >
-          <QueryList
-            query={filesQuery}
-            RenderItem={CommitDetailsDialogItem}
-            name="modified files"
-            getItems={getPageItems}
-            itemSize={48}
-            size="md"
-            options={virtualizerOptions}
-            placeholdersCount={Math.min(
-              10,
-              commitInfo.changes?.filesCount
-                ? commitInfo.changes.filesCount
-                : 1,
+        <div className={cn('grid auto-rows-auto gap-y-2')}>
+          <div
+            className={cn(
+              'max-h-65 overflow-y-hidden',
+              'bg-dark-700 border-1 border-dark-300 rounded-lg',
             )}
-          />
+          >
+            <QueryList
+              query={filesQuery}
+              RenderItem={CommitDetailsDialogItem}
+              name="modified files"
+              getItems={getPageItems}
+              itemSize={48}
+              size="md"
+              options={virtualizerOptions}
+              placeholdersCount={Math.min(
+                10,
+                commitInfo.changes?.filesCount
+                  ? commitInfo.changes.filesCount
+                  : 1,
+              )}
+            />
+          </div>
+
+          {showPagination && (
+            <Pagination
+              className={cn('-mb-2')}
+              page={page}
+              pageSize={COMMIT_FILES_PAGE_SIZE}
+              hasNext={!!filesQuery.data?.hasNext}
+              setPrevPage={() => {
+                setPage((_page) => _page - 1)
+              }}
+              setNextPage={() => {
+                setPage((_page) => _page + 1)
+              }}
+            />
+          )}
         </div>
       </div>
     </Dialog>
