@@ -1,0 +1,17 @@
+import { queryOptions, useQuery } from '@tanstack/react-query'
+import { invoke } from '@tauri-apps/api/core'
+
+import type { Settings } from '../models'
+
+const settingsQueryKey = ['settings'] as const
+
+const fetchSettings = (): Promise<Settings> => invoke('get_setings')
+
+const settingsQuery = queryOptions({
+  queryKey: settingsQueryKey,
+  queryFn: fetchSettings,
+})
+
+const useQuerySettings = () => useQuery(settingsQuery)
+
+export { settingsQueryKey, useQuerySettings }

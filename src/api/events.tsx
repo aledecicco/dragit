@@ -5,7 +5,17 @@ import { P, match } from 'ts-pattern'
 
 import { useSelectedRefs } from '@context/branches'
 import type { AppEvent } from './models'
-import { queryKeys } from './queries'
+import {
+  branchDivergenceQueryKeys,
+  branchesQueryKeys,
+  commitHistoryQueryKeys,
+  commonAncestorQueryKeys,
+  filesQueryKeys,
+  headInfoQueryKeys,
+  pathQueryKey,
+  remotesQueryKeys,
+  stashesQueryKeys,
+} from './queries'
 
 const EVENT_ID = 'app-event'
 
@@ -27,50 +37,38 @@ const EventHandler = (props: PropsWithChildren) => {
         })
         .with({ type: 'gitFolderModified', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: queryKeys.directory.current(path),
+            queryKey: [pathQueryKey(path)],
           })
         })
         .with({ type: 'branchesListUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.branches(path)],
+            queryKey: [branchesQueryKeys.all(path)],
           })
         })
         .with(
           { type: 'branchUpdated', path: P.string, name: P.string },
           ({ name: branchName, path }) => {
             client.invalidateQueries({
-              queryKey: [
-                queryKeys.directory.commitHistory.reference(path, branchName),
-              ],
+              queryKey: [commitHistoryQueryKeys.reference(path, branchName)],
+            })
+
+            client.invalidateQueries({
+              queryKey: [branchDivergenceQueryKeys.branch(path, branchName)],
             })
 
             client.invalidateQueries({
               queryKey: [
-                queryKeys.directory.branchDivergence.branch(path, branchName),
+                branchDivergenceQueryKeys.baseBranch(path, branchName),
               ],
             })
 
             client.invalidateQueries({
-              queryKey: [
-                queryKeys.directory.branchDivergence.baseBranch(
-                  path,
-                  branchName,
-                ),
-              ],
+              queryKey: [commonAncestorQueryKeys.reference(path, branchName)],
             })
 
             client.invalidateQueries({
               queryKey: [
-                queryKeys.directory.commonAncestor.reference(path, branchName),
-              ],
-            })
-
-            client.invalidateQueries({
-              queryKey: [
-                queryKeys.directory.commonAncestor.baseReference(
-                  path,
-                  branchName,
-                ),
+                commonAncestorQueryKeys.baseReference(path, branchName),
               ],
             })
 
@@ -80,45 +78,45 @@ const EventHandler = (props: PropsWithChildren) => {
               reference.refName === branchName
             ) {
               client.invalidateQueries({
-                queryKey: [queryKeys.directory.headInfo(path)],
+                queryKey: [headInfoQueryKeys.all(path)],
               })
               client.invalidateQueries({
-                queryKey: [queryKeys.directory.files.all(path)],
+                queryKey: [filesQueryKeys.all(path)],
               })
             }
           },
         )
         .with({ type: 'headChanged', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.headInfo(path)],
+            queryKey: [headInfoQueryKeys.all(path)],
           })
         })
         .with({ type: 'filesModified', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.files.status(path, 'unstaged').all],
+            queryKey: [filesQueryKeys.status(path, 'unstaged').all],
           })
 
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.files.status(path, 'untracked').all],
+            queryKey: [filesQueryKeys.status(path, 'untracked').all],
           })
         })
         .with({ type: 'configUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.branches(path)],
+            queryKey: [branchesQueryKeys.all(path)],
           })
 
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.remotes(path)],
+            queryKey: [remotesQueryKeys.all(path)],
           })
         })
         .with({ type: 'indexUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.files.all(path)],
+            queryKey: [filesQueryKeys.all(path)],
           })
         })
         .with({ type: 'stashesUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [queryKeys.directory.stashes(path)],
+            queryKey: [stashesQueryKeys.all(path)],
           })
         })
         .exhaustive()
