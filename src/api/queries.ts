@@ -7,6 +7,7 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
+import { fetch } from '@tauri-apps/plugin-http'
 import { P, match } from 'ts-pattern'
 
 import { useFilesPage } from '@context/pages'
@@ -40,7 +41,6 @@ import type {
 import {
   BRANCHES_SCHEMA,
   BRANCH_DIVERGENCE_SCHEMA,
-  COMMITTED_FILE_INFO_SCHEMA,
   COMMIT_FILES_PAGE_SCHEMA,
   COMMIT_INFO_SCHEMA,
   COMMON_ANCESTOR_INFO_SCHEMA,
@@ -667,6 +667,28 @@ const stashesQuery = (path: string) =>
 
 const useQueryStashes = () => useRepositoryQuery(stashesQuery)
 
+const fetchGithubProfilePicture = async (
+  username: string,
+): Promise<string | undefined> => {
+  const res = await fetch(
+    `https://api.github.com/search/users?q=${encodeURIComponent(`${username} in:name`)}`,
+  )
+
+  console.log(res)
+  return (await res.json())?.items?.at(0)?.avatar_url
+}
+
+const githubProfilePictureQuery = (username: string | undefined) =>
+  queryOptions({
+    queryKey: ['github_profile_picture', username],
+    queryFn: username ? () => fetchGithubProfilePicture(username) : skipToken,
+    enabled: !!username,
+  })
+
+const useQueryGithubProfilePicture = (username: string | undefined) => {
+  return useQuery(githubProfilePictureQuery(username))
+}
+
 export {
   queryKeys,
   useQuerySettings,
@@ -682,4 +704,5 @@ export {
   useQueryBranchDivergence,
   useQueryRemotes,
   useQueryStashes,
+  useQueryGithubProfilePicture,
 }

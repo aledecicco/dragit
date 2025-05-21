@@ -62,7 +62,7 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
           </div>
 
           <div className={cn('flex flex-row items-center gap-x-1')}>
-            <ProfilePicture username={commitInfo.authorEmail} size="sm" />
+            <ProfilePicture username={commitInfo.authorName} size="md" />
             <p className={cn('text-xs text-light-950')}>
               {commitInfo.authorName}, {timeAgo}
             </p>
