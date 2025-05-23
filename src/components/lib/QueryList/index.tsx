@@ -49,18 +49,15 @@ const QueryList = <T, I>(props: QueryListProps<T, I>) => {
       {(data) => {
         const items = getItems(data)
 
-        if (!items.length) {
-          return (
-            <p className={cn('text-sm text-light-950/50 italic p-3')}>
-              No {name} found
-            </p>
-          )
-        }
-
         const list = (
           <VirtualizedDiv
             size="sm"
             items={items}
+            fallback={
+              <p className={cn('text-sm text-light-950/50 italic p-3')}>
+                No {name} found.
+              </p>
+            }
             {...propsWithCn(virtualizedDivProps, 'h-full')}
           />
         )

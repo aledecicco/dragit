@@ -5,28 +5,30 @@ import {
   setNextPage,
   setPrevPage,
   useFilesPage,
+  useNeedsPagination,
 } from '@context/pages'
-import { Pagination, useNeedsPagination } from '@lib/Pagination'
+import { Pagination } from '@lib/Pagination'
+import type { UseQueryResult } from '@tanstack/react-query'
 import { Chip } from '@ui/Chip'
 
 interface FileStatusSectionPaginationProps<T extends FileType> {
   type: T
-  files: Page<FileTypes[T]> | undefined
+  query: UseQueryResult<Page<FileTypes[T]>>
 }
 
 const FileStatusSectionPagination = <T extends FileType>(
   props: FileStatusSectionPaginationProps<T>,
 ) => {
-  const { type, files } = props
+  const { type, query } = props
   const page = useFilesPage(type)
 
-  const showPagination = useNeedsPagination(page, files?.hasNext)
+  const showPagination = useNeedsPagination(query, page)
 
   return showPagination ? (
     <Pagination
       page={page}
       pageSize={FILE_STATUSES_PAGE_SIZE}
-      hasNext={!!files?.hasNext}
+      hasNext={!!query.data?.hasNext}
       setPrevPage={() => {
         setPrevPage(type)
       }}
@@ -35,7 +37,7 @@ const FileStatusSectionPagination = <T extends FileType>(
       }}
     />
   ) : (
-    <Chip size="sm">{files?.items.length ?? '...'}</Chip>
+    <Chip size="sm">{query.data?.items.length ?? '...'}</Chip>
   )
 }
 

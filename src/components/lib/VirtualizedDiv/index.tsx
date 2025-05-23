@@ -1,5 +1,5 @@
 import type { VirtualizerOptions } from '@tanstack/react-virtual'
-import { type ComponentType, useMemo } from 'react'
+import { type ComponentType, type ReactNode, useMemo } from 'react'
 
 import {
   ScrollShadowDiv,
@@ -10,14 +10,15 @@ import { cn } from '@utils/styles'
 import { VirtualizedDivItem } from './Item'
 
 interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
-  items: T[]
+  items: T[] | undefined
   RenderItem: ComponentType<{ item: T }>
   itemSize: number
   options?: Partial<VirtualizerOptions<HTMLDivElement, Element>>
+  fallback?: ReactNode
 }
 
 const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
-  const { items, itemSize, RenderItem, options, ...divProps } = props
+  const { items, itemSize, RenderItem, options, fallback, ...divProps } = props
 
   const { scrollContainerRef, virtualizer, isScrolled, hasScrollLeft } =
     useVirtualList(
@@ -27,12 +28,16 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
           paddingStart: 8,
           paddingEnd: 8,
           gap: 8,
-          count: items.length,
+          count: items?.length ?? 0,
           overscan: 2,
           ...options,
         }
-      }, [options, items.length, itemSize]),
+      }, [options, items?.length, itemSize]),
     )
+
+  if (!items?.length) {
+    return fallback
+  }
 
   return (
     <ScrollShadowDiv

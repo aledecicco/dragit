@@ -39,9 +39,7 @@ const FileStatusesSection = <T extends FileType>(
     <AccordionSection
       defaultOpen
       label={`${type} files`}
-      extraInfo={
-        <FileStatusSectionPagination type={type} files={filesQuery.data} />
-      }
+      extraInfo={<FileStatusSectionPagination type={type} query={filesQuery} />}
       {...propsWithCn(accordionSectionProps, 'min-h-30 overflow-y-hidden')}
     >
       <QueryList

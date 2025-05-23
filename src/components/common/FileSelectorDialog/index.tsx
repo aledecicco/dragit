@@ -6,7 +6,11 @@ import { hideDialog } from '@context/dialogs'
 import { useHandleFilesPageSync } from '@context/pages'
 import type { AskForValueProps } from '@lib/AskForValueDialog'
 import type { Shortcut } from '@lib/ShortcutsCheatsheet'
+import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { CommandMenu } from '@ui/CommandMenu'
+import { CommandMenuItem } from '@ui/CommandMenu/Item'
+import { cn } from '@utils/styles'
+import { mapFn } from '@utils/types'
 
 interface FileSelectorDialogProps<T extends FileType>
   extends AskForValueProps<{ path: string }> {
@@ -34,14 +38,20 @@ const FileSelectorDialog = <T extends FileType>(
   useHandleFilesPageSync(types, search)
 
   const items = useMemo(() => {
-    return filesQuery.data?.items.map((file) => ({
-      value: file.path,
-    }))
+    return filesQuery.data?.items.map((file) => file.path)
   }, [filesQuery.data])
+
+  const virtualizerOptions = useMemo(() => {
+    return mapFn(items, (items) => ({
+      getItemKey: (index: number) => items[index],
+      gap: 0,
+      paddingStart: 4,
+      paddingEnd: 12,
+    }))
+  }, [items])
 
   return (
     <CommandMenu
-      items={items}
       extraShortcuts={EXTRA_SHORTCUTS}
       onSearchChange={setSearch}
       onKeyDown={(e) => {
@@ -54,7 +64,22 @@ const FileSelectorDialog = <T extends FileType>(
       }}
       {...askForValueProps}
       submitValue={(path) => submitValue(path ? { path } : undefined)}
-    />
+    >
+      <VirtualizedDiv
+        size="sm"
+        items={items}
+        itemSize={36}
+        RenderItem={CommandMenuItem}
+        options={virtualizerOptions}
+        fallback={
+          <div
+            className={cn('p-2 text-center', 'text-sm italic text-light-950')}
+          >
+            {items === undefined ? 'Loading matches.' : 'No matches found.'}
+          </div>
+        }
+      />
+    </CommandMenu>
   )
 }
 

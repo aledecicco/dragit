@@ -1,24 +1,22 @@
 import * as Ariakit from '@ariakit/react'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 
+import { hideDialog } from '@context/dialogs'
 import { type Shortcut, ShortcutCheatsheet } from '@lib/ShortcutsCheatsheet'
-import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { Dialog, type DialogProps } from '@ui/Dialog'
 import { Separator } from '@ui/Separator'
 import { cn, propsWithCn } from '@utils/styles'
-import { type PickPartial, mapFn } from '@utils/types'
-import { CommandMenuItem } from './Item'
+import type { PickPartial } from '@utils/types'
 
 interface CommandMenuProps
-  extends Omit<PickPartial<DialogProps, 'dialogKey'>, 'heading' | 'showClose'> {
-  items: CommandMenuCommand[] | undefined
+  extends Omit<
+    PickPartial<DialogProps, 'dialogKey'>,
+    'heading' | 'showClose' | 'children'
+  > {
+  children: Ariakit.ComboboxListProps['render']
   extraShortcuts?: Shortcut[]
   onSearchChange: (value: string) => void
   submitValue: (value: string | undefined) => void
-}
-
-interface CommandMenuCommand {
-  value: string
 }
 
 const DEFAULT_SHORTCUTS: Shortcut[] = [
@@ -37,38 +35,16 @@ const DEFAULT_SHORTCUTS: Shortcut[] = [
 
 const CommandMenu = (props: CommandMenuProps) => {
   const {
-    items,
     extraShortcuts = [],
     onSearchChange,
     submitValue,
+    children,
     ...dialogProps
   } = props
 
   const shortcuts = useMemo(() => {
     return [...extraShortcuts, ...DEFAULT_SHORTCUTS]
   }, [extraShortcuts])
-
-  const virtualizerOptions = useMemo(() => {
-    return mapFn(items, (items) => ({
-      getItemKey: (index: number) => items[index].value,
-      gap: 0,
-      paddingStart: 4,
-      paddingEnd: 12,
-    }))
-  }, [items])
-
-  const Item = useCallback(
-    (props: { item: CommandMenuCommand }) => {
-      return (
-        <CommandMenuItem
-          value={props.item.value}
-          submitValue={submitValue}
-          dialogKey={dialogProps.dialogKey}
-        />
-      )
-    },
-    [submitValue, dialogProps.dialogKey],
-  )
 
   return (
     <Dialog
@@ -81,8 +57,14 @@ const CommandMenu = (props: CommandMenuProps) => {
       }}
     >
       <Ariakit.ComboboxProvider
+        open
         includesBaseElement={false}
+        focusLoop={false}
         setValue={onSearchChange}
+        setSelectedValue={(value) => {
+          submitValue(typeof value === 'string' ? value : value.at(0))
+          hideDialog(dialogProps.dialogKey)
+        }}
         resetValueOnHide
       >
         <Ariakit.Combobox
@@ -94,33 +76,7 @@ const CommandMenu = (props: CommandMenuProps) => {
         <Separator className={cn('border-dark-700')} />
 
         <div className={cn('pt-1 grid max-h-70')}>
-          {items === undefined ? (
-            <div
-              className={cn('p-2 text-center', 'text-sm italic text-light-950')}
-            >
-              Loading
-            </div>
-          ) : items.length === 0 ? (
-            <div
-              className={cn('p-2 text-center', 'text-sm italic text-light-950')}
-            >
-              No matches found
-            </div>
-          ) : (
-            <Ariakit.ComboboxList
-              alwaysVisible
-              className={cn('h-full')}
-              render={
-                <VirtualizedDiv
-                  size="sm"
-                  items={items}
-                  itemSize={36}
-                  RenderItem={Item}
-                  options={virtualizerOptions}
-                />
-              }
-            />
-          )}
+          <Ariakit.ComboboxList className={cn('h-full')} render={children} />
         </div>
       </Ariakit.ComboboxProvider>
 

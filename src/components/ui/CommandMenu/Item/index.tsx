@@ -1,31 +1,18 @@
 import * as Ariakit from '@ariakit/react'
 
-import { type DialogKey, hideDialog } from '@context/dialogs'
 import { cn } from '@utils/styles'
 
 interface CommandMenuItemProps extends Ariakit.ComboboxItemProps {
-  value: string
-  submitValue: (value: string | undefined) => void
-  dialogKey: DialogKey
+  item: string
 }
 
 const CommandMenuItem = (props: CommandMenuItemProps) => {
-  const { value, submitValue, dialogKey } = props
-  const context = Ariakit.useComboboxContext()
-  const search = Ariakit.useStoreState(context)?.value
+  const { item } = props
 
   return (
     <Ariakit.ComboboxItem
-      onClick={(e) => {
-        if (e.ctrlKey) {
-          submitValue(search)
-        } else {
-          submitValue(value)
-        }
-        hideDialog(dialogKey)
-      }}
       focusOnHover
-      value={value}
+      value={item}
       className={cn(
         'text-xs text-center text-light-500',
         'px-2 py-3 rounded-none cursor-pointer',
