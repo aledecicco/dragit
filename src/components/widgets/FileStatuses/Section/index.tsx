@@ -3,7 +3,7 @@ import { type ComponentType, useMemo } from 'react'
 import type { FileType, FileTypes } from '@api/models'
 import { useQueryFiles } from '@api/queries'
 import { getPageItems } from '@api/utils'
-import { usePagesSync } from '@context/pages'
+import { useHandleFilesPageSync } from '@context/pages'
 import { QueryList } from '@lib/QueryList'
 import {
   AccordionSection,
@@ -27,7 +27,7 @@ const FileStatusesSection = <T extends FileType>(
 ) => {
   const { type, ...accordionSectionProps } = props
   const filesQuery = useQueryFiles([type])
-  usePagesSync(type)
+  useHandleFilesPageSync(type)
 
   const virtualizerOptions = useMemo(() => {
     return mapFn(filesQuery.data, (files) => ({

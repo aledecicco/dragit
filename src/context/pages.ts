@@ -1,7 +1,9 @@
+import type { UseQueryResult } from '@tanstack/react-query'
 import { Store, useStore } from '@tanstack/react-store'
-import { useEffect } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
+import { usePrevious } from 'react-use'
 
-import type { FileType } from '@api/models'
+import type { FileType, Page } from '@api/models'
 import { useQueryFiles } from '@api/queries'
 import { getFileTypeFilter } from '@api/utils'
 
@@ -49,15 +51,55 @@ const setPrevPage = (types: FileType | FileType[]) => {
   })
 }
 
-const usePagesSync = (types: FileType | FileType[], pathspec?: string) => {
-  const filesQuery = useQueryFiles(types, pathspec)
-  const page = useFilesPage(types)
-
+const useHandlePageSync = (
+  query: UseQueryResult<Page<unknown>>,
+  page: number,
+  clearPage: () => void,
+) => {
   useEffect(() => {
-    if (page && !filesQuery.isLoading && !filesQuery.data?.items.length) {
-      clearPage(types)
+    if (page && !query.isLoading && !query.data?.items.length) {
+      clearPage()
     }
-  }, [types, page, filesQuery.data, filesQuery.isLoading])
+  }, [clearPage, query.data, query.isLoading, page])
 }
 
-export { useFilesPage, setNextPage, setPrevPage, usePagesSync, type FileType }
+const useHandleFilesPageSync = (
+  types: FileType | FileType[],
+  pathspec?: string,
+) => {
+  const filesQuery = useQueryFiles(types, pathspec)
+  const page = useFilesPage(types)
+  const clear = useCallback(() => {
+    clearPage(types)
+  }, [types])
+
+  useHandlePageSync(filesQuery, page, clear)
+}
+
+const needsPagination = (page: number, hasNext: boolean) => {
+  return page !== 0 || hasNext
+}
+
+const useNeedsPagination = (
+  query: UseQueryResult<Page<unknown>>,
+  page: number,
+) => {
+  const paginate = useMemo(
+    () => needsPagination(page, !!query.data?.hasNext),
+    [query.data?.hasNext, page],
+  )
+  const prevPaginate = usePrevious(paginate)
+
+  return paginate || (prevPaginate && query.isLoading)
+}
+
+export {
+  useFilesPage,
+  setNextPage,
+  setPrevPage,
+  clearPage,
+  useHandlePageSync,
+  useHandleFilesPageSync,
+  useNeedsPagination,
+  type FileType,
+}

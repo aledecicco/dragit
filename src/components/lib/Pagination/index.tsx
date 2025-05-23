@@ -58,21 +58,4 @@ const Pagination = (props: PaginationProps) => {
   )
 }
 
-export const needsPagination = (page: number, hasNext: boolean) => {
-  return page !== 0 || hasNext
-}
-
-export const useNeedsPagination = (
-  page: number,
-  hasNext: boolean | undefined,
-) => {
-  const paginate = useMemo(
-    () => needsPagination(page, !!hasNext),
-    [page, hasNext],
-  )
-  const prevPaginate = usePrevious(paginate)
-
-  return paginate || (prevPaginate && hasNext === undefined)
-}
-
 export { Pagination, type PaginationProps }

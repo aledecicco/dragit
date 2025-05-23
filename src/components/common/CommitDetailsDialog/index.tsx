@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import type { CommitId, CommitInfo } from '@api/models'
 import { COMMIT_FILES_PAGE_SIZE, useQueryCommitFiles } from '@api/queries'
@@ -6,7 +6,8 @@ import { getPageItems } from '@api/utils'
 import { ChangesSummary } from '@common/DiffSummary'
 import { ProfilePicture } from '@common/ProfilePicture'
 import { showDialog } from '@context/dialogs'
-import { Pagination, useNeedsPagination } from '@lib/Pagination'
+import { useHandlePageSync, useNeedsPagination } from '@context/pages'
+import { Pagination } from '@lib/Pagination'
 import { QueryList } from '@lib/QueryList'
 import { Dialog, type DialogProps } from '@ui/Dialog'
 import { cn } from '@utils/styles'
@@ -26,21 +27,19 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
   const timeAgo = useDateDifference(commitInfo.timestamp)
 
   const [page, setPage] = useState(0)
+  const clearPage = useCallback(() => {
+    setPage(0)
+  }, [])
+
   const filesQuery = useQueryCommitFiles(commitInfo.hash, page)
-  const showPagination = useNeedsPagination(page, filesQuery.data?.hasNext)
+  const showPagination = useNeedsPagination(filesQuery, page)
+  useHandlePageSync(filesQuery, page, clearPage)
 
   const virtualizerOptions = useMemo(() => {
     return mapFn(filesQuery.data, (page) => ({
       getItemKey: (index: number) => page.items[index].path,
     }))
   }, [filesQuery.data])
-
-  // TODO: extraxt into hook
-  useEffect(() => {
-    if (page && !filesQuery.isLoading && !filesQuery.data?.items.length) {
-      setPage(0)
-    }
-  }, [page, filesQuery.data, filesQuery.isLoading])
 
   return (
     <Dialog

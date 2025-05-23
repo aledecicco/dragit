@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react'
 import type { FileType } from '@api/models'
 import { useQueryFiles } from '@api/queries'
 import { hideDialog } from '@context/dialogs'
-import { usePagesSync } from '@context/pages'
+import { useHandleFilesPageSync } from '@context/pages'
 import type { AskForValueProps } from '@lib/AskForValueDialog'
 import type { Shortcut } from '@lib/ShortcutsCheatsheet'
 import { CommandMenu } from '@ui/CommandMenu'
@@ -31,7 +31,7 @@ const FileSelectorDialog = <T extends FileType>(
 
   const [search, setSearch] = useState('')
   const filesQuery = useQueryFiles(types, search)
-  usePagesSync(types, search)
+  useHandleFilesPageSync(types, search)
 
   const items = useMemo(() => {
     return filesQuery.data?.items.map((file) => ({
