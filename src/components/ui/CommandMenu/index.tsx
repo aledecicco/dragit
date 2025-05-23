@@ -1,5 +1,5 @@
 import * as Ariakit from '@ariakit/react'
-import { useMemo } from 'react'
+import type { ReactNode } from 'react'
 
 import { hideDialog } from '@context/dialogs'
 import { type Shortcut, ShortcutCheatsheet } from '@lib/ShortcutsCheatsheet'
@@ -14,20 +14,19 @@ interface CommandMenuProps
     'heading' | 'showClose' | 'children'
   > {
   children: Ariakit.ComboboxListProps['render']
-  extraShortcuts?: Shortcut[]
+  shortcuts?: Shortcut[]
+  footer?: ReactNode
   onSearchChange: (value: string) => void
   submitValue: (value: string | undefined) => void
 }
 
-const DEFAULT_SHORTCUTS: Shortcut[] = [
+export const DEFAULT_SHORTCUTS: Shortcut[] = [
   { keys: [{ symbol: '↵', keyName: 'Enter' }], label: 'Select' },
   { keys: [{ symbol: 'Esc', keyName: 'Escape' }], label: 'Cancel' },
   {
     keys: [
       { symbol: '▲', keyName: 'ArrowUp' },
-      { symbol: '◄', keyName: 'ArrowLeft' },
       { symbol: '▼', keyName: 'ArrowDown' },
-      { symbol: '►', keyName: 'ArrowRight' },
     ],
     label: 'Navigate',
   },
@@ -35,16 +34,13 @@ const DEFAULT_SHORTCUTS: Shortcut[] = [
 
 const CommandMenu = (props: CommandMenuProps) => {
   const {
-    extraShortcuts = [],
+    children,
+    shortcuts = DEFAULT_SHORTCUTS,
+    footer,
     onSearchChange,
     submitValue,
-    children,
     ...dialogProps
   } = props
-
-  const shortcuts = useMemo(() => {
-    return [...extraShortcuts, ...DEFAULT_SHORTCUTS]
-  }, [extraShortcuts])
 
   return (
     <Dialog
@@ -83,10 +79,15 @@ const CommandMenu = (props: CommandMenuProps) => {
       <Separator
         className={cn('w-[95%] border-light-950/10 mb-1 self-center')}
       />
-      <ShortcutCheatsheet
-        shortcuts={shortcuts}
-        className={cn('p-1 self-center')}
-      />
+
+      {footer}
+
+      {!!shortcuts.length && (
+        <ShortcutCheatsheet
+          shortcuts={shortcuts}
+          className={cn('p-1 self-center')}
+        />
+      )}
     </Dialog>
   )
 }

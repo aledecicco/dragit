@@ -14,7 +14,7 @@ const CommandMenuItem = (props: CommandMenuItemProps) => {
       focusOnHover
       value={item}
       className={cn(
-        'text-xs text-center text-light-500',
+        'text-xs text-light-500',
         'px-2 py-3 rounded-none cursor-pointer',
         'data-[active-item]:bg-dark-100',
       )}

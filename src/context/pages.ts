@@ -73,6 +73,10 @@ const useHandleFilesPageSync = (
     clearPage(types)
   }, [types])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: clear page when search changes
+  useEffect(() => {
+    clearPage(types)
+  }, [types, pathspec, clearPage])
   useHandlePageSync(filesQuery, page, clear)
 }
 

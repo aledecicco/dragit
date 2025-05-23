@@ -1,10 +1,17 @@
 import { useMemo, useState } from 'react'
 
 import type { FileType } from '@api/models'
-import { useQueryFiles } from '@api/queries'
+import { FILE_STATUSES_PAGE_SIZE, useQueryFiles } from '@api/queries'
 import { hideDialog } from '@context/dialogs'
-import { useHandleFilesPageSync } from '@context/pages'
+import {
+  setNextPage,
+  setPrevPage,
+  useFilesPage,
+  useHandleFilesPageSync,
+  useNeedsPagination,
+} from '@context/pages'
 import type { AskForValueProps } from '@lib/AskForValueDialog'
+import { Pagination } from '@lib/Pagination'
 import type { Shortcut } from '@lib/ShortcutsCheatsheet'
 import { VirtualizedDiv } from '@lib/VirtualizedDiv'
 import { CommandMenu } from '@ui/CommandMenu'
@@ -17,7 +24,7 @@ interface FileSelectorDialogProps<T extends FileType>
   types: T | T[]
 }
 
-const EXTRA_SHORTCUTS: Shortcut[] = [
+const SHORTCUTS: Shortcut[] = [
   {
     keys: [
       { symbol: 'Ctrl', keyName: 'Control' },
@@ -25,6 +32,25 @@ const EXTRA_SHORTCUTS: Shortcut[] = [
     ],
     combined: true,
     label: 'Use all matches',
+  },
+]
+
+const PAGINATION_SHORTCUTS: Shortcut[] = [
+  {
+    keys: [
+      { symbol: 'Ctrl', keyName: 'Control' },
+      { symbol: 'Q', keyName: 'q' },
+    ],
+    combined: true,
+    label: 'Previous page',
+  },
+  {
+    keys: [
+      { symbol: 'Ctrl', keyName: 'Control' },
+      { symbol: 'E', keyName: 'e' },
+    ],
+    combined: true,
+    label: 'Next page',
   },
 ]
 
@@ -50,9 +76,20 @@ const FileSelectorDialog = <T extends FileType>(
     }))
   }, [items])
 
+  const page = useFilesPage(types)
+  const showPagination = useNeedsPagination(filesQuery, page)
+
+  const shortcuts = useMemo(() => {
+    if (showPagination) {
+      return [...SHORTCUTS, ...PAGINATION_SHORTCUTS]
+    }
+
+    return SHORTCUTS
+  }, [showPagination])
+
   return (
     <CommandMenu
-      extraShortcuts={EXTRA_SHORTCUTS}
+      shortcuts={shortcuts}
       onSearchChange={setSearch}
       onKeyDown={(e) => {
         if (e.ctrlKey && e.key === 'Enter') {
@@ -61,9 +98,37 @@ const FileSelectorDialog = <T extends FileType>(
           submitValue({ path: search.length ? search : '.' })
           hideDialog(askForValueProps.dialogKey)
         }
+
+        if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
+          setPrevPage(types)
+        }
+
+        if (e.ctrlKey && (e.key === 'e' || e.key === 'E')) {
+          if (filesQuery.data?.hasNext) {
+            setNextPage(types)
+          }
+        }
       }}
       {...askForValueProps}
       submitValue={(path) => submitValue(path ? { path } : undefined)}
+      footer={
+        showPagination && (
+          <Pagination
+            page={page}
+            pageSize={FILE_STATUSES_PAGE_SIZE}
+            hasNext={!!filesQuery.data?.hasNext}
+            setPrevPage={() => {
+              setPrevPage(types)
+            }}
+            setNextPage={() => {
+              setNextPage(types)
+            }}
+            buttonProps={{
+              variant: 'plain',
+            }}
+          />
+        )
+      }
     >
       <VirtualizedDiv
         size="sm"

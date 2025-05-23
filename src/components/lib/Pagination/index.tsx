@@ -1,8 +1,7 @@
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
-import { type ComponentProps, useMemo } from 'react'
-import { usePrevious } from 'react-use'
+import type { ComponentProps } from 'react'
 
-import { Button } from '@ui/Button'
+import { Button, type ButtonProps } from '@ui/Button'
 import { Icon } from '@ui/Icon'
 import { cn, propsWithCn } from '@utils/styles'
 
@@ -12,11 +11,19 @@ interface PaginationProps extends ComponentProps<'div'> {
   hasNext: boolean
   setPrevPage: () => void
   setNextPage: () => void
+  buttonProps?: Partial<ButtonProps>
 }
 
 const Pagination = (props: PaginationProps) => {
-  const { page, pageSize, hasNext, setPrevPage, setNextPage, ...divProps } =
-    props
+  const {
+    page,
+    pageSize,
+    hasNext,
+    setPrevPage,
+    setNextPage,
+    buttonProps,
+    ...divProps
+  } = props
 
   return (
     <div
@@ -30,6 +37,7 @@ const Pagination = (props: PaginationProps) => {
         round
         variant="filled"
         status="neutral"
+        {...buttonProps}
         description="Previous page"
         disabled={page === 0}
         onClick={() => {
@@ -46,6 +54,7 @@ const Pagination = (props: PaginationProps) => {
         round
         variant="filled"
         status="neutral"
+        {...buttonProps}
         description="Next page"
         disabled={!hasNext}
         onClick={() => {

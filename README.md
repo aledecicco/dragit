@@ -14,7 +14,7 @@ Stash of ideas in ~planned implementation order:
 - [ ] Performance pass
 - [ ] Checkout of remote branches, create branch from commit
 - [ ] "Create" option on empty comboboxes
-- [ ] Paginate pathspec searches
+- [x] Paginate pathspec searches
 - [ ] Highlight matches during pathspec search
 - [ ] "Init", "empty dir", and "not a repository" screens
 - [ ] Animations pass
