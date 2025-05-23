@@ -1,20 +1,22 @@
-import type { ComponentProps } from 'react'
+import * as Ariakit from '@ariakit/react'
 
 import { propsWithCn } from '@utils/styles'
 
-interface ListItemProps extends ComponentProps<'div'> {}
+interface ListItemProps extends Ariakit.CompositeItemProps {
+  interactive?: boolean
+}
 
 const ListItem = (props: ListItemProps) => {
-  const { ...divProps } = props
+  const { interactive = false, ...itemProps } = props
 
   return (
-    <div
+    <Ariakit.CompositeItem
+      render={interactive ? undefined : <div />}
       {...propsWithCn(
-        divProps,
-        'flex flex-row items-start justify-between gap-x-4',
-        'p-1.5 bg-dark-600 rounded-xs',
-        'shadow-md',
-        'hover:bg-dark-500 focus:bg-dark-500 data-focus:bg-dark-500',
+        itemProps,
+        'w-full p-1.5 bg-dark-600 rounded-xs shadow-md',
+        'hover:bg-dark-500 focus:bg-dark-500 data-focus:bg-dark-500 aria-checked:bg-dark-500',
+        interactive && 'cursor-pointer',
       )}
     />
   )

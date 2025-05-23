@@ -1,47 +1,50 @@
 import * as Ariakit from '@ariakit/react'
-import type { ComponentProps } from 'react'
-
-import type { CommitedFileInfo } from '@api/models'
-import { ListItem } from '@ui/ListItem'
-import { Marquee } from '@ui/Marquee'
-import { cn } from '@utils/styles'
 import { match } from 'ts-pattern'
 
-interface CommitDetailsDialogItemProps extends ComponentProps<'div'> {
+import type { CommitedFileInfo } from '@api/models'
+import { ListItem, type ListItemProps } from '@ui/ListItem'
+import { Marquee } from '@ui/Marquee'
+import { cn, propsWithCn } from '@utils/styles'
+
+interface CommitDetailsDialogItemProps extends ListItemProps {
   item: CommitedFileInfo
 }
 
 const CommitDetailsDialogItem = (props: CommitDetailsDialogItemProps) => {
-  const { item, ...divProps } = props
+  const { item, ...itemProps } = props
 
   return (
-    <Ariakit.CompositeItem render={<ListItem {...divProps} />}>
-      <div className={cn('min-w-0 w-full')}>
-        <div className={cn('flex flex-row gap-x-1 items-center')}>
+    <Ariakit.Checkbox
+      value={item.path}
+      render={
+        <ListItem
+          interactive
+          {...propsWithCn(itemProps, 'flex flex-col items-start')}
+        >
           <Marquee className={cn('text-sm text-light-600')} reverse>
             {item.path}
           </Marquee>
-        </div>
 
-        <p
-          className={cn(
-            'text-xs',
-            item.status === 'deleted'
-              ? 'text-danger-300/50'
-              : 'text-success-300/50',
-          )}
-        >
-          {match(item.status)
-            .with('added', () => 'Created')
-            .with('deleted', () => 'Deleted')
-            .with('modified', () => 'Edited')
-            .with('copied', () => 'Copied')
-            .with('renamed', () => 'Renamed')
-            .with('typeChanged', () => 'Converted')
-            .exhaustive()}
-        </p>
-      </div>
-    </Ariakit.CompositeItem>
+          <p
+            className={cn(
+              'text-xs',
+              item.status === 'deleted'
+                ? 'text-danger-300/50'
+                : 'text-success-300/50',
+            )}
+          >
+            {match(item.status)
+              .with('added', () => 'Created')
+              .with('deleted', () => 'Deleted')
+              .with('modified', () => 'Edited')
+              .with('copied', () => 'Copied')
+              .with('renamed', () => 'Renamed')
+              .with('typeChanged', () => 'Converted')
+              .exhaustive()}
+          </p>
+        </ListItem>
+      }
+    />
   )
 }
 

@@ -6,25 +6,25 @@ import {
   IconFilePlus,
   IconFiles,
 } from '@tabler/icons-react'
-import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
 import type { StagedFileInfo } from '@api/models'
+import type { ListItemProps } from '@ui/ListItem'
 import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '..'
 
-interface StagedFileStatusItemProps extends ComponentProps<'div'> {
+interface StagedFileStatusItemProps extends ListItemProps {
   item: StagedFileInfo
 }
 
 const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
-  const { item, ...divProps } = props
+  const { item, ...itemProps } = props
 
   return (
     <FileStatusItem
-      {...propsWithCn(divProps, 'text-light-600')}
+      {...propsWithCn(itemProps, 'text-light-600')}
       item={item}
-      type="staged"
+      fileType="staged"
       statusMessage={
         <p className={cn('text-xs text-success-300/50')}>
           {match(item.changes)

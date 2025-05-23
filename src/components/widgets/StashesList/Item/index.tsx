@@ -1,35 +1,30 @@
-import * as Ariakit from '@ariakit/react'
 import { IconArchive, IconGitBranch } from '@tabler/icons-react'
-import { type ComponentProps, memo } from 'react'
+import { memo } from 'react'
 
 import type { StashInfo } from '@api/models'
 import { ChangesSummary } from '@common/DiffSummary'
 import { StashToolbar } from '@common/StashToolbar'
 import { Icon } from '@ui/Icon'
-import { ListItem } from '@ui/ListItem'
+import { ListItem, type ListItemProps } from '@ui/ListItem'
 import { Marquee } from '@ui/Marquee'
 import { cn, propsWithCn } from '@utils/styles'
 import { useDateDifference } from '@utils/time'
 
-interface StashesListItemProps extends ComponentProps<'div'> {
+interface StashesListItemProps extends ListItemProps {
   item: StashInfo
 }
 
 const StashesListItem = memo((props: StashesListItemProps) => {
-  const { item, ...divProps } = props
+  const { item, ...itemProps } = props
   const stashedTime = useDateDifference(item.timestamp)
 
   return (
-    <Ariakit.CompositeItem
-      render={
-        <ListItem
-          {...propsWithCn(
-            divProps,
-            'flex-col justify-between',
-            'border-1 border-solid border-transparent',
-          )}
-        />
-      }
+    <ListItem
+      {...propsWithCn(
+        itemProps,
+        'flex-col justify-between',
+        'border-1 border-solid border-transparent',
+      )}
     >
       <div
         className={cn(
@@ -85,7 +80,7 @@ const StashesListItem = memo((props: StashesListItemProps) => {
           )}
         </Marquee>
       </div>
-    </Ariakit.CompositeItem>
+    </ListItem>
   )
 })
 

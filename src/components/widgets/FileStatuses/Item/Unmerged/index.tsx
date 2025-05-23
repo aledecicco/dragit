@@ -1,23 +1,23 @@
 import { IconFileAlert } from '@tabler/icons-react'
-import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
 import type { UnmergedFileInfo } from '@api/models'
+import type { ListItemProps } from '@ui/ListItem'
 import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '..'
 
-interface UnmergedFileStatusItemProps extends ComponentProps<'div'> {
+interface UnmergedFileStatusItemProps extends ListItemProps {
   item: UnmergedFileInfo
 }
 
 const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
-  const { item, ...divProps } = props
+  const { item, ...itemProps } = props
 
   return (
     <FileStatusItem
-      {...propsWithCn(divProps, 'text-light-600')}
+      {...propsWithCn(itemProps, 'text-light-600')}
       item={item}
-      type="unmerged"
+      fileType="unmerged"
       Glyph={IconFileAlert}
       statusMessage={
         <p className={cn('text-xs text-warning-400/50')}>

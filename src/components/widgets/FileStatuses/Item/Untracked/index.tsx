@@ -1,22 +1,22 @@
 import { IconFileUnknown } from '@tabler/icons-react'
-import type { ComponentProps } from 'react'
 
 import type { UntrackedFileInfo } from '@api/models'
+import type { ListItemProps } from '@ui/ListItem'
 import { propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '..'
 
-interface UntrackedFileStatusItemProps extends ComponentProps<'div'> {
+interface UntrackedFileStatusItemProps extends ListItemProps {
   item: UntrackedFileInfo
 }
 
 const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
-  const { item, ...divProps } = props
+  const { item, ...itemProps } = props
 
   return (
     <FileStatusItem
-      {...propsWithCn(divProps, 'text-light-950/90')}
+      {...propsWithCn(itemProps, 'text-light-950/90')}
       item={item}
-      type="untracked"
+      fileType="untracked"
       Glyph={IconFileUnknown}
     />
   )

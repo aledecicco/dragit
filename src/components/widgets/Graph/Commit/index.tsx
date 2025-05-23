@@ -54,10 +54,7 @@ const GraphCommit = makeTracked<
           height: COMMIT_HEIGHT,
         }}
       >
-        <QueryLoader
-          query={commitInfoQuery}
-          loadingFallback={<Skeleton variant="fill" />}
-        >
+        <QueryLoader query={commitInfoQuery}>
           {(commitInfo) => (
             <Ariakit.CompositeItem
               rowId={`${distance}`}

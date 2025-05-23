@@ -1,9 +1,11 @@
+import * as Ariakit from '@ariakit/react'
 import { useCallback, useMemo, useState } from 'react'
 
 import type { CommitId, CommitInfo } from '@api/models'
 import { COMMIT_FILES_PAGE_SIZE, useQueryCommitFiles } from '@api/queries'
 import { getPageItems } from '@api/utils'
 import { ChangesSummary } from '@common/DiffSummary'
+import { FileDiff } from '@common/FileDiff'
 import { ProfilePicture } from '@common/ProfilePicture'
 import { showDialog } from '@context/dialogs'
 import { useHandlePageSync, useNeedsPagination } from '@context/pages'
@@ -41,10 +43,18 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
     }))
   }, [filesQuery.data])
 
+  const store = Ariakit.useCheckboxStore()
+  const selectedFile = Ariakit.useStoreState(store, 'value')
+
   return (
     <Dialog
       dialogKey={COMMIT_DETAILS_DIALOG_KEY(commitInfo.hash)}
       heading={`#${commitInfo.shortHash}`}
+      sideContent={
+        typeof selectedFile === 'string' ? (
+          <FileDiff filepath={selectedFile} />
+        ) : undefined
+      }
       {...dialogProps}
     >
       <div className={cn('grid auto-rows-auto gap-y-6')}>
@@ -84,21 +94,23 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
               'bg-dark-700 border-1 border-dark-300 rounded-lg',
             )}
           >
-            <QueryList
-              query={filesQuery}
-              RenderItem={CommitDetailsDialogItem}
-              name="modified files"
-              getItems={getPageItems}
-              itemSize={48}
-              size="md"
-              options={virtualizerOptions}
-              placeholdersCount={Math.min(
-                10,
-                commitInfo.changes?.filesCount
-                  ? commitInfo.changes.filesCount
-                  : 1,
-              )}
-            />
+            <Ariakit.CheckboxProvider store={store}>
+              <QueryList
+                query={filesQuery}
+                RenderItem={CommitDetailsDialogItem}
+                name="modified files"
+                getItems={getPageItems}
+                itemSize={48}
+                size="md"
+                options={virtualizerOptions}
+                placeholdersCount={Math.min(
+                  10,
+                  commitInfo.changes?.filesCount
+                    ? commitInfo.changes.filesCount
+                    : 1,
+                )}
+              />
+            </Ariakit.CheckboxProvider>
           </div>
 
           {showPagination && (

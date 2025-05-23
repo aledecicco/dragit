@@ -1,4 +1,5 @@
 import * as Ariakit from '@ariakit/react'
+import type { ComponentProps, ReactNode } from 'react'
 
 import { type DialogKey, hideDialog } from '@context/dialogs'
 import { Button } from '@ui/Button'
@@ -8,6 +9,8 @@ interface DialogProps extends Ariakit.DialogProps {
   dialogKey: DialogKey
   heading?: string
   showClose?: boolean
+  contentProps?: ComponentProps<'div'>
+  sideContent?: ReactNode
 }
 
 const Dialog = (props: DialogProps) => {
@@ -15,6 +18,8 @@ const Dialog = (props: DialogProps) => {
     dialogKey,
     heading,
     showClose = true,
+    contentProps,
+    sideContent,
     children,
     ...dialogProps
   } = props
@@ -29,44 +34,56 @@ const Dialog = (props: DialogProps) => {
         {...propsWithCn(
           dialogProps,
           'fixed top-half left-half -translate-half',
-          'w-150 max-w-[70%] max-h-[70%] overflow-auto',
-          'py-8 px-6 bg-dark-600 rounded-lg',
+          'max-w-[70%] max-h-[70%] rounded-lg overflow-hidden',
           'border-2 border-solid border-dark-900',
-          'flex flex-col',
-          heading && 'pb-6',
+          !!sideContent && 'grid grid-cols-[1fr_2fr]',
         )}
         onClose={(e) => {
           dialogProps.onClose?.(e)
           hideDialog(dialogKey)
         }}
       >
-        {showClose && (
-          <Ariakit.DialogDismiss
-            render={
-              <Button
-                round
-                variant="plain"
-                status="neutral"
-                size="md"
-                className={cn(
-                  'text-lg text-light-950',
-                  'absolute top-1.5 right-1.5',
-                )}
-                description="Close dialog"
-              />
-            }
-          />
-        )}
+        <div
+          {...propsWithCn(
+            contentProps,
+            'min-w-110 w-150',
+            'py-8 px-6 bg-dark-600',
+            'flex flex-col overflow-hidden max-h-full',
+            heading && 'pb-6',
+          )}
+        >
+          {showClose && (
+            <Ariakit.DialogDismiss
+              render={
+                <Button
+                  round
+                  variant="plain"
+                  status="neutral"
+                  size="md"
+                  className={cn(
+                    'text-lg text-light-950',
+                    'absolute top-1.5 right-1.5',
+                  )}
+                  description="Close dialog"
+                />
+              }
+            />
+          )}
 
-        {heading && (
-          <Ariakit.DialogHeading
-            className={cn('text-xl font-bold text-center -mt-2 mb-6')}
-          >
-            {heading}
-          </Ariakit.DialogHeading>
-        )}
+          {heading && (
+            <Ariakit.DialogHeading
+              className={cn('text-xl font-bold text-center -mt-2 mb-6')}
+            >
+              {heading}
+            </Ariakit.DialogHeading>
+          )}
 
-        {children}
+          {children}
+        </div>
+
+        {!!sideContent && (
+          <div className={cn('w-full h-full bg-dark-900')}>{sideContent}</div>
+        )}
       </Ariakit.Dialog>
     </Ariakit.DialogProvider>
   )

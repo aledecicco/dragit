@@ -44,9 +44,10 @@ const CommandMenu = (props: CommandMenuProps) => {
 
   return (
     <Dialog
-      {...propsWithCn(dialogProps, 'p-0 rounded-md bg-dark-300')}
+      {...propsWithCn(dialogProps, 'rounded-md')}
       showClose={false}
       heading={undefined}
+      contentProps={propsWithCn(dialogProps.contentProps, 'p-0 bg-dark-300')}
       onClose={(e) => {
         dialogProps.onClose?.(e)
         submitValue(undefined)
