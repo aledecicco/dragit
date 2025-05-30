@@ -11,8 +11,8 @@ use utils::*;
 
 use models::{
     AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommittedFileInfo,
-    CommonAncestorInfo, FileInfo, FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem,
-    Page, RemoteInfo, StashInfo,
+    CommonAncestorInfo, FileDiff, FileInfo, FileTypesFilter, GitError, GitHandler, HeadInfo,
+    HistoryItem, Page, RemoteInfo, StashInfo,
 };
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
@@ -184,9 +184,14 @@ impl GitHandler for CmdGit {
         })
     }
 
-    fn get_head_info(&self, path: &str) -> Result<HeadInfo, GitError> {
-        let process = self.spawn_command(
-            &path,
+    fn get_head_info(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+    ) -> Result<HeadInfo, GitError> {
+        let process = self.spawn_and_notify(
+            channel,
+            path,
             [
                 "--no-optional-locks",
                 "status",
@@ -479,8 +484,12 @@ impl GitHandler for CmdGit {
             }))
     }
 
-    fn get_remotes(&self, path: &str) -> Result<Vec<RemoteInfo>, GitError> {
-        let process = self.spawn_command(path, ["remote", "--verbose"])?;
+    fn get_remotes(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+    ) -> Result<Vec<RemoteInfo>, GitError> {
+        let process = self.spawn_and_notify(channel, path, ["remote", "--verbose"])?;
         let lines = self.get_all_output_lines(process)?;
 
         Ok(parse_remote_infos(&lines))
@@ -529,9 +538,16 @@ impl GitHandler for CmdGit {
             }))
     }
 
-    fn get_stashes(&self, path: &str) -> Result<Vec<StashInfo>, GitError> {
-        let process =
-            self.spawn_command(path, ["stash", "list", STASH_INFO_FORMAT, "--shortstat"])?;
+    fn get_stashes(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+    ) -> Result<Vec<StashInfo>, GitError> {
+        let process = self.spawn_and_notify(
+            channel,
+            path,
+            ["stash", "list", STASH_INFO_FORMAT, "--shortstat"],
+        )?;
         let mut lines = self.get_output_lines_stream(process)?.peekable();
         let mut stashes = Vec::new();
 
@@ -600,5 +616,31 @@ impl GitHandler for CmdGit {
             .or(Err(GitError::DiscardStashFailed {
                 stash_id: stash_id.to_string(),
             }))
+    }
+
+    fn get_file_diff(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+        reference: &str,
+        filepath: &str,
+    ) -> Result<FileDiff, GitError> {
+        let process = self.spawn_and_notify(
+            channel,
+            path,
+            [
+                "diff",
+                &format!("{}^1", reference),
+                "-U1000000",
+                "--",
+                filepath,
+            ],
+        )?;
+        let lines = self.get_all_output_lines(process)?;
+
+        parse_file_diff(&lines).ok_or(GitError::GetFileDiffFailed {
+            filepath: filepath.to_string(),
+            reference: reference.to_string(),
+        })
     }
 }

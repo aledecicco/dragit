@@ -22,8 +22,8 @@ const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
           run: () => stage.mutateAsync({ files: [file.path] }),
           label: {
             idle: 'Mark as resolved',
-            running: 'Staging',
-            success: 'Staged',
+            running: 'Resolving',
+            success: 'Resolved',
             error: 'Failed',
           },
           Glyph: IconCheck,

@@ -168,3 +168,18 @@ export const STASH_INFO_SCHEMA = BorshSchema.Struct({
   changes: BorshSchema.Option(DIFF_SUMMARY_SCHEMA),
 })
 export const STASHES_SCHEMA = BorshSchema.Vec(STASH_INFO_SCHEMA)
+
+export const DIFF_TYPE_SCHEMA = BorshSchema.Enum({
+  Added: BorshSchema.Unit,
+  Removed: BorshSchema.Unit,
+  Unchanged: BorshSchema.Unit,
+})
+
+export const DIFF_SECTION_SCHEMA = BorshSchema.Struct({
+  diffType: DIFF_TYPE_SCHEMA,
+  lines: BorshSchema.Vec(BorshSchema.String),
+})
+
+export const FILE_DIFF_SCHEMA = BorshSchema.Struct({
+  sections: BorshSchema.Vec(DIFF_SECTION_SCHEMA),
+})

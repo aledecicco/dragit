@@ -5,7 +5,7 @@ import type { CommitId, CommitInfo } from '@api/models'
 import { COMMIT_FILES_PAGE_SIZE, useQueryCommitFiles } from '@api/queries'
 import { getPageItems } from '@api/utils'
 import { ChangesSummary } from '@common/DiffSummary'
-import { FileDiff } from '@common/FileDiff'
+import { FileDiffViewer } from '@common/FileDiffViewer'
 import { ProfilePicture } from '@common/ProfilePicture'
 import { showDialog } from '@context/dialogs'
 import { useHandlePageSync, useNeedsPagination } from '@context/pages'
@@ -55,7 +55,7 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
       }}
       sideContent={
         typeof selectedFile === 'string' ? (
-          <FileDiff filepath={selectedFile} />
+          <FileDiffViewer reference={commitInfo.hash} filepath={selectedFile} />
         ) : undefined
       }
       {...dialogProps}

@@ -75,6 +75,7 @@ pub fn run() {
             api::stash,
             api::apply_stash,
             api::discard_stash,
+            api::get_file_diff,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

@@ -139,8 +139,12 @@ pub async fn get_commit_info(
 }
 
 #[tauri::command]
-pub async fn get_head_info(state: State<'_, AppState>, path: &str) -> Result<Response, AppError> {
-    with_handler(&state, &|h| h.get_head_info(path)).and_then(serialize_response)
+pub async fn get_head_info(
+    state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
+    path: &str,
+) -> Result<Response, AppError> {
+    with_handler(&state, &|h| h.get_head_info(&channel, path)).and_then(serialize_response)
 }
 
 #[tauri::command]
@@ -269,8 +273,12 @@ pub async fn pull_branch(
 }
 
 #[tauri::command]
-pub async fn get_remotes(state: State<'_, AppState>, path: &str) -> Result<Response, AppError> {
-    with_handler(&state, &|h| h.get_remotes(path)).and_then(serialize_response)
+pub async fn get_remotes(
+    state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
+    path: &str,
+) -> Result<Response, AppError> {
+    with_handler(&state, &|h| h.get_remotes(&channel, path)).and_then(serialize_response)
 }
 
 #[tauri::command]
@@ -332,8 +340,12 @@ pub async fn change_remote_url(
 }
 
 #[tauri::command]
-pub async fn get_stashes(state: State<'_, AppState>, path: &str) -> Result<Response, AppError> {
-    with_handler(&state, &|h| h.get_stashes(path)).and_then(serialize_response)
+pub async fn get_stashes(
+    state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
+    path: &str,
+) -> Result<Response, AppError> {
+    with_handler(&state, &|h| h.get_stashes(&channel, path)).and_then(serialize_response)
 }
 
 #[tauri::command]
@@ -365,4 +377,18 @@ pub async fn discard_stash(
     stash_id: &str,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| h.discard_stash(path, stash_id))
+}
+
+#[tauri::command]
+pub async fn get_file_diff(
+    state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
+    path: &str,
+    reference: &str,
+    filepath: &str,
+) -> Result<Response, AppError> {
+    with_handler(&state, &|h| {
+        h.get_file_diff(&channel, path, reference, filepath)
+    })
+    .and_then(serialize_response)
 }

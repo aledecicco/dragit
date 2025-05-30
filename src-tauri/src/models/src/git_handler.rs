@@ -2,7 +2,7 @@ use tauri::ipc::Channel;
 
 use crate::{
     AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommittedFileInfo, CommonAncestorInfo,
-    FileInfo, GitError, HeadInfo, HistoryItem, Page, RemoteInfo, StashInfo,
+    FileDiff, FileInfo, GitError, HeadInfo, HistoryItem, Page, RemoteInfo, StashInfo,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -42,7 +42,11 @@ pub trait GitHandler {
     ) -> Result<CommitInfo, GitError>;
 
     /// Returns information about the current state of the HEAD.
-    fn get_head_info(&self, path: &str) -> Result<HeadInfo, GitError>;
+    fn get_head_info(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+    ) -> Result<HeadInfo, GitError>;
 
     /// Returns (a page of) the list of files with the given types.
     fn get_files_page(
@@ -117,7 +121,11 @@ pub trait GitHandler {
     ) -> Result<(), GitError>;
 
     /// Returns the list of available remotes.
-    fn get_remotes(&self, path: &str) -> Result<Vec<RemoteInfo>, GitError>;
+    fn get_remotes(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+    ) -> Result<Vec<RemoteInfo>, GitError>;
 
     /// Fetches the given remote, updating the remote references.
     fn fetch_remote(&self, path: &str, remote: &str) -> Result<(), GitError>;
@@ -138,7 +146,11 @@ pub trait GitHandler {
     fn change_remote_url(&self, path: &str, name: &str, new_url: &str) -> Result<(), GitError>;
 
     /// Returns the list of stashed changes.
-    fn get_stashes(&self, path: &str) -> Result<Vec<StashInfo>, GitError>;
+    fn get_stashes(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+    ) -> Result<Vec<StashInfo>, GitError>;
 
     /// Stashes the given files with an optional message.
     fn stash(
@@ -154,6 +166,15 @@ pub trait GitHandler {
 
     /// Discards the given stash.
     fn discard_stash(&self, path: &str, stash_id: &str) -> Result<(), GitError>;
+
+    /// Returns the line changes made to a file in a commit.
+    fn get_file_diff(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+        reference: &str,
+        filepath: &str,
+    ) -> Result<FileDiff, GitError>;
 }
 
 #[derive(serde::Deserialize, Debug)]

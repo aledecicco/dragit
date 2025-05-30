@@ -173,6 +173,17 @@ export type Reference =
       refName: BranchName
     }
 
+export type DiffType = 'added' | 'removed' | 'unchanged'
+
+export interface DiffSection {
+  diffType: DiffType
+  lines: string[]
+}
+
+export interface FileDiff {
+  sections: DiffSection[]
+}
+
 export type AppMessage = {
   type: 'processStarted'
   pid: number
