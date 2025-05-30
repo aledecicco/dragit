@@ -5,12 +5,18 @@ import { pluralize } from '@utils/string'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface ChangesSummaryProps extends ComponentProps<'span'> {
-  diff: DiffSummary
+  diff: DiffSummary | null
   compact?: boolean
 }
 
 const ChangesSummary = (props: ChangesSummaryProps) => {
   const { diff, compact = true, ...spanProps } = props
+
+  if (!diff) {
+    return (
+      <span {...propsWithCn(spanProps, 'text-light-950/60')}>No changes</span>
+    )
+  }
 
   return (
     <span {...propsWithCn(spanProps, 'text-light-950/60')}>

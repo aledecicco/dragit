@@ -36,7 +36,10 @@ const Dialog = (props: DialogProps) => {
           'fixed top-half left-half -translate-half',
           'max-w-[70%] max-h-[70%] rounded-lg overflow-hidden',
           'border-2 border-solid border-dark-900',
-          !!sideContent && 'grid grid-cols-[1fr_2fr]',
+          'grid grid-rows-1',
+          sideContent
+            ? 'w-full h-full grid-cols-[480px_1fr]'
+            : 'grid-cols-[480px]',
         )}
         onClose={(e) => {
           dialogProps.onClose?.(e)
@@ -46,9 +49,8 @@ const Dialog = (props: DialogProps) => {
         <div
           {...propsWithCn(
             contentProps,
-            'min-w-110 w-150',
             'py-8 px-6 bg-dark-600',
-            'flex flex-col overflow-hidden max-h-full',
+            'grid overflow-hidden',
             heading && 'pb-6',
           )}
         >

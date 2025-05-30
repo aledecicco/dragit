@@ -50,6 +50,9 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
     <Dialog
       dialogKey={COMMIT_DETAILS_DIALOG_KEY(commitInfo.hash)}
       heading={`#${commitInfo.shortHash}`}
+      contentProps={{
+        className: cn('grid-rows-[max-content_max-content]'),
+      }}
       sideContent={
         typeof selectedFile === 'string' ? (
           <FileDiff filepath={selectedFile} />
@@ -57,15 +60,17 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
       }
       {...dialogProps}
     >
-      <div className={cn('grid auto-rows-auto gap-y-6')}>
-        {commitInfo.changes && (
-          <ChangesSummary
-            diff={commitInfo.changes}
-            compact={false}
-            className={cn('text-sm justify-self-center -mt-6')}
-          />
-        )}
+      <ChangesSummary
+        diff={commitInfo.changes}
+        compact={false}
+        className={cn('text-sm justify-self-center -mt-6 mb-6')}
+      />
 
+      <div
+        className={cn(
+          'grid gap-y-6 overflow-y-hidden grid-rows-[max-content_1fr]',
+        )}
+      >
         <div>
           <div
             className={cn(
@@ -87,10 +92,10 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
           </div>
         </div>
 
-        <div className={cn('grid auto-rows-auto gap-y-2')}>
+        <div className={cn('grid gap-y-2 overflow-y-hidden')}>
           <div
             className={cn(
-              'max-h-65 overflow-y-hidden',
+              'overflow-y-hidden',
               'bg-dark-700 border-1 border-dark-300 rounded-lg',
             )}
           >
@@ -112,23 +117,23 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
               />
             </Ariakit.CheckboxProvider>
           </div>
-
-          {showPagination && (
-            <Pagination
-              className={cn('-mb-2')}
-              page={page}
-              pageSize={COMMIT_FILES_PAGE_SIZE}
-              hasNext={!!filesQuery.data?.hasNext}
-              setPrevPage={() => {
-                setPage((_page) => _page - 1)
-              }}
-              setNextPage={() => {
-                setPage((_page) => _page + 1)
-              }}
-            />
-          )}
         </div>
       </div>
+
+      {showPagination && (
+        <Pagination
+          className={cn('mt-6 -mb-2')}
+          page={page}
+          pageSize={COMMIT_FILES_PAGE_SIZE}
+          hasNext={!!filesQuery.data?.hasNext}
+          setPrevPage={() => {
+            setPage((_page) => _page - 1)
+          }}
+          setNextPage={() => {
+            setPage((_page) => _page + 1)
+          }}
+        />
+      )}
     </Dialog>
   )
 }

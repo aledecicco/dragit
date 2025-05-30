@@ -41,7 +41,11 @@ const Toolbar = (props: ToolbarProps) => {
       >
         {tools.map((tool) => (
           <ActionButton
-            key={tool.action.label.idle}
+            key={
+              typeof tool.action.label === 'string'
+                ? tool.action.label
+                : tool.action.label.idle
+            }
             className={cn(
               fixed && 'w-full',
               'not-first:rounded-l-none',
