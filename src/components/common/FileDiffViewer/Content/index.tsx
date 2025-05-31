@@ -18,7 +18,7 @@ const DiffViewerContent = (props: DiffViewerContentProps) => {
         'col-start-1 -col-end-1',
       )}
     >
-      <div className={cn('w-max')}>
+      <div className={cn('w-max min-w-full')}>
         {fileDiff.sections.map((section, i) =>
           section.lines.map((line, j) => (
             <ContentCell

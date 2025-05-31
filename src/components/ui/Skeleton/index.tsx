@@ -24,7 +24,7 @@ const Skeleton = (props: SkeletonProps) => {
       )}
       style={
         variant === 'line'
-          ? { width: `${50 + Math.floor(Math.random() * 40)}%` }
+          ? { width: `${50 + Math.floor(Math.random() * 5) * 8}%` }
           : undefined
       }
     />

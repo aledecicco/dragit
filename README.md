@@ -9,7 +9,7 @@ Stash of ideas in ~planned implementation order:
 - [x] Keyboard shortcuts cheatsheet component
 - [x] Loading indicators
 - [x] Remotes manipulation widgets
-- [ ] Commit details
+- [x] Commit details
 - [ ] Documentation pass
 - [ ] Performance pass
 - [ ] Checkout of remote branches, create branch from commit

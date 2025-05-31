@@ -19,7 +19,12 @@ const CommitDetailsDialogItem = (props: CommitDetailsDialogItemProps) => {
       render={
         <ListItem
           interactive
-          {...propsWithCn(itemProps, 'flex flex-col items-start')}
+          {...propsWithCn(
+            itemProps,
+            'flex flex-col items-start',
+            'border-1 border-solid border-transparent',
+            'aria-checked:border-accent-300',
+          )}
         >
           <Marquee className={cn('text-sm text-light-600')} reverse>
             {item.path}
