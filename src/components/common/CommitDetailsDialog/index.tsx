@@ -12,7 +12,7 @@ import { useHandlePageSync, useNeedsPagination } from '@context/pages'
 import { Pagination } from '@lib/Pagination'
 import { QueryList } from '@lib/QueryList'
 import { Dialog, type DialogProps } from '@ui/Dialog'
-import { cn } from '@utils/styles'
+import { cn, propsWithCn } from '@utils/styles'
 import { useDateDifference } from '@utils/time'
 import { mapFn } from '@utils/types'
 import { CommitDetailsDialogItem } from './Item'
@@ -58,7 +58,7 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
           <FileDiffViewer reference={commitInfo.hash} filepath={selectedFile} />
         ) : undefined
       }
-      {...dialogProps}
+      {...propsWithCn(dialogProps, 'max-w-[85%] max-h-[85%]')}
     >
       <ChangesSummary
         diff={commitInfo.changes}
