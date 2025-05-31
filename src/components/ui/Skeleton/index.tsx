@@ -3,23 +3,24 @@ import { match } from 'ts-pattern'
 
 import { propsWithCn } from '@utils/styles'
 
+type SkeletonVariant = 'line' | 'fill'
+
 interface SkeletonProps extends ComponentProps<'div'> {
-  variant?: 'fill'
+  variant?: SkeletonVariant
 }
 
 const Skeleton = (props: SkeletonProps) => {
-  const { variant, ...divProps } = props
+  const { variant = 'fill', ...divProps } = props
 
   return (
     <div
       {...propsWithCn(
         divProps,
-        'animate-pulse bg-dark-400',
-        'flex flex-col items-center justify-center text-center text-sm text-light-950',
-        'rounded-xs',
+        'animate-pulse bg-dark-400 rounded-xs',
         match(variant)
           .with('fill', () => 'w-full h-full')
-          .otherwise(() => undefined),
+          .with('line', () => 'h-4')
+          .exhaustive(),
       )}
     />
   )

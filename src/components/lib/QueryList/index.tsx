@@ -4,6 +4,7 @@ import type { UseQueryResult } from '@tanstack/react-query'
 import { QueryLoader } from '@lib/Loader/Query'
 import { VirtualizedDiv, type VirtualizedDivProps } from '@lib/VirtualizedDiv'
 import { Skeleton } from '@ui/Skeleton'
+import { range } from '@utils/array'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface QueryListProps<T, I> extends Omit<VirtualizedDivProps<I>, 'items'> {
@@ -36,7 +37,7 @@ const QueryList = <T, I>(props: QueryListProps<T, I>) => {
             gap: virtualizedDivProps.options?.gap ?? 8,
           }}
         >
-          {[...Array(placeholdersCount).keys()].map((i) => (
+          {range(placeholdersCount).map((i) => (
             <Skeleton
               key={i}
               style={{ height: virtualizedDivProps.itemSize }}

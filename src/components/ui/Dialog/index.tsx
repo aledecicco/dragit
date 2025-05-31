@@ -84,7 +84,9 @@ const Dialog = (props: DialogProps) => {
         </div>
 
         {!!sideContent && (
-          <div className={cn('w-full h-full bg-dark-900')}>{sideContent}</div>
+          <div className={cn('w-full h-full bg-dark-900 overflow-hidden')}>
+            {sideContent}
+          </div>
         )}
       </Ariakit.Dialog>
     </Ariakit.DialogProvider>
