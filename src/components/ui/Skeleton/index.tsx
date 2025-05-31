@@ -19,9 +19,14 @@ const Skeleton = (props: SkeletonProps) => {
         'animate-pulse bg-dark-400 rounded-xs',
         match(variant)
           .with('fill', () => 'w-full h-full')
-          .with('line', () => 'h-4')
+          .with('line', () => 'h-3')
           .exhaustive(),
       )}
+      style={
+        variant === 'line'
+          ? { width: `${50 + Math.floor(Math.random() * 40)}%` }
+          : undefined
+      }
     />
   )
 }

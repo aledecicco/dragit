@@ -72,4 +72,8 @@ const useDateDifference = (date: Date | number): string => {
   return useTimedMemo(getDifference, MS_IN_MINUTE)
 }
 
-export { useTimedMemo, useDateDifference }
+const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+export { useTimedMemo, useDateDifference, sleep }

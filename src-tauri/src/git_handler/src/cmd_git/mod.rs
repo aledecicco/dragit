@@ -281,19 +281,20 @@ impl GitHandler for CmdGit {
         start_after: usize,
         limit: usize,
     ) -> Result<Page<CommittedFileInfo>, GitError> {
-        let parent = format!("{}^1", reference);
-        let args = vec![
-            "diff-tree",
-            "-r",
-            "--root",
-            "--name-status",
-            "--find-copies",
-            "--no-commit-id",
-            reference,
-            &parent,
-        ];
-
-        let process = self.spawn_and_notify(channel, path, args)?;
+        let process = self.spawn_and_notify(
+            channel,
+            path,
+            [
+                "diff-tree",
+                "-r",
+                "--root",
+                "--name-status",
+                "--find-copies",
+                "--no-commit-id",
+                reference,
+                &format!("{}^1", reference),
+            ],
+        )?;
         let lines = self.get_output_lines_stream(process)?;
 
         let mut items_iter = lines
@@ -630,6 +631,7 @@ impl GitHandler for CmdGit {
             path,
             [
                 "diff",
+                reference,
                 &format!("{}^1", reference),
                 "-U1000000",
                 "--",

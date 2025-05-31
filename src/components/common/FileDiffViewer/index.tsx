@@ -9,7 +9,9 @@ import { Separator } from '@ui/Separator'
 import { Skeleton } from '@ui/Skeleton'
 import { range } from '@utils/array'
 import { cn, propsWithCn } from '@utils/styles'
-import { match } from 'ts-pattern'
+import { DiffViewerContent } from './Content'
+import { DiffViewerLineChanges } from './LineChanges'
+import { DiffViewerLineNumbers } from './LineNumbers'
 
 interface FileDiffViewerProps extends ComponentProps<'div'> {
   reference: string
@@ -25,11 +27,11 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'p-2 w-full h-full',
-        'grid grid-rows-[max-content_max-content_1fr] gap-y-3',
+        'w-full h-full',
+        'grid grid-rows-[max-content_max-content_1fr]',
       )}
     >
-      <div className="flex flex-row items-center gap-x-2 pr-9">
+      <div className="flex flex-row items-center gap-x-2 p-2 pr-9">
         <Icon Glyph={IconFile} size="lg" />
         <Marquee className={cn('text-md text-light-500')}>{filepath}</Marquee>
       </div>
@@ -38,13 +40,27 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
 
       <div
         className={cn(
-          'px-2 text-sm overflow-y-auto grid grid-cols-[max-content_max-content_1fr]',
+          'pl-1 pt-1 text-sm overflow-y-auto grid grid-cols-[max-content_max-content_1fr] auto-rows-max',
         )}
       >
         <QueryLoader
           query={fileDiffQuery}
-          loadingFallback={range(5).map((i) => (
-            <Skeleton key={i} variant="line" className={cn('col-span-2')} />
+          loadingFallback={range(50).map((i) => (
+            <Fragment key={i}>
+              <div
+                className={cn(
+                  'h-7 flex flex-row items-center font-mono',
+                  'text-xs w-19 px-1 overflow-hidden',
+                  'bg-dark-600 text-light-950/30',
+                )}
+              >
+                {i + 1}
+              </div>
+              <Skeleton
+                variant="line"
+                className={cn('col-span-2 m-1.5 mx-2')}
+              />
+            </Fragment>
           ))}
         >
           {(fileDiff) => {
@@ -54,96 +70,22 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
               )
             }
 
-            const lengthSums = fileDiff.sections.reduce(
-              (acc: number[], section) => {
-                acc.push((acc.at(-1) ?? 0) + section.lines.length)
-                return acc
-              },
-              [],
-            )
-            const totalLength = lengthSums.at(-1) ?? 0
-
             return (
               <>
-                <div
-                  className={cn('col-start-1 select-none')}
-                  style={{ gridRowStart: 1, gridRowEnd: totalLength + 1 }}
-                >
-                  {fileDiff.sections.map((section, i) =>
-                    section.lines.map((_, j) => (
-                      <div
-                        key={`${section.diffType}-${i}-${j}`}
-                        className={cn(
-                          'h-7 flex flex-row items-center font-mono',
-                          'text-xs w-18 px-1 overflow-hidden',
-                          match(section.diffType)
-                            .with('added', () => 'bg-success-500/30')
-                            .with('removed', () => 'bg-danger-600/30')
-                            .with('unchanged', () => 'bg-dark-600')
-                            .exhaustive(),
-                        )}
-                      >
-                        {(i === 0 ? 0 : lengthSums[i - 1]) + j + 1}
-                      </div>
-                    )),
-                  )}
-                  <div className={cn('h-7 bg-dark-600')} />
-                </div>
+                <DiffViewerLineNumbers
+                  fileDiff={fileDiff}
+                  className={cn('col-start-1')}
+                />
 
-                <div
-                  className={cn('col-start-2 select-none')}
-                  style={{ gridRowStart: 1, gridRowEnd: totalLength + 1 }}
-                >
-                  {fileDiff.sections.map((section, i) =>
-                    section.lines.map((_, j) => (
-                      <div
-                        key={`${section.diffType}-${i}-${j}`}
-                        className={cn(
-                          'h-7 flex flex-row items-center justify-center font-mono',
-                          'w-4',
-                          match(section.diffType)
-                            .with('added', () => 'bg-success-500/10')
-                            .with('removed', () => 'bg-danger-600/10')
-                            .with('unchanged', () => undefined)
-                            .exhaustive(),
-                        )}
-                      >
-                        {match(section.diffType)
-                          .with('added', () => '+')
-                          .with('removed', () => '-')
-                          .with('unchanged', () => ' ')
-                          .exhaustive()}
-                      </div>
-                    )),
-                  )}
-                  <div className={cn('h-7')} />
-                </div>
+                <DiffViewerLineChanges
+                  fileDiff={fileDiff}
+                  className={cn('col-start-2')}
+                />
 
-                <div
-                  className={cn(
-                    'col-start-3 flex flex-col overflow-x-auto overflow-y-hidden',
-                  )}
-                  style={{ gridRowStart: 1, gridRowEnd: totalLength + 1 }}
-                >
-                  {fileDiff.sections.map((section, i) =>
-                    section.lines.map((line, j) => (
-                      <div
-                        key={`${section.diffType}-${i}-${j}`}
-                        className={cn(
-                          'h-7 font-mono whitespace-pre pl-1 flex flex-row items-center w-full',
-                          match(section.diffType)
-                            .with('added', () => 'bg-success-500/10')
-                            .with('removed', () => 'bg-danger-600/10')
-                            .with('unchanged', () => undefined)
-                            .exhaustive(),
-                        )}
-                      >
-                        {line}
-                      </div>
-                    )),
-                  )}
-                  <div className={cn('h-7')} />
-                </div>
+                <DiffViewerContent
+                  fileDiff={fileDiff}
+                  className={cn('col-start-3')}
+                />
               </>
             )
           }}
