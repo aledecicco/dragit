@@ -22,11 +22,13 @@ const Skeleton = (props: SkeletonProps) => {
           .with('line', () => 'h-3')
           .exhaustive(),
       )}
-      style={
-        variant === 'line'
-          ? { width: `${50 + Math.floor(Math.random() * 5) * 8}%` }
-          : undefined
-      }
+      style={{
+        ...divProps.style,
+        width:
+          variant === 'line'
+            ? `${50 + Math.floor(Math.random() * 5) * 8}%`
+            : undefined,
+      }}
     />
   )
 }

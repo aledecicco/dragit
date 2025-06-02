@@ -11,6 +11,7 @@ import {
 } from '@ui/Accordion/Section'
 import { propsWithCn } from '@utils/styles'
 import { mapFn } from '@utils/types'
+import { usePrevious } from 'react-use'
 import { StagedFileStatusItem } from '../Item/Staged'
 import { UnmergedFileStatusItem } from '../Item/Unmerged'
 import { UnstagedFileStatusItem } from '../Item/Unstaged'
@@ -35,6 +36,8 @@ const FileStatusesSection = <T extends FileType>(
     }))
   }, [filesQuery.data])
 
+  const prevCount = usePrevious(filesQuery.data?.items.length)
+
   return (
     <AccordionSection
       defaultOpen
@@ -51,6 +54,7 @@ const FileStatusesSection = <T extends FileType>(
         RenderItem={FileStatusItem[type]}
         options={virtualizerOptions}
         isStandalone={false}
+        placeholdersCount={Math.min(10, prevCount ?? 3)}
       />
     </AccordionSection>
   )
