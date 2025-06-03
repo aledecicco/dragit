@@ -6,9 +6,15 @@ import { useAddToIndex } from '@api/mutations'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 
 interface UnstagedFileToolbarProps extends Partial<ToolbarProps> {
+  /**
+   * The file to operate on.
+   */
   file: UnstagedFileInfo
 }
 
+/**
+ * The common set of tools for unstaged files.
+ */
 const UnstagedFileToolbar = (props: UnstagedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
   const stage = useAddToIndex()

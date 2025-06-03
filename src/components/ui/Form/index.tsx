@@ -1,6 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 import type { ReactNode } from 'react'
 
+import { type Action, ActionButton } from '@lib/ActionButton'
 import {
   type ActionDescription,
   type ActionTracker,
@@ -16,13 +17,39 @@ type FormCallback<T extends AnyObject> = (
 
 interface FormProps<T extends AnyObject>
   extends Omit<Ariakit.FormProps, 'children'> {
+  /**
+   * The default values for the form fields.
+   */
   defaultValues: T
+
+  /**
+   * The description of the action that the form performs on submit.
+   */
   actionDescription: ActionDescription
+
+  /**
+   * Callback that is triggered when the form is submitted.
+   */
   onFormSubmit: FormCallback<T>
+
+  /**
+   * Callback triggered for form validation.
+   */
   validateForm?: FormCallback<T>
+
+  /**
+   * The children of the form, which can be a function that receives the state of the tracked form action.
+   */
   children?: ReactNode | ((tracker: ActionTracker) => ReactNode)
 }
 
+/**
+ * Form component that handles validation and submission, and provides its state to the fields it contains.
+ *
+ * The form submission callback is treated as an {@link Action}, and the submission button is an {@link ActionButton} that tracks it.
+ *
+ * @template T - The type of the form values.
+ */
 const Form = <T extends AnyObject>(props: FormProps<T>) => {
   const {
     defaultValues,

@@ -35,7 +35,14 @@ export interface AncestorInfo {
 }
 
 export interface CommonAncestorInfo {
+  /**
+   * The last commit of the main branch before the common ancestor.
+   */
   lastCommit: AncestorInfo | null
+
+  /**
+   * The first commit that two branches have in common.
+   */
   commonCommit: AncestorInfo
 }
 

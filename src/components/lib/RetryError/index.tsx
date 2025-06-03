@@ -6,10 +6,22 @@ import { Icon } from '@ui/Icon'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface RetryErrorProps extends ComponentProps<'div'> {
+  /**
+   * The error message to display.
+   */
   message: string
+
+  /**
+   * A callback to trigger a retry.
+   */
   retry: () => void
 }
 
+/**
+ * Displays an error message and a retry button.
+ *
+ * Useful for displaying query errors and allowing a re-fetch.
+ */
 const RetryError = (props: RetryErrorProps) => {
   const { message, retry, ...divProps } = props
 

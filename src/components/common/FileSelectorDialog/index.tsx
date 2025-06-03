@@ -21,6 +21,9 @@ import { mapFn } from '@utils/types'
 
 interface FileSelectorDialogProps<T extends FileType>
   extends AskForValueProps<{ path: string }> {
+  /**
+   * The types of files to match.
+   */
   types: T | T[]
 }
 
@@ -54,6 +57,9 @@ const PAGINATION_SHORTCUTS: Shortcut[] = [
   },
 ]
 
+/**
+ * Dialog that allows the user to search for files matching a pathspec, and select one (or all) of them.
+ */
 const FileSelectorDialog = <T extends FileType>(
   props: FileSelectorDialogProps<T>,
 ) => {

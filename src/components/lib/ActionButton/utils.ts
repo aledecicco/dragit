@@ -29,6 +29,17 @@ interface ActionTracker {
   trackAction: (promise: Promise<unknown>, action: ActionDescription) => void
 }
 
+/**
+ * A hook that facilitates tracking the state of an action button.
+ *
+ * Manages the icon and label of the button, allowing to track one of the alternative actions,
+ * and reverting back to the main one once done.
+ *
+ * @param mainAction - The main action to use as default.
+ * @param defaultStatus - The default status of the button while idle (used during running state also).
+ *
+ * @returns The current icon, label, button status, action state, and a callback to trigger and start tracking an action.
+ */
 const useActionTracker = (
   mainAction: ActionDescription,
   defaultStatus: ButtonStatus,

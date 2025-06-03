@@ -6,9 +6,15 @@ import { usePullBranch, usePushBranch } from '@api/mutations'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 
 interface BranchToolbarProps extends Partial<ToolbarProps> {
+  /**
+   * The branch to operate on.
+   */
   branch: BranchInfo | undefined
 }
 
+/**
+ * The common set of tools for branches (both local and remote).
+ */
 const BranchToolbar = (props: BranchToolbarProps) => {
   const { branch, ...toolbarProps } = props
 

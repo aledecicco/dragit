@@ -11,10 +11,16 @@ import type { ListItemProps } from '@ui/ListItem'
 import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '..'
 
+/**
+ * Information about the unstaged file to display.
+ */
 interface UnstagedFileStatusItemProps extends ListItemProps {
   item: UnstagedFileInfo
 }
 
+/**
+ * The list item for files in the 'unstaged' file statuses widget section.
+ */
 const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
   const { item, ...itemProps } = props
 

@@ -10,17 +10,41 @@ interface BranchSelectorProps<T extends boolean>
       'option' | 'options' | 'setOption'
     >
   > {
+  /**
+   * The currently selected branch.
+   */
   branch: BranchInfo | undefined
+
+  /**
+   * The list of available branches.
+   */
   branches: BranchInfo[] | undefined
+
+  /**
+   * Optionally exclude a specific branch from the options (usually the current branch).
+   */
   exclude?: BranchName
+
+  /**
+   * Whether to allow seleting an empty option.
+   */
   allowEmpty: T
-  onBranchChange: (
-    newBranch: ComboboxOption<
-      T extends true ? BranchInfo | undefined : BranchInfo
-    >,
-  ) => void
+
+  /**
+   * Callback that handles branch selection changes.
+   *
+   * @param newBranch - The new branch to be selected. If `allowEmpty` is true, this can be undefined.
+   */
+  onBranchChange: (newBranch: ComboboxOption<BranchOption<T>>) => void
 }
 
+type BranchOption<T extends boolean> = T extends true
+  ? BranchInfo | undefined
+  : BranchInfo
+
+/**
+ * A combobox used for branch selection.
+ */
 const BranchSelector = <T extends boolean>(props: BranchSelectorProps<T>) => {
   const {
     branch,
@@ -31,9 +55,7 @@ const BranchSelector = <T extends boolean>(props: BranchSelectorProps<T>) => {
     ...comboboxProps
   } = props
 
-  const branchOptions: ComboboxOption<
-    T extends true ? BranchInfo | undefined : BranchInfo
-  >[] = useMemo(() => {
+  const branchOptions: ComboboxOption<BranchOption<T>>[] = useMemo(() => {
     return getBranchOptions(branches, allowEmpty, exclude)
   }, [branches, allowEmpty, exclude])
 
@@ -50,16 +72,21 @@ const BranchSelector = <T extends boolean>(props: BranchSelectorProps<T>) => {
   )
 }
 
-type BranchOptionType<T extends boolean> = T extends true
-  ? BranchInfo | undefined
-  : BranchInfo
-
+/**
+ * Generates the appropriate options for a branch selector based on the provided config.
+ *
+ * @param branches The list of all available branches.
+ * @param allowEmpty Whether to allow selecting an empty option.
+ * @param exclude An optional branch name to exclude from the options.
+ *
+ * @returns An array of combobox options.
+ */
 const getBranchOptions = <T extends boolean>(
   branches: BranchInfo[] | undefined,
   allowEmpty: T,
   exclude?: BranchName,
-): ComboboxOption<BranchOptionType<T>>[] => {
-  let options: ComboboxOption<BranchOptionType<T>>[] =
+): ComboboxOption<BranchOption<T>>[] => {
+  let options: ComboboxOption<BranchOption<T>>[] =
     branches?.map((branch) => {
       const option = {
         value: branch.name,
@@ -73,7 +100,7 @@ const getBranchOptions = <T extends boolean>(
   }
 
   if (allowEmpty) {
-    options.unshift({ value: '', data: undefined as BranchOptionType<T> })
+    options.unshift({ value: '', data: undefined as BranchOption<T> })
   }
 
   return options

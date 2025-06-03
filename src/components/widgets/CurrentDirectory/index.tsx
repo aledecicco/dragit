@@ -7,6 +7,9 @@ import { propsWithCn } from '@utils/styles'
 
 interface CurrentDirectoryProps extends Partial<ButtonProps> {}
 
+/**
+ * Main app widget that displays the current directory path and allows the user to open a new one.
+ */
 const CurrentDirectory = (props: CurrentDirectoryProps) => {
   const { ...buttonProps } = props
   const currentDirQuery = useQueryCurrentDir()

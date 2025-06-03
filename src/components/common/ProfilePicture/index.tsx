@@ -9,15 +9,39 @@ import type { Size } from '@utils/types'
 
 type ProfilePictureVariant = 'accent' | 'primary' | 'neutral'
 
-type ProfilePictureSource = 'github' // TODO: add more
+type ProfilePictureSource = 'github' // TODO: add more?
 
 interface ProfilePictureProps extends ComponentProps<'div'> {
+  /**
+   * The username to use for fetching the profile picture.
+   *
+   * If undefined, a fallback icon is displayed.
+   */
   username: string | undefined
+
+  /**
+   * The color variant of the profile picture.
+   *
+   * Used to determine borders, and colors when no picture is available.
+   */
   variant?: ProfilePictureVariant
+
+  /**
+   * The size of the profile picture.
+   */
   size?: Size
+
+  /**
+   * The source to use for fetching the profile picture.
+   *
+   * Currently only supports GitHub.
+   */
   source?: ProfilePictureSource
 }
 
+/**
+ * Displays the profile picture of a user from a specified source.
+ */
 const ProfilePicture = (props: ProfilePictureProps) => {
   const {
     username,

@@ -15,6 +15,11 @@ interface BranchesListItemProps extends ListItemProps {
   item: BranchInfo
 }
 
+/**
+ * The list item for branches in the branches widget.
+ *
+ * Uses {@link Marquee}s to display long branch names.
+ */
 const BranchesListItem = memo((props: BranchesListItemProps) => {
   const { item, ...itemProps } = props
   const lastModified = useDateDifference(item.timestamp)

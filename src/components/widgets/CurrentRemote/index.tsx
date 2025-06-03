@@ -26,6 +26,9 @@ import { cn, propsWithCn } from '@utils/styles'
 
 interface CurrentRemoteProps extends ComponentProps<'div'> {}
 
+/**
+ * Main app widget that displays the current remote and remote branch selected for pushing and pulling.
+ */
 const CurrentRemote = (props: CurrentRemoteProps) => {
   const { ...divProps } = props
 

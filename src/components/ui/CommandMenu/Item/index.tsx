@@ -1,11 +1,20 @@
 import * as Ariakit from '@ariakit/react'
 
 import { cn } from '@utils/styles'
+import { CommandMenu } from '..'
 
 interface CommandMenuItemProps extends Ariakit.ComboboxItemProps {
+  /**
+   * The value of the item.
+   */
   item: string
 }
 
+/**
+ * A single item inside a {@link CommandMenu}.
+ *
+ * The callback to trigger the action of the item is handled by the parent.
+ */
 const CommandMenuItem = (props: CommandMenuItemProps) => {
   const { item } = props
 

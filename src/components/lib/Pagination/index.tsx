@@ -6,14 +6,40 @@ import { Icon } from '@ui/Icon'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface PaginationProps extends ComponentProps<'div'> {
+  /**
+   * The current 0-indexed page number.
+   */
   page: number
+
+  /**
+   * The number of items per page.
+   */
   pageSize: number
+
+  /**
+   * Whether there is a next page available.
+   */
   hasNext: boolean
+
+  /**
+   * Callback to move to the previous page.
+   */
   setPrevPage: () => void
+
+  /**
+   * Callback to move to the next page.
+   */
   setNextPage: () => void
+
+  /**
+   * Additional props for the buttons, shared between both of them.
+   */
   buttonProps?: Partial<ButtonProps>
 }
 
+/**
+ * Displays controls for paginated data, allowing navigation between pages.
+ */
 const Pagination = (props: PaginationProps) => {
   const {
     page,

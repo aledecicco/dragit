@@ -18,6 +18,13 @@ interface FileStatusItemProps<T extends FileType> extends ListItemProps {
   Glyph: Glyph
 }
 
+/**
+ * Base list item for files in the different file statuses widget sections.
+ *
+ * Includes the appropriate toolbar to manipulate the file.
+ *
+ * Uses {@link Marquee}s to display long paths.
+ */
 const FileStatusItem = <T extends FileType>(props: FileStatusItemProps<T>) => {
   const { item, fileType, statusMessage, Glyph, ...itemProps } = props
   const FileToolbar: ToolbarComponent<T> = FileItemToolbar[fileType]

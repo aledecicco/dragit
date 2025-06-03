@@ -7,9 +7,17 @@ import { Marquee } from '@ui/Marquee'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface CommitDetailsDialogItemProps extends ListItemProps {
+  /**
+   * The file that this list item should display.
+   */
   item: CommitedFileInfo
 }
 
+/**
+ * The list item for files in the commit details dialog.
+ *
+ * Displays as a checkbox to allow selecting/unselecting files.
+ */
 const CommitDetailsDialogItem = (props: CommitDetailsDialogItemProps) => {
   const { item, ...itemProps } = props
 

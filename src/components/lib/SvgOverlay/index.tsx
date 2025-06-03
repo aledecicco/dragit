@@ -10,6 +10,9 @@ import {
 import { makeTracked } from './utils'
 
 interface SvgOverlayProps extends ComponentProps<'div'> {
+  /**
+   * Component constructor that will take care of rendering the SVG elements.
+   */
   RenderOverlay: ComponentType<Pick<SvgOverlayState, 'elements'>>
 }
 
@@ -21,6 +24,11 @@ const SvgOverlay = (props: SvgOverlayProps) => {
   )
 }
 
+/**
+ * Renders the given children with an SVG overlay.
+ *
+ * Takes a component that should take care of rendering the SVG elements based on the state.
+ */
 const SvgOverlayInner = (props: SvgOverlayProps) => {
   const { children, RenderOverlay, ...divProps } = props
   const svgOverlay = useSvgOverlay()

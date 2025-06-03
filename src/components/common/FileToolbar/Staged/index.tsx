@@ -6,9 +6,15 @@ import { useRemoveFromIndex } from '@api/mutations'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 
 interface StagedFileToolbarProps extends Partial<ToolbarProps> {
+  /**
+   * The file to operate on.
+   */
   file: StagedFileInfo
 }
 
+/**
+ * The common set of tools for staged files.
+ */
 const StagedFileToolbar = (props: StagedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
   const unstage = useRemoveFromIndex()

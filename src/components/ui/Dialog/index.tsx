@@ -6,13 +6,37 @@ import { Button } from '@ui/Button'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface DialogProps extends Ariakit.DialogProps {
+  /**
+   * The unique identifier of the dialog, used to manage its visibility.
+   */
   dialogKey: DialogKey
+
+  /**
+   * An optional title to be used as heading.
+   */
   heading?: string
+
+  /**
+   * Whether to display a close button.
+   */
   showClose?: boolean
+
+  /**
+   * Additional props for the div that wraps the content.
+   */
   contentProps?: ComponentProps<'div'>
+
+  /**
+   * Optional content to be displayed to one side of the dialog.
+   */
   sideContent?: ReactNode
 }
 
+/**
+ * A dialog component that can be used to display content in an overlay.
+ *
+ * It supports a heading, close button, and side content.
+ */
 const Dialog = (props: DialogProps) => {
   const {
     dialogKey,

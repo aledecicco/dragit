@@ -6,9 +6,15 @@ import { useApplyStash, useDiscardStash } from '@api/mutations'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 
 interface StashToolbarProps extends Partial<ToolbarProps> {
+  /**
+   * The stash to operate on.
+   */
   stash: StashInfo
 }
 
+/**
+ * The common set of tools for stashes.
+ */
 const StashToolbar = (props: StashToolbarProps) => {
   const { stash, ...toolbarProps } = props
 

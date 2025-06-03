@@ -12,9 +12,17 @@ import { EditableText } from '@ui/EditableText'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface RemotesDialogItemProps extends ComponentProps<'div'> {
+  /**
+   * The remote that this list item should display.
+   */
   item: RemoteInfo
 }
 
+/**
+ * The list item for remotes in the remotes dialog.
+ *
+ * The fields are displayed as editable text fields.
+ */
 const RemotesDialogItem = (props: RemotesDialogItemProps) => {
   const { item, ...divProps } = props
 

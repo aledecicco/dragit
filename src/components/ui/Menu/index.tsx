@@ -11,11 +11,27 @@ interface MenuItem extends Ariakit.MenuItemProps {
 }
 
 interface MenuProps extends Ariakit.MenuProps {
+  /**
+   * The anchor element that triggers the menu when clicked.
+   */
   anchor: NonNullable<Ariakit.MenuButtonProps['render']>
+
+  /**
+   * Description of the menu items to display when opened.
+   */
   items: MenuItem[]
+
+  /**
+   * Size of the menu items.
+   */
   size?: Size
 }
 
+/**
+ * Dropdown menu component that is triggered when a button is clicked.
+ *
+ * Displays a list of menu items, each of which can have an icon and a label.
+ */
 const Menu = (props: MenuProps) => {
   const { anchor, items, size = 'md', ...menuProps } = props
 

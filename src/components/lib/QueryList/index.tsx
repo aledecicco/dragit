@@ -8,13 +8,39 @@ import { range } from '@utils/array'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface QueryListProps<T, I> extends Omit<VirtualizedDivProps<I>, 'items'> {
+  /**
+   * The query to get the data from.
+   */
   query: UseQueryResult<T>
+
+  /**
+   * The name of the items being displayed, used for fallback messages.
+   */
   name: string
+
+  /**
+   * A function that extracts the list of items from the query data.
+   *
+   * @param data - The data returned by the query.
+   */
   getItems: (data: T) => I[]
+
+  /**
+   * Whether this list is standalone or rendered in a group of lists.
+   * If not standalone, it's rendered as a composite element to allow navigating between lists.
+   */
   isStandalone?: boolean
+
+  /**
+   * The number of placeholder list items to display while loading.
+   * Defaults to 3.
+   */
   placeholdersCount?: number
 }
 
+/**
+ * A virtualized list that displays data from a query, with fallback loading and error states.
+ */
 const QueryList = <T, I>(props: QueryListProps<T, I>) => {
   const {
     query,

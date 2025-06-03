@@ -15,6 +15,9 @@ const client = new QueryClient({
   },
 })
 
+/**
+ * Provides the app with a query client with default options, and enables the Dev Tools.
+ */
 const ClientProvider = (props: PropsWithChildren) => {
   const { children } = props
 

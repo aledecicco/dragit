@@ -4,13 +4,28 @@ import type { ReactNode } from 'react'
 
 import { Icon } from '@ui/Icon'
 import { cn, propsWithCn } from '@utils/styles'
+import { Accordion } from '..'
 
 interface AccordionSectionProps extends Ariakit.DisclosureContentProps {
+  /**
+   * The label for the section, displayed in the header.
+   */
   label: string
+
+  /**
+   * Extra information to be displayed at the end of the header.
+   */
   extraInfo?: ReactNode
+
+  /**
+   * Whether this section should be open by default.
+   */
   defaultOpen?: boolean
 }
 
+/**
+ * A single section inside an {@link Accordion}.
+ */
 const AccordionSection = (props: AccordionSectionProps) => {
   const { label, extraInfo, defaultOpen, ...contentProps } = props
 

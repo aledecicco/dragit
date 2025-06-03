@@ -6,9 +6,15 @@ import { useAddToIndex } from '@api/mutations'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 
 interface UntrackedFileToolbarProps extends Partial<ToolbarProps> {
+  /**
+   * The file to operate on.
+   */
   file: UntrackedFileInfo
 }
 
+/**
+ * The common set of tools for untracked files.
+ */
 const UntrackedFileToolbar = (props: UntrackedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
   const stage = useAddToIndex()

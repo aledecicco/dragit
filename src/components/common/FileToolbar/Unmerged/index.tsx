@@ -7,9 +7,15 @@ import { useAddToIndex, useRemoveFromTree } from '@api/mutations'
 import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 
 interface UnmergedFileToolbarProps extends Partial<ToolbarProps> {
+  /**
+   * The file to operate on.
+   */
   file: UnmergedFileInfo
 }
 
+/**
+ * The common set of tools for unmerged files.
+ */
 const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
   const stage = useAddToIndex()

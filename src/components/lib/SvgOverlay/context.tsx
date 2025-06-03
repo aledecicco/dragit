@@ -20,21 +20,64 @@ interface Element<
   R extends string = string,
   T extends LiteralUnion<R> = string,
 > {
+  /**
+   * A ref to the element being displayed, used for position calculation.
+   */
   ref: RefObject<HTMLElement | null>
+
+  /**
+   * An optional parent relationship to another element.
+   */
   parent: ParentRel<LiteralUnion<T>> | undefined
 }
 
 interface ParentRel<R extends string> {
+  /**
+   * The unique identifier of the parent element.
+   */
   id: ElementId
+
+  /**
+   * The type of relationship this element has with its parent.
+   * Used to allow different styles of connections.
+   */
   type: R
 }
 
 interface SvgOverlayState {
+  /**
+   * A map of all registered elements.
+   */
   elements: Map<ElementId, Element>
+
+  /**
+   * A callback that registers an element in the overlay.
+   *
+   * @param id - The unique identifier of the element.
+   * @param element - The element to register.
+   */
   registerElement: (id: ElementId, element: Element) => void
+
+  /**
+   * A callback that unregisters an element from the overlay.
+   *
+   * @param id - The unique identifier of the element.
+   */
   unregisterElement: (id: ElementId) => void
+
+  /**
+   * A ref to the native svg element.
+   */
   svgRef: RefObject<SVGSVGElement | null>
+
+  /**
+   * A ref to the component that contains the svg overlay.
+   */
   componentRef: RefObject<HTMLDivElement | null>
+
+  /**
+   * A callback to manually trigger re-renders.
+   */
   refresh: () => void
 }
 
@@ -53,6 +96,11 @@ const useSvgOverlay = () => useContext(SvgOverlayContext)
 
 interface SvgOverlayContextProviderProps extends PropsWithChildren {}
 
+/**
+ * Context that provides access to a set of tracked elements and their relationships.
+ *
+ * Handles refreshes and position calculations when the set of elements changes, or when the component is resized.
+ */
 const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
   const { children } = props
   const [elemsState, setElemsState] = useState<Map<ElementId, Element>>(

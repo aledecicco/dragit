@@ -4,6 +4,9 @@ import { propsWithCn } from '@utils/styles'
 
 interface SeparatorProps extends Ariakit.SeparatorProps {}
 
+/**
+ * A visual horizontal separator.
+ */
 const Separator = (props: SeparatorProps) => {
   const { ...separatorProps } = props
   return (

@@ -8,10 +8,20 @@ import {
 import type { AnyObject } from '@utils/types'
 
 interface FormDialogProps<T extends AnyObject> extends DialogProps {
+  /**
+   * Options for the form contained in the dialog.
+   */
   formOptions: FormProps<T>
+
+  /**
+   * Props for the submit button.
+   */
   submitProps?: Partial<FormSubmitButtonProps>
 }
 
+/**
+ * A dialog whose purpose is to display a form, that is hidden when the form is successfully submitted.
+ */
 const FormDialog = <T extends AnyObject>(props: FormDialogProps<T>) => {
   const { formOptions, submitProps, children, ...dialogProps } = props
 

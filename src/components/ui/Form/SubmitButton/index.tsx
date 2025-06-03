@@ -1,16 +1,27 @@
 import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
+import { Action } from '@lib/ActionButton'
 import type { ActionTracker } from '@lib/ActionButton/utils'
 import { Button, type ButtonProps, type ButtonStatus } from '@ui/Button'
 import { Icon } from '@ui/Icon'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface FormSubmitButtonProps extends Partial<ButtonProps> {
+  /**
+   * Details about the form action that this button submits.
+   */
   actionTracker: ActionTracker
+
+  /**
+   * Whether the button should be displayed in a compact form, without its label.
+   */
   compact?: boolean
 }
 
+/**
+ * {@link Button} that submits the form it's contained in, and tracks the form submission as an {@link Action}.
+ */
 const FormSubmitButton = (props: FormSubmitButtonProps) => {
   const {
     actionTracker,

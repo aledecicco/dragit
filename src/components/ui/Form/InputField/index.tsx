@@ -3,6 +3,9 @@ import { FormField, type FormFieldProps } from '../Field'
 
 interface InputFieldProps extends FormFieldProps {}
 
+/**
+ * Input field component with default styles.
+ */
 const InputField = (props: InputFieldProps) => {
   const { ...fieldProps } = props
 

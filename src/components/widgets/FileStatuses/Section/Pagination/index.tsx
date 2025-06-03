@@ -1,3 +1,5 @@
+import type { UseQueryResult } from '@tanstack/react-query'
+
 import type { FileTypes, Page } from '@api/models'
 import { FILE_STATUSES_PAGE_SIZE } from '@api/queries'
 import {
@@ -8,14 +10,24 @@ import {
   useNeedsPagination,
 } from '@context/pages'
 import { Pagination } from '@lib/Pagination'
-import type { UseQueryResult } from '@tanstack/react-query'
 import { Chip } from '@ui/Chip'
 
 interface FileStatusSectionPaginationProps<T extends FileType> {
+  /**
+   * The status of the files being displayed.
+   */
   type: T
+
+  /**
+   * The query that returns (a page of) the files of the specified type.
+   */
   query: UseQueryResult<Page<FileTypes[T]>>
 }
 
+/**
+ * Pagination controls for a file statuses section.
+ * Falls back to displayinh the number of items if pagination is not needed.
+ */
 const FileStatusSectionPagination = <T extends FileType>(
   props: FileStatusSectionPaginationProps<T>,
 ) => {

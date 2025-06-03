@@ -12,6 +12,7 @@ interface AskForValueDialogProps<T extends AnyObject>
   defaultValues: T
 }
 
+// TODO: remove
 const AskForValueDialog = <T extends AnyObject>(
   props: AskForValueDialogProps<T>,
 ) => {

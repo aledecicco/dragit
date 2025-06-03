@@ -6,10 +6,20 @@ import { Menu, type MenuItem } from '@ui/Menu'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface SplitButtonProps extends Omit<ButtonProps, 'round'> {
+  /**
+   * The list of items to display in the dropdown menu.
+   */
   items: MenuItem[]
+
+  /**
+   * Props for the menu button that triggers the dropdown menu.
+   */
   menuButtonProps?: Partial<ButtonProps>
 }
 
+/**
+ * A button with a primary action, and a dropdown menu next to it for alternatives.
+ */
 const SplitButton = (props: SplitButtonProps) => {
   const {
     items,

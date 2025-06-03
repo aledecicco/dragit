@@ -4,13 +4,28 @@ import type { ReactNode } from 'react'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface TooltipProps extends Ariakit.TooltipProps {
+  /**
+   * The anchor element that triggers the tooltip when hovered.
+   */
   anchor: NonNullable<Ariakit.TooltipAnchorProps['render']>
+
+  /**
+   * The content to display inside the tooltip.
+   */
   description: ReactNode
+
+  /**
+   * The placement of the tooltip relative to the anchor.
+   * Defaults to 'top'.
+   */
   placement?: Ariakit.TooltipProviderProps['placement']
 }
 
+/**
+ * Tooltip component with default styles that is triggered when hovering over an anchor.
+ */
 const Tooltip = (props: TooltipProps) => {
-  const { anchor, description, placement, ...tooltipProps } = props
+  const { anchor, description, placement = 'top', ...tooltipProps } = props
 
   return (
     <Ariakit.TooltipProvider placement={placement}>

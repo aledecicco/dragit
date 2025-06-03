@@ -11,6 +11,9 @@ import { BranchesListItem } from './Item'
 
 interface BranchesListProps extends ComponentProps<'div'> {}
 
+/**
+ * Main app widget that displays the list of branches in the current repository.
+ */
 const BranchesList = (props: BranchesListProps) => {
   const { ...divProps } = props
 

@@ -15,14 +15,46 @@ interface ComboboxOption<T> {
 }
 
 interface ComboboxProps<T> extends Partial<ButtonProps> {
+  /**
+   * The currently selected option.
+   */
   option: ComboboxOption<T> | undefined
+
+  /**
+   * The list of all available options.
+   */
   options: ComboboxOption<T>[]
+
+  /**
+   * An icon decorator for the input.
+   */
   Glyph?: Glyph
+
+  /**
+   * Function that renders an option.
+   *
+   * @param option - The option to render.
+   */
   renderOption: (option: ComboboxOption<T>) => ReactNode
+
+  /**
+   * Callback that updates the selected option.
+   *
+   * @param option - The new option to set.
+   */
   setOption: (option: ComboboxOption<T>) => void
+
+  /**
+   * Placeholder text to display when no option is selected.
+   */
   placeholder?: string
 }
 
+/**
+ * A select field that allows searching through a list of options.
+ *
+ * Automatically filters options based on the current input value.
+ */
 const Combobox = <T,>(props: ComboboxProps<T>) => {
   const {
     option,

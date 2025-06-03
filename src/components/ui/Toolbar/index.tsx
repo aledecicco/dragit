@@ -11,14 +11,43 @@ interface ToolbarTool {
 }
 
 interface ToolbarProps extends Ariakit.ToolbarProps {
+  /**
+   * Descriptions of the actions in the toolbar.
+   */
   tools: ToolbarTool[]
+
+  /**
+   * The visual variant of the buttons in the toolbar.
+   */
   variant?: ButtonVariant
+
+  /**
+   * The default status of the buttons in the toolbar.
+   */
   status?: ButtonStatus
+
+  /**
+   * The size of the buttons in the toolbar.
+   */
   size?: Size
+
+  /**
+   * Whether the toolbar will have a fixed width.
+   *
+   * If `true`, it's assumed that the toolbar has a fixed width, and the buttons will grow proportionally to fill the available space.
+   * If `false`, the toolbar will grow with the size of its buttons, and each button will take only as much space as it needs.
+   */
   fixed?: boolean
+
+  /**
+   * Whether the buttons in the toolbar will be displayed in their compact form.
+   */
   compact?: boolean
 }
 
+/**
+ * Component that displays a set of actions, each triggered and tracked by an {@link ActionButton}.
+ */
 const Toolbar = (props: ToolbarProps) => {
   const {
     tools,

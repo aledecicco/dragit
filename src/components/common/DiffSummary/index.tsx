@@ -5,10 +5,21 @@ import { pluralize } from '@utils/string'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface ChangesSummaryProps extends ComponentProps<'span'> {
+  /**
+   * The diff summary to display.
+   * If it's null, it's assumed there are no changes.
+   */
   diff: DiffSummary | null
+
+  /**
+   * Whether to display the summary in a compact form.
+   */
   compact?: boolean
 }
 
+/**
+ * Displays the number of files changed, insertions, and deletions, in a diff summary.
+ */
 const ChangesSummary = (props: ChangesSummaryProps) => {
   const { diff, compact = true, ...spanProps } = props
 

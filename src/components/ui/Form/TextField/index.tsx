@@ -3,6 +3,9 @@ import { FormField, type FormFieldProps } from '../Field'
 
 interface TextFieldProps extends FormFieldProps {}
 
+/**
+ * Textarea input field component with default styles.
+ */
 const TextField = (props: TextFieldProps) => {
   const { ...fieldProps } = props
 

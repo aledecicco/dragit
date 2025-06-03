@@ -5,9 +5,15 @@ import type { DiffType, FileDiff } from '@api/models'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface DiffViewerLineChangesProps extends ComponentProps<'div'> {
+  /**
+   * The diff to display.
+   */
   fileDiff: FileDiff
 }
 
+/**
+ * Displays a column with the diff type of each line in a diff viewer.
+ */
 const DiffViewerLineChanges = (props: DiffViewerLineChangesProps) => {
   const { fileDiff, ...divProps } = props
 
@@ -30,6 +36,12 @@ const DiffViewerLineChanges = (props: DiffViewerLineChangesProps) => {
   )
 }
 
+/**
+ * Displays a single diff type for a line with the appropriate styling.
+ *
+ * @param props.diffType - The type of diff for the line.
+ * @param props.empty - Whether this cell should be empty.
+ */
 const LineChangesCell = (props: {
   diffType: DiffType
   empty?: boolean

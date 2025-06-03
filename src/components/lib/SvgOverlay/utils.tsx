@@ -22,6 +22,11 @@ interface TrackRefProps<T extends HTMLElement> {
   trackRef: Ref<T>
 }
 
+/**
+ * HOC that wraps a component and automatically registers it when it mounts and unregisters it when it unmounts.
+ *
+ * Also provides a ref that should be attached by the inner component to the elements that's going to be tracked.
+ */
 const makeTracked = <P, T extends HTMLElement, R extends string = string>(
   WrappedComponent: ComponentType<P & TrackRefProps<T>>,
 ) => {
@@ -62,7 +67,14 @@ interface Position {
   y: number
 }
 
-const getPosition = (elem: Element) => {
+/**
+ * Given an element, returns its position in the SVG overlay.
+ *
+ * Accounts for transformations and offsets.
+ *
+ * @param elem - The element to get the position of.
+ */
+const getPosition = (elem: Element): Position => {
   const pos = { x: 0, y: 0 }
 
   if (elem.ref.current) {

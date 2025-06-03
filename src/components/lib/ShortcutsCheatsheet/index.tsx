@@ -8,16 +8,38 @@ interface ShortcutCheatsheetProps extends ComponentProps<'div'> {
 }
 
 interface Shortcut {
+  /**
+   * The list of keys involved in the shortcut.
+   */
   keys: ShortcutKey[]
+
+  /**
+   * The description of the shortcut.
+   */
   label: string
+
+  /**
+   * Whether the keys should be pressed at the same time (key combination),
+   * or if they are alternatives for the same action.
+   */
   combined?: boolean
 }
 
 interface ShortcutKey {
+  /**
+   * The symbol displayed for the key.
+   */
   symbol: string
+
+  /**
+   * The name of the key used for detection on keypress events.
+   */
   keyName: string
 }
 
+/**
+ * Displays a set of accessible keyboard shortcuts that react to key presses.
+ */
 const ShortcutCheatsheet = (props: ShortcutCheatsheetProps) => {
   const { shortcuts, ...divProps } = props
 
@@ -59,6 +81,12 @@ const ShortcutCheatsheet = (props: ShortcutCheatsheetProps) => {
   )
 }
 
+/**
+ * Displays a single keyboard shortcut key that reacts to key presses.
+ *
+ * @param props.shortcutKey - The key to display.
+ * @param props.withLabel - Whether to include an aria-label (usually excluded for key combinations).
+ */
 const ShortcutKey = (props: {
   shortcutKey: ShortcutKey
   withLabel: boolean

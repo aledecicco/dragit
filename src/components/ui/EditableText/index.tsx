@@ -7,10 +7,24 @@ import { Marquee } from '@ui/Marquee'
 import { propsWithCn } from '@utils/styles'
 
 interface EditableTextProps extends AutosuggestProps {
+  /**
+   * A label used for accessibility.
+   */
   label: string
+
+  /**
+   * Props for the button that triggers the editable text.
+   */
   buttonProps?: ButtonProps
 }
 
+/**
+ * A button that turns into an editable text input when clicked.
+ *
+ * The changes can be committed by pressing Enter, or discarded by pressing Escape.
+ *
+ * Can receive suggestions from the {@link Autosuggest} component.
+ */
 const EditableText = (props: EditableTextProps) => {
   const { buttonProps, label, ...inputProps } = props
   const [editing, setEditing] = useState(false)

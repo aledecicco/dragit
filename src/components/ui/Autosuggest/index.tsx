@@ -7,13 +7,40 @@ import { mapOr } from '@utils/array'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface AutosuggestProps extends Ariakit.ComboboxProps {
+  /**
+   * The current value of the input.
+   */
   value: string | undefined
+
+  /**
+   * The list of all possible suggestions that could be displayed.
+   * If not provided, the suggestions dropdown won't be displayed.
+   */
   suggestions?: string[]
+
+  /**
+   * An icon decorator for the input.
+   */
   Glyph?: Glyph
+
+  /**
+   * Callback that updates the value of the input.
+   *
+   * @param value - The new value to set. If `undefined`, the input will be cleared.
+   */
   setValue: (value: string | undefined) => void
+
+  /**
+   * Placeholder text for the input when no value is set.
+   */
   placeholder?: string
 }
 
+/**
+ * Input field that displays suggestions from a list as the user types with autocomplete functionality.
+ *
+ * Automatically filters suggestions based on the current input value.
+ */
 const Autosuggest = (props: AutosuggestProps) => {
   const {
     value,

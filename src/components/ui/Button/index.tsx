@@ -10,13 +10,37 @@ type ButtonVariant = 'filled' | 'plain'
 type ButtonStatus = 'primary' | 'cta' | 'neutral' | 'success' | 'error'
 
 interface ButtonProps extends Ariakit.ButtonProps {
+  /**
+   * Optional description for a tooltip.
+   */
   description?: string
+
+  /**
+   * The visual style of the button.
+   */
   variant?: ButtonVariant
+
+  /**
+   * The status of the button, which affects its color and style.
+   */
   status?: ButtonStatus
+
+  /**
+   * Whether the button should be round, with a square aspect ratio.
+   */
   round?: boolean
+
+  /**
+   * The size of the button, which affects its padding and font size.
+   */
   size?: Size
 }
 
+/**
+ * Button with different styles, variants, and sizes.
+ *
+ * Can display a tooltip with a description when provided.
+ */
 const Button = (props: ButtonProps) => {
   const {
     description,

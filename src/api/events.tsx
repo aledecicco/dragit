@@ -19,6 +19,9 @@ import {
 
 const EVENT_ID = 'app-event'
 
+/**
+ * Subscribes the app to events coming from the backend, and invalidates queries accordingly.
+ */
 const EventHandler = (props: PropsWithChildren) => {
   const { children } = props
   const client = useQueryClient()

@@ -5,9 +5,15 @@ import type { DiffType, FileDiff } from '@api/models'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface DiffViewerLineNumbersProps extends ComponentProps<'div'> {
+  /**
+   * The diff to display.
+   */
   fileDiff: FileDiff
 }
 
+/**
+ * Displays a column with the line numbers of each line in a diff viewer.
+ */
 const DiffViewerLineNumbers = (props: DiffViewerLineNumbersProps) => {
   const { fileDiff, ...divProps } = props
 
@@ -40,6 +46,13 @@ const DiffViewerLineNumbers = (props: DiffViewerLineNumbersProps) => {
   )
 }
 
+/**
+ * Displays a single line number with the appropriate styling based on its diff type.
+ *
+ * @param props.lineNumber - The line number to display.
+ * @param props.diffType - The type of diff for the line.
+ * @param props.faded - Whether to display the line number in a faded style.
+ */
 const LineNumbersCell = (props: {
   lineNumber: number
   diffType: DiffType

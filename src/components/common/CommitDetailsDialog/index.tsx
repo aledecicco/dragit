@@ -21,9 +21,17 @@ export const COMMIT_DETAILS_DIALOG_KEY = (commitId: CommitId) =>
   `commit_details_dialog_${commitId}`
 
 interface CommitDetailsDialogProps extends Omit<DialogProps, 'dialogKey'> {
+  /**
+   * The commit that should be displayed.
+   */
   commitInfo: CommitInfo
 }
 
+/**
+ * Dialog that displays details about a given commit.
+ *
+ * Allows viewing file diffs in detail.
+ */
 const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
   const { commitInfo, ...dialogProps } = props
   const timeAgo = useDateDifference(commitInfo.timestamp)
@@ -55,7 +63,10 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
       }}
       sideContent={
         typeof selectedFile === 'string' ? (
-          <FileDiffViewer reference={commitInfo.hash} filepath={selectedFile} />
+          <FileDiffViewer
+            reference={{ type: 'commit', refName: commitInfo.hash }}
+            filepath={selectedFile}
+          />
         ) : undefined
       }
       {...propsWithCn(dialogProps, 'max-w-[85%] max-h-[85%]')}

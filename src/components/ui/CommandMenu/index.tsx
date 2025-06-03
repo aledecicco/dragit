@@ -7,16 +7,40 @@ import { Dialog, type DialogProps } from '@ui/Dialog'
 import { Separator } from '@ui/Separator'
 import { cn, propsWithCn } from '@utils/styles'
 import type { PickPartial } from '@utils/types'
+import { CommandMenuItem } from './Item'
 
 interface CommandMenuProps
   extends Omit<
     PickPartial<DialogProps, 'dialogKey'>,
     'heading' | 'showClose' | 'children'
   > {
+  /**
+   * The children of the command menu, which should be a list of command items.
+   */
   children: Ariakit.ComboboxListProps['render']
+
+  /**
+   * A list of keyboard shortcuts to display at the bottom of the command menu.
+   */
   shortcuts?: Shortcut[]
+
+  /**
+   * A footer to display at the bottom of the command menu, before the shortcuts.
+   */
   footer?: ReactNode
+
+  /**
+   * Callback that updates the search value.
+   *
+   * @param value - The new search value.
+   */
   onSearchChange: (value: string) => void
+
+  /**
+   * Callback that submits an item to trigger its action.
+   *
+   * @param value - The value of the item to submit, or `undefined` if no item was selected.
+   */
   submitValue: (value: string | undefined) => void
 }
 
@@ -32,6 +56,13 @@ export const DEFAULT_SHORTCUTS: Shortcut[] = [
   },
 ]
 
+/**
+ * Dialog that displays a list of command options that can be searched through. Each one triggers an action when selected.
+ *
+ * Should contain a list of {@link CommandMenuItem}s as children.
+ *
+ * Displays a keyboard shortcuts cheatsheet at the bottom.
+ */
 const CommandMenu = (props: CommandMenuProps) => {
   const {
     children,

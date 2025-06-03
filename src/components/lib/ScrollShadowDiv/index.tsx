@@ -5,11 +5,27 @@ import { cn, propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
 interface ScrollShadowDivProps extends ComponentProps<'div'> {
+  /**
+   * Whether the div has been scrolled down.
+   * If true, the top shadow is displayed.
+   */
   isScrolled: boolean
+
+  /**
+   * Whether the div has can be scrolled down.
+   * If true, the bottom shadow is displayed.
+   */
   hasScrollLeft: boolean
+
+  /**
+   * The size of the shadows.
+   */
   size?: Size
 }
 
+/**
+ * Div that displays shadows at the top and bottom to signal scrollable content.
+ */
 const ScrollShadowDiv = (props: ScrollShadowDivProps) => {
   const {
     isScrolled,

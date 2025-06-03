@@ -7,12 +7,35 @@ import { cn } from '@utils/styles'
 import { type Action, type ActionState, useActionTracker } from './utils'
 
 interface ActionButtonProps extends ButtonProps {
+  /**
+   * The action that is triggered when the button is clicked.
+   */
   mainAction: Action
+
+  /**
+   * A list of alternative actions that can be selected from a dropdown menu.
+   *
+   * When selected, they are run and tracked like the main action.
+   */
   alternatives?: Action[]
+
+  /**
+   * Whether to display the button in its compact form,
+   * displaying only its icon, and with its label in a tooltip
+   */
   compact?: boolean
+
+  /**
+   * Additional props used for the dropdown menu if alternatives are provided.
+   */
   menuButtonProps?: Partial<ButtonProps>
 }
 
+/**
+ * A {@link Button} that triggers and tracks an action, reflecting its state during its lifecycle.
+ *
+ * It can also display and track alternatives through a dropdown menu, in which case it becomes a {@link SplitButton}.
+ */
 const ActionButton = (props: ActionButtonProps) => {
   const { mainAction, alternatives, compact, menuButtonProps, ...buttonProps } =
     props

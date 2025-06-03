@@ -14,12 +14,34 @@ import { MS_IN_SECOND } from '@utils/time'
 const INFINITE_SPACING = 32
 
 interface MarqueeProps extends ComponentProps<'div'> {
+  /**
+   * The speed at which the content scrolls when hovered, in pixels per second.
+   * Defaults to 100.
+   */
   speed?: number
+
+  /**
+   * Whether the marquee should loop infinitely.
+   * Defaults to false.
+   */
   infinite?: boolean
+
+  /**
+   * Whether the marquee should scroll in reverse direction (show rightmost content, and scroll to the left).
+   * Defaults to true.
+   */
   reverse?: boolean
+
+  /**
+   * Whether to display shadows on the sides of the marquee to signal scrollable content.
+   * Defaults to true.
+   */
   withShadows?: boolean
 }
 
+/**
+ * Marquee component that tracks its content and scrolls it horizontally when hovered, if necessary.
+ */
 const Marquee = (props: MarqueeProps) => {
   const {
     speed = 100,

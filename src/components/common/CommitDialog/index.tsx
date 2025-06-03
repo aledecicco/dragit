@@ -12,6 +12,9 @@ interface CommitDialogProps extends AskForValueProps<CommitFormValues> {}
 
 // TODO: https://ariakit.org/examples/combobox-textarea
 
+/**
+ * Dialog that allows the user to commit changes.
+ */
 const CommitDialog = (props: CommitDialogProps) => {
   const { ...askForValueProps } = props
 

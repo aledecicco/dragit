@@ -7,9 +7,15 @@ import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '..'
 
 interface UnmergedFileStatusItemProps extends ListItemProps {
+  /**
+   * Information about the unmerged file to display.
+   */
   item: UnmergedFileInfo
 }
 
+/**
+ * The list item for files in the 'unmerged' file statuses widget section.
+ */
 const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
   const { item, ...itemProps } = props
 

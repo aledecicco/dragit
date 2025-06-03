@@ -14,6 +14,9 @@ export const REMOTES_DIALOG_KEY = 'remotes_dialog'
 
 interface RemotesDialogProps extends Omit<DialogProps, 'dialogKey'> {}
 
+/**
+ * Dialog that displays existing remotes and allows managing them.
+ */
 const RemotesDialog = (props: RemotesDialogProps) => {
   const { ...dialogProps } = props
 

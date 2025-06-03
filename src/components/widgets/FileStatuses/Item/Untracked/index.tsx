@@ -6,9 +6,15 @@ import { propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '..'
 
 interface UntrackedFileStatusItemProps extends ListItemProps {
+  /**
+   * Information about the untracked file to display.
+   */
   item: UntrackedFileInfo
 }
 
+/**
+ * The list item for files in the 'untracked' file statuses widget section.
+ */
 const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
   const { item, ...itemProps } = props
 

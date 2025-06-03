@@ -18,6 +18,9 @@ import { match } from 'ts-pattern'
 import type { AppMessage, FileType, FileTypeFilter, Page } from './models'
 import { useQueryCurrentDir } from './queries'
 
+/**
+ * An implementation of `queryOptions` for mutations.
+ */
 export function mutationOptions<
   TData = unknown,
   TError = DefaultError,
@@ -29,6 +32,12 @@ export function mutationOptions<
   return options
 }
 
+/**
+ * Retrieves an item at a specific index in a paginated data structure.
+ *
+ * @param data - The paginated data structure.
+ * @param index - The index of the item to retrieve.
+ */
 const getPaginatedItem = <T>(
   data: InfiniteData<{ items: T[] }> | undefined,
   index: number,
@@ -40,26 +49,21 @@ const getPaginatedItem = <T>(
   return data?.pages?.at(pageIndex)?.items.at(itemIndex)
 }
 
-const getNextPaginatedItem = <T>(
-  data: InfiniteData<{ items: T[] }> | undefined,
-  index: number,
-  pageSize: number,
-): T | undefined => {
-  return getPaginatedItem(data, index + 1, pageSize)
-}
-
+/**
+ * Calculates the total number of items across all pages in a paginated data structure.
+ *
+ * @param data - The paginated data structure.
+ */
 const getPaginatedLength = <T>(
   data: InfiniteData<{ items: T[] }> | undefined,
 ): number => {
   return data?.pages?.reduce((sum, page) => sum + page.items.length, 0) ?? 0
 }
 
-const useHasCurrentPath = () => {
-  const path = useQueryCurrentDir().data?.path
-  return !!path
-}
-
-// A hook that returns the path in the currentDir query assuming it's there
+/**
+ * @returns The current repository path, assuming it's available.
+ * @throws If the repository path is not available.
+ */
 const useCurrentPath = () => {
   const path = useQueryCurrentDir().data?.path
 
@@ -70,6 +74,12 @@ const useCurrentPath = () => {
   return path
 }
 
+/**
+ * A wrapper around {@link useMutation} that provides the current repository path.
+ *
+ * @param repositoryMutation - The inner mutation, which should accept a path as the first argument.
+ * @param args - The rest of the arguments to pass to the mutation.
+ */
 const useRepositoryMutation = <
   A extends unknown[],
   TData = unknown,
@@ -87,6 +97,12 @@ const useRepositoryMutation = <
   return useMutation(repositoryMutation(path, ...args))
 }
 
+/**
+ * A wrapper around {@link useQuery} that provides the current repository path.
+ *
+ * @param repositoryQuery - The inner query, which should accept a path as the first argument.
+ * @param args - The rest of the arguments to pass to the query.
+ */
 const useRepositoryQuery = <
   A extends unknown[],
   TQueryFnData = unknown,
@@ -104,6 +120,12 @@ const useRepositoryQuery = <
   return useQuery(repositoryQuery(path, ...args))
 }
 
+/**
+ * A wrapper around {@link useInfiniteQuery} that provides the current repository path.
+ *
+ * @param repositoryQuery - The inner infinite query, which should accept a path as the first argument.
+ * @param args - The rest of the arguments to pass to the infinite query.
+ */
 const useRepositoryInfiniteQuery = <
   A extends unknown[],
   TQueryFnData = unknown,
@@ -129,6 +151,20 @@ const useRepositoryInfiniteQuery = <
   return useInfiniteQuery(repositoryQuery(path, ...args))
 }
 
+/**
+ * Runs a command in the backend and deserializes the result using the provided schema.
+ * Opens a channel to the backend, through which the backend can send the pid of the process running the command.
+ * If the query is aborted through the `context.signal`, the process is killed.
+ * Works asynchronously, handling cases where the pid is received after the query is aborted, or viceversa.
+ *
+ * @param command - The command to run in the backend.
+ * @param args - The arguments to pass to the command.
+ * @param schema - The Borsh schema to use for deserializing the result.
+ * @param context - The query function context, which contains the signal to listen for aborts.
+ *
+ * @returns A promise that resolves to the deserialized result.
+ * @throws If the query is aborted.
+ */
 const fetchAndDeserialize = async <T>(
   command: string,
   args: Record<string, unknown>,
@@ -141,8 +177,10 @@ const fetchAndDeserialize = async <T>(
   const abortSignal = context.signal
   abortSignal.onabort = () => {
     if (processId !== undefined) {
+      // When the query is aborted, we kill the process if we already have its pid.
       new Child(processId).kill()
     } else {
+      // If we don't have the pid yet, we set a flag to kill it later.
       shouldStop = true
     }
   }
@@ -155,9 +193,11 @@ const fetchAndDeserialize = async <T>(
           type: 'processStarted',
         },
         ({ pid }) => {
+          // When we receive the pid, we store it.
           processId = pid
 
           if (shouldStop) {
+            // If the query was aborted before we received the pid, we kill the process now.
             new Child(pid).kill()
           }
         },
@@ -166,6 +206,7 @@ const fetchAndDeserialize = async <T>(
   }
 
   if (shouldStop) {
+    // Stop the query if it was aborted before it started.
     throw new Error('Aborted')
   }
 
@@ -178,6 +219,11 @@ const fetchAndDeserialize = async <T>(
   return res
 }
 
+/**
+ * Builds a file type filter object based on the provided file types.
+ *
+ * @param types - The file types to filter by. Can be a single type or an array of types.
+ */
 const getFileTypeFilter = (types: FileType | FileType[]): FileTypeFilter => {
   const filter: FileTypeFilter = {}
 
@@ -192,17 +238,19 @@ const getFileTypeFilter = (types: FileType | FileType[]): FileTypeFilter => {
   return filter
 }
 
+/**
+ * Retrieves just the items from a paginated data structure.
+ * @param page - The paginated data structure.
+ */
 const getPageItems = <T>(page: Page<T>): T[] => {
   return page.items
 }
 
 export {
   getPaginatedItem,
-  getNextPaginatedItem,
   getPaginatedLength,
   useRepositoryQuery,
   useRepositoryInfiniteQuery,
-  useHasCurrentPath,
   useCurrentPath,
   useRepositoryMutation,
   fetchAndDeserialize,

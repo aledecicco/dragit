@@ -5,9 +5,15 @@ import { propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
 
 interface ChipProps extends ComponentProps<'div'> {
+  /**
+   * The size of the chip, which affects its padding and font size.
+   */
   size?: Size
 }
 
+/**
+ * Small rounded component used to display tags or labels.
+ */
 const Chip = (props: ChipProps) => {
   const { size = 'md', ...divProps } = props
 

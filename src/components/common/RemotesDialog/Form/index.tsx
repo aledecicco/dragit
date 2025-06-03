@@ -19,9 +19,15 @@ interface RemoteFormProps
     FormProps<RemoteFormValues>,
     'onFormSubmit' | 'actionDescription'
   > {
+  /**
+   * Callback to handle form cancellation.
+   */
   onCancel: () => void
 }
 
+/**
+ * Form that allows creating new remotes.
+ */
 const RemoteForm = (props: RemoteFormProps) => {
   const { onCancel, ...formProps } = props
 

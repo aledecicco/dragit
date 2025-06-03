@@ -12,11 +12,7 @@ import type {
   Page,
 } from '@api/models'
 import { HISTORY_PAGE_SIZE, useQueryCommonAncestor } from '@api/queries'
-import {
-  getNextPaginatedItem,
-  getPaginatedItem,
-  getPaginatedLength,
-} from '@api/utils'
+import { getPaginatedItem, getPaginatedLength } from '@api/utils'
 import { useSelectedRefs } from '@context/branches'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<Page<HistoryItem>>>
@@ -90,7 +86,7 @@ const getGraphCommitData = (
   const isAnchor = !!anchor && hash === anchor.hash
 
   const parent =
-    getNextPaginatedItem(history, row.index, HISTORY_PAGE_SIZE)?.hash ??
+    getPaginatedItem(history, row.index + 1, HISTORY_PAGE_SIZE)?.hash ??
     (anchor && anchor.distance > row.index ? anchor.hash : undefined)
 
   return { hash, isAnchor, parent }

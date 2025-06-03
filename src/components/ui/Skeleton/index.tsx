@@ -6,9 +6,18 @@ import { propsWithCn } from '@utils/styles'
 type SkeletonVariant = 'line' | 'fill'
 
 interface SkeletonProps extends ComponentProps<'div'> {
+  /**
+   * The type of skeleton to display.
+   *
+   * If 'fill', it will cover all space available.
+   * If 'line', it will be a horizontal line with a random width.
+   */
   variant?: SkeletonVariant
 }
 
+/**
+ * A visual indicator of a loading state.
+ */
 const Skeleton = (props: SkeletonProps) => {
   const { variant = 'fill', ...divProps } = props
 

@@ -14,9 +14,15 @@ import { cn, propsWithCn } from '@utils/styles'
 import { FileStatusItem } from '..'
 
 interface StagedFileStatusItemProps extends ListItemProps {
+  /**
+   * Information about the staged file to display.
+   */
   item: StagedFileInfo
 }
 
+/**
+ * The list item for files in the 'staged' file statuses widget section.
+ */
 const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
   const { item, ...itemProps } = props
 

@@ -20,9 +20,15 @@ import { FileStatusSectionPagination } from './Pagination'
 
 interface FileStatusesSectionProps<T extends FileType>
   extends Partial<AccordionSectionProps> {
+  /**
+   * The status of the files being displayed.
+   */
   type: T
 }
 
+/**
+ * A section in the file statuses widget that displays files with a specific status.
+ */
 const FileStatusesSection = <T extends FileType>(
   props: FileStatusesSectionProps<T>,
 ) => {
@@ -36,6 +42,7 @@ const FileStatusesSection = <T extends FileType>(
     }))
   }, [filesQuery.data])
 
+  // TODO: could be implemented inside QueryList directly
   const prevCount = usePrevious(filesQuery.data?.items.length)
 
   return (
