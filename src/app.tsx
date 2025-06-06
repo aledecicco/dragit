@@ -12,7 +12,6 @@ import { MainToolbar } from '@widgets/MainToolbar'
 import { StashesList } from '@widgets/StashesList'
 
 const App = () => {
-  const dialog = useDialog()
   const currentDirQuery = useQueryCurrentDir()
 
   return (
@@ -31,10 +30,16 @@ const App = () => {
           currentDirQuery.data.isRepository &&
           currentDirQuery.data.exists && <InRepository />}
 
-        {dialog}
+        <Dialogs />
       </div>
     </>
   )
+}
+
+const Dialogs = () => {
+  const dialog = useDialog()
+
+  return dialog
 }
 
 const InRepository = () => {
