@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 import { hideDialog } from '@context/dialogs'
 import { Dialog, type DialogProps } from '@ui/Dialog'
 import { Form, type FormProps } from '@ui/Form'
@@ -22,7 +24,7 @@ interface FormDialogProps<T extends AnyObject> extends DialogProps {
 /**
  * A dialog whose purpose is to display a form, that is hidden when the form is successfully submitted.
  */
-const FormDialog = <T extends AnyObject>(props: FormDialogProps<T>) => {
+const FormDialog = memo(<T extends AnyObject>(props: FormDialogProps<T>) => {
   const { formOptions, submitProps, children, ...dialogProps } = props
 
   return (
@@ -51,6 +53,6 @@ const FormDialog = <T extends AnyObject>(props: FormDialogProps<T>) => {
       </Form>
     </Dialog>
   )
-}
+})
 
 export { FormDialog, type FormDialogProps }

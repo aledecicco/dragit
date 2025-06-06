@@ -19,7 +19,7 @@ const App = () => {
       <div
         className={cn(
           'px-8 py-4 w-full h-full max-h-full',
-          'grid grid-cols-[1fr_2fr_1fr] grid-rows-[max-content_1fr_max-content] gap-4',
+          'grid grid-cols-[1fr_2fr_1fr] grid-rows-[max-content_1fr_4fr_max-content] gap-4',
         )}
       >
         <CurrentDirectory
@@ -29,9 +29,8 @@ const App = () => {
         {currentDirQuery.data?.path &&
           currentDirQuery.data.isRepository &&
           currentDirQuery.data.exists && <InRepository />}
-
-        <Dialogs />
       </div>
+      <Dialogs />
     </>
   )
 }
@@ -48,12 +47,12 @@ const InRepository = () => {
 
   return (
     <>
-      <StashesList className={cn('col-start-1 row-start-1')} />
-      <FileStatuses className={cn('col-start-1 row-start-2')} />
-      <MainToolbar className={cn('col-start-1 row-start-3')} />
-      <Graph className={cn('col-start-2 row-start-2 row-span-2')} />
+      <StashesList className={cn('col-start-1 row-start-1 row-span-2')} />
+      <FileStatuses className={cn('col-start-1 row-start-3')} />
+      <MainToolbar className={cn('col-start-1 row-start-4')} />
+      <Graph className={cn('col-start-2 row-start-2 row-span-3')} />
       <CurrentRemote className={cn('col-start-3 row-start-1')} />
-      <BranchesList className={cn('col-start-3 row-start-2')} />
+      <BranchesList className={cn('col-start-3 row-start-2 row-span-2')} />
     </>
   )
 }

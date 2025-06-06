@@ -1,11 +1,13 @@
-import type { VirtualizerOptions } from '@tanstack/react-virtual'
-import { type ComponentType, type ReactNode, useMemo } from 'react'
+import {
+  type VirtualizerOptions,
+  useVirtualizer,
+} from '@tanstack/react-virtual'
+import { type ComponentType, type ReactNode, useCallback, useRef } from 'react'
 
 import {
   ScrollShadowDiv,
   type ScrollShadowDivProps,
 } from '@lib/ScrollShadowDiv'
-import { useVirtualList } from '@utils/performance'
 import { cn } from '@utils/styles'
 import { VirtualizedDivItem } from './Item'
 
@@ -44,20 +46,16 @@ interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
 const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
   const { items, itemSize, RenderItem, options, fallback, ...divProps } = props
 
-  const { scrollContainerRef, virtualizer, isScrolled, hasScrollLeft } =
-    useVirtualList(
-      useMemo(() => {
-        return {
-          estimateSize: () => itemSize,
-          paddingStart: 8,
-          paddingEnd: 8,
-          gap: 8,
-          count: items?.length ?? 0,
-          overscan: 2,
-          ...options,
-        }
-      }, [options, items?.length, itemSize]),
-    )
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const virtualizer = useVirtualizer({
+    estimateSize: useCallback(() => itemSize, [itemSize]),
+    paddingStart: 8,
+    paddingEnd: 8,
+    gap: 8,
+    count: items?.length ?? 0,
+    overscan: 2,
+    getScrollElement: useCallback(() => scrollContainerRef.current, []),
+  })
 
   if (!items?.length) {
     return fallback
@@ -65,8 +63,15 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
 
   return (
     <ScrollShadowDiv
-      isScrolled={isScrolled}
-      hasScrollLeft={hasScrollLeft}
+      isScrolled={
+        virtualizer.scrollOffset !== null && virtualizer.scrollOffset > 0
+      }
+      hasScrollLeft={
+        virtualizer.scrollOffset !== null &&
+        scrollContainerRef.current !== null &&
+        virtualizer.scrollOffset <
+          virtualizer.getTotalSize() - scrollContainerRef.current?.clientHeight
+      }
       {...divProps}
     >
       <div

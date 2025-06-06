@@ -1,5 +1,5 @@
 import * as Ariakit from '@ariakit/react'
-import type { ComponentProps, ReactNode } from 'react'
+import { type ComponentProps, type ReactNode, memo } from 'react'
 
 import { type DialogKey, hideDialog } from '@context/dialogs'
 import { Button } from '@ui/Button'
@@ -37,7 +37,7 @@ interface DialogProps extends Ariakit.DialogProps {
  *
  * It supports a heading, close button, and side content.
  */
-const Dialog = (props: DialogProps) => {
+const Dialog = memo((props: DialogProps) => {
   const {
     dialogKey,
     heading,
@@ -115,6 +115,6 @@ const Dialog = (props: DialogProps) => {
       </Ariakit.Dialog>
     </Ariakit.DialogProvider>
   )
-}
+})
 
 export { Dialog, type DialogProps }

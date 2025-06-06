@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { match } from 'ts-pattern'
 
 import type { Element, ElementId } from '@lib/SvgOverlay/context'
@@ -179,7 +179,7 @@ interface EdgesProps {
  *
  * Edges can have different styles, represented by {@link ParentCommitType}.
  */
-const Edges = (props: EdgesProps) => {
+const Edges = memo((props: EdgesProps) => {
   const { elements } = props
 
   const edges = useMemo(() => {
@@ -222,7 +222,7 @@ const Edges = (props: EdgesProps) => {
   }, [elements])
 
   return edges
-}
+})
 
 /**
  * Builds the SVG path commands to connect two elements at the given positions.

@@ -44,7 +44,7 @@ const ShortcutCheatsheet = (props: ShortcutCheatsheetProps) => {
   const { shortcuts, ...divProps } = props
 
   return (
-    <div {...propsWithCn(divProps, 'flex flex-row gap-x-4')}>
+    <div {...propsWithCn(divProps, 'flex flex-row gap-x-4 justify-center')}>
       {shortcuts.map((shortcut) => (
         <div
           key={shortcut.label}

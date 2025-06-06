@@ -1,5 +1,5 @@
 import * as Ariakit from '@ariakit/react'
-import { useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 
 import type { CommitId, CommitInfo } from '@api/models'
 import { COMMIT_FILES_PAGE_SIZE, useQueryCommitFiles } from '@api/queries'
@@ -32,7 +32,7 @@ interface CommitDetailsDialogProps extends Omit<DialogProps, 'dialogKey'> {
  *
  * Allows viewing file diffs in detail.
  */
-const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
+const CommitDetailsDialog = memo((props: CommitDetailsDialogProps) => {
   const { commitInfo, ...dialogProps } = props
   const timeAgo = useDateDifference(commitInfo.timestamp)
 
@@ -147,7 +147,7 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
       )}
     </Dialog>
   )
-}
+})
 
 const showCommitDetailsDialog = (
   commitInfo: CommitInfo,

@@ -11,7 +11,6 @@ import {
 } from '@ui/Accordion/Section'
 import { propsWithCn } from '@utils/styles'
 import { mapFn } from '@utils/types'
-import { usePrevious } from 'react-use'
 import { StagedFileStatusItem } from '../Item/Staged'
 import { UnmergedFileStatusItem } from '../Item/Unmerged'
 import { UnstagedFileStatusItem } from '../Item/Unstaged'
@@ -33,7 +32,7 @@ const FileStatusesSection = <T extends FileType>(
   props: FileStatusesSectionProps<T>,
 ) => {
   const { type, ...accordionSectionProps } = props
-  const filesQuery = useQueryFiles([type])
+  const filesQuery = useQueryFiles(type)
   useHandleFilesPageSync(type)
 
   const virtualizerOptions = useMemo(() => {
@@ -41,9 +40,6 @@ const FileStatusesSection = <T extends FileType>(
       getItemKey: (index: number) => files.items[index].path,
     }))
   }, [filesQuery.data])
-
-  // TODO: could be implemented inside QueryList directly
-  const prevCount = usePrevious(filesQuery.data?.items.length)
 
   return (
     <AccordionSection
@@ -61,7 +57,6 @@ const FileStatusesSection = <T extends FileType>(
         RenderItem={FileStatusItem[type]}
         options={virtualizerOptions}
         isStandalone={false}
-        placeholdersCount={Math.min(10, prevCount ?? 3)}
       />
     </AccordionSection>
   )

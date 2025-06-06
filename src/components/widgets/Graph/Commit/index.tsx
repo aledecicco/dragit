@@ -1,5 +1,5 @@
 import * as Ariakit from '@ariakit/react'
-import type { ComponentProps } from 'react'
+import { type ComponentProps, memo } from 'react'
 import { mergeRefs } from 'react-merge-refs'
 
 import type { CommitId } from '@api/models'
@@ -41,42 +41,40 @@ interface GraphCommitProps extends ComponentProps<'div'> {
  *
  * Registers/unregisters itself in the SVG overlay when mounted/unmounted.
  */
-const GraphCommit = makeTracked<
-  GraphCommitProps,
-  HTMLDivElement,
-  ParentCommitType
->((props) => {
-  const { commitId, commitType, distance, trackRef, ...divProps } = props
-  const commitInfoQuery = useQueryCommitInfo(commitId)
+const GraphCommit = memo(
+  makeTracked<GraphCommitProps, HTMLDivElement, ParentCommitType>((props) => {
+    const { commitId, commitType, distance, trackRef, ...divProps } = props
+    const commitInfoQuery = useQueryCommitInfo(commitId)
 
-  return (
-    <div
-      {...propsWithCn(divProps, 'relative')}
-      ref={mergeRefs([trackRef, divProps.ref])}
-    >
-      <GraphCommitNode commitType={commitType} />
-
+    return (
       <div
-        className={cn(
-          'absolute left-full top-half translate-x-2 -translate-y-half',
-          'border-4 border-dark-600 rounded-lg shadow-md',
-        )}
-        style={{
-          width: COMMIT_WIDTH,
-          height: COMMIT_HEIGHT,
-        }}
+        {...propsWithCn(divProps, 'relative')}
+        ref={mergeRefs([trackRef, divProps.ref])}
       >
-        <QueryLoader query={commitInfoQuery}>
-          {(commitInfo) => (
-            <Ariakit.CompositeItem
-              rowId={`${distance}`}
-              render={<GraphCommitCard commitInfo={commitInfo} />}
-            />
+        <GraphCommitNode commitType={commitType} />
+
+        <div
+          className={cn(
+            'absolute left-full top-half translate-x-2 -translate-y-half',
+            'border-4 border-dark-600 rounded-lg shadow-md',
           )}
-        </QueryLoader>
+          style={{
+            width: COMMIT_WIDTH,
+            height: COMMIT_HEIGHT,
+          }}
+        >
+          <QueryLoader query={commitInfoQuery}>
+            {(commitInfo) => (
+              <Ariakit.CompositeItem
+                rowId={`${distance}`}
+                render={<GraphCommitCard commitInfo={commitInfo} />}
+              />
+            )}
+          </QueryLoader>
+        </div>
       </div>
-    </div>
-  )
-})
+    )
+  }),
+)
 
 export { GraphCommit, type GraphCommitProps }

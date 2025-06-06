@@ -1,4 +1,4 @@
-import { useVirtualizer } from '@tanstack/react-virtual'
+import type { useVirtualizer } from '@tanstack/react-virtual'
 import { type DependencyList, useCallback, useReducer, useRef } from 'react'
 
 import { MS_IN_SECOND } from './time'
@@ -18,11 +18,17 @@ interface DebounceOptions {
  * @param deps - The dependencies that cause the callback to be created again.
  * @param options - Options for the debounce behavior.
  */
-const useDebouncedCallback = <T>(
+function useDebouncedCallback(
+  callback: () => void,
+  deps: DependencyList,
+  options?: DebounceOptions,
+): () => void
+
+function useDebouncedCallback<T>(
   callback: (args: T) => void,
   deps: DependencyList,
   options?: DebounceOptions,
-): ((args: T) => void) => {
+): (args: T) => void {
   const timeoutId = useRef<number>(null)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: handle function reconstruction manually
@@ -62,11 +68,24 @@ interface ThrottleOptions {
  * @param deps - The dependencies that cause the callback to be rebuilt.
  * @param options - Options for the throttling behavior.
  */
-const useThrottledCallback = <T>(
+/**
+ * Creates a throttled version of the given callback.
+ *
+ * @param callback - The function to debounce.
+ * @param deps - The dependencies that cause the callback to be created again.
+ * @param options - Options for the throttling behavior.
+ */
+function useThrottledCallback(
+  callback: () => void,
+  deps: DependencyList,
+  options?: ThrottleOptions,
+): () => void
+
+function useThrottledCallback<T>(
   callback: (args: T) => void,
   deps: DependencyList,
   options?: ThrottleOptions,
-): ((args: T) => void) => {
+): (args: T) => void {
   /**
    * Whether calls must be stopped.
    */
@@ -137,43 +156,5 @@ type VirtualListOptions<T extends HTMLElement> = Omit<
   'getScrollElement'
 >
 
-/**
- * Hook that puts together the state used for a virtual list and its display.
- *
- * @param options - Options for the virtualizer.
- *
- * @returns An object containing:
- * - `scrollContainerRef`: A ref to the element that can be scrolled.
- * - `virtualizer`: The virtualizer instance.
- * - `isScrolled`: Whether the list has been scrolled down.
- * - `hasScrollLeft`: Whether the list can be scrolled down.
- */
-const useVirtualList = <T extends HTMLElement>(
-  options: VirtualListOptions<T>,
-) => {
-  const scrollContainerRef = useRef<T>(null)
-  const virtualizer = useVirtualizer({
-    ...options,
-    getScrollElement: () => scrollContainerRef.current,
-  })
-
-  return {
-    scrollContainerRef,
-    virtualizer,
-    isScrolled:
-      virtualizer.scrollOffset !== null && virtualizer.scrollOffset > 0,
-    hasScrollLeft:
-      virtualizer.scrollOffset !== null &&
-      scrollContainerRef.current !== null &&
-      virtualizer.scrollOffset <
-        virtualizer.getTotalSize() - scrollContainerRef.current?.clientHeight,
-  }
-}
-
-export {
-  useDebouncedCallback,
-  useThrottledCallback,
-  useRerender,
-  useVirtualList,
-}
+export { useDebouncedCallback, useThrottledCallback, useRerender }
 export type { DebounceOptions, ThrottleOptions, VirtualListOptions }

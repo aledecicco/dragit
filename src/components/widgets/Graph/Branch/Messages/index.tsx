@@ -1,11 +1,11 @@
-import type { PropsWithChildren } from 'react'
+import { type PropsWithChildren, memo } from 'react'
 
 import { useQueryCommitHistory } from '@api/queries'
 import { useSelectedRefs } from '@context/branches'
 import { cn } from '@utils/styles'
 import { useCurrentCommonAncestor } from '@widgets/Graph/utils'
 
-const BranchMessages = () => {
+const BranchMessages = memo(() => {
   const { reference, baseReference } = useSelectedRefs()
   const commonAncestorQuery = useCurrentCommonAncestor()
   const branchHistoryQuery = useQueryCommitHistory(reference?.refName)
@@ -52,7 +52,7 @@ const BranchMessages = () => {
       )}
     </>
   )
-}
+})
 
 const BranchMessage = (props: PropsWithChildren<{ isBase: boolean }>) => {
   const { isBase, children } = props

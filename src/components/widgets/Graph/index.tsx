@@ -1,6 +1,10 @@
 import * as Ariakit from '@ariakit/react'
-import { type Range, defaultRangeExtractor } from '@tanstack/react-virtual'
-import { type ComponentProps, useCallback, useMemo } from 'react'
+import {
+  type Range,
+  defaultRangeExtractor,
+  useVirtualizer,
+} from '@tanstack/react-virtual'
+import { type ComponentProps, memo, useCallback, useMemo, useRef } from 'react'
 
 import { useQueryCommitHistory } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
@@ -8,7 +12,6 @@ import { BranchToolbar } from '@common/BranchToolbar'
 import { useSelectedRefs } from '@context/branches'
 import { ScrollShadowDiv } from '@lib/ScrollShadowDiv'
 import { SvgOverlay } from '@lib/SvgOverlay'
-import { type VirtualListOptions, useVirtualList } from '@utils/performance'
 import { useSelectedBranches } from '@utils/repository'
 import { cn, propsWithCn } from '@utils/styles'
 import { GraphBranch } from './Branch'
@@ -26,7 +29,7 @@ interface GraphProps extends ComponentProps<'div'> {}
  * It has a simplified structure, only showing the checked out branch, and optionally a base branch that can be arbitrary.
  * The divergence point between both branches is computed, and the main branch "spawns" from that point.
  */
-const Graph = (props: GraphProps) => {
+const Graph = memo((props: GraphProps) => {
   const { ...divProps } = props
   const { branch, baseBranch } = useSelectedBranches()
 
@@ -57,9 +60,9 @@ const Graph = (props: GraphProps) => {
       </div>
     </div>
   )
-}
+})
 
-const GraphInner = () => {
+const GraphInner = memo(() => {
   const { reference, baseReference } = useSelectedRefs()
   const commonAncestor = useCurrentCommonAncestor()
 
@@ -77,44 +80,50 @@ const GraphInner = () => {
     return getPaginatedLength(baseBranchHistoryQuery.data)
   }, [baseBranchHistoryQuery.data])
 
-  const rangeExtractor = useCallback(
-    (range: Range) => {
-      const indexes = new Set(defaultRangeExtractor(range))
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const virtualizer = useVirtualizer({
+    estimateSize: useCallback(() => NODE_SIZE, []),
+    rangeExtractor: useCallback(
+      (range: Range) => {
+        const indexes = new Set(defaultRangeExtractor(range))
 
-      if (commonAncestor?.commonCommit.distance !== undefined) {
-        indexes.add(commonAncestor.commonCommit.distance)
-      }
-      if (commonAncestor?.lastCommit?.distance !== undefined) {
-        indexes.add(commonAncestor.lastCommit.distance)
-      }
+        if (commonAncestor?.commonCommit.distance !== undefined) {
+          indexes.add(commonAncestor.commonCommit.distance)
+        }
+        if (commonAncestor?.lastCommit?.distance !== undefined) {
+          indexes.add(commonAncestor.lastCommit.distance)
+        }
 
-      return [...indexes].sort((a, b) => a - b)
-    },
-    [commonAncestor],
-  )
-
-  const virtualizerOptions = useMemo<VirtualListOptions<HTMLDivElement>>(() => {
-    return {
-      estimateSize: () => NODE_SIZE,
-      rangeExtractor: rangeExtractor,
-      gap: EDGE_LENGTH,
-      paddingStart: CURVE_SIZE * 2 + EDGE_OFFSET,
-      paddingEnd: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
-      count: Math.max(branchLength, baseLength),
-      overscan: 3,
-    }
-  }, [branchLength, baseLength, rangeExtractor])
-
-  const { scrollContainerRef, virtualizer, isScrolled, hasScrollLeft } =
-    useVirtualList(virtualizerOptions)
+        return [...indexes].sort((a, b) => a - b)
+      },
+      [
+        commonAncestor?.commonCommit.distance,
+        commonAncestor?.lastCommit?.distance,
+      ],
+    ),
+    gap: EDGE_LENGTH,
+    paddingStart: CURVE_SIZE * 2 + EDGE_OFFSET,
+    paddingEnd: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
+    count: Math.max(branchLength, baseLength),
+    overscan: 3,
+    getScrollElement: useCallback(() => scrollContainerRef.current, []),
+  })
 
   return (
     <Ariakit.CompositeProvider focusLoop="horizontal" focusShift>
       <Ariakit.Composite
         render={
           <ScrollShadowDiv
-            isScrolled={isScrolled}
-            hasScrollLeft={hasScrollLeft}
+            isScrolled={
+              virtualizer.scrollOffset !== null && virtualizer.scrollOffset > 0
+            }
+            hasScrollLeft={
+              virtualizer.scrollOffset !== null &&
+              scrollContainerRef.current !== null &&
+              virtualizer.scrollOffset <
+                virtualizer.getTotalSize() -
+                  scrollContainerRef.current?.clientHeight
+            }
             className={cn('w-full h-full col-span-3 col-start-1 row-start-3')}
             size="md"
           />
@@ -124,6 +133,7 @@ const GraphInner = () => {
           ref={scrollContainerRef}
           className={cn(
             'overflow-auto scroll-smooth w-full h-full bg-dark-800/80',
+            'will-change-transform',
           )}
         >
           <SvgOverlay
@@ -142,6 +152,6 @@ const GraphInner = () => {
       </Ariakit.Composite>
     </Ariakit.CompositeProvider>
   )
-}
+})
 
 export { Graph }

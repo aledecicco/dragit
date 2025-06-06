@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 import {
   AskForValueDialog,
   type AskForValueProps,
@@ -15,7 +17,7 @@ interface CommitDialogProps extends AskForValueProps<CommitFormValues> {}
 /**
  * Dialog that allows the user to commit changes.
  */
-const CommitDialog = (props: CommitDialogProps) => {
+const CommitDialog = memo((props: CommitDialogProps) => {
   const { ...askForValueProps } = props
 
   return (
@@ -27,6 +29,6 @@ const CommitDialog = (props: CommitDialogProps) => {
       <TextField label="Commit Message" name="message" autoFocus required />
     </AskForValueDialog>
   )
-}
+})
 
 export { CommitDialog, type CommitDialogProps }

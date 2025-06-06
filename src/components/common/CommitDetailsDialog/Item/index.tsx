@@ -1,4 +1,5 @@
 import * as Ariakit from '@ariakit/react'
+import { memo } from 'react'
 import { match } from 'ts-pattern'
 
 import type { CommitedFileInfo } from '@api/models'
@@ -18,7 +19,7 @@ interface CommitDetailsDialogItemProps extends ListItemProps {
  *
  * Displays as a checkbox to allow selecting/unselecting files.
  */
-const CommitDetailsDialogItem = (props: CommitDetailsDialogItemProps) => {
+const CommitDetailsDialogItem = memo((props: CommitDetailsDialogItemProps) => {
   const { item, ...itemProps } = props
 
   return (
@@ -59,6 +60,6 @@ const CommitDetailsDialogItem = (props: CommitDetailsDialogItemProps) => {
       }
     />
   )
-}
+})
 
 export { CommitDetailsDialogItem, type CommitDetailsDialogItemProps }

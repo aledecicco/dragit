@@ -1,5 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 import type { UseQueryResult } from '@tanstack/react-query'
+import { usePrevious } from 'react-use'
 
 import { QueryLoader } from '@lib/Loader/Query'
 import { VirtualizedDiv, type VirtualizedDivProps } from '@lib/VirtualizedDiv'
@@ -33,7 +34,7 @@ interface QueryListProps<T, I> extends Omit<VirtualizedDivProps<I>, 'items'> {
 
   /**
    * The number of placeholder list items to display while loading.
-   * Defaults to 3.
+   * Defaults to the previous count of items or 3 if not available.
    */
   placeholdersCount?: number
 }
@@ -47,9 +48,13 @@ const QueryList = <T, I>(props: QueryListProps<T, I>) => {
     name,
     getItems,
     isStandalone = true,
-    placeholdersCount = 3,
+    placeholdersCount,
     ...virtualizedDivProps
   } = props
+
+  const prevCount = usePrevious(
+    query.data ? Math.min(getItems(query.data).length, 10) : undefined,
+  )
 
   return (
     <QueryLoader
@@ -63,7 +68,7 @@ const QueryList = <T, I>(props: QueryListProps<T, I>) => {
             gap: virtualizedDivProps.options?.gap ?? 8,
           }}
         >
-          {range(placeholdersCount).map((i) => (
+          {range(placeholdersCount ?? prevCount ?? 3).map((i) => (
             <Skeleton
               key={i}
               style={{ height: virtualizedDivProps.itemSize }}

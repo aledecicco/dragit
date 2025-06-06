@@ -1,4 +1,5 @@
 import * as Ariakit from '@ariakit/react'
+import { memo } from 'react'
 
 import { propsWithCn } from '@utils/styles'
 
@@ -14,7 +15,7 @@ interface ListItemProps extends Ariakit.CompositeItemProps {
 /**
  * Base list item component with default styles, that can be set as interactive or not.
  */
-const ListItem = (props: ListItemProps) => {
+const ListItem = memo((props: ListItemProps) => {
   const { interactive = false, ...itemProps } = props
 
   return (
@@ -28,6 +29,6 @@ const ListItem = (props: ListItemProps) => {
       )}
     />
   )
-}
+})
 
 export { ListItem, type ListItemProps }

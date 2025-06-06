@@ -1,5 +1,5 @@
 import { IconTrash } from '@tabler/icons-react'
-import type { ComponentProps } from 'react'
+import { type ComponentProps, memo } from 'react'
 
 import type { RemoteInfo } from '@api/models'
 import {
@@ -23,7 +23,7 @@ interface RemotesDialogItemProps extends ComponentProps<'div'> {
  *
  * The fields are displayed as editable text fields.
  */
-const RemotesDialogItem = (props: RemotesDialogItemProps) => {
+const RemotesDialogItem = memo((props: RemotesDialogItemProps) => {
   const { item, ...divProps } = props
 
   const removeRemote = useRemoveRemote()
@@ -88,6 +88,6 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
       />
     </div>
   )
-}
+})
 
 export { RemotesDialogItem, type RemotesDialogItemProps }

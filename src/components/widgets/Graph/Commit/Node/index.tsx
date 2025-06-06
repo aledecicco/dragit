@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react'
+import { type ComponentProps, memo } from 'react'
 import { match } from 'ts-pattern'
 
 import { propsWithCn } from '@utils/styles'
@@ -16,7 +16,7 @@ interface GraphCommitNodeProps extends ComponentProps<'div'> {
 /**
  * The node used as anchor by edges in the commit graph.
  */
-const GraphCommitNode = (props: GraphCommitNodeProps) => {
+const GraphCommitNode = memo((props: GraphCommitNodeProps) => {
   const { commitType, ...divProps } = props
 
   return (
@@ -33,6 +33,6 @@ const GraphCommitNode = (props: GraphCommitNodeProps) => {
       style={{ width: NODE_SIZE, height: NODE_SIZE }}
     />
   )
-}
+})
 
 export { GraphCommitNode, type GraphCommitNodeProps }

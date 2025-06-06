@@ -1,4 +1,4 @@
-import { IconLoader2, IconSwitchHorizontal } from '@tabler/icons-react'
+import { IconSwitchHorizontal } from '@tabler/icons-react'
 import { useMemo } from 'react'
 
 import { useCheckout } from '@api/mutations'
