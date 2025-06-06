@@ -4,7 +4,6 @@ import { P, match } from 'ts-pattern'
 import type {
   BranchInfo,
   Reference,
-  RemoteBranch,
   RemoteInfo,
   RemoteName,
   RemoteRef,
@@ -15,13 +14,22 @@ import { mapFn } from './types'
 
 export const DEFAULT_REMOTE_NAME = 'origin'
 
-const getBranchInfo = (
+/**
+ * Finds a branch's info by name in a list of available branches.
+ *
+ * @param refName - The name to search for.
+ * @param branches - The list of branches to search in.
+ */
+const findBranchInfo = (
   refName: string,
   branches: BranchInfo[],
 ): BranchInfo | undefined => {
   return branches.find((branch) => branch.name === refName)
 }
 
+/**
+ * @returns The remote counterpart of a local branch, if any.
+ */
 const getRemoteCounterpart = (branch: BranchInfo): RemoteRef | undefined => {
   return match(branch)
     .with({ type: 'local', remote: P.select() }, (remote) =>
@@ -34,6 +42,13 @@ const getRemoteCounterpart = (branch: BranchInfo): RemoteRef | undefined => {
     .exhaustive()
 }
 
+/**
+ * Hook that tracks a branch by name.
+ *
+ * @param reference - The branch to track.
+ *
+ * @returns A stable reference to the branch's info if found.
+ */
 const useBranch = (
   reference: Reference | undefined,
 ): BranchInfo | undefined => {
@@ -44,36 +59,20 @@ const useBranch = (
       return undefined
     }
 
-    return getBranchInfo(reference.refName, branchesQuery.data)
+    return findBranchInfo(reference.refName, branchesQuery.data)
   }, [branchesQuery.data, reference])
 
   return branch
 }
 
-const useTrackedBranch = (
-  branch: BranchInfo | undefined,
-): RemoteBranch | undefined => {
-  const branchesQuery = useQueryBranches()
-
-  const trackedBranch = useMemo(() => {
-    if (!branch || !branchesQuery.data?.length) {
-      return undefined
-    }
-
-    const remoteRef = getRemoteCounterpart(branch)
-
-    if (!remoteRef) {
-      return undefined
-    }
-
-    return branchesQuery.data
-      .filter((branch) => branch.type === 'remote')
-      .find((branch) => branch.name === remoteRef)
-  }, [branchesQuery.data, branch])
-
-  return trackedBranch
-}
-
+/**
+ * Listens to the currently selected reference and base reference,
+ * and evaluates them to branches if possible.
+ *
+ * @returns An object containing:
+ * - `branch`: The branch pointed at by the selected reference, if any.
+ * - `baseBranch`: The branch pointed at by the base reference, if any.
+ */
 const useSelectedBranches = () => {
   const { reference, baseReference } = useSelectedRefs()
   const branch = useBranch(reference)
@@ -88,14 +87,29 @@ const useSelectedBranches = () => {
   )
 }
 
-const getRemoteInfo = (
+/**
+ * Finds a remote's info by name in a list of available remotes.
+ *
+ * @param remoteName - The name to search for.
+ * @param remotes - The list of remotes to search in.
+ */
+const findRemoteInfo = (
   remoteName: string,
   remotes: RemoteInfo[],
 ): RemoteInfo | undefined => {
   return remotes.find((remote) => remote.name === remoteName)
 }
 
-const useRemote = (remoteName: RemoteName | undefined) => {
+/**
+ * Hook that tracks a remote by name.
+ *
+ * @param remoteName - The remote to track.
+ *
+ * @returns A stable reference to the remote's info if found.
+ */
+const useRemote = (
+  remoteName: RemoteName | undefined,
+): RemoteInfo | undefined => {
   const remotesQuery = useQueryRemotes()
 
   const remote = useMemo(() => {
@@ -103,29 +117,17 @@ const useRemote = (remoteName: RemoteName | undefined) => {
       return undefined
     }
 
-    return getRemoteInfo(remoteName, remotesQuery.data)
+    return findRemoteInfo(remoteName, remotesQuery.data)
   }, [remotesQuery.data, remoteName])
 
   return remote
 }
 
-const useCurrentRemote = () => {
-  const { branch } = useSelectedBranches()
-
-  const remote = useRemote(
-    branch?.type === 'local' ? branch.remote?.remoteName : undefined,
-  )
-
-  return remote
-}
-
 export {
-  getBranchInfo,
+  findBranchInfo,
   getRemoteCounterpart,
-  useTrackedBranch,
   useBranch,
   useSelectedBranches,
-  getRemoteInfo,
+  findRemoteInfo,
   useRemote,
-  useCurrentRemote,
 }

@@ -10,7 +10,7 @@ Stash of ideas in ~planned implementation order:
 - [x] Loading indicators
 - [x] Remotes manipulation widgets
 - [x] Commit details
-- [ ] Documentation pass
+- [x] Documentation pass
 - [ ] Performance pass
 - [ ] Checkout of remote branches, create branch from commit
 - [ ] "Create" option on empty comboboxes

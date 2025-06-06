@@ -15,8 +15,18 @@ const selectedRefs = new Store<SelectedRefs>({
   baseReference: undefined,
 })
 
+/**
+ * @returns An object containing:
+ * - `reference`: The currently selected reference in the application.
+ * - `baseReference`: The currently selected base reference for comparison in the application.
+ */
 const useSelectedRefs = () => useStore(selectedRefs)
 
+/**
+ * Selects a reference to compare the current one against.
+ *
+ * @param baseReference - The reference to select.
+ */
 const changeBaseRef = (baseReference: Reference | undefined) => {
   selectedRefs.setState((state) => ({
     ...state,
@@ -24,6 +34,11 @@ const changeBaseRef = (baseReference: Reference | undefined) => {
   }))
 }
 
+/**
+ * Hook that synchronizes the selected references with the current HEAD info.
+ *
+ * Can swap the base reference to avoid selecting the same one twice.
+ */
 const useReferencesSync = () => {
   const headInfoQuery = useQueryHeadInfo()
 

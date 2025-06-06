@@ -11,6 +11,9 @@ import { StashesListItem } from './Item'
 
 interface StashesListProps extends ComponentProps<'div'> {}
 
+/**
+ * Main app widget that displays the saved stashes in the current repository.
+ */
 const StashesList = (props: StashesListProps) => {
   const { ...divProps } = props
 

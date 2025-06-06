@@ -9,6 +9,9 @@ const ids = new Store<Ids>({
   nextId: 0,
 })
 
+/**
+ * Generates a new unique ID in hexadecimal format.
+ */
 const getUniqueId = () => {
   const id = ids.state.nextId
   ids.setState((ids) => ({
@@ -19,6 +22,9 @@ const getUniqueId = () => {
   return id.toString(16)
 }
 
+/**
+ * @returns A stable unique ID.
+ */
 const useUniqueId = () => {
   const [id] = useState(getUniqueId())
 

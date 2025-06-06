@@ -16,8 +16,18 @@ const selectedUpstream = new Store<SelectedUpstream>({
   remoteBranch: undefined,
 })
 
+/**
+ * @returns An object containing:
+ * - `remote`: The currently selected remote in the application.
+ * - `remoteBranch`: The currently selected remote branch in the application.
+ */
 const useSelectedUpstream = () => useStore(selectedUpstream)
 
+/**
+ * Selects a remote to use for upstream operations.
+ *
+ * @param remote - The remote to select.
+ */
 const changeUpstreamRemote = (remote: RemoteInfo | undefined) => {
   selectedUpstream.setState((state) => ({
     ...state,
@@ -25,6 +35,11 @@ const changeUpstreamRemote = (remote: RemoteInfo | undefined) => {
   }))
 }
 
+/**
+ * Selects a remote branch to use for upstream operations.
+ *
+ * @param remoteBranch - The remote branch to select.
+ */
 const changeUpstreamBranch = (remoteBranch: BranchName | undefined) => {
   selectedUpstream.setState((state) => ({
     ...state,
@@ -32,6 +47,11 @@ const changeUpstreamBranch = (remoteBranch: BranchName | undefined) => {
   }))
 }
 
+/**
+ * Hook that synchronizes the selected remote and remote branch when the checked out branch changes.
+ *
+ * Chooses sensible defaults when the branch has no remote set in Git.
+ */
 const useUpstreamSync = () => {
   const { remote } = useSelectedUpstream()
   const { branch } = useSelectedBranches()

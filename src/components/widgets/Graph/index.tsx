@@ -20,6 +20,12 @@ import { useCurrentCommonAncestor } from './utils'
 
 interface GraphProps extends ComponentProps<'div'> {}
 
+/**
+ * Main app widget that displays the commit graph of the current repository.
+ *
+ * It has a simplified structure, only showing the checked out branch, and optionally a base branch that can be arbitrary.
+ * The divergence point between both branches is computed, and the main branch "spawns" from that point.
+ */
 const Graph = (props: GraphProps) => {
   const { ...divProps } = props
   const { branch, baseBranch } = useSelectedBranches()

@@ -11,9 +11,17 @@ import { cn, propsWithCn } from '@utils/styles'
 import { useDateDifference } from '@utils/time'
 
 interface StashesListItemProps extends ListItemProps {
+  /**
+   * The stash that this list item should display.
+   */
   item: StashInfo
 }
 
+/**
+ * The list item for stashes in the stashes widget.
+ *
+ * Includes a toolbar to apply or delete the stash.
+ */
 const StashesListItem = memo((props: StashesListItemProps) => {
   const { item, ...itemProps } = props
   const stashedTime = useDateDifference(item.timestamp)

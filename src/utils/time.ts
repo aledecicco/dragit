@@ -10,6 +10,11 @@ export const MS_IN_YEAR = 365 * MS_IN_DAY
 
 /**
  * A memoized value that auto-updates with the given frequency.
+ *
+ * @param factory - A function that returns the value to memoize.
+ * @param interval - The refresh interval in milliseconds.
+ *
+ * @returns The memoized value.
  */
 const useTimedMemo = <T>(factory: () => T, interval: number) => {
   const isSet = useRef(false)
@@ -29,6 +34,12 @@ const useTimedMemo = <T>(factory: () => T, interval: number) => {
 }
 
 const dateDiffFormatter = new Intl.RelativeTimeFormat('en', { style: 'long' })
+
+/**
+ * Builds a human-readable string with the time difference between the current time and the given date.
+ *
+ * @params date - The date to compare against. Can be a Date object or a timestamp in milliseconds.
+ */
 const getDateDifference = (date: Date | number) => {
   const dateDiff =
     (typeof date === 'number' ? date : date.getTime()) - Date.now()
@@ -64,6 +75,13 @@ const getDateDifference = (date: Date | number) => {
   return 'Just now'
 }
 
+/**
+ * Keeps track of the time difference between the current time and the given date,
+ * updating the value every minute.
+ *
+ * @param date - The date to compare against. Can be a Date object or a timestamp in milliseconds.
+ * @returns
+ */
 const useDateDifference = (date: Date | number): string => {
   const getDifference = useCallback(() => {
     return getDateDifference(date)
@@ -72,6 +90,11 @@ const useDateDifference = (date: Date | number): string => {
   return useTimedMemo(getDifference, MS_IN_MINUTE)
 }
 
+/**
+ * Promise that resolves after the given time.
+ *
+ * @param ms - The duration in milliseconds to wait.
+ */
 const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }

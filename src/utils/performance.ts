@@ -4,20 +4,25 @@ import { type DependencyList, useCallback, useReducer, useRef } from 'react'
 import { MS_IN_SECOND } from './time'
 
 interface DebounceOptions {
+  /**
+   * The delay in milliseconds before the callback is executed.
+   * Defaults to 1/10th of a second.
+   */
   delay?: number
 }
 
-function useDebouncedCallback(
-  callback: () => void,
-  deps: DependencyList,
-  options?: DebounceOptions,
-): () => void
-
-function useDebouncedCallback<T>(
+/**
+ * Creates a debounced version of the given callback.
+ *
+ * @param callback - The function to debounce.
+ * @param deps - The dependencies that cause the callback to be created again.
+ * @param options - Options for the debounce behavior.
+ */
+const useDebouncedCallback = <T>(
   callback: (args: T) => void,
   deps: DependencyList,
   options?: DebounceOptions,
-): (args: T) => void {
+): ((args: T) => void) => {
   const timeoutId = useRef<number>(null)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: handle function reconstruction manually
@@ -36,64 +41,45 @@ function useDebouncedCallback<T>(
   }, deps)
 }
 
-interface BaseThrottleOptions {
+interface ThrottleOptions {
+  /**
+   * The delay in milliseconds before the next call can be made.
+   * Defaults to 1/60th of a second (for 60 hz).
+   */
   delay?: number
+
+  /**
+   * Whether to trigger the callback at the end of the wait period if a call was throttled in the meantime.
+   * Defaults to false.
+   */
   trailingCall?: boolean
 }
 
-interface WithAccumulator<T> extends BaseThrottleOptions {
-  withAccumulator: {
-    initial: T
-    update: (accumulator: T, args: T) => T
-  }
-}
-
-interface WithoutAccumulator extends BaseThrottleOptions {
-  withAccumulator?: never
-}
-
-type ThrottleOptions<T = void> = WithoutAccumulator | WithAccumulator<T>
-
-function useThrottledCallback(
-  callback: () => void,
-  deps: DependencyList,
-  options?: WithoutAccumulator,
-): () => void
-
-function useThrottledCallback<T>(
+/**
+ * Creates a throttled version of the given callback.
+ *
+ * @param callback - The function to throttle.
+ * @param deps - The dependencies that cause the callback to be rebuilt.
+ * @param options - Options for the throttling behavior.
+ */
+const useThrottledCallback = <T>(
   callback: (args: T) => void,
   deps: DependencyList,
-  options?: WithoutAccumulator,
-): (args: T) => void
-
-function useThrottledCallback<T>(
-  callback: (acc: T) => void,
-  deps: DependencyList,
-  options: WithAccumulator<T>,
-): (args: T) => void
-
-function useThrottledCallback<T>(
-  callback: (args: T) => void,
-  deps: DependencyList,
-  options?: ThrottleOptions<T>,
-): (args: T) => void {
-  const accumulator = useRef(
-    options?.withAccumulator
-      ? { value: options?.withAccumulator.initial }
-      : undefined,
-  )
+  options?: ThrottleOptions,
+): ((args: T) => void) => {
+  /**
+   * Whether calls must be stopped.
+   */
   const wait = useRef(false)
+  /**
+   * Whether a call was made during the wait period.
+   */
   const pending = useRef(false)
+
   const timeoutId = useRef<number>(null)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: handle function reconstruction manually
   return useCallback((args: T) => {
-    if (options?.withAccumulator && accumulator.current) {
-      accumulator.current = {
-        value: options?.withAccumulator.update(accumulator.current.value, args),
-      }
-    }
-
     if (wait.current) {
       pending.current = true
       return
@@ -102,22 +88,8 @@ function useThrottledCallback<T>(
     wait.current = true
     pending.current = false
 
-    const execute = () => {
-      if (options?.withAccumulator) {
-        if (accumulator.current) {
-          callback(accumulator.current.value)
-        }
-      } else {
-        callback(args)
-      }
-
-      if (options?.withAccumulator) {
-        accumulator.current = { value: options?.withAccumulator.initial }
-      }
-    }
-
     const executeAndSchedule = () => {
-      execute()
+      callback(args)
 
       if (timeoutId.current) {
         clearTimeout(timeoutId.current)
@@ -132,7 +104,7 @@ function useThrottledCallback<T>(
             pending.current = false
 
             if (options?.trailingCall) {
-              execute()
+              callback(args)
             }
           }
         },
@@ -144,6 +116,13 @@ function useThrottledCallback<T>(
   }, deps)
 }
 
+/**
+ * Hook that provides a way to trigger a rerender.
+ *
+ * @returns An object containing:
+ * - `rerenderTrigger`: A variable that can be used as a dependency to trigger a rerender.
+ * - `rerender`: A function that can be called to manually trigger a rerender.
+ */
 const useRerender = () => {
   const [rerenderTrigger, rerender] = useReducer(
     (n) => (n + 1) % Number.MAX_SAFE_INTEGER,
@@ -158,6 +137,17 @@ type VirtualListOptions<T extends HTMLElement> = Omit<
   'getScrollElement'
 >
 
+/**
+ * Hook that puts together the state used for a virtual list and its display.
+ *
+ * @param options - Options for the virtualizer.
+ *
+ * @returns An object containing:
+ * - `scrollContainerRef`: A ref to the element that can be scrolled.
+ * - `virtualizer`: The virtualizer instance.
+ * - `isScrolled`: Whether the list has been scrolled down.
+ * - `hasScrollLeft`: Whether the list can be scrolled down.
+ */
 const useVirtualList = <T extends HTMLElement>(
   options: VirtualListOptions<T>,
 ) => {

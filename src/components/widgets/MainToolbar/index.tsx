@@ -14,6 +14,9 @@ import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
 
 interface MainToolbarProps extends Partial<ToolbarProps> {}
 
+/**
+ * Main app widget that displays a toolbar with the most important actions for file handling.
+ */
 const MainToolbar = (props: MainToolbarProps) => {
   const { ...toolbarProps } = props
 

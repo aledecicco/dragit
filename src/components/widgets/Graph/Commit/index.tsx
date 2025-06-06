@@ -6,7 +6,6 @@ import type { CommitId } from '@api/models'
 import { useQueryCommitInfo } from '@api/queries'
 import { QueryLoader } from '@lib/Loader/Query'
 import { makeTracked } from '@lib/SvgOverlay'
-import { Skeleton } from '@ui/Skeleton'
 import { cn, propsWithCn } from '@utils/styles'
 import type { ParentCommitType } from '../Edges'
 import { GraphCommitCard } from './Card'
@@ -21,11 +20,27 @@ const COMMIT_WIDTH = 320
 const COMMIT_HEIGHT = 66
 
 interface GraphCommitProps extends ComponentProps<'div'> {
+  /**
+   * The hash of the commit to display.
+   */
   commitId: CommitId
+
+  /**
+   * The type of the commit, used to determine the style of the node.
+   */
   commitType: CommitType
+
+  /**
+   * The distance to this commit from the branch's tip.
+   */
   distance: number
 }
 
+/**
+ * A single commit which displays a card with a short summary about it, and a node for edges to use as anchor.
+ *
+ * Registers/unregisters itself in the SVG overlay when mounted/unmounted.
+ */
 const GraphCommit = makeTracked<
   GraphCommitProps,
   HTMLDivElement,
@@ -39,10 +54,7 @@ const GraphCommit = makeTracked<
       {...propsWithCn(divProps, 'relative')}
       ref={mergeRefs([trackRef, divProps.ref])}
     >
-      <GraphCommitNode
-        commitType={commitType}
-        commitInfo={commitInfoQuery.data}
-      />
+      <GraphCommitNode commitType={commitType} />
 
       <div
         className={cn(

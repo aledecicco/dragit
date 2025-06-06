@@ -8,6 +8,7 @@ import { useEffect } from 'react'
 import type {
   AncestorInfo,
   BranchDivergence,
+  CommonAncestorInfo,
   HistoryItem,
   Page,
 } from '@api/models'
@@ -17,6 +18,13 @@ import { useSelectedRefs } from '@context/branches'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<Page<HistoryItem>>>
 
+/**
+ * Whether an ancestor at a given distance is not amongst the currently loaded items.
+ *
+ * @param ancestorDistance - The distance from the branch's tip of the ancestor to search for.
+ * @param historyQuery - The query containing the commit history.
+ * @param items - The currently rendered items in the virtual list.
+ */
 const ancestorNotInRange = (
   ancestorDistance: number,
   historyQuery: HistoryQuery,
@@ -28,6 +36,12 @@ const ancestorNotInRange = (
   )
 }
 
+/**
+ * Whether an ancestor is "ahead" of a given branch's tip.
+ *
+ * @param ancestorDistance - The distance from the branch's tip of the ancestor to check.
+ * @param branchDivergence - The computed divergence info about the branch.
+ */
 const ancestorIsDivergent = (
   ancestorDistance: number,
   branchDivergence: BranchDivergence,
@@ -35,6 +49,12 @@ const ancestorIsDivergent = (
   return ancestorDistance + 1 <= branchDivergence.ahead
 }
 
+/**
+ * Hook that automatically fetches the next page of the given query when the virtual list reaches the end.
+ *
+ * @param historyQuery - The query containing the commit history.
+ * @param items - The currently rendered items in the virtual list.
+ */
 const useInfiniteScroll = (
   historyQuery: HistoryQuery,
   items: VirtualItem[],
@@ -59,7 +79,10 @@ const useInfiniteScroll = (
   ])
 }
 
-const useCurrentCommonAncestor = () => {
+/**
+ * Tracks the two selected refs and returns information about their common ancestor.
+ */
+const useCurrentCommonAncestor = (): CommonAncestorInfo | undefined => {
   const { reference, baseReference } = useSelectedRefs()
   const commonAncestorQuery = useQueryCommonAncestor(
     reference?.refName,
@@ -69,6 +92,18 @@ const useCurrentCommonAncestor = () => {
   return commonAncestorQuery.data ?? undefined
 }
 
+/**
+ * Computes and returns information useful to render a commit in the graph.
+ *
+ * @param row - The row representing a commit in the virtual list.
+ * @param history - The commit history.
+ * @param anchor - The ancestor being used as anchor between the two selected refs.
+ *
+ * @returns An object containing:
+ * - `hash`: The commit's hash.
+ * - `isAnchor`: Whether the commit is the anchor commit.
+ * - `parent`: The commit's parent hash. Can skip to the anchor commit if the intermediate commits are not loaded.
+ */
 const getGraphCommitData = (
   row: VirtualItem,
   history: InfiniteData<Page<HistoryItem>>,

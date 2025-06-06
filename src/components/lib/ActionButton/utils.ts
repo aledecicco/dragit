@@ -38,7 +38,12 @@ interface ActionTracker {
  * @param mainAction - The main action to use as default.
  * @param defaultStatus - The default status of the button while idle (used during running state also).
  *
- * @returns The current icon, label, button status, action state, and a callback to trigger and start tracking an action.
+ * @returns An object containing:
+ * - `Glyph`: The icon to display in the button.
+ * - `label`: The label to display in the button.
+ * - `buttonStatus`: The status of the button, used for styling.
+ * - `actionState`: The current state of the action being tracked.
+ * - `trackAction`: A callback to trigger and start tracking an action.
  */
 const useActionTracker = (
   mainAction: ActionDescription,

@@ -7,9 +7,15 @@ import { cn, propsWithCn } from '@utils/styles'
 import { useDateDifference } from '@utils/time'
 
 interface GraphCommitCardProps extends Ariakit.ButtonProps {
+  /**
+   * Information about the commit to display.
+   */
   commitInfo: CommitInfo
 }
 
+/**
+ * A summary card for a commit in the commit graph.
+ */
 const GraphCommitCard = (props: GraphCommitCardProps) => {
   const { commitInfo, ...buttonProps } = props
   const timeAgo = useDateDifference(commitInfo.timestamp)

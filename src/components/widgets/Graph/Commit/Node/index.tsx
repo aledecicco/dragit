@@ -1,19 +1,23 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import type { CommitInfo } from '@api/models'
 import { propsWithCn } from '@utils/styles'
 import type { CommitType } from '..'
 
 export const NODE_SIZE = 15
 
 interface GraphCommitNodeProps extends ComponentProps<'div'> {
+  /**
+   * The type of the commit, used to determine the style of the node.
+   */
   commitType: CommitType
-  commitInfo: CommitInfo | undefined
 }
 
+/**
+ * The node used as anchor by edges in the commit graph.
+ */
 const GraphCommitNode = (props: GraphCommitNodeProps) => {
-  const { commitType, commitInfo, ...divProps } = props
+  const { commitType, ...divProps } = props
 
   return (
     <div
