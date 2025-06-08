@@ -16,12 +16,7 @@ interface StashesListProps extends ComponentProps<'div'> {}
  */
 const StashesList = (props: StashesListProps) => {
   const { ...divProps } = props
-
   const stashesQuery = useQueryStashes()
-
-  const virtualizerOptions = mapFn(stashesQuery.data, (stashes) => ({
-    getItemKey: (index: number) => stashes[index].id,
-  }))
 
   return (
     <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>
@@ -39,7 +34,9 @@ const StashesList = (props: StashesListProps) => {
           size="sm"
           itemSize={74}
           RenderItem={StashesListItem}
-          options={virtualizerOptions}
+          options={mapFn(stashesQuery.data, (stashes) => ({
+            getItemKey: (index: number) => stashes[index].id,
+          }))}
         />
       </AccordionSection>
     </Accordion>

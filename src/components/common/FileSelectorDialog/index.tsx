@@ -71,13 +71,6 @@ const FileSelectorDialog = <T extends FileType>(
 
   const items = filesQuery.data?.items.map((file) => file.path)
 
-  const virtualizerOptions = mapFn(items, (items) => ({
-    getItemKey: (index: number) => items[index],
-    gap: 0,
-    paddingStart: 4,
-    paddingEnd: 12,
-  }))
-
   const page = useFilesPage(types)
   const showPagination = useNeedsPagination(filesQuery, page)
 
@@ -133,7 +126,12 @@ const FileSelectorDialog = <T extends FileType>(
         items={items}
         itemSize={36}
         RenderItem={CommandMenuItem}
-        options={virtualizerOptions}
+        options={mapFn(items, (items) => ({
+          getItemKey: (index: number) => items[index],
+          gap: 0,
+          paddingStart: 4,
+          paddingEnd: 12,
+        }))}
         fallback={
           <div
             className={cn('p-2 text-center', 'text-sm italic text-light-950')}

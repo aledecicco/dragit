@@ -16,12 +16,7 @@ interface BranchesListProps extends ComponentProps<'div'> {}
  */
 const BranchesList = (props: BranchesListProps) => {
   const { ...divProps } = props
-
   const branchesQuery = useQueryBranches()
-
-  const virtualizerOptions = mapFn(branchesQuery.data, (branches) => ({
-    getItemKey: (index: number) => branches[index].name,
-  }))
 
   return (
     <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>
@@ -39,7 +34,9 @@ const BranchesList = (props: BranchesListProps) => {
           size="sm"
           itemSize={74}
           RenderItem={BranchesListItem}
-          options={virtualizerOptions}
+          options={mapFn(branchesQuery.data, (branches) => ({
+            getItemKey: (index: number) => branches[index].name,
+          }))}
         />
       </AccordionSection>
     </Accordion>

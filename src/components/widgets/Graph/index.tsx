@@ -1,7 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 import {
   type Range,
-  type VirtualizerOptions,
   defaultRangeExtractor,
   useVirtualizer,
 } from '@tanstack/react-virtual'
@@ -77,32 +76,27 @@ const GraphInner = () => {
   )
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const estimateSize = () => NODE_SIZE
-  const getScrollElement = () => scrollContainerRef.current
-  const rangeExtractor = (range: Range) => {
-    const indexes = new Set(defaultRangeExtractor(range))
+  const virtualizer = useVirtualizer({
+    estimateSize: () => NODE_SIZE,
+    getScrollElement: () => scrollContainerRef.current,
+    rangeExtractor: (range: Range) => {
+      const indexes = new Set(defaultRangeExtractor(range))
 
-    if (commonAncestor?.commonCommit.distance !== undefined) {
-      indexes.add(commonAncestor.commonCommit.distance)
-    }
-    if (commonAncestor?.lastCommit?.distance !== undefined) {
-      indexes.add(commonAncestor.lastCommit.distance)
-    }
+      if (commonAncestor?.commonCommit.distance !== undefined) {
+        indexes.add(commonAncestor.commonCommit.distance)
+      }
+      if (commonAncestor?.lastCommit?.distance !== undefined) {
+        indexes.add(commonAncestor.lastCommit.distance)
+      }
 
-    return [...indexes].sort((a, b) => a - b)
-  }
-
-  const virtualizerOptions = {
-    estimateSize,
-    getScrollElement,
-    rangeExtractor,
+      return [...indexes].sort((a, b) => a - b)
+    },
     gap: EDGE_LENGTH,
     paddingStart: CURVE_SIZE * 2 + EDGE_OFFSET,
     paddingEnd: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
     count: Math.max(branchLength, baseLength),
     overscan: 3,
-  }
-  const virtualizer = useVirtualizer(virtualizerOptions)
+  })
 
   return (
     <Ariakit.CompositeProvider focusLoop="horizontal" focusShift>

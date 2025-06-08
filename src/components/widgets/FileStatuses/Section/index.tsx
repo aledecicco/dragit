@@ -35,10 +35,6 @@ const FileStatusesSection = <T extends FileType>(
   const filesQuery = useQueryFiles(type)
   useHandleFilesPageSync(type)
 
-  const virtualizerOptions = mapFn(filesQuery.data, (files) => ({
-    getItemKey: (index: number) => files.items[index].path,
-  }))
-
   return (
     <AccordionSection
       defaultOpen
@@ -53,7 +49,9 @@ const FileStatusesSection = <T extends FileType>(
         size="sm"
         itemSize={ItemSize[type]}
         RenderItem={FileStatusItem[type]}
-        options={virtualizerOptions}
+        options={mapFn(filesQuery.data, (files) => ({
+          getItemKey: (index: number) => files.items[index].path,
+        }))}
         isStandalone={false}
       />
     </AccordionSection>

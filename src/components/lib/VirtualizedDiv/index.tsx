@@ -47,19 +47,16 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
   const { items, itemSize, RenderItem, options, fallback, ...divProps } = props
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const estimateSize = () => itemSize
-  const getScrollElement = () => scrollContainerRef.current
-  const virtualizerOptions = {
-    estimateSize,
-    getScrollElement,
+  const virtualizer = useVirtualizer({
+    estimateSize: () => itemSize,
+    getScrollElement: () => scrollContainerRef.current,
     paddingStart: 8,
     paddingEnd: 8,
     gap: 8,
     count: items?.length ?? 0,
     overscan: 2,
     ...options,
-  }
-  const virtualizer = useVirtualizer(virtualizerOptions)
+  })
 
   if (!items?.length) {
     return fallback

@@ -45,10 +45,6 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
   const showPagination = useNeedsPagination(filesQuery, page)
   useHandlePageSync(filesQuery, page, clearPage)
 
-  const virtualizerOptions = mapFn(filesQuery.data, (page) => ({
-    getItemKey: (index: number) => page.items[index].path,
-  }))
-
   const store = Ariakit.useCheckboxStore()
   const selectedFile = Ariakit.useStoreState(store, 'value')
 
@@ -116,7 +112,9 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
                 getItems={getPageItems}
                 itemSize={48}
                 size="md"
-                options={virtualizerOptions}
+                options={mapFn(filesQuery.data, (page) => ({
+                  getItemKey: (index: number) => page.items[index].path,
+                }))}
                 placeholdersCount={Math.min(
                   10,
                   commitInfo.changes?.filesCount

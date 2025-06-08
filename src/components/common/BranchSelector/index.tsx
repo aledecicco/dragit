@@ -61,18 +61,12 @@ const BranchSelector = <T extends boolean>(props: BranchSelectorProps<T>) => {
       option={option}
       options={branchOptions}
       setOption={onBranchChange}
-      renderOption={getOptionName}
+      renderOption={(option) => option.data?.name ?? 'No branch'}
       placeholder="Choose a branch..."
       {...comboboxProps}
       disabled={!branches || comboboxProps.disabled}
     />
   )
-}
-
-const getOptionName = (
-  option: ComboboxOption<BranchOption<boolean>>,
-): string => {
-  return option.data?.name ?? 'No branch'
 }
 
 /**

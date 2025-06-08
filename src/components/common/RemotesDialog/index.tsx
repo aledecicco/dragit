@@ -23,10 +23,6 @@ const RemotesDialog = (props: RemotesDialogProps) => {
   const [adding, setAdding] = useState(false)
   const remotesQuery = useQueryRemotes()
 
-  const virtualizerOptions = mapFn(remotesQuery.data, (remotes) => ({
-    getItemKey: (index: number) => remotes[index].name,
-  }))
-
   return (
     <Dialog dialogKey={REMOTES_DIALOG_KEY} heading="Remotes" {...dialogProps}>
       <div
@@ -42,7 +38,9 @@ const RemotesDialog = (props: RemotesDialogProps) => {
           getItems={idFn}
           itemSize={36}
           size="md"
-          options={virtualizerOptions}
+          options={mapFn(remotesQuery.data, (remotes) => ({
+            getItemKey: (index: number) => remotes[index].name,
+          }))}
         />
       </div>
 
