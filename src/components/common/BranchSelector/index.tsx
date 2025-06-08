@@ -55,21 +55,31 @@ const BranchSelector = <T extends boolean>(props: BranchSelectorProps<T>) => {
     ...comboboxProps
   } = props
 
+  const option: ComboboxOption<BranchOption<T>> | undefined = useMemo(() => {
+    return branch ? { value: branch.name, data: branch } : undefined
+  }, [branch])
+
   const branchOptions: ComboboxOption<BranchOption<T>>[] = useMemo(() => {
     return getBranchOptions(branches, allowEmpty, exclude)
   }, [branches, allowEmpty, exclude])
 
   return (
     <Combobox
-      option={branch ? { value: branch.name, data: branch } : undefined}
+      option={option}
       options={branchOptions}
       setOption={onBranchChange}
-      renderOption={(option) => option.data?.name ?? 'No branch'}
+      renderOption={getOptionName}
       placeholder="Choose a branch..."
       {...comboboxProps}
       disabled={!branches || comboboxProps.disabled}
     />
   )
+}
+
+const getOptionName = (
+  option: ComboboxOption<BranchOption<boolean>>,
+): string => {
+  return option.data?.name ?? 'No branch'
 }
 
 /**

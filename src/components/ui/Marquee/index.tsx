@@ -1,6 +1,7 @@
 import {
   type CSSProperties,
   type ComponentProps,
+  memo,
   useEffect,
   useRef,
   useState,
@@ -42,7 +43,7 @@ interface MarqueeProps extends ComponentProps<'div'> {
 /**
  * Marquee component that tracks its content and scrolls it horizontally when hovered, if necessary.
  */
-const Marquee = (props: MarqueeProps) => {
+const Marquee = memo((props: MarqueeProps) => {
   const {
     speed = 100,
     infinite = false,
@@ -194,6 +195,6 @@ const Marquee = (props: MarqueeProps) => {
       )}
     </div>
   )
-}
+})
 
 export { Marquee, type MarqueeProps }

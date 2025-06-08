@@ -1,5 +1,5 @@
 import { IconPlus } from '@tabler/icons-react'
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 
 import type { UnstagedFileInfo } from '@api/models'
 import { useAddToIndex } from '@api/mutations'
@@ -15,7 +15,7 @@ interface UnstagedFileToolbarProps extends Partial<ToolbarProps> {
 /**
  * The common set of tools for unstaged files.
  */
-const UnstagedFileToolbar = (props: UnstagedFileToolbarProps) => {
+const UnstagedFileToolbar = memo((props: UnstagedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
   const stage = useAddToIndex()
 
@@ -37,6 +37,6 @@ const UnstagedFileToolbar = (props: UnstagedFileToolbarProps) => {
   }, [file.path, stage.mutateAsync])
 
   return <Toolbar size="sm" tools={tools} compact {...toolbarProps} />
-}
+})
 
 export { UnstagedFileToolbar }

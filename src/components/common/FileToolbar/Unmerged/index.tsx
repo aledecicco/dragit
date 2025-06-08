@@ -1,5 +1,5 @@
 import { IconCheck, IconTrash } from '@tabler/icons-react'
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { P, match } from 'ts-pattern'
 
 import type { UnmergedFileInfo } from '@api/models'
@@ -16,7 +16,7 @@ interface UnmergedFileToolbarProps extends Partial<ToolbarProps> {
 /**
  * The common set of tools for unmerged files.
  */
-const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
+const UnmergedFileToolbar = memo((props: UnmergedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
   const stage = useAddToIndex()
   const remove = useRemoveFromTree()
@@ -55,6 +55,6 @@ const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
   }, [file.path, file.changes, stage.mutateAsync, remove.mutateAsync])
 
   return <Toolbar size="sm" tools={tools} compact {...toolbarProps} />
-}
+})
 
 export { UnmergedFileToolbar }

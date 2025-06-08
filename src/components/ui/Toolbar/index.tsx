@@ -4,6 +4,7 @@ import { type Action, ActionButton } from '@lib/ActionButton'
 import type { ButtonStatus, ButtonVariant } from '@ui/Button'
 import { cn, propsWithCn } from '@utils/styles'
 import type { Size } from '@utils/types'
+import { memo } from 'react'
 
 interface ToolbarTool {
   action: Action
@@ -46,9 +47,9 @@ interface ToolbarProps extends Ariakit.ToolbarProps {
 }
 
 /**
- * Component that displays a set of actions, each triggered and tracked by an {@link ActionButton}.
+ * Component that displays a set of related actions, each triggered and tracked by an {@link ActionButton}.
  */
-const Toolbar = (props: ToolbarProps) => {
+const Toolbar = memo((props: ToolbarProps) => {
   const {
     tools,
     variant = 'filled',
@@ -94,6 +95,6 @@ const Toolbar = (props: ToolbarProps) => {
       </Ariakit.Toolbar>
     </Ariakit.ToolbarProvider>
   )
-}
+})
 
 export { Toolbar, type ToolbarProps, type ToolbarTool }

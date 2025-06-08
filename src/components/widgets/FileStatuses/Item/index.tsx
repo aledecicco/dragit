@@ -28,6 +28,7 @@ interface FileStatusItemProps<T extends FileType> extends ListItemProps {
 const FileStatusItem = memo(
   <T extends FileType>(props: FileStatusItemProps<T>) => {
     const { item, fileType, statusMessage, Glyph, ...itemProps } = props
+
     const FileToolbar: ToolbarComponent<T> = FileItemToolbar[fileType]
 
     return (

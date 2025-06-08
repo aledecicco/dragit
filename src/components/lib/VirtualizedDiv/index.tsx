@@ -55,6 +55,7 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
     count: items?.length ?? 0,
     overscan: 2,
     getScrollElement: useCallback(() => scrollContainerRef.current, []),
+    ...options,
   })
 
   if (!items?.length) {

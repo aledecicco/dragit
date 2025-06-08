@@ -1,5 +1,5 @@
 import { IconPlus } from '@tabler/icons-react'
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 
 import type { UntrackedFileInfo } from '@api/models'
 import { useAddToIndex } from '@api/mutations'
@@ -15,7 +15,7 @@ interface UntrackedFileToolbarProps extends Partial<ToolbarProps> {
 /**
  * The common set of tools for untracked files.
  */
-const UntrackedFileToolbar = (props: UntrackedFileToolbarProps) => {
+const UntrackedFileToolbar = memo((props: UntrackedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
   const stage = useAddToIndex()
 
@@ -37,6 +37,6 @@ const UntrackedFileToolbar = (props: UntrackedFileToolbarProps) => {
   }, [file.path, stage.mutateAsync])
 
   return <Toolbar size="sm" tools={tools} compact {...toolbarProps} />
-}
+})
 
 export { UntrackedFileToolbar }

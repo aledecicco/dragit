@@ -1,5 +1,5 @@
 import { IconMinus } from '@tabler/icons-react'
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 
 import type { StagedFileInfo } from '@api/models'
 import { useRemoveFromIndex } from '@api/mutations'
@@ -15,7 +15,7 @@ interface StagedFileToolbarProps extends Partial<ToolbarProps> {
 /**
  * The common set of tools for staged files.
  */
-const StagedFileToolbar = (props: StagedFileToolbarProps) => {
+const StagedFileToolbar = memo((props: StagedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
   const unstage = useRemoveFromIndex()
 
@@ -37,6 +37,6 @@ const StagedFileToolbar = (props: StagedFileToolbarProps) => {
   }, [file.path, unstage.mutateAsync])
 
   return <Toolbar size="sm" tools={tools} compact {...toolbarProps} />
-}
+})
 
 export { StagedFileToolbar }

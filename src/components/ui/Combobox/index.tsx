@@ -1,6 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
-import { type ReactNode, startTransition, useMemo, useState } from 'react'
+import { type ReactNode, memo, startTransition, useMemo, useState } from 'react'
 
 import { Button, type ButtonProps } from '@ui/Button'
 import { type Glyph, Icon } from '@ui/Icon'
@@ -49,6 +49,8 @@ interface ComboboxProps<T> extends Partial<ButtonProps> {
    */
   placeholder?: string
 }
+
+const LIMIT = 20
 
 /**
  * A select field that allows searching through a list of options.
@@ -137,12 +139,23 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
               >
                 No matches found
               </div>,
-              matchingOptions,
+              matchingOptions.slice(0, LIMIT),
               (option) => (
                 <ComboboxItem key={option.value} item={option}>
                   {renderOption(option)}
                 </ComboboxItem>
               ),
+            )}
+
+            {matchingOptions.length > LIMIT && (
+              <div
+                className={cn(
+                  'text-center p-2',
+                  'text-xs italic text-light-950',
+                )}
+              >
+                ...
+              </div>
             )}
           </Ariakit.ComboboxList>
         </Ariakit.SelectPopover>
@@ -155,7 +168,7 @@ interface ComboboxItemProps<T> extends Ariakit.SelectItemProps {
   item: ComboboxOption<T>
 }
 
-const ComboboxItem = <T,>(props: ComboboxItemProps<T>) => {
+const ComboboxItem = memo(<T,>(props: ComboboxItemProps<T>) => {
   const { item, ...itemProps } = props
 
   return (
@@ -177,6 +190,6 @@ const ComboboxItem = <T,>(props: ComboboxItemProps<T>) => {
       }
     />
   )
-}
+})
 
 export { Combobox, type ComboboxProps, type ComboboxOption }
