@@ -1,6 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
-import { type ReactNode, memo, startTransition, useMemo, useState } from 'react'
+import { type ReactNode, startTransition, useState } from 'react'
 
 import { Button, type ButtonProps } from '@ui/Button'
 import { type Glyph, Icon } from '@ui/Icon'
@@ -70,9 +70,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
 
   const [search, setSearch] = useState('')
 
-  const matchingOptions = useMemo(() => {
-    return matchSorter(options, search, { keys: ['value'] })
-  }, [options, search])
+  const matchingOptions = matchSorter(options, search, { keys: ['value'] })
 
   return (
     <Ariakit.ComboboxProvider
@@ -168,7 +166,7 @@ interface ComboboxItemProps<T> extends Ariakit.SelectItemProps {
   item: ComboboxOption<T>
 }
 
-const ComboboxItem = memo(<T,>(props: ComboboxItemProps<T>) => {
+const ComboboxItem = <T,>(props: ComboboxItemProps<T>) => {
   const { item, ...itemProps } = props
 
   return (
@@ -190,6 +188,6 @@ const ComboboxItem = memo(<T,>(props: ComboboxItemProps<T>) => {
       }
     />
   )
-})
+}
 
 export { Combobox, type ComboboxProps, type ComboboxOption }

@@ -3,7 +3,6 @@ import {
   IconMessageCheck,
   IconPackage,
 } from '@tabler/icons-react'
-import { useMemo } from 'react'
 
 import type { FileType } from '@api/models'
 import { useAddToIndex, useCommitIndex, useSaveStash } from '@api/mutations'
@@ -24,66 +23,64 @@ const MainToolbar = (props: MainToolbarProps) => {
   const commit = useCommitIndex()
   const stash = useSaveStash()
 
-  const tools = useMemo(() => {
-    return [
-      {
-        action: {
-          run: async () => {
-            const types: FileType[] = ['unstaged', 'unmerged', 'untracked']
-            const fileParams = await askForValue(FileSelectorDialog, {
-              types,
-            })
-            await add.mutateAsync({
-              files: [fileParams.path],
-            })
-          },
-          label: {
-            idle: 'Add Files',
-            running: 'Adding',
-            success: 'Added',
-            error: 'Failed',
-          },
-          Glyph: IconListCheck,
+  const tools = [
+    {
+      action: {
+        run: async () => {
+          const types: FileType[] = ['unstaged', 'unmerged', 'untracked']
+          const fileParams = await askForValue(FileSelectorDialog, {
+            types,
+          })
+          await add.mutateAsync({
+            files: [fileParams.path],
+          })
         },
-      },
-      {
-        action: {
-          run: () => {
-            return stash.mutateAsync({
-              files: ['.'],
-              message: null,
-              includeUntracked: true,
-            })
-          },
-          label: {
-            idle: 'Stash',
-            running: 'Stashing',
-            success: 'Stashed',
-            error: 'Failed',
-          },
-          Glyph: IconPackage,
+        label: {
+          idle: 'Add Files',
+          running: 'Adding',
+          success: 'Added',
+          error: 'Failed',
         },
+        Glyph: IconListCheck,
       },
-      {
-        action: {
-          run: async () => {
-            const commitParams = await askForValue(CommitDialog)
-            return await commit.mutateAsync({
-              message: commitParams.message,
-              isAmend: false,
-            })
-          },
-          label: {
-            idle: 'Commit',
-            running: 'Committing',
-            success: 'Committed',
-            error: 'Failed',
-          },
-          Glyph: IconMessageCheck,
+    },
+    {
+      action: {
+        run: () => {
+          return stash.mutateAsync({
+            files: ['.'],
+            message: null,
+            includeUntracked: true,
+          })
         },
+        label: {
+          idle: 'Stash',
+          running: 'Stashing',
+          success: 'Stashed',
+          error: 'Failed',
+        },
+        Glyph: IconPackage,
       },
-    ]
-  }, [add.mutateAsync, commit.mutateAsync, stash.mutateAsync])
+    },
+    {
+      action: {
+        run: async () => {
+          const commitParams = await askForValue(CommitDialog)
+          return await commit.mutateAsync({
+            message: commitParams.message,
+            isAmend: false,
+          })
+        },
+        label: {
+          idle: 'Commit',
+          running: 'Committing',
+          success: 'Committed',
+          error: 'Failed',
+        },
+        Glyph: IconMessageCheck,
+      },
+    },
+  ]
 
   return (
     <Toolbar

@@ -24,6 +24,7 @@ export default defineConfig(async () => ({
   resolve: {
     alias: {
       // TODO: workaround for slow loading times in dev mode. Might be fixed by a future version of @tabler-icons
+      // https://github.com/tabler/tabler-icons/issues/1233
       '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
     },
   },

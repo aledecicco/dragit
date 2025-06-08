@@ -1,7 +1,6 @@
 import {
   type CSSProperties,
   type ComponentProps,
-  memo,
   useEffect,
   useRef,
   useState,
@@ -43,7 +42,7 @@ interface MarqueeProps extends ComponentProps<'div'> {
 /**
  * Marquee component that tracks its content and scrolls it horizontally when hovered, if necessary.
  */
-const Marquee = memo((props: MarqueeProps) => {
+const Marquee = (props: MarqueeProps) => {
   const {
     speed = 100,
     infinite = false,
@@ -75,7 +74,6 @@ const Marquee = memo((props: MarqueeProps) => {
         setOverflow(0)
       }
     },
-    [infinite],
     {
       trailingCall: true,
       delay: MS_IN_SECOND / 30,
@@ -195,6 +193,6 @@ const Marquee = memo((props: MarqueeProps) => {
       )}
     </div>
   )
-})
+}
 
 export { Marquee, type MarqueeProps }

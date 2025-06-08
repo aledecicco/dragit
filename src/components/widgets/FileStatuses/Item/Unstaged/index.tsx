@@ -4,7 +4,6 @@ import {
   IconFilePencil,
   IconFilePlus,
 } from '@tabler/icons-react'
-import { memo } from 'react'
 import { match } from 'ts-pattern'
 
 import type { UnstagedFileInfo } from '@api/models'
@@ -22,7 +21,7 @@ interface UnstagedFileStatusItemProps extends ListItemProps {
 /**
  * The list item for files in the 'unstaged' file statuses widget section.
  */
-const UnstagedFileStatusItem = memo((props: UnstagedFileStatusItemProps) => {
+const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
   const { item, ...itemProps } = props
 
   return (
@@ -48,6 +47,6 @@ const UnstagedFileStatusItem = memo((props: UnstagedFileStatusItemProps) => {
         .exhaustive()}
     />
   )
-})
+}
 
 export { UnstagedFileStatusItem, type UnstagedFileStatusItemProps }

@@ -1,4 +1,4 @@
-import { type ComponentType, type ReactNode, memo } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 
 import type { FileType, FileTypes } from '@api/models'
 import { StagedFileToolbar } from '@common/FileToolbar/Staged'
@@ -25,34 +25,32 @@ interface FileStatusItemProps<T extends FileType> extends ListItemProps {
  *
  * Uses {@link Marquee}s to display long paths.
  */
-const FileStatusItem = memo(
-  <T extends FileType>(props: FileStatusItemProps<T>) => {
-    const { item, fileType, statusMessage, Glyph, ...itemProps } = props
+const FileStatusItem = <T extends FileType>(props: FileStatusItemProps<T>) => {
+  const { item, fileType, statusMessage, Glyph, ...itemProps } = props
 
-    const FileToolbar: ToolbarComponent<T> = FileItemToolbar[fileType]
+  const FileToolbar: ToolbarComponent<T> = FileItemToolbar[fileType]
 
-    return (
-      <ListItem
-        {...propsWithCn(
-          itemProps,
-          'flex flex-row items-start justify-between gap-x-8',
-        )}
-      >
-        <div className={cn('min-w-0 w-full')}>
-          <div className={cn('flex flex-row gap-x-1 items-center')}>
-            <Icon Glyph={Glyph} size="md" />
+  return (
+    <ListItem
+      {...propsWithCn(
+        itemProps,
+        'flex flex-row items-start justify-between gap-x-8',
+      )}
+    >
+      <div className={cn('min-w-0 w-full')}>
+        <div className={cn('flex flex-row gap-x-1 items-center')}>
+          <Icon Glyph={Glyph} size="md" />
 
-            <Marquee className={cn('text-sm')}>{item.path}</Marquee>
-          </div>
-
-          {statusMessage}
+          <Marquee className={cn('text-sm')}>{item.path}</Marquee>
         </div>
 
-        <FileToolbar file={item} size="sm" />
-      </ListItem>
-    )
-  },
-)
+        {statusMessage}
+      </div>
+
+      <FileToolbar file={item} size="sm" />
+    </ListItem>
+  )
+}
 
 type ToolbarComponent<T extends FileType> = ComponentType<
   { file: FileTypes[T] } & Partial<ToolbarProps>

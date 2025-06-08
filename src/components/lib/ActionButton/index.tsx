@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { Button, type ButtonProps } from '@ui/Button'
 import { Icon } from '@ui/Icon'
 import { SplitButton } from '@ui/SplitButton'
@@ -43,20 +41,17 @@ const ActionButton = (props: ActionButtonProps) => {
   const { Glyph, label, buttonStatus, actionState, trackAction } =
     useActionTracker(mainAction, buttonProps.status ?? 'primary')
 
-  const menuItems = useMemo(() => {
-    return (
-      alternatives?.map((alternative) => ({
-        label:
-          typeof alternative.label === 'string'
-            ? alternative.label
-            : alternative.label.idle,
-        onClick: () => {
-          trackAction(alternative.run(), alternative)
-        },
-        disabled: actionState === 'running',
-      })) ?? []
-    )
-  }, [alternatives, trackAction, actionState])
+  const menuItems =
+    alternatives?.map((alternative) => ({
+      label:
+        typeof alternative.label === 'string'
+          ? alternative.label
+          : alternative.label.idle,
+      onClick: () => {
+        trackAction(alternative.run(), alternative)
+      },
+      disabled: actionState === 'running',
+    })) ?? []
 
   return alternatives?.length ? (
     <SplitButton

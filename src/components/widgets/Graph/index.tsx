@@ -1,10 +1,11 @@
 import * as Ariakit from '@ariakit/react'
 import {
   type Range,
+  type VirtualizerOptions,
   defaultRangeExtractor,
   useVirtualizer,
 } from '@tanstack/react-virtual'
-import { type ComponentProps, memo, useCallback, useMemo, useRef } from 'react'
+import { type ComponentProps, useRef } from 'react'
 
 import { useQueryCommitHistory } from '@api/queries'
 import { getPaginatedLength } from '@api/utils'
@@ -29,7 +30,7 @@ interface GraphProps extends ComponentProps<'div'> {}
  * It has a simplified structure, only showing the checked out branch, and optionally a base branch that can be arbitrary.
  * The divergence point between both branches is computed, and the main branch "spawns" from that point.
  */
-const Graph = memo((props: GraphProps) => {
+const Graph = (props: GraphProps) => {
   const { ...divProps } = props
   const { branch, baseBranch } = useSelectedBranches()
 
@@ -60,54 +61,48 @@ const Graph = memo((props: GraphProps) => {
       </div>
     </div>
   )
-})
+}
 
-const GraphInner = memo(() => {
+const GraphInner = () => {
   const { reference, baseReference } = useSelectedRefs()
   const commonAncestor = useCurrentCommonAncestor()
 
   const branchHistoryQuery = useQueryCommitHistory(reference?.refName)
   const baseBranchHistoryQuery = useQueryCommitHistory(baseReference?.refName)
 
-  const branchLength = useMemo(() => {
-    return Math.min(
-      (commonAncestor?.lastCommit?.distance ?? Number.POSITIVE_INFINITY) + 1,
-      getPaginatedLength(branchHistoryQuery.data),
-    )
-  }, [commonAncestor, branchHistoryQuery.data])
-
-  const baseLength = useMemo(() => {
-    return getPaginatedLength(baseBranchHistoryQuery.data)
-  }, [baseBranchHistoryQuery.data])
+  const baseLength = getPaginatedLength(baseBranchHistoryQuery.data)
+  const branchLength = Math.min(
+    (commonAncestor?.lastCommit?.distance ?? Number.POSITIVE_INFINITY) + 1,
+    getPaginatedLength(branchHistoryQuery.data),
+  )
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const virtualizer = useVirtualizer({
-    estimateSize: useCallback(() => NODE_SIZE, []),
-    rangeExtractor: useCallback(
-      (range: Range) => {
-        const indexes = new Set(defaultRangeExtractor(range))
+  const estimateSize = () => NODE_SIZE
+  const getScrollElement = () => scrollContainerRef.current
+  const rangeExtractor = (range: Range) => {
+    const indexes = new Set(defaultRangeExtractor(range))
 
-        if (commonAncestor?.commonCommit.distance !== undefined) {
-          indexes.add(commonAncestor.commonCommit.distance)
-        }
-        if (commonAncestor?.lastCommit?.distance !== undefined) {
-          indexes.add(commonAncestor.lastCommit.distance)
-        }
+    if (commonAncestor?.commonCommit.distance !== undefined) {
+      indexes.add(commonAncestor.commonCommit.distance)
+    }
+    if (commonAncestor?.lastCommit?.distance !== undefined) {
+      indexes.add(commonAncestor.lastCommit.distance)
+    }
 
-        return [...indexes].sort((a, b) => a - b)
-      },
-      [
-        commonAncestor?.commonCommit.distance,
-        commonAncestor?.lastCommit?.distance,
-      ],
-    ),
+    return [...indexes].sort((a, b) => a - b)
+  }
+
+  const virtualizerOptions = {
+    estimateSize,
+    getScrollElement,
+    rangeExtractor,
     gap: EDGE_LENGTH,
     paddingStart: CURVE_SIZE * 2 + EDGE_OFFSET,
     paddingEnd: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
     count: Math.max(branchLength, baseLength),
     overscan: 3,
-    getScrollElement: useCallback(() => scrollContainerRef.current, []),
-  })
+  }
+  const virtualizer = useVirtualizer(virtualizerOptions)
 
   return (
     <Ariakit.CompositeProvider focusLoop="horizontal" focusShift>
@@ -152,6 +147,6 @@ const GraphInner = memo(() => {
       </Ariakit.Composite>
     </Ariakit.CompositeProvider>
   )
-})
+}
 
 export { Graph }

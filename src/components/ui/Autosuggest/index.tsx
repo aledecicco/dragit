@@ -1,6 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useDeferredValue, useState } from 'react'
 
 import type { Glyph } from '@ui/Icon'
 import { mapOr } from '@utils/array'
@@ -55,9 +55,7 @@ const Autosuggest = (props: AutosuggestProps) => {
   const [search, setSearch] = useState(value ?? '')
   const deferredSearch = useDeferredValue(search)
 
-  const matchingSuggestions = useMemo(() => {
-    return matchSorter(suggestions, deferredSearch)
-  }, [deferredSearch, suggestions])
+  const matchingSuggestions = matchSorter(suggestions, deferredSearch)
 
   return (
     <Ariakit.ComboboxProvider store={store} value={search} setValue={setSearch}>

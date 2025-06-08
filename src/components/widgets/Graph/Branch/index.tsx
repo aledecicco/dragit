@@ -20,6 +20,10 @@ type GraphBranchProps = {
 }
 
 const GraphBranch = (props: GraphBranchProps) => {
+  'use no memo'
+  // TODO: Re-add memoization when fixed
+  // https://github.com/TanStack/virtual/issues/736
+
   const { virtualizer, isBase } = props
 
   const { reference, baseReference } = useSelectedRefs()

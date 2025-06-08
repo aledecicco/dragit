@@ -1,5 +1,4 @@
 import * as Ariakit from '@ariakit/react'
-import { memo } from 'react'
 
 import { cn } from '@utils/styles'
 import { CommandMenu } from '..'
@@ -16,7 +15,7 @@ interface CommandMenuItemProps extends Ariakit.ComboboxItemProps {
  *
  * The callback to trigger the action of the item is handled by the parent.
  */
-const CommandMenuItem = memo((props: CommandMenuItemProps) => {
+const CommandMenuItem = (props: CommandMenuItemProps) => {
   const { item } = props
 
   return (
@@ -38,6 +37,6 @@ const CommandMenuItem = memo((props: CommandMenuItemProps) => {
       />
     </Ariakit.ComboboxItem>
   )
-})
+}
 
 export { CommandMenuItem, type CommandMenuItemProps }

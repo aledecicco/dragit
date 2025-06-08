@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { P, match } from 'ts-pattern'
 
 import type {
@@ -54,13 +53,10 @@ const useBranch = (
 ): BranchInfo | undefined => {
   const branchesQuery = useQueryBranches()
 
-  const branch = useMemo(() => {
-    if (!reference || !branchesQuery.data?.length) {
-      return undefined
-    }
-
-    return findBranchInfo(reference.refName, branchesQuery.data)
-  }, [branchesQuery.data, reference])
+  const branch =
+    reference && branchesQuery.data?.length
+      ? findBranchInfo(reference.refName, branchesQuery.data)
+      : undefined
 
   return branch
 }
@@ -78,13 +74,10 @@ const useSelectedBranches = () => {
   const branch = useBranch(reference)
   const baseBranch = useBranch(baseReference)
 
-  return useMemo(
-    () => ({
-      branch,
-      baseBranch,
-    }),
-    [branch, baseBranch],
-  )
+  return {
+    branch,
+    baseBranch,
+  }
 }
 
 /**
@@ -112,13 +105,10 @@ const useRemote = (
 ): RemoteInfo | undefined => {
   const remotesQuery = useQueryRemotes()
 
-  const remote = useMemo(() => {
-    if (!remoteName || !remotesQuery.data?.length) {
-      return undefined
-    }
-
-    return findRemoteInfo(remoteName, remotesQuery.data)
-  }, [remotesQuery.data, remoteName])
+  const remote =
+    remoteName && remotesQuery.data?.length
+      ? findRemoteInfo(remoteName, remotesQuery.data)
+      : undefined
 
   return remote
 }

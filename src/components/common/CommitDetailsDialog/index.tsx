@@ -1,5 +1,5 @@
 import * as Ariakit from '@ariakit/react'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import type { CommitId, CommitInfo } from '@api/models'
 import { COMMIT_FILES_PAGE_SIZE, useQueryCommitFiles } from '@api/queries'
@@ -32,24 +32,22 @@ interface CommitDetailsDialogProps extends Omit<DialogProps, 'dialogKey'> {
  *
  * Allows viewing file diffs in detail.
  */
-const CommitDetailsDialog = memo((props: CommitDetailsDialogProps) => {
+const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
   const { commitInfo, ...dialogProps } = props
   const timeAgo = useDateDifference(commitInfo.timestamp)
 
   const [page, setPage] = useState(0)
-  const clearPage = useCallback(() => {
+  const clearPage = () => {
     setPage(0)
-  }, [])
+  }
 
   const filesQuery = useQueryCommitFiles(commitInfo.hash, page)
   const showPagination = useNeedsPagination(filesQuery, page)
   useHandlePageSync(filesQuery, page, clearPage)
 
-  const virtualizerOptions = useMemo(() => {
-    return mapFn(filesQuery.data, (page) => ({
-      getItemKey: (index: number) => page.items[index].path,
-    }))
-  }, [filesQuery.data])
+  const virtualizerOptions = mapFn(filesQuery.data, (page) => ({
+    getItemKey: (index: number) => page.items[index].path,
+  }))
 
   const store = Ariakit.useCheckboxStore()
   const selectedFile = Ariakit.useStoreState(store, 'value')
@@ -147,7 +145,7 @@ const CommitDetailsDialog = memo((props: CommitDetailsDialogProps) => {
       )}
     </Dialog>
   )
-})
+}
 
 const showCommitDetailsDialog = (
   commitInfo: CommitInfo,

@@ -1,5 +1,4 @@
 import { IconPackageExport, IconTrash } from '@tabler/icons-react'
-import { useMemo } from 'react'
 
 import type { StashInfo } from '@api/models'
 import { useApplyStash, useDiscardStash } from '@api/mutations'
@@ -21,34 +20,32 @@ const StashToolbar = (props: StashToolbarProps) => {
   const apply = useApplyStash()
   const discard = useDiscardStash()
 
-  const tools = useMemo(() => {
-    return [
-      {
-        action: {
-          run: () => apply.mutateAsync({ stashId: stash.id }),
-          label: {
-            idle: 'Apply',
-            running: 'Applying',
-            success: 'Applied',
-            error: 'Failed',
-          },
-          Glyph: IconPackageExport,
+  const tools = [
+    {
+      action: {
+        run: () => apply.mutateAsync({ stashId: stash.id }),
+        label: {
+          idle: 'Apply',
+          running: 'Applying',
+          success: 'Applied',
+          error: 'Failed',
         },
+        Glyph: IconPackageExport,
       },
-      {
-        action: {
-          run: () => discard.mutateAsync({ stashId: stash.id }),
-          label: {
-            idle: 'Discard',
-            running: 'Discarding',
-            success: 'Discarded',
-            error: 'Failed',
-          },
-          Glyph: IconTrash,
+    },
+    {
+      action: {
+        run: () => discard.mutateAsync({ stashId: stash.id }),
+        label: {
+          idle: 'Discard',
+          running: 'Discarding',
+          success: 'Discarded',
+          error: 'Failed',
         },
+        Glyph: IconTrash,
       },
-    ]
-  }, [stash.id, apply.mutateAsync, discard.mutateAsync])
+    },
+  ]
 
   return <Toolbar tools={tools} size="sm" compact {...toolbarProps} />
 }

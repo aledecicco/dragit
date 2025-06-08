@@ -1,5 +1,4 @@
 import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
-import { memo } from 'react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@api/models'
@@ -20,7 +19,7 @@ interface BranchesListItemProps extends ListItemProps {
  *
  * Uses {@link Marquee}s to display long branch names.
  */
-const BranchesListItem = memo((props: BranchesListItemProps) => {
+const BranchesListItem = (props: BranchesListItemProps) => {
   const { item, ...itemProps } = props
   const lastModified = useDateDifference(item.timestamp)
 
@@ -76,6 +75,6 @@ const BranchesListItem = memo((props: BranchesListItemProps) => {
       </Marquee>
     </ListItem>
   )
-})
+}
 
 export { BranchesListItem, type BranchesListItemProps }

@@ -6,7 +6,6 @@ import {
   IconFilePlus,
   IconFiles,
 } from '@tabler/icons-react'
-import { memo } from 'react'
 import { match } from 'ts-pattern'
 
 import type { StagedFileInfo } from '@api/models'
@@ -24,7 +23,7 @@ interface StagedFileStatusItemProps extends ListItemProps {
 /**
  * The list item for files in the 'staged' file statuses widget section.
  */
-const StagedFileStatusItem = memo((props: StagedFileStatusItemProps) => {
+const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
   const { item, ...itemProps } = props
 
   return (
@@ -54,6 +53,6 @@ const StagedFileStatusItem = memo((props: StagedFileStatusItemProps) => {
         .exhaustive()}
     />
   )
-})
+}
 
 export { StagedFileStatusItem, type StagedFileStatusItemProps }

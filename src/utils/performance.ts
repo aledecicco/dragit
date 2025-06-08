@@ -1,5 +1,5 @@
 import type { useVirtualizer } from '@tanstack/react-virtual'
-import { type DependencyList, useCallback, useReducer, useRef } from 'react'
+import { useReducer, useRef } from 'react'
 
 import { MS_IN_SECOND } from './time'
 
@@ -20,19 +20,16 @@ interface DebounceOptions {
  */
 function useDebouncedCallback(
   callback: () => void,
-  deps: DependencyList,
   options?: DebounceOptions,
 ): () => void
 
 function useDebouncedCallback<T>(
   callback: (args: T) => void,
-  deps: DependencyList,
   options?: DebounceOptions,
 ): (args: T) => void {
   const timeoutId = useRef<number>(null)
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handle function reconstruction manually
-  return useCallback((args: T) => {
+  return (args: T) => {
     if (timeoutId.current) {
       clearTimeout(timeoutId.current)
     }
@@ -44,7 +41,7 @@ function useDebouncedCallback<T>(
       },
       options?.delay ?? MS_IN_SECOND / 10,
     )
-  }, deps)
+  }
 }
 
 interface ThrottleOptions {
@@ -77,13 +74,11 @@ interface ThrottleOptions {
  */
 function useThrottledCallback(
   callback: () => void,
-  deps: DependencyList,
   options?: ThrottleOptions,
 ): () => void
 
 function useThrottledCallback<T>(
   callback: (args: T) => void,
-  deps: DependencyList,
   options?: ThrottleOptions,
 ): (args: T) => void {
   /**
@@ -97,8 +92,7 @@ function useThrottledCallback<T>(
 
   const timeoutId = useRef<number>(null)
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handle function reconstruction manually
-  return useCallback((args: T) => {
+  return (args: T) => {
     if (wait.current) {
       pending.current = true
       return
@@ -132,7 +126,7 @@ function useThrottledCallback<T>(
     }
 
     executeAndSchedule()
-  }, deps)
+  }
 }
 
 /**

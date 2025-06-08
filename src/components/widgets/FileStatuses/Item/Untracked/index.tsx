@@ -1,5 +1,4 @@
 import { IconFileUnknown } from '@tabler/icons-react'
-import { memo } from 'react'
 
 import type { UntrackedFileInfo } from '@api/models'
 import type { ListItemProps } from '@ui/ListItem'
@@ -16,7 +15,7 @@ interface UntrackedFileStatusItemProps extends ListItemProps {
 /**
  * The list item for files in the 'untracked' file statuses widget section.
  */
-const UntrackedFileStatusItem = memo((props: UntrackedFileStatusItemProps) => {
+const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
   const { item, ...itemProps } = props
 
   return (
@@ -27,6 +26,6 @@ const UntrackedFileStatusItem = memo((props: UntrackedFileStatusItemProps) => {
       Glyph={IconFileUnknown}
     />
   )
-})
+}
 
 export { UntrackedFileStatusItem, type UntrackedFileStatusItemProps }

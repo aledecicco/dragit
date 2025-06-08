@@ -5,7 +5,7 @@ import {
   IconWorldCancel,
   IconWorldQuestion,
 } from '@tabler/icons-react'
-import { type ComponentProps, useMemo } from 'react'
+import type { ComponentProps } from 'react'
 
 import type { RemoteInfo } from '@api/models'
 import { useFetchRemote } from '@api/mutations'
@@ -39,30 +39,21 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
   const remotesQuery = useQueryRemotes()
   const branchesQuery = useQueryBranches()
 
-  const remoteOptions: ComboboxOption<RemoteInfo>[] = useMemo(() => {
-    return (
-      remotesQuery.data?.map((remote) => {
-        const option = {
-          value: remote.name,
-          data: remote,
-        }
-        return option
-      }) ?? []
-    )
-  }, [remotesQuery.data])
+  const remoteOptions: ComboboxOption<RemoteInfo>[] =
+    remotesQuery.data?.map((remote) => {
+      const option = {
+        value: remote.name,
+        data: remote,
+      }
+      return option
+    }) ?? []
 
-  const remoteBranchOptions = useMemo(() => {
-    if (!remote) {
-      return []
-    }
-
-    return (
-      branchesQuery.data
+  const remoteBranchOptions = !remote
+    ? []
+    : (branchesQuery.data
         ?.filter((branch) => branch.type === 'remote')
         .filter((branch) => branch.name.startsWith(`${remote.name}/`))
-        .map((branch) => branch.name.substring(remote.name.length + 1)) ?? []
-    )
-  }, [remote, branchesQuery.data])
+        .map((branch) => branch.name.substring(remote.name.length + 1)) ?? [])
 
   return (
     <div {...propsWithCn(divProps, 'w-full flex flex-row items-center')}>

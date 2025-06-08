@@ -1,6 +1,6 @@
 import type { UseQueryResult } from '@tanstack/react-query'
 import { Store, useStore } from '@tanstack/react-store'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { usePrevious } from 'react-use'
 
 import type { FileType, Page } from '@api/models'
@@ -103,9 +103,9 @@ const useHandleFilesPageSync = (
 ) => {
   const filesQuery = useQueryFiles(types, pathspec)
   const page = useFilesPage(types)
-  const clear = useCallback(() => {
+  const clear = () => {
     clearPage(types)
-  }, [types])
+  }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: clear page when search changes
   useEffect(() => {
@@ -136,10 +136,7 @@ const useNeedsPagination = (
   query: UseQueryResult<Page<unknown>>,
   page: number,
 ): boolean => {
-  const paginate = useMemo(
-    () => needsPagination(page, !!query.data?.hasNext),
-    [query.data?.hasNext, page],
-  )
+  const paginate = needsPagination(page, !!query.data?.hasNext)
   const prevPaginate = usePrevious(paginate)
 
   return paginate || (!!prevPaginate && query.isLoading)

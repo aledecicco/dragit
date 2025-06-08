@@ -1,4 +1,4 @@
-import { type ComponentProps, useMemo } from 'react'
+import type { ComponentProps } from 'react'
 
 import { useQueryBranches } from '@api/queries'
 import { QueryList } from '@lib/QueryList'
@@ -19,11 +19,9 @@ const BranchesList = (props: BranchesListProps) => {
 
   const branchesQuery = useQueryBranches()
 
-  const virtualizerOptions = useMemo(() => {
-    return mapFn(branchesQuery.data, (branches) => ({
-      getItemKey: (index: number) => branches[index].name,
-    }))
-  }, [branchesQuery.data])
+  const virtualizerOptions = mapFn(branchesQuery.data, (branches) => ({
+    getItemKey: (index: number) => branches[index].name,
+  }))
 
   return (
     <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>

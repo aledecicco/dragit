@@ -1,5 +1,4 @@
 import { IconArchive, IconGitBranch } from '@tabler/icons-react'
-import { memo } from 'react'
 
 import type { StashInfo } from '@api/models'
 import { ChangesSummary } from '@common/DiffSummary'
@@ -22,7 +21,7 @@ interface StashesListItemProps extends ListItemProps {
  *
  * Includes a toolbar to apply or delete the stash.
  */
-const StashesListItem = memo((props: StashesListItemProps) => {
+const StashesListItem = (props: StashesListItemProps) => {
   const { item, ...itemProps } = props
   const stashedTime = useDateDifference(item.timestamp)
 
@@ -90,6 +89,6 @@ const StashesListItem = memo((props: StashesListItemProps) => {
       </div>
     </ListItem>
   )
-})
+}
 
 export { StashesListItem, type StashesListItemProps }

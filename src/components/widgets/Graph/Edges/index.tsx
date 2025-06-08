@@ -1,4 +1,3 @@
-import { memo, useMemo } from 'react'
 import { match } from 'ts-pattern'
 
 import type { Element, ElementId } from '@lib/SvgOverlay/context'
@@ -179,50 +178,48 @@ interface EdgesProps {
  *
  * Edges can have different styles, represented by {@link ParentCommitType}.
  */
-const Edges = memo((props: EdgesProps) => {
+const Edges = (props: EdgesProps) => {
   const { elements } = props
 
-  const edges = useMemo(() => {
-    return [...elements.entries()].map(([id, elem]) => {
-      if (elem.ref.current && elem.parent) {
-        const parentElem = elements.get(elem.parent.id)
+  const edges = [...elements.entries()].map(([id, elem]) => {
+    if (elem.ref.current && elem.parent) {
+      const parentElem = elements.get(elem.parent.id)
 
-        if (parentElem?.ref?.current) {
-          const elemPos = getPosition(elem)
-          const parentPos = getPosition(parentElem)
+      if (parentElem?.ref?.current) {
+        const elemPos = getPosition(elem)
+        const parentPos = getPosition(parentElem)
 
-          // Anchor is center bottom
-          elemPos.x += NODE_SIZE / 2
-          elemPos.y += NODE_SIZE + EDGE_OFFSET
+        // Anchor is center bottom
+        elemPos.x += NODE_SIZE / 2
+        elemPos.y += NODE_SIZE + EDGE_OFFSET
 
-          // Anchor is center top
-          parentPos.x += NODE_SIZE / 2
-          parentPos.y -= EDGE_OFFSET
+        // Anchor is center top
+        parentPos.x += NODE_SIZE / 2
+        parentPos.y -= EDGE_OFFSET
 
-          const path = buildPath(elemPos, parentPos).join(' ')
+        const path = buildPath(elemPos, parentPos).join(' ')
 
-          return (
-            <path
-              key={id}
-              className={cn(
-                'fill-none stroke-4',
-                match(elem.parent.type)
-                  .with('solid', () => 'stroke-primary-600')
-                  .with('dashed', () => 'stroke-primary-600')
-                  .with('unconfirmed', () => 'stroke-accent-400')
-                  .otherwise(() => undefined),
-                elem.parent.type === 'dashed' && '[stroke-dasharray:8_5]',
-              )}
-              d={path}
-            />
-          )
-        }
+        return (
+          <path
+            key={id}
+            className={cn(
+              'fill-none stroke-4',
+              match(elem.parent.type)
+                .with('solid', () => 'stroke-primary-600')
+                .with('dashed', () => 'stroke-primary-600')
+                .with('unconfirmed', () => 'stroke-accent-400')
+                .otherwise(() => undefined),
+              elem.parent.type === 'dashed' && '[stroke-dasharray:8_5]',
+            )}
+            d={path}
+          />
+        )
       }
-    })
-  }, [elements])
+    }
+  })
 
   return edges
-})
+}
 
 /**
  * Builds the SVG path commands to connect two elements at the given positions.

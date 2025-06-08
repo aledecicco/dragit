@@ -1,5 +1,4 @@
 import * as Ariakit from '@ariakit/react'
-import { memo } from 'react'
 
 import type { CommitInfo } from '@api/models'
 import { showCommitDetailsDialog } from '@common/CommitDetailsDialog'
@@ -17,7 +16,7 @@ interface GraphCommitCardProps extends Ariakit.ButtonProps {
 /**
  * A summary card for a commit in the commit graph.
  */
-const GraphCommitCard = memo((props: GraphCommitCardProps) => {
+const GraphCommitCard = (props: GraphCommitCardProps) => {
   const { commitInfo, ...buttonProps } = props
   const timeAgo = useDateDifference(commitInfo.timestamp)
 
@@ -56,6 +55,6 @@ const GraphCommitCard = memo((props: GraphCommitCardProps) => {
       </div>
     </Ariakit.Button>
   )
-})
+}
 
 export { GraphCommitCard, type GraphCommitCardProps }

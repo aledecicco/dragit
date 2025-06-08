@@ -1,4 +1,4 @@
-import { type ComponentType, useMemo } from 'react'
+import type { ComponentType } from 'react'
 
 import type { FileType, FileTypes } from '@api/models'
 import { useQueryFiles } from '@api/queries'
@@ -35,11 +35,9 @@ const FileStatusesSection = <T extends FileType>(
   const filesQuery = useQueryFiles(type)
   useHandleFilesPageSync(type)
 
-  const virtualizerOptions = useMemo(() => {
-    return mapFn(filesQuery.data, (files) => ({
-      getItemKey: (index: number) => files.items[index].path,
-    }))
-  }, [filesQuery.data])
+  const virtualizerOptions = mapFn(filesQuery.data, (files) => ({
+    getItemKey: (index: number) => files.items[index].path,
+  }))
 
   return (
     <AccordionSection

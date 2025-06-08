@@ -1,4 +1,4 @@
-import { type ComponentType, type Ref, useEffect, useMemo, useRef } from 'react'
+import { type ComponentType, type Ref, useEffect, useRef } from 'react'
 
 import {
   type ThrottleOptions,
@@ -104,12 +104,9 @@ const REFRESH_OPTIONS: ThrottleOptions = {
 const useRefreshCanvas = () => {
   const { rerenderTrigger, rerender } = useRerender()
 
-  const refresh = useThrottledCallback(rerender, [], REFRESH_OPTIONS)
+  const refresh = useThrottledCallback(rerender, REFRESH_OPTIONS)
 
-  return useMemo(
-    () => ({ refreshTrigger: rerenderTrigger, refresh }),
-    [rerenderTrigger, refresh],
-  )
+  return { refreshTrigger: rerenderTrigger, refresh }
 }
 
 export { makeTracked, type TrackRefProps, getPosition, type Position }

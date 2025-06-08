@@ -1,5 +1,4 @@
 import { IconCheck, IconTrash } from '@tabler/icons-react'
-import { memo, useMemo } from 'react'
 import { P, match } from 'ts-pattern'
 
 import type { UnmergedFileInfo } from '@api/models'
@@ -16,45 +15,43 @@ interface UnmergedFileToolbarProps extends Partial<ToolbarProps> {
 /**
  * The common set of tools for unmerged files.
  */
-const UnmergedFileToolbar = memo((props: UnmergedFileToolbarProps) => {
+const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
   const stage = useAddToIndex()
   const remove = useRemoveFromTree()
 
-  const tools = useMemo(() => {
-    return [
-      {
-        action: {
-          run: () => stage.mutateAsync({ files: [file.path] }),
-          label: {
-            idle: 'Mark as resolved',
-            running: 'Resolving',
-            success: 'Resolved',
-            error: 'Failed',
-          },
-          Glyph: IconCheck,
+  const tools = [
+    {
+      action: {
+        run: () => stage.mutateAsync({ files: [file.path] }),
+        label: {
+          idle: 'Mark as resolved',
+          running: 'Resolving',
+          success: 'Resolved',
+          error: 'Failed',
         },
+        Glyph: IconCheck,
       },
-      ...match(file.changes)
-        .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => [
-          {
-            action: {
-              run: () => remove.mutateAsync({ files: [file.path] }),
-              label: {
-                idle: 'Delete',
-                running: 'Deleting',
-                success: 'Deleted',
-                error: 'Failed',
-              },
-              Glyph: IconTrash,
+    },
+    ...match(file.changes)
+      .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => [
+        {
+          action: {
+            run: () => remove.mutateAsync({ files: [file.path] }),
+            label: {
+              idle: 'Delete',
+              running: 'Deleting',
+              success: 'Deleted',
+              error: 'Failed',
             },
+            Glyph: IconTrash,
           },
-        ])
-        .otherwise(() => []),
-    ]
-  }, [file.path, file.changes, stage.mutateAsync, remove.mutateAsync])
+        },
+      ])
+      .otherwise(() => []),
+  ]
 
   return <Toolbar size="sm" tools={tools} compact {...toolbarProps} />
-})
+}
 
 export { UnmergedFileToolbar }

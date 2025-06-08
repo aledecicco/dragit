@@ -3,7 +3,7 @@ import {
   IconCircleCheckFilled,
   IconLoader2,
 } from '@tabler/icons-react'
-import { useMemo, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { match } from 'ts-pattern'
 
 import type { ButtonStatus } from '@ui/Button'
@@ -54,41 +54,26 @@ const useActionTracker = (
   const [actionState, setActionState] = useState<ActionState>('idle')
   const timeoutId = useRef<number>(null)
 
-  const Glyph = useMemo(() => {
-    return match(actionState)
-      .returnType<Glyph>()
-      .with('idle', () => activeAction.Glyph)
-      .with('running', () => IconLoader2)
-      .with('success', () => IconCircleCheckFilled)
-      .with('error', () => IconAlertTriangleFilled)
-      .exhaustive()
-  }, [actionState, activeAction.Glyph])
+  const Glyph = match(actionState)
+    .returnType<Glyph>()
+    .with('idle', () => activeAction.Glyph)
+    .with('running', () => IconLoader2)
+    .with('success', () => IconCircleCheckFilled)
+    .with('error', () => IconAlertTriangleFilled)
+    .exhaustive()
 
-  const label = useMemo(() => {
-    const label = activeAction.label
+  const label =
+    typeof activeAction.label === 'string'
+      ? activeAction.label
+      : activeAction.label[actionState]
 
-    if (typeof label === 'string') {
-      return label
-    }
-
-    return match(actionState)
-      .returnType<string>()
-      .with('idle', () => label.idle)
-      .with('running', () => label.running)
-      .with('success', () => label.success)
-      .with('error', () => label.error)
-      .exhaustive()
-  }, [actionState, activeAction.label])
-
-  const buttonStatus = useMemo(() => {
-    return match(actionState)
-      .returnType<ButtonStatus>()
-      .with('idle', () => defaultStatus)
-      .with('running', () => defaultStatus)
-      .with('success', () => 'success')
-      .with('error', () => 'error')
-      .exhaustive()
-  }, [actionState, defaultStatus])
+  const buttonStatus = match(actionState)
+    .returnType<ButtonStatus>()
+    .with('idle', () => defaultStatus)
+    .with('running', () => defaultStatus)
+    .with('success', () => 'success')
+    .with('error', () => 'error')
+    .exhaustive()
 
   const trackAction = (
     promise: Promise<unknown>,

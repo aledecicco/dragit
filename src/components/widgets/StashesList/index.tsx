@@ -1,4 +1,4 @@
-import { type ComponentProps, useMemo } from 'react'
+import type { ComponentProps } from 'react'
 
 import { useQueryStashes } from '@api/queries'
 import { QueryList } from '@lib/QueryList'
@@ -19,11 +19,9 @@ const StashesList = (props: StashesListProps) => {
 
   const stashesQuery = useQueryStashes()
 
-  const virtualizerOptions = useMemo(() => {
-    return mapFn(stashesQuery.data, (stashes) => ({
-      getItemKey: (index: number) => stashes[index].id,
-    }))
-  }, [stashesQuery.data])
+  const virtualizerOptions = mapFn(stashesQuery.data, (stashes) => ({
+    getItemKey: (index: number) => stashes[index].id,
+  }))
 
   return (
     <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>

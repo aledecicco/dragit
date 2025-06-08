@@ -1,4 +1,4 @@
-import { type ComponentProps, useMemo } from 'react'
+import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
 import type { DiffType, FileDiff } from '@api/models'
@@ -17,12 +17,10 @@ interface DiffViewerLineNumbersProps extends ComponentProps<'div'> {
 const DiffViewerLineNumbers = (props: DiffViewerLineNumbersProps) => {
   const { fileDiff, ...divProps } = props
 
-  const lengthSums = useMemo(() => {
-    return fileDiff.sections.reduce((acc: number[], section) => {
-      acc.push((acc.at(-1) ?? 0) + section.lines.length)
-      return acc
-    }, [])
-  }, [fileDiff])
+  const lengthSums = fileDiff.sections.reduce((acc: number[], section) => {
+    acc.push((acc.at(-1) ?? 0) + section.lines.length)
+    return acc
+  }, [])
   const totalLength = lengthSums.at(-1) ?? 0
 
   return (

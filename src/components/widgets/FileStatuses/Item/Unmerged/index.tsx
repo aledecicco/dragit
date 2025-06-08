@@ -1,5 +1,4 @@
 import { IconFileAlert } from '@tabler/icons-react'
-import { memo } from 'react'
 import { match } from 'ts-pattern'
 
 import type { UnmergedFileInfo } from '@api/models'
@@ -17,7 +16,7 @@ interface UnmergedFileStatusItemProps extends ListItemProps {
 /**
  * The list item for files in the 'unmerged' file statuses widget section.
  */
-const UnmergedFileStatusItem = memo((props: UnmergedFileStatusItemProps) => {
+const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
   const { item, ...itemProps } = props
 
   return (
@@ -44,6 +43,6 @@ const UnmergedFileStatusItem = memo((props: UnmergedFileStatusItemProps) => {
       }
     />
   )
-})
+}
 
 export { UnmergedFileStatusItem, type UnmergedFileStatusItemProps }

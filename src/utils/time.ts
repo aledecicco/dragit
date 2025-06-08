@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export const MS_IN_SECOND = 1000
 export const MS_IN_MINUTE = 60 * MS_IN_SECOND
@@ -9,14 +9,12 @@ export const MS_IN_MONTH = 30 * MS_IN_DAY
 export const MS_IN_YEAR = 365 * MS_IN_DAY
 
 /**
- * A memoized value that auto-updates with the given frequency.
+ * A value that auto-updates with the given frequency.
  *
  * @param factory - A function that returns the value to memoize.
  * @param interval - The refresh interval in milliseconds.
- *
- * @returns The memoized value.
  */
-const useTimedMemo = <T>(factory: () => T, interval: number) => {
+const useTimedValue = <T>(factory: () => T, interval: number) => {
   const isSet = useRef(false)
   const [value, setValue] = useState(factory())
 
@@ -83,11 +81,11 @@ const getDateDifference = (date: Date | number) => {
  * @returns
  */
 const useDateDifference = (date: Date | number): string => {
-  const getDifference = useCallback(() => {
+  const getDifference = () => {
     return getDateDifference(date)
-  }, [date])
+  }
 
-  return useTimedMemo(getDifference, MS_IN_MINUTE)
+  return useTimedValue(getDifference, MS_IN_MINUTE)
 }
 
 /**
@@ -99,4 +97,4 @@ const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export { useTimedMemo, useDateDifference, sleep }
+export { useTimedValue, useDateDifference, sleep }

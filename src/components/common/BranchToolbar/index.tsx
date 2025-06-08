@@ -1,5 +1,4 @@
 import { IconDownload, IconUpload } from '@tabler/icons-react'
-import { useMemo } from 'react'
 
 import type { BranchInfo } from '@api/models'
 import { usePullBranch, usePushBranch } from '@api/mutations'
@@ -21,36 +20,58 @@ const BranchToolbar = (props: BranchToolbarProps) => {
   const pull = usePullBranch()
   const push = usePushBranch()
 
-  const tools = useMemo(() => {
-    return [
-      {
-        action: {
-          Glyph: IconDownload,
-          label: {
-            idle: 'Pull',
-            running: 'Pulling',
-            success: 'Pulled',
-            error: 'Failed',
-          },
-          run: async () => {
-            if (branch?.type === 'local') {
-              await pull.mutateAsync({
-                branch: branch.name,
-                remote: branch.remote?.remoteName ?? 'origin',
-                remoteBranch: branch.remote?.branchName ?? branch.name,
-                isRebase: false,
-              })
-            } else {
-              throw new Error('Branch is not local')
-            }
-          },
+  const tools = [
+    {
+      action: {
+        Glyph: IconDownload,
+        label: {
+          idle: 'Pull',
+          running: 'Pulling',
+          success: 'Pulled',
+          error: 'Failed',
+        },
+        run: async () => {
+          if (branch?.type === 'local') {
+            await pull.mutateAsync({
+              branch: branch.name,
+              remote: branch.remote?.remoteName ?? 'origin',
+              remoteBranch: branch.remote?.branchName ?? branch.name,
+              isRebase: false,
+            })
+          } else {
+            throw new Error('Branch is not local')
+          }
         },
       },
-      {
-        action: {
+    },
+    {
+      action: {
+        Glyph: IconUpload,
+        label: {
+          idle: 'Push',
+          running: 'Pushing',
+          success: 'Pushed',
+          error: 'Failed',
+        },
+        run: async () => {
+          if (branch?.type === 'local') {
+            await push.mutateAsync({
+              branch: branch.name,
+              remote: branch.remote?.remoteName ?? 'origin',
+              remoteBranch: branch.remote?.branchName ?? branch.name,
+              isForce: false,
+              setUpstream: true,
+            })
+          } else {
+            throw new Error('Branch is not local')
+          }
+        },
+      },
+      alternatives: [
+        {
           Glyph: IconUpload,
           label: {
-            idle: 'Push',
+            idle: 'Force push',
             running: 'Pushing',
             success: 'Pushed',
             error: 'Failed',
@@ -61,7 +82,7 @@ const BranchToolbar = (props: BranchToolbarProps) => {
                 branch: branch.name,
                 remote: branch.remote?.remoteName ?? 'origin',
                 remoteBranch: branch.remote?.branchName ?? branch.name,
-                isForce: false,
+                isForce: true,
                 setUpstream: true,
               })
             } else {
@@ -69,33 +90,9 @@ const BranchToolbar = (props: BranchToolbarProps) => {
             }
           },
         },
-        alternatives: [
-          {
-            Glyph: IconUpload,
-            label: {
-              idle: 'Force push',
-              running: 'Pushing',
-              success: 'Pushed',
-              error: 'Failed',
-            },
-            run: async () => {
-              if (branch?.type === 'local') {
-                await push.mutateAsync({
-                  branch: branch.name,
-                  remote: branch.remote?.remoteName ?? 'origin',
-                  remoteBranch: branch.remote?.branchName ?? branch.name,
-                  isForce: true,
-                  setUpstream: true,
-                })
-              } else {
-                throw new Error('Branch is not local')
-              }
-            },
-          },
-        ],
-      },
-    ]
-  }, [branch, pull.mutateAsync, push.mutateAsync])
+      ],
+    },
+  ]
 
   return (
     <Toolbar

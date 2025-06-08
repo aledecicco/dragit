@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { useQueryRemotes } from '@api/queries'
 import { showDialog } from '@context/dialogs'
@@ -17,17 +17,15 @@ interface RemotesDialogProps extends Omit<DialogProps, 'dialogKey'> {}
 /**
  * Dialog that displays existing remotes and allows managing them.
  */
-const RemotesDialog = memo((props: RemotesDialogProps) => {
+const RemotesDialog = (props: RemotesDialogProps) => {
   const { ...dialogProps } = props
 
   const [adding, setAdding] = useState(false)
   const remotesQuery = useQueryRemotes()
 
-  const virtualizerOptions = useMemo(() => {
-    return mapFn(remotesQuery.data, (remotes) => ({
-      getItemKey: (index: number) => remotes[index].name,
-    }))
-  }, [remotesQuery.data])
+  const virtualizerOptions = mapFn(remotesQuery.data, (remotes) => ({
+    getItemKey: (index: number) => remotes[index].name,
+  }))
 
   return (
     <Dialog dialogKey={REMOTES_DIALOG_KEY} heading="Remotes" {...dialogProps}>
@@ -68,7 +66,7 @@ const RemotesDialog = memo((props: RemotesDialogProps) => {
       )}
     </Dialog>
   )
-})
+}
 
 const showRemotesDialog = (props?: Partial<RemotesDialogProps>) => {
   showDialog(REMOTES_DIALOG_KEY, <RemotesDialog {...props} />)

@@ -2,10 +2,8 @@ import {
   type PropsWithChildren,
   type RefObject,
   createContext,
-  useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -74,11 +72,6 @@ interface SvgOverlayState {
    * A ref to the component that contains the svg overlay.
    */
   componentRef: RefObject<HTMLDivElement | null>
-
-  /**
-   * A callback to manually trigger re-renders.
-   */
-  refresh: () => void
 }
 
 const emptyState: SvgOverlayState = {
@@ -87,7 +80,6 @@ const emptyState: SvgOverlayState = {
   unregisterElement: () => {},
   svgRef: { current: null },
   componentRef: { current: null },
-  refresh: () => {},
 }
 
 const SvgOverlayContext = createContext(emptyState)
@@ -103,22 +95,20 @@ interface SvgOverlayContextProviderProps extends PropsWithChildren {}
  */
 const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
   const { children } = props
-  const [elemsState, setElemsState] = useState<Map<ElementId, Element>>(
-    new Map(),
-  )
+  const [elements, setElements] = useState<Map<ElementId, Element>>(new Map())
   const svgRef = useRef<SVGSVGElement>(null)
   const componentRef = useRef<HTMLDivElement>(null)
 
-  const registerElement = useCallback((id: ElementId, element: Element) => {
-    setElemsState((prevElems) => {
+  const registerElement = (id: ElementId, element: Element) => {
+    setElements((prevElems) => {
       const newElems = new Map(prevElems)
       newElems.set(id, element)
       return newElems
     })
-  }, [])
+  }
 
-  const unregisterElement = useCallback((id: ElementId) => {
-    setElemsState((prevElems) => {
+  const unregisterElement = (id: ElementId) => {
+    setElements((prevElems) => {
       if (prevElems.has(id)) {
         const newElems = new Map(prevElems)
         newElems.delete(id)
@@ -127,15 +117,9 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
 
       return prevElems
     })
-  }, [])
+  }
 
-  const { refreshTrigger, refresh } = useRefreshCanvas()
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies(refreshTrigger): refreshTrigger is added to force re-renders
-  const elements = useMemo(() => {
-    return new Map(elemsState)
-  }, [elemsState, refreshTrigger])
-
+  const { refresh } = useRefreshCanvas()
   const observer = useRef(new ResizeObserver(refresh))
   useEffect(() => {
     if (componentRef.current) {
@@ -149,16 +133,13 @@ const SvgOverlayContextProvider = (props: SvgOverlayContextProviderProps) => {
     }
   }, [])
 
-  const contextValue: SvgOverlayState = useMemo(() => {
-    return {
-      elements,
-      registerElement,
-      unregisterElement,
-      svgRef,
-      componentRef,
-      refresh,
-    }
-  }, [elements, refresh, registerElement, unregisterElement])
+  const contextValue: SvgOverlayState = {
+    elements,
+    registerElement,
+    unregisterElement,
+    svgRef,
+    componentRef,
+  }
 
   return (
     <SvgOverlayContext.Provider value={contextValue}>

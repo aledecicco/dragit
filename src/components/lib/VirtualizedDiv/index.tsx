@@ -2,7 +2,7 @@ import {
   type VirtualizerOptions,
   useVirtualizer,
 } from '@tanstack/react-virtual'
-import { type ComponentType, type ReactNode, useCallback, useRef } from 'react'
+import { type ComponentType, type ReactNode, useRef } from 'react'
 
 import {
   ScrollShadowDiv,
@@ -47,16 +47,19 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
   const { items, itemSize, RenderItem, options, fallback, ...divProps } = props
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const virtualizer = useVirtualizer({
-    estimateSize: useCallback(() => itemSize, [itemSize]),
+  const estimateSize = () => itemSize
+  const getScrollElement = () => scrollContainerRef.current
+  const virtualizerOptions = {
+    estimateSize,
+    getScrollElement,
     paddingStart: 8,
     paddingEnd: 8,
     gap: 8,
     count: items?.length ?? 0,
     overscan: 2,
-    getScrollElement: useCallback(() => scrollContainerRef.current, []),
     ...options,
-  })
+  }
+  const virtualizer = useVirtualizer(virtualizerOptions)
 
   if (!items?.length) {
     return fallback

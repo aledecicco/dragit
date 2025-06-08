@@ -1,5 +1,4 @@
 import { IconSwitchHorizontal } from '@tabler/icons-react'
-import { useMemo } from 'react'
 
 import { useCheckout } from '@api/mutations'
 import { useQueryBranches, useQueryHeadInfo } from '@api/queries'
@@ -20,24 +19,22 @@ const BranchSelectors = () => {
 
   const checkout = useCheckout()
 
-  const switchAction = useMemo(() => {
-    return {
-      run: async () => {
-        if (baseBranch) {
-          await checkout.mutateAsync({ reference: baseBranch.name })
-        } else {
-          throw new Error('No base branch selected')
-        }
-      },
-      Glyph: IconSwitchHorizontal,
-      label: {
-        idle: 'Switch branch and base branch',
-        running: 'Switching branches',
-        success: 'Branches switched',
-        error: 'Failed to switch',
-      },
-    }
-  }, [baseBranch, checkout.mutateAsync])
+  const switchAction = {
+    run: async () => {
+      if (baseBranch) {
+        await checkout.mutateAsync({ reference: baseBranch.name })
+      } else {
+        throw new Error('No base branch selected')
+      }
+    },
+    Glyph: IconSwitchHorizontal,
+    label: {
+      idle: 'Switch branch and base branch',
+      running: 'Switching branches',
+      success: 'Branches switched',
+      error: 'Failed to switch',
+    },
+  }
 
   return (
     <>

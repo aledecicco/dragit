@@ -1,5 +1,5 @@
 import * as Ariakit from '@ariakit/react'
-import { type ReactNode, memo } from 'react'
+import type { ReactNode } from 'react'
 
 import { hideDialog } from '@context/dialogs'
 import { type Shortcut, ShortcutCheatsheet } from '@lib/ShortcutsCheatsheet'
@@ -63,7 +63,7 @@ export const DEFAULT_SHORTCUTS: Shortcut[] = [
  *
  * Displays a keyboard shortcuts cheatsheet at the bottom.
  */
-const CommandMenu = memo((props: CommandMenuProps) => {
+const CommandMenu = (props: CommandMenuProps) => {
   const {
     children,
     shortcuts = DEFAULT_SHORTCUTS,
@@ -122,6 +122,6 @@ const CommandMenu = memo((props: CommandMenuProps) => {
       )}
     </Dialog>
   )
-})
+}
 
 export { CommandMenu, type CommandMenuProps }
