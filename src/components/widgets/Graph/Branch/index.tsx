@@ -1,4 +1,4 @@
-import type { Virtualizer } from '@tanstack/react-virtual'
+import type { VirtualItem } from '@tanstack/react-virtual'
 
 import { useQueryBranchDivergence, useQueryCommitHistory } from '@api/queries'
 import { useSelectedRefs } from '@context/branches'
@@ -14,23 +14,31 @@ import {
   useInfiniteScroll,
 } from '../utils'
 
-type GraphBranchProps = {
-  virtualizer: Virtualizer<HTMLDivElement, Element>
+interface GraphBranchProps {
+  /**
+   * The virtual items representing the commits currently being displayed.
+   */
+  items: VirtualItem[]
+
+  /**
+   * Whether this is the branch being used as base for comparison.
+   */
   isBase: boolean
 }
 
+/**
+ * Loads commits for a branch from the given virtual items,
+ * and displays them as a graph correctly setting their styles, positions, and parents.
+ *
+ * TODO: The compiler's memoization might cause issues here: https://github.com/TanStack/virtual/issues/736
+ */
 const GraphBranch = (props: GraphBranchProps) => {
-  'use no memo'
-  // TODO: Re-add memoization when fixed
-  // https://github.com/TanStack/virtual/issues/736
-
-  const { virtualizer, isBase } = props
+  const { items, isBase } = props
 
   const { reference, baseReference } = useSelectedRefs()
   const currentRef = isBase ? baseReference : reference
 
   const historyQuery = useQueryCommitHistory(currentRef?.refName)
-  const items = virtualizer.getVirtualItems()
   useInfiniteScroll(historyQuery, items)
 
   const { remote, remoteBranch } = useSelectedUpstream()

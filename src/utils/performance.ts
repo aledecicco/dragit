@@ -15,7 +15,6 @@ interface DebounceOptions {
  * Creates a debounced version of the given callback.
  *
  * @param callback - The function to debounce.
- * @param deps - The dependencies that cause the callback to be created again.
  * @param options - Options for the debounce behavior.
  */
 function useDebouncedCallback(
@@ -61,15 +60,7 @@ interface ThrottleOptions {
 /**
  * Creates a throttled version of the given callback.
  *
- * @param callback - The function to throttle.
- * @param deps - The dependencies that cause the callback to be rebuilt.
- * @param options - Options for the throttling behavior.
- */
-/**
- * Creates a throttled version of the given callback.
- *
  * @param callback - The function to debounce.
- * @param deps - The dependencies that cause the callback to be created again.
  * @param options - Options for the throttling behavior.
  */
 function useThrottledCallback(

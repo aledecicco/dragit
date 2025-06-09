@@ -101,9 +101,15 @@ const REFRESH_OPTIONS: ThrottleOptions = {
   delay: MS_IN_SECOND / 60,
 }
 
+/**
+ * Hook that provides a way to trigger a refresh of the SVG overlay, throttled to 60 FPS.
+ *
+ * @returns An object containing:
+ * - `refreshTrigger`: A variable that can be used as a dependency to trigger a refresh.
+ * - `refresh`: A function that can be called to manually trigger a refresh.
+ */
 const useRefreshCanvas = () => {
   const { rerenderTrigger, rerender } = useRerender()
-
   const refresh = useThrottledCallback(rerender, REFRESH_OPTIONS)
 
   return { refreshTrigger: rerenderTrigger, refresh }

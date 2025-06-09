@@ -9,6 +9,9 @@ import { useBranch } from '@utils/repository'
 import { cn } from '@utils/styles'
 import { mapFn } from '@utils/types'
 
+/**
+ * Controls to select the main branch and the base branch.
+ */
 const BranchSelectors = () => {
   const headInfoQuery = useQueryHeadInfo()
   const branchesQuery = useQueryBranches()

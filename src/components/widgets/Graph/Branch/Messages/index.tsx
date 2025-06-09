@@ -5,6 +5,10 @@ import { useSelectedRefs } from '@context/branches'
 import { cn } from '@utils/styles'
 import { useCurrentCommonAncestor } from '@widgets/Graph/utils'
 
+/**
+ * Messages that display the status of the main branch and the base branch,
+ * in cases where no commits are displayed.
+ */
 const BranchMessages = () => {
   const { reference, baseReference } = useSelectedRefs()
   const commonAncestorQuery = useCurrentCommonAncestor()

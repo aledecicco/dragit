@@ -11,7 +11,7 @@ Stash of ideas in ~planned implementation order:
 - [x] Remotes manipulation widgets
 - [x] Commit details
 - [x] Documentation pass
-- [ ] Performance pass
+- [x] Performance pass
 - [ ] Checkout of remote branches, create branch from commit
 - [ ] "Create" option on empty comboboxes
 - [x] Paginate pathspec searches
