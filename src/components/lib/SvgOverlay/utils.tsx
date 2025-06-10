@@ -6,6 +6,7 @@ import {
   useThrottledCallback,
 } from '@utils/performance'
 import { MS_IN_SECOND } from '@utils/time'
+import type { AnyObject } from '@utils/types'
 import {
   type Element,
   type ElementId,
@@ -25,14 +26,18 @@ interface TrackRefProps<T extends HTMLElement> {
 /**
  * HOC that wraps a component and automatically registers it when it mounts and unregisters it when it unmounts.
  *
- * Also provides a ref that should be attached by the inner component to the elements that's going to be tracked.
+ * Also provides a ref that should be attached by the inner component to the element that's going to be tracked.
  */
-const makeTracked = <P, T extends HTMLElement, R extends string = string>(
-  WrappedComponent: ComponentType<P & TrackRefProps<T>>,
+const makeTracked = <
+  P extends AnyObject,
+  T extends HTMLElement,
+  R extends string = string,
+>(
+  WrappedComponent: ComponentType<
+    Omit<P, keyof TrackedComponentProps<R>> & TrackRefProps<T>
+  >,
 ) => {
-  const TrackedComponent = (
-    props: Omit<P, 'trackRef'> & TrackedComponentProps<R>,
-  ) => {
+  const TrackedComponent = (props: P & TrackedComponentProps<R>) => {
     const { elementId, parent, ...componentProps } = props
     const svgOverlay = useSvgOverlay()
 
@@ -48,15 +53,9 @@ const makeTracked = <P, T extends HTMLElement, R extends string = string>(
       return () => {
         svgOverlay.unregisterElement(elementId)
       }
-    }, [
-      elementId,
-      parent?.id,
-      parent?.type,
-      svgOverlay.registerElement,
-      svgOverlay.unregisterElement,
-    ])
+    }, [elementId, parent?.id, parent?.type])
 
-    return <WrappedComponent {...(componentProps as P)} trackRef={ref} />
+    return <WrappedComponent {...componentProps} trackRef={ref} />
   }
 
   return TrackedComponent

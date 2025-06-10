@@ -15,8 +15,9 @@ Stash of ideas in ~planned implementation order:
 - [ ] Checkout of remote branches, create branch from commit
 - [ ] "Create" option on empty comboboxes
 - [x] Paginate pathspec searches
-- [ ] Highlight matches during pathspec search
 - [ ] "Init", "empty dir", and "not a repository" screens
+- [ ] Highlight matches during pathspec search
+- [ ] More complete commit dialog with "amend" option
 - [ ] Animations pass
 - [ ] Drag and drop shortcuts
 - [ ] Global keyboard shortcuts

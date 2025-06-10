@@ -2,6 +2,7 @@ import { useQueryCurrentDir } from '@api/queries'
 import { useReferencesSync } from '@context/branches'
 import { useDialog } from '@context/dialogs'
 import { useUpstreamSync } from '@context/upstream'
+import { useContextMenuHandler } from '@lib/ContextMenu'
 import { cn } from '@utils/styles'
 import { BranchesList } from '@widgets/BranchesList'
 import { CurrentDirectory } from '@widgets/CurrentDirectory'
@@ -12,6 +13,7 @@ import { MainToolbar } from '@widgets/MainToolbar'
 import { StashesList } from '@widgets/StashesList'
 
 const App = () => {
+  useContextMenuHandler()
   const currentDirQuery = useQueryCurrentDir()
 
   return (
