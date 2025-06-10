@@ -3,6 +3,7 @@ import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@api/models'
 import { useCheckout } from '@api/mutations'
+import { withContextMenu } from '@lib/ContextMenu'
 import { Icon } from '@ui/Icon'
 import { ListItem, type ListItemProps } from '@ui/ListItem'
 import { Marquee } from '@ui/Marquee'
@@ -19,7 +20,7 @@ interface BranchesListItemProps extends ListItemProps {
  *
  * Uses {@link Marquee}s to display long branch names.
  */
-const BranchesListItem = (props: BranchesListItemProps) => {
+const BranchesListItem = withContextMenu<BranchesListItemProps>((props) => {
   const { item, ...itemProps } = props
   const lastModified = useDateDifference(item.timestamp)
 
@@ -75,6 +76,6 @@ const BranchesListItem = (props: BranchesListItemProps) => {
       </Marquee>
     </ListItem>
   )
-}
+})
 
 export { BranchesListItem, type BranchesListItemProps }

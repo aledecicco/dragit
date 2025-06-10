@@ -5,6 +5,7 @@ import { useDeferredValue, useState } from 'react'
 import type { Glyph } from '@ui/Icon'
 import { mapOr } from '@utils/array'
 import { cn, propsWithCn } from '@utils/styles'
+import { AutosuggestItem } from './Item'
 
 interface AutosuggestProps extends Ariakit.ComboboxProps {
   /**
@@ -109,30 +110,6 @@ const Autosuggest = (props: AutosuggestProps) => {
         </Ariakit.ComboboxPopover>
       )}
     </Ariakit.ComboboxProvider>
-  )
-}
-
-interface AutosuggestItemProps extends Ariakit.ComboboxItemProps {}
-
-const AutosuggestItem = (props: AutosuggestItemProps) => {
-  const { ...itemProps } = props
-
-  return (
-    <Ariakit.ComboboxItem
-      focusOnHover
-      {...propsWithCn(
-        itemProps,
-        'text-sm text-center text-light-50',
-        'p-2 rounded-sm cursor-pointer',
-        'wrap-anywhere',
-        itemProps.value === '' && 'italic',
-        'data-[active-item]:bg-dark-100',
-      )}
-    >
-      <Ariakit.ComboboxItemValue
-        className={cn('*:data-[user-value]:text-accent-300')}
-      />
-    </Ariakit.ComboboxItem>
   )
 }
 
