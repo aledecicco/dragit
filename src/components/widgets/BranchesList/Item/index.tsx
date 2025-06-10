@@ -12,7 +12,7 @@ import { cn, propsWithCn } from '@utils/styles'
 import { useDateDifference } from '@utils/time'
 
 interface BranchesListItemProps extends ListItemProps {
-  item: BranchInfo
+  branch: BranchInfo
 }
 
 /**
@@ -21,13 +21,13 @@ interface BranchesListItemProps extends ListItemProps {
  * Uses {@link Marquee}s to display long branch names.
  */
 const BranchesListItem = withContextMenu<BranchesListItemProps>((props) => {
-  const { item, ...itemProps } = props
-  const lastModified = useDateDifference(item.timestamp)
+  const { branch, ...itemProps } = props
+  const lastModified = useDateDifference(branch.timestamp)
 
-  const remoteCounterpart = getRemoteCounterpart(item)
+  const remoteCounterpart = getRemoteCounterpart(branch)
 
-  const { branch } = useSelectedBranches()
-  const isCurrentBranch = branch && item.name === branch.name
+  const { branch: currentBranch } = useSelectedBranches()
+  const isCurrentBranch = currentBranch && branch.name === currentBranch.name
   const checkout = useCheckout()
 
   return (
@@ -41,14 +41,14 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>((props) => {
       onClick={(e) => {
         itemProps.onClick?.(e)
         if (e.detail === 0) {
-          checkout.mutateAsync({ reference: item.name })
+          checkout.mutateAsync({ reference: branch.name })
         }
       }}
     >
       <div className={cn('flex flex-row gap-x-1 items-center text-light-600')}>
         <Icon Glyph={IconGitBranch} size="md" />
 
-        <Marquee className={cn('text-sm')}>{item.name}</Marquee>
+        <Marquee className={cn('text-sm')}>{branch.name}</Marquee>
 
         {isCurrentBranch && (
           <Icon
@@ -60,7 +60,7 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>((props) => {
       </div>
 
       <Marquee className={cn('text-xs text-light-950')} reverse={false}>
-        {match(item.type)
+        {match(branch.type)
           .with('local', () => 'Local branch')
           .with('remote', () => 'Remote branch')
           .exhaustive()}

@@ -9,19 +9,19 @@ interface UntrackedFileStatusItemProps extends ListItemProps {
   /**
    * Information about the untracked file to display.
    */
-  item: UntrackedFileInfo
+  file: UntrackedFileInfo
 }
 
 /**
  * The list item for files in the 'untracked' file statuses widget section.
  */
 const UntrackedFileStatusItem = (props: UntrackedFileStatusItemProps) => {
-  const { item, ...itemProps } = props
+  const { file, ...itemProps } = props
 
   return (
     <FileStatusItem
       {...propsWithCn(itemProps, 'text-light-950/90')}
-      item={item}
+      file={file}
       fileType="untracked"
       Glyph={IconFileUnknown}
     />

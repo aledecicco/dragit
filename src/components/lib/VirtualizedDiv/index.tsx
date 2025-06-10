@@ -2,7 +2,7 @@ import {
   type VirtualizerOptions,
   useVirtualizer,
 } from '@tanstack/react-virtual'
-import { type ComponentType, type ReactNode, useRef } from 'react'
+import { type ReactNode, useRef } from 'react'
 
 import {
   ScrollShadowDiv,
@@ -18,9 +18,9 @@ interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
   items: T[] | undefined
 
   /**
-   * A component constructor that will take care of rendering each item.
+   * Render function for each item.
    */
-  RenderItem: ComponentType<{ item: T }>
+  renderItem: (item: T) => ReactNode
 
   /**
    * The fixed height of each item.
@@ -44,7 +44,7 @@ interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
  * Displays shadows to signal scrollable content.
  */
 const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
-  const { items, itemSize, RenderItem, options, fallback, ...divProps } = props
+  const { items, itemSize, renderItem, options, fallback, ...divProps } = props
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const virtualizer = useVirtualizer({
@@ -86,11 +86,11 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
           {virtualizer.getVirtualItems().map((virtualRow) => (
             <VirtualizedDivItem
               key={virtualRow.key}
-              item={items[virtualRow.index]}
               itemSize={itemSize}
               position={virtualRow.start}
-              RenderItem={RenderItem}
-            />
+            >
+              {renderItem(items[virtualRow.index])}
+            </VirtualizedDivItem>
           ))}
         </div>
       </div>

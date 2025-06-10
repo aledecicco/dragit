@@ -27,13 +27,14 @@ const withContextMenu = <P extends AnyObject>(
         <WrappedComponent
           {...componentProps}
           onContextMenu={(e) => {
-            e.stopPropagation()
             setAnchorRect({ x: e.clientX, y: e.clientY })
             menu.show()
           }}
         />
 
         <Menu
+          modal
+          size="sm"
           store={menu}
           items={contextMenuItems}
           getAnchorRect={() => anchorRect}

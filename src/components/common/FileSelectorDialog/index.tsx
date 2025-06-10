@@ -125,7 +125,7 @@ const FileSelectorDialog = <T extends FileType>(
         size="sm"
         items={items}
         itemSize={36}
-        RenderItem={CommandMenuItem}
+        renderItem={(value) => <CommandMenuItem value={value} />}
         options={mapFn(items, (items) => ({
           getItemKey: (index: number) => items[index],
           gap: 0,

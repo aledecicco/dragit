@@ -5,6 +5,7 @@ import { StagedFileToolbar } from '@common/FileToolbar/Staged'
 import { UnmergedFileToolbar } from '@common/FileToolbar/Unmerged'
 import { UnstagedFileToolbar } from '@common/FileToolbar/Unstaged'
 import { UntrackedFileToolbar } from '@common/FileToolbar/Untracked'
+import { withContextMenu } from '@lib/ContextMenu'
 import { type Glyph, Icon } from '@ui/Icon'
 import { ListItem, type ListItemProps } from '@ui/ListItem'
 import { Marquee } from '@ui/Marquee'
@@ -12,9 +13,24 @@ import type { ToolbarProps } from '@ui/Toolbar'
 import { cn, propsWithCn } from '@utils/styles'
 
 interface FileStatusItemProps<T extends FileType> extends ListItemProps {
-  item: FileTypes[T]
+  /**
+   * The file to display.
+   */
+  file: FileTypes[T]
+
+  /**
+   * The status of the file being displayed.
+   */
   fileType: T
+
+  /**
+   * An optional extra message to display below the file path.
+   */
   statusMessage?: ReactNode
+
+  /**
+   * The icon to display for the file.
+   */
   Glyph: Glyph
 }
 
@@ -26,7 +42,7 @@ interface FileStatusItemProps<T extends FileType> extends ListItemProps {
  * Uses {@link Marquee}s to display long paths.
  */
 const FileStatusItem = <T extends FileType>(props: FileStatusItemProps<T>) => {
-  const { item, fileType, statusMessage, Glyph, ...itemProps } = props
+  const { file, fileType, statusMessage, Glyph, ...itemProps } = props
 
   const FileToolbar: ToolbarComponent<T> = FileItemToolbar[fileType]
 
@@ -41,13 +57,13 @@ const FileStatusItem = <T extends FileType>(props: FileStatusItemProps<T>) => {
         <div className={cn('flex flex-row gap-x-1 items-center')}>
           <Icon Glyph={Glyph} size="md" />
 
-          <Marquee className={cn('text-sm')}>{item.path}</Marquee>
+          <Marquee className={cn('text-sm')}>{file.path}</Marquee>
         </div>
 
         {statusMessage}
       </div>
 
-      <FileToolbar file={item} size="sm" />
+      <FileToolbar file={file} size="sm" />
     </ListItem>
   )
 }

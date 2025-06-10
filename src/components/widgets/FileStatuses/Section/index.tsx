@@ -9,6 +9,7 @@ import {
   AccordionSection,
   type AccordionSectionProps,
 } from '@ui/Accordion/Section'
+import type { ListItemProps } from '@ui/ListItem'
 import { propsWithCn } from '@utils/styles'
 import { mapFn } from '@utils/types'
 import { StagedFileStatusItem } from '../Item/Staged'
@@ -43,12 +44,18 @@ const FileStatusesSection = <T extends FileType>(
       {...propsWithCn(accordionSectionProps, 'min-h-30 overflow-y-hidden')}
     >
       <QueryList
+        name={`${type} files`}
         query={filesQuery}
         getItems={getPageItems}
-        name={`${type} files`}
+        renderItem={(file: FileTypes[T]) => {
+          const FileStatusItemComponent: ComponentType<
+            { file: FileTypes[T] } & ListItemProps
+          > = FileStatusItem[type]
+
+          return <FileStatusItemComponent file={file} />
+        }}
         size="sm"
         itemSize={ItemSize[type]}
-        RenderItem={FileStatusItem[type]}
         options={mapFn(filesQuery.data, (files) => ({
           getItemKey: (index: number) => files.items[index].path,
         }))}
@@ -59,7 +66,7 @@ const FileStatusesSection = <T extends FileType>(
 }
 
 const FileStatusItem: {
-  [T in FileType]: ComponentType<{ item: FileTypes[T] }>
+  [T in FileType]: ComponentType<{ file: FileTypes[T] } & ListItemProps>
 } = {
   staged: StagedFileStatusItem,
   unstaged: UnstagedFileStatusItem,

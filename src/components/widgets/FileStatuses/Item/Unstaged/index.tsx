@@ -15,23 +15,23 @@ import { FileStatusItem } from '..'
  * Information about the unstaged file to display.
  */
 interface UnstagedFileStatusItemProps extends ListItemProps {
-  item: UnstagedFileInfo
+  file: UnstagedFileInfo
 }
 
 /**
  * The list item for files in the 'unstaged' file statuses widget section.
  */
 const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
-  const { item, ...itemProps } = props
+  const { file, ...itemProps } = props
 
   return (
     <FileStatusItem
       {...propsWithCn(itemProps, 'text-light-600')}
-      item={item}
+      file={file}
       fileType="unstaged"
       statusMessage={
         <p className={cn('text-xs text-light-950')}>
-          {match(item.changes)
+          {match(file.changes)
             .with('added', () => 'New')
             .with('deleted', () => 'Deleted')
             .with('modified', () => 'Edited')
@@ -39,7 +39,7 @@ const UnstagedFileStatusItem = (props: UnstagedFileStatusItemProps) => {
             .exhaustive()}
         </p>
       }
-      Glyph={match(item.changes)
+      Glyph={match(file.changes)
         .with('added', () => IconFilePlus)
         .with('deleted', () => IconFileMinus)
         .with('modified', () => IconFilePencil)

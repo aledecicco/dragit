@@ -1,14 +1,9 @@
 import * as Ariakit from '@ariakit/react'
 
-import { cn } from '@utils/styles'
+import { cn, propsWithCn } from '@utils/styles'
 import { CommandMenu } from '..'
 
-interface CommandMenuItemProps extends Ariakit.ComboboxItemProps {
-  /**
-   * The value of the item.
-   */
-  item: string
-}
+interface CommandMenuItemProps extends Ariakit.ComboboxItemProps {}
 
 /**
  * A single item inside a {@link CommandMenu}.
@@ -16,13 +11,13 @@ interface CommandMenuItemProps extends Ariakit.ComboboxItemProps {
  * The callback to trigger the action of the item is handled by the parent.
  */
 const CommandMenuItem = (props: CommandMenuItemProps) => {
-  const { item } = props
+  const { ...itemProps } = props
 
   return (
     <Ariakit.ComboboxItem
       focusOnHover
-      value={item}
-      className={cn(
+      {...propsWithCn(
+        itemProps,
         'text-xs text-light-500',
         'px-2 py-3 rounded-none cursor-pointer',
         'data-[active-item]:bg-dark-100',

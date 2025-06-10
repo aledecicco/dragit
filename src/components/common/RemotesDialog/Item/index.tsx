@@ -15,7 +15,7 @@ interface RemotesDialogItemProps extends ComponentProps<'div'> {
   /**
    * The remote that this list item should display.
    */
-  item: RemoteInfo
+  remote: RemoteInfo
 }
 
 /**
@@ -24,7 +24,7 @@ interface RemotesDialogItemProps extends ComponentProps<'div'> {
  * The fields are displayed as editable text fields.
  */
 const RemotesDialogItem = (props: RemotesDialogItemProps) => {
-  const { item, ...divProps } = props
+  const { remote, ...divProps } = props
 
   const removeRemote = useRemoveRemote()
   const renameRemote = useRenameRemote()
@@ -32,14 +32,14 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
 
   return (
     <div
-      key={item.name}
+      key={remote.name}
       {...propsWithCn(divProps, 'w-full flex flex-row items-stretch')}
     >
       <EditableText
-        value={item.name}
+        value={remote.name}
         setValue={(newName) => {
           if (newName) {
-            renameRemote.mutateAsync({ name: item.name, newName })
+            renameRemote.mutateAsync({ name: remote.name, newName })
           }
         }}
         label="Remote Name"
@@ -50,11 +50,11 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
       />
 
       <EditableText
-        value={item.fetchUrl}
+        value={remote.fetchUrl}
         setValue={(newUrl) => {
           if (newUrl) {
             changeRemoteUrl.mutateAsync({
-              name: item.name,
+              name: remote.name,
               newUrl,
             })
           }
@@ -72,7 +72,7 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
 
       <ActionButton
         mainAction={{
-          run: () => removeRemote.mutateAsync({ name: item.name }),
+          run: () => removeRemote.mutateAsync({ name: remote.name }),
           Glyph: IconTrash,
           label: {
             idle: 'Remove',

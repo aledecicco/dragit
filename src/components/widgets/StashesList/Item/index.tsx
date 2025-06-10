@@ -3,6 +3,7 @@ import { IconArchive, IconGitBranch } from '@tabler/icons-react'
 import type { StashInfo } from '@api/models'
 import { ChangesSummary } from '@common/DiffSummary'
 import { StashToolbar } from '@common/StashToolbar'
+import { withContextMenu } from '@lib/ContextMenu'
 import { Icon } from '@ui/Icon'
 import { ListItem, type ListItemProps } from '@ui/ListItem'
 import { Marquee } from '@ui/Marquee'
@@ -13,7 +14,7 @@ interface StashesListItemProps extends ListItemProps {
   /**
    * The stash that this list item should display.
    */
-  item: StashInfo
+  stash: StashInfo
 }
 
 /**
@@ -21,9 +22,9 @@ interface StashesListItemProps extends ListItemProps {
  *
  * Includes a toolbar to apply or delete the stash.
  */
-const StashesListItem = (props: StashesListItemProps) => {
-  const { item, ...itemProps } = props
-  const stashedTime = useDateDifference(item.timestamp)
+const StashesListItem = withContextMenu<StashesListItemProps>((props) => {
+  const { stash, ...itemProps } = props
+  const stashedTime = useDateDifference(stash.timestamp)
 
   return (
     <ListItem
@@ -46,27 +47,27 @@ const StashesListItem = (props: StashesListItemProps) => {
             <Icon Glyph={IconArchive} size="md" />
 
             <Marquee className={cn('text-sm')} reverse={false}>
-              #{item.id} -{' '}
+              #{stash.id} -{' '}
               <span className={cn('text-light-950')}>
                 <Icon
                   Glyph={IconGitBranch}
                   size="sm"
                   className={cn('inline-block')}
                 />{' '}
-                {item.createdOn}
+                {stash.createdOn}
               </span>
             </Marquee>
           </div>
 
           <Marquee
-            className={cn('text-xs text-light-950', !item.message && 'italic')}
+            className={cn('text-xs text-light-950', !stash.message && 'italic')}
             reverse={false}
           >
-            {item.message ?? 'No description'}
+            {stash.message ?? 'No description'}
           </Marquee>
         </div>
 
-        <StashToolbar stash={item} size="sm" />
+        <StashToolbar stash={stash} size="sm" />
       </div>
 
       <div
@@ -80,8 +81,8 @@ const StashesListItem = (props: StashesListItemProps) => {
         </Marquee>
 
         <Marquee className={cn('text-xs')} reverse={false}>
-          {item.changes ? (
-            <ChangesSummary diff={item.changes} />
+          {stash.changes ? (
+            <ChangesSummary diff={stash.changes} />
           ) : (
             <span className={cn('text-light-950')}>Untracked changes</span>
           )}
@@ -89,6 +90,6 @@ const StashesListItem = (props: StashesListItemProps) => {
       </div>
     </ListItem>
   )
-}
+})
 
 export { StashesListItem, type StashesListItemProps }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import type { RemoteInfo } from '@api/models'
 import { useQueryRemotes } from '@api/queries'
 import { showDialog } from '@context/dialogs'
 import { QueryList } from '@lib/QueryList'
@@ -32,10 +33,12 @@ const RemotesDialog = (props: RemotesDialogProps) => {
         )}
       >
         <QueryList
-          query={remotesQuery}
-          RenderItem={RemotesDialogItem}
           name="remotes"
+          query={remotesQuery}
           getItems={idFn}
+          renderItem={(remote: RemoteInfo) => (
+            <RemotesDialogItem remote={remote} />
+          )}
           itemSize={36}
           size="md"
           options={mapFn(remotesQuery.data, (remotes) => ({

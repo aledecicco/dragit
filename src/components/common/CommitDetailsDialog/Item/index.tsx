@@ -10,7 +10,7 @@ interface CommitDetailsDialogItemProps extends ListItemProps {
   /**
    * The file that this list item should display.
    */
-  item: CommitedFileInfo
+  file: CommitedFileInfo
 }
 
 /**
@@ -19,11 +19,11 @@ interface CommitDetailsDialogItemProps extends ListItemProps {
  * Displays as a checkbox to allow selecting/unselecting files.
  */
 const CommitDetailsDialogItem = (props: CommitDetailsDialogItemProps) => {
-  const { item, ...itemProps } = props
+  const { file, ...itemProps } = props
 
   return (
     <Ariakit.Checkbox
-      value={item.path}
+      value={file.path}
       render={
         <ListItem
           interactive
@@ -35,18 +35,18 @@ const CommitDetailsDialogItem = (props: CommitDetailsDialogItemProps) => {
           )}
         >
           <Marquee className={cn('text-sm text-light-600')} reverse>
-            {item.path}
+            {file.path}
           </Marquee>
 
           <p
             className={cn(
               'text-xs',
-              item.status === 'deleted'
+              file.status === 'deleted'
                 ? 'text-danger-300/50'
                 : 'text-success-300/50',
             )}
           >
-            {match(item.status)
+            {match(file.status)
               .with('added', () => 'Created')
               .with('deleted', () => 'Deleted')
               .with('modified', () => 'Edited')

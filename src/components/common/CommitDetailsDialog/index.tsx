@@ -1,7 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 import { useState } from 'react'
 
-import type { CommitId, CommitInfo } from '@api/models'
+import type { CommitId, CommitInfo, CommitedFileInfo } from '@api/models'
 import { COMMIT_FILES_PAGE_SIZE, useQueryCommitFiles } from '@api/queries'
 import { getPageItems } from '@api/utils'
 import { ChangesSummary } from '@common/DiffSummary'
@@ -106,10 +106,12 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
           >
             <Ariakit.CheckboxProvider store={store}>
               <QueryList
-                query={filesQuery}
-                RenderItem={CommitDetailsDialogItem}
                 name="modified files"
+                query={filesQuery}
                 getItems={getPageItems}
+                renderItem={(file: CommitedFileInfo) => (
+                  <CommitDetailsDialogItem file={file} />
+                )}
                 itemSize={48}
                 size="md"
                 options={mapFn(filesQuery.data, (page) => ({

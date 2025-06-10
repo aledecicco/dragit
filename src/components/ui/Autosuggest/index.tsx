@@ -89,7 +89,7 @@ const Autosuggest = (props: AutosuggestProps) => {
             {mapOr(
               <div
                 className={cn(
-                  'text-center p-2',
+                  'text-center p-1',
                   'text-sm italic text-light-950',
                 )}
               >

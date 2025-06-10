@@ -17,23 +17,23 @@ interface StagedFileStatusItemProps extends ListItemProps {
   /**
    * Information about the staged file to display.
    */
-  item: StagedFileInfo
+  file: StagedFileInfo
 }
 
 /**
  * The list item for files in the 'staged' file statuses widget section.
  */
 const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
-  const { item, ...itemProps } = props
+  const { file, ...itemProps } = props
 
   return (
     <FileStatusItem
       {...propsWithCn(itemProps, 'text-light-600')}
-      item={item}
+      file={file}
       fileType="staged"
       statusMessage={
         <p className={cn('text-xs text-success-300/50')}>
-          {match(item.changes)
+          {match(file.changes)
             .with('added', () => 'New')
             .with('deleted', () => 'Deleted')
             .with('modified', () => 'Edited')
@@ -43,7 +43,7 @@ const StagedFileStatusItem = (props: StagedFileStatusItemProps) => {
             .exhaustive()}
         </p>
       }
-      Glyph={match(item.changes)
+      Glyph={match(file.changes)
         .with('added', () => IconFilePlus)
         .with('deleted', () => IconFileMinus)
         .with('modified', () => IconFilePencil)

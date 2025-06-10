@@ -10,24 +10,24 @@ interface UnmergedFileStatusItemProps extends ListItemProps {
   /**
    * Information about the unmerged file to display.
    */
-  item: UnmergedFileInfo
+  file: UnmergedFileInfo
 }
 
 /**
  * The list item for files in the 'unmerged' file statuses widget section.
  */
 const UnmergedFileStatusItem = (props: UnmergedFileStatusItemProps) => {
-  const { item, ...itemProps } = props
+  const { file, ...itemProps } = props
 
   return (
     <FileStatusItem
       {...propsWithCn(itemProps, 'text-light-600')}
-      item={item}
+      file={file}
       fileType="unmerged"
       Glyph={IconFileAlert}
       statusMessage={
         <p className={cn('text-xs text-warning-400/50')}>
-          {match(item.changes)
+          {match(file.changes)
             .with('addedByThem', () => 'Added by incoming changes')
             .with('addedByUs', () => 'Added by local changes')
             .with('bothAdded', () => 'Added by local and incoming changes')
