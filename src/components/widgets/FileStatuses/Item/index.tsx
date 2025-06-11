@@ -1,27 +1,21 @@
-import type { ComponentType, ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { match } from 'ts-pattern'
 
-import type { FileType, FileTypes } from '@api/models'
+import type { FileInfo } from '@api/models'
 import { StagedFileToolbar } from '@common/FileToolbar/Staged'
 import { UnmergedFileToolbar } from '@common/FileToolbar/Unmerged'
 import { UnstagedFileToolbar } from '@common/FileToolbar/Unstaged'
 import { UntrackedFileToolbar } from '@common/FileToolbar/Untracked'
-import { withContextMenu } from '@lib/ContextMenu'
 import { type Glyph, Icon } from '@ui/Icon'
 import { ListItem, type ListItemProps } from '@ui/ListItem'
 import { Marquee } from '@ui/Marquee'
-import type { ToolbarProps } from '@ui/Toolbar'
 import { cn, propsWithCn } from '@utils/styles'
 
-interface FileStatusItemProps<T extends FileType> extends ListItemProps {
+interface FileStatusItemProps extends ListItemProps {
   /**
    * The file to display.
    */
-  file: FileTypes[T]
-
-  /**
-   * The status of the file being displayed.
-   */
-  fileType: T
+  file: FileInfo
 
   /**
    * An optional extra message to display below the file path.
@@ -41,10 +35,8 @@ interface FileStatusItemProps<T extends FileType> extends ListItemProps {
  *
  * Uses {@link Marquee}s to display long paths.
  */
-const FileStatusItem = <T extends FileType>(props: FileStatusItemProps<T>) => {
-  const { file, fileType, statusMessage, Glyph, ...itemProps } = props
-
-  const FileToolbar: ToolbarComponent<T> = FileItemToolbar[fileType]
+const FileStatusItem = (props: FileStatusItemProps) => {
+  const { file, statusMessage, Glyph, ...itemProps } = props
 
   return (
     <ListItem
@@ -63,22 +55,22 @@ const FileStatusItem = <T extends FileType>(props: FileStatusItemProps<T>) => {
         {statusMessage}
       </div>
 
-      <FileToolbar file={file} size="sm" />
+      {match(file)
+        .with({ status: 'staged' }, (file) => (
+          <StagedFileToolbar file={file} size="sm" />
+        ))
+        .with({ status: 'unstaged' }, (file) => (
+          <UnstagedFileToolbar file={file} size="sm" />
+        ))
+        .with({ status: 'unmerged' }, (file) => (
+          <UnmergedFileToolbar file={file} size="sm" />
+        ))
+        .with({ status: 'untracked' }, (file) => (
+          <UntrackedFileToolbar file={file} size="sm" />
+        ))
+        .exhaustive()}
     </ListItem>
   )
-}
-
-type ToolbarComponent<T extends FileType> = ComponentType<
-  { file: FileTypes[T] } & Partial<ToolbarProps>
->
-
-const FileItemToolbar: {
-  [T in FileType]: ToolbarComponent<T>
-} = {
-  staged: StagedFileToolbar,
-  unstaged: UnstagedFileToolbar,
-  unmerged: UnmergedFileToolbar,
-  untracked: UntrackedFileToolbar,
 }
 
 export { FileStatusItem, type FileStatusItemProps }

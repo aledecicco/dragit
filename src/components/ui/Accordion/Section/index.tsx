@@ -70,7 +70,7 @@ const AccordionSection = (props: AccordionSectionProps) => {
         {...propsWithCn(
           contentProps,
           'overflow-y-hidden grow',
-          'w-full bg-dark-700 rounded-sm',
+          'w-full bg-dark-800 rounded-sm',
         )}
       />
     </Ariakit.DisclosureProvider>

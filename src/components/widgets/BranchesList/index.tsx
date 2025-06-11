@@ -1,10 +1,8 @@
 import type { ComponentProps } from 'react'
 
 import type { BranchInfo } from '@api/models'
-import { useCheckout } from '@api/mutations'
 import { useQueryBranches } from '@api/queries'
 import { QueryList } from '@lib/QueryList'
-import { IconLocationFilled } from '@tabler/icons-react'
 import { Accordion } from '@ui/Accordion'
 import { AccordionSection } from '@ui/Accordion/Section'
 import { Chip } from '@ui/Chip'
@@ -20,7 +18,6 @@ interface BranchesListProps extends ComponentProps<'div'> {}
 const BranchesList = (props: BranchesListProps) => {
   const { ...divProps } = props
   const branchesQuery = useQueryBranches()
-  const checkout = useCheckout()
 
   return (
     <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>
@@ -36,18 +33,7 @@ const BranchesList = (props: BranchesListProps) => {
           query={branchesQuery}
           getItems={idFn}
           renderItem={(branch: BranchInfo) => (
-            <BranchesListItem
-              branch={branch}
-              contextMenuItems={[
-                {
-                  label: 'Checkout',
-                  Glyph: IconLocationFilled,
-                  onClick: () => {
-                    checkout.mutateAsync({ reference: branch.name })
-                  },
-                },
-              ]}
-            />
+            <BranchesListItem branch={branch} />
           )}
           size="sm"
           itemSize={74}

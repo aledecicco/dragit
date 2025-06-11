@@ -1,7 +1,4 @@
-import type { UseQueryResult } from '@tanstack/react-query'
-
-import type { FileTypes, Page } from '@api/models'
-import { FILE_STATUSES_PAGE_SIZE } from '@api/queries'
+import { FILE_STATUSES_PAGE_SIZE, useQueryFiles } from '@api/queries'
 import {
   type FileType,
   setNextPage,
@@ -12,35 +9,31 @@ import {
 import { Pagination } from '@lib/Pagination'
 import { Chip } from '@ui/Chip'
 
-interface FileStatusSectionPaginationProps<T extends FileType> {
+interface FileStatusSectionPaginationProps {
   /**
    * The status of the files being displayed.
    */
-  type: T
-
-  /**
-   * The query that returns (a page of) the files of the specified type.
-   */
-  query: UseQueryResult<Page<FileTypes[T]>>
+  type: FileType
 }
 
 /**
  * Pagination controls for a file statuses section.
- * Falls back to displayinh the number of items if pagination is not needed.
+ * Falls back to displaying the number of items if pagination is not needed.
  */
-const FileStatusSectionPagination = <T extends FileType>(
-  props: FileStatusSectionPaginationProps<T>,
+const FileStatusSectionPagination = (
+  props: FileStatusSectionPaginationProps,
 ) => {
-  const { type, query } = props
+  const { type } = props
+  const filesQuery = useQueryFiles(type)
   const page = useFilesPage(type)
 
-  const showPagination = useNeedsPagination(query, page)
+  const showPagination = useNeedsPagination(filesQuery, page)
 
   return showPagination ? (
     <Pagination
       page={page}
       pageSize={FILE_STATUSES_PAGE_SIZE}
-      hasNext={!!query.data?.hasNext}
+      hasNext={!!filesQuery.data?.hasNext}
       setPrevPage={() => {
         setPrevPage(type)
       }}
@@ -49,7 +42,7 @@ const FileStatusSectionPagination = <T extends FileType>(
       }}
     />
   ) : (
-    <Chip size="sm">{query.data?.items.length ?? '...'}</Chip>
+    <Chip size="sm">{filesQuery.data?.items.length ?? '...'}</Chip>
   )
 }
 

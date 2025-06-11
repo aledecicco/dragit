@@ -56,7 +56,7 @@ const Menu = (props: MenuProps) => {
               'cursor-pointer hover:bg-dark-100 data-[active-item]:bg-dark-100',
             )}
           >
-            {Glyph && <Icon Glyph={Glyph} size={size} />}
+            {Glyph && <Icon Glyph={Glyph} size="sm" />}
             {label}
           </Ariakit.MenuItem>
         )

@@ -1,6 +1,6 @@
-import type { ComponentType } from 'react'
+import { match } from 'ts-pattern'
 
-import type { FileType, FileTypes } from '@api/models'
+import type { FileInfo, FileType } from '@api/models'
 import { useQueryFiles } from '@api/queries'
 import { getPageItems } from '@api/utils'
 import { useHandleFilesPageSync } from '@context/pages'
@@ -9,7 +9,6 @@ import {
   AccordionSection,
   type AccordionSectionProps,
 } from '@ui/Accordion/Section'
-import type { ListItemProps } from '@ui/ListItem'
 import { propsWithCn } from '@utils/styles'
 import { mapFn } from '@utils/types'
 import { StagedFileStatusItem } from '../Item/Staged'
@@ -18,20 +17,17 @@ import { UnstagedFileStatusItem } from '../Item/Unstaged'
 import { UntrackedFileStatusItem } from '../Item/Untracked'
 import { FileStatusSectionPagination } from './Pagination'
 
-interface FileStatusesSectionProps<T extends FileType>
-  extends Partial<AccordionSectionProps> {
+interface FileStatusesSectionProps extends Partial<AccordionSectionProps> {
   /**
    * The status of the files being displayed.
    */
-  type: T
+  type: FileType
 }
 
 /**
  * A section in the file statuses widget that displays files with a specific status.
  */
-const FileStatusesSection = <T extends FileType>(
-  props: FileStatusesSectionProps<T>,
-) => {
+const FileStatusesSection = (props: FileStatusesSectionProps) => {
   const { type, ...accordionSectionProps } = props
   const filesQuery = useQueryFiles(type)
   useHandleFilesPageSync(type)
@@ -40,22 +36,36 @@ const FileStatusesSection = <T extends FileType>(
     <AccordionSection
       defaultOpen
       label={`${type} files`}
-      extraInfo={<FileStatusSectionPagination type={type} query={filesQuery} />}
+      extraInfo={<FileStatusSectionPagination type={type} />}
       {...propsWithCn(accordionSectionProps, 'min-h-30 overflow-y-hidden')}
     >
       <QueryList
         name={`${type} files`}
         query={filesQuery}
         getItems={getPageItems}
-        renderItem={(file: FileTypes[T]) => {
-          const FileStatusItemComponent: ComponentType<
-            { file: FileTypes[T] } & ListItemProps
-          > = FileStatusItem[type]
-
-          return <FileStatusItemComponent file={file} />
-        }}
+        renderItem={(file: FileInfo) =>
+          match(file)
+            .with({ status: 'staged' }, (file) => (
+              <StagedFileStatusItem file={file} />
+            ))
+            .with({ status: 'unstaged' }, (file) => (
+              <UnstagedFileStatusItem file={file} />
+            ))
+            .with({ status: 'unmerged' }, (file) => (
+              <UnmergedFileStatusItem file={file} />
+            ))
+            .with({ status: 'untracked' }, (file) => (
+              <UntrackedFileStatusItem file={file} />
+            ))
+            .exhaustive()
+        }
         size="sm"
-        itemSize={ItemSize[type]}
+        itemSize={match(type)
+          .with('staged', () => ItemSize.staged)
+          .with('unstaged', () => ItemSize.unstaged)
+          .with('unmerged', () => ItemSize.unmerged)
+          .with('untracked', () => ItemSize.untracked)
+          .exhaustive()}
         options={mapFn(filesQuery.data, (files) => ({
           getItemKey: (index: number) => files.items[index].path,
         }))}
@@ -63,15 +73,6 @@ const FileStatusesSection = <T extends FileType>(
       />
     </AccordionSection>
   )
-}
-
-const FileStatusItem: {
-  [T in FileType]: ComponentType<{ file: FileTypes[T] } & ListItemProps>
-} = {
-  staged: StagedFileStatusItem,
-  unstaged: UnstagedFileStatusItem,
-  unmerged: UnmergedFileStatusItem,
-  untracked: UntrackedFileStatusItem,
 }
 
 const ItemSize: {
