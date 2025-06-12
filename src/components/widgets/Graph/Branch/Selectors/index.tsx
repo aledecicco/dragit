@@ -1,6 +1,6 @@
 import { IconSwitchHorizontal } from '@tabler/icons-react'
 
-import { useCheckout } from '@api/mutations'
+import { useCheckoutLocal } from '@api/mutations'
 import { useQueryBranches, useQueryHeadInfo } from '@api/queries'
 import { BranchSelector } from '@common/BranchSelector'
 import { changeBaseRef, useSelectedRefs } from '@context/branches'
@@ -20,7 +20,7 @@ const BranchSelectors = () => {
   const branch = useBranch(reference)
   const baseBranch = useBranch(baseReference)
 
-  const checkout = useCheckout()
+  const checkout = useCheckoutLocal()
 
   const switchAction = {
     run: async () => {

@@ -31,8 +31,7 @@ export { remotesQueryKeys } from './remotes'
 export { settingsQueryKey } from './settings'
 export { stashesQueryKeys } from './stashes'
 
-const pathQueryKey = (path: string) =>
+export const pathQueryKey = (path: string) =>
   ({
     path,
   }) as const
-export { pathQueryKey }

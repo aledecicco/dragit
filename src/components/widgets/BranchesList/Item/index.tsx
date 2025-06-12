@@ -2,7 +2,7 @@ import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@api/models'
-import { useCheckout } from '@api/mutations'
+import { useCheckoutLocal } from '@api/mutations'
 import { withContextMenu } from '@lib/ContextMenu'
 import { Icon } from '@ui/Icon'
 import { ListItem, type ListItemProps } from '@ui/ListItem'
@@ -29,7 +29,7 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
 
     const { branch: currentBranch } = useSelectedBranches()
     const isCurrentBranch = currentBranch && branch.name === currentBranch.name
-    const checkout = useCheckout()
+    const checkout = useCheckoutLocal()
 
     return (
       <ListItem
@@ -84,7 +84,7 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
     )
   },
   ({ branch }) => {
-    const checkout = useCheckout()
+    const checkout = useCheckoutLocal()
 
     return [
       {
