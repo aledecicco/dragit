@@ -12,7 +12,7 @@ const discardStashKey = (path: string) =>
 const discardStashMutation = (path: string) =>
   mutationOptions({
     mutationKey: [discardStashKey(path)],
-    mutationFn: (args: { index: number }) => {
+    mutationFn: (args: { stashId: string }) => {
       return invoke('discard_stash', { path: path, ...args })
     },
     networkMode: 'always',

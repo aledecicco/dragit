@@ -12,7 +12,7 @@ const applyStashKey = (path: string) =>
 const applyStashMutation = (path: string) =>
   mutationOptions({
     mutationKey: [applyStashKey(path)],
-    mutationFn: (args: { index: number; shouldDrop: boolean }) => {
+    mutationFn: (args: { stashId: string }) => {
       return invoke('apply_stash', { path: path, ...args })
     },
     networkMode: 'always',
