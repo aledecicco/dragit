@@ -1,11 +1,11 @@
 import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
-import { Action } from '@lib/ActionButton'
-import type { ActionTracker } from '@lib/ActionButton/utils'
-import { Button, type ButtonProps, type ButtonStatus } from '@ui/Button'
-import { Icon } from '@ui/Icon'
-import { cn, propsWithCn } from '@utils/styles'
+import { Action } from '@/lib/ActionButton'
+import type { ActionTracker } from '@/lib/ActionButton/utils'
+import { Button, type ButtonProps, type ButtonStatus } from '@/ui/Button'
+import { Icon } from '@/ui/Icon'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface FormSubmitButtonProps extends Partial<ButtonProps> {
   /**

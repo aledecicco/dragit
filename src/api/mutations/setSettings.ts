@@ -8,9 +8,7 @@ const setSettingsKey = ['set_settings'] as const
 
 const setSettingsMutation = mutationOptions({
   mutationKey: setSettingsKey,
-  mutationFn: (args: {
-    settings: Settings
-  }) => {
+  mutationFn: (args: { settings: Settings }) => {
     return invoke('set_settings', args)
   },
   networkMode: 'always',

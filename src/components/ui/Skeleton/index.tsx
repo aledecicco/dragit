@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import { propsWithCn } from '@utils/styles'
+import { propsWithCn } from '@/utils/styles'
 
 type SkeletonVariant = 'line' | 'fill'
 

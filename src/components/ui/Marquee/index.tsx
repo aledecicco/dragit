@@ -1,15 +1,15 @@
 import {
-  type CSSProperties,
   type ComponentProps,
+  type CSSProperties,
   useEffect,
   useRef,
   useState,
 } from 'react'
 import { mergeRefs } from 'react-merge-refs'
 
-import { useThrottledCallback } from '@utils/performance'
-import { cn, propsWithCn } from '@utils/styles'
-import { MS_IN_SECOND } from '@utils/time'
+import { useThrottledCallback } from '@/utils/performance'
+import { cn, propsWithCn } from '@/utils/styles'
+import { MS_IN_SECOND } from '@/utils/time'
 
 const INFINITE_SPACING = 32
 

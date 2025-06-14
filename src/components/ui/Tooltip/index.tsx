@@ -1,7 +1,7 @@
-import * as Ariakit from '@ariakit/react'
 import type { ReactNode } from 'react'
+import * as Ariakit from '@ariakit/react'
 
-import { cn, propsWithCn } from '@utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface TooltipProps extends Ariakit.TooltipProps {
   /**

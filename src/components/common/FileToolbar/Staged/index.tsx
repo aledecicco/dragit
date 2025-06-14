@@ -1,8 +1,8 @@
 import { IconMinus } from '@tabler/icons-react'
 
-import type { StagedFileInfo } from '@api/models'
-import { useRemoveFromIndex } from '@api/mutations'
-import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
+import type { StagedFileInfo } from '@/api/models'
+import { useRemoveFromIndex } from '@/api/mutations'
+import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 
 interface StagedFileToolbarProps extends Partial<ToolbarProps> {
   /**

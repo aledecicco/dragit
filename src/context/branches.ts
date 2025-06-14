@@ -1,9 +1,9 @@
-import { Store, useStore } from '@tanstack/react-store'
 import { useEffect } from 'react'
+import { Store, useStore } from '@tanstack/react-store'
 import { match } from 'ts-pattern'
 
-import type { Reference } from '@api/models'
-import { useQueryHeadInfo } from '@api/queries'
+import type { Reference } from '@/api/models'
+import { useQueryHeadInfo } from '@/api/queries'
 
 interface SelectedRefs {
   reference: Reference | undefined

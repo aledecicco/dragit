@@ -1,23 +1,23 @@
 import { useState } from 'react'
 
-import type { FileType } from '@api/models'
-import { FILE_STATUSES_PAGE_SIZE, useQueryFiles } from '@api/queries'
-import { hideDialog } from '@context/dialogs'
+import type { FileType } from '@/api/models'
+import { FILE_STATUSES_PAGE_SIZE, useQueryFiles } from '@/api/queries'
+import { hideDialog } from '@/context/dialogs'
 import {
   setNextPage,
   setPrevPage,
   useFilesPage,
   useHandleFilesPageSync,
   useNeedsPagination,
-} from '@context/pages'
-import type { AskForValueProps } from '@lib/AskForValueDialog'
-import { Pagination } from '@lib/Pagination'
-import type { Shortcut } from '@lib/ShortcutsCheatsheet'
-import { VirtualizedDiv } from '@lib/VirtualizedDiv'
-import { CommandMenu } from '@ui/CommandMenu'
-import { CommandMenuItem } from '@ui/CommandMenu/Item'
-import { cn } from '@utils/styles'
-import { mapFn } from '@utils/types'
+} from '@/context/pages'
+import type { AskForValueProps } from '@/lib/AskForValueDialog'
+import { Pagination } from '@/lib/Pagination'
+import type { Shortcut } from '@/lib/ShortcutsCheatsheet'
+import { VirtualizedDiv } from '@/lib/VirtualizedDiv'
+import { CommandMenu } from '@/ui/CommandMenu'
+import { CommandMenuItem } from '@/ui/CommandMenu/Item'
+import { cn } from '@/utils/styles'
+import { mapFn } from '@/utils/types'
 
 interface FileSelectorDialogProps<T extends FileType>
   extends AskForValueProps<{ path: string }> {

@@ -1,10 +1,10 @@
 import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
-import type { CommitedFileInfo } from '@api/models'
-import { ListItem, type ListItemProps } from '@ui/ListItem'
-import { Marquee } from '@ui/Marquee'
-import { cn, propsWithCn } from '@utils/styles'
+import type { CommitedFileInfo } from '@/api/models'
+import { ListItem, type ListItemProps } from '@/ui/ListItem'
+import { Marquee } from '@/ui/Marquee'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface CommitDetailsDialogItemProps extends ListItemProps {
   /**

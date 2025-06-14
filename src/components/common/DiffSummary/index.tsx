@@ -1,8 +1,8 @@
 import type { ComponentProps } from 'react'
 
-import type { DiffSummary } from '@api/models'
-import { pluralize } from '@utils/string'
-import { cn, propsWithCn } from '@utils/styles'
+import type { DiffSummary } from '@/api/models'
+import { pluralize } from '@/utils/string'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface ChangesSummaryProps extends ComponentProps<'span'> {
   /**

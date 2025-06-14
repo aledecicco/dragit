@@ -1,13 +1,13 @@
-import { FILE_STATUSES_PAGE_SIZE, useQueryFiles } from '@api/queries'
+import { FILE_STATUSES_PAGE_SIZE, useQueryFiles } from '@/api/queries'
 import {
   type FileType,
   setNextPage,
   setPrevPage,
   useFilesPage,
   useNeedsPagination,
-} from '@context/pages'
-import { Pagination } from '@lib/Pagination'
-import { Chip } from '@ui/Chip'
+} from '@/context/pages'
+import { Pagination } from '@/lib/Pagination'
+import { Chip } from '@/ui/Chip'
 
 interface FileStatusSectionPaginationProps {
   /**

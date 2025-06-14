@@ -1,10 +1,10 @@
+import { useDeferredValue, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
-import { useDeferredValue, useState } from 'react'
 
-import type { Glyph } from '@ui/Icon'
-import { mapOr } from '@utils/array'
-import { cn, propsWithCn } from '@utils/styles'
+import { mapOr } from '@/utils/array'
+import { cn, propsWithCn } from '@/utils/styles'
+
 import { AutosuggestItem } from './Item'
 
 interface AutosuggestProps extends Ariakit.ComboboxProps {
@@ -18,11 +18,6 @@ interface AutosuggestProps extends Ariakit.ComboboxProps {
    * If not provided, the suggestions dropdown won't be displayed.
    */
   suggestions?: string[]
-
-  /**
-   * An icon decorator for the input.
-   */
-  Glyph?: Glyph
 
   /**
    * Callback that updates the value of the input.
@@ -46,7 +41,6 @@ const Autosuggest = (props: AutosuggestProps) => {
   const {
     value,
     suggestions = [],
-    Glyph,
     setValue,
     placeholder = 'Select...',
     store,

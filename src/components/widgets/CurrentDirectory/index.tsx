@@ -1,9 +1,9 @@
 import { open } from '@tauri-apps/plugin-dialog'
 
-import { useOpenFolder } from '@api/mutations'
-import { useQueryCurrentDir } from '@api/queries'
-import { Button, type ButtonProps } from '@ui/Button'
-import { propsWithCn } from '@utils/styles'
+import { useOpenFolder } from '@/api/mutations'
+import { useQueryCurrentDir } from '@/api/queries'
+import { Button, type ButtonProps } from '@/ui/Button'
+import { propsWithCn } from '@/utils/styles'
 
 interface CurrentDirectoryProps extends Partial<ButtonProps> {}
 

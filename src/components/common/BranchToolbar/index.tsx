@@ -1,8 +1,8 @@
 import { IconDownload, IconUpload } from '@tabler/icons-react'
 
-import type { BranchInfo } from '@api/models'
-import { usePullBranch, usePushBranch } from '@api/mutations'
-import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
+import type { BranchInfo } from '@/api/models'
+import { usePullBranch, usePushBranch } from '@/api/mutations'
+import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 
 interface BranchToolbarProps extends Partial<ToolbarProps> {
   /**

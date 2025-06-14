@@ -7,11 +7,12 @@ import {
 } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
-import type { UnstagedFileInfo } from '@api/models'
-import { useAddToIndex } from '@api/mutations'
-import { withContextMenu } from '@lib/ContextMenu'
-import type { ListItemProps } from '@ui/ListItem'
-import { cn, propsWithCn } from '@utils/styles'
+import type { UnstagedFileInfo } from '@/api/models'
+import { useAddToIndex } from '@/api/mutations'
+import { withContextMenu } from '@/lib/ContextMenu'
+import type { ListItemProps } from '@/ui/ListItem'
+import { cn, propsWithCn } from '@/utils/styles'
+
 import { FileStatusItem } from '..'
 
 /**

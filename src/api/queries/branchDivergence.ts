@@ -4,10 +4,10 @@ import {
   skipToken,
 } from '@tanstack/react-query'
 
-import { pathQueryKey } from '.'
 import type { BranchDivergence, BranchName } from '../models'
 import { BRANCH_DIVERGENCE_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
+import { pathQueryKey } from '.'
 
 const branchDivergenceQueryKeys = {
   all: (path: string) =>

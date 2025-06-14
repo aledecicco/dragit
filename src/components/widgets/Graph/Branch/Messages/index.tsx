@@ -1,9 +1,10 @@
 import type { PropsWithChildren } from 'react'
 
-import { useQueryCommitHistory } from '@api/queries'
-import { useSelectedRefs } from '@context/branches'
-import { cn } from '@utils/styles'
-import { useCurrentCommonAncestor } from '@widgets/Graph/utils'
+import { useCurrentCommonAncestor } from '@/widgets/Graph/utils'
+
+import { useQueryCommitHistory } from '@/api/queries'
+import { useSelectedRefs } from '@/context/branches'
+import { cn } from '@/utils/styles'
 
 /**
  * Messages that display the status of the main branch and the base branch,

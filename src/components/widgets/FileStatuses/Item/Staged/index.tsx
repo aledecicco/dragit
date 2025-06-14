@@ -9,11 +9,12 @@ import {
 } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
-import type { StagedFileInfo } from '@api/models'
-import { useRemoveFromIndex } from '@api/mutations'
-import { withContextMenu } from '@lib/ContextMenu'
-import type { ListItemProps } from '@ui/ListItem'
-import { cn, propsWithCn } from '@utils/styles'
+import type { StagedFileInfo } from '@/api/models'
+import { useRemoveFromIndex } from '@/api/mutations'
+import { withContextMenu } from '@/lib/ContextMenu'
+import type { ListItemProps } from '@/ui/ListItem'
+import { cn, propsWithCn } from '@/utils/styles'
+
 import { FileStatusItem } from '..'
 
 interface StagedFileStatusItemProps extends ListItemProps {
@@ -35,7 +36,12 @@ const StagedFileStatusItem = withContextMenu<StagedFileStatusItemProps>(
         {...propsWithCn(itemProps, 'text-light-600')}
         file={file}
         statusMessage={
-          <p className={cn('text-xs text-success-300/50')}>
+          <p
+            className={cn(
+              'text-xs text-success-300/50',
+              'text-nowrap overflow-hidden text-ellipsis',
+            )}
+          >
             {match(file.changes)
               .with('added', () => 'New')
               .with('deleted', () => 'Deleted')

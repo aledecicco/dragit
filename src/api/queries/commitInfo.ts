@@ -1,10 +1,11 @@
 import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
 
-import { MS_IN_SECOND } from '@utils/time'
-import { pathQueryKey } from '.'
+import { MS_IN_SECOND } from '@/utils/time'
+
 import type { CommitId, CommitInfo } from '../models'
 import { COMMIT_INFO_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
+import { pathQueryKey } from '.'
 
 const commitInfoQueryKeys = {
   all: (path: string) =>

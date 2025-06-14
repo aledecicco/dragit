@@ -1,7 +1,8 @@
 import type { ComponentProps, ComponentType } from 'react'
 import { mergeRefs } from 'react-merge-refs'
 
-import { cn, propsWithCn } from '@utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
+
 import {
   SvgOverlayContextProvider,
   type SvgOverlayState,

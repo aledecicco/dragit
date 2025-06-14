@@ -1,10 +1,10 @@
 import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
-import { P, match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
-import { pathQueryKey } from '.'
 import type { HeadInfo } from '../models'
 import { HEAD_INFO_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
+import { pathQueryKey } from '.'
 
 const headInfoQueryKeys = {
   all: (path: string) =>

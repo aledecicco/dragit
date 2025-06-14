@@ -2,11 +2,11 @@ import * as Ariakit from '@ariakit/react'
 import type { UseQueryResult } from '@tanstack/react-query'
 import { usePrevious } from 'react-use'
 
-import { QueryLoader } from '@lib/Loader/Query'
-import { VirtualizedDiv, type VirtualizedDivProps } from '@lib/VirtualizedDiv'
-import { Skeleton } from '@ui/Skeleton'
-import { range } from '@utils/array'
-import { cn, propsWithCn } from '@utils/styles'
+import { QueryLoader } from '@/lib/Loader/Query'
+import { VirtualizedDiv, type VirtualizedDivProps } from '@/lib/VirtualizedDiv'
+import { Skeleton } from '@/ui/Skeleton'
+import { range } from '@/utils/array'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface QueryListProps<T, I> extends Omit<VirtualizedDivProps<I>, 'items'> {
   /**

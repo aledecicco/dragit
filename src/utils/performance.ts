@@ -1,5 +1,5 @@
-import type { useVirtualizer } from '@tanstack/react-virtual'
 import { useReducer, useRef } from 'react'
+import type { useVirtualizer } from '@tanstack/react-virtual'
 
 import { MS_IN_SECOND } from './time'
 

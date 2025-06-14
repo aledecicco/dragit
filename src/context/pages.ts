@@ -1,11 +1,11 @@
+import { useEffect } from 'react'
 import type { UseQueryResult } from '@tanstack/react-query'
 import { Store, useStore } from '@tanstack/react-store'
-import { useEffect } from 'react'
 import { usePrevious } from 'react-use'
 
-import type { FileType, Page } from '@api/models'
-import { useQueryFiles } from '@api/queries'
-import { getFileTypeFilter } from '@api/utils'
+import type { FileType, Page } from '@/api/models'
+import { useQueryFiles } from '@/api/queries'
+import { getFileTypeFilter } from '@/api/utils'
 
 type FilePages = Map<string, number>
 const filesPages = new Store<FilePages>(new Map())

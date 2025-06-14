@@ -1,9 +1,10 @@
+import { type PropsWithChildren, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
-import { type PropsWithChildren, useEffect } from 'react'
-import { P, match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
-import { useSelectedRefs } from '@context/branches'
+import { useSelectedRefs } from '@/context/branches'
+
 import type { AppEvent } from './models'
 import {
   branchDivergenceQueryKeys,

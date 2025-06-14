@@ -1,19 +1,20 @@
+import { type ComponentProps, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import {
-  type Range,
   defaultRangeExtractor,
+  type Range,
   useVirtualizer,
 } from '@tanstack/react-virtual'
-import { type ComponentProps, useRef } from 'react'
 
-import { useQueryCommitHistory } from '@api/queries'
-import { getPaginatedLength } from '@api/utils'
-import { BranchToolbar } from '@common/BranchToolbar'
-import { useSelectedRefs } from '@context/branches'
-import { ScrollShadowDiv } from '@lib/ScrollShadowDiv'
-import { SvgOverlay } from '@lib/SvgOverlay'
-import { useSelectedBranches } from '@utils/repository'
-import { cn, propsWithCn } from '@utils/styles'
+import { useQueryCommitHistory } from '@/api/queries'
+import { getPaginatedLength } from '@/api/utils'
+import { BranchToolbar } from '@/common/BranchToolbar'
+import { useSelectedRefs } from '@/context/branches'
+import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
+import { SvgOverlay } from '@/lib/SvgOverlay'
+import { useSelectedBranches } from '@/utils/repository'
+import { cn, propsWithCn } from '@/utils/styles'
+
 import { GraphBranch } from './Branch'
 import { BranchMessages } from './Branch/Messages'
 import { BranchSelectors } from './Branch/Selectors'

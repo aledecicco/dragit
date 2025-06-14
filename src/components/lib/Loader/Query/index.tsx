@@ -1,9 +1,9 @@
-import type { UseQueryResult } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
+import type { UseQueryResult } from '@tanstack/react-query'
 
-import { RetryError } from '@lib/RetryError'
-import { Skeleton } from '@ui/Skeleton'
-import { getErrorMessage } from '@utils/error'
+import { RetryError } from '@/lib/RetryError'
+import { Skeleton } from '@/ui/Skeleton'
+import { getErrorMessage } from '@/utils/error'
 
 interface QueryLoaderProps<T> {
   /**

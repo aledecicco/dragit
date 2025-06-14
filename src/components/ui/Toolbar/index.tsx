@@ -1,9 +1,9 @@
 import * as Ariakit from '@ariakit/react'
 
-import { type Action, ActionButton } from '@lib/ActionButton'
-import type { ButtonStatus, ButtonVariant } from '@ui/Button'
-import { cn, propsWithCn } from '@utils/styles'
-import type { Size } from '@utils/types'
+import { type Action, ActionButton } from '@/lib/ActionButton'
+import type { ButtonStatus, ButtonVariant } from '@/ui/Button'
+import { cn, propsWithCn } from '@/utils/styles'
+import type { Size } from '@/utils/types'
 
 interface ToolbarTool {
   action: Action
@@ -70,11 +70,7 @@ const Toolbar = (props: ToolbarProps) => {
       >
         {tools.map((tool) => (
           <ActionButton
-            key={
-              typeof tool.action.label === 'string'
-                ? tool.action.label
-                : tool.action.label.idle
-            }
+            key={tool.action.label.idle}
             className={cn(
               fixed && 'w-full',
               'not-first:rounded-l-none',

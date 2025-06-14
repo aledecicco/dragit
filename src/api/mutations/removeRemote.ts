@@ -1,8 +1,8 @@
 import { invoke } from '@tauri-apps/api/core'
 
-import { pathMutationKey } from '.'
 import type { RemoteName } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
+import { pathMutationKey } from '.'
 
 const removeRemoteKey = (path: string) =>
   ({

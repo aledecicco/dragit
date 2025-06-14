@@ -3,12 +3,12 @@ import {
   queryOptions,
   skipToken,
 } from '@tanstack/react-query'
-import { P, match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
-import { pathQueryKey } from '.'
 import type { DiffSection, DiffType, FileDiff } from '../models'
 import { FILE_DIFF_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
+import { pathQueryKey } from '.'
 
 const filesDiffQueryKeys = {
   all: (path: string) =>

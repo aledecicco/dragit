@@ -1,9 +1,9 @@
 import { IconCheck, IconTrash } from '@tabler/icons-react'
-import { P, match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
-import type { UnmergedFileInfo } from '@api/models'
-import { useAddToIndex, useRemoveFromTree } from '@api/mutations'
-import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
+import type { UnmergedFileInfo } from '@/api/models'
+import { useAddToIndex, useRemoveFromTree } from '@/api/mutations'
+import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 
 interface UnmergedFileToolbarProps extends Partial<ToolbarProps> {
   /**

@@ -4,9 +4,10 @@ import {
   type ThrottleOptions,
   useRerender,
   useThrottledCallback,
-} from '@utils/performance'
-import { MS_IN_SECOND } from '@utils/time'
-import type { AnyObject } from '@utils/types'
+} from '@/utils/performance'
+import { MS_IN_SECOND } from '@/utils/time'
+import type { AnyObject } from '@/utils/types'
+
 import {
   type Element,
   type ElementId,

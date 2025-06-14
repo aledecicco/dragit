@@ -1,13 +1,13 @@
 import {
-  type QueryFunctionContext,
   infiniteQueryOptions,
+  type QueryFunctionContext,
   skipToken,
 } from '@tanstack/react-query'
 
-import { pathQueryKey } from '.'
 import type { HistoryItem, Page } from '../models'
 import { HISTORY_PAGE_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryInfiniteQuery } from '../utils'
+import { pathQueryKey } from '.'
 
 export const HISTORY_PAGE_SIZE = 50
 

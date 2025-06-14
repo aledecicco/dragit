@@ -1,4 +1,5 @@
-import { propsWithCn } from '@utils/styles'
+import { propsWithCn } from '@/utils/styles'
+
 import { FormField, type FormFieldProps } from '../Field'
 
 interface InputFieldProps extends FormFieldProps {}

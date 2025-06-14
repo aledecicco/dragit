@@ -172,7 +172,7 @@ const fetchAndDeserialize = async <T>(
   context: QueryFunctionContext,
 ): Promise<T> => {
   let shouldStop = false
-  let processId: number | undefined = undefined
+  let processId: number | undefined
 
   const abortSignal = context.signal
   abortSignal.onabort = () => {

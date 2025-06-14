@@ -1,6 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 
-import { propsWithCn } from '@utils/styles'
+import { propsWithCn } from '@/utils/styles'
 
 interface ListItemProps extends Ariakit.CompositeItemProps {
   /**

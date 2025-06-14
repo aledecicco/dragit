@@ -1,9 +1,9 @@
+import { useEffect } from 'react'
 import type {
   InfiniteData,
   UseInfiniteQueryResult,
 } from '@tanstack/react-query'
 import type { VirtualItem } from '@tanstack/react-virtual'
-import { useEffect } from 'react'
 
 import type {
   AncestorInfo,
@@ -11,10 +11,10 @@ import type {
   CommonAncestorInfo,
   HistoryItem,
   Page,
-} from '@api/models'
-import { HISTORY_PAGE_SIZE, useQueryCommonAncestor } from '@api/queries'
-import { getPaginatedItem, getPaginatedLength } from '@api/utils'
-import { useSelectedRefs } from '@context/branches'
+} from '@/api/models'
+import { HISTORY_PAGE_SIZE, useQueryCommonAncestor } from '@/api/queries'
+import { getPaginatedItem, getPaginatedLength } from '@/api/utils'
+import { useSelectedRefs } from '@/context/branches'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<Page<HistoryItem>>>
 

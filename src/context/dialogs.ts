@@ -1,5 +1,5 @@
-import { Store, useStore } from '@tanstack/react-store'
 import type { ReactNode } from 'react'
+import { Store, useStore } from '@tanstack/react-store'
 
 type DialogKey = string
 
@@ -17,7 +17,7 @@ const dialogs = new Store<Dialogs>({
 const useDialog = (): ReactNode | undefined => {
   const allDialogs = useStore(dialogs)
 
-  let entry: [DialogKey, ReactNode] | undefined = undefined
+  let entry: [DialogKey, ReactNode] | undefined
   for (entry of allDialogs.mounted);
 
   return entry?.[1]

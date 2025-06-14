@@ -4,10 +4,10 @@ import {
   skipToken,
 } from '@tanstack/react-query'
 
-import { pathQueryKey } from '.'
 import type { CommonAncestorInfo } from '../models'
 import { COMMON_ANCESTOR_INFO_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
+import { pathQueryKey } from '.'
 
 const commonAncestorQueryKeys = {
   all: (path: string) =>

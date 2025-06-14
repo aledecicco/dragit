@@ -1,8 +1,8 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import type { DiffType, FileDiff } from '@api/models'
-import { cn, propsWithCn } from '@utils/styles'
+import type { DiffType, FileDiff } from '@/api/models'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface DiffViewerContentProps extends ComponentProps<'div'> {
   /**
@@ -50,10 +50,7 @@ const DiffViewerContent = (props: DiffViewerContentProps) => {
  * @param props.diffType - The type of diff for the line.
  * @param props.line - The content of the line to display.
  */
-const ContentCell = (props: {
-  diffType: DiffType
-  line: string
-}) => {
+const ContentCell = (props: { diffType: DiffType; line: string }) => {
   const { diffType, line } = props
 
   return (

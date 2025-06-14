@@ -1,13 +1,13 @@
 import { IconDeviceFloppy, IconX } from '@tabler/icons-react'
 
-import { useAddRemote } from '@api/mutations'
-import { useQueryRemotes } from '@api/queries'
-import { Button } from '@ui/Button'
-import { Form, type FormProps } from '@ui/Form'
-import { InputField } from '@ui/Form/InputField'
-import { FormSubmitButton } from '@ui/Form/SubmitButton'
-import { Icon } from '@ui/Icon'
-import { cn, propsWithCn } from '@utils/styles'
+import { useAddRemote } from '@/api/mutations'
+import { useQueryRemotes } from '@/api/queries'
+import { Button } from '@/ui/Button'
+import { Form, type FormProps } from '@/ui/Form'
+import { InputField } from '@/ui/Form/InputField'
+import { FormSubmitButton } from '@/ui/Form/SubmitButton'
+import { Icon } from '@/ui/Icon'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface RemoteFormValues {
   name: string

@@ -1,10 +1,10 @@
-import { useComboboxStore, useStoreState } from '@ariakit/react'
 import { useEffect, useState } from 'react'
+import { useComboboxStore, useStoreState } from '@ariakit/react'
 
-import { Autosuggest, type AutosuggestProps } from '@ui/Autosuggest'
-import { Button, type ButtonProps } from '@ui/Button'
-import { Marquee } from '@ui/Marquee'
-import { propsWithCn } from '@utils/styles'
+import { Autosuggest, type AutosuggestProps } from '@/ui/Autosuggest'
+import { Button, type ButtonProps } from '@/ui/Button'
+import { Marquee } from '@/ui/Marquee'
+import { propsWithCn } from '@/utils/styles'
 
 interface EditableTextProps extends AutosuggestProps {
   /**

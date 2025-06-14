@@ -7,9 +7,7 @@ const removeRecentFolderKey = ['remove_recent_folder'] as const
 
 const removeRecentFolderMutation = mutationOptions({
   mutationKey: removeRecentFolderKey,
-  mutationFn: (args: {
-    recentPath: string
-  }) => {
+  mutationFn: (args: { recentPath: string }) => {
     return invoke('remove_recent', args)
   },
   networkMode: 'always',

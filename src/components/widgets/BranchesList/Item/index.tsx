@@ -1,15 +1,15 @@
 import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
-import type { BranchInfo } from '@api/models'
-import { useCheckoutLocal } from '@api/mutations'
-import { withContextMenu } from '@lib/ContextMenu'
-import { Icon } from '@ui/Icon'
-import { ListItem, type ListItemProps } from '@ui/ListItem'
-import { Marquee } from '@ui/Marquee'
-import { getRemoteCounterpart, useSelectedBranches } from '@utils/repository'
-import { cn, propsWithCn } from '@utils/styles'
-import { useDateDifference } from '@utils/time'
+import type { BranchInfo } from '@/api/models'
+import { useCheckoutLocal } from '@/api/mutations'
+import { withContextMenu } from '@/lib/ContextMenu'
+import { Icon } from '@/ui/Icon'
+import { ListItem, type ListItemProps } from '@/ui/ListItem'
+import { Marquee } from '@/ui/Marquee'
+import { getRemoteCounterpart, useSelectedBranches } from '@/utils/repository'
+import { cn, propsWithCn } from '@/utils/styles'
+import { useDateDifference } from '@/utils/time'
 
 interface BranchesListItemProps extends ListItemProps {
   branch: BranchInfo
@@ -62,7 +62,12 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
           )}
         </div>
 
-        <Marquee className={cn('text-xs text-light-950')} reverse={false}>
+        <p
+          className={cn(
+            'text-xs text-light-950',
+            'text-nowrap overflow-hidden text-ellipsis',
+          )}
+        >
           {match(branch.type)
             .with('local', () => 'Local branch')
             .with('remote', () => 'Remote branch')
@@ -73,13 +78,15 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
               <span className={cn('text-light-400')}>{remoteCounterpart}</span>
             </>
           )}
-        </Marquee>
-        <Marquee
-          className={cn('text-xs text-light-950/60 mt-2')}
-          reverse={false}
+        </p>
+        <p
+          className={cn(
+            'text-xs text-light-950/60 mt-2',
+            'text-nowrap overflow-hidden text-ellipsis',
+          )}
         >
           Last modified {lastModified}
-        </Marquee>
+        </p>
       </ListItem>
     )
   },

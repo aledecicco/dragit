@@ -1,7 +1,8 @@
-import * as Ariakit from '@ariakit/react'
 import type { ComponentProps } from 'react'
+import * as Ariakit from '@ariakit/react'
 
-import { propsWithCn } from '@utils/styles'
+import { propsWithCn } from '@/utils/styles'
+
 import { AccordionSection } from './Section'
 
 interface AccordionProps extends ComponentProps<'div'> {}

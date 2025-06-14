@@ -1,15 +1,15 @@
 import type { ReactNode } from 'react'
 import { match } from 'ts-pattern'
 
-import type { FileInfo } from '@api/models'
-import { StagedFileToolbar } from '@common/FileToolbar/Staged'
-import { UnmergedFileToolbar } from '@common/FileToolbar/Unmerged'
-import { UnstagedFileToolbar } from '@common/FileToolbar/Unstaged'
-import { UntrackedFileToolbar } from '@common/FileToolbar/Untracked'
-import { type Glyph, Icon } from '@ui/Icon'
-import { ListItem, type ListItemProps } from '@ui/ListItem'
-import { Marquee } from '@ui/Marquee'
-import { cn, propsWithCn } from '@utils/styles'
+import type { FileInfo } from '@/api/models'
+import { StagedFileToolbar } from '@/common/FileToolbar/Staged'
+import { UnmergedFileToolbar } from '@/common/FileToolbar/Unmerged'
+import { UnstagedFileToolbar } from '@/common/FileToolbar/Unstaged'
+import { UntrackedFileToolbar } from '@/common/FileToolbar/Untracked'
+import { type Glyph, Icon } from '@/ui/Icon'
+import { ListItem, type ListItemProps } from '@/ui/ListItem'
+import { Marquee } from '@/ui/Marquee'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface FileStatusItemProps extends ListItemProps {
   /**

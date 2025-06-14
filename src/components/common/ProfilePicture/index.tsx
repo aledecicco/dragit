@@ -1,15 +1,14 @@
-import { IconUserFilled } from '@tabler/icons-react'
 import type { ComponentProps } from 'react'
+import { IconUserFilled } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
-import { useQueryGithubProfilePicture } from '@api/queries'
-import { Icon } from '@ui/Icon'
-import { cn, propsWithCn } from '@utils/styles'
-import type { Size } from '@utils/types'
+import type { ProfilePictureSource } from '@/api/models'
+import { useQueryProfilePicture } from '@/api/queries'
+import { Icon } from '@/ui/Icon'
+import { cn, propsWithCn } from '@/utils/styles'
+import type { Size } from '@/utils/types'
 
 type ProfilePictureVariant = 'accent' | 'primary' | 'neutral'
-
-type ProfilePictureSource = 'github' // TODO: add more?
 
 interface ProfilePictureProps extends ComponentProps<'div'> {
   /**
@@ -33,8 +32,6 @@ interface ProfilePictureProps extends ComponentProps<'div'> {
 
   /**
    * The source to use for fetching the profile picture.
-   *
-   * Currently only supports GitHub.
    */
   source?: ProfilePictureSource
 }
@@ -51,7 +48,7 @@ const ProfilePicture = (props: ProfilePictureProps) => {
     ...divProps
   } = props
 
-  const picture = useQueryGithubProfilePicture(username)
+  const picture = useQueryProfilePicture(username, source)
 
   return (
     <div

@@ -1,8 +1,8 @@
 import { invoke } from '@tauri-apps/api/core'
 
-import { pathMutationKey } from '.'
 import type { BranchName, RemoteRef } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
+import { pathMutationKey } from '.'
 
 const setUpstreamKey = (path: string) =>
   ({
@@ -13,10 +13,7 @@ const setUpstreamKey = (path: string) =>
 const setUpstreamMutation = (path: string) =>
   mutationOptions({
     mutationKey: [setUpstreamKey(path)],
-    mutationFn: (args: {
-      branch: BranchName
-      remoteRef: RemoteRef
-    }) => {
+    mutationFn: (args: { branch: BranchName; remoteRef: RemoteRef }) => {
       return invoke('set_upstream', { path: path, ...args })
     },
     networkMode: 'always',

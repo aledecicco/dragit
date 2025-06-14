@@ -1,8 +1,8 @@
 import { IconPackageExport, IconTrash } from '@tabler/icons-react'
 
-import type { StashInfo } from '@api/models'
-import { useApplyStash, useDiscardStash } from '@api/mutations'
-import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
+import type { StashInfo } from '@/api/models'
+import { useApplyStash, useDiscardStash } from '@/api/mutations'
+import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 
 interface StashToolbarProps extends Partial<ToolbarProps> {
   /**

@@ -1,10 +1,10 @@
 import type { ComponentType } from 'react'
-
-import { type DialogKey, hideDialog, showDialog } from '@context/dialogs'
-import { getUniqueId } from '@context/ids'
 import { IconCheck } from '@tabler/icons-react'
-import { FormDialog, type FormDialogProps } from '@ui/FormDialog'
-import type { AnyObject, PickPartial } from '@utils/types'
+
+import { type DialogKey, hideDialog, showDialog } from '@/context/dialogs'
+import { getUniqueId } from '@/context/ids'
+import { FormDialog, type FormDialogProps } from '@/ui/FormDialog'
+import type { AnyObject, PickPartial } from '@/utils/types'
 
 interface AskForValueDialogProps<T extends AnyObject>
   extends PickPartial<FormDialogProps<T>, 'dialogKey'> {

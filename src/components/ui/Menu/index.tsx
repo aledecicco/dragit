@@ -1,9 +1,9 @@
 import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
-import { type Glyph, Icon } from '@ui/Icon'
-import { propsWithCn } from '@utils/styles'
-import type { Size } from '@utils/types'
+import { type Glyph, Icon } from '@/ui/Icon'
+import { propsWithCn } from '@/utils/styles'
+import type { Size } from '@/utils/types'
 
 interface MenuItem extends Ariakit.MenuItemProps {
   Glyph?: Glyph

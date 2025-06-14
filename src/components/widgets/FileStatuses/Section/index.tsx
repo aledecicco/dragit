@@ -1,16 +1,17 @@
 import { match } from 'ts-pattern'
 
-import type { FileInfo, FileType } from '@api/models'
-import { useQueryFiles } from '@api/queries'
-import { getPageItems } from '@api/utils'
-import { useHandleFilesPageSync } from '@context/pages'
-import { QueryList } from '@lib/QueryList'
+import type { FileInfo, FileType } from '@/api/models'
+import { useQueryFiles } from '@/api/queries'
+import { getPageItems } from '@/api/utils'
+import { useHandleFilesPageSync } from '@/context/pages'
+import { QueryList } from '@/lib/QueryList'
 import {
   AccordionSection,
   type AccordionSectionProps,
-} from '@ui/Accordion/Section'
-import { propsWithCn } from '@utils/styles'
-import { mapFn } from '@utils/types'
+} from '@/ui/Accordion/Section'
+import { propsWithCn } from '@/utils/styles'
+import { mapFn } from '@/utils/types'
+
 import { StagedFileStatusItem } from '../Item/Staged'
 import { UnmergedFileStatusItem } from '../Item/Unmerged'
 import { UnstagedFileStatusItem } from '../Item/Unstaged'

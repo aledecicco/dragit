@@ -1,9 +1,9 @@
 import { type ComponentProps, Fragment } from 'react'
 import { useKeyPress } from 'react-use'
 
-import { cn, propsWithCn } from '@utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 
-interface ShortcutCheatsheetProps extends ComponentProps<'div'> {
+interface ShortcutCheatsheetProps extends ComponentProps<'ul'> {
   shortcuts: Shortcut[]
 }
 
@@ -41,27 +41,19 @@ interface ShortcutKey {
  * Displays a set of accessible keyboard shortcuts that react to key presses.
  */
 const ShortcutCheatsheet = (props: ShortcutCheatsheetProps) => {
-  const { shortcuts, ...divProps } = props
+  const { shortcuts, ...listProps } = props
 
   return (
-    <div {...propsWithCn(divProps, 'flex flex-row gap-x-4 justify-center')}>
+    <ul {...propsWithCn(listProps, 'flex flex-row gap-x-4 justify-center')}>
       {shortcuts.map((shortcut) => (
-        <div
+        <li
           key={shortcut.label}
           className={cn(
             'flex flex-row items-center gap-x-1 text-xs text-light-700',
           )}
+          aria-label={`${shortcut.label}: ${shortcut.keys.map((shortcutKey) => shortcutKey.keyName).join(shortcut.combined ? '+' : ' or ')}`}
         >
-          <div
-            className={cn('flex flex-row items-center gap-x-0.5')}
-            aria-label={
-              shortcut.combined
-                ? shortcut.keys
-                    .map((shortcutKey) => shortcutKey.keyName)
-                    .join('+')
-                : undefined
-            }
-          >
+          <div className={cn('flex flex-row items-center gap-x-0.5')}>
             {shortcut.keys.map((shortcutKey, index) => (
               <Fragment key={shortcutKey.symbol}>
                 {!!shortcut.combined && index > 0 && '+'}
@@ -75,9 +67,9 @@ const ShortcutCheatsheet = (props: ShortcutCheatsheetProps) => {
           </div>
 
           {shortcut.label}
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
 

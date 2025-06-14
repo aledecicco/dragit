@@ -1,4 +1,4 @@
-import { P, match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
 import type {
   BranchInfo,
@@ -6,9 +6,10 @@ import type {
   RemoteInfo,
   RemoteName,
   RemoteRef,
-} from '@api/models'
-import { useQueryBranches, useQueryRemotes } from '@api/queries'
-import { useSelectedRefs } from '@context/branches'
+} from '@/api/models'
+import { useQueryBranches, useQueryRemotes } from '@/api/queries'
+import { useSelectedRefs } from '@/context/branches'
+
 import { mapFn } from './types'
 
 export const DEFAULT_REMOTE_NAME = 'origin'

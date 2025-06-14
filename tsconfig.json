@@ -20,14 +20,14 @@
 
     "baseUrl": "./src",
     "paths": {
-      "@assets/*": ["assets/*"],
-      "@api/*": ["api/*"],
-      "@context/*": ["context/*"],
-      "@common/*": ["components/common/*"],
-      "@lib/*": ["components/lib/*"],
-      "@ui/*": ["components/ui/*"],
-      "@widgets/*": ["components/widgets/*"],
-      "@utils/*": ["utils/*"]
+      "@/assets/*": ["assets/*"],
+      "@/api/*": ["api/*"],
+      "@/context/*": ["context/*"],
+      "@/common/*": ["components/common/*"],
+      "@/lib/*": ["components/lib/*"],
+      "@/ui/*": ["components/ui/*"],
+      "@/widgets/*": ["components/widgets/*"],
+      "@/utils/*": ["utils/*"]
     }
   },
   "include": ["src"],

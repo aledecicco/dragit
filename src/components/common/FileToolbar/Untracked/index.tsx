@@ -1,8 +1,8 @@
 import { IconPlus } from '@tabler/icons-react'
 
-import type { UntrackedFileInfo } from '@api/models'
-import { useAddToIndex } from '@api/mutations'
-import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
+import type { UntrackedFileInfo } from '@/api/models'
+import { useAddToIndex } from '@/api/mutations'
+import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 
 interface UntrackedFileToolbarProps extends Partial<ToolbarProps> {
   /**

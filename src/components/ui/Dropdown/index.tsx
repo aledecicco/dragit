@@ -1,7 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 
-import { Menu, type MenuProps } from '@ui/Menu'
-import { cn } from '@utils/styles'
+import { Menu, type MenuProps } from '@/ui/Menu'
+import { cn } from '@/utils/styles'
 
 interface DropdownProps extends MenuProps {
   /**

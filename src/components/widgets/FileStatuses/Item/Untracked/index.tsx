@@ -1,10 +1,11 @@
 import { IconFileUnknown, IconPlus } from '@tabler/icons-react'
 
-import type { UntrackedFileInfo } from '@api/models'
-import { useAddToIndex } from '@api/mutations'
-import { withContextMenu } from '@lib/ContextMenu'
-import type { ListItemProps } from '@ui/ListItem'
-import { propsWithCn } from '@utils/styles'
+import type { UntrackedFileInfo } from '@/api/models'
+import { useAddToIndex } from '@/api/mutations'
+import { withContextMenu } from '@/lib/ContextMenu'
+import type { ListItemProps } from '@/ui/ListItem'
+import { propsWithCn } from '@/utils/styles'
+
 import { FileStatusItem } from '..'
 
 interface UntrackedFileStatusItemProps extends ListItemProps {

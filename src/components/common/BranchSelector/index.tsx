@@ -1,5 +1,9 @@
-import type { BranchInfo, BranchName } from '@api/models'
-import { Combobox, type ComboboxOption, type ComboboxProps } from '@ui/Combobox'
+import type { BranchInfo, BranchName } from '@/api/models'
+import {
+  Combobox,
+  type ComboboxOption,
+  type ComboboxProps,
+} from '@/ui/Combobox'
 
 interface BranchSelectorProps<T extends boolean>
   extends Partial<

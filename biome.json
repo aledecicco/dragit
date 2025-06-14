@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.0.0-beta.6/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -7,14 +7,35 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["**/src-tauri/**"]
+    "includes": ["**", "!**/src-tauri/**", "!**/*.css"]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space"
   },
-  "organizeImports": {
-    "enabled": true
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              "react-scan",
+              "react",
+              ":PACKAGE_WITH_PROTOCOL:",
+              ":PACKAGE:",
+              ":BLANK_LINE:",
+              "@/assets/**",
+              ":BLANK_LINE:",
+              "@/widgets/**",
+              ":BLANK_LINE:",
+              ":ALIAS:",
+              ":BLANK_LINE:"
+            ]
+          }
+        }
+      }
+    }
   },
   "linter": {
     "enabled": true,
@@ -24,7 +45,18 @@
         "noUnusedVariables": "warn",
         "noSwitchDeclarations": "warn"
       },
-      "nursery": {
+      "nursery": {},
+      "style": {
+        "noParameterAssign": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error",
+        "noUselessElse": "error",
         "useAtIndex": "warn"
       }
     }
@@ -36,11 +68,6 @@
       "semicolons": "asNeeded",
       "arrowParentheses": "always",
       "trailingCommas": "all"
-    }
-  },
-  "css": {
-    "formatter": {
-      "enabled": true
     }
   }
 }

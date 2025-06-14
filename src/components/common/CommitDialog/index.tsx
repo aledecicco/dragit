@@ -1,8 +1,8 @@
 import {
   AskForValueDialog,
   type AskForValueProps,
-} from '@lib/AskForValueDialog'
-import { TextField } from '@ui/Form/TextField'
+} from '@/lib/AskForValueDialog'
+import { TextField } from '@/ui/Form/TextField'
 
 interface CommitFormValues {
   message: string

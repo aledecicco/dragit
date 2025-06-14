@@ -1,10 +1,11 @@
 import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
 
-import { MS_IN_SECOND } from '@utils/time'
-import { pathQueryKey } from '.'
+import { MS_IN_SECOND } from '@/utils/time'
+
 import type { StashInfo } from '../models'
 import { STASHES_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
+import { pathQueryKey } from '.'
 
 const stashesQueryKeys = {
   all: (path: string) =>

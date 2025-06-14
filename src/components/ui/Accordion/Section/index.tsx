@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { IconChevronDown } from '@tabler/icons-react'
-import type { ReactNode } from 'react'
 
-import { Icon } from '@ui/Icon'
-import { cn, propsWithCn } from '@utils/styles'
+import { Icon } from '@/ui/Icon'
+import { cn, propsWithCn } from '@/utils/styles'
+
 import { Accordion } from '..'
 
 interface AccordionSectionProps extends Ariakit.DisclosureContentProps {

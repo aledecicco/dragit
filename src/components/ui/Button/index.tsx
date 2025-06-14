@@ -1,9 +1,9 @@
 import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
-import { Tooltip } from '@ui/Tooltip'
-import { propsWithCn } from '@utils/styles'
-import type { Size } from '@utils/types'
+import { Tooltip } from '@/ui/Tooltip'
+import { propsWithCn } from '@/utils/styles'
+import type { Size } from '@/utils/types'
 
 type ButtonVariant = 'filled' | 'plain'
 

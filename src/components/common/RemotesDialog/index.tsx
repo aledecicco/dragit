@@ -1,13 +1,14 @@
 import { useState } from 'react'
 
-import type { RemoteInfo } from '@api/models'
-import { useQueryRemotes } from '@api/queries'
-import { showDialog } from '@context/dialogs'
-import { QueryList } from '@lib/QueryList'
-import { Button } from '@ui/Button'
-import { Dialog, type DialogProps } from '@ui/Dialog'
-import { cn } from '@utils/styles'
-import { idFn, mapFn } from '@utils/types'
+import type { RemoteInfo } from '@/api/models'
+import { useQueryRemotes } from '@/api/queries'
+import { showDialog } from '@/context/dialogs'
+import { QueryList } from '@/lib/QueryList'
+import { Button } from '@/ui/Button'
+import { Dialog, type DialogProps } from '@/ui/Dialog'
+import { cn } from '@/utils/styles'
+import { idFn, mapFn } from '@/utils/types'
+
 import { RemoteForm } from './Form'
 import { RemotesDialogItem } from './Item'
 

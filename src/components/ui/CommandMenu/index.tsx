@@ -1,12 +1,13 @@
-import * as Ariakit from '@ariakit/react'
 import type { ReactNode } from 'react'
+import * as Ariakit from '@ariakit/react'
 
-import { hideDialog } from '@context/dialogs'
-import { type Shortcut, ShortcutCheatsheet } from '@lib/ShortcutsCheatsheet'
-import { Dialog, type DialogProps } from '@ui/Dialog'
-import { Separator } from '@ui/Separator'
-import { cn, propsWithCn } from '@utils/styles'
-import type { PickPartial } from '@utils/types'
+import { hideDialog } from '@/context/dialogs'
+import { type Shortcut, ShortcutCheatsheet } from '@/lib/ShortcutsCheatsheet'
+import { Dialog, type DialogProps } from '@/ui/Dialog'
+import { Separator } from '@/ui/Separator'
+import { cn, propsWithCn } from '@/utils/styles'
+import type { PickPartial } from '@/utils/types'
+
 import { CommandMenuItem } from './Item'
 
 interface CommandMenuProps

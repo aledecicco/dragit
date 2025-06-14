@@ -1,8 +1,8 @@
 import { invoke } from '@tauri-apps/api/core'
 
-import { pathMutationKey } from '.'
 import type { RemoteName } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
+import { pathMutationKey } from '.'
 
 const renameRemoteKey = (path: string) =>
   ({
@@ -13,10 +13,7 @@ const renameRemoteKey = (path: string) =>
 const renameRemoteMutation = (path: string) =>
   mutationOptions({
     mutationKey: [renameRemoteKey(path)],
-    mutationFn: (args: {
-      name: RemoteName
-      newName: RemoteName
-    }) => {
+    mutationFn: (args: { name: RemoteName; newName: RemoteName }) => {
       return invoke('rename_remote', { path: path, ...args })
     },
     networkMode: 'always',

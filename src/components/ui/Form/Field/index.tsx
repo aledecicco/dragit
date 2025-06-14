@@ -1,7 +1,7 @@
-import * as Ariakit from '@ariakit/react'
 import type { ComponentProps } from 'react'
+import * as Ariakit from '@ariakit/react'
 
-import { cn, propsWithCn } from '@utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface FormFieldProps extends Ariakit.FormInputProps {
   /**

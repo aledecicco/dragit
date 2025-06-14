@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react'
 import {
   IconMenuDeep,
   IconRefresh,
@@ -5,24 +6,23 @@ import {
   IconWorldCancel,
   IconWorldQuestion,
 } from '@tabler/icons-react'
-import type { ComponentProps } from 'react'
 
-import type { RemoteInfo } from '@api/models'
-import { useFetchRemote } from '@api/mutations'
-import { useQueryBranches, useQueryRemotes } from '@api/queries'
-import { showRemotesDialog } from '@common/RemotesDialog'
+import type { RemoteInfo } from '@/api/models'
+import { useFetchRemote } from '@/api/mutations'
+import { useQueryBranches, useQueryRemotes } from '@/api/queries'
+import { showRemotesDialog } from '@/common/RemotesDialog'
 import {
   changeUpstreamBranch,
   changeUpstreamRemote,
   useSelectedUpstream,
-} from '@context/upstream'
-import { ActionButton } from '@lib/ActionButton'
-import { Button } from '@ui/Button'
-import { Combobox, type ComboboxOption } from '@ui/Combobox'
-import { EditableText } from '@ui/EditableText'
-import { Icon } from '@ui/Icon'
-import { useSelectedBranches } from '@utils/repository'
-import { cn, propsWithCn } from '@utils/styles'
+} from '@/context/upstream'
+import { ActionButton } from '@/lib/ActionButton'
+import { Button } from '@/ui/Button'
+import { Combobox, type ComboboxOption } from '@/ui/Combobox'
+import { EditableText } from '@/ui/EditableText'
+import { Icon } from '@/ui/Icon'
+import { useSelectedBranches } from '@/utils/repository'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface CurrentRemoteProps extends ComponentProps<'div'> {}
 

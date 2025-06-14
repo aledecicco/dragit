@@ -1,10 +1,10 @@
-import * as Ariakit from '@ariakit/react'
 import { type ComponentType, type HTMLAttributes, useState } from 'react'
+import * as Ariakit from '@ariakit/react'
 import { useEffectOnce } from 'react-use'
 
-import { Menu, type MenuProps } from '@ui/Menu'
-import { cn } from '@utils/styles'
-import type { AnyObject } from '@utils/types'
+import { Menu, type MenuProps } from '@/ui/Menu'
+import { cn } from '@/utils/styles'
+import type { AnyObject } from '@/utils/types'
 
 interface ContextMenuProps {
   contextMenuItems: MenuProps['items']

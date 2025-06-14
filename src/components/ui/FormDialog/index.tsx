@@ -1,11 +1,11 @@
-import { hideDialog } from '@context/dialogs'
-import { Dialog, type DialogProps } from '@ui/Dialog'
-import { Form, type FormProps } from '@ui/Form'
+import { hideDialog } from '@/context/dialogs'
+import { Dialog, type DialogProps } from '@/ui/Dialog'
+import { Form, type FormProps } from '@/ui/Form'
 import {
   FormSubmitButton,
   type FormSubmitButtonProps,
-} from '@ui/Form/SubmitButton'
-import type { AnyObject } from '@utils/types'
+} from '@/ui/Form/SubmitButton'
+import type { AnyObject } from '@/utils/types'
 
 interface FormDialogProps<T extends AnyObject> extends DialogProps {
   /**

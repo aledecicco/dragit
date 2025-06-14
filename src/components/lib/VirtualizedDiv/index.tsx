@@ -1,14 +1,15 @@
-import {
-  type VirtualizerOptions,
-  useVirtualizer,
-} from '@tanstack/react-virtual'
 import { type ReactNode, useRef } from 'react'
+import {
+  useVirtualizer,
+  type VirtualizerOptions,
+} from '@tanstack/react-virtual'
 
 import {
   ScrollShadowDiv,
   type ScrollShadowDivProps,
-} from '@lib/ScrollShadowDiv'
-import { cn } from '@utils/styles'
+} from '@/lib/ScrollShadowDiv'
+import { cn } from '@/utils/styles'
+
 import { VirtualizedDivItem } from './Item'
 
 interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {

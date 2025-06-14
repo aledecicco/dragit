@@ -1,14 +1,15 @@
 import {
+  createContext,
   type PropsWithChildren,
   type RefObject,
-  createContext,
   useContext,
   useEffect,
   useRef,
   useState,
 } from 'react'
 
-import type { LiteralUnion } from '@utils/types'
+import type { LiteralUnion } from '@/utils/types'
+
 import { useRefreshCanvas } from './utils'
 
 type ElementId = string

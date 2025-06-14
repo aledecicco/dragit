@@ -1,10 +1,10 @@
 import { useRef } from 'react'
 import { match } from 'ts-pattern'
 
-import { Button, type ButtonProps } from '@ui/Button'
-import { Dropdown } from '@ui/Dropdown'
-import type { MenuItem } from '@ui/Menu'
-import { cn, propsWithCn } from '@utils/styles'
+import { Button, type ButtonProps } from '@/ui/Button'
+import { Dropdown } from '@/ui/Dropdown'
+import type { MenuItem } from '@/ui/Menu'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface SplitButtonProps extends Omit<ButtonProps, 'round'> {
   /**

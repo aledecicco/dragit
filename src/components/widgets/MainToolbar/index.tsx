@@ -4,12 +4,12 @@ import {
   IconPackage,
 } from '@tabler/icons-react'
 
-import type { FileType } from '@api/models'
-import { useAddToIndex, useCommitIndex, useSaveStash } from '@api/mutations'
-import { CommitDialog } from '@common/CommitDialog'
-import { FileSelectorDialog } from '@common/FileSelectorDialog'
-import { askForValue } from '@lib/AskForValueDialog'
-import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
+import type { FileType } from '@/api/models'
+import { useAddToIndex, useCommitIndex, useSaveStash } from '@/api/mutations'
+import { CommitDialog } from '@/common/CommitDialog'
+import { FileSelectorDialog } from '@/common/FileSelectorDialog'
+import { askForValue } from '@/lib/AskForValueDialog'
+import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 
 interface MainToolbarProps extends Partial<ToolbarProps> {}
 

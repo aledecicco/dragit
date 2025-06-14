@@ -1,15 +1,15 @@
-import { IconTrash } from '@tabler/icons-react'
 import type { ComponentProps } from 'react'
+import { IconTrash } from '@tabler/icons-react'
 
-import type { RemoteInfo } from '@api/models'
+import type { RemoteInfo } from '@/api/models'
 import {
   useChangeRemoteUrl,
   useRemoveRemote,
   useRenameRemote,
-} from '@api/mutations'
-import { ActionButton } from '@lib/ActionButton'
-import { EditableText } from '@ui/EditableText'
-import { cn, propsWithCn } from '@utils/styles'
+} from '@/api/mutations'
+import { ActionButton } from '@/lib/ActionButton'
+import { EditableText } from '@/ui/EditableText'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface RemotesDialogItemProps extends ComponentProps<'div'> {
   /**

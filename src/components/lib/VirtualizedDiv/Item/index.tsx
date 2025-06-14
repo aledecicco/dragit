@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react'
 
-import { propsWithCn } from '@utils/styles'
+import { propsWithCn } from '@/utils/styles'
 
 interface VirtualizedDivItemProps extends ComponentProps<'div'> {
   /**

@@ -1,31 +1,63 @@
+import { useRef, useState } from 'react'
 import {
   IconAlertTriangleFilled,
   IconCircleCheckFilled,
   IconLoader2,
 } from '@tabler/icons-react'
-import { useRef, useState } from 'react'
 import { match } from 'ts-pattern'
 
-import type { ButtonStatus } from '@ui/Button'
-import type { Glyph } from '@ui/Icon'
-import { MS_IN_SECOND } from '@utils/time'
+import type { ButtonStatus } from '@/ui/Button'
+import type { Glyph } from '@/ui/Icon'
+import { MS_IN_SECOND } from '@/utils/time'
 
 interface ActionDescription {
+  /**
+   * Icon to display during the idle state.
+   */
   Glyph: Glyph
-  label: string | { [T in ActionState]: string }
+
+  /**
+   * Collection of labels for the action, depending on its state.
+   */
+  label: { [T in ActionState]: string }
 }
 
 interface Action extends ActionDescription {
+  /**
+   * Async function that performs the action.
+   */
   run: () => Promise<unknown>
 }
 
 type ActionState = 'idle' | 'running' | 'success' | 'error'
 
 interface ActionTracker {
+  /**
+   * Icon to display.
+   */
   Glyph: Glyph
+
+  /**
+   * Label to display.
+   */
   label: string
+
+  /**
+   * The status of the button, used for styling.
+   */
   buttonStatus: ButtonStatus
+
+  /**
+   * The current state of the action being tracked.
+   */
   actionState: ActionState
+
+  /**
+   * A callback to trigger and start tracking an action.
+   *
+   * @param promise - The promise that runs the action.
+   * @param action - The description of the action.
+   */
   trackAction: (promise: Promise<unknown>, action: ActionDescription) => void
 }
 
@@ -38,12 +70,7 @@ interface ActionTracker {
  * @param mainAction - The main action to use as default.
  * @param defaultStatus - The default status of the button while idle (used during running state also).
  *
- * @returns An object containing:
- * - `Glyph`: The icon to display in the button.
- * - `label`: The label to display in the button.
- * - `buttonStatus`: The status of the button, used for styling.
- * - `actionState`: The current state of the action being tracked.
- * - `trackAction`: A callback to trigger and start tracking an action.
+ * @returns An {@link ActionTracker}
  */
 const useActionTracker = (
   mainAction: ActionDescription,

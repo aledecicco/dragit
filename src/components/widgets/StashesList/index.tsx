@@ -1,13 +1,14 @@
 import type { ComponentProps } from 'react'
 
-import type { StashInfo } from '@api/models'
-import { useQueryStashes } from '@api/queries'
-import { QueryList } from '@lib/QueryList'
-import { Accordion } from '@ui/Accordion'
-import { AccordionSection } from '@ui/Accordion/Section'
-import { Chip } from '@ui/Chip'
-import { propsWithCn } from '@utils/styles'
-import { idFn, mapFn } from '@utils/types'
+import type { StashInfo } from '@/api/models'
+import { useQueryStashes } from '@/api/queries'
+import { QueryList } from '@/lib/QueryList'
+import { Accordion } from '@/ui/Accordion'
+import { AccordionSection } from '@/ui/Accordion/Section'
+import { Chip } from '@/ui/Chip'
+import { propsWithCn } from '@/utils/styles'
+import { idFn, mapFn } from '@/utils/types'
+
 import { StashesListItem } from './Item'
 
 interface StashesListProps extends ComponentProps<'div'> {}

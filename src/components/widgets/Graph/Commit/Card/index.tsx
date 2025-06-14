@@ -1,10 +1,10 @@
 import * as Ariakit from '@ariakit/react'
 
-import type { CommitInfo } from '@api/models'
-import { showCommitDetailsDialog } from '@common/CommitDetailsDialog'
-import { Marquee } from '@ui/Marquee'
-import { cn, propsWithCn } from '@utils/styles'
-import { useDateDifference } from '@utils/time'
+import type { CommitInfo } from '@/api/models'
+import { showCommitDetailsDialog } from '@/common/CommitDetailsDialog'
+import { Marquee } from '@/ui/Marquee'
+import { cn, propsWithCn } from '@/utils/styles'
+import { useDateDifference } from '@/utils/time'
 
 interface GraphCommitCardProps extends Ariakit.ButtonProps {
   /**

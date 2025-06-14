@@ -1,6 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 
-import { cn, propsWithCn } from '@utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface AutosuggestItemProps extends Ariakit.ComboboxItemProps {}
 

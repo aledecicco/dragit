@@ -1,8 +1,8 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import type { DiffType, FileDiff } from '@api/models'
-import { cn, propsWithCn } from '@utils/styles'
+import type { DiffType, FileDiff } from '@/api/models'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface DiffViewerLineChangesProps extends ComponentProps<'div'> {
   /**
@@ -42,10 +42,7 @@ const DiffViewerLineChanges = (props: DiffViewerLineChangesProps) => {
  * @param props.diffType - The type of diff for the line.
  * @param props.empty - Whether this cell should be empty.
  */
-const LineChangesCell = (props: {
-  diffType: DiffType
-  empty?: boolean
-}) => {
+const LineChangesCell = (props: { diffType: DiffType; empty?: boolean }) => {
   const { diffType, empty } = props
 
   return (

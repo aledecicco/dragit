@@ -1,7 +1,8 @@
 import type { ComponentProps } from 'react'
 
-import { Accordion } from '@ui/Accordion'
-import { propsWithCn } from '@utils/styles'
+import { Accordion } from '@/ui/Accordion'
+import { propsWithCn } from '@/utils/styles'
+
 import { FileStatusesSection } from './Section'
 
 interface FileStatusesProps extends ComponentProps<'div'> {}

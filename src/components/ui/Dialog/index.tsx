@@ -1,9 +1,9 @@
-import * as Ariakit from '@ariakit/react'
 import type { ComponentProps, ReactNode } from 'react'
+import * as Ariakit from '@ariakit/react'
 
-import { type DialogKey, hideDialog } from '@context/dialogs'
-import { Button } from '@ui/Button'
-import { cn, propsWithCn } from '@utils/styles'
+import { type DialogKey, hideDialog } from '@/context/dialogs'
+import { Button } from '@/ui/Button'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface DialogProps extends Ariakit.DialogProps {
   /**

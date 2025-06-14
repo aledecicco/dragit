@@ -1,9 +1,9 @@
 import type { ComponentProps } from 'react'
-
 import { IconReload } from '@tabler/icons-react'
-import { Button } from '@ui/Button'
-import { Icon } from '@ui/Icon'
-import { cn, propsWithCn } from '@utils/styles'
+
+import { Button } from '@/ui/Button'
+import { Icon } from '@/ui/Icon'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface RetryErrorProps extends ComponentProps<'div'> {
   /**

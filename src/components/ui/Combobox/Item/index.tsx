@@ -1,6 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 
-import { cn } from '@utils/styles'
+import { cn } from '@/utils/styles'
+
 import type { ComboboxOption } from '..'
 
 interface ComboboxItemProps<T> extends Ariakit.SelectItemProps {

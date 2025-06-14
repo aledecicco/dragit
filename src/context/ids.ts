@@ -1,5 +1,5 @@
-import { Store } from '@tanstack/react-store'
 import { useState } from 'react'
+import { Store } from '@tanstack/react-store'
 
 interface Ids {
   nextId: number

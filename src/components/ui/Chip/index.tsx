@@ -1,8 +1,8 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import { propsWithCn } from '@utils/styles'
-import type { Size } from '@utils/types'
+import { propsWithCn } from '@/utils/styles'
+import type { Size } from '@/utils/types'
 
 interface ChipProps extends ComponentProps<'div'> {
   /**

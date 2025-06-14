@@ -1,13 +1,14 @@
+import { type ReactNode, startTransition, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
-import { type ReactNode, startTransition, useState } from 'react'
 
-import { Button, type ButtonProps } from '@ui/Button'
-import { type Glyph, Icon } from '@ui/Icon'
-import { Marquee } from '@ui/Marquee'
-import { Separator } from '@ui/Separator'
-import { mapOr } from '@utils/array'
-import { cn, propsWithCn } from '@utils/styles'
+import { Button, type ButtonProps } from '@/ui/Button'
+import { type Glyph, Icon } from '@/ui/Icon'
+import { Marquee } from '@/ui/Marquee'
+import { Separator } from '@/ui/Separator'
+import { mapOr } from '@/utils/array'
+import { cn, propsWithCn } from '@/utils/styles'
+
 import { ComboboxItem } from './Item'
 
 interface ComboboxOption<T> {

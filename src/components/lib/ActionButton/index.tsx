@@ -1,7 +1,8 @@
-import { Button, type ButtonProps } from '@ui/Button'
-import { Icon } from '@ui/Icon'
-import { SplitButton } from '@ui/SplitButton'
-import { cn } from '@utils/styles'
+import { Button, type ButtonProps } from '@/ui/Button'
+import { Icon } from '@/ui/Icon'
+import { SplitButton } from '@/ui/SplitButton'
+import { cn } from '@/utils/styles'
+
 import { type Action, type ActionState, useActionTracker } from './utils'
 
 interface ActionButtonProps extends ButtonProps {
@@ -19,7 +20,7 @@ interface ActionButtonProps extends ButtonProps {
 
   /**
    * Whether to display the button in its compact form,
-   * displaying only its icon, and with its label in a tooltip
+   * displaying only its icon, and with its label in a tooltip.
    */
   compact?: boolean
 
@@ -43,10 +44,7 @@ const ActionButton = (props: ActionButtonProps) => {
 
   const menuItems =
     alternatives?.map((alternative) => ({
-      label:
-        typeof alternative.label === 'string'
-          ? alternative.label
-          : alternative.label.idle,
+      label: alternative.label.idle,
       onClick: () => {
         trackAction(alternative.run(), alternative)
       },

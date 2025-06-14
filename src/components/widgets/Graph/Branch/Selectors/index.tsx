@@ -1,13 +1,13 @@
 import { IconSwitchHorizontal } from '@tabler/icons-react'
 
-import { useCheckoutLocal } from '@api/mutations'
-import { useQueryBranches, useQueryHeadInfo } from '@api/queries'
-import { BranchSelector } from '@common/BranchSelector'
-import { changeBaseRef, useSelectedRefs } from '@context/branches'
-import { ActionButton } from '@lib/ActionButton'
-import { useBranch } from '@utils/repository'
-import { cn } from '@utils/styles'
-import { mapFn } from '@utils/types'
+import { useCheckoutLocal } from '@/api/mutations'
+import { useQueryBranches, useQueryHeadInfo } from '@/api/queries'
+import { BranchSelector } from '@/common/BranchSelector'
+import { changeBaseRef, useSelectedRefs } from '@/context/branches'
+import { ActionButton } from '@/lib/ActionButton'
+import { useBranch } from '@/utils/repository'
+import { cn } from '@/utils/styles'
+import { mapFn } from '@/utils/types'
 
 /**
  * Controls to select the main branch and the base branch.

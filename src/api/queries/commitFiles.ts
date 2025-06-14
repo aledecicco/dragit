@@ -1,19 +1,19 @@
 import {
   type QueryFunctionContext,
-  type UseQueryResult,
   queryOptions,
+  type UseQueryResult,
 } from '@tanstack/react-query'
-import { P, match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
-import { commitInfoQueryKeys } from '.'
 import type {
-  CommitId,
   CommitedFileInfo,
   CommitedFileStatus,
+  CommitId,
   Page,
 } from '../models'
 import { COMMIT_FILES_PAGE_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
+import { commitInfoQueryKeys } from '.'
 
 export const COMMIT_FILES_PAGE_SIZE = 1000
 

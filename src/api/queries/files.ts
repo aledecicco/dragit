@@ -1,12 +1,12 @@
 import {
   type QueryFunctionContext,
-  type UseQueryResult,
   queryOptions,
+  type UseQueryResult,
 } from '@tanstack/react-query'
-import { P, match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
-import { useFilesPage } from '@context/pages'
-import { pathQueryKey } from '.'
+import { useFilesPage } from '@/context/pages'
+
 import type {
   ChangeStatus,
   FileInfo,
@@ -24,6 +24,7 @@ import {
   getFileTypeFilter,
   useRepositoryQuery,
 } from '../utils'
+import { pathQueryKey } from '.'
 
 export const FILE_STATUSES_PAGE_SIZE = 1000
 

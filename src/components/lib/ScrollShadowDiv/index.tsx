@@ -1,8 +1,8 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import { cn, propsWithCn } from '@utils/styles'
-import type { Size } from '@utils/types'
+import { cn, propsWithCn } from '@/utils/styles'
+import type { Size } from '@/utils/types'
 
 interface ScrollShadowDivProps extends ComponentProps<'div'> {
   /**

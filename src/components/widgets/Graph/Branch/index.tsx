@@ -1,11 +1,12 @@
 import type { VirtualItem } from '@tanstack/react-virtual'
 
-import { useQueryBranchDivergence, useQueryCommitHistory } from '@api/queries'
-import { useSelectedRefs } from '@context/branches'
-import { useSelectedUpstream } from '@context/upstream'
-import { useBranch } from '@utils/repository'
-import { cn } from '@utils/styles'
-import { mapFn } from '@utils/types'
+import { useQueryBranchDivergence, useQueryCommitHistory } from '@/api/queries'
+import { useSelectedRefs } from '@/context/branches'
+import { useSelectedUpstream } from '@/context/upstream'
+import { useBranch } from '@/utils/repository'
+import { cn } from '@/utils/styles'
+import { mapFn } from '@/utils/types'
+
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
 import {
   ancestorIsDivergent,

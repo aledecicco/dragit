@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api/core'
 
-import { pathMutationKey } from '.'
 import { mutationOptions, useRepositoryMutation } from '../utils'
+import { pathMutationKey } from '.'
 
 const removeFromIndexKey = (path: string) =>
   ({

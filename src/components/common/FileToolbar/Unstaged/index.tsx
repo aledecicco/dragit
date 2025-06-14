@@ -1,8 +1,8 @@
 import { IconPlus } from '@tabler/icons-react'
 
-import type { UnstagedFileInfo } from '@api/models'
-import { useAddToIndex } from '@api/mutations'
-import { Toolbar, type ToolbarProps } from '@ui/Toolbar'
+import type { UnstagedFileInfo } from '@/api/models'
+import { useAddToIndex } from '@/api/mutations'
+import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 
 interface UnstagedFileToolbarProps extends Partial<ToolbarProps> {
   /**

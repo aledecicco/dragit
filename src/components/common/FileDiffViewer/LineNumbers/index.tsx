@@ -1,8 +1,8 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import type { DiffType, FileDiff } from '@api/models'
-import { cn, propsWithCn } from '@utils/styles'
+import type { DiffType, FileDiff } from '@/api/models'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface DiffViewerLineNumbersProps extends ComponentProps<'div'> {
   /**

@@ -5,16 +5,16 @@ import {
   IconTrash,
 } from '@tabler/icons-react'
 
-import type { StashInfo } from '@api/models'
-import { useApplyStash, useDiscardStash } from '@api/mutations'
-import { ChangesSummary } from '@common/DiffSummary'
-import { StashToolbar } from '@common/StashToolbar'
-import { withContextMenu } from '@lib/ContextMenu'
-import { Icon } from '@ui/Icon'
-import { ListItem, type ListItemProps } from '@ui/ListItem'
-import { Marquee } from '@ui/Marquee'
-import { cn, propsWithCn } from '@utils/styles'
-import { useDateDifference } from '@utils/time'
+import type { StashInfo } from '@/api/models'
+import { useApplyStash, useDiscardStash } from '@/api/mutations'
+import { ChangesSummary } from '@/common/DiffSummary'
+import { StashToolbar } from '@/common/StashToolbar'
+import { withContextMenu } from '@/lib/ContextMenu'
+import { Icon } from '@/ui/Icon'
+import { ListItem, type ListItemProps } from '@/ui/ListItem'
+import { Marquee } from '@/ui/Marquee'
+import { cn, propsWithCn } from '@/utils/styles'
+import { useDateDifference } from '@/utils/time'
 
 interface StashesListItemProps extends ListItemProps {
   /**
@@ -88,9 +88,14 @@ const StashesListItem = withContextMenu<StashesListItemProps>(
             'flex flex-row justify-between items-end gap-x-2',
           )}
         >
-          <Marquee className={cn('text-xs text-light-950/60')} reverse={false}>
+          <p
+            className={cn(
+              'text-xs text-light-950/60',
+              'text-nowrap overflow-hidden text-ellipsis',
+            )}
+          >
             Stashed {stashedTime}
-          </Marquee>
+          </p>
 
           <Marquee className={cn('text-xs')} reverse={false}>
             {stash.changes ? (

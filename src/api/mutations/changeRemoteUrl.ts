@@ -1,8 +1,8 @@
 import { invoke } from '@tauri-apps/api/core'
 
-import { pathMutationKey } from '.'
 import type { RemoteName } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
+import { pathMutationKey } from '.'
 
 const changeRemoteUrlKey = (path: string) =>
   ({
@@ -13,10 +13,7 @@ const changeRemoteUrlKey = (path: string) =>
 const changeRemoteUrlMutation = (path: string) =>
   mutationOptions({
     mutationKey: [changeRemoteUrlKey(path)],
-    mutationFn: (args: {
-      name: RemoteName
-      url: string
-    }) => {
+    mutationFn: (args: { name: RemoteName; url: string }) => {
       return invoke('change_remote_url', { path: path, ...args })
     },
     networkMode: 'always',

@@ -1,9 +1,9 @@
-import type { IconProps as TablerIconProps } from '@tabler/icons-react'
 import type { ComponentType } from 'react'
+import type { IconProps as TablerIconProps } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
-import { propsWithCn } from '@utils/styles'
-import type { LiteralUnion, Size } from '@utils/types'
+import { propsWithCn } from '@/utils/styles'
+import type { LiteralUnion, Size } from '@/utils/types'
 
 type Glyph = ComponentType<TablerIconProps>
 

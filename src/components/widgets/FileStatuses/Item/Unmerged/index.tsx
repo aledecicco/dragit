@@ -1,11 +1,12 @@
 import { IconCheck, IconFileAlert, IconTrash } from '@tabler/icons-react'
-import { P, match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
-import type { UnmergedFileInfo } from '@api/models'
-import { useAddToIndex, useRemoveFromTree } from '@api/mutations'
-import { withContextMenu } from '@lib/ContextMenu'
-import type { ListItemProps } from '@ui/ListItem'
-import { cn, propsWithCn } from '@utils/styles'
+import type { UnmergedFileInfo } from '@/api/models'
+import { useAddToIndex, useRemoveFromTree } from '@/api/mutations'
+import { withContextMenu } from '@/lib/ContextMenu'
+import type { ListItemProps } from '@/ui/ListItem'
+import { cn, propsWithCn } from '@/utils/styles'
+
 import { FileStatusItem } from '..'
 
 interface UnmergedFileStatusItemProps extends ListItemProps {
@@ -28,7 +29,12 @@ const UnmergedFileStatusItem = withContextMenu<UnmergedFileStatusItemProps>(
         file={file}
         Glyph={IconFileAlert}
         statusMessage={
-          <p className={cn('text-xs text-warning-400/50')}>
+          <p
+            className={cn(
+              'text-xs text-warning-400/50',
+              'text-nowrap overflow-hidden text-ellipsis',
+            )}
+          >
             {match(file.changes)
               .with('addedByThem', () => 'Added by incoming changes')
               .with('addedByUs', () => 'Added by local changes')

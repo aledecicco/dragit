@@ -1,9 +1,9 @@
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import type { ComponentProps } from 'react'
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 
-import { Button, type ButtonProps } from '@ui/Button'
-import { Icon } from '@ui/Icon'
-import { cn, propsWithCn } from '@utils/styles'
+import { Button, type ButtonProps } from '@/ui/Button'
+import { Icon } from '@/ui/Icon'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface PaginationProps extends ComponentProps<'div'> {
   /**

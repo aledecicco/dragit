@@ -1,11 +1,12 @@
 import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
-import { P, match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
-import { MS_IN_SECOND } from '@utils/time'
-import { pathQueryKey } from '.'
+import { MS_IN_SECOND } from '@/utils/time'
+
 import type { BranchInfo, RemoteRef } from '../models'
 import { BRANCHES_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
+import { pathQueryKey } from '.'
 
 const branchesQueryKeys = {
   all: (path: string) =>
