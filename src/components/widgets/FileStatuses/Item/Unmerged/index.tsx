@@ -2,7 +2,6 @@ import { IconCheck, IconFileAlert, IconTrash } from '@tabler/icons-react'
 import { match, P } from 'ts-pattern'
 
 import type { UnmergedFileInfo } from '@/api/models'
-import { useAddToIndex, useRemoveFromTree } from '@/api/mutations'
 import { withContextMenu } from '@/lib/ContextMenu'
 import type { ListItemProps } from '@/ui/ListItem'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -56,19 +55,16 @@ const UnmergedFileStatusItem = withContextMenu<UnmergedFileStatusItemProps>(
     )
   },
   ({ file }) => {
-    const stage = useAddToIndex()
-    const remove = useRemoveFromTree()
-
     return [
       {
         label: 'Mark as resolved',
         Glyph: IconCheck,
-        onClick: () => stage.mutateAsync({ files: [file.path] }),
+        onClick: () => {}, // TODO: resolve,
       },
       ...match(file.changes)
         .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => [
           {
-            onClick: () => remove.mutateAsync({ files: [file.path] }),
+            onClick: () => {}, // TODO: delete
             label: 'Delete',
             Glyph: IconTrash,
           },

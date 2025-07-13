@@ -1,4 +1,7 @@
+import { IconPackage } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
+
+import type { Action } from '@/context/actions'
 
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
@@ -12,12 +15,36 @@ const saveStashKey = (path: string) =>
 const saveStashMutation = (path: string) =>
   mutationOptions({
     mutationKey: [saveStashKey(path)],
-    mutationFn: (args: { message: string; includeUntracked: boolean }) => {
+    mutationFn: (args: {
+      files: string[]
+      message: string | null
+      includeUntracked: boolean
+    }) => {
       return invoke('stash', { path: path, ...args })
     },
     networkMode: 'always',
   })
 
-const useSaveStash = () => useRepositoryMutation(saveStashMutation)
+const useQuickStash = (): Action => {
+  const saveStash = useRepositoryMutation(saveStashMutation)
 
-export { useSaveStash, saveStashKey }
+  return {
+    id: 'quick_stash',
+    run: async () => {
+      await saveStash.mutateAsync({
+        files: ['.'],
+        message: null,
+        includeUntracked: true,
+      })
+    },
+    label: {
+      idle: 'Stash',
+      running: 'Stashing',
+      success: 'Stashed',
+      error: 'Failed',
+    },
+    Glyph: IconPackage,
+  }
+}
+
+export { useQuickStash, saveStashKey }

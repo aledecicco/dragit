@@ -1,8 +1,6 @@
-import { IconMinus } from '@tabler/icons-react'
-
 import type { StagedFileInfo } from '@/api/models'
-import { useRemoveFromIndex } from '@/api/mutations'
-import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
+import { useUnstageFile } from '@/api/mutations'
+import { Toolbar, type ToolbarProps, type ToolbarTool } from '@/ui/Toolbar'
 
 interface StagedFileToolbarProps extends Partial<ToolbarProps> {
   /**
@@ -16,20 +14,11 @@ interface StagedFileToolbarProps extends Partial<ToolbarProps> {
  */
 const StagedFileToolbar = (props: StagedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
-  const unstage = useRemoveFromIndex()
 
-  const tools = [
+  const unstage = useUnstageFile(file)
+  const tools: ToolbarTool[] = [
     {
-      action: {
-        run: () => unstage.mutateAsync({ files: [file.path] }),
-        label: {
-          idle: 'Unstage',
-          running: 'Unstaging',
-          success: 'Unstaged',
-          error: 'Failed',
-        },
-        Glyph: IconMinus,
-      },
+      mainAction: unstage,
     },
   ]
 

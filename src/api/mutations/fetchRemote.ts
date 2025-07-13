@@ -1,4 +1,7 @@
+import { IconRefresh } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
+
+import type { Action } from '@/context/actions'
 
 import type { RemoteName } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
@@ -19,6 +22,28 @@ const fetchRemoteMutation = (path: string) =>
     networkMode: 'online',
   })
 
-const useFetchRemote = () => useRepositoryMutation(fetchRemoteMutation)
+const useFetchRemote = (remote: RemoteName | undefined): Action => {
+  const fetchRemote = useRepositoryMutation(fetchRemoteMutation)
+
+  return {
+    id: `fetch_remote:${remote}`,
+    run: async () => {
+      if (!remote) {
+        throw new Error('No remote specified')
+      }
+
+      await fetchRemote.mutateAsync({
+        remote,
+      })
+    },
+    label: {
+      idle: 'Fetch remote',
+      running: 'Fetching remote',
+      success: 'Remote fetched',
+      error: 'Failed',
+    },
+    Glyph: IconRefresh,
+  }
+}
 
 export { useFetchRemote, fetchRemoteKey }

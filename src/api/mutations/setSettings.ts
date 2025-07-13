@@ -14,6 +14,7 @@ const setSettingsMutation = mutationOptions({
   networkMode: 'always',
 })
 
+// TODO: action?
 const useSetSettings = () => useMutation(setSettingsMutation)
 
 export { useSetSettings, setSettingsKey }

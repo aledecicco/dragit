@@ -1,8 +1,6 @@
-import { IconPlus } from '@tabler/icons-react'
-
 import type { UntrackedFileInfo } from '@/api/models'
-import { useAddToIndex } from '@/api/mutations'
-import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
+import { useStageFile } from '@/api/mutations'
+import { Toolbar, type ToolbarProps, type ToolbarTool } from '@/ui/Toolbar'
 
 interface UntrackedFileToolbarProps extends Partial<ToolbarProps> {
   /**
@@ -16,20 +14,11 @@ interface UntrackedFileToolbarProps extends Partial<ToolbarProps> {
  */
 const UntrackedFileToolbar = (props: UntrackedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
-  const stage = useAddToIndex()
 
-  const tools = [
+  const stage = useStageFile(file)
+  const tools: ToolbarTool[] = [
     {
-      action: {
-        run: () => stage.mutateAsync({ files: [file.path] }),
-        label: {
-          idle: 'Stage',
-          running: 'Staging',
-          success: 'Staged',
-          error: 'Failed',
-        },
-        Glyph: IconPlus,
-      },
+      mainAction: stage,
     },
   ]
 

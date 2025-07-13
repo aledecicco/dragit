@@ -1,5 +1,9 @@
+import { IconMinus } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
+import type { Action } from '@/context/actions'
+
+import type { FileInfo } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
@@ -18,6 +22,22 @@ const removeFromIndexMutation = (path: string) =>
     networkMode: 'always',
   })
 
-const useRemoveFromIndex = () => useRepositoryMutation(removeFromIndexMutation)
+const useUnstageFile = (file: FileInfo): Action => {
+  const unstage = useRepositoryMutation(removeFromIndexMutation)
 
-export { useRemoveFromIndex, removeFromIndexKey }
+  return {
+    id: `unstage:${file.path}`,
+    run: async () => {
+      await unstage.mutateAsync({ files: [file.path] })
+    },
+    label: {
+      idle: 'Unstage',
+      running: 'Unstaging',
+      success: 'Unstaged',
+      error: 'Failed to unstage',
+    },
+    Glyph: IconMinus,
+  }
+}
+
+export { useUnstageFile, removeFromIndexKey }

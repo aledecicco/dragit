@@ -13,6 +13,7 @@ const removeRecentFolderMutation = mutationOptions({
   networkMode: 'always',
 })
 
+// TODO: action?
 const useRemoveRecentFolder = () => useMutation(removeRecentFolderMutation)
 
 export { useRemoveRecentFolder, removeRecentFolderKey }

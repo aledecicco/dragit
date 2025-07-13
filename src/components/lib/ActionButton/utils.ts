@@ -1,4 +1,3 @@
-import { useRef, useState } from 'react'
 import {
   IconAlertTriangleFilled,
   IconCircleCheckFilled,
@@ -6,59 +5,53 @@ import {
 } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
+import {
+  type Action,
+  type ActionDescription,
+  type ActionId,
+  useActionStatuses,
+} from '@/context/actions'
 import type { ButtonStatus } from '@/ui/Button'
 import type { Glyph } from '@/ui/Icon'
-import { MS_IN_SECOND } from '@/utils/time'
 
-interface ActionDescription {
-  /**
-   * Icon to display during the idle state.
-   */
-  Glyph: Glyph
+/**
+ * A hook that provides the necessary info to correctly display an action button tracking the given action.
+ *
+ * @param action - The action to track.
+ * @param defaultStatus - The default status of the button while idle (used during running state also).
+ *
+ * @returns An object containing:
+ * - `Glyph`: The icon to display based on the action status.
+ * - `label`: The label to display based on the action status.
+ * - `actionStatus`: The current status of the action.
+ * - `buttonStatus`: The status to use for the button.
+ */
+const useActionButtonPresenter = (
+  actionId: ActionId,
+  actionDescription: ActionDescription,
+  defaultStatus: ButtonStatus,
+) => {
+  const actionStatus = useActionStatuses(actionId)
 
-  /**
-   * Collection of labels for the action, depending on its state.
-   */
-  label: { [T in ActionState]: string }
-}
+  const Glyph = match(actionStatus)
+    .returnType<Glyph>()
+    .with('idle', () => actionDescription.Glyph)
+    .with('running', () => IconLoader2)
+    .with('success', () => IconCircleCheckFilled)
+    .with('error', () => IconAlertTriangleFilled)
+    .exhaustive()
 
-interface Action extends ActionDescription {
-  /**
-   * Async function that performs the action.
-   */
-  run: () => Promise<unknown>
-}
+  const label = actionDescription.label[actionStatus]
 
-type ActionState = 'idle' | 'running' | 'success' | 'error'
+  const buttonStatus = match(actionStatus)
+    .returnType<ButtonStatus>()
+    .with('idle', () => defaultStatus)
+    .with('running', () => defaultStatus)
+    .with('success', () => 'success')
+    .with('error', () => 'error')
+    .exhaustive()
 
-interface ActionTracker {
-  /**
-   * Icon to display.
-   */
-  Glyph: Glyph
-
-  /**
-   * Label to display.
-   */
-  label: string
-
-  /**
-   * The status of the button, used for styling.
-   */
-  buttonStatus: ButtonStatus
-
-  /**
-   * The current state of the action being tracked.
-   */
-  actionState: ActionState
-
-  /**
-   * A callback to trigger and start tracking an action.
-   *
-   * @param promise - The promise that runs the action.
-   * @param action - The description of the action.
-   */
-  trackAction: (promise: Promise<unknown>, action: ActionDescription) => void
+  return { Glyph, label, actionStatus, buttonStatus }
 }
 
 /**
@@ -68,74 +61,29 @@ interface ActionTracker {
  * and reverting back to the main one once done.
  *
  * @param mainAction - The main action to use as default.
- * @param defaultStatus - The default status of the button while idle (used during running state also).
+ * @param alternatives - A list of alternative actions to track.
+ * @param defaultStatus - The default status of the button while all actions are idle (used during running state also).
  *
- * @returns An {@link ActionTracker}
+ * @returns An object containing:
+ * - `Glyph`: The icon to display based on the active action status.
+ * - `label`: The label to display based on the active action status.
+ * - `actionStatus`: The current status of the active action.
+ * - `buttonStatus`: The status to use for the button.
  */
-const useActionTracker = (
-  mainAction: ActionDescription,
+const useActionButtonTracker = <T>(
+  mainAction: Action<T> | Action<void>,
+  alternatives: Action[] | undefined,
   defaultStatus: ButtonStatus,
-): ActionTracker => {
-  const [activeAction, setActiveAction] =
-    useState<ActionDescription>(mainAction)
-  const [actionState, setActionState] = useState<ActionState>('idle')
-  const timeoutId = useRef<number>(null)
+) => {
+  const actions = [mainAction, ...(alternatives ?? [])]
+  const statuses = useActionStatuses(...actions.map((action) => action.id))
 
-  const Glyph = match(actionState)
-    .returnType<Glyph>()
-    .with('idle', () => activeAction.Glyph)
-    .with('running', () => IconLoader2)
-    .with('success', () => IconCircleCheckFilled)
-    .with('error', () => IconAlertTriangleFilled)
-    .exhaustive()
+  const activeAction =
+    actions.find((_, index) => statuses[index] === 'running') ??
+    actions.find((_, index) => statuses[index] === 'error') ??
+    mainAction
 
-  const label =
-    typeof activeAction.label === 'string'
-      ? activeAction.label
-      : activeAction.label[actionState]
-
-  const buttonStatus = match(actionState)
-    .returnType<ButtonStatus>()
-    .with('idle', () => defaultStatus)
-    .with('running', () => defaultStatus)
-    .with('success', () => 'success')
-    .with('error', () => 'error')
-    .exhaustive()
-
-  const trackAction = (
-    promise: Promise<unknown>,
-    action: ActionDescription,
-  ) => {
-    if (actionState !== 'running') {
-      if (timeoutId.current !== null) {
-        clearTimeout(timeoutId.current)
-      }
-
-      setActiveAction(action)
-      setActionState('running')
-      promise
-        .then(() => {
-          setActionState('success')
-        })
-        .catch(() => {
-          setActionState('error')
-        })
-        .finally(() => {
-          timeoutId.current = setTimeout(() => {
-            setActionState('idle')
-            setActiveAction(mainAction)
-          }, MS_IN_SECOND * 2)
-        })
-    }
-  }
-
-  return { Glyph, label, buttonStatus, actionState, trackAction }
+  return useActionButtonPresenter(activeAction.id, activeAction, defaultStatus)
 }
 
-export {
-  useActionTracker,
-  type Action,
-  type ActionState,
-  type ActionDescription,
-  type ActionTracker,
-}
+export { useActionButtonPresenter, useActionButtonTracker }

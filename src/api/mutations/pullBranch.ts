@@ -1,6 +1,9 @@
+import { IconDownload } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { BranchName, RemoteName } from '../models'
+import type { Action } from '@/context/actions'
+
+import type { BranchInfo, BranchName, RemoteName } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
@@ -24,6 +27,35 @@ const pullBranchMutation = (path: string) =>
     networkMode: 'online',
   })
 
-const usePullBranch = () => useRepositoryMutation(pullBranchMutation)
+const usePullBranch = (branch: BranchInfo | undefined): Action => {
+  const pullBranch = useRepositoryMutation(pullBranchMutation)
+
+  return {
+    id: `pull_branch:${branch?.name}`,
+    run: async () => {
+      if (!branch) {
+        throw new Error('No branch specified')
+      }
+
+      if (branch.type !== 'local') {
+        throw new Error('Branch is not local')
+      }
+
+      await pullBranch.mutateAsync({
+        branch: branch.name,
+        remote: branch.remote?.remoteName ?? 'origin',
+        remoteBranch: branch.remote?.branchName ?? branch.name,
+        isRebase: false,
+      })
+    },
+    label: {
+      idle: 'Pull',
+      running: 'Pulling',
+      success: 'Pulled',
+      error: 'Failed to pull',
+    },
+    Glyph: IconDownload,
+  }
+}
 
 export { usePullBranch, pullBranchKey }

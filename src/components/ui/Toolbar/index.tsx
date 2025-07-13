@@ -1,14 +1,12 @@
 import * as Ariakit from '@ariakit/react'
 
-import { type Action, ActionButton } from '@/lib/ActionButton'
+import { ActionButton, type ActionButtonProps } from '@/lib/ActionButton'
 import type { ButtonStatus, ButtonVariant } from '@/ui/Button'
-import { cn, propsWithCn } from '@/utils/styles'
+import { propsWithCn } from '@/utils/styles'
 import type { Size } from '@/utils/types'
 
-interface ToolbarTool {
-  action: Action
-  alternatives?: Action[]
-}
+// biome-ignore lint/suspicious/noExplicitAny: Toolbars need to accept actions with different parameter types.
+type ToolbarTool = ActionButtonProps<any>
 
 interface ToolbarProps extends Ariakit.ToolbarProps {
   /**
@@ -32,8 +30,6 @@ interface ToolbarProps extends Ariakit.ToolbarProps {
   size?: Size
 
   /**
-   * Whether the toolbar will have a fixed width.
-   *
    * If `true`, it's assumed that the toolbar has a fixed width, and the buttons will grow proportionally to fill the available space.
    * If `false`, the toolbar will grow with the size of its buttons, and each button will take only as much space as it needs.
    */
@@ -68,16 +64,9 @@ const Toolbar = (props: ToolbarProps) => {
           fixed ? 'auto-cols-fr' : 'auto-cols-max',
         )}
       >
-        {tools.map((tool) => (
+        {tools.map((tool, index) => (
           <ActionButton
-            key={tool.action.label.idle}
-            className={cn(
-              fixed && 'w-full',
-              'not-first:rounded-l-none',
-              'not-last:rounded-r-none not-last:border-r-2 not-last:border-solid not-last:border-r-dark-500',
-            )}
-            mainAction={tool.action}
-            alternatives={tool.alternatives}
+            key={`${tool.mainAction.label.idle}_${index}`}
             size={size}
             variant={variant}
             status={status}
@@ -85,6 +74,13 @@ const Toolbar = (props: ToolbarProps) => {
             disabled={toolbarProps.disabled}
             render={<Ariakit.ToolbarItem />}
             menuButtonProps={{ render: <Ariakit.ToolbarItem /> }}
+            {...propsWithCn(
+              // biome-ignore lint/suspicious/noExplicitAny: see tools type above
+              tool as ActionButtonProps<any>,
+              fixed && 'w-full',
+              'not-first:rounded-l-none',
+              'not-last:rounded-r-none not-last:border-r-2 not-last:border-solid not-last:border-r-dark-500',
+            )}
           />
         ))}
       </Ariakit.Toolbar>

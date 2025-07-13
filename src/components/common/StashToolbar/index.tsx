@@ -1,8 +1,6 @@
-import { IconPackageExport, IconTrash } from '@tabler/icons-react'
-
 import type { StashInfo } from '@/api/models'
 import { useApplyStash, useDiscardStash } from '@/api/mutations'
-import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
+import { Toolbar, type ToolbarProps, type ToolbarTool } from '@/ui/Toolbar'
 
 interface StashToolbarProps extends Partial<ToolbarProps> {
   /**
@@ -17,33 +15,15 @@ interface StashToolbarProps extends Partial<ToolbarProps> {
 const StashToolbar = (props: StashToolbarProps) => {
   const { stash, ...toolbarProps } = props
 
-  const apply = useApplyStash()
-  const discard = useDiscardStash()
+  const applyStash = useApplyStash(stash.id)
+  const discardStash = useDiscardStash(stash.id)
 
-  const tools = [
+  const tools: ToolbarTool[] = [
     {
-      action: {
-        run: () => apply.mutateAsync({ stashId: stash.id }),
-        label: {
-          idle: 'Apply',
-          running: 'Applying',
-          success: 'Applied',
-          error: 'Failed',
-        },
-        Glyph: IconPackageExport,
-      },
+      mainAction: applyStash,
     },
     {
-      action: {
-        run: () => discard.mutateAsync({ stashId: stash.id }),
-        label: {
-          idle: 'Discard',
-          running: 'Discarding',
-          success: 'Discarded',
-          error: 'Failed',
-        },
-        Glyph: IconTrash,
-      },
+      mainAction: discardStash,
     },
   ]
 

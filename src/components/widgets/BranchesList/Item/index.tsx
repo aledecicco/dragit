@@ -3,6 +3,7 @@ import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@/api/models'
 import { useCheckoutLocal } from '@/api/mutations'
+import { useRunAction } from '@/context/actions'
 import { withContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
@@ -29,6 +30,8 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
 
     const { branch: currentBranch } = useSelectedBranches()
     const isCurrentBranch = currentBranch && branch.name === currentBranch.name
+
+    const runAction = useRunAction()
     const checkout = useCheckoutLocal()
 
     return (
@@ -42,7 +45,7 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
         onClick={(e) => {
           itemProps.onClick?.(e)
           if (e.detail === 0) {
-            checkout.mutateAsync({ reference: branch.name })
+            runAction(checkout.id, () => checkout.run(branch.name))
           }
         }}
       >
@@ -90,14 +93,12 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
       </ListItem>
     )
   },
-  ({ branch }) => {
-    const checkout = useCheckoutLocal()
-
+  () => {
     return [
       {
         label: 'Checkout',
         Glyph: IconLocationFilled,
-        onClick: () => checkout.mutateAsync({ reference: branch.name }),
+        onClick: () => {}, // TODO: run checkout,
       },
     ]
   },

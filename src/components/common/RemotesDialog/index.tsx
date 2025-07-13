@@ -12,7 +12,7 @@ import { idFn, mapFn } from '@/utils/types'
 import { RemoteForm } from './Form'
 import { RemotesDialogItem } from './Item'
 
-export const REMOTES_DIALOG_KEY = 'remotes_dialog'
+const REMOTES_DIALOG_KEY = 'remotes_dialog'
 
 interface RemotesDialogProps extends Omit<DialogProps, 'dialogKey'> {}
 

@@ -1,46 +1,8 @@
 import type { ComponentType } from 'react'
-import { IconCheck } from '@tabler/icons-react'
 
-import { type DialogKey, hideDialog, showDialog } from '@/context/dialogs'
+import { type DialogKey, showDialog } from '@/context/dialogs'
 import { getUniqueId } from '@/context/ids'
-import { FormDialog, type FormDialogProps } from '@/ui/FormDialog'
-import type { AnyObject, PickPartial } from '@/utils/types'
-
-interface AskForValueDialogProps<T extends AnyObject>
-  extends PickPartial<FormDialogProps<T>, 'dialogKey'> {
-  submitValue: (value: T | undefined) => void
-  defaultValues: T
-}
-
-// TODO: remove
-const AskForValueDialog = <T extends AnyObject>(
-  props: AskForValueDialogProps<T>,
-) => {
-  const { submitValue, defaultValues, ...dialogProps } = props
-
-  return (
-    <FormDialog
-      {...dialogProps}
-      formOptions={{
-        defaultValues,
-        ...dialogProps.formOptions,
-        onFormSubmit: (formState, form) => {
-          dialogProps.formOptions?.onFormSubmit?.(formState, form)
-          submitValue(formState.values)
-          hideDialog(dialogProps.dialogKey)
-        },
-        actionDescription: {
-          Glyph: IconCheck,
-          label: 'Accept',
-        },
-      }}
-      onClose={(e) => {
-        dialogProps.onClose?.(e)
-        submitValue(undefined)
-      }}
-    />
-  )
-}
+import type { AnyObject } from '@/utils/types'
 
 interface AskForValueProps<T extends AnyObject> {
   dialogKey: DialogKey
@@ -80,9 +42,4 @@ function askForValue<T extends AnyObject, P>(
   })
 }
 
-export {
-  AskForValueDialog,
-  type AskForValueDialogProps,
-  type AskForValueProps,
-  askForValue,
-}
+export { type AskForValueProps, askForValue }

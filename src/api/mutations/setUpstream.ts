@@ -19,6 +19,7 @@ const setUpstreamMutation = (path: string) =>
     networkMode: 'always',
   })
 
+// TODO: action?
 const useSetUpstream = () => useRepositoryMutation(setUpstreamMutation)
 
 export { useSetUpstream, setUpstreamKey }

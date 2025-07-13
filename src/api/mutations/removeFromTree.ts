@@ -1,5 +1,9 @@
+import { IconTrash } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
+import type { Action } from '@/context/actions'
+
+import type { FileInfo } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
@@ -18,6 +22,22 @@ const removeFromTreeMutation = (path: string) =>
     networkMode: 'always',
   })
 
-const useRemoveFromTree = () => useRepositoryMutation(removeFromTreeMutation)
+const useMarkAsRemoved = (file: FileInfo): Action => {
+  const remove = useRepositoryMutation(removeFromTreeMutation)
 
-export { useRemoveFromTree, removeFromTreeKey }
+  return {
+    id: `remove_from_tree:${file.path}`,
+    run: async () => {
+      await remove.mutateAsync({ files: [file.path] })
+    },
+    label: {
+      idle: 'Delete',
+      running: 'Deleting',
+      success: 'Deleted',
+      error: 'Failed to delete',
+    },
+    Glyph: IconTrash,
+  }
+}
+
+export { useMarkAsRemoved, removeFromTreeKey }

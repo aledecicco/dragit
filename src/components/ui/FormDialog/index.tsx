@@ -16,7 +16,7 @@ interface FormDialogProps<T extends AnyObject> extends DialogProps {
   /**
    * Props for the submit button.
    */
-  submitProps?: Partial<FormSubmitButtonProps>
+  submitProps?: Partial<FormSubmitButtonProps<T>>
 }
 
 /**
@@ -30,20 +30,15 @@ const FormDialog = <T extends AnyObject>(props: FormDialogProps<T>) => {
       <Form
         {...formOptions}
         onFormSubmit={(formState, form) => {
-          const res = formOptions.onFormSubmit(formState, form)
-
-          if (res) {
-            res.then(() => hideDialog(dialogProps.dialogKey))
-          } else {
-            hideDialog(dialogProps.dialogKey)
-          }
+          formOptions.onFormSubmit?.(formState, form)
+          hideDialog(dialogProps.dialogKey)
         }}
       >
-        {(actionTracker) => (
+        {(action) => (
           <>
             {children}
 
-            <FormSubmitButton {...submitProps} actionTracker={actionTracker}>
+            <FormSubmitButton action={action} {...submitProps}>
               Accept
             </FormSubmitButton>
           </>

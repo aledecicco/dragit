@@ -18,6 +18,7 @@ const initRepositoryMutation = (path: string) =>
     networkMode: 'always',
   })
 
+// TODO: action?
 const useInitRepository = () => useRepositoryMutation(initRepositoryMutation)
 
 export { useInitRepository, initRepositoryKey }

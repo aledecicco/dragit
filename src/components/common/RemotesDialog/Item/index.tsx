@@ -1,5 +1,4 @@
 import type { ComponentProps } from 'react'
-import { IconTrash } from '@tabler/icons-react'
 
 import type { RemoteInfo } from '@/api/models'
 import {
@@ -7,6 +6,7 @@ import {
   useRemoveRemote,
   useRenameRemote,
 } from '@/api/mutations'
+import { useRunAction } from '@/context/actions'
 import { ActionButton } from '@/lib/ActionButton'
 import { EditableText } from '@/ui/EditableText'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -26,9 +26,10 @@ interface RemotesDialogItemProps extends ComponentProps<'div'> {
 const RemotesDialogItem = (props: RemotesDialogItemProps) => {
   const { remote, ...divProps } = props
 
-  const removeRemote = useRemoveRemote()
-  const renameRemote = useRenameRemote()
-  const changeRemoteUrl = useChangeRemoteUrl()
+  const runAction = useRunAction()
+  const removeRemote = useRemoveRemote(remote.name)
+  const renameRemote = useRenameRemote(remote.name)
+  const changeRemoteUrl = useChangeRemoteUrl(remote.name)
 
   return (
     <div
@@ -39,7 +40,7 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
         value={remote.name}
         setValue={(newName) => {
           if (newName) {
-            renameRemote.mutateAsync({ name: remote.name, newName })
+            runAction(renameRemote.id, () => renameRemote.run(newName))
           }
         }}
         label="Remote Name"
@@ -53,10 +54,7 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
         value={remote.fetchUrl}
         setValue={(newUrl) => {
           if (newUrl) {
-            changeRemoteUrl.mutateAsync({
-              name: remote.name,
-              newUrl,
-            })
+            runAction(changeRemoteUrl.id, () => changeRemoteUrl.run(newUrl))
           }
         }}
         label="Remote URL"
@@ -71,16 +69,7 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
       />
 
       <ActionButton
-        mainAction={{
-          run: () => removeRemote.mutateAsync({ name: remote.name }),
-          Glyph: IconTrash,
-          label: {
-            idle: 'Remove',
-            running: 'Removing',
-            success: 'Removed',
-            error: 'Failed',
-          },
-        }}
+        mainAction={removeRemote}
         compact
         variant="filled"
         status="neutral"

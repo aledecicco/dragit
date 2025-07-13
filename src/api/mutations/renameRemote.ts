@@ -1,4 +1,7 @@
+import { IconPencil } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
+
+import type { Action } from '@/context/actions'
 
 import type { RemoteName } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
@@ -19,6 +22,22 @@ const renameRemoteMutation = (path: string) =>
     networkMode: 'always',
   })
 
-const useRenameRemote = () => useRepositoryMutation(renameRemoteMutation)
+const useRenameRemote = (name: RemoteName): Action<string> => {
+  const renameRemote = useRepositoryMutation(renameRemoteMutation)
+
+  return {
+    id: 'rename_remote',
+    run: async (newName) => {
+      await renameRemote.mutateAsync({ name, newName })
+    },
+    Glyph: IconPencil,
+    label: {
+      idle: 'Rename remote',
+      running: 'Renaming remote',
+      success: 'Remote renamed',
+      error: 'Failed to rename',
+    },
+  }
+}
 
 export { useRenameRemote, renameRemoteKey }

@@ -1,12 +1,8 @@
 import type { ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 
-import { type Action, ActionButton } from '@/lib/ActionButton'
-import {
-  type ActionDescription,
-  type ActionTracker,
-  useActionTracker,
-} from '@/lib/ActionButton/utils'
+import { type Action, useRunAction } from '@/context/actions'
+import { ActionButton } from '@/lib/ActionButton'
 import { propsWithCn } from '@/utils/styles'
 import type { AnyObject } from '@/utils/types'
 
@@ -14,6 +10,8 @@ type FormCallback<T extends AnyObject> = (
   formState: Ariakit.FormStoreState<T>,
   form: Ariakit.FormStore<T>,
 ) => void | Promise<void>
+
+type FormAction<T extends AnyObject> = Action<Parameters<FormCallback<T>>>
 
 interface FormProps<T extends AnyObject>
   extends Omit<Ariakit.FormProps, 'children'> {
@@ -23,14 +21,9 @@ interface FormProps<T extends AnyObject>
   defaultValues: T
 
   /**
-   * The description of the action that the form performs on submit.
+   * The action performed by the form.
    */
-  actionDescription: ActionDescription
-
-  /**
-   * Callback that is triggered when the form is submitted.
-   */
-  onFormSubmit: FormCallback<T>
+  formAction: FormAction<T>
 
   /**
    * Callback triggered for form validation.
@@ -38,9 +31,14 @@ interface FormProps<T extends AnyObject>
   validateForm?: FormCallback<T>
 
   /**
-   * The children of the form, which can be a function that receives the state of the tracked form action.
+   * Callback triggered when the form is submitted.
    */
-  children?: ReactNode | ((tracker: ActionTracker) => ReactNode)
+  onFormSubmit?: FormCallback<T>
+
+  /**
+   * The children of the form, which can be a function that receives the status of the tracked form action.
+   */
+  children?: ReactNode | ((action: FormAction<T>) => ReactNode)
 }
 
 /**
@@ -53,25 +51,22 @@ interface FormProps<T extends AnyObject>
 const Form = <T extends AnyObject>(props: FormProps<T>) => {
   const {
     defaultValues,
-    actionDescription,
-    onFormSubmit,
+    formAction,
     validateForm,
+    onFormSubmit,
     children,
     ...formProps
   } = props
 
+  const run = useRunAction()
   const form = Ariakit.useFormStore({ defaultValues })
 
-  const actionTracker = useActionTracker(actionDescription, 'primary')
-
   form.useSubmit((formState) => {
-    const res = onFormSubmit(formState, form)
-
-    if (res) {
-      actionTracker.trackAction(res, actionDescription)
-    }
-
-    return res
+    return run(formAction.id, () => formAction.run([formState, form])).then(
+      () => {
+        onFormSubmit?.(formState, form)
+      },
+    )
   })
 
   form.useValidate((formState) => {
@@ -81,10 +76,10 @@ const Form = <T extends AnyObject>(props: FormProps<T>) => {
   return (
     <Ariakit.FormProvider store={form}>
       <Ariakit.Form {...propsWithCn(formProps, 'flex flex-col gap-8')}>
-        {typeof children === 'function' ? children(actionTracker) : children}
+        {typeof children === 'function' ? children(formAction) : children}
       </Ariakit.Form>
     </Ariakit.FormProvider>
   )
 }
 
-export { Form, type FormProps, type FormCallback }
+export { Form, type FormProps, type FormCallback, type FormAction }

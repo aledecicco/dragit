@@ -13,6 +13,7 @@ const openFolderMutation = mutationOptions({
   networkMode: 'always',
 })
 
+// TODO: action?
 const useOpenFolder = () => useMutation(openFolderMutation)
 
 export { useOpenFolder, openFolderKey }

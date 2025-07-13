@@ -1,7 +1,6 @@
 import { IconFileUnknown, IconPlus } from '@tabler/icons-react'
 
 import type { UntrackedFileInfo } from '@/api/models'
-import { useAddToIndex } from '@/api/mutations'
 import { withContextMenu } from '@/lib/ContextMenu'
 import type { ListItemProps } from '@/ui/ListItem'
 import { propsWithCn } from '@/utils/styles'
@@ -30,14 +29,12 @@ const UntrackedFileStatusItem = withContextMenu<UntrackedFileStatusItemProps>(
       />
     )
   },
-  ({ file }) => {
-    const stage = useAddToIndex()
-
+  () => {
     return [
       {
         label: 'Stage',
         Glyph: IconPlus,
-        onClick: () => stage.mutateAsync({ files: [file.path] }),
+        onClick: () => {}, // TODO: stage
       },
     ]
   },

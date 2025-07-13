@@ -1,14 +1,17 @@
-import {
-  AskForValueDialog,
-  type AskForValueProps,
-} from '@/lib/AskForValueDialog'
+import { useCommitIndex } from '@/api/mutations'
+import { showDialog } from '@/context/dialogs'
+import type { DialogProps } from '@/ui/Dialog'
 import { TextField } from '@/ui/Form/TextField'
+import { FormDialog } from '@/ui/FormDialog'
+
+const COMMIT_DIALOG_KEY = 'commit_dialog'
+
+interface CommitDialogProps extends Omit<DialogProps, 'dialogKey'> {}
 
 interface CommitFormValues {
   message: string
+  isAmend: boolean
 }
-
-interface CommitDialogProps extends AskForValueProps<CommitFormValues> {}
 
 // TODO: https://ariakit.org/examples/combobox-textarea
 
@@ -16,17 +19,26 @@ interface CommitDialogProps extends AskForValueProps<CommitFormValues> {}
  * Dialog that allows the user to commit changes.
  */
 const CommitDialog = (props: CommitDialogProps) => {
-  const { ...askForValueProps } = props
+  const { ...dialogProps } = props
+  const defaultValues: CommitFormValues = { message: '', isAmend: false }
+  const commit = useCommitIndex()
 
   return (
-    <AskForValueDialog
-      heading="Commit"
-      defaultValues={{ message: '' }}
-      {...askForValueProps}
+    <FormDialog
+      dialogKey={COMMIT_DIALOG_KEY}
+      formOptions={{
+        defaultValues,
+        formAction: commit,
+      }}
+      {...dialogProps}
     >
       <TextField label="Commit Message" name="message" autoFocus required />
-    </AskForValueDialog>
+    </FormDialog>
   )
 }
 
-export { CommitDialog, type CommitDialogProps }
+const showCommitDialog = (props?: Partial<CommitDialogProps>) => {
+  showDialog(COMMIT_DIALOG_KEY, <CommitDialog {...props} />)
+}
+
+export { CommitDialog, showCommitDialog, type CommitDialogProps }

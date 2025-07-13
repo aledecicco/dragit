@@ -1,4 +1,7 @@
+import { IconTrash } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
+
+import type { Action } from '@/context/actions'
 
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
@@ -18,6 +21,22 @@ const discardStashMutation = (path: string) =>
     networkMode: 'always',
   })
 
-const useDiscardStash = () => useRepositoryMutation(discardStashMutation)
+const useDiscardStash = (stashId: string): Action => {
+  const discardStash = useRepositoryMutation(discardStashMutation)
+
+  return {
+    id: `discard_stash:${stashId}`,
+    run: async () => {
+      await discardStash.mutateAsync({ stashId })
+    },
+    label: {
+      idle: 'Discard',
+      running: 'Discarding',
+      success: 'Discarded',
+      error: 'Failed',
+    },
+    Glyph: IconTrash,
+  }
+}
 
 export { useDiscardStash, discardStashKey }

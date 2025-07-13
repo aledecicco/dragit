@@ -1,7 +1,6 @@
 import type { ComponentProps } from 'react'
 import {
   IconMenuDeep,
-  IconRefresh,
   IconWorld,
   IconWorldCancel,
   IconWorldQuestion,
@@ -35,7 +34,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
   const { branch } = useSelectedBranches()
   const { remote, remoteBranch } = useSelectedUpstream()
 
-  const fetchRemote = useFetchRemote()
+  const fetchRemote = useFetchRemote(remote?.name)
   const remotesQuery = useQueryRemotes()
   const branchesQuery = useQueryBranches()
 
@@ -117,22 +116,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         round
         disabled={!remote}
         className={cn('mx-2')}
-        mainAction={{
-          Glyph: IconRefresh,
-          label: {
-            idle: 'Fetch remote',
-            running: 'Fetching remote',
-            success: 'Remote fetched',
-            error: 'Failed',
-          },
-          run: async () => {
-            if (remote) {
-              await fetchRemote.mutateAsync({
-                remote: remote.name,
-              })
-            }
-          },
-        }}
+        mainAction={fetchRemote}
       />
 
       <Button

@@ -1,7 +1,8 @@
-import { IconDeviceFloppy, IconX } from '@tabler/icons-react'
+import { IconX } from '@tabler/icons-react'
 
 import { useAddRemote } from '@/api/mutations'
 import { useQueryRemotes } from '@/api/queries'
+import { useActionStatuses } from '@/context/actions'
 import { Button } from '@/ui/Button'
 import { Form, type FormProps } from '@/ui/Form'
 import { InputField } from '@/ui/Form/InputField'
@@ -15,10 +16,7 @@ interface RemoteFormValues {
 }
 
 interface RemoteFormProps
-  extends Omit<
-    FormProps<RemoteFormValues>,
-    'onFormSubmit' | 'actionDescription'
-  > {
+  extends Omit<FormProps<RemoteFormValues>, 'formAction'> {
   /**
    * Callback to handle form cancellation.
    */
@@ -33,28 +31,13 @@ const RemoteForm = (props: RemoteFormProps) => {
 
   const remotesQuery = useQueryRemotes()
   const addRemote = useAddRemote()
+  const status = useActionStatuses(addRemote.id)
 
   return (
     <Form
       {...propsWithCn(formProps, 'flex flex-row gap-1')}
       defaultValues={{ name: '', url: '' }}
-      actionDescription={{
-        Glyph: IconDeviceFloppy,
-        label: {
-          idle: 'Save',
-          running: 'Saving',
-          success: 'Saved',
-          error: 'Failed',
-        },
-      }}
-      onFormSubmit={async (formState) => {
-        if (formState.values.name && formState.values.url) {
-          await addRemote.mutateAsync({
-            name: formState.values.name,
-            url: formState.values.url,
-          })
-        }
-      }}
+      formAction={addRemote}
       validateForm={(formState, form) => {
         if (
           remotesQuery.data?.find(
@@ -65,7 +48,7 @@ const RemoteForm = (props: RemoteFormProps) => {
         }
       }}
     >
-      {(actionTracker) => (
+      {(action) => (
         <>
           <InputField
             name="name"
@@ -82,14 +65,10 @@ const RemoteForm = (props: RemoteFormProps) => {
             compact
           />
 
-          <FormSubmitButton
-            className={cn('w-max')}
-            actionTracker={actionTracker}
-            compact
-          />
+          <FormSubmitButton className={cn('w-max')} action={action} compact />
 
           <Button
-            disabled={actionTracker.actionState === 'running'}
+            disabled={status === 'running'}
             className={cn('w-max')}
             onClick={() => {
               onCancel()
@@ -104,4 +83,4 @@ const RemoteForm = (props: RemoteFormProps) => {
   )
 }
 
-export { RemoteForm, type RemoteFormProps }
+export { RemoteForm, type RemoteFormProps, type RemoteFormValues }

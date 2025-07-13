@@ -1,9 +1,9 @@
-import { IconCheck, IconTrash } from '@tabler/icons-react'
 import { match, P } from 'ts-pattern'
 
 import type { UnmergedFileInfo } from '@/api/models'
-import { useAddToIndex, useRemoveFromTree } from '@/api/mutations'
-import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
+import { useMarkAsResolved } from '@/api/mutations'
+import { useMarkAsRemoved } from '@/api/mutations/removeFromTree'
+import { Toolbar, type ToolbarProps, type ToolbarTool } from '@/ui/Toolbar'
 
 interface UnmergedFileToolbarProps extends Partial<ToolbarProps> {
   /**
@@ -17,35 +17,17 @@ interface UnmergedFileToolbarProps extends Partial<ToolbarProps> {
  */
 const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
   const { file, ...toolbarProps } = props
-  const stage = useAddToIndex()
-  const remove = useRemoveFromTree()
+  const resolve = useMarkAsResolved(file)
+  const remove = useMarkAsRemoved(file)
 
-  const tools = [
+  const tools: ToolbarTool[] = [
     {
-      action: {
-        run: () => stage.mutateAsync({ files: [file.path] }),
-        label: {
-          idle: 'Mark as resolved',
-          running: 'Resolving',
-          success: 'Resolved',
-          error: 'Failed',
-        },
-        Glyph: IconCheck,
-      },
+      mainAction: resolve,
     },
     ...match(file.changes)
       .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => [
         {
-          action: {
-            run: () => remove.mutateAsync({ files: [file.path] }),
-            label: {
-              idle: 'Delete',
-              running: 'Deleting',
-              success: 'Deleted',
-              error: 'Failed',
-            },
-            Glyph: IconTrash,
-          },
+          mainAction: remove,
         },
       ])
       .otherwise(() => []),
