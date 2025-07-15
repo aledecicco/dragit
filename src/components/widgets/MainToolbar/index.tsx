@@ -2,7 +2,7 @@ import type { FileType } from '@/api/models'
 import { useAddFiles, useCommitIndex, useQuickStash } from '@/api/mutations'
 import { showCommitDialog } from '@/common/CommitDialog'
 import { FileSelectorDialog } from '@/common/FileSelectorDialog'
-import { useRunAction } from '@/context/actions'
+import { runAction } from '@/context/actions'
 import { askForValue } from '@/lib/AskForValueDialog'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 
@@ -13,7 +13,6 @@ interface MainToolbarProps extends Partial<ToolbarProps> {}
  */
 const MainToolbar = (props: MainToolbarProps) => {
   const { ...toolbarProps } = props
-  const runAction = useRunAction()
 
   const addFiles = useAddFiles()
   const quickStash = useQuickStash()

@@ -75,8 +75,7 @@ const Toolbar = (props: ToolbarProps) => {
             render={<Ariakit.ToolbarItem />}
             menuButtonProps={{ render: <Ariakit.ToolbarItem /> }}
             {...propsWithCn(
-              // biome-ignore lint/suspicious/noExplicitAny: see tools type above
-              tool as ActionButtonProps<any>,
+              tool,
               fixed && 'w-full',
               'not-first:rounded-l-none',
               'not-last:rounded-r-none not-last:border-r-2 not-last:border-solid not-last:border-r-dark-500',

@@ -1,7 +1,7 @@
 import { useCheckoutLocal, useSwitchBranches } from '@/api/mutations'
 import { useQueryBranches, useQueryHeadInfo } from '@/api/queries'
 import { BranchSelector } from '@/common/BranchSelector'
-import { useActionStatuses, useRunAction } from '@/context/actions'
+import { runAction, useActionStatuses } from '@/context/actions'
 import { changeBaseRef, useSelectedRefs } from '@/context/branches'
 import { ActionButton } from '@/lib/ActionButton'
 import { useBranch } from '@/utils/repository'
@@ -19,7 +19,6 @@ const BranchSelectors = () => {
   const branch = useBranch(reference)
   const baseBranch = useBranch(baseReference)
 
-  const runAction = useRunAction()
   const checkout = useCheckoutLocal()
   const checkoutStatus = useActionStatuses(checkout.id)
   const switchBranches = useSwitchBranches()

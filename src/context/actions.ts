@@ -43,41 +43,11 @@ interface ActionsTracker {
    * Map of action IDs to their timeout IDs for managing timers.
    */
   timers: Map<ActionId, number>
-
-  /**
-   * Function to run an action, tracking it by its ID.
-   *
-   * @param id - The unique identifier of the action.
-   * @param runAction - The callback that performs the action.
-   */
-  run: (id: ActionId, runAction: () => Promise<void>) => Promise<void>
 }
 
 const actionsTracker = new Store<ActionsTracker>({
   actions: new Map(),
   timers: new Map(),
-  run: async (id: ActionId, runAction: () => Promise<void>) => {
-    const status = actionsTracker.state.actions.get(id) ?? 'idle'
-
-    if (status !== 'running') {
-      setActionStatus(id, 'running')
-      setActionTimer(id, undefined)
-
-      await runAction()
-        .then(() => {
-          setActionStatus(id, 'success')
-        })
-        .catch(() => {
-          setActionStatus(id, 'error')
-        })
-        .finally(() => {
-          const timeoutId = setTimeout(() => {
-            setActionStatus(id, undefined)
-          }, MS_IN_SECOND * 2)
-          setActionTimer(id, timeoutId)
-        })
-    }
-  },
 })
 
 /**
@@ -146,9 +116,33 @@ function useActionStatuses(...ids: ActionId[]) {
 }
 
 /**
- * Hook that provides a callback to trigger and track an action.
+ * Function to run an action, tracking it by its ID.
+ *
+ * @param id - The unique identifier of the action.
+ * @param runAction - The callback that performs the action.
  */
-const useRunAction = () => useStore(actionsTracker).run
+const runAction = async (id: ActionId, runAction: () => Promise<void>) => {
+  const status = actionsTracker.state.actions.get(id) ?? 'idle'
 
-export { useActionStatuses, useRunAction }
+  if (status !== 'running') {
+    setActionStatus(id, 'running')
+    setActionTimer(id, undefined)
+
+    await runAction()
+      .then(() => {
+        setActionStatus(id, 'success')
+      })
+      .catch(() => {
+        setActionStatus(id, 'error')
+      })
+      .finally(() => {
+        const timeoutId = setTimeout(() => {
+          setActionStatus(id, undefined)
+        }, MS_IN_SECOND * 2)
+        setActionTimer(id, timeoutId)
+      })
+  }
+}
+
+export { useActionStatuses, runAction }
 export type { Action, ActionId, ActionDescription, ActionStatus }

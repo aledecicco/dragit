@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 
-import { type Action, useRunAction } from '@/context/actions'
+import { type Action, runAction } from '@/context/actions'
 import { ActionButton } from '@/lib/ActionButton'
 import { propsWithCn } from '@/utils/styles'
 import type { AnyObject } from '@/utils/types'
@@ -58,15 +58,14 @@ const Form = <T extends AnyObject>(props: FormProps<T>) => {
     ...formProps
   } = props
 
-  const run = useRunAction()
   const form = Ariakit.useFormStore({ defaultValues })
 
   form.useSubmit((formState) => {
-    return run(formAction.id, () => formAction.run([formState, form])).then(
-      () => {
-        onFormSubmit?.(formState, form)
-      },
-    )
+    return runAction(formAction.id, () =>
+      formAction.run([formState, form]),
+    ).then(() => {
+      onFormSubmit?.(formState, form)
+    })
   })
 
   form.useValidate((formState) => {

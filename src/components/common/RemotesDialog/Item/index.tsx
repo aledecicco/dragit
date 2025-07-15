@@ -6,7 +6,7 @@ import {
   useRemoveRemote,
   useRenameRemote,
 } from '@/api/mutations'
-import { useRunAction } from '@/context/actions'
+import { runAction } from '@/context/actions'
 import { ActionButton } from '@/lib/ActionButton'
 import { EditableText } from '@/ui/EditableText'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -26,7 +26,6 @@ interface RemotesDialogItemProps extends ComponentProps<'div'> {
 const RemotesDialogItem = (props: RemotesDialogItemProps) => {
   const { remote, ...divProps } = props
 
-  const runAction = useRunAction()
   const removeRemote = useRemoveRemote(remote.name)
   const renameRemote = useRenameRemote(remote.name)
   const changeRemoteUrl = useChangeRemoteUrl(remote.name)

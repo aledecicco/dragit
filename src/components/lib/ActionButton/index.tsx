@@ -1,4 +1,4 @@
-import { type Action, useRunAction } from '@/context/actions'
+import { type Action, runAction } from '@/context/actions'
 import { Button, type ButtonProps } from '@/ui/Button'
 import { Icon } from '@/ui/Icon'
 import type { MenuItem } from '@/ui/Menu'
@@ -69,8 +69,6 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     menuButtonProps,
     ...buttonProps
   } = props
-
-  const runAction = useRunAction()
 
   const { Glyph, label, actionStatus, buttonStatus } = useActionButtonTracker(
     mainAction,

@@ -3,7 +3,7 @@ import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@/api/models'
 import { useCheckoutLocal } from '@/api/mutations'
-import { useRunAction } from '@/context/actions'
+import { runAction } from '@/context/actions'
 import { withContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
@@ -31,7 +31,6 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
     const { branch: currentBranch } = useSelectedBranches()
     const isCurrentBranch = currentBranch && branch.name === currentBranch.name
 
-    const runAction = useRunAction()
     const checkout = useCheckoutLocal()
 
     return (
