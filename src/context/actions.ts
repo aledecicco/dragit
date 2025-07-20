@@ -104,15 +104,17 @@ const setActionTimer = (id: ActionId, timeoutId: number | undefined) => {
 function useActionStatuses(id: ActionId): ActionStatus
 function useActionStatuses(...ids: ActionId[]): ActionStatus[]
 function useActionStatuses(...ids: ActionId[]) {
-  const { actions } = useStore(actionsTracker)
+  return useStore(actionsTracker, (state) => {
+    if (ids.length === 1) {
+      return state.actions.get(ids[0]) || 'idle'
+    }
 
-  if (ids.length === 1) {
-    return actions.get(ids[0]) || 'idle'
-  }
+    const statuses = ids.map(
+      (actionId) => state.actions.get(actionId) || 'idle',
+    )
 
-  const statuses = ids.map((actionId) => actions.get(actionId) || 'idle')
-
-  return statuses
+    return statuses
+  })
 }
 
 /**

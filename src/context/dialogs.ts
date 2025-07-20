@@ -14,14 +14,13 @@ const dialogs = new Store<Dialogs>({
 /**
  * @returns The highest priority dialog that should be mounted.
  */
-const useDialog = (): ReactNode | undefined => {
-  const allDialogs = useStore(dialogs)
+const useDialog = (): ReactNode | undefined =>
+  useStore(dialogs, (allDialogs) => {
+    let entry: [DialogKey, ReactNode] | undefined
+    for (entry of allDialogs.mounted);
 
-  let entry: [DialogKey, ReactNode] | undefined
-  for (entry of allDialogs.mounted);
-
-  return entry?.[1]
-}
+    return entry?.[1]
+  })
 
 /**
  * Add a dialog to the top of the stack, or bump an existing one with the same key.
