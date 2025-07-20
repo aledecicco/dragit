@@ -1,5 +1,8 @@
+import { IconDeviceFloppy } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
+
+import type { Action } from '@/context/actions'
 
 import type { Settings } from '../models'
 import { mutationOptions } from '../utils'
@@ -14,7 +17,22 @@ const setSettingsMutation = mutationOptions({
   networkMode: 'always',
 })
 
-// TODO: action?
-const useSetSettings = () => useMutation(setSettingsMutation)
+const useSaveSettings = (): Action<Settings> => {
+  const setSettings = useMutation(setSettingsMutation)
 
-export { useSetSettings, setSettingsKey }
+  return {
+    id: 'set_settings',
+    run: async (settings: Settings) => {
+      await setSettings.mutateAsync({ settings })
+    },
+    label: {
+      idle: 'Save settings',
+      running: 'Saving settings',
+      success: 'Settings saved',
+      error: 'Failed to save settings',
+    },
+    Glyph: IconDeviceFloppy,
+  }
+}
+
+export { useSaveSettings, setSettingsKey }

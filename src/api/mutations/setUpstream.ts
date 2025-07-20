@@ -1,4 +1,7 @@
+import { IconWorldUpload } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
+
+import type { Action } from '@/context/actions'
 
 import type { BranchName, RemoteRef } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
@@ -19,7 +22,22 @@ const setUpstreamMutation = (path: string) =>
     networkMode: 'always',
   })
 
-// TODO: action?
-const useSetUpstream = () => useRepositoryMutation(setUpstreamMutation)
+const useSetUpstream = (branch: BranchName): Action<RemoteRef> => {
+  const setUpstream = useRepositoryMutation(setUpstreamMutation)
+
+  return {
+    id: `set_upstream:${branch}`,
+    run: async (remoteRef: RemoteRef) => {
+      await setUpstream.mutateAsync({ branch, remoteRef })
+    },
+    label: {
+      idle: 'Set upstream',
+      running: 'Setting upstream',
+      success: 'Upstream set',
+      error: 'Failed to set upstream',
+    },
+    Glyph: IconWorldUpload,
+  }
+}
 
 export { useSetUpstream, setUpstreamKey }

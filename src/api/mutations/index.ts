@@ -28,7 +28,7 @@ export {
 export { removeRemoteKey, useRemoveRemote } from './removeRemote'
 export { renameRemoteKey, useRenameRemote } from './renameRemote'
 export { saveStashKey, useQuickStash } from './saveStash'
-export { setSettingsKey, useSetSettings } from './setSettings'
+export { setSettingsKey, useSaveSettings } from './setSettings'
 export { setUpstreamKey, useSetUpstream } from './setUpstream'
 
 export const pathMutationKey = (path: string) =>

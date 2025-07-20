@@ -2,7 +2,9 @@ import { open } from '@tauri-apps/plugin-dialog'
 
 import { useOpenFolder } from '@/api/mutations'
 import { useQueryCurrentDir } from '@/api/queries'
-import { Button, type ButtonProps } from '@/ui/Button'
+import { runAction } from '@/context/actions'
+import { ActionButton } from '@/lib/ActionButton'
+import type { ButtonProps } from '@/ui/Button'
 import { propsWithCn } from '@/utils/styles'
 
 interface CurrentDirectoryProps extends Partial<ButtonProps> {}
@@ -13,10 +15,13 @@ interface CurrentDirectoryProps extends Partial<ButtonProps> {}
 const CurrentDirectory = (props: CurrentDirectoryProps) => {
   const { ...buttonProps } = props
   const currentDirQuery = useQueryCurrentDir()
+
   const openFolder = useOpenFolder()
 
   return (
-    <Button
+    <ActionButton
+      mainAction={openFolder}
+      trackOnly
       variant="plain"
       status="primary"
       size="md"
@@ -34,21 +39,12 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
           directory: true,
         }).then((path) => {
           if (path) {
-            openFolder.mutateAsync({ newPath: path })
+            runAction(openFolder.id, () => openFolder.run(path))
           }
         })
       }}
-      disabled={
-        openFolder.isPending ||
-        currentDirQuery.isFetching ||
-        buttonProps.disabled
-      }
-    >
-      {currentDirQuery.data?.path ??
-        (currentDirQuery.isFetching
-          ? 'Loading directory...'
-          : 'Choose a directory')}
-    </Button>
+      disabled={currentDirQuery.isFetching || buttonProps.disabled}
+    />
   )
 }
 
