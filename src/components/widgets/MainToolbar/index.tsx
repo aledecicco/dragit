@@ -34,7 +34,7 @@ const MainToolbar = (props: MainToolbarProps) => {
             askForValue(FileSelectorDialog, {
               types,
             }).then((filesParam) => {
-              runAction(addFiles.id, () => addFiles.run([filesParam.path]))
+              runAction(addFiles, [filesParam.path])
             })
           },
         },

@@ -61,9 +61,7 @@ const Form = <T extends AnyObject>(props: FormProps<T>) => {
   const form = Ariakit.useFormStore({ defaultValues })
 
   form.useSubmit((formState) => {
-    return runAction(formAction.id, () =>
-      formAction.run([formState, form]),
-    ).then(() => {
+    return runAction(formAction, [formState, form]).then(() => {
       onFormSubmit?.(formState, form)
     })
   })

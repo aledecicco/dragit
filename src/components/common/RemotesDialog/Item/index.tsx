@@ -39,7 +39,7 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
         value={remote.name}
         setValue={(newName) => {
           if (newName) {
-            runAction(renameRemote.id, () => renameRemote.run(newName))
+            runAction(renameRemote, newName)
           }
         }}
         label="Remote Name"
@@ -53,7 +53,7 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
         value={remote.fetchUrl}
         setValue={(newUrl) => {
           if (newUrl) {
-            runAction(changeRemoteUrl.id, () => changeRemoteUrl.run(newUrl))
+            runAction(changeRemoteUrl, newUrl)
           }
         }}
         label="Remote URL"

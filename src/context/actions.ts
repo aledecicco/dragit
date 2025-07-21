@@ -1,4 +1,10 @@
+import {
+  IconAlertTriangleFilled,
+  IconCircleCheckFilled,
+  IconLoader2,
+} from '@tabler/icons-react'
 import { Store, useStore } from '@tanstack/react-store'
+import { match } from 'ts-pattern'
 
 import type { Glyph } from '@/ui/Icon'
 import { MS_IN_SECOND } from '@/utils/time'
@@ -118,33 +124,65 @@ function useActionStatuses(...ids: ActionId[]) {
 }
 
 /**
- * Function to run an action, tracking it by its ID.
+ * Function to run and start tracking an action.
  *
- * @param id - The unique identifier of the action.
- * @param runAction - The callback that performs the action.
+ * @param action - The action to run.
+ * @param args - The arguments to pass to the action.
  */
-const runAction = async (id: ActionId, runAction: () => Promise<void>) => {
-  const status = actionsTracker.state.actions.get(id) ?? 'idle'
+async function runAction<T>(action: Action<T>, args: T): Promise<void>
+async function runAction(action: Action<void>): Promise<void>
+async function runAction<T>(action: Action<T>, args?: T): Promise<void> {
+  const status = actionsTracker.state.actions.get(action.id) ?? 'idle'
 
   if (status !== 'running') {
-    setActionStatus(id, 'running')
-    setActionTimer(id, undefined)
+    setActionStatus(action.id, 'running')
+    setActionTimer(action.id, undefined)
 
-    await runAction()
+    return action
+      .run(args as T)
       .then(() => {
-        setActionStatus(id, 'success')
+        setActionStatus(action.id, 'success')
       })
       .catch(() => {
-        setActionStatus(id, 'error')
+        setActionStatus(action.id, 'error')
       })
       .finally(() => {
         const timeoutId = setTimeout(() => {
-          setActionStatus(id, undefined)
+          setActionStatus(action.id, undefined)
         }, MS_IN_SECOND * 2)
-        setActionTimer(id, timeoutId)
+        setActionTimer(action.id, timeoutId)
       })
   }
 }
 
-export { useActionStatuses, runAction }
+/**
+ * A hook that provides the necessary info to correctly display an action.
+ *
+ * @param action - The action to track.
+ *
+ * @returns An object containing:
+ * - `Glyph`: The icon to display based on the action status.
+ * - `label`: The label to display based on the action status.
+ * - `actionStatus`: The current status of the action.
+ */
+const useActionPresenter = (
+  actionId: ActionId,
+  actionDescription: ActionDescription,
+) => {
+  const actionStatus = useActionStatuses(actionId)
+
+  const Glyph = match(actionStatus)
+    .returnType<Glyph>()
+    .with('idle', () => actionDescription.Glyph)
+    .with('running', () => IconLoader2)
+    .with('success', () => IconCircleCheckFilled)
+    .with('error', () => IconAlertTriangleFilled)
+    .exhaustive()
+
+  const label = actionDescription.label[actionStatus]
+
+  return { Glyph, label, actionStatus }
+}
+
+export { useActionStatuses, runAction, useActionPresenter }
 export type { Action, ActionId, ActionDescription, ActionStatus }

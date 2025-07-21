@@ -44,7 +44,7 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
         onClick={(e) => {
           itemProps.onClick?.(e)
           if (e.detail === 0) {
-            runAction(checkout.id, () => checkout.run(branch.name))
+            runAction(checkout, branch.name)
           }
         }}
       >

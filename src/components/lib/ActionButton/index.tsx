@@ -1,5 +1,7 @@
+import { match } from 'ts-pattern'
+
 import { type Action, runAction } from '@/context/actions'
-import { Button, type ButtonProps } from '@/ui/Button'
+import { Button, type ButtonProps, type ButtonStatus } from '@/ui/Button'
 import { Icon } from '@/ui/Icon'
 import type { MenuItem } from '@/ui/Menu'
 import { SplitButton } from '@/ui/SplitButton'
@@ -70,11 +72,17 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     ...buttonProps
   } = props
 
-  const { Glyph, label, actionStatus, buttonStatus } = useActionButtonTracker(
+  const { Glyph, label, actionStatus } = useActionButtonTracker(
     mainAction,
     alternatives,
-    buttonProps.status ?? 'neutral',
   )
+  const buttonStatus = match(actionStatus)
+    .returnType<ButtonStatus>()
+    .with('idle', () => buttonProps.status ?? 'neutral')
+    .with('running', () => buttonProps.status ?? 'neutral')
+    .with('success', () => 'success')
+    .with('error', () => 'error')
+    .exhaustive()
 
   const menuItems: MenuItem[] =
     alternatives?.map((alternative) => ({
@@ -82,7 +90,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
       Glyph: alternative.Glyph,
       onClick: () => {
         if (actionStatus !== 'running') {
-          runAction(alternative.id, alternative.run)
+          runAction(alternative)
         }
       },
     })) ?? []
@@ -94,7 +102,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
       onClick={(e) => {
         buttonProps.onClick?.(e)
         if (!trackOnly && actionStatus !== 'running') {
-          runAction(mainAction.id, mainAction.run)
+          runAction(mainAction)
         }
       }}
       description={compact ? label : undefined}
@@ -114,7 +122,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
       onClick={(e) => {
         buttonProps.onClick?.(e)
         if (!trackOnly && actionStatus !== 'running') {
-          runAction(mainAction.id, mainAction.run)
+          runAction(mainAction)
         }
       }}
       description={compact ? label : undefined}

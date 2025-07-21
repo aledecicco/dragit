@@ -10,25 +10,25 @@ import { pathMutationKey } from '.'
 const checkoutLocalKey = (path: string) =>
   ({
     ...pathMutationKey(path),
-    key: 'checkoutLocal_local_branch',
+    key: 'checkout_local',
   }) as const
 
 const checkoutLocalMutation = (path: string) =>
   mutationOptions({
     mutationKey: [checkoutLocalKey(path)],
     mutationFn: (args: { reference: string }) => {
-      return invoke('checkoutLocal', { path: path, ...args })
+      return invoke('checkout', { path: path, ...args })
     },
     networkMode: 'always',
   })
 
 const useCheckoutLocal = (): Action<string> => {
-  const checkoutLocal = useRepositoryMutation(checkoutLocalMutation)
+  const checkout = useRepositoryMutation(checkoutLocalMutation)
 
   return {
     id: 'checkout_local',
     run: async (reference) => {
-      await checkoutLocal.mutateAsync({ reference })
+      await checkout.mutateAsync({ reference })
     },
     Glyph: IconGitBranch,
     label: {

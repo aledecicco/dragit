@@ -3,7 +3,6 @@ import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
 
 import { Button, type ButtonProps } from '@/ui/Button'
-import { type Glyph, Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { Separator } from '@/ui/Separator'
 import { mapOr } from '@/utils/array'
@@ -28,9 +27,9 @@ interface ComboboxProps<T> extends Partial<ButtonProps> {
   options: ComboboxOption<T>[]
 
   /**
-   * An icon decorator for the input.
+   * A decorator for the input.
    */
-  Glyph?: Glyph
+  decorator?: ReactNode
 
   /**
    * Function that renders an option.
@@ -63,7 +62,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
   const {
     option,
     options,
-    Glyph,
+    decorator,
     renderOption,
     setOption,
     placeholder = 'Select...',
@@ -107,7 +106,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
             />
           }
         >
-          {Glyph && <Icon Glyph={Glyph} size="md" />}
+          {decorator}
           <Marquee reverse={false}>
             {option === undefined ? placeholder : renderOption(option)}
           </Marquee>

@@ -39,7 +39,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
           directory: true,
         }).then((path) => {
           if (path) {
-            runAction(openFolder.id, () => openFolder.run(path))
+            runAction(openFolder, path)
           }
         })
       }}
