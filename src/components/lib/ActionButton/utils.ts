@@ -1,6 +1,7 @@
 import {
   type Action,
-  useActionPresenter,
+  type ActionPresenter,
+  useActionPresenters,
   useActionStatuses,
 } from '@/context/actions'
 
@@ -13,26 +14,20 @@ import {
  * @param mainAction - The main action to use as default.
  * @param alternatives - A list of alternative actions to track.
  * @param defaultStatus - The default status of the button while all actions are idle (used during running state also).
- *
- * @returns An object containing:
- * - `Glyph`: The icon to display based on the active action status.
- * - `label`: The label to display based on the active action status.
- * - `actionStatus`: The current status of the active action.
- * - `buttonStatus`: The status to use for the button.
  */
 const useActionButtonTracker = <T>(
   mainAction: Action<T> | Action<void>,
   alternatives: Action[] | undefined,
-) => {
+): ActionPresenter => {
   const actions = [mainAction, ...(alternatives ?? [])]
-  const statuses = useActionStatuses(...actions.map((action) => action.id))
+  const statuses = useActionStatuses(actions.map((action) => action.id))
 
   const activeAction =
     actions.find((_, index) => statuses[index] === 'running') ??
     actions.find((_, index) => statuses[index] === 'error') ??
     mainAction
 
-  return useActionPresenter(activeAction.id, activeAction)
+  return useActionPresenters(activeAction)
 }
 
 export { useActionButtonTracker }

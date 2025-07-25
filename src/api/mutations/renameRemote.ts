@@ -26,7 +26,7 @@ const useRenameRemote = (name: RemoteName): Action<string> => {
   const renameRemote = useRepositoryMutation(renameRemoteMutation)
 
   return {
-    id: 'rename_remote',
+    id: `rename_remote:${name}`,
     run: async (newName) => {
       await renameRemote.mutateAsync({ name, newName })
     },

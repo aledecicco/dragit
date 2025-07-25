@@ -104,15 +104,16 @@ const setActionTimer = (id: ActionId, timeoutId: number | undefined) => {
 /**
  * Hook that facilitates tracking the status of one or more actions.
  *
- * @param id - The unique identifier of the action to track.
- * @returns ActionStatus when called with a single id, ActionStatus[] when called with multiple ids
+ * @param id - The unique identifier/s of the action/s to track.
+ * @returns An {@link ActionStatus}  for each action ID provided.
  */
 function useActionStatuses(id: ActionId): ActionStatus
-function useActionStatuses(...ids: ActionId[]): ActionStatus[]
-function useActionStatuses(...ids: ActionId[]) {
+function useActionStatuses(ids: ActionId[]): ActionStatus[]
+function useActionStatuses(ids: ActionId | ActionId[]) {
   return useStore(actionsTracker, (state) => {
-    if (ids.length === 1) {
-      return state.actions.get(ids[0]) || 'idle'
+    if (!Array.isArray(ids)) {
+      const actionId = ids
+      return state.actions.get(actionId) || 'idle'
     }
 
     const statuses = ids.map(
@@ -156,33 +157,71 @@ async function runAction<T>(action: Action<T>, args?: T): Promise<void> {
 }
 
 /**
- * A hook that provides the necessary info to correctly display an action.
- *
- * @param action - The action to track.
- *
- * @returns An object containing:
- * - `Glyph`: The icon to display based on the action status.
- * - `label`: The label to display based on the action status.
- * - `actionStatus`: The current status of the action.
+ * Utility function to get the icon to display for an action based on its status.
  */
-const useActionPresenter = (
-  actionId: ActionId,
-  actionDescription: ActionDescription,
-) => {
-  const actionStatus = useActionStatuses(actionId)
-
-  const Glyph = match(actionStatus)
+const getActionGlyph = (
+  action: ActionDescription,
+  status: ActionStatus,
+): Glyph => {
+  return match(status)
     .returnType<Glyph>()
-    .with('idle', () => actionDescription.Glyph)
+    .with('idle', () => action.Glyph)
     .with('running', () => IconLoader2)
     .with('success', () => IconCircleCheckFilled)
     .with('error', () => IconAlertTriangleFilled)
     .exhaustive()
-
-  const label = actionDescription.label[actionStatus]
-
-  return { Glyph, label, actionStatus }
 }
 
-export { useActionStatuses, runAction, useActionPresenter }
-export type { Action, ActionId, ActionDescription, ActionStatus }
+interface ActionPresenter {
+  Glyph: Glyph
+  label: string
+  actionStatus: ActionStatus
+}
+
+// biome-ignore lint/suspicious/noExplicitAny: We don't care about the shape of the actions.
+type AnyAction = Action<any>
+
+/**
+ * A hook that provides the necessary info to correctly display one or more actions.
+ *
+ * @param action - The action/s to track.
+ *
+ * @returns An {@link ActionPresenter} for each action provider.
+ */
+function useActionPresenters(action: AnyAction): ActionPresenter
+function useActionPresenters(actions: AnyAction[]): ActionPresenter[]
+function useActionPresenters(actions: AnyAction | AnyAction[]) {
+  const actionStatuses = useActionStatuses(
+    Array.isArray(actions) ? actions.map((action) => action.id) : [actions.id],
+  )
+
+  if (!Array.isArray(actions)) {
+    const action = actions
+    const status = actionStatuses.at(0) ?? 'idle'
+
+    return {
+      Glyph: getActionGlyph(action, status),
+      label: action.label[status],
+      actionStatus: status,
+    }
+  }
+
+  return actions.map((action, index) => {
+    const status = actionStatuses.at(index) ?? 'idle'
+
+    return {
+      Glyph: getActionGlyph(action, status),
+      label: action.label[status],
+      actionStatus: status,
+    }
+  })
+}
+
+export { useActionStatuses, runAction, useActionPresenters }
+export type {
+  Action,
+  ActionId,
+  ActionDescription,
+  ActionStatus,
+  ActionPresenter,
+}

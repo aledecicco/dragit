@@ -87,7 +87,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   const menuItems: MenuItem[] =
     alternatives?.map((alternative) => ({
       label: alternative.label.idle,
-      Glyph: alternative.Glyph,
+      decorator: <Icon Glyph={alternative.Glyph} size="sm" />,
       onClick: () => {
         if (actionStatus !== 'running') {
           runAction(alternative)
@@ -107,7 +107,13 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
       }}
       description={compact ? label : undefined}
       status={buttonStatus}
-      menuButtonProps={menuButtonProps}
+      menuButtonProps={{
+        ...menuButtonProps,
+        disabled:
+          actionStatus === 'running' ||
+          menuButtonProps?.disabled ||
+          buttonProps.disabled,
+      }}
     >
       <Icon
         size={buttonProps.size}

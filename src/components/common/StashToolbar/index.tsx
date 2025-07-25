@@ -15,8 +15,8 @@ interface StashToolbarProps extends Partial<ToolbarProps> {
 const StashToolbar = (props: StashToolbarProps) => {
   const { stash, ...toolbarProps } = props
 
-  const applyStash = useApplyStash(stash.id)
-  const discardStash = useDiscardStash(stash.id)
+  const applyStash = useApplyStash(stash)
+  const discardStash = useDiscardStash(stash)
 
   const tools: ToolbarTool[] = [
     {

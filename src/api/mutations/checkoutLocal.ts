@@ -4,6 +4,7 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Action } from '@/context/actions'
 import { useSelectedBranches } from '@/utils/repository'
 
+import type { BranchInfo } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
@@ -40,6 +41,17 @@ const useCheckoutLocal = (): Action<string> => {
   }
 }
 
+const useCheckoutBranch = (branch: BranchInfo): Action<void> => {
+  const checkoutLocal = useCheckoutLocal()
+
+  return {
+    ...checkoutLocal,
+    run: async () => {
+      await checkoutLocal.run(branch.name)
+    },
+  }
+}
+
 const useSwitchBranches = (): Action => {
   const { baseBranch } = useSelectedBranches()
   const checkoutLocal = useRepositoryMutation(checkoutLocalMutation)
@@ -63,4 +75,9 @@ const useSwitchBranches = (): Action => {
   }
 }
 
-export { useCheckoutLocal, useSwitchBranches, checkoutLocalKey }
+export {
+  useCheckoutLocal,
+  useCheckoutBranch,
+  useSwitchBranches,
+  checkoutLocalKey,
+}

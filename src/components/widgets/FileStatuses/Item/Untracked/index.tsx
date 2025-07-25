@@ -1,6 +1,7 @@
-import { IconFileUnknown, IconPlus } from '@tabler/icons-react'
+import { IconFileUnknown } from '@tabler/icons-react'
 
 import type { UntrackedFileInfo } from '@/api/models'
+import { useStageFile } from '@/api/mutations'
 import { withContextMenu } from '@/lib/ContextMenu'
 import type { ListItemProps } from '@/ui/ListItem'
 import { propsWithCn } from '@/utils/styles'
@@ -29,14 +30,9 @@ const UntrackedFileStatusItem = withContextMenu<UntrackedFileStatusItemProps>(
       />
     )
   },
-  () => {
-    return [
-      {
-        label: 'Stage',
-        Glyph: IconPlus,
-        onClick: () => {}, // TODO: stage
-      },
-    ]
+  ({ file }) => {
+    const stage = useStageFile(file)
+    return [stage]
   },
 )
 

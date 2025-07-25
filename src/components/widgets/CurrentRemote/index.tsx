@@ -59,12 +59,17 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
       <Combobox
         option={remote ? { value: remote.name, data: remote } : undefined}
         options={remoteOptions}
-        Glyph={
-          branch?.type === 'local'
-            ? remote === undefined
-              ? IconWorldQuestion
-              : IconWorld
-            : IconWorldCancel
+        decorator={
+          <Icon
+            Glyph={
+              branch?.type === 'local'
+                ? remote === undefined
+                  ? IconWorldQuestion
+                  : IconWorld
+                : IconWorldCancel
+            }
+            size="sm"
+          />
         }
         setOption={(newOption) => {
           changeUpstreamRemote(newOption.data)

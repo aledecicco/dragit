@@ -26,7 +26,7 @@ const useRemoveRemote = (name: RemoteName): Action => {
   const removeRemote = useRepositoryMutation(removeRemoteMutation)
 
   return {
-    id: 'remove_remote',
+    id: `remove_remote:${name}`,
     run: async () => {
       await removeRemote.mutateAsync({ name })
     },

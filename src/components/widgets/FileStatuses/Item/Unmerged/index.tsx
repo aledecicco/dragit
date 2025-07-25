@@ -1,7 +1,8 @@
-import { IconCheck, IconFileAlert, IconTrash } from '@tabler/icons-react'
+import { IconFileAlert } from '@tabler/icons-react'
 import { match, P } from 'ts-pattern'
 
 import type { UnmergedFileInfo } from '@/api/models'
+import { useMarkAsRemoved, useMarkAsResolved } from '@/api/mutations'
 import { withContextMenu } from '@/lib/ContextMenu'
 import type { ListItemProps } from '@/ui/ListItem'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -55,19 +56,14 @@ const UnmergedFileStatusItem = withContextMenu<UnmergedFileStatusItemProps>(
     )
   },
   ({ file }) => {
+    const resolve = useMarkAsResolved(file)
+    const remove = useMarkAsRemoved(file)
+
     return [
-      {
-        label: 'Mark as resolved',
-        Glyph: IconCheck,
-        onClick: () => {}, // TODO: resolve,
-      },
+      resolve,
       ...match(file.changes)
         .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => [
-          {
-            onClick: () => {}, // TODO: delete
-            label: 'Delete',
-            Glyph: IconTrash,
-          },
+          remove,
         ])
         .otherwise(() => []),
     ]

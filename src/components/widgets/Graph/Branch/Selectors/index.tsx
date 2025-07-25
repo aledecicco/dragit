@@ -4,7 +4,7 @@ import { match } from 'ts-pattern'
 import { useCheckoutLocal, useSwitchBranches } from '@/api/mutations'
 import { useQueryBranches, useQueryHeadInfo } from '@/api/queries'
 import { BranchSelector } from '@/common/BranchSelector'
-import { runAction, useActionPresenter } from '@/context/actions'
+import { runAction, useActionPresenters } from '@/context/actions'
 import { changeBaseRef, useSelectedRefs } from '@/context/branches'
 import { ActionButton } from '@/lib/ActionButton'
 import { Icon } from '@/ui/Icon'
@@ -24,7 +24,7 @@ const BranchSelectors = () => {
   const baseBranch = useBranch(baseReference)
 
   const checkout = useCheckoutLocal()
-  const checkoutTracker = useActionPresenter(checkout.id, checkout)
+  const checkoutTracker = useActionPresenters(checkout)
   const switchBranches = useSwitchBranches()
 
   return (

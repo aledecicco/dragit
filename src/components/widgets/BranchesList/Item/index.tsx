@@ -3,6 +3,7 @@ import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@/api/models'
 import { useCheckoutLocal } from '@/api/mutations'
+import { useCheckoutBranch } from '@/api/mutations/checkoutLocal'
 import { runAction } from '@/context/actions'
 import { withContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
@@ -92,14 +93,9 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
       </ListItem>
     )
   },
-  () => {
-    return [
-      {
-        label: 'Checkout',
-        Glyph: IconLocationFilled,
-        onClick: () => {}, // TODO: run checkout,
-      },
-    ]
+  ({ branch }) => {
+    const checkout = useCheckoutBranch(branch)
+    return [checkout]
   },
 )
 

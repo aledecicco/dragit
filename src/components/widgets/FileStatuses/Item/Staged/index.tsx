@@ -5,11 +5,11 @@ import {
   IconFilePencil,
   IconFilePlus,
   IconFiles,
-  IconMinus,
 } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { StagedFileInfo } from '@/api/models'
+import { useUnstageFile } from '@/api/mutations'
 import { withContextMenu } from '@/lib/ContextMenu'
 import type { ListItemProps } from '@/ui/ListItem'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -62,14 +62,9 @@ const StagedFileStatusItem = withContextMenu<StagedFileStatusItemProps>(
       />
     )
   },
-  () => {
-    return [
-      {
-        label: 'Unstage',
-        Glyph: IconMinus,
-        onClick: () => {}, // TODO: unstage
-      },
-    ]
+  ({ file }) => {
+    const unstage = useUnstageFile(file)
+    return [unstage]
   },
 )
 

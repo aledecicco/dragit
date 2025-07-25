@@ -1,11 +1,7 @@
-import {
-  IconArchive,
-  IconGitBranch,
-  IconPackageExport,
-  IconTrash,
-} from '@tabler/icons-react'
+import { IconArchive, IconGitBranch } from '@tabler/icons-react'
 
 import type { StashInfo } from '@/api/models'
+import { useApplyStash, useDiscardStash } from '@/api/mutations'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { StashToolbar } from '@/common/StashToolbar'
 import { withContextMenu } from '@/lib/ContextMenu'
@@ -107,19 +103,10 @@ const StashesListItem = withContextMenu<StashesListItemProps>(
       </ListItem>
     )
   },
-  () => {
-    return [
-      {
-        label: 'Apply',
-        Glyph: IconPackageExport,
-        onClick: () => {}, // TODO: apply,
-      },
-      {
-        label: 'Discard',
-        Glyph: IconTrash,
-        onClick: () => {}, // TODO: discard,
-      },
-    ]
+  ({ stash }) => {
+    const apply = useApplyStash(stash)
+    const discard = useDiscardStash(stash)
+    return [apply, discard]
   },
 )
 

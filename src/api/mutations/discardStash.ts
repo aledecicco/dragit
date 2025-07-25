@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
+import type { StashInfo } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
@@ -21,13 +22,13 @@ const discardStashMutation = (path: string) =>
     networkMode: 'always',
   })
 
-const useDiscardStash = (stashId: string): Action => {
+const useDiscardStash = (stash: StashInfo): Action => {
   const discardStash = useRepositoryMutation(discardStashMutation)
 
   return {
-    id: `discard_stash:${stashId}`,
+    id: `discard_stash:${stash.id}`,
     run: async () => {
-      await discardStash.mutateAsync({ stashId })
+      await discardStash.mutateAsync({ stashId: stash.id })
     },
     label: {
       idle: 'Discard',

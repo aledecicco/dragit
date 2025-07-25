@@ -1,12 +1,12 @@
+import type { ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
-import { type Glyph, Icon } from '@/ui/Icon'
 import { propsWithCn } from '@/utils/styles'
 import type { Size } from '@/utils/types'
 
 interface MenuItem extends Ariakit.MenuItemProps {
-  Glyph?: Glyph
+  decorator?: ReactNode
   label?: string
 }
 
@@ -40,14 +40,14 @@ const Menu = (props: MenuProps) => {
       )}
     >
       {items.map((menuItem) => {
-        const { Glyph, label, ...menuItemProps } = menuItem
+        const { decorator, label, ...menuItemProps } = menuItem
         return (
           <Ariakit.MenuItem
             key={label}
             {...propsWithCn(
               menuItemProps,
               'flex flex-row shrink-0 items-center gap-x-2 text-nowrap min-w-max',
-              'rounded-sm text-light-50',
+              'rounded-sm text-light-50 aria-disabled:text-light-50/50',
               match(size)
                 .with('sm', () => 'text-xs p-0.5')
                 .with('md', () => 'text-xs p-1')
@@ -56,7 +56,7 @@ const Menu = (props: MenuProps) => {
               'cursor-pointer hover:bg-dark-100 data-[active-item]:bg-dark-100',
             )}
           >
-            {Glyph && <Icon Glyph={Glyph} size="sm" />}
+            {decorator}
             {label}
           </Ariakit.MenuItem>
         )
