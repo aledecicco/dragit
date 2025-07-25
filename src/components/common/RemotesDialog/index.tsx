@@ -6,7 +6,7 @@ import { showDialog } from '@/context/dialogs'
 import { QueryList } from '@/lib/QueryList'
 import { Button } from '@/ui/Button'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
-import { cn } from '@/utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 import { idFn, mapFn } from '@/utils/types'
 
 import { RemoteForm } from './Form'
@@ -26,7 +26,11 @@ const RemotesDialog = (props: RemotesDialogProps) => {
   const remotesQuery = useQueryRemotes()
 
   return (
-    <Dialog dialogKey={REMOTES_DIALOG_KEY} heading="Remotes" {...dialogProps}>
+    <Dialog
+      dialogKey={REMOTES_DIALOG_KEY}
+      heading="Remotes"
+      {...propsWithCn(dialogProps, 'grid-cols-[560px]')}
+    >
       <div
         className={cn(
           'grid max-h-60 overflow-y-hidden mb-4',

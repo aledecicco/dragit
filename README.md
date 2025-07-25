@@ -12,7 +12,7 @@ Stash of ideas in ~planned implementation order:
 - [x] Commit details
 - [x] Documentation pass
 - [x] Performance pass
-- [ ] Global action tracking
+- [x] Global action tracking
 - [ ] Word diffs
 - [ ] Checkout of remote branches, create branch from commit
 - [ ] "Create" option on empty comboboxes

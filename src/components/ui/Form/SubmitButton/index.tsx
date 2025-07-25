@@ -36,6 +36,7 @@ const FormSubmitButton = <T extends AnyObject>(
           status={status}
           trackOnly
           mainAction={action}
+          compact={compact}
           {...propsWithCn(buttonProps, compact ? 'w-max' : 'w-full')}
         />
       }
