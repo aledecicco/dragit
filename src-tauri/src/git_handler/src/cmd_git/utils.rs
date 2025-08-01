@@ -2,9 +2,9 @@ use std::{str::FromStr, u32};
 
 use models::{
     BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, CommittedFileInfo, CommittedStatus,
-    DiffSection, DiffSummary, DiffType, FileDiff, HeadInfo, HistoryItem, MergeStatus, MovedStatus,
-    RemoteInfo, RemoteRef, StagedFileInfo, StagedFileStatus, StashInfo, StatusType,
-    UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo,
+    DiffSummary, HeadInfo, HistoryItem, MergeStatus, MovedStatus, RemoteInfo, RemoteRef,
+    StagedFileInfo, StagedFileStatus, StashInfo, StatusType, UnmergedFileInfo, UnstagedFileInfo,
+    UntrackedFileInfo,
 };
 
 /// Format used to get the needed information about a commit.
@@ -45,8 +45,6 @@ pub(crate) const STASH_INFO_QUICK: &str = "WIP";
 pub(crate) const DIFF_INSERTIONS: &str = "insertions(+)";
 /// The suffix that denotes that a string contains the number of deletions in a revision.
 pub(crate) const DIFF_DELETIONS: &str = "deletions(-)";
-/// The prefix that denotes that a line is the delimiter of a file diff.
-pub(crate) const FILE_DIFF_PREFIX: &str = "@@";
 
 pub(crate) fn parse_commit_info(line: &String) -> Option<CommitInfo> {
     let mut segments = line.split('\0');
@@ -337,54 +335,4 @@ pub(crate) fn parse_stash_info(lines: &Vec<String>) -> Option<StashInfo> {
         created_on,
         changes: diff_line.and_then(parse_diff_summary),
     })
-}
-
-pub(crate) fn parse_file_diff(lines: &Vec<String>) -> Option<FileDiff> {
-    let lines = lines.iter();
-    let lines: Vec<&String> = lines
-        .skip_while(|line| !line.starts_with(FILE_DIFF_PREFIX))
-        .skip(1)
-        .collect();
-
-    let mut sections: Vec<DiffSection> = Vec::new();
-    let mut current_type: Option<DiffType> = None;
-    let mut current_lines: Vec<String> = Vec::new();
-
-    for line in lines {
-        let (line_type, content) = match line.chars().nth(0) {
-            Some('+') => (DiffType::Added, line[1..].to_string()),
-            Some('-') => (DiffType::Removed, line[1..].to_string()),
-            Some(' ') => (DiffType::Unchanged, line[1..].to_string()),
-            _ => continue,
-        };
-
-        match &current_type {
-            Some(section_type) => {
-                if *section_type == line_type {
-                    current_lines.push(content)
-                } else {
-                    sections.push(DiffSection {
-                        diff_type: (*section_type).clone(),
-                        lines: current_lines,
-                    });
-
-                    current_type = Some(line_type);
-                    current_lines = vec![content];
-                }
-            }
-            _ => {
-                current_type = Some(line_type);
-                current_lines.push(content);
-            }
-        }
-    }
-
-    if !current_lines.is_empty() {
-        sections.push(DiffSection {
-            diff_type: current_type?,
-            lines: current_lines,
-        });
-    }
-
-    Some(FileDiff { sections })
 }

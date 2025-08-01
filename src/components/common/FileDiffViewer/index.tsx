@@ -76,30 +76,30 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
           ))}
         >
           {(fileDiff) => {
-            if (fileDiff.sections.length === 0) {
+            if (fileDiff.pages[0].items.length === 0) {
               return (
                 <p className={cn('text-light-950/50 italic')}>Empty file</p>
               )
             }
 
-            return (
+            return fileDiff.pages.map((page) => (
               <>
                 <DiffViewerLineNumbers
-                  fileDiff={fileDiff}
+                  fileDiff={page.items}
                   className={cn('col-start-1')}
                 />
 
                 <DiffViewerLineChanges
-                  fileDiff={fileDiff}
+                  fileDiff={page.items}
                   className={cn('col-start-2')}
                 />
 
                 <DiffViewerContent
-                  fileDiff={fileDiff}
+                  fileDiff={page.items}
                   className={cn('col-start-3')}
                 />
               </>
-            )
+            ))
           }}
         </QueryLoader>
       </div>

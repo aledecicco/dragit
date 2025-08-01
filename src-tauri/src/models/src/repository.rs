@@ -230,21 +230,3 @@ pub struct StashInfo {
     pub created_on: String,
     pub changes: Option<DiffSummary>,
 }
-
-#[derive(borsh::BorshSerialize, Debug)]
-pub struct FileDiff {
-    pub sections: Vec<DiffSection>,
-}
-
-#[derive(borsh::BorshSerialize, Debug)]
-pub struct DiffSection {
-    pub diff_type: DiffType,
-    pub lines: Vec<String>,
-}
-
-#[derive(borsh::BorshSerialize, Debug, Clone, PartialEq)]
-pub enum DiffType {
-    Added,
-    Removed,
-    Unchanged,
-}

@@ -386,9 +386,11 @@ pub async fn get_file_diff(
     path: &str,
     reference: &str,
     filepath: &str,
+    start_after: usize,
+    limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_file_diff(&channel, path, reference, filepath)
+        h.get_file_diff(&channel, path, reference, filepath, start_after, limit)
     })
     .and_then(serialize_response)
 }

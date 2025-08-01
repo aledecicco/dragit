@@ -1,14 +1,21 @@
 import {
+  infiniteQueryOptions,
   type QueryFunctionContext,
   queryOptions,
   skipToken,
 } from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
-import type { DiffSection, DiffType, FileDiff } from '../models'
-import { FILE_DIFF_SCHEMA } from '../schemas'
-import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
+import type { DiffType, LineDiff, Page } from '../models'
+import { FILE_DIFF_PAGE_SCHEMA } from '../schemas'
+import {
+  fetchAndDeserialize,
+  useRepositoryInfiniteQuery,
+  useRepositoryQuery,
+} from '../utils'
 import { pathQueryKey } from '.'
+
+export const FILE_DIFF_PAGE_SIZE = 1000
 
 const filesDiffQueryKeys = {
   all: (path: string) =>
@@ -34,32 +41,25 @@ const filesDiffQueryKeys = {
 
 const fetchFileDiff = async (
   path: string,
-  context: QueryFunctionContext,
   reference: string,
   filepath: string,
-): Promise<FileDiff> => {
+  page: number,
+  context: QueryFunctionContext,
+): Promise<Page<LineDiff>> => {
   const res = await fetchAndDeserialize(
     'get_file_diff',
-    { path, reference, filepath },
-    FILE_DIFF_SCHEMA,
+    {
+      path,
+      reference,
+      filepath,
+      startAfter: page * FILE_DIFF_PAGE_SIZE,
+      limit: FILE_DIFF_PAGE_SIZE,
+    },
+    FILE_DIFF_PAGE_SCHEMA,
     context,
   )
 
-  const sections: DiffSection[] = res.sections.map((section) => {
-    const diffType = match(section.diffType)
-      .returnType<DiffType>()
-      .with({ Added: P._ }, () => 'added')
-      .with({ Removed: P._ }, () => 'removed')
-      .with({ Unchanged: P._ }, () => 'unchanged')
-      .exhaustive()
-
-    return {
-      diffType,
-      lines: section.lines,
-    }
-  })
-
-  return { sections }
+  return res
 }
 
 const fileDiffQuery = (
@@ -67,17 +67,23 @@ const fileDiffQuery = (
   reference: string | undefined,
   filepath: string | undefined,
 ) =>
-  queryOptions({
+  infiniteQueryOptions({
     queryKey: [filesDiffQueryKeys.file(path, reference, filepath)],
     queryFn:
       !!reference && !!filepath
-        ? (context) => fetchFileDiff(path, context, reference, filepath)
+        ? (context) =>
+            fetchFileDiff(path, reference, filepath, context.pageParam, context)
         : skipToken,
+
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _, lastPageParam) => {
+      return lastPage.hasNext ? lastPageParam + 1 : undefined
+    },
   })
 
 const useQueryFileDiff = (
   reference: string | undefined,
   filediff: string | undefined,
-) => useRepositoryQuery(fileDiffQuery, reference, filediff)
+) => useRepositoryInfiniteQuery(fileDiffQuery, reference, filediff)
 
 export { filesDiffQueryKeys, useQueryFileDiff }

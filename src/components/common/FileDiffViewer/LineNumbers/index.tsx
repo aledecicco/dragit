@@ -1,14 +1,17 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import type { DiffType, FileDiff } from '@/api/models'
+import type { DiffType, LineDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
+import { mapFn } from '@/utils/types'
+
+import { getLineDiffType } from '../utils'
 
 interface DiffViewerLineNumbersProps extends ComponentProps<'div'> {
   /**
    * The diff to display.
    */
-  fileDiff: FileDiff
+  fileDiff: LineDiff[]
 }
 
 /**
@@ -17,27 +20,22 @@ interface DiffViewerLineNumbersProps extends ComponentProps<'div'> {
 const DiffViewerLineNumbers = (props: DiffViewerLineNumbersProps) => {
   const { fileDiff, ...divProps } = props
 
-  const lengthSums = fileDiff.sections.reduce((acc: number[], section) => {
-    acc.push((acc.at(-1) ?? 0) + section.lines.length)
-    return acc
-  }, [])
-  const totalLength = lengthSums.at(-1) ?? 0
-
   return (
     <div {...propsWithCn(divProps, 'select-none row-start-1 -row-end-1')}>
-      {fileDiff.sections.map((section, i) =>
-        section.lines.map((_, j) => (
+      {fileDiff.map((line, i) => {
+        const diffType = getLineDiffType(line)
+        return (
           <LineNumbersCell
-            key={`${section.diffType}-${i}-${j}`}
-            lineNumber={(i === 0 ? 0 : lengthSums[i - 1]) + j + 1}
-            diffType={section.diffType}
+            key={`${diffType}-${i + 1}`}
+            lineNumber={i + 1}
+            diffType={diffType}
           />
-        )),
-      )}
+        )
+      })}
 
       <LineNumbersCell
-        lineNumber={totalLength + 1}
-        diffType={fileDiff.sections.at(-1)?.diffType ?? 'unchanged'}
+        lineNumber={fileDiff.length + 1}
+        diffType={mapFn(fileDiff.at(-1), getLineDiffType) ?? 'unchanged'}
         faded
       />
     </div>

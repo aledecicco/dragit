@@ -11,8 +11,8 @@ use utils::*;
 
 use models::{
     AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommittedFileInfo,
-    CommonAncestorInfo, FileDiff, FileInfo, FileTypesFilter, GitError, GitHandler, HeadInfo,
-    HistoryItem, Page, RemoteInfo, StashInfo,
+    CommonAncestorInfo, FileInfo, FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem,
+    Page, RemoteInfo, StashInfo,
 };
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
@@ -625,7 +625,9 @@ impl GitHandler for CmdGit {
         path: &str,
         reference: &str,
         filepath: &str,
-    ) -> Result<FileDiff, GitError> {
+        start_after: usize,
+        limit: usize,
+    ) -> Result<Page<Vec<String>>, GitError> {
         let process = self.spawn_and_notify(
             channel,
             path,
@@ -634,15 +636,52 @@ impl GitHandler for CmdGit {
                 reference,
                 &format!("{}^1", reference),
                 "-U1000000",
+                "--word-diff=porcelain",
                 "--",
                 filepath,
             ],
         )?;
-        let lines = self.get_all_output_lines(process)?;
 
-        parse_file_diff(&lines).ok_or(GitError::GetFileDiffFailed {
-            filepath: filepath.to_string(),
-            reference: reference.to_string(),
-        })
+        let mut items: Vec<Vec<String>> = Vec::new();
+        let mut skipped = 0;
+        let mut current_segments: Vec<String> = Vec::new();
+
+        let lines = self.get_output_lines_stream(process)?;
+
+        for line in lines {
+            if let Ok(line) = line {
+                if start_after >= skipped {
+                    if line.starts_with("~") {
+                        skipped += 1;
+                    }
+
+                    continue;
+                }
+
+                current_segments.push(line.to_string());
+                if line.starts_with("~") {
+                    items.push(current_segments);
+                    current_segments = Vec::new();
+                }
+            } else {
+                return Err(GitError::GetFileDiffFailed {
+                    reference: reference.to_string(),
+                    filepath: filepath.to_string(),
+                });
+            }
+
+            if limit <= items.len() {
+                break;
+            }
+        }
+
+        let has_remaining = !current_segments.is_empty();
+        if has_remaining {
+            items.push(current_segments);
+        }
+
+        let has_next = has_remaining;
+
+        Ok(Page { items, has_next })
     }
 }

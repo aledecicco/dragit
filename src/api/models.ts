@@ -184,14 +184,9 @@ export type Reference =
 
 export type DiffType = 'added' | 'removed' | 'unchanged'
 
-export interface DiffSection {
-  diffType: DiffType
-  lines: string[]
-}
+export type DiffLineSegment = string
 
-export interface FileDiff {
-  sections: DiffSection[]
-}
+export type LineDiff = DiffLineSegment[]
 
 export type AppMessage = {
   type: 'processStarted'

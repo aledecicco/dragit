@@ -2,7 +2,7 @@ use tauri::ipc::Channel;
 
 use crate::{
     AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommittedFileInfo, CommonAncestorInfo,
-    FileDiff, FileInfo, GitError, HeadInfo, HistoryItem, Page, RemoteInfo, StashInfo,
+    FileInfo, GitError, HeadInfo, HistoryItem, Page, RemoteInfo, StashInfo,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -174,7 +174,9 @@ pub trait GitHandler {
         path: &str,
         reference: &str,
         filepath: &str,
-    ) -> Result<FileDiff, GitError>;
+        start_after: usize,
+        limit: usize,
+    ) -> Result<Page<Vec<String>>, GitError>;
 }
 
 #[derive(serde::Deserialize, Debug)]

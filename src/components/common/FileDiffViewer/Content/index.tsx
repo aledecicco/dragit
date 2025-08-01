@@ -1,14 +1,17 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import type { DiffType, FileDiff } from '@/api/models'
+import type { DiffLineSegment, DiffType, LineDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
+import { mapFn } from '@/utils/types'
+
+import { getDiffSegmentType, getLineDiffType } from '../utils'
 
 interface DiffViewerContentProps extends ComponentProps<'div'> {
   /**
    * The diff to display.
    */
-  fileDiff: FileDiff
+  fileDiff: LineDiff[]
 }
 
 /**
@@ -25,19 +28,21 @@ const DiffViewerContent = (props: DiffViewerContentProps) => {
       )}
     >
       <div className={cn('w-max min-w-full')}>
-        {fileDiff.sections.map((section, i) =>
-          section.lines.map((line, j) => (
+        {fileDiff.map((line, i) => {
+          const diffType = getLineDiffType(line)
+
+          return (
             <ContentCell
-              key={`${section.diffType}-${i}-${j}`}
-              diffType={section.diffType}
-              line={line}
+              key={`${diffType}-${i + 1}`}
+              diffType={diffType}
+              segments={line}
             />
-          )),
-        )}
+          )
+        })}
 
         <ContentCell
-          diffType={fileDiff.sections.at(-1)?.diffType ?? 'unchanged'}
-          line=""
+          diffType={mapFn(fileDiff.at(-1), getLineDiffType) ?? 'unchanged'}
+          segments={[]}
         />
       </div>
     </div>
@@ -48,10 +53,13 @@ const DiffViewerContent = (props: DiffViewerContentProps) => {
  * Displays a single line of content with the appropriate styling based on its diff type.
  *
  * @param props.diffType - The type of diff for the line.
- * @param props.line - The content of the line to display.
+ * @param props.segments - The content of the line to display.
  */
-const ContentCell = (props: { diffType: DiffType; line: string }) => {
-  const { diffType, line } = props
+const ContentCell = (props: {
+  diffType: DiffType
+  segments: DiffLineSegment[]
+}) => {
+  const { diffType, segments } = props
 
   return (
     <div
@@ -64,7 +72,20 @@ const ContentCell = (props: { diffType: DiffType; line: string }) => {
           .exhaustive(),
       )}
     >
-      {line}
+      {segments.map((segment, index) => (
+        <div
+          key={`${index + 1}`}
+          className={cn(
+            match(getDiffSegmentType(segment))
+              .with('added', () => 'bg-success-500/30')
+              .with('removed', () => 'bg-danger-600/30')
+              .with('unchanged', () => undefined)
+              .exhaustive(),
+          )}
+        >
+          {segment.slice(1)}
+        </div>
+      ))}
     </div>
   )
 }
