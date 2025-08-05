@@ -1,11 +1,11 @@
-import type { ComponentProps } from 'react'
+import { type ComponentProps, Fragment } from 'react'
 import { match } from 'ts-pattern'
 
 import type { DiffType, LineDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-import { getLineDiffType } from '../utils'
+import { getLineDiffType, isCompositeLine } from '../utils'
 
 interface DiffViewerLineNumbersProps extends ComponentProps<'div'> {
   /**
@@ -23,10 +23,21 @@ const DiffViewerLineNumbers = (props: DiffViewerLineNumbersProps) => {
   return (
     <div {...propsWithCn(divProps, 'select-none row-start-1 -row-end-1')}>
       {fileDiff.map((line, i) => {
+        const isComposite = isCompositeLine(line)
+
+        if (isComposite) {
+          return (
+            <Fragment key={`${i + 1}`}>
+              <LineNumbersCell lineNumber={i + 1} diffType="removed" />
+              <LineNumbersCell lineNumber={undefined} diffType="added" />
+            </Fragment>
+          )
+        }
+
         const diffType = getLineDiffType(line)
         return (
           <LineNumbersCell
-            key={`${diffType}-${i + 1}`}
+            key={`${i + 1}`}
             lineNumber={i + 1}
             diffType={diffType}
           />
@@ -50,7 +61,7 @@ const DiffViewerLineNumbers = (props: DiffViewerLineNumbersProps) => {
  * @param props.faded - Whether to display the line number in a faded style.
  */
 const LineNumbersCell = (props: {
-  lineNumber: number
+  lineNumber: number | undefined
   diffType: DiffType
   faded?: boolean
 }) => {

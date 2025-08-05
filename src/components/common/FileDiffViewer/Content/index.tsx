@@ -1,11 +1,11 @@
-import type { ComponentProps } from 'react'
+import { type ComponentProps, Fragment } from 'react'
 import { match } from 'ts-pattern'
 
 import type { DiffLineSegment, DiffType, LineDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-import { getDiffSegmentType, getLineDiffType } from '../utils'
+import { getDiffSegmentType, getLineDiffType, isCompositeLine } from '../utils'
 
 interface DiffViewerContentProps extends ComponentProps<'div'> {
   /**
@@ -29,14 +29,30 @@ const DiffViewerContent = (props: DiffViewerContentProps) => {
     >
       <div className={cn('w-max min-w-full')}>
         {fileDiff.map((line, i) => {
-          const diffType = getLineDiffType(line)
+          const isComposite = isCompositeLine(line)
 
+          if (isComposite) {
+            return (
+              <Fragment key={`${i + 1}`}>
+                <ContentCell
+                  diffType="removed"
+                  segments={line.filter(
+                    (segment) => getDiffSegmentType(segment) !== 'added',
+                  )}
+                />
+                <ContentCell
+                  diffType="added"
+                  segments={line.filter(
+                    (segment) => getDiffSegmentType(segment) !== 'removed',
+                  )}
+                />
+              </Fragment>
+            )
+          }
+
+          const diffType = getLineDiffType(line)
           return (
-            <ContentCell
-              key={`${diffType}-${i + 1}`}
-              diffType={diffType}
-              segments={line}
-            />
+            <ContentCell key={`${i + 1}`} diffType={diffType} segments={line} />
           )
         })}
 
@@ -73,18 +89,20 @@ const ContentCell = (props: {
       )}
     >
       {segments.map((segment, index) => (
-        <div
+        <span
           key={`${index + 1}`}
           className={cn(
-            match(getDiffSegmentType(segment))
-              .with('added', () => 'bg-success-500/30')
-              .with('removed', () => 'bg-danger-600/30')
-              .with('unchanged', () => undefined)
-              .exhaustive(),
+            'flex flex-row items-center h-full',
+            segments.length > 1 &&
+              match(getDiffSegmentType(segment))
+                .with('added', () => 'bg-success-500/30')
+                .with('removed', () => 'bg-danger-600/30')
+                .with('unchanged', () => undefined)
+                .exhaustive(),
           )}
         >
           {segment.slice(1)}
-        </div>
+        </span>
       ))}
     </div>
   )

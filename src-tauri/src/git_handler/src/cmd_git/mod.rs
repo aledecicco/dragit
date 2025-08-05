@@ -633,8 +633,8 @@ impl GitHandler for CmdGit {
             path,
             [
                 "diff",
-                reference,
                 &format!("{}^1", reference),
+                reference,
                 "-U1000000",
                 "--word-diff=porcelain",
                 "--",
@@ -646,11 +646,17 @@ impl GitHandler for CmdGit {
         let mut skipped = 0;
         let mut current_segments: Vec<String> = Vec::new();
 
-        let lines = self.get_output_lines_stream(process)?;
+        let mut lines = self.get_output_lines_stream(process)?;
+
+        for line in &mut lines {
+            if line.is_ok_and(|line| line.starts_with("@@")) {
+                break;
+            }
+        }
 
         for line in lines {
             if let Ok(line) = line {
-                if start_after >= skipped {
+                if start_after > skipped {
                     if line.starts_with("~") {
                         skipped += 1;
                     }
@@ -658,10 +664,11 @@ impl GitHandler for CmdGit {
                     continue;
                 }
 
-                current_segments.push(line.to_string());
                 if line.starts_with("~") {
                     items.push(current_segments);
                     current_segments = Vec::new();
+                } else {
+                    current_segments.push(line.to_string());
                 }
             } else {
                 return Err(GitError::GetFileDiffFailed {

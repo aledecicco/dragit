@@ -1,11 +1,11 @@
-import type { ComponentProps } from 'react'
+import { type ComponentProps, Fragment } from 'react'
 import { match } from 'ts-pattern'
 
 import type { DiffType, LineDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-import { getLineDiffType } from '../utils'
+import { getLineDiffType, isCompositeLine } from '../utils'
 
 interface DiffViewerLineChangesProps extends ComponentProps<'div'> {
   /**
@@ -23,10 +23,19 @@ const DiffViewerLineChanges = (props: DiffViewerLineChangesProps) => {
   return (
     <div {...propsWithCn(divProps, 'select-none row-start-1 -row-end-1')}>
       {fileDiff.map((line, i) => {
+        const isComposite = isCompositeLine(line)
+
+        if (isComposite) {
+          return (
+            <Fragment key={`${i + 1}`}>
+              <LineChangesCell diffType="removed" />
+              <LineChangesCell diffType="added" />
+            </Fragment>
+          )
+        }
+
         const diffType = getLineDiffType(line)
-        return (
-          <LineChangesCell key={`${diffType}-${i + 1}`} diffType={diffType} />
-        )
+        return <LineChangesCell key={`${i + 1}`} diffType={diffType} />
       })}
 
       <LineChangesCell
