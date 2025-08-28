@@ -34,7 +34,6 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
   const { reference, filepath, ...divProps } = props
 
   const fileDiffQuery = useQueryFileDiff(reference.refName, filepath)
-  console.log(fileDiffQuery.data?.pages[0])
 
   return (
     <div
@@ -77,30 +76,31 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
           ))}
         >
           {(fileDiff) => {
-            if (fileDiff.pages[0].items.length === 0) {
+            if (fileDiff.length === 0) {
               return (
                 <p className={cn('text-light-950/50 italic')}>Empty file</p>
               )
             }
 
-            return fileDiff.pages.map((page, index) => (
-              <Fragment key={`page-${index + 1}`}>
+            return (
+              <>
                 <DiffViewerLineNumbers
-                  fileDiff={page.items}
+                  fileDiff={fileDiff}
                   className={cn('col-start-1')}
                 />
 
                 <DiffViewerLineChanges
-                  fileDiff={page.items}
+                  fileDiff={fileDiff}
                   className={cn('col-start-2')}
                 />
 
                 <DiffViewerContent
-                  fileDiff={page.items}
+                  filepath={filepath}
+                  fileDiff={fileDiff}
                   className={cn('col-start-3')}
                 />
-              </Fragment>
-            ))
+              </>
+            )
           }}
         </QueryLoader>
       </div>

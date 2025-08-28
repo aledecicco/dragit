@@ -175,6 +175,6 @@ export const DIFF_TYPE_SCHEMA = BorshSchema.Enum({
   Unchanged: BorshSchema.Unit,
 })
 
-export const FILE_DIFF_PAGE_SCHEMA = PAGE_SCHEMA(
+export const FILE_DIFF_SCHEMA = BorshSchema.Vec(
   BorshSchema.Vec(BorshSchema.String),
 )

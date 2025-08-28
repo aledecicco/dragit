@@ -186,7 +186,9 @@ export type DiffType = 'added' | 'removed' | 'unchanged'
 
 export type DiffLineSegment = string
 
-export type LineDiff = DiffLineSegment[]
+export type DiffLine = DiffLineSegment[]
+
+export type FileDiff = DiffLine[]
 
 export type AppMessage = {
   type: 'processStarted'

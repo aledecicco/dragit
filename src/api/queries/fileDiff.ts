@@ -1,18 +1,12 @@
 import {
-  infiniteQueryOptions,
   type QueryFunctionContext,
   queryOptions,
   skipToken,
 } from '@tanstack/react-query'
-import { match, P } from 'ts-pattern'
 
-import type { DiffType, LineDiff, Page } from '../models'
-import { FILE_DIFF_PAGE_SCHEMA } from '../schemas'
-import {
-  fetchAndDeserialize,
-  useRepositoryInfiniteQuery,
-  useRepositoryQuery,
-} from '../utils'
+import type { FileDiff } from '../models'
+import { FILE_DIFF_SCHEMA } from '../schemas'
+import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
 export const FILE_DIFF_PAGE_SIZE = 1000
@@ -43,19 +37,16 @@ const fetchFileDiff = async (
   path: string,
   reference: string,
   filepath: string,
-  page: number,
   context: QueryFunctionContext,
-): Promise<Page<LineDiff>> => {
+): Promise<FileDiff> => {
   const res = await fetchAndDeserialize(
     'get_file_diff',
     {
       path,
       reference,
       filepath,
-      startAfter: page * FILE_DIFF_PAGE_SIZE,
-      limit: FILE_DIFF_PAGE_SIZE,
     },
-    FILE_DIFF_PAGE_SCHEMA,
+    FILE_DIFF_SCHEMA,
     context,
   )
 
@@ -67,23 +58,17 @@ const fileDiffQuery = (
   reference: string | undefined,
   filepath: string | undefined,
 ) =>
-  infiniteQueryOptions({
+  queryOptions({
     queryKey: [filesDiffQueryKeys.file(path, reference, filepath)],
     queryFn:
       !!reference && !!filepath
-        ? (context) =>
-            fetchFileDiff(path, reference, filepath, context.pageParam, context)
+        ? (context) => fetchFileDiff(path, reference, filepath, context)
         : skipToken,
-
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, _, lastPageParam) => {
-      return lastPage.hasNext ? lastPageParam + 1 : undefined
-    },
   })
 
 const useQueryFileDiff = (
   reference: string | undefined,
   filediff: string | undefined,
-) => useRepositoryInfiniteQuery(fileDiffQuery, reference, filediff)
+) => useRepositoryQuery(fileDiffQuery, reference, filediff)
 
 export { filesDiffQueryKeys, useQueryFileDiff }

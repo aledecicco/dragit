@@ -174,8 +174,6 @@ pub trait GitHandler {
         path: &str,
         reference: &str,
         filepath: &str,
-        start_after: usize,
-        limit: usize,
     ) -> Result<Page<Vec<String>>, GitError>;
 }
 

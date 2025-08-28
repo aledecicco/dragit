@@ -625,8 +625,6 @@ impl GitHandler for CmdGit {
         path: &str,
         reference: &str,
         filepath: &str,
-        start_after: usize,
-        limit: usize,
     ) -> Result<Page<Vec<String>>, GitError> {
         let process = self.spawn_and_notify(
             channel,
@@ -643,7 +641,6 @@ impl GitHandler for CmdGit {
         )?;
 
         let mut items: Vec<Vec<String>> = Vec::new();
-        let mut skipped = 0;
         let mut current_segments: Vec<String> = Vec::new();
 
         let mut lines = self.get_output_lines_stream(process)?;
@@ -656,11 +653,7 @@ impl GitHandler for CmdGit {
 
         for line in lines {
             if let Ok(line) = line {
-                if start_after > skipped {
-                    if line.starts_with("~") {
-                        skipped += 1;
-                    }
-
+                if line.starts_with("@@") {
                     continue;
                 }
 
@@ -675,10 +668,6 @@ impl GitHandler for CmdGit {
                     reference: reference.to_string(),
                     filepath: filepath.to_string(),
                 });
-            }
-
-            if limit <= items.len() {
-                break;
             }
         }
 
