@@ -3,7 +3,9 @@ name = "settings"
 version = "0.1.0"
 edition = "2021"
 
+
 [dependencies]
-tauri = "2.4.0"
-tauri-plugin-store = "2"
+tauri = { workspace = true }
+tauri-plugin-store = { workspace = true }
+
 models = { path = "../models" }

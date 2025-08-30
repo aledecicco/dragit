@@ -5,7 +5,6 @@ description = ""
 authors = ["Alejandro De Cicco"]
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
 # The `_lib` suffix may seem redundant but it is necessary
@@ -14,21 +13,46 @@ edition = "2021"
 name = "dragit_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+
 [build-dependencies]
 tauri-build = { version = "2.1.0", features = [] }
 
+
 [dependencies]
-tauri = { version = "2.4.0", features = [] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+tauri = { workspace = true }
+serde = { workspace = true }
+borsh = { workspace = true }
+tauri-plugin-store = { workspace = true }
+
 api = { path = "src/api" }
 git_handler = { path = "src/git_handler" }
 repo_watcher = { path = "src/repo_watcher" }
 models = { path = "src/models" }
 settings = { path = "src/settings" }
-tauri-plugin-dialog = "2"
-tauri-plugin-clipboard-manager = "2.2.2"
-tauri-plugin-store = "2"
-tauri-plugin-process = "2"
-tauri-plugin-shell = "2"
-tauri-plugin-http = "2"
+
+tauri-plugin-dialog = { version = "2" }
+tauri-plugin-clipboard-manager = { version = "2.2.2" }
+tauri-plugin-process = { version = "2" }
+tauri-plugin-shell = { version = "2" }
+tauri-plugin-http = { version = "2" }
+
+
+[workspace]
+members = [
+  "src/api",
+  "src/models",
+  "src/settings",
+  "src/git_handler",
+  "src/repo_watcher",
+]
+
+
+[workspace.dependencies]
+tauri = { version = "2.4.0", features = [] }
+serde = { version = "1", features = ["derive"] }
+borsh = { version = "1.5.7", features = ["derive"] }
+tauri-plugin-store = { version = "2" }
+
+
+[profile.dev]
+debug = 0

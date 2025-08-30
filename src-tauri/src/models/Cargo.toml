@@ -3,11 +3,12 @@ name = "models"
 version = "0.1.0"
 edition = "2021"
 
+
 [dependencies]
+tauri = { workspace = true }
+serde = { workspace = true }
+borsh = { workspace = true}
+
 parking_lot = { version = "0.12.3", features = ["deadlock_detection"] }
-serde = { version = "1.0.210", features = ["derive"] }
-serde_json = "1.0.128"
-borsh = { version = "1.5.7", features = ["derive"] }
+thiserror = { version = "1.0.64" }
 strum = { version = "0.26.3", features = ["derive"] }
-thiserror = "1.0.64"
-tauri = "2.4.0"

@@ -3,7 +3,8 @@ name = "git_handler"
 version = "0.1.0"
 edition = "2021"
 
+
 [dependencies]
-borsh = { version = "1.5.7", features = ["derive"] }
-tauri = "2.4.0"
+borsh = { workspace = true }
+tauri = { workspace = true }
 models = { path = "../models" }
