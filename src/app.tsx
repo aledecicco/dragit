@@ -13,8 +13,12 @@ import { useUpstreamSync } from '@/context/upstream'
 import { useContextMenuHandler } from '@/lib/ContextMenu'
 import { cn } from '@/utils/styles'
 
+import { useEventsHandler } from './api/events'
+
 const App = () => {
+  useEventsHandler()
   useContextMenuHandler()
+
   const currentDirQuery = useQueryCurrentDir()
 
   return (

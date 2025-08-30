@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
 import { match, P } from 'ts-pattern'
@@ -23,10 +23,8 @@ const EVENT_ID = 'app-event'
 /**
  * Subscribes the app to events coming from the backend, and invalidates queries accordingly.
  */
-const EventHandler = (props: PropsWithChildren) => {
-  const { children } = props
+const useEventsHandler = () => {
   const client = useQueryClient()
-
   const { reference } = useSelectedRefs()
 
   useEffect(() => {
@@ -130,8 +128,6 @@ const EventHandler = (props: PropsWithChildren) => {
       unlisten.then((f) => f())
     }
   }, [client.resetQueries, client.invalidateQueries, reference])
-
-  return children
 }
 
-export { EventHandler }
+export { useEventsHandler }
