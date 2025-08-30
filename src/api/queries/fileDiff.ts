@@ -9,8 +9,6 @@ import { FILE_DIFF_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
-export const FILE_DIFF_PAGE_SIZE = 1000
-
 const filesDiffQueryKeys = {
   all: (path: string) =>
     ({

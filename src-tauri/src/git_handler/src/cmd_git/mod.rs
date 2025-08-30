@@ -625,7 +625,7 @@ impl GitHandler for CmdGit {
         path: &str,
         reference: &str,
         filepath: &str,
-    ) -> Result<Page<Vec<String>>, GitError> {
+    ) -> Result<Vec<Vec<String>>, GitError> {
         let process = self.spawn_and_notify(
             channel,
             path,
@@ -653,13 +653,11 @@ impl GitHandler for CmdGit {
 
         for line in lines {
             if let Ok(line) = line {
-                if line.starts_with("@@") {
-                    continue;
-                }
-
                 if line.starts_with("~") {
-                    items.push(current_segments);
-                    current_segments = Vec::new();
+                    if !current_segments.is_empty() {
+                        items.push(current_segments);
+                        current_segments = Vec::new();
+                    }
                 } else {
                     current_segments.push(line.to_string());
                 }
@@ -676,8 +674,6 @@ impl GitHandler for CmdGit {
             items.push(current_segments);
         }
 
-        let has_next = has_remaining;
-
-        Ok(Page { items, has_next })
+        Ok(items)
     }
 }

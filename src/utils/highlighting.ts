@@ -7,6 +7,7 @@ import { Fragment, jsx, jsxs } from 'react/jsx-runtime'
 import type { FileDiff } from '@/api/models'
 import {
   getDiffSegmentType,
+  lineHasAdditions,
   lineHasRemovals,
 } from '@/common/FileDiffViewer/utils'
 
@@ -27,13 +28,12 @@ const renderTree = (tree: Root): ReactNode => {
 
 const getContentBefore = (fileDiff: FileDiff): string => {
   return fileDiff
-    .map((line) => {
-      console.log(line)
-      return line
+    .map((line) =>
+      line
         .filter((segment) => getDiffSegmentType(segment) !== 'added')
         .map((segment) => segment.slice(1))
-        .join('')
-    })
+        .join(''),
+    )
     .join('\n')
 }
 
@@ -48,14 +48,15 @@ const getContentAfter = (fileDiff: FileDiff): string => {
     .join('\n')
 }
 
+const LINES_REGEX = /\r\n|\r|\n/
+
 const splitIntoLines = (tree: Root): RootContent[][] => {
   const lines: RootContent[][] = []
   let line: RootContent[] = []
 
   tree.children.forEach((node) => {
     if (node.type === 'text') {
-      const regex = /\r\n|\r|\n/
-      node.value.split(regex).forEach((part, index) => {
+      node.value.split(LINES_REGEX).forEach((part, index) => {
         if (index > 0) {
           lines.push(line)
           line = []
@@ -80,24 +81,50 @@ const splitIntoLines = (tree: Root): RootContent[][] => {
 export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
   const treeBefore = getTree(getContentBefore(fileDiff), path)
   const linesBefore = treeBefore ? splitIntoLines(treeBefore) : []
+  let pointerBefore = 0
 
   const treeAfter = getTree(getContentAfter(fileDiff), path)
   const linesAfter = treeAfter ? splitIntoLines(treeAfter) : []
+  let pointerAfter = 0
 
-  let res: RootContent[] = []
-  for (let i = 0; i < fileDiff.length; i++) {
-    const diffLine = fileDiff[i]
+  const res: RootContent[] = []
+  for (const diffLine of fileDiff) {
+    const hasRemovals = lineHasRemovals(diffLine)
+    const hasAdditions = lineHasAdditions(diffLine)
 
-    if (lineHasRemovals(diffLine)) {
-      res = res.concat(linesBefore.at(i) ?? [])
-      res.push({ type: 'text', value: '\n' })
+    if (hasRemovals) {
+      res.push(...(linesBefore.at(pointerBefore) ?? []), {
+        type: 'text',
+        value: '\n',
+      })
+      pointerBefore++
+
+      if (!hasAdditions) {
+        pointerAfter++
+      }
     }
 
-    res = res.concat(linesAfter.at(i) ?? [])
-    res.push({ type: 'text', value: '\n' })
-  }
+    if (hasAdditions) {
+      res.push(...(linesAfter.at(pointerAfter) ?? []), {
+        type: 'text',
+        value: '\n',
+      })
+      pointerAfter++
 
-  console.log('res', res)
+      if (!hasRemovals) {
+        pointerBefore++
+      }
+    }
+
+    if (!hasRemovals && !hasAdditions) {
+      res.push(...(linesAfter.at(pointerAfter) ?? []), {
+        type: 'text',
+        value: '\n',
+      })
+      pointerBefore++
+      pointerAfter++
+    }
+  }
 
   return renderTree({ type: 'root', children: res })
 }

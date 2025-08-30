@@ -174,7 +174,7 @@ pub trait GitHandler {
         path: &str,
         reference: &str,
         filepath: &str,
-    ) -> Result<Page<Vec<String>>, GitError>;
+    ) -> Result<Vec<Vec<String>>, GitError>;
 }
 
 #[derive(serde::Deserialize, Debug)]
