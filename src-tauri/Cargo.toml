@@ -25,10 +25,11 @@ borsh = { workspace = true }
 tauri-plugin-store = { workspace = true }
 
 api = { path = "src/api" }
-git_handler = { path = "src/git_handler" }
-repo_watcher = { path = "src/repo_watcher" }
 models = { path = "src/models" }
 settings = { path = "src/settings" }
+git_handler = { path = "src/git_handler" }
+repo_watcher = { path = "src/repo_watcher" }
+diffs = { path = "src/diffs" }
 
 tauri-plugin-dialog = { version = "2" }
 tauri-plugin-clipboard-manager = { version = "2.2.2" }
@@ -44,6 +45,7 @@ members = [
   "src/settings",
   "src/git_handler",
   "src/repo_watcher",
+  "src/diffs",
 ]
 
 

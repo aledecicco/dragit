@@ -1,3 +1,4 @@
+use diffs::compute_diff;
 use std::{
     collections::HashMap,
     fmt::Debug,
@@ -673,6 +674,13 @@ impl GitHandler for CmdGit {
         if has_remaining {
             items.push(current_segments);
         }
+
+        let p = self.spawn_command(path, ["show", &format!("{}:{}", reference, filepath)])?;
+        let l = self.get_all_output(p)?;
+        let p2 = self.spawn_command(path, ["show", &format!("{}^1:{}", reference, filepath)])?;
+        let l2 = self.get_all_output(p2)?;
+
+        compute_diff(&l2, &l);
 
         Ok(items)
     }
