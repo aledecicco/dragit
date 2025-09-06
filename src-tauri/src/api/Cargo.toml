@@ -8,5 +8,6 @@ edition = "2021"
 borsh = { workspace = true }
 serde = { workspace = true }
 tauri = { workspace = true }
+diffs = { path = "../diffs" }
 models = { path = "../models" }
 settings = { path = "../settings" }

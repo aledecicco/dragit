@@ -167,14 +167,14 @@ pub trait GitHandler {
     /// Discards the given stash.
     fn discard_stash(&self, path: &str, stash_id: &str) -> Result<(), GitError>;
 
-    /// Returns the line changes made to a file in a commit.
-    fn get_file_diff(
+    /// Returns the contents of a file at a given point.
+    fn get_file_contents(
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
         reference: &str,
         filepath: &str,
-    ) -> Result<Vec<Vec<String>>, GitError>;
+    ) -> Result<String, GitError>;
 }
 
 #[derive(serde::Deserialize, Debug)]

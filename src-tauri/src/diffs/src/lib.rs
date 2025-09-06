@@ -42,10 +42,9 @@ fn process_tokens(
 
     for &token in &stream[(from as usize)..(to as usize)] {
         let segment = input.interner[token];
+        buffer.push(format!("{mode}{segment}"));
         if is_newline(segment) {
             flush_buffer(lines, buffer);
-        } else {
-            buffer.push(format!("{mode}{segment}"));
         }
     }
 }

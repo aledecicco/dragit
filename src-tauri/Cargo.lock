@@ -67,6 +67,7 @@ name = "api"
 version = "0.1.0"
 dependencies = [
  "borsh",
+ "diffs",
  "models",
  "serde",
  "settings",
@@ -1408,7 +1409,6 @@ name = "git_handler"
 version = "0.1.0"
 dependencies = [
  "borsh",
- "diffs",
  "models",
  "tauri",
 ]

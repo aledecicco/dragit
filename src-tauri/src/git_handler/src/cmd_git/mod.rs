@@ -1,4 +1,3 @@
-use diffs::compute_diff;
 use std::{
     collections::HashMap,
     fmt::Debug,
@@ -620,68 +619,24 @@ impl GitHandler for CmdGit {
             }))
     }
 
-    fn get_file_diff(
+    fn get_file_contents(
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
         reference: &str,
         filepath: &str,
-    ) -> Result<Vec<Vec<String>>, GitError> {
+    ) -> Result<String, GitError> {
         let process = self.spawn_and_notify(
             channel,
             path,
-            [
-                "diff",
-                &format!("{}^1", reference),
-                reference,
-                "-U1000000",
-                "--word-diff=porcelain",
-                "--",
-                filepath,
-            ],
+            ["show", &format!("{}:{}", reference, filepath)],
         )?;
 
-        let mut items: Vec<Vec<String>> = Vec::new();
-        let mut current_segments: Vec<String> = Vec::new();
-
-        let mut lines = self.get_output_lines_stream(process)?;
-
-        for line in &mut lines {
-            if line.is_ok_and(|line| line.starts_with("@@")) {
-                break;
-            }
-        }
-
-        for line in lines {
-            if let Ok(line) = line {
-                if line.starts_with("~") {
-                    if !current_segments.is_empty() {
-                        items.push(current_segments);
-                        current_segments = Vec::new();
-                    }
-                } else {
-                    current_segments.push(line.to_string());
-                }
-            } else {
-                return Err(GitError::GetFileDiffFailed {
-                    reference: reference.to_string(),
-                    filepath: filepath.to_string(),
-                });
-            }
-        }
-
-        let has_remaining = !current_segments.is_empty();
-        if has_remaining {
-            items.push(current_segments);
-        }
-
-        let p = self.spawn_command(path, ["show", &format!("{}:{}", reference, filepath)])?;
-        let l = self.get_all_output(p)?;
-        let p2 = self.spawn_command(path, ["show", &format!("{}^1:{}", reference, filepath)])?;
-        let l2 = self.get_all_output(p2)?;
-
-        compute_diff(&l2, &l);
-
-        Ok(items)
+        Ok(self
+            .get_all_output(process)
+            .or(Err(GitError::GetFileContentsFailed {
+                reference: reference.to_string(),
+                filepath: filepath.to_string(),
+            }))?)
     }
 }

@@ -34,7 +34,7 @@ const getContentBefore = (fileDiff: FileDiff): string => {
         .map((segment) => segment.slice(1))
         .join(''),
     )
-    .join('\n')
+    .join('')
 }
 
 const getContentAfter = (fileDiff: FileDiff): string => {
@@ -45,7 +45,7 @@ const getContentAfter = (fileDiff: FileDiff): string => {
         .map((segment) => segment.slice(1))
         .join(''),
     )
-    .join('\n')
+    .join('')
 }
 
 const LINES_REGEX = /\r\n|\r|\n/
@@ -78,6 +78,17 @@ const splitIntoLines = (tree: Root): RootContent[][] => {
   return lines
 }
 
+const getLineContent = (line: RootContent[]): string => {
+  return line
+    .map((node) => {
+      if (node.type === 'text') {
+        return node.value
+      }
+      return getLineContent('children' in node ? node.children : [])
+    })
+    .join('')
+}
+
 export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
   const treeBefore = getTree(getContentBefore(fileDiff), path)
   const linesBefore = treeBefore ? splitIntoLines(treeBefore) : []
@@ -88,41 +99,41 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
   let pointerAfter = 0
 
   const res: RootContent[] = []
+
+  //fileDiff[1][0] = '-  '
+  //fileDiff[2][0] = '   '
+
   for (const diffLine of fileDiff) {
+    const lineBefore = linesBefore.at(pointerBefore) ?? []
+    const lineAfter = linesAfter.at(pointerAfter) ?? []
+
     const hasRemovals = lineHasRemovals(diffLine)
     const hasAdditions = lineHasAdditions(diffLine)
 
-    if (hasRemovals) {
-      res.push(...(linesBefore.at(pointerBefore) ?? []), {
-        type: 'text',
-        value: '\n',
-      })
-      pointerBefore++
+    console.log(diffLine, getLineContent(lineBefore), getLineContent(lineAfter))
 
-      if (!hasAdditions) {
+    const lastSegment = diffLine.at(-1)
+    const endsWithNewline = lastSegment?.endsWith('\n') ?? false
+
+    if (lastSegment && endsWithNewline) {
+      const lastSegmentType = getDiffSegmentType(lastSegment)
+
+      if (!hasAdditions && !hasRemovals) {
+        res.push(...lineBefore, { type: 'text', value: '\n' })
+        pointerBefore++
         pointerAfter++
+        continue
       }
-    }
 
-    if (hasAdditions) {
-      res.push(...(linesAfter.at(pointerAfter) ?? []), {
-        type: 'text',
-        value: '\n',
-      })
-      pointerAfter++
-
-      if (!hasRemovals) {
+      if (lastSegmentType !== 'added') {
+        res.push(...lineBefore, { type: 'text', value: '\n' })
         pointerBefore++
       }
-    }
 
-    if (!hasRemovals && !hasAdditions) {
-      res.push(...(linesAfter.at(pointerAfter) ?? []), {
-        type: 'text',
-        value: '\n',
-      })
-      pointerBefore++
-      pointerAfter++
+      if (lastSegmentType !== 'removed') {
+        res.push(...lineAfter, { type: 'text', value: '\n' })
+        pointerAfter++
+      }
     }
   }
 

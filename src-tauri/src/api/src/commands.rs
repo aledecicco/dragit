@@ -1,3 +1,4 @@
+use diffs::compute_diff;
 use std::path::Path;
 use tauri::{
     ipc::{Channel, Response},
@@ -388,7 +389,10 @@ pub async fn get_file_diff(
     filepath: &str,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_file_diff(&channel, path, reference, filepath)
+        let before = h.get_file_contents(&channel, path, &format!("{reference}^1"), filepath)?;
+        let after = h.get_file_contents(&channel, path, reference, filepath)?;
+
+        Ok(compute_diff(&before, &after))
     })
     .and_then(serialize_response)
 }
