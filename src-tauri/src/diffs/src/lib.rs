@@ -61,6 +61,7 @@ pub fn compute_diff(before: &str, after: &str) -> Vec<Vec<String>> {
 
     let mut diff = Diff::compute(Algorithm::Histogram, &input);
     diff.postprocess_no_heuristic(&input);
+    // TODO: implement tabulation heuristic
 
     let mut current_pos = 0;
     let mut lines = Vec::new();

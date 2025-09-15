@@ -1,11 +1,16 @@
-import { type ComponentProps, Fragment } from 'react'
+import { type ComponentProps, Fragment, type ReactNode } from 'react'
 import { match } from 'ts-pattern'
 
 import type { DiffType, FileDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-import { getDiffLineType, isCompositeLine } from '../utils'
+import {
+  getDiffLineType,
+  getDiffSegmentType,
+  lineHasAdditions,
+  lineHasRemovals,
+} from '../utils'
 
 interface DiffViewerLineNumbersProps extends ComponentProps<'div'> {
   /**
@@ -22,33 +27,7 @@ const DiffViewerLineNumbers = (props: DiffViewerLineNumbersProps) => {
 
   return (
     <div {...propsWithCn(divProps, 'select-none row-start-1 -row-end-1')}>
-      {fileDiff.map((line, i) => {
-        const isComposite = isCompositeLine(line)
-
-        if (isComposite) {
-          return (
-            <Fragment key={`${i + 1}`}>
-              <LineNumbersCell lineNumber={i + 1} diffType="removed" />
-              <LineNumbersCell lineNumber={undefined} diffType="added" />
-            </Fragment>
-          )
-        }
-
-        const diffType = getDiffLineType(line)
-        return (
-          <LineNumbersCell
-            key={`${i + 1}`}
-            lineNumber={i + 1}
-            diffType={diffType}
-          />
-        )
-      })}
-
-      <LineNumbersCell
-        lineNumber={fileDiff.length + 1}
-        diffType={mapFn(fileDiff.at(-1), getDiffLineType) ?? 'unchanged'}
-        faded
-      />
+      {getDiffLineNumbers(fileDiff)}
     </div>
   )
 }
@@ -90,6 +69,93 @@ const LineNumbersCell = (props: {
     >
       {lineNumber}
     </div>
+  )
+}
+
+const getDiffLineNumbers = (fileDiff: FileDiff): ReactNode => {
+  let deletions = 0
+  let offset = 0
+
+  return (
+    <>
+      {fileDiff.map((diffLine, i) => {
+        const hasRemovals = lineHasRemovals(diffLine)
+        const hasAdditions = lineHasAdditions(diffLine)
+
+        const lastSegment = diffLine.at(-1)
+        const endsWithNewline = lastSegment?.endsWith('\n') ?? false
+
+        if (lastSegment && endsWithNewline) {
+          const lastSegmentType = getDiffSegmentType(lastSegment)
+
+          if (lastSegmentType === 'added') {
+            offset -= deletions
+            deletions = 0
+          }
+
+          const res =
+            !hasAdditions && !hasRemovals ? (
+              <LineNumbersCell
+                key={`${i + 1}`}
+                lineNumber={i + 1 + offset}
+                diffType="unchanged"
+              />
+            ) : (
+              match(lastSegmentType)
+                .with('unchanged', () => (
+                  <Fragment key={`${i + 1}`}>
+                    <LineNumbersCell
+                      lineNumber={i + 1 + offset}
+                      diffType="removed"
+                    />
+                    <LineNumbersCell lineNumber={undefined} diffType="added" />
+                  </Fragment>
+                ))
+                .with('removed', () => (
+                  <LineNumbersCell
+                    key={`${i + 1}`}
+                    lineNumber={i + 1 + offset}
+                    diffType="removed"
+                  />
+                ))
+                .with('added', () => (
+                  <LineNumbersCell
+                    key={`${i + 1}`}
+                    lineNumber={i + 1 + offset}
+                    diffType="added"
+                  />
+                ))
+                .exhaustive()
+            )
+
+          if (lastSegmentType === 'unchanged') {
+            offset -= deletions
+            deletions = 0
+          }
+
+          if (lastSegmentType === 'removed') {
+            deletions++
+          }
+
+          return res
+        }
+
+        const diffType = getDiffLineType(diffLine)
+        return (
+          <LineNumbersCell
+            key={`${i + 1}`}
+            lineNumber={i + 1 + offset}
+            diffType={diffType}
+          />
+        )
+      })}
+
+      <LineNumbersCell
+        lineNumber={fileDiff.length + 1 + offset}
+        diffType={mapFn(fileDiff.at(-1), getDiffLineType) ?? 'unchanged'}
+        faded
+      />
+    </>
   )
 }
 

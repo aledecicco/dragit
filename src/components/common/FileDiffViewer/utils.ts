@@ -65,12 +65,3 @@ export const getDiffLineType = (line: DiffLine): DiffType => {
 
   return 'unchanged'
 }
-
-/**
- * Checks whether a line contains both added and removed segments.
- *
- * @param line - The line to check.
- */
-export const isCompositeLine = (line: DiffLine): boolean => {
-  return lineHasAdditions(line) && lineHasRemovals(line)
-}

@@ -8,6 +8,8 @@ import type { FileDiff } from '@/api/models'
 import {
   getDiffSegmentType,
   lineHasAdditions,
+  lineHasOnlyAdditions,
+  lineHasOnlyRemovals,
   lineHasRemovals,
 } from '@/common/FileDiffViewer/utils'
 
@@ -99,9 +101,7 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
   let pointerAfter = 0
 
   const res: RootContent[] = []
-
-  //fileDiff[1][0] = '-  '
-  //fileDiff[2][0] = '   '
+  let buffer: RootContent[] = []
 
   for (const diffLine of fileDiff) {
     const lineBefore = linesBefore.at(pointerBefore) ?? []
@@ -113,26 +113,52 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
     console.log(diffLine, getLineContent(lineBefore), getLineContent(lineAfter))
 
     const lastSegment = diffLine.at(-1)
-    const endsWithNewline = lastSegment?.endsWith('\n') ?? false
+    const endsWithNewline = !!lastSegment?.endsWith('\n')
 
     if (lastSegment && endsWithNewline) {
       const lastSegmentType = getDiffSegmentType(lastSegment)
 
       if (!hasAdditions && !hasRemovals) {
         res.push(...lineBefore, { type: 'text', value: '\n' })
+        if (buffer.length > 0) {
+          res.push(...buffer)
+          buffer = []
+          res.push(...lineAfter, { type: 'text', value: '\n' })
+        }
         pointerBefore++
         pointerAfter++
         continue
       }
 
-      if (lastSegmentType !== 'added') {
+      if (lastSegmentType === 'added') {
+        if (hasRemovals || buffer.length > 0) {
+          buffer.push(...lineAfter, { type: 'text', value: '\n' })
+          pointerAfter++
+          continue
+        }
+      } else {
         res.push(...lineBefore, { type: 'text', value: '\n' })
         pointerBefore++
+        if (buffer.length > 0) {
+          res.push(...buffer)
+          buffer = []
+          res.push(...lineAfter, { type: 'text', value: '\n' })
+          pointerAfter++
+          continue
+        }
       }
 
       if (lastSegmentType !== 'removed') {
         res.push(...lineAfter, { type: 'text', value: '\n' })
         pointerAfter++
+      }
+    } else {
+      if (lineHasOnlyAdditions(diffLine)) {
+        res.push(...lineAfter, { type: 'text', value: '\n' })
+        pointerAfter++
+      } else {
+        res.push(...lineBefore, { type: 'text', value: '\n' })
+        pointerBefore++
       }
     }
   }
