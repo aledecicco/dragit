@@ -186,7 +186,10 @@ export type DiffType = 'added' | 'removed' | 'unchanged'
 
 export type DiffLineSegment = string
 
-export type DiffLine = DiffLineSegment[]
+export interface DiffLine {
+  type: DiffType
+  content: DiffLineSegment[]
+}
 
 export type FileDiff = DiffLine[]
 

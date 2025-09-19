@@ -259,7 +259,6 @@ pub(crate) fn parse_remote_infos(lines: &Vec<String>) -> Vec<RemoteInfo> {
 }
 
 fn parse_diff_summary(line: &String) -> Option<DiffSummary> {
-    println!("{}", line);
     let files_count;
     let mut insertions = 0;
     let mut deletions = 0;

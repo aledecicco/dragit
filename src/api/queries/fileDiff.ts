@@ -3,8 +3,9 @@ import {
   queryOptions,
   skipToken,
 } from '@tanstack/react-query'
+import { match, P } from 'ts-pattern'
 
-import type { FileDiff } from '../models'
+import type { DiffLine, FileDiff } from '../models'
 import { FILE_DIFF_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
@@ -48,7 +49,23 @@ const fetchFileDiff = async (
     context,
   )
 
-  return res
+  return res.map((resItem) =>
+    match(resItem)
+      .returnType<DiffLine>()
+      .with({ Added: P.select() }, (line) => ({
+        type: 'added',
+        content: line,
+      }))
+      .with({ Removed: P.select() }, (line) => ({
+        type: 'removed',
+        content: line,
+      }))
+      .with({ Unchanged: P.select() }, (line) => ({
+        type: 'unchanged',
+        content: line,
+      }))
+      .exhaustive(),
+  )
 }
 
 const fileDiffQuery = (

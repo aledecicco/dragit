@@ -3,15 +3,9 @@ import { all, createStarryNight } from '@wooorm/starry-night'
 import type { Root, RootContent } from 'hast'
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime'
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime'
+import { match } from 'ts-pattern'
 
 import type { FileDiff } from '@/api/models'
-import {
-  getDiffSegmentType,
-  lineHasAdditions,
-  lineHasOnlyAdditions,
-  lineHasOnlyRemovals,
-  lineHasRemovals,
-} from '@/common/FileDiffViewer/utils'
 
 const starryNight = await createStarryNight(all)
 
@@ -30,44 +24,26 @@ const renderTree = (tree: Root): ReactNode => {
 
 const getContentBefore = (fileDiff: FileDiff): string => {
   return fileDiff
-    .map((line) =>
-      line
-        .filter((segment) => getDiffSegmentType(segment) !== 'added')
-        .map((segment) => segment.slice(1))
-        .join(''),
-    )
+    .filter((line) => line.type !== 'added')
+    .map((line) => line.content.map((segment) => segment.slice(1)).join(''))
     .join('')
 }
 
 const getContentAfter = (fileDiff: FileDiff): string => {
   return fileDiff
-    .map((line) =>
-      line
-        .filter((segment) => getDiffSegmentType(segment) !== 'removed')
-        .map((segment) => segment.slice(1))
-        .join(''),
-    )
+    .filter((line) => line.type !== 'removed')
+    .map((line) => line.content.map((segment) => segment.slice(1)).join(''))
     .join('')
 }
-
-const LINES_REGEX = /\r\n|\r|\n/
 
 const splitIntoLines = (tree: Root): RootContent[][] => {
   const lines: RootContent[][] = []
   let line: RootContent[] = []
 
   tree.children.forEach((node) => {
-    if (node.type === 'text') {
-      node.value.split(LINES_REGEX).forEach((part, index) => {
-        if (index > 0) {
-          lines.push(line)
-          line = []
-        }
-
-        if (part) {
-          line.push({ type: 'text', value: part })
-        }
-      })
+    if (node.type === 'text' && node.value === '\n') {
+      lines.push(line)
+      line = []
     } else {
       line.push(node)
     }
@@ -80,17 +56,6 @@ const splitIntoLines = (tree: Root): RootContent[][] => {
   return lines
 }
 
-const getLineContent = (line: RootContent[]): string => {
-  return line
-    .map((node) => {
-      if (node.type === 'text') {
-        return node.value
-      }
-      return getLineContent('children' in node ? node.children : [])
-    })
-    .join('')
-}
-
 export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
   const treeBefore = getTree(getContentBefore(fileDiff), path)
   const linesBefore = treeBefore ? splitIntoLines(treeBefore) : []
@@ -101,66 +66,25 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
   let pointerAfter = 0
 
   const res: RootContent[] = []
-  let buffer: RootContent[] = []
 
   for (const diffLine of fileDiff) {
     const lineBefore = linesBefore.at(pointerBefore) ?? []
     const lineAfter = linesAfter.at(pointerAfter) ?? []
 
-    const hasRemovals = lineHasRemovals(diffLine)
-    const hasAdditions = lineHasAdditions(diffLine)
-
-    console.log(diffLine, getLineContent(lineBefore), getLineContent(lineAfter))
-
-    const lastSegment = diffLine.at(-1)
-    const endsWithNewline = !!lastSegment?.endsWith('\n')
-
-    if (lastSegment && endsWithNewline) {
-      const lastSegmentType = getDiffSegmentType(lastSegment)
-
-      if (!hasAdditions && !hasRemovals) {
-        res.push(...lineBefore, { type: 'text', value: '\n' })
-        if (buffer.length > 0) {
-          res.push(...buffer)
-          buffer = []
-          res.push(...lineAfter, { type: 'text', value: '\n' })
-        }
-        pointerBefore++
-        pointerAfter++
-        continue
-      }
-
-      if (lastSegmentType === 'added') {
-        if (hasRemovals || buffer.length > 0) {
-          buffer.push(...lineAfter, { type: 'text', value: '\n' })
-          pointerAfter++
-          continue
-        }
-      } else {
-        res.push(...lineBefore, { type: 'text', value: '\n' })
-        pointerBefore++
-        if (buffer.length > 0) {
-          res.push(...buffer)
-          buffer = []
-          res.push(...lineAfter, { type: 'text', value: '\n' })
-          pointerAfter++
-          continue
-        }
-      }
-
-      if (lastSegmentType !== 'removed') {
+    match(diffLine.type)
+      .with('added', () => {
         res.push(...lineAfter, { type: 'text', value: '\n' })
         pointerAfter++
-      }
-    } else {
-      if (lineHasOnlyAdditions(diffLine)) {
-        res.push(...lineAfter, { type: 'text', value: '\n' })
-        pointerAfter++
-      } else {
+      })
+      .with('removed', () => {
         res.push(...lineBefore, { type: 'text', value: '\n' })
         pointerBefore++
-      }
-    }
+      })
+      .with('unchanged', () => {
+        res.push(...lineBefore, { type: 'text', value: '\n' })
+        pointerBefore++
+        pointerAfter++
+      })
   }
 
   return renderTree({ type: 'root', children: res })

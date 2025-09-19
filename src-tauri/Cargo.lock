@@ -718,6 +718,7 @@ name = "diffs"
 version = "0.1.0"
 dependencies = [
  "imara-diff",
+ "models",
  "regex",
 ]
 

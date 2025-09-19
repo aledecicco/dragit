@@ -5,12 +5,7 @@ import type { DiffType, FileDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-import {
-  getDiffLineType,
-  getDiffSegmentType,
-  lineHasAdditions,
-  lineHasRemovals,
-} from '../utils'
+import { getDiffSegmentType } from '../utils'
 
 interface DiffViewerLineChangesProps extends ComponentProps<'div'> {
   /**
@@ -27,44 +22,11 @@ const DiffViewerLineChanges = (props: DiffViewerLineChangesProps) => {
 
   return (
     <div {...propsWithCn(divProps, 'select-none row-start-1 -row-end-1')}>
-      {fileDiff.map((diffLine, i) => {
-        const hasRemovals = lineHasRemovals(diffLine)
-        const hasAdditions = lineHasAdditions(diffLine)
+      {fileDiff.map((diffLine, i) => (
+        <LineChangesCell key={`${i + 1}`} diffType={diffLine.type} />
+      ))}
 
-        const lastSegment = diffLine.at(-1)
-        const endsWithNewline = lastSegment?.endsWith('\n') ?? false
-
-        if (lastSegment && endsWithNewline) {
-          const lastSegmentType = getDiffSegmentType(lastSegment)
-
-          if (!hasAdditions && !hasRemovals) {
-            return <LineChangesCell key={`${i + 1}`} diffType="unchanged" />
-          }
-
-          return match(lastSegmentType)
-            .with('unchanged', () => (
-              <Fragment key={`${i + 1}`}>
-                <LineChangesCell diffType="removed" />
-                <LineChangesCell diffType="added" />
-              </Fragment>
-            ))
-            .with('removed', () => (
-              <LineChangesCell key={`${i + 1}`} diffType="removed" />
-            ))
-            .with('added', () => (
-              <LineChangesCell key={`${i + 1}`} diffType="added" />
-            ))
-            .exhaustive()
-        }
-
-        const diffType = getDiffLineType(diffLine)
-        return <LineChangesCell key={`${i + 1}`} diffType={diffType} />
-      })}
-
-      <LineChangesCell
-        diffType={mapFn(fileDiff.at(-1), getDiffLineType) ?? 'unchanged'}
-        empty
-      />
+      <LineChangesCell diffType={fileDiff.at(-1)?.type ?? 'unchanged'} empty />
     </div>
   )
 }

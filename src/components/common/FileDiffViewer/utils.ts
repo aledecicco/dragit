@@ -1,6 +1,6 @@
 import { match } from 'ts-pattern'
 
-import type { DiffLine, DiffLineSegment, DiffType } from '@/api/models'
+import type { DiffLineSegment, DiffType } from '@/api/models'
 
 /**
  * Gets the type of a diff segment based on its first character.
@@ -13,55 +13,4 @@ export const getDiffSegmentType = (segment: DiffLineSegment): DiffType => {
     .with('+', () => 'added')
     .with('-', () => 'removed')
     .otherwise(() => 'unchanged')
-}
-
-/**
- * @param diffLine - The line to check.
- * @returns Whether the line contains any added segments.
- */
-export const lineHasAdditions = (diffLine: DiffLine): boolean => {
-  return diffLine.some((segment) => getDiffSegmentType(segment) === 'added')
-}
-
-/**
- * @param diffLine - The line to check.
- * @returns Whether the line contains any removed segments.
- */
-export const lineHasRemovals = (diffLine: DiffLine): boolean => {
-  return diffLine.some((segment) => getDiffSegmentType(segment) === 'removed')
-}
-
-/**
- * @param diffLine - The line to check.
- * @returns Whether the line contains only added segments.
- */
-export const lineHasOnlyAdditions = (diffLine: DiffLine): boolean => {
-  return diffLine.every((segment) => getDiffSegmentType(segment) === 'added')
-}
-
-/**
- * @param diffLine - The line to check.
- * @returns Whether the line contains only removed segments.
- */
-export const lineHasOnlyRemovals = (diffLine: DiffLine): boolean => {
-  return diffLine.every((segment) => getDiffSegmentType(segment) === 'removed')
-}
-
-/**
- * Gets the type of a line in a diff based on its segments. If any segment is an addition,
- * the line is considered an addition. If not, and if any segment is a removal, the line is considered
- * a removal. Otherwise, the line is considered unchanged.
- *
- * @param line - The line to get the diff type for.
- */
-export const getDiffLineType = (line: DiffLine): DiffType => {
-  if (lineHasAdditions(line)) {
-    return 'added'
-  }
-
-  if (lineHasRemovals(line)) {
-    return 'removed'
-  }
-
-  return 'unchanged'
 }

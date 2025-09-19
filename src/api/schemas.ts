@@ -176,5 +176,9 @@ export const DIFF_TYPE_SCHEMA = BorshSchema.Enum({
 })
 
 export const FILE_DIFF_SCHEMA = BorshSchema.Vec(
-  BorshSchema.Vec(BorshSchema.String),
+  BorshSchema.Enum({
+    Added: BorshSchema.Vec(BorshSchema.String),
+    Removed: BorshSchema.Vec(BorshSchema.String),
+    Unchanged: BorshSchema.Vec(BorshSchema.String),
+  }),
 )
