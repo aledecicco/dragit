@@ -8,6 +8,7 @@ import { match } from 'ts-pattern'
 import type { FileDiff } from '@/api/models'
 
 const starryNight = await createStarryNight(all)
+const SPLIT_REGEX = /\r\n|\r|\n/
 
 const getTree = (content: string, identifier: string): Root | undefined => {
   const scope = starryNight.flagToScope(identifier)
@@ -41,9 +42,18 @@ const splitIntoLines = (tree: Root): RootContent[][] => {
   let line: RootContent[] = []
 
   tree.children.forEach((node) => {
-    if (node.type === 'text' && node.value === '\n') {
-      lines.push(line)
-      line = []
+    if (node.type === 'text') {
+      const parts = node.value.split(SPLIT_REGEX)
+      parts.forEach((part, index) => {
+        if (index > 0) {
+          lines.push(line)
+          line = []
+        }
+
+        if (part.length > 0) {
+          line.push({ ...node, value: part })
+        }
+      })
     } else {
       line.push(node)
     }

@@ -1,11 +1,8 @@
-import { type ComponentProps, Fragment } from 'react'
+import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
 import type { DiffType, FileDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
-import { mapFn } from '@/utils/types'
-
-import { getDiffSegmentType } from '../utils'
 
 interface DiffViewerLineChangesProps extends ComponentProps<'div'> {
   /**

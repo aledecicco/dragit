@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { match } from 'ts-pattern'
 
 import type { DiffType, FileDiff } from '@/api/models'
@@ -19,19 +19,7 @@ const DiffViewerLineNumbers = (props: DiffViewerLineNumbersProps) => {
 
   return (
     <div {...propsWithCn(divProps, 'select-none row-start-1 -row-end-1')}>
-      {fileDiff.map((diffLine, i) => (
-        <LineNumbersCell
-          key={`${i + 1}`}
-          lineNumber={i + 1}
-          diffType={diffLine.type}
-        />
-      ))}
-
-      <LineNumbersCell
-        lineNumber={fileDiff.length + 1}
-        diffType={fileDiff.at(-1)?.type ?? 'unchanged'}
-        faded
-      />
+      {getLineNumbers(fileDiff)}
     </div>
   )
 }
@@ -74,6 +62,45 @@ const LineNumbersCell = (props: {
       {lineNumber}
     </div>
   )
+}
+
+const getLineNumbers = (fileDiff: FileDiff): ReactNode => {
+  const res = []
+
+  let offset = 0
+  let removals = 0
+
+  fileDiff.forEach((diffLine, i) => {
+    if (diffLine.type === 'removed') {
+      removals++
+    } else if (removals > 0) {
+      offset -= removals
+      removals = 0
+    }
+
+    res.push(
+      <LineNumbersCell
+        key={`${i + 1}`}
+        lineNumber={i + 1 + offset}
+        diffType={diffLine.type}
+      />,
+    )
+  })
+
+  if (removals > 0) {
+    offset -= removals
+    removals = 0
+  }
+
+  res.push(
+    <LineNumbersCell
+      lineNumber={fileDiff.length + 1 + offset}
+      diffType={fileDiff.at(-1)?.type ?? 'unchanged'}
+      faded
+    />,
+  )
+
+  return res
 }
 
 export { DiffViewerLineNumbers, type DiffViewerLineNumbersProps }

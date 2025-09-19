@@ -392,10 +392,7 @@ pub async fn get_file_diff(
         let before = h.get_file_contents(&channel, path, &format!("{reference}^1"), filepath)?;
         let after = h.get_file_contents(&channel, path, reference, filepath)?;
 
-        let res = compute_diff(&before, &after);
-        res.iter().for_each(|l| println!("{:?}", l));
-
-        Ok(res)
+        Ok(compute_diff(&before, &after))
     })
     .and_then(serialize_response)
 }

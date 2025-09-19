@@ -41,14 +41,12 @@ fn get_hunk_contents(hunk: &Hunk, file_input: &InternedInput<&str>) -> (String, 
     let hunk_before = file_input.before[hunk.before.start as usize..hunk.before.end as usize]
         .iter()
         .map(|token| file_input.interner[*token])
-        .collect::<Vec<_>>()
-        .join("\n");
+        .collect::<String>();
 
     let hunk_after = file_input.after[hunk.after.start as usize..hunk.after.end as usize]
         .iter()
         .map(|token| file_input.interner[*token])
-        .collect::<Vec<_>>()
-        .join("\n");
+        .collect::<String>();
 
     (hunk_before, hunk_after)
 }

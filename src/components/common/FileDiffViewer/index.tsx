@@ -1,4 +1,4 @@
-import { type ComponentProps, Fragment } from 'react'
+import { type ComponentProps, Fragment, useEffect, useRef } from 'react'
 import { IconFile } from '@tabler/icons-react'
 
 import type { Reference } from '@/api/models'
@@ -35,6 +35,13 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
 
   const fileDiffQuery = useQueryFileDiff(reference.refName, filepath)
 
+  const viewerRef = useRef<HTMLDivElement>(null)
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset scroll when a different file is selected
+  useEffect(() => {
+    viewerRef.current?.scrollTo({ top: 0, left: 0 })
+  }, [filepath])
+
   return (
     <div
       {...propsWithCn(
@@ -51,6 +58,7 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
       <Separator />
 
       <div
+        ref={viewerRef}
         className={cn(
           'pl-1 pt-1 text-sm overflow-y-auto grid grid-cols-[max-content_max-content_1fr] auto-rows-max',
         )}
