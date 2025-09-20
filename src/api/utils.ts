@@ -172,17 +172,14 @@ const fetchAndDeserialize = async <T>(
   context: QueryFunctionContext,
 ): Promise<T> => {
   let shouldStop = false
-  let processId: number | undefined
+  const processIds: number[] = []
 
   const abortSignal = context.signal
   abortSignal.onabort = () => {
-    if (processId !== undefined) {
-      // When the query is aborted, we kill the process if we already have its pid.
-      new Child(processId).kill()
-    } else {
-      // If we don't have the pid yet, we set a flag to kill it later.
-      shouldStop = true
-    }
+    // When the query is aborted, we set a flag to kill processes later.
+    shouldStop = true
+    // And we kill any processes we already have the pid for.
+    processIds.forEach((pid) => new Child(pid).kill())
   }
 
   const channel = new Channel<AppMessage>()
@@ -193,12 +190,12 @@ const fetchAndDeserialize = async <T>(
           type: 'processStarted',
         },
         ({ pid }) => {
-          // When we receive the pid, we store it.
-          processId = pid
-
           if (shouldStop) {
             // If the query was aborted before we received the pid, we kill the process now.
             new Child(pid).kill()
+          } else {
+            // Otherwise we store it.
+            processIds.push(pid)
           }
         },
       )
