@@ -95,6 +95,7 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
         pointerBefore++
         pointerAfter++
       })
+      .exhaustive()
   }
 
   return renderTree({ type: 'root', children: res })

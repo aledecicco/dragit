@@ -52,7 +52,7 @@ fn get_hunk_contents(hunk: &Hunk, file_input: &InternedInput<&str>) -> (String, 
 }
 
 /// Adds a range of unchanged context lines to the result.
-fn add_context_lines<T, U>(from: T, to: U, input: &InternedInput<&str>, lines: &mut Vec<DiffLine>)
+fn add_context_lines<T, U>(from: T, to: U, input: &InternedInput<&str>, res: &mut Vec<DiffLine>)
 where
     T: TryInto<usize>,
     T::Error: Debug,
@@ -61,12 +61,12 @@ where
 {
     for &token in &input.before[from.try_into().unwrap()..to.try_into().unwrap()] {
         let line = input.interner[token];
-        lines.push(DiffLine::Unchanged(vec![format!(" {line}")]));
+        res.push(DiffLine::Unchanged(vec![format!(" {line}")]));
     }
 }
 
 /// Adds the contents of the buffer as a new line and clears it.
-fn flush_buffer(line_buffer: &mut Vec<String>, lines: &mut Vec<DiffLine>, line_mode: &DiffMode) {
+fn flush_buffer(line_buffer: &mut Vec<String>, res: &mut Vec<DiffLine>, line_mode: &DiffMode) {
     let line_constructor = match line_mode {
         DiffMode::Unchanged => DiffLine::Unchanged,
         DiffMode::Added => DiffLine::Added,
@@ -74,7 +74,7 @@ fn flush_buffer(line_buffer: &mut Vec<String>, lines: &mut Vec<DiffLine>, line_m
     };
 
     if !line_buffer.is_empty() {
-        lines.push(line_constructor(std::mem::take(line_buffer)));
+        res.push(line_constructor(std::mem::take(line_buffer)));
     }
 }
 
@@ -84,7 +84,7 @@ fn process_hunk_segments<T, U>(
     to: U,
     hunk_input: &InternedInput<&str>,
     line_buffer: &mut Vec<String>,
-    lines: &mut Vec<DiffLine>,
+    res: &mut Vec<DiffLine>,
     line_mode: &DiffMode,
     segment_mode: &DiffMode,
 ) where
@@ -109,7 +109,7 @@ fn process_hunk_segments<T, U>(
         let segment = hunk_input.interner[token];
         line_buffer.push(format!("{indicator}{segment}"));
         if is_newline(segment) {
-            flush_buffer(line_buffer, lines, &line_mode);
+            flush_buffer(line_buffer, res, &line_mode);
         }
     }
 }
@@ -119,10 +119,11 @@ fn process_hunk(
     hunk_diff: &Diff,
     hunk_input: &InternedInput<&str>,
     line_buffer: &mut Vec<String>,
-    lines: &mut Vec<DiffLine>,
-    current_pos: &mut u32,
+    res: &mut Vec<DiffLine>,
     diff_mode: &DiffMode,
 ) {
+    let mut current_pos = 0;
+
     hunk_diff.hunks().for_each(|section_hunk| {
         let stream = match diff_mode {
             DiffMode::Unchanged => &section_hunk.before,
@@ -131,11 +132,11 @@ fn process_hunk(
         };
 
         process_hunk_segments(
-            *current_pos,
+            current_pos,
             stream.start,
             &hunk_input,
             line_buffer,
-            lines,
+            res,
             diff_mode,
             &DiffMode::Unchanged,
         );
@@ -145,12 +146,12 @@ fn process_hunk(
             stream.end,
             &hunk_input,
             line_buffer,
-            lines,
+            res,
             diff_mode,
             diff_mode,
         );
 
-        *current_pos = stream.end;
+        current_pos = stream.end;
     });
 
     let stream = match diff_mode {
@@ -160,17 +161,17 @@ fn process_hunk(
     };
 
     process_hunk_segments(
-        *current_pos,
+        current_pos,
         stream.len(),
         &hunk_input,
         line_buffer,
-        lines,
+        res,
         diff_mode,
         &DiffMode::Unchanged,
     );
 
     if !line_buffer.is_empty() {
-        flush_buffer(line_buffer, lines, diff_mode);
+        flush_buffer(line_buffer, res, diff_mode);
     }
 }
 
@@ -187,25 +188,19 @@ pub fn compute_diff(before: &str, after: &str) -> Vec<DiffLine> {
         let (hunk_diff, hunk_input) = get_hunk_diff(&hunk_before, &hunk_after);
         let mut line_buffer = Vec::new();
 
-        let mut current_pos = 0;
-
         process_hunk(
             &hunk_diff,
             &hunk_input,
             &mut line_buffer,
             &mut res,
-            &mut current_pos,
             &DiffMode::Removed,
         );
 
-        current_pos = 0;
-
         process_hunk(
             &hunk_diff,
             &hunk_input,
             &mut line_buffer,
             &mut res,
-            &mut current_pos,
             &DiffMode::Added,
         );
 
