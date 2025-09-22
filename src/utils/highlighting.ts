@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react'
 import { all, createStarryNight } from '@wooorm/starry-night'
-import type { Element, ElementContent, Root, RootContent, Text } from 'hast'
+import type { Element, Root, RootContent, Text } from 'hast'
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime'
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime'
 import { match } from 'ts-pattern'
 
 import type { DiffLineSegment, DiffType, FileDiff } from '@/api/models'
+
+type LineNode = Element | Text
 
 const starryNight = await createStarryNight(all)
 const SPLIT_REGEX = /\r\n|\r|\n/
@@ -76,9 +78,9 @@ const getContentAfter = (fileDiff: FileDiff): string => {
  *
  * @param tree - The hast tree to split.
  */
-const splitIntoLines = (tree: Root): RootContent[][] => {
-  const lines: RootContent[][] = []
-  let line: RootContent[] = []
+const splitIntoLines = (tree: Root): LineNode[][] => {
+  const lines: LineNode[][] = []
+  let line: LineNode[] = []
 
   tree.children.forEach((node) => {
     if (node.type === 'text') {
@@ -93,7 +95,7 @@ const splitIntoLines = (tree: Root): RootContent[][] => {
           line.push({ ...node, value: part })
         }
       })
-    } else {
+    } else if (node.type === 'element') {
       line.push(node)
     }
   })
@@ -106,6 +108,23 @@ const splitIntoLines = (tree: Root): RootContent[][] => {
 }
 
 /**
+ * Builds a shallow copy of the relevant children of a node.
+ *
+ * @param node - The node to get the children of.
+ */
+const getNodeChildren = (node: Element): LineNode[] => {
+  const res: LineNode[] = []
+
+  for (const child of node.children) {
+    if (child.type === 'text' || child.type === 'element') {
+      res.push(child)
+    }
+  }
+
+  return res
+}
+
+/**
  * Applies a diff segment to a text node, returning a new node
  * and the number of characters covered.
  *
@@ -115,26 +134,25 @@ const splitIntoLines = (tree: Root): RootContent[][] => {
 const applyDiffSegment = (
   diffSegment: DiffLineSegment,
   node: Text,
-): [Element | Text, number] => {
+): [LineNode, number] => {
   const nodeLength = node.value.length
   const segmentType = getDiffSegmentType(diffSegment)
   const segmentLength = diffSegment.length - 1
 
   if (segmentLength >= nodeLength) {
     // The diff segment covers the whole text node, so we wrap it completely,
-
     const newNode = match(segmentType)
       .returnType<Element | Text>()
       .with('added', () => ({
         type: 'element',
         tagName: 'span',
-        properties: { className: 'bg-success-500/20' },
+        properties: { className: 'bg-success-400/15 py-0.5' },
         children: [node],
       }))
       .with('removed', () => ({
         type: 'element',
         tagName: 'span',
-        properties: { className: 'bg-danger-500/20' },
+        properties: { className: 'bg-danger-400/15 py-0.5' },
         children: [node],
       }))
       .with('unchanged', () => node)
@@ -151,13 +169,13 @@ const applyDiffSegment = (
     .with('added', () => ({
       type: 'element',
       tagName: 'span',
-      properties: { className: 'bg-success-500/20' },
+      properties: { className: 'bg-success-400/15 py-0.5' },
       children: [{ type: 'text', value: coveredPart }],
     }))
     .with('removed', () => ({
       type: 'element',
       tagName: 'span',
-      properties: { className: 'bg-danger-500/20' },
+      properties: { className: 'bg-danger-400/15 py-0.5' },
       children: [{ type: 'text', value: coveredPart }],
     }))
     .with('unchanged', () => ({ type: 'text', value: coveredPart }))
@@ -176,17 +194,9 @@ const applyDiffSegment = (
  */
 function applyDiffLine(
   diffSegments: DiffLineSegment[],
-  line: RootContent[],
-): RootContent[]
-function applyDiffLine(
-  diffSegments: DiffLineSegment[],
-  line: ElementContent[],
-): ElementContent[]
-function applyDiffLine<T extends ElementContent>(
-  diffSegments: DiffLineSegment[],
-  line: T[],
-): T[] {
-  const newLine: T[] = []
+  line: LineNode[],
+): LineNode[] {
+  const newLine: LineNode[] = []
 
   // We process both the diff segments and the line nodes at the same time,
   // until we run out of either.
@@ -198,7 +208,7 @@ function applyDiffLine<T extends ElementContent>(
     if (node.type === 'text') {
       // If the current node is a text node, we can apply the diff segment to it.
       const [newNode, lengthCovered] = applyDiffSegment(segment, node)
-      newLine.push(newNode as T)
+      newLine.push(newNode)
 
       if (lengthCovered < node.value.length) {
         // The diff segment didn't cover the whole text node,
@@ -226,12 +236,11 @@ function applyDiffLine<T extends ElementContent>(
     } else if ('children' in node && node.children.length > 0) {
       // If the current node has children, we apply the diff line to them.
       // This modifies the diff segments as a side effect, so we don't need to do it again.
-      const childLine = applyDiffLine(diffSegments, [...node.children])
+      const childLine = applyDiffLine(diffSegments, getNodeChildren(node))
       newLine.push({ ...node, children: childLine })
       line.shift()
     } else {
-      // Otherwise we can't apply the diff segment to this node, so we leave it as is.
-      newLine.push(node)
+      // Otherwise we can't apply the diff segment to this node, so we discard it.
       line.shift()
     }
   }
@@ -253,8 +262,8 @@ function applyDiffLine<T extends ElementContent>(
  */
 const addWordDiff = (
   fileDiff: FileDiff,
-  linesBefore: RootContent[][],
-  linesAfter: RootContent[][],
+  linesBefore: LineNode[][],
+  linesAfter: LineNode[][],
 ) => {
   let pointerBefore = 0
   let pointerAfter = 0
@@ -319,11 +328,23 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
 
     match(diffLine.type)
       .with('added', () => {
-        res.push(...lineAfter, { type: 'text', value: '\n' })
+        res.push({
+          type: 'element',
+          children: [...lineAfter, { type: 'text', value: '\n' }],
+          tagName: 'span',
+          properties: {
+            className: 'bg-success-500/8 w-full block -ml-2 pl-2',
+          },
+        })
         pointerAfter++
       })
       .with('removed', () => {
-        res.push(...lineBefore, { type: 'text', value: '\n' })
+        res.push({
+          type: 'element',
+          children: [...lineBefore, { type: 'text', value: '\n' }],
+          tagName: 'span',
+          properties: { className: 'bg-danger-500/8 w-full block -ml-2 pl-2' },
+        })
         pointerBefore++
       })
       .with('unchanged', () => {

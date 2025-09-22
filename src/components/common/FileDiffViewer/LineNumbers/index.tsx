@@ -87,11 +87,6 @@ const getLineNumbers = (fileDiff: FileDiff): ReactNode => {
     )
   })
 
-  if (removals > 0) {
-    offset -= removals
-    removals = 0
-  }
-
   res.push(
     <LineNumbersCell
       lineNumber={fileDiff.length + 1 + offset}
