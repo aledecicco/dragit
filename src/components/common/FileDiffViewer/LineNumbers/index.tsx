@@ -89,6 +89,7 @@ const getLineNumbers = (fileDiff: FileDiff): ReactNode => {
 
   res.push(
     <LineNumbersCell
+      key={fileDiff.length + 1}
       lineNumber={fileDiff.length + 1 + offset}
       diffType={fileDiff.at(-1)?.type ?? 'unchanged'}
       faded

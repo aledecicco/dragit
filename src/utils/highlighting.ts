@@ -5,12 +5,7 @@ import { toJsxRuntime } from 'hast-util-to-jsx-runtime'
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime'
 import { match } from 'ts-pattern'
 
-import type {
-  DiffLine,
-  DiffLineSegment,
-  DiffType,
-  FileDiff,
-} from '@/api/models'
+import type { DiffLineSegment, DiffType, FileDiff } from '@/api/models'
 
 type LineNode = Element | Text
 
@@ -160,33 +155,33 @@ const wrapNodeInDiff = (node: Text, diffType: DiffType): LineNode => {
 }
 
 /**
- * Wraps the given node with the appropriate highlighting for the given segment type.
+ * Wraps the given line with the appropriate highlighting for the given diff type.
  *
- * @param node - The node to wrap.
+ * @param line - The line to wrap.
  * @param diffType - The type of diff to apply.
  */
-const wrapLineInDiff = (diffLine: DiffLine, line: LineNode[]): Element => {
-  return match(diffLine.type)
+const wrapLineInDiff = (line: LineNode[], diffType: DiffType): Element => {
+  return match(diffType)
     .returnType<Element>()
     .with('added', () => ({
       type: 'element',
       children: line,
       tagName: 'span',
       properties: {
-        className: 'bg-success-500/8 w-full block -ml-2 pl-2',
+        className: 'bg-success-500/8 w-full block -ml-2 pl-2 pr-5',
       },
     }))
     .with('removed', () => ({
       type: 'element',
       children: line,
       tagName: 'span',
-      properties: { className: 'bg-danger-500/8 w-full block -ml-2 pl-2' },
+      properties: { className: 'bg-danger-500/8 w-full block -ml-2 pl-2 pr-5' },
     }))
     .with('unchanged', () => ({
       type: 'element',
       children: line,
       tagName: 'span',
-      properties: { className: 'w-full block -ml-2 pl-2' },
+      properties: { className: 'w-full block -ml-2 pl-2 pr-5' },
     }))
     .exhaustive()
 }
@@ -289,6 +284,48 @@ const applyDiffLineInner = (
 }
 
 /**
+ * Adds a visual representation of newlines at the end of a line,
+ * only in cases where it's needed for clarity.
+ * This modifies the line in-place.
+ *
+ * @param diffSegments - The diff segments for the line.
+ * @param line - The line to modify.
+ */
+const addVisislbeNewlines = (
+  diffSegments: DiffLineSegment[],
+  line: LineNode[],
+) => {
+  const lastSegment = diffSegments.at(-1)
+
+  if (line.length > 0 && lastSegment) {
+    const segmentType = getDiffSegmentType(lastSegment)
+
+    if (
+      segmentType !== 'unchanged' &&
+      NEWLINE_REGEX.test(lastSegment.slice(1)) &&
+      diffSegments.length > 1 &&
+      diffSegments.every(
+        (seg, i) =>
+          i === diffSegments.length - 1 ||
+          getDiffSegmentType(seg) === 'unchanged',
+      )
+    ) {
+      line[line.length - 1] = {
+        type: 'element',
+        tagName: 'span',
+        properties: {
+          className: match(segmentType)
+            .with('added', () => 'text-success-300/90 py-0.5')
+            .with('removed', () => 'text-danger-300/90 py-0.5')
+            .exhaustive(),
+        },
+        children: [{ type: 'text', value: '⤶\n' }],
+      }
+    }
+  }
+}
+
+/**
  * Applies a series of diff segments to a line.
  *
  * @param diffSegments - The diff segments to apply.
@@ -298,7 +335,12 @@ const applyDiffLine = (
   diffSegments: DiffLineSegment[],
   line: LineNode[],
 ): LineNode[] => {
-  return applyDiffLineInner([...diffSegments], [...line])
+  const newLine = [...line]
+  const newSegments = [...diffSegments]
+
+  addVisislbeNewlines(newSegments, newLine)
+
+  return applyDiffLineInner(newSegments, newLine)
 }
 
 /**
@@ -370,20 +412,27 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
 
     match(diffLine.type)
       .with('added', () => {
-        res.push(wrapLineInDiff(diffLine, lineAfter))
+        res.push(wrapLineInDiff(lineAfter, diffLine.type))
         pointerAfter++
       })
       .with('removed', () => {
-        res.push(wrapLineInDiff(diffLine, lineBefore))
+        res.push(wrapLineInDiff(lineBefore, diffLine.type))
         pointerBefore++
       })
       .with('unchanged', () => {
-        res.push(wrapLineInDiff(diffLine, lineBefore))
+        res.push(wrapLineInDiff(lineBefore, diffLine.type))
         pointerBefore++
         pointerAfter++
       })
       .exhaustive()
   }
+
+  res.push(
+    wrapLineInDiff(
+      [{ type: 'text', value: '\n' }],
+      fileDiff.at(-1)?.type ?? 'unchanged',
+    ),
+  )
 
   return renderTree({ type: 'root', children: res })
 }

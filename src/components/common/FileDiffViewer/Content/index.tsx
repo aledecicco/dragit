@@ -31,7 +31,7 @@ const DiffViewerContent = (props: DiffViewerContentProps) => {
     >
       <div
         className={cn(
-          'w-max min-w-full pl-2 pr-3',
+          'w-max min-w-full pl-2',
           'whitespace-pre font-mono leading-7',
         )}
       >
