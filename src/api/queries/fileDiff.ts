@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
-import type { DiffLine, FileDiff } from '../models'
+import type { DiffLine, FileDiff, SnapshotId } from '../models'
 import { FILE_DIFF_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
@@ -16,25 +16,25 @@ const filesDiffQueryKeys = {
       ...pathQueryKey(path),
       key: 'file_diff',
     }) as const,
-  reference: (path: string, reference: string | undefined) =>
+  snapshot: (path: string, snapshot: SnapshotId | undefined) =>
     ({
       ...filesDiffQueryKeys.all(path),
-      reference: reference,
+      snapshot,
     }) as const,
   file: (
     path: string,
-    reference: string | undefined,
+    snapshot: SnapshotId | undefined,
     filepath: string | undefined,
   ) =>
     ({
-      ...filesDiffQueryKeys.reference(path, reference),
+      ...filesDiffQueryKeys.snapshot(path, snapshot),
       filepath: filepath,
     }) as const,
 }
 
 const fetchFileDiff = async (
   path: string,
-  reference: string,
+  snapshotId: SnapshotId,
   filepath: string,
   context: QueryFunctionContext,
 ): Promise<FileDiff> => {
@@ -42,7 +42,7 @@ const fetchFileDiff = async (
     'get_file_diff',
     {
       path,
-      reference,
+      snapshotId,
       filepath,
     },
     FILE_DIFF_SCHEMA,
@@ -70,20 +70,20 @@ const fetchFileDiff = async (
 
 const fileDiffQuery = (
   path: string,
-  reference: string | undefined,
+  snapshotId: SnapshotId | undefined,
   filepath: string | undefined,
 ) =>
   queryOptions({
-    queryKey: [filesDiffQueryKeys.file(path, reference, filepath)],
+    queryKey: [filesDiffQueryKeys.file(path, snapshotId, filepath)],
     queryFn:
-      !!reference && !!filepath
-        ? (context) => fetchFileDiff(path, reference, filepath, context)
+      !!snapshotId && !!filepath
+        ? (context) => fetchFileDiff(path, snapshotId, filepath, context)
         : skipToken,
   })
 
 const useQueryFileDiff = (
-  reference: string | undefined,
+  snapshotId: SnapshotId | undefined,
   filediff: string | undefined,
-) => useRepositoryQuery(fileDiffQuery, reference, filediff)
+) => useRepositoryQuery(fileDiffQuery, snapshotId, filediff)
 
 export { filesDiffQueryKeys, useQueryFileDiff }

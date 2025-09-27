@@ -1,10 +1,10 @@
 use std::{str::FromStr, u32};
 
 use models::{
-    BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, CommittedFileInfo, CommittedStatus,
-    DiffSummary, HeadInfo, HistoryItem, MergeStatus, MovedStatus, RemoteInfo, RemoteRef,
-    StagedFileInfo, StagedFileStatus, StashInfo, StatusType, UnmergedFileInfo, UnstagedFileInfo,
-    UntrackedFileInfo,
+    BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, DiffSummary, HeadInfo, HistoryItem,
+    MergeStatus, MovedStatus, RemoteInfo, RemoteRef, StagedFileInfo, StagedFileStatus, StashInfo,
+    StatusType, UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo, VersionedFileInfo,
+    VersionedFileStatus,
 };
 
 /// Format used to get the needed information about a commit.
@@ -174,15 +174,15 @@ pub(crate) fn parse_untracked_file_info(line: &String) -> Option<UntrackedFileIn
     })
 }
 
-pub(crate) fn parse_committed_file_info(line: &String) -> Option<CommittedFileInfo> {
-    let committed_str = line.chars().nth(0)?.to_string();
-    let committed_status = CommittedStatus::from_str(&committed_str).ok()?;
+pub(crate) fn parse_versioned_file_info(line: &String) -> Option<VersionedFileInfo> {
+    let versioned_str = line.chars().nth(0)?.to_string();
+    let versioned_status = VersionedFileStatus::from_str(&versioned_str).ok()?;
 
     let path = line.split_ascii_whitespace().last()?;
 
-    Some(CommittedFileInfo {
+    Some(VersionedFileInfo {
         path: path.to_string(),
-        status: committed_status,
+        status: versioned_status,
     })
 }
 

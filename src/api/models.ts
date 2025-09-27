@@ -17,12 +17,28 @@ export interface CurrentDirInfo {
 }
 
 export type CommitId = string
+export type StashId = string
+export type SnapshotId = CommitId | StashId
 export type BranchName = string
 export type RemoteName = string
 export type RemoteRef = `${RemoteName}/${BranchName}`
 
+export interface DiffSummary {
+  filesCount: number
+  insertions: number
+  deletions: number
+}
+
+export interface StashInfo {
+  id: StashId
+  message: string | null
+  timestamp: number
+  createdOn: CommitId | BranchName
+  changes: DiffSummary | null
+}
+
 export interface CommitInfo {
-  hash: CommitId
+  id: CommitId
   shortHash: string
   authorName: string
   authorEmail: string
@@ -30,6 +46,8 @@ export interface CommitInfo {
   message: string | null
   changes: DiffSummary | null
 }
+
+export type SnapshotInfo = CommitInfo | StashInfo
 
 export interface AncestorInfo {
   distance: number
@@ -114,7 +132,7 @@ export type FileTypeFilter = {
   [T in FileType]?: boolean
 }
 
-export type CommitedFileStatus =
+export type VersionedFileStatus =
   | 'modified'
   | 'typeChanged'
   | 'added'
@@ -122,29 +140,15 @@ export type CommitedFileStatus =
   | 'renamed'
   | 'copied'
 
-export interface CommitedFileInfo {
+export interface VersionedFileInfo {
   path: string
-  status: CommitedFileStatus
+  status: VersionedFileStatus
 }
 
 export interface RemoteInfo {
   name: RemoteName
   fetchUrl: string
   pushUrl: string
-}
-
-export interface DiffSummary {
-  filesCount: number
-  insertions: number
-  deletions: number
-}
-
-export interface StashInfo {
-  id: string
-  message: string | null
-  timestamp: number
-  createdOn: CommitId | BranchName
-  changes: DiffSummary | null
 }
 
 export interface Settings {

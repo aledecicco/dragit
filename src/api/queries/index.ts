@@ -4,11 +4,6 @@ export {
 } from './branchDivergence'
 export { branchesQueryKeys, useQueryBranches } from './branches'
 export {
-  COMMIT_FILES_PAGE_SIZE,
-  commitFilesQueryKeys,
-  useQueryCommitFiles,
-} from './commitFiles'
-export {
   commitHistoryQueryKeys,
   HISTORY_PAGE_SIZE,
   useQueryCommitHistory,
@@ -28,6 +23,11 @@ export {
 } from './recentlyOpened'
 export { remotesQueryKeys, useQueryRemotes } from './remotes'
 export { settingsQueryKey, useQuerySettings } from './settings'
+export {
+  SNAPSHOT_FILES_PAGE_SIZE,
+  snapshotFilesQueryKeys,
+  useQuerySnapshotFiles,
+} from './snapshotFiles'
 export { stashesQueryKeys, useQueryStashes } from './stashes'
 
 export const pathQueryKey = (path: string) =>

@@ -1,8 +1,8 @@
 use tauri::ipc::Channel;
 
 use crate::{
-    AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommittedFileInfo, CommonAncestorInfo,
-    FileInfo, GitError, HeadInfo, HistoryItem, Page, RemoteInfo, StashInfo,
+    AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, FileInfo, GitError,
+    HeadInfo, HistoryItem, Page, RemoteInfo, StashInfo, VersionedFileInfo,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -59,15 +59,15 @@ pub trait GitHandler {
         limit: usize,
     ) -> Result<Page<FileInfo>, GitError>;
 
-    /// Returns (a page of) the list of files in the given commit.
-    fn get_commit_files_page(
+    /// Returns (a page of) the list of files in the given snapshot.
+    fn get_snapshot_files_page(
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
-        reference: &str,
+        snapshot_id: &str,
         start_after: usize,
         limit: usize,
-    ) -> Result<Page<CommittedFileInfo>, GitError>;
+    ) -> Result<Page<VersionedFileInfo>, GitError>;
 
     /// Adds the given list of files to the current index.
     fn add_to_index(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError>;

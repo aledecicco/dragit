@@ -139,7 +139,7 @@ pub enum FileInfo {
 }
 
 #[derive(borsh::BorshSerialize, strum::EnumString, Debug)]
-pub enum CommittedStatus {
+pub enum VersionedFileStatus {
     #[strum(serialize = "M")]
     Modified,
 
@@ -160,9 +160,9 @@ pub enum CommittedStatus {
 }
 
 #[derive(borsh::BorshSerialize, Debug)]
-pub struct CommittedFileInfo {
+pub struct VersionedFileInfo {
     pub path: String,
-    pub status: CommittedStatus,
+    pub status: VersionedFileStatus,
 }
 
 #[derive(borsh::BorshSerialize, Debug)]

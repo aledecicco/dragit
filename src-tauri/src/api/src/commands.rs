@@ -165,16 +165,16 @@ pub async fn get_files_page(
 }
 
 #[tauri::command]
-pub async fn get_commit_files_page(
+pub async fn get_snapshot_files_page(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
     path: &str,
-    reference: &str,
+    snapshot_id: &str,
     start_after: usize,
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_commit_files_page(&channel, path, reference, start_after, limit)
+        h.get_snapshot_files_page(&channel, path, snapshot_id, start_after, limit)
     })
     .and_then(serialize_response)
 }
@@ -385,12 +385,12 @@ pub async fn get_file_diff(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
     path: &str,
-    reference: &str,
+    snapshot_id: &str,
     filepath: &str,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        let before = h.get_file_contents(&channel, path, &format!("{reference}^1"), filepath)?;
-        let after = h.get_file_contents(&channel, path, reference, filepath)?;
+        let before = h.get_file_contents(&channel, path, &format!("{snapshot_id}^1"), filepath)?;
+        let after = h.get_file_contents(&channel, path, snapshot_id, filepath)?;
 
         Ok(compute_diff(&before, &after))
     })

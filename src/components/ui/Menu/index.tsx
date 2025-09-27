@@ -39,11 +39,13 @@ const Menu = (props: MenuProps) => {
         'bg-dark-300 min-w-max',
       )}
     >
-      {items.map((menuItem) => {
+      {items.map((menuItem, i) => {
         const { decorator, label, ...menuItemProps } = menuItem
         return (
           <Ariakit.MenuItem
+            focusable
             key={label}
+            autoFocus={i === 0}
             {...propsWithCn(
               menuItemProps,
               'flex flex-row shrink-0 items-center gap-x-2 text-nowrap min-w-max',

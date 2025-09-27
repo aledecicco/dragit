@@ -1,7 +1,7 @@
 import { type ComponentProps, Fragment, useEffect, useRef } from 'react'
 import { IconFile } from '@tabler/icons-react'
 
-import type { Reference } from '@/api/models'
+import type { SnapshotId } from '@/api/models'
 import { useQueryFileDiff } from '@/api/queries/fileDiff'
 import { QueryLoader } from '@/lib/Loader/Query'
 import { Icon } from '@/ui/Icon'
@@ -17,9 +17,9 @@ import { DiffViewerLineNumbers } from './LineNumbers'
 
 interface FileDiffViewerProps extends ComponentProps<'div'> {
   /**
-   * The reference where the changes were made.
+   * The snapshot where the changes were made.
    */
-  reference: Reference
+  snapshotId: SnapshotId
 
   /**
    * The path of the file to display the diff for.
@@ -31,9 +31,9 @@ interface FileDiffViewerProps extends ComponentProps<'div'> {
  * Displays the contents of a file, showing changes made to it on each line.
  */
 const FileDiffViewer = (props: FileDiffViewerProps) => {
-  const { reference, filepath, ...divProps } = props
+  const { snapshotId, filepath, ...divProps } = props
 
-  const fileDiffQuery = useQueryFileDiff(reference.refName, filepath)
+  const fileDiffQuery = useQueryFileDiff(snapshotId, filepath)
 
   const viewerRef = useRef<HTMLDivElement>(null)
 

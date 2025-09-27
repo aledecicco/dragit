@@ -1,7 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 
 import type { CommitInfo } from '@/api/models'
-import { showCommitDetailsDialog } from '@/common/CommitDetailsDialog'
+import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
@@ -33,7 +33,7 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
       )}
       onClick={(e) => {
         buttonProps.onClick?.(e)
-        showCommitDetailsDialog(commitInfo)
+        showSnapshotDetailsDialog(commitInfo)
       }}
     >
       <p

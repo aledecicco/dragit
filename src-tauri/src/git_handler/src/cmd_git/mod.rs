@@ -10,9 +10,9 @@ mod utils;
 use utils::*;
 
 use models::{
-    AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommittedFileInfo,
-    CommonAncestorInfo, FileInfo, FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem,
-    Page, RemoteInfo, StashInfo,
+    AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
+    FileInfo, FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
+    StashInfo, VersionedFileInfo,
 };
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
@@ -273,14 +273,14 @@ impl GitHandler for CmdGit {
         Ok(Page { items, has_next })
     }
 
-    fn get_commit_files_page(
+    fn get_snapshot_files_page(
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
-        reference: &str,
+        snapshot_id: &str,
         start_after: usize,
         limit: usize,
-    ) -> Result<Page<CommittedFileInfo>, GitError> {
+    ) -> Result<Page<VersionedFileInfo>, GitError> {
         let process = self.spawn_and_notify(
             channel,
             path,
@@ -291,14 +291,14 @@ impl GitHandler for CmdGit {
                 "--name-status",
                 "--find-copies",
                 "--no-commit-id",
-                reference,
-                &format!("{}^1", reference),
+                snapshot_id,
+                &format!("{}^1", snapshot_id),
             ],
         )?;
         let lines = self.get_output_lines_stream(process)?;
 
         let mut items_iter = lines
-            .filter_map(|line| line.ok().and_then(|line| parse_committed_file_info(&line)))
+            .filter_map(|line| line.ok().and_then(|line| parse_versioned_file_info(&line)))
             .skip(start_after);
         let items: Vec<_> = items_iter.by_ref().take(limit).collect();
         let has_next = items_iter.next().is_some();

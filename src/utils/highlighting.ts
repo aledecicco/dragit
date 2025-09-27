@@ -412,14 +412,18 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
 
     match(diffLine.type)
       .with('added', () => {
+        // If this is an added line, we take it from the "after" content.
         res.push(wrapLineInDiff(lineAfter, diffLine.type))
         pointerAfter++
       })
       .with('removed', () => {
+        // If this is a removed line, we take it from the "before" content.
         res.push(wrapLineInDiff(lineBefore, diffLine.type))
         pointerBefore++
       })
       .with('unchanged', () => {
+        // If this is an unchanged line, either one should be the same,
+        // and so we move both pointers.
         res.push(wrapLineInDiff(lineBefore, diffLine.type))
         pointerBefore++
         pointerAfter++
@@ -427,6 +431,7 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
       .exhaustive()
   }
 
+  // We add an empty line at the end with the style of the previous one for continuity.
   res.push(
     wrapLineInDiff(
       [{ type: 'text', value: '\n' }],

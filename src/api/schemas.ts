@@ -23,7 +23,7 @@ export const DIFF_SUMMARY_SCHEMA = BorshSchema.Struct({
 })
 
 export const COMMIT_INFO_SCHEMA = BorshSchema.Struct({
-  hash: BorshSchema.String,
+  id: BorshSchema.String,
   shortHash: BorshSchema.String,
   authorName: BorshSchema.String,
   authorEmail: BorshSchema.String,
@@ -138,7 +138,7 @@ export const FILE_INFO_SCHEMA = BorshSchema.Enum({
 })
 export const FILES_PAGE_SCHEMA = PAGE_SCHEMA(FILE_INFO_SCHEMA)
 
-export const COMMITTED_STATUS_SCHEMA = BorshSchema.Enum({
+export const VERSIONED_FILE_STATUS_SCHEMA = BorshSchema.Enum({
   Modified: BorshSchema.Unit,
   TypeChanged: BorshSchema.Unit,
   Added: BorshSchema.Unit,
@@ -147,11 +147,13 @@ export const COMMITTED_STATUS_SCHEMA = BorshSchema.Enum({
   Copied: BorshSchema.Unit,
 })
 
-export const COMMITTED_FILE_INFO_SCHEMA = BorshSchema.Struct({
+export const VERSIONED_FILE_INFO_SCHEMA = BorshSchema.Struct({
   path: BorshSchema.String,
-  status: COMMITTED_STATUS_SCHEMA,
+  status: VERSIONED_FILE_STATUS_SCHEMA,
 })
-export const COMMIT_FILES_PAGE_SCHEMA = PAGE_SCHEMA(COMMITTED_FILE_INFO_SCHEMA)
+export const SNAPSHOT_FILES_PAGE_SCHEMA = PAGE_SCHEMA(
+  VERSIONED_FILE_INFO_SCHEMA,
+)
 
 export const REMOTE_INFO_SCHEMA = BorshSchema.Struct({
   name: BorshSchema.String,

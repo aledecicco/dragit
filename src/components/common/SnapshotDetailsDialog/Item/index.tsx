@@ -1,24 +1,24 @@
 import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
-import type { CommitedFileInfo } from '@/api/models'
+import type { VersionedFileInfo } from '@/api/models'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
 
-interface CommitDetailsDialogItemProps extends ListItemProps {
+interface SnapshotDetailsDialogItemProps extends ListItemProps {
   /**
    * The file that this list item should display.
    */
-  file: CommitedFileInfo
+  file: VersionedFileInfo
 }
 
 /**
- * The list item for files in the commit details dialog.
+ * The list item for files in the snapshot details dialog.
  *
  * Displays as a checkbox to allow selecting/unselecting files.
  */
-const CommitDetailsDialogItem = (props: CommitDetailsDialogItemProps) => {
+const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
   const { file, ...itemProps } = props
 
   return (
@@ -61,4 +61,4 @@ const CommitDetailsDialogItem = (props: CommitDetailsDialogItemProps) => {
   )
 }
 
-export { CommitDetailsDialogItem, type CommitDetailsDialogItemProps }
+export { SnapshotDetailsDialogItem, type SnapshotDetailsDialogItemProps }

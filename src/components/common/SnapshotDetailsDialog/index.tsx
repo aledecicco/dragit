@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import * as Ariakit from '@ariakit/react'
 
-import type { CommitedFileInfo, CommitId, CommitInfo } from '@/api/models'
-import { COMMIT_FILES_PAGE_SIZE, useQueryCommitFiles } from '@/api/queries'
+import type { SnapshotId, SnapshotInfo, VersionedFileInfo } from '@/api/models'
+import { SNAPSHOT_FILES_PAGE_SIZE, useQuerySnapshotFiles } from '@/api/queries'
 import { getPageItems } from '@/api/utils'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { FileDiffViewer } from '@/common/FileDiffViewer'
@@ -16,16 +16,16 @@ import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 import { mapFn } from '@/utils/types'
 
-import { CommitDetailsDialogItem } from './Item'
+import { SnapshotDetailsDialogItem } from './Item'
 
-export const COMMIT_DETAILS_DIALOG_KEY = (commitId: CommitId) =>
-  `commit_details_dialog_${commitId}`
+export const SNAPSHOT_DETAILS_DIALOG_KEY = (snapshotId: SnapshotId) =>
+  `snapshot_details_dialog_${snapshotId}`
 
-interface CommitDetailsDialogProps extends Omit<DialogProps, 'dialogKey'> {
+interface SnapshotDetailsDialogProps extends Omit<DialogProps, 'dialogKey'> {
   /**
-   * The commit that should be displayed.
+   * The snapshot that should be displayed.
    */
-  commitInfo: CommitInfo
+  snapshotInfo: SnapshotInfo
 }
 
 /**
@@ -33,16 +33,16 @@ interface CommitDetailsDialogProps extends Omit<DialogProps, 'dialogKey'> {
  *
  * Allows viewing file diffs in detail.
  */
-const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
-  const { commitInfo, ...dialogProps } = props
-  const timeAgo = useDateDifference(commitInfo.timestamp)
+const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
+  const { snapshotInfo, ...dialogProps } = props
 
+  const timeAgo = useDateDifference(snapshotInfo.timestamp)
   const [page, setPage] = useState(0)
   const clearPage = () => {
     setPage(0)
   }
 
-  const filesQuery = useQueryCommitFiles(commitInfo.hash, page)
+  const filesQuery = useQuerySnapshotFiles(snapshotInfo.id, page)
   const showPagination = useNeedsPagination(filesQuery, page)
   useHandlePageSync(filesQuery, page, clearPage)
 
@@ -51,15 +51,19 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
 
   return (
     <Dialog
-      dialogKey={COMMIT_DETAILS_DIALOG_KEY(commitInfo.hash)}
-      heading={`#${commitInfo.shortHash}`}
+      dialogKey={SNAPSHOT_DETAILS_DIALOG_KEY(snapshotInfo.id)}
+      heading={
+        'shortHash' in snapshotInfo
+          ? `#${snapshotInfo.shortHash}`
+          : `Stash #${snapshotInfo.id}`
+      }
       contentProps={{
         className: cn('grid-rows-[max-content_max-content]'),
       }}
       sideContent={
         typeof selectedFile === 'string' ? (
           <FileDiffViewer
-            reference={{ type: 'commit', refName: commitInfo.hash }}
+            snapshotId={snapshotInfo.id}
             filepath={selectedFile}
           />
         ) : undefined
@@ -67,7 +71,7 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
       {...propsWithCn(dialogProps, 'max-w-[85%] max-h-[85%]')}
     >
       <ChangesSummary
-        diff={commitInfo.changes}
+        diff={snapshotInfo.changes}
         compact={false}
         className={cn('text-sm justify-self-center -mt-6 mb-6')}
       />
@@ -84,18 +88,22 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
               'bg-dark-500 text-light-400 text-sm whitespace-pre-wrap',
               'p-3 max-h-40 overflow-y-auto',
               'mb-2',
-              !commitInfo.message && 'italic text-light-950',
+              !snapshotInfo.message && 'italic text-light-950',
             )}
           >
-            {commitInfo.message ?? 'No message.'}
+            {snapshotInfo.message ?? 'No message.'}
           </div>
 
-          <div className={cn('flex flex-row items-center gap-x-1')}>
-            <ProfilePicture username={commitInfo.authorName} size="md" />
-            <p className={cn('text-xs text-light-950')}>
-              {commitInfo.authorName}, {timeAgo}
-            </p>
-          </div>
+          {'authorName' in snapshotInfo ? (
+            <div className={cn('flex flex-row items-center gap-x-1')}>
+              <ProfilePicture username={snapshotInfo.authorName} size="md" />
+              <p className={cn('text-xs text-light-950')}>
+                {snapshotInfo.authorName}, {timeAgo}
+              </p>
+            </div>
+          ) : (
+            <p className={cn('text-xs text-light-950')}>{timeAgo}</p>
+          )}
         </div>
 
         <div className={cn('grid gap-y-2 overflow-y-hidden')}>
@@ -110,8 +118,8 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
                 name="modified files"
                 query={filesQuery}
                 getItems={getPageItems}
-                renderItem={(file: CommitedFileInfo) => (
-                  <CommitDetailsDialogItem file={file} />
+                renderItem={(file: VersionedFileInfo) => (
+                  <SnapshotDetailsDialogItem file={file} />
                 )}
                 itemSize={48}
                 size="md"
@@ -120,8 +128,8 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
                 }))}
                 placeholdersCount={Math.min(
                   10,
-                  commitInfo.changes?.filesCount
-                    ? commitInfo.changes.filesCount
+                  snapshotInfo.changes?.filesCount
+                    ? snapshotInfo.changes.filesCount
                     : 1,
                 )}
               />
@@ -134,7 +142,7 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
         <Pagination
           className={cn('mt-6 -mb-2')}
           page={page}
-          pageSize={COMMIT_FILES_PAGE_SIZE}
+          pageSize={SNAPSHOT_FILES_PAGE_SIZE}
           hasNext={!!filesQuery.data?.hasNext}
           setPrevPage={() => {
             setPage((_page) => _page - 1)
@@ -148,18 +156,18 @@ const CommitDetailsDialog = (props: CommitDetailsDialogProps) => {
   )
 }
 
-const showCommitDetailsDialog = (
-  commitInfo: CommitInfo,
-  props?: Partial<CommitDetailsDialogProps>,
+const showSnapshotDetailsDialog = (
+  snapshotInfo: SnapshotInfo,
+  props?: Partial<SnapshotDetailsDialogProps>,
 ) => {
   showDialog(
-    COMMIT_DETAILS_DIALOG_KEY(commitInfo.hash),
-    <CommitDetailsDialog commitInfo={commitInfo} {...props} />,
+    SNAPSHOT_DETAILS_DIALOG_KEY(snapshotInfo.id),
+    <SnapshotDetailsDialog snapshotInfo={snapshotInfo} {...props} />,
   )
 }
 
 export {
-  CommitDetailsDialog,
-  showCommitDetailsDialog,
-  type CommitDetailsDialogProps,
+  SnapshotDetailsDialog,
+  showSnapshotDetailsDialog,
+  type SnapshotDetailsDialogProps,
 }
