@@ -1,13 +1,26 @@
-import type { ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
 import { propsWithCn } from '@/utils/styles'
 import type { Size } from '@/utils/types'
 
+import { type Glyph, Icon, type IconProps } from '../Icon'
+
 interface MenuItem extends Ariakit.MenuItemProps {
-  decorator?: ReactNode
-  label?: string
+  /**
+   * The label of the menu item.
+   */
+  label: string
+
+  /**
+   * The icon to display in the menu item.
+   */
+  Glyph: Glyph
+
+  /**
+   * Additional props to pass to the icon component.
+   */
+  iconProps?: Partial<IconProps>
 }
 
 interface MenuProps extends Ariakit.MenuProps {
@@ -40,7 +53,7 @@ const Menu = (props: MenuProps) => {
       )}
     >
       {items.map((menuItem, i) => {
-        const { decorator, label, ...menuItemProps } = menuItem
+        const { Glyph, label, ...menuItemProps } = menuItem
         return (
           <Ariakit.MenuItem
             focusable
@@ -58,7 +71,7 @@ const Menu = (props: MenuProps) => {
               'cursor-pointer hover:bg-dark-100 data-[active-item]:bg-dark-100',
             )}
           >
-            {decorator}
+            <Icon Glyph={Glyph} size={size} {...menuItem.iconProps} />
             {label}
           </Ariakit.MenuItem>
         )

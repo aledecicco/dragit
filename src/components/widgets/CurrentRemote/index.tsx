@@ -16,10 +16,9 @@ import {
   useSelectedUpstream,
 } from '@/context/upstream'
 import { ActionButton } from '@/lib/ActionButton'
-import { Button } from '@/ui/Button'
+import { DecoratedButton } from '@/lib/DecoratedButton'
 import { Combobox, type ComboboxOption } from '@/ui/Combobox'
 import { EditableText } from '@/ui/EditableText'
-import { Icon } from '@/ui/Icon'
 import { useSelectedBranches } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -59,17 +58,12 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
       <Combobox
         option={remote ? { value: remote.name, data: remote } : undefined}
         options={remoteOptions}
-        decorator={
-          <Icon
-            Glyph={
-              branch?.type === 'local'
-                ? remote === undefined
-                  ? IconWorldQuestion
-                  : IconWorld
-                : IconWorldCancel
-            }
-            size="sm"
-          />
+        Glyph={
+          branch?.type === 'local'
+            ? remote === undefined
+              ? IconWorldQuestion
+              : IconWorld
+            : IconWorldCancel
         }
         setOption={(newOption) => {
           changeUpstreamRemote(newOption.data)
@@ -124,15 +118,15 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         mainAction={fetchRemote}
       />
 
-      <Button
+      <DecoratedButton
+        compact
         round
-        description="Manage remotes"
+        label="Manage remotes"
+        Glyph={IconMenuDeep}
         onClick={() => {
           showRemotesDialog()
         }}
-      >
-        <Icon Glyph={IconMenuDeep} />
-      </Button>
+      />
     </div>
   )
 }

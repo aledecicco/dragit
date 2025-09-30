@@ -4,7 +4,6 @@ import { IconLoader2 } from '@tabler/icons-react'
 import { useEffectOnce } from 'react-use'
 
 import { type Action, runAction, useActionStatuses } from '@/context/actions'
-import { Icon } from '@/ui/Icon'
 import { Menu, type MenuItem } from '@/ui/Menu'
 import { cn } from '@/utils/styles'
 import type { AnyObject } from '@/utils/types'
@@ -38,13 +37,8 @@ const withContextMenu = <P extends AnyObject>(
         return {
           label:
             status === 'running' ? action.label.running : action.label.idle,
-          decorator: (
-            <Icon
-              Glyph={status === 'running' ? IconLoader2 : action.Glyph}
-              className={cn(status === 'running' && 'animate-spin')}
-              size="sm"
-            />
-          ),
+          Glyph: status === 'running' ? IconLoader2 : action.Glyph,
+
           disabled: status === 'running',
           onClick: () => {
             runAction(action)

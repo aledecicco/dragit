@@ -1,12 +1,18 @@
 import * as Ariakit from '@ariakit/react'
 
-import { ActionButton, type ActionButtonProps } from '@/lib/ActionButton'
+import type { Action } from '@/context/actions'
+import { ActionButton } from '@/lib/ActionButton'
 import type { ButtonStatus, ButtonVariant } from '@/ui/Button'
-import { propsWithCn } from '@/utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 import type { Size } from '@/utils/types'
 
-// biome-ignore lint/suspicious/noExplicitAny: Toolbars need to accept actions with different parameter types.
-type ToolbarTool = ActionButtonProps<any>
+type ToolbarTool = {
+  alternatives?: Action[]
+  onClick?: () => void
+} & ( // biome-ignore lint/suspicious/noExplicitAny: Toolbars need to accept actions with different parameter types.
+  | { mainAction: Action<any>; trackOnly: true }
+  | { mainAction: Action; trackOnly?: false }
+)
 
 interface ToolbarProps extends Ariakit.ToolbarProps {
   /**
@@ -71,15 +77,15 @@ const Toolbar = (props: ToolbarProps) => {
             variant={variant}
             status={status}
             compact={compact}
-            disabled={toolbarProps.disabled}
             render={<Ariakit.ToolbarItem />}
             menuButtonProps={{ render: <Ariakit.ToolbarItem /> }}
-            {...propsWithCn(
-              tool,
+            {...tool}
+            className={cn(
               fixed && 'w-full',
               'not-first:rounded-l-none',
               'not-last:rounded-r-none not-last:border-r-2 not-last:border-solid not-last:border-r-dark-500',
             )}
+            disabled={toolbarProps.disabled}
           />
         ))}
       </Ariakit.Toolbar>

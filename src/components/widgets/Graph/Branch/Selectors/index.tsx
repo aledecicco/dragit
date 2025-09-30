@@ -7,7 +7,6 @@ import { BranchSelector } from '@/common/BranchSelector'
 import { runAction, useActionPresenters } from '@/context/actions'
 import { changeBaseRef, useSelectedRefs } from '@/context/branches'
 import { ActionButton } from '@/lib/ActionButton'
-import { Icon } from '@/ui/Icon'
 import { useBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
@@ -47,19 +46,16 @@ const BranchSelectors = () => {
           !headInfoQuery.data ||
           !branchesQuery.data
         }
-        decorator={
-          <Icon
-            Glyph={checkoutTracker.Glyph}
-            size="md"
-            className={cn(
-              match(checkoutTracker.actionStatus)
-                .with('success', () => 'text-success-300')
-                .with('error', () => 'text-danger-600')
-                .with('running', () => 'animate-spin')
-                .otherwise(() => undefined),
-            )}
-          />
-        }
+        Glyph={checkoutTracker.Glyph}
+        iconProps={{
+          className: cn(
+            match(checkoutTracker.actionStatus)
+              .with('success', () => 'text-success-300')
+              .with('error', () => 'text-danger-600')
+              .with('running', () => 'animate-spin')
+              .otherwise(() => undefined),
+          ),
+        }}
       />
 
       <ActionButton
@@ -93,7 +89,7 @@ const BranchSelectors = () => {
             : 'Choose a base branch...'
         }
         disabled={!headInfoQuery.data || !branchesQuery.data}
-        decorator={<Icon Glyph={IconGitBranch} size="md" />}
+        Glyph={IconGitBranch}
       />
     </>
   )

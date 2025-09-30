@@ -1,5 +1,6 @@
 import { type ReactNode, startTransition, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
+import { IconChevronDown } from '@tabler/icons-react'
 import { matchSorter } from 'match-sorter'
 
 import { Button, type ButtonProps } from '@/ui/Button'
@@ -8,6 +9,7 @@ import { Separator } from '@/ui/Separator'
 import { mapOr } from '@/utils/array'
 import { cn, propsWithCn } from '@/utils/styles'
 
+import { type Glyph, Icon, type IconProps } from '../Icon'
 import { ComboboxItem } from './Item'
 
 interface ComboboxOption<T> {
@@ -29,7 +31,12 @@ interface ComboboxProps<T> extends Partial<ButtonProps> {
   /**
    * A decorator for the input.
    */
-  decorator?: ReactNode
+  Glyph?: Glyph
+
+  /**
+   * Additional props to pass to the decorator icon.
+   */
+  iconProps?: Partial<IconProps>
 
   /**
    * Function that renders an option.
@@ -62,7 +69,8 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
   const {
     option,
     options,
-    decorator,
+    Glyph,
+    iconProps,
     renderOption,
     setOption,
     placeholder = 'Select...',
@@ -106,11 +114,15 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
             />
           }
         >
-          {decorator}
+          {Glyph && (
+            <Icon Glyph={Glyph} size={buttonProps.size} {...iconProps} />
+          )}
           <Marquee reverse={false}>
             {option === undefined ? placeholder : renderOption(option)}
           </Marquee>
-          <Ariakit.SelectArrow
+          <Icon
+            Glyph={IconChevronDown}
+            size={buttonProps.size}
             className={cn('group-aria-expanded/combobox:rotate-180')}
           />
         </Ariakit.Select>

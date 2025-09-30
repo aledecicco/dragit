@@ -3,11 +3,10 @@ import { IconX } from '@tabler/icons-react'
 import { useAddRemote } from '@/api/mutations'
 import { useQueryRemotes } from '@/api/queries'
 import { useActionStatuses } from '@/context/actions'
-import { Button } from '@/ui/Button'
+import { DecoratedButton } from '@/lib/DecoratedButton'
 import { Form, type FormProps } from '@/ui/Form'
 import { InputField } from '@/ui/Form/InputField'
 import { FormSubmitButton } from '@/ui/Form/SubmitButton'
-import { Icon } from '@/ui/Icon'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface RemoteFormValues {
@@ -67,16 +66,16 @@ const RemoteForm = (props: RemoteFormProps) => {
 
           <FormSubmitButton className={cn('w-max')} action={action} compact />
 
-          <Button
+          <DecoratedButton
             disabled={status === 'running'}
             className={cn('w-max')}
             onClick={() => {
               onCancel()
             }}
-            description="Cancel"
-          >
-            <Icon Glyph={IconX} />
-          </Button>
+            label="Cancel"
+            Glyph={IconX}
+            compact
+          />
         </>
       )}
     </Form>

@@ -25,6 +25,7 @@ const useActionButtonTracker = <T>(
   const activeAction =
     actions.find((_, index) => statuses[index] === 'running') ??
     actions.find((_, index) => statuses[index] === 'error') ??
+    actions.find((_, index) => statuses[index] === 'success') ??
     mainAction
 
   return useActionPresenters(activeAction)

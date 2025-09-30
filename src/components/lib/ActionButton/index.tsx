@@ -1,13 +1,27 @@
+import type { MouseEvent } from 'react'
 import { match } from 'ts-pattern'
 
 import { type Action, runAction } from '@/context/actions'
-import { Button, type ButtonProps, type ButtonStatus } from '@/ui/Button'
-import { Icon } from '@/ui/Icon'
-import type { MenuItem } from '@/ui/Menu'
+import { Button, type ButtonStatus } from '@/ui/Button'
 import { SplitButton } from '@/ui/SplitButton'
-import { cn } from '@/utils/styles'
+import { propsWithCn } from '@/utils/styles'
 
+import { DecoratedButton, type DecoratedButtonProps } from '../DecoratedButton'
 import { useActionButtonTracker } from './utils'
+
+interface BaseActionButtonProps extends Partial<DecoratedButtonProps> {
+  /**
+   * Additional props used for the dropdown menu if alternatives are provided.
+   */
+  menuButtonProps?: Partial<DecoratedButtonProps>
+
+  /**
+   * A list of alternative actions that can be selected from a dropdown menu.
+   *
+   * When selected, they are run and tracked like the main action.
+   */
+  alternatives?: Action[]
+}
 
 type TrackOnlyActionButtonProps<T> = BaseActionButtonProps & {
   /**
@@ -17,6 +31,7 @@ type TrackOnlyActionButtonProps<T> = BaseActionButtonProps & {
 
   /**
    * If `true`, the button will only track the action's state, and not trigger it when clicked.
+   * If `false`, the button will run the action when clicked.
    */
   trackOnly: true
 }
@@ -28,6 +43,7 @@ type RunnerActionButtonProps = BaseActionButtonProps & {
   mainAction: Action
 
   /**
+   * If `true`, the button will only track the action's state, and not trigger it when clicked.
    * If `false`, the button will run the action when clicked.
    */
   trackOnly?: false
@@ -37,26 +53,6 @@ type ActionButtonProps<T> =
   | TrackOnlyActionButtonProps<T>
   | RunnerActionButtonProps
 
-interface BaseActionButtonProps extends ButtonProps {
-  /**
-   * Whether to display the button in its compact form,
-   * showing only its icon, and with its label in a tooltip.
-   */
-  compact?: boolean
-
-  /**
-   * Additional props used for the dropdown menu if alternatives are provided.
-   */
-  menuButtonProps?: Partial<ButtonProps>
-
-  /**
-   * A list of alternative actions that can be selected from a dropdown menu.
-   *
-   * When selected, they are run and tracked like the main action.
-   */
-  alternatives?: Action[]
-}
-
 /**
  * A {@link Button} that triggers and tracks an action, reflecting its state during its lifecycle.
  *
@@ -64,11 +60,11 @@ interface BaseActionButtonProps extends ButtonProps {
  */
 const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   const {
+    status,
     mainAction,
     alternatives,
-    trackOnly,
-    compact,
     menuButtonProps,
+    trackOnly,
     ...buttonProps
   } = props
 
@@ -78,69 +74,52 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   )
   const buttonStatus = match(actionStatus)
     .returnType<ButtonStatus>()
-    .with('idle', () => buttonProps.status ?? 'neutral')
-    .with('running', () => buttonProps.status ?? 'neutral')
+    .with('idle', () => status ?? 'neutral')
+    .with('running', () => status ?? 'neutral')
     .with('success', () => 'success')
     .with('error', () => 'error')
     .exhaustive()
 
-  const menuItems: MenuItem[] =
-    alternatives?.map((alternative) => ({
-      label: alternative.label.idle,
-      decorator: <Icon Glyph={alternative.Glyph} size="sm" />,
-      onClick: () => {
-        if (actionStatus !== 'running') {
-          runAction(alternative)
-        }
-      },
-    })) ?? []
+  const commonProps = {
+    ...buttonProps,
+    label: label,
+    Glyph: Glyph,
+    status: buttonStatus,
+    iconProps: propsWithCn(
+      buttonProps.iconProps,
+      actionStatus === 'running' ? 'animate-spin' : undefined,
+    ),
+    onClick: (e: MouseEvent<HTMLButtonElement>) => {
+      buttonProps.onClick?.(e)
+      if (!trackOnly && actionStatus !== 'running') {
+        runAction(mainAction)
+      }
+    },
+  }
 
-  return alternatives?.length ? (
+  return alternatives ? (
     <SplitButton
-      {...buttonProps}
-      items={menuItems}
-      onClick={(e) => {
-        buttonProps.onClick?.(e)
-        if (!trackOnly && actionStatus !== 'running') {
-          runAction(mainAction)
-        }
-      }}
-      description={compact ? label : undefined}
-      status={buttonStatus}
+      {...commonProps}
+      items={alternatives.map((alternative) => ({
+        label: alternative.label.idle,
+        Glyph: alternative.Glyph,
+        onClick: () => {
+          if (actionStatus !== 'running') {
+            runAction(alternative)
+          }
+        },
+      }))}
       menuButtonProps={{
+        label: 'View alternatives',
         ...menuButtonProps,
         disabled:
           actionStatus === 'running' ||
           menuButtonProps?.disabled ||
           buttonProps.disabled,
       }}
-    >
-      <Icon
-        size={buttonProps.size}
-        Glyph={Glyph}
-        className={cn(actionStatus === 'running' && 'animate-spin')}
-      />
-      {!compact && label}
-    </SplitButton>
+    />
   ) : (
-    <Button
-      {...buttonProps}
-      onClick={(e) => {
-        buttonProps.onClick?.(e)
-        if (!trackOnly && actionStatus !== 'running') {
-          runAction(mainAction)
-        }
-      }}
-      description={compact ? label : undefined}
-      status={buttonStatus}
-    >
-      <Icon
-        size={buttonProps.size}
-        Glyph={Glyph}
-        className={cn(actionStatus === 'running' && 'animate-spin')}
-      />
-      {!compact && label}
-    </Button>
+    <DecoratedButton {...commonProps} />
   )
 }
 

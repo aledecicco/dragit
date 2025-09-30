@@ -1,8 +1,9 @@
 import type { ComponentProps, ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
+import { IconX } from '@tabler/icons-react'
 
 import { type DialogKey, hideDialog } from '@/context/dialogs'
-import { Button } from '@/ui/Button'
+import { DecoratedButton } from '@/lib/DecoratedButton'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface DialogProps extends Ariakit.DialogProps {
@@ -81,8 +82,9 @@ const Dialog = (props: DialogProps) => {
           {showClose && (
             <Ariakit.DialogDismiss
               render={
-                <Button
+                <DecoratedButton
                   round
+                  compact
                   variant="plain"
                   status="neutral"
                   size="md"
@@ -90,7 +92,8 @@ const Dialog = (props: DialogProps) => {
                     'text-lg text-light-950',
                     'absolute top-1.5 right-1.5',
                   )}
-                  description="Close dialog"
+                  label="Close dialog"
+                  Glyph={IconX}
                 />
               }
             />

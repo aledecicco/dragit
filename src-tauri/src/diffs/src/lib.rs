@@ -5,7 +5,7 @@ use models::{DiffLine, DiffMode};
 use regex::Regex;
 use std::sync::LazyLock;
 
-static SPLIT_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"\n|\r\n|\s+|\S+"#).unwrap());
+static SPLIT_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"\n|\r\n|\s+|\S+"#).unwrap()); // TODO: better split for code
 
 /// Checks if a string is a newline (either `\n` or `\r\n`).
 fn is_newline(s: &str) -> bool {
