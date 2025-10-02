@@ -44,7 +44,7 @@ const RemotesDialog = (props: RemotesDialogProps) => {
           renderItem={(remote: RemoteInfo) => (
             <RemotesDialogItem remote={remote} />
           )}
-          itemSize={36}
+          itemSize={34}
           size="md"
           options={mapFn(remotesQuery.data, (remotes) => ({
             getItemKey: (index: number) => remotes[index].name,

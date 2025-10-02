@@ -64,18 +64,24 @@ const LineNumbersCell = (props: {
   )
 }
 
+/**
+ * Generates the line numbers for a given file diff.
+ *
+ * Staggers line numbers when there's a sequence of deletions to keep them aligned
+ * with the actual lines in the resulting file.
+ */
 const getLineNumbers = (fileDiff: FileDiff): ReactNode => {
   const res = []
 
   let offset = 0
-  let removals = 0
+  let deletions = 0
 
   fileDiff.forEach((diffLine, i) => {
     if (diffLine.type === 'removed') {
-      removals++
-    } else if (removals > 0) {
-      offset -= removals
-      removals = 0
+      deletions++
+    } else if (deletions > 0) {
+      offset -= deletions
+      deletions = 0
     }
 
     res.push(

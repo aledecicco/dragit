@@ -38,7 +38,6 @@ const withContextMenu = <P extends AnyObject>(
           label:
             status === 'running' ? action.label.running : action.label.idle,
           Glyph: status === 'running' ? IconLoader2 : action.Glyph,
-
           disabled: status === 'running',
           onClick: () => {
             runAction(action)

@@ -292,7 +292,6 @@ impl GitHandler for CmdGit {
                 "--find-copies",
                 "--no-commit-id",
                 snapshot_id,
-                &format!("{}^1", snapshot_id),
             ],
         )?;
         let lines = self.get_output_lines_stream(process)?;
