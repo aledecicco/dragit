@@ -9,7 +9,7 @@ import { cn } from '@/utils/styles'
 import type { AnyObject } from '@/utils/types'
 
 interface ContextMenuProps {
-  actions: Action<void>[]
+  actions: Action[]
 }
 
 /**
@@ -36,8 +36,15 @@ const withContextMenu = <P extends AnyObject>(
 
         return {
           label:
-            status === 'running' ? action.label.running : action.label.idle,
+            action.type === 'instant'
+              ? action.label
+              : status === 'running'
+                ? action.label.running
+                : action.label.idle,
           Glyph: status === 'running' ? IconLoader2 : action.Glyph,
+          iconProps: {
+            className: cn(status === 'running' && 'animate-spin'),
+          },
           disabled: status === 'running',
           onClick: () => {
             runAction(action)

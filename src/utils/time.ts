@@ -70,7 +70,7 @@ const getDateDifference = (date: Date | number) => {
     )
   }
 
-  return 'Just now'
+  return 'just now'
 }
 
 /**

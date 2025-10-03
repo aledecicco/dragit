@@ -8,6 +8,7 @@ import { withContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
+import { viewStash } from '@/utils/actions'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
@@ -51,7 +52,7 @@ const StashesListItem = withContextMenu<StashesListItemProps>(
               <Icon Glyph={IconArchive} size="md" />
 
               <Marquee className={cn('text-sm')} reverse={false}>
-                #{stash.id} -{' '}
+                #{stash.stashNumber} -{' '}
                 <span className={cn('text-light-950')}>
                   <Icon
                     Glyph={IconGitBranch}
@@ -106,7 +107,7 @@ const StashesListItem = withContextMenu<StashesListItemProps>(
   ({ stash }) => {
     const apply = useApplyStash(stash)
     const discard = useDiscardStash(stash)
-    return [apply, discard]
+    return [viewStash(stash), apply, discard]
   },
 )
 

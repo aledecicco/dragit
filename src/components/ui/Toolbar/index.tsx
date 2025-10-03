@@ -1,6 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 
-import type { Action } from '@/context/actions'
+import type { Action, InstantAction } from '@/context/actions'
 import { ActionButton } from '@/lib/ActionButton'
 import type { ButtonStatus, ButtonVariant } from '@/ui/Button'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -8,10 +8,10 @@ import type { Size } from '@/utils/types'
 
 type ToolbarTool = {
   alternatives?: Action[]
-  onClick?: () => void
 } & ( // biome-ignore lint/suspicious/noExplicitAny: Toolbars need to accept actions with different parameter types.
-  | { mainAction: Action<any>; trackOnly: true }
-  | { mainAction: Action; trackOnly?: false }
+  | { mainAction: Action<any>; trackOnly: true; onClick: () => void }
+  | { mainAction: Action<void>; trackOnly?: false }
+  | { mainAction: InstantAction }
 )
 
 interface ToolbarProps extends Ariakit.ToolbarProps {
@@ -72,7 +72,7 @@ const Toolbar = (props: ToolbarProps) => {
       >
         {tools.map((tool, index) => (
           <ActionButton
-            key={`${tool.mainAction.label.idle}_${index}`}
+            key={`${tool.mainAction.type === 'instant' ? tool.mainAction.label : tool.mainAction.label.idle}_${index}`}
             size={size}
             variant={variant}
             status={status}

@@ -164,6 +164,7 @@ export const REMOTES_SCHEMA = BorshSchema.Vec(REMOTE_INFO_SCHEMA)
 
 export const STASH_INFO_SCHEMA = BorshSchema.Struct({
   id: BorshSchema.String,
+  stashNumber: BorshSchema.String,
   message: BorshSchema.Option(BorshSchema.String),
   timestamp: BorshSchema.u32,
   createdOn: BorshSchema.String,

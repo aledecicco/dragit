@@ -304,12 +304,12 @@ fn parse_diff_summary(line: &String) -> Option<DiffSummary> {
 
 pub(crate) fn parse_stash_info(lines: &Vec<String>) -> Option<StashInfo> {
     let hashes_line = lines.get(0)?;
-    let name_line = lines.get(1)?;
+    let id = lines.get(1)?.to_string();
     let timestamp_line = lines.get(2)?;
     let creation_line = lines.get(3)?;
     let diff_line = lines.get(4);
 
-    let id = name_line
+    let stash_number = id
         .strip_prefix(STASH_NAME_PREFIX)?
         .strip_suffix('}')?
         .to_string();
@@ -329,6 +329,7 @@ pub(crate) fn parse_stash_info(lines: &Vec<String>) -> Option<StashInfo> {
 
     Some(StashInfo {
         id,
+        stash_number,
         message,
         timestamp,
         created_on,

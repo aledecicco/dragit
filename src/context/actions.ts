@@ -13,7 +13,17 @@ type ActionId = string
 
 type ActionStatus = 'idle' | 'running' | 'success' | 'error'
 
-interface ActionDescription {
+/**
+ * An action that can be triggered and tracked, involving an async workload.
+ */
+interface WorkloadAction<T> {
+  type?: 'workload'
+
+  /**
+   * The unique identifier of the action.
+   */
+  id: ActionId
+
   /**
    * Collection of labels for the action, depending on its state.
    */
@@ -25,19 +35,41 @@ interface ActionDescription {
    * Icon to display during the idle state.
    */
   Glyph: Glyph
-}
-
-interface Action<T = void> extends ActionDescription {
-  /**
-   * The unique identifier of the action.
-   */
-  id: ActionId
 
   /**
    * Async function that performs the action.
    */
   run: (args: T) => Promise<void>
 }
+
+/**
+ * An action that doesn't need tracking and is executed immediately.
+ */
+interface InstantAction {
+  type: 'instant'
+
+  /**
+   * The unique identifier of the action.
+   */
+  id: ActionId
+
+  /**
+   * The label of the action.
+   */
+  label: string
+
+  /**
+   * The icon of the action.
+   */
+  Glyph: Glyph
+
+  /**
+   * Function that performs the action.
+   */
+  run: () => void
+}
+
+type Action<T = void> = WorkloadAction<T> | InstantAction
 
 interface ActionsTracker {
   /**
@@ -133,6 +165,11 @@ function useActionStatuses(ids: ActionId | ActionId[]) {
 async function runAction<T>(action: Action<T>, args: T): Promise<void>
 async function runAction(action: Action<void>): Promise<void>
 async function runAction<T>(action: Action<T>, args?: T): Promise<void> {
+  if (action.type === 'instant') {
+    action.run()
+    return Promise.resolve()
+  }
+
   const status = actionsTracker.state.actions.get(action.id) ?? 'idle'
 
   if (status !== 'running') {
@@ -156,13 +193,13 @@ async function runAction<T>(action: Action<T>, args?: T): Promise<void> {
   }
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: We don't care about the shape of the actions.
+type AnyAction = Action<any>
+
 /**
  * Utility function to get the icon to display for an action based on its status.
  */
-const getActionGlyph = (
-  action: ActionDescription,
-  status: ActionStatus,
-): Glyph => {
+const getActionGlyph = (action: AnyAction, status: ActionStatus): Glyph => {
   return match(status)
     .returnType<Glyph>()
     .with('idle', () => action.Glyph)
@@ -177,10 +214,6 @@ interface ActionPresenter {
   label: string
   actionStatus: ActionStatus
 }
-
-// biome-ignore lint/suspicious/noExplicitAny: We don't care about the shape of the actions.
-type AnyAction = Action<any>
-
 /**
  * A hook that provides the necessary info to correctly display one or more actions.
  *
@@ -201,7 +234,7 @@ function useActionPresenters(actions: AnyAction | AnyAction[]) {
 
     return {
       Glyph: getActionGlyph(action, status),
-      label: action.label[status],
+      label: action.type === 'instant' ? action.label : action.label[status],
       actionStatus: status,
     }
   }
@@ -211,7 +244,7 @@ function useActionPresenters(actions: AnyAction | AnyAction[]) {
 
     return {
       Glyph: getActionGlyph(action, status),
-      label: action.label[status],
+      label: action.type === 'instant' ? action.label : action.label[status],
       actionStatus: status,
     }
   })
@@ -220,8 +253,9 @@ function useActionPresenters(actions: AnyAction | AnyAction[]) {
 export { useActionStatuses, runAction, useActionPresenters }
 export type {
   Action,
+  WorkloadAction,
+  InstantAction,
   ActionId,
-  ActionDescription,
   ActionStatus,
   ActionPresenter,
 }

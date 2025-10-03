@@ -225,6 +225,7 @@ pub struct RemoteInfo {
 #[derive(borsh::BorshSerialize, Debug)]
 pub struct StashInfo {
     pub id: String,
+    pub stash_number: String,
     pub message: Option<String>,
     pub timestamp: u32,
     pub created_on: String,

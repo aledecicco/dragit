@@ -29,7 +29,7 @@ interface SnapshotDetailsDialogProps extends Omit<DialogProps, 'dialogKey'> {
 }
 
 /**
- * Dialog that displays details about a given commit.
+ * Dialog that displays details about a given snapshot.
  *
  * Allows viewing file diffs in detail.
  */
@@ -42,6 +42,11 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
     setPage(0)
   }
 
+  const snapshotName =
+    'stashNumber' in snapshotInfo
+      ? `Stash #${snapshotInfo.stashNumber}`
+      : `#${snapshotInfo.shortHash}`
+
   const filesQuery = useQuerySnapshotFiles(snapshotInfo.id, page)
   const showPagination = useNeedsPagination(filesQuery, page)
   useHandlePageSync(filesQuery, page, clearPage)
@@ -52,11 +57,7 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
   return (
     <Dialog
       dialogKey={SNAPSHOT_DETAILS_DIALOG_KEY(snapshotInfo.id)}
-      heading={
-        'shortHash' in snapshotInfo
-          ? `#${snapshotInfo.shortHash}`
-          : `Stash #${snapshotInfo.id}`
-      }
+      heading={snapshotName}
       contentProps={{
         className: cn('grid-rows-[max-content_max-content]'),
       }}
@@ -68,7 +69,7 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
           />
         ) : undefined
       }
-      {...propsWithCn(dialogProps, 'max-w-[85%] max-h-[85%]')}
+      {...propsWithCn(dialogProps, 'max-w-[90%] max-h-[85%]')}
     >
       <ChangesSummary
         diff={snapshotInfo.changes}

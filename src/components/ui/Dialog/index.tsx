@@ -63,7 +63,7 @@ const Dialog = (props: DialogProps) => {
           'border-2 border-solid border-dark-900',
           'grid grid-rows-1',
           sideContent
-            ? 'w-full h-full grid-cols-[480px_1fr]'
+            ? 'w-full h-full grid-cols-[430px_1fr]'
             : 'grid-cols-[480px]',
         )}
         onClose={(e) => {

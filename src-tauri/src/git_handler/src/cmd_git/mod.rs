@@ -291,6 +291,7 @@ impl GitHandler for CmdGit {
                 "--name-status",
                 "--find-copies",
                 "--no-commit-id",
+                &format!("{}^1", snapshot_id),
                 snapshot_id,
             ],
         )?;

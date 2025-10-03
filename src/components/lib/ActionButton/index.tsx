@@ -101,7 +101,10 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     <SplitButton
       {...commonProps}
       items={alternatives.map((alternative) => ({
-        label: alternative.label.idle,
+        label:
+          alternative.type === 'instant'
+            ? alternative.label
+            : alternative.label.idle,
         Glyph: alternative.Glyph,
         onClick: () => {
           if (actionStatus !== 'running') {

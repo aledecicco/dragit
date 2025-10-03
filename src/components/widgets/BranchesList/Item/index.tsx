@@ -2,9 +2,8 @@ import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@/api/models'
-import { useCheckoutLocal } from '@/api/mutations'
+import { usePullBranch } from '@/api/mutations'
 import { useCheckoutBranch } from '@/api/mutations/checkoutLocal'
-import { runAction } from '@/context/actions'
 import { withContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
@@ -32,8 +31,6 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
     const { branch: currentBranch } = useSelectedBranches()
     const isCurrentBranch = currentBranch && branch.name === currentBranch.name
 
-    const checkout = useCheckoutLocal()
-
     return (
       <ListItem
         aria-selected={isCurrentBranch}
@@ -42,12 +39,6 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
           'border-1 border-solid border-transparent',
           isCurrentBranch && 'bg-dark-500 border-accent-300',
         )}
-        onClick={(e) => {
-          itemProps.onClick?.(e)
-          if (e.detail === 0) {
-            runAction(checkout, branch.name)
-          }
-        }}
       >
         <div
           className={cn('flex flex-row gap-x-1 items-center text-light-600')}
@@ -95,7 +86,9 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
   },
   ({ branch }) => {
     const checkout = useCheckoutBranch(branch)
-    return [checkout]
+    const pull = usePullBranch(branch)
+
+    return [checkout, ...(branch.type === 'local' ? [pull] : [])]
   },
 )
 
