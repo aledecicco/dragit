@@ -32,10 +32,7 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
         dialogProps,
         'max-w-[70%] max-h-[85%] grid-cols-[1fr] w-full',
       )}
-      contentProps={propsWithCn(
-        dialogProps.contentProps,
-        'p-0 overflow-auto bg-dark-900 ',
-      )}
+      contentProps={propsWithCn(dialogProps.contentProps, 'p-0 bg-dark-900')}
     >
       {match(file.status)
         .with('unstaged', () => (

@@ -75,7 +75,7 @@ const Dialog = (props: DialogProps) => {
           {...propsWithCn(
             contentProps,
             'py-8 px-6 bg-dark-600',
-            'grid overflow-hidden',
+            'overflow-hidden',
             heading && 'pb-6',
           )}
         >

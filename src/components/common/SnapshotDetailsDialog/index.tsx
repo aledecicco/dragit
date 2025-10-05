@@ -59,7 +59,7 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
       dialogKey={SNAPSHOT_DETAILS_DIALOG_KEY(snapshotInfo.id)}
       heading={snapshotName}
       contentProps={{
-        className: cn('grid-rows-[max-content_max-content]'),
+        className: cn('grid grid-rows-[max-content_max-content]'),
       }}
       sideContent={
         typeof selectedFile === 'string' ? (

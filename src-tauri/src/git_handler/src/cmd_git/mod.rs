@@ -1,7 +1,7 @@
 use std::{
     collections::HashMap,
     fmt::Debug,
-    io::{BufRead, BufReader, Lines},
+    io::{BufRead, BufReader, Lines, Read},
     process::{Child, ChildStdout, Command, Stdio},
 };
 use tauri::ipc::Channel;
@@ -83,7 +83,15 @@ impl CmdGit {
     }
 
     fn get_all_output<'a>(&self, process: Child) -> Result<String, GitError> {
-        Ok(self.get_all_output_lines(process)?.join("\n"))
+        let stdout = process.stdout.ok_or(GitError::GetCommandOutputFailed {})?;
+
+        let mut reader = BufReader::new(stdout);
+        let mut buffer = String::new();
+        reader
+            .read_to_string(&mut buffer)
+            .or(Err(GitError::GetCommandOutputFailed {}))?;
+
+        Ok(buffer)
     }
 }
 

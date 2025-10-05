@@ -398,28 +398,24 @@ pub async fn get_file_diff(
                 h.get_file_contents(&channel, path, "HEAD", filepath)?,
                 h.get_file_contents(&channel, path, ":0", filepath)?,
             ),
-            DiffScope::Unstaged => (h.get_file_contents(&channel, path, ":0", filepath)?, {
-                let mut content = std::fs::read_to_string(Path::new(path).join(filepath)).or(
-                    Err(GitError::GetFileContentsFailed {
+            DiffScope::Unstaged => (
+                h.get_file_contents(&channel, path, ":0", filepath)?,
+                std::fs::read_to_string(Path::new(path).join(filepath)).or(Err(
+                    GitError::GetFileContentsFailed {
                         reference: "Worktree".to_string(),
                         filepath: filepath.to_string(),
-                    }),
-                )?;
-                content.pop();
-
-                content
-            }),
-            DiffScope::Uncommitted => (h.get_file_contents(&channel, path, "HEAD", filepath)?, {
-                let mut content = std::fs::read_to_string(Path::new(path).join(filepath)).or(
-                    Err(GitError::GetFileContentsFailed {
+                    },
+                ))?,
+            ),
+            DiffScope::Uncommitted => (
+                h.get_file_contents(&channel, path, "HEAD", filepath)?,
+                std::fs::read_to_string(Path::new(path).join(filepath)).or(Err(
+                    GitError::GetFileContentsFailed {
                         reference: "Worktree".to_string(),
                         filepath: filepath.to_string(),
-                    }),
-                )?;
-                content.pop();
-
-                content
-            }),
+                    },
+                ))?,
+            ),
         };
 
         Ok(compute_diff(&before, &after))
