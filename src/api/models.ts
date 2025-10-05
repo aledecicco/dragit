@@ -198,6 +198,12 @@ export interface DiffLine {
 
 export type FileDiff = DiffLine[]
 
+export type DiffScope =
+  | { type: 'uncommitted' }
+  | { type: 'staged' }
+  | { type: 'unstaged' }
+  | { type: 'snapshot'; snapshotId: SnapshotId }
+
 export type AppMessage = {
   type: 'processStarted'
   pid: number

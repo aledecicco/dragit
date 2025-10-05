@@ -7,8 +7,8 @@ use tauri::{
 
 use crate::{serialize_response, with_handler};
 use models::{
-    AppError, AppEvent, AppMessage, AppState, CurrentDirInfo, FileTypesFilter, GitHandler,
-    RepoWatcherError, Settings, EVENT_ID,
+    AppError, AppEvent, AppMessage, AppState, CurrentDirInfo, DiffScope, FileTypesFilter, GitError,
+    GitHandler, RepoWatcherError, Settings, EVENT_ID,
 };
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
@@ -385,12 +385,42 @@ pub async fn get_file_diff(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
     path: &str,
-    snapshot_id: &str,
     filepath: &str,
+    scope: DiffScope,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        let before = h.get_file_contents(&channel, path, &format!("{snapshot_id}^1"), filepath)?;
-        let after = h.get_file_contents(&channel, path, snapshot_id, filepath)?;
+        let (before, after) = match &scope {
+            DiffScope::Snapshot { snapshot_id } => (
+                h.get_file_contents(&channel, path, &format!("{snapshot_id}^1"), filepath)?,
+                h.get_file_contents(&channel, path, &snapshot_id, filepath)?,
+            ),
+            DiffScope::Staged => (
+                h.get_file_contents(&channel, path, "HEAD", filepath)?,
+                h.get_file_contents(&channel, path, ":0", filepath)?,
+            ),
+            DiffScope::Unstaged => (h.get_file_contents(&channel, path, ":0", filepath)?, {
+                let mut content = std::fs::read_to_string(Path::new(path).join(filepath)).or(
+                    Err(GitError::GetFileContentsFailed {
+                        reference: "Worktree".to_string(),
+                        filepath: filepath.to_string(),
+                    }),
+                )?;
+                content.pop();
+
+                content
+            }),
+            DiffScope::Uncommitted => (h.get_file_contents(&channel, path, "HEAD", filepath)?, {
+                let mut content = std::fs::read_to_string(Path::new(path).join(filepath)).or(
+                    Err(GitError::GetFileContentsFailed {
+                        reference: "Worktree".to_string(),
+                        filepath: filepath.to_string(),
+                    }),
+                )?;
+                content.pop();
+
+                content
+            }),
+        };
 
         Ok(compute_diff(&before, &after))
     })

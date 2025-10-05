@@ -4,6 +4,7 @@ import type { UnmergedFileInfo } from '@/api/models'
 import { useMarkAsResolved } from '@/api/mutations'
 import { useMarkAsRemoved } from '@/api/mutations/removeFromTree'
 import { Toolbar, type ToolbarProps, type ToolbarTool } from '@/ui/Toolbar'
+import { viewWorktreeFileDiff } from '@/utils/actions'
 
 interface UnmergedFileToolbarProps extends Partial<ToolbarProps> {
   /**
@@ -21,6 +22,9 @@ const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
   const remove = useMarkAsRemoved(file)
 
   const tools: ToolbarTool[] = [
+    {
+      mainAction: viewWorktreeFileDiff(file),
+    },
     {
       mainAction: resolve,
     },

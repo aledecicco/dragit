@@ -64,7 +64,7 @@ const Dialog = (props: DialogProps) => {
           'grid grid-rows-1',
           sideContent
             ? 'w-full h-full grid-cols-[430px_1fr]'
-            : 'grid-cols-[480px]',
+            : 'grid-cols-[530px]',
         )}
         onClose={(e) => {
           dialogProps.onClose?.(e)

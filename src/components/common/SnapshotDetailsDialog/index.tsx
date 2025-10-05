@@ -19,7 +19,7 @@ import { mapFn } from '@/utils/types'
 import { SnapshotDetailsDialogItem } from './Item'
 
 export const SNAPSHOT_DETAILS_DIALOG_KEY = (snapshotId: SnapshotId) =>
-  `snapshot_details_dialog_${snapshotId}`
+  `snapshot_details_dialog:${snapshotId}`
 
 interface SnapshotDetailsDialogProps extends Omit<DialogProps, 'dialogKey'> {
   /**
@@ -64,8 +64,8 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
       sideContent={
         typeof selectedFile === 'string' ? (
           <FileDiffViewer
-            snapshotId={snapshotInfo.id}
             filepath={selectedFile}
+            diffScope={{ type: 'snapshot', snapshotId: snapshotInfo.id }}
           />
         ) : undefined
       }
@@ -103,7 +103,9 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
               </p>
             </div>
           ) : (
-            <p className={cn('text-xs text-light-950')}>{timeAgo}</p>
+            <p className={cn('text-xs text-light-950 first-letter:capitalize')}>
+              {timeAgo}
+            </p>
           )}
         </div>
 

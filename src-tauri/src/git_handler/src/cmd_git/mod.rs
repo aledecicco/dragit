@@ -606,14 +606,14 @@ impl GitHandler for CmdGit {
     }
 
     fn apply_stash(&self, path: &str, stash_id: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["stash", "pop", &format!("stash@{{{stash_id}}}")])
+        self.spawn_and_await(path, ["stash", "pop", &stash_id])
             .or(Err(GitError::ApplyStashFailed {
                 stash_id: stash_id.to_string(),
             }))
     }
 
     fn discard_stash(&self, path: &str, stash_id: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["stash", "drop", &format!("stash@{{{stash_id}}}")])
+        self.spawn_and_await(path, ["stash", "drop", &stash_id])
             .or(Err(GitError::DiscardStashFailed {
                 stash_id: stash_id.to_string(),
             }))

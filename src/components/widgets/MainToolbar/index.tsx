@@ -1,5 +1,5 @@
 import type { FileType } from '@/api/models'
-import { useAddFiles, useCommitIndex, useQuickStash } from '@/api/mutations'
+import { useAddFiles, useCommitIndex, useSaveStash } from '@/api/mutations'
 import { showCommitDialog } from '@/common/CommitDialog'
 import { FileSelectorDialog } from '@/common/FileSelectorDialog'
 import { runAction } from '@/context/actions'
@@ -15,7 +15,7 @@ const MainToolbar = (props: MainToolbarProps) => {
   const { ...toolbarProps } = props
 
   const addFiles = useAddFiles()
-  const quickStash = useQuickStash()
+  const saveStash = useSaveStash()
   const commit = useCommitIndex()
 
   return (
@@ -38,7 +38,19 @@ const MainToolbar = (props: MainToolbarProps) => {
             })
           },
         },
-        { mainAction: quickStash },
+        {
+          mainAction: saveStash,
+          trackOnly: true,
+          onClick: () => {
+            const types: FileType[] = ['unstaged', 'unmerged', 'untracked']
+
+            askForValue(FileSelectorDialog, {
+              types,
+            }).then((filesParam) => {
+              runAction(saveStash, [filesParam.path])
+            })
+          },
+        },
         {
           mainAction: commit,
           trackOnly: true,

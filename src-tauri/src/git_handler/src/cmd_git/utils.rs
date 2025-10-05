@@ -42,9 +42,9 @@ pub(crate) const STASH_INFO_DETACHED: &str = "(no branch)";
 /// The string that denotes that a stash was created using the shorthand, without a message.
 pub(crate) const STASH_INFO_QUICK: &str = "WIP";
 /// The suffix that denotes that a string contains the number of insertions in a revision.
-pub(crate) const DIFF_INSERTIONS: &str = "insertions(+)";
+pub(crate) const DIFF_INSERTIONS: &str = "(+)";
 /// The suffix that denotes that a string contains the number of deletions in a revision.
-pub(crate) const DIFF_DELETIONS: &str = "deletions(-)";
+pub(crate) const DIFF_DELETIONS: &str = "(-)";
 
 pub(crate) fn parse_commit_info(line: &String) -> Option<CommitInfo> {
     let mut segments = line.split('\0');
@@ -278,9 +278,9 @@ fn parse_diff_summary(line: &String) -> Option<DiffSummary> {
             .split_ascii_whitespace()
             .collect::<Vec<_>>();
         if let (Some(section_number), Some(section_type)) = (section.get(0), section.get(1)) {
-            if (*section_type).eq(DIFF_INSERTIONS) {
+            if (*section_type).ends_with(DIFF_INSERTIONS) {
                 insertions = u32::from_str(section_number).ok().unwrap_or(0);
-            } else if (*section_type).eq(DIFF_DELETIONS) {
+            } else if (*section_type).ends_with(DIFF_DELETIONS) {
                 deletions = u32::from_str(section_number).ok().unwrap_or(0);
             }
         }

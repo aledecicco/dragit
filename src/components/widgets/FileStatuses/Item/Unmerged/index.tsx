@@ -5,6 +5,7 @@ import type { UnmergedFileInfo } from '@/api/models'
 import { useMarkAsRemoved, useMarkAsResolved } from '@/api/mutations'
 import { withContextMenu } from '@/lib/ContextMenu'
 import type { ListItemProps } from '@/ui/ListItem'
+import { viewWorktreeFileDiff } from '@/utils/actions'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { FileStatusItem } from '..'
@@ -60,6 +61,7 @@ const UnmergedFileStatusItem = withContextMenu<UnmergedFileStatusItemProps>(
     const remove = useMarkAsRemoved(file)
 
     return [
+      viewWorktreeFileDiff(file),
       resolve,
       ...match(file.changes)
         .with(P.union('bothDeleted', 'deletedByThem', 'deletedByUs'), () => [

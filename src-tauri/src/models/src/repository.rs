@@ -245,3 +245,15 @@ pub enum DiffLine {
     Removed(Vec<String>),
     Unchanged(Vec<String>),
 }
+
+#[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
+#[serde(rename_all(deserialize = "snake_case"), tag = "type")]
+pub enum DiffScope {
+    Uncommitted,
+    Staged,
+    Unstaged,
+    Snapshot {
+        #[serde(rename(deserialize = "snapshotId"))]
+        snapshot_id: String,
+    },
+}

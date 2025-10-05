@@ -1,6 +1,7 @@
 import type { StagedFileInfo } from '@/api/models'
 import { useUnstageFile } from '@/api/mutations'
 import { Toolbar, type ToolbarProps, type ToolbarTool } from '@/ui/Toolbar'
+import { viewWorktreeFileDiff } from '@/utils/actions'
 
 interface StagedFileToolbarProps extends Partial<ToolbarProps> {
   /**
@@ -17,6 +18,9 @@ const StagedFileToolbar = (props: StagedFileToolbarProps) => {
 
   const unstage = useUnstageFile(file)
   const tools: ToolbarTool[] = [
+    {
+      mainAction: viewWorktreeFileDiff(file),
+    },
     {
       mainAction: unstage,
     },

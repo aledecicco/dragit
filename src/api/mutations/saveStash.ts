@@ -25,15 +25,14 @@ const saveStashMutation = (path: string) =>
     networkMode: 'always',
   })
 
-const useQuickStash = (): Action => {
+const useSaveStash = (): Action<string[]> => {
   const saveStash = useRepositoryMutation(saveStashMutation)
-
   return {
-    id: 'quick_stash',
-    run: async () => {
+    id: 'save_stash',
+    run: async (files: string[]) => {
       await saveStash.mutateAsync({
-        files: ['.'],
-        message: null,
+        files,
+        message: null, // TODO: allow messages
         includeUntracked: true,
       })
     },
@@ -47,4 +46,4 @@ const useQuickStash = (): Action => {
   }
 }
 
-export { useQuickStash, saveStashKey }
+export { useSaveStash, saveStashKey }

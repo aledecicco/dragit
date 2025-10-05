@@ -27,7 +27,7 @@ export {
 } from './removeRecentFolder'
 export { removeRemoteKey, useRemoveRemote } from './removeRemote'
 export { renameRemoteKey, useRenameRemote } from './renameRemote'
-export { saveStashKey, useQuickStash } from './saveStash'
+export { saveStashKey, useSaveStash } from './saveStash'
 export { setSettingsKey, useSaveSettings } from './setSettings'
 export { setUpstreamKey, useSetUpstream } from './setUpstream'
 

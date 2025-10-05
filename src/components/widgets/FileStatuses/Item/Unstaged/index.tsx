@@ -10,6 +10,7 @@ import type { UnstagedFileInfo } from '@/api/models'
 import { useStageFile } from '@/api/mutations'
 import { withContextMenu } from '@/lib/ContextMenu'
 import type { ListItemProps } from '@/ui/ListItem'
+import { viewWorktreeFileDiff } from '@/utils/actions'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { FileStatusItem } from '..'
@@ -53,7 +54,7 @@ const UnstagedFileStatusItem = withContextMenu<UnstagedFileStatusItemProps>(
   },
   ({ file }) => {
     const stage = useStageFile(file)
-    return [stage]
+    return [viewWorktreeFileDiff(file), stage]
   },
 )
 
