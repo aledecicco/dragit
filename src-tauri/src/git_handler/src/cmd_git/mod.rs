@@ -346,18 +346,22 @@ impl GitHandler for CmdGit {
     // TODO: optimize this. It can be very slow in some cases.
     fn get_common_ancestor(
         &self,
-        _: &Channel<AppMessage>,
+        channel: &Channel<AppMessage>,
         path: &str,
         reference_a: &str,
         reference_b: &str,
     ) -> Result<Option<CommonAncestorInfo>, GitError> {
-        // TODO: handle cancelation
-
         let parse_ref = |reference: &str, back: u32| -> Option<String> {
             let process = self
-                .spawn_command(path, ["rev-parse", &format!("{}^{}", reference, back)])
+                .spawn_and_notify(
+                    channel,
+                    path,
+                    ["rev-parse", &format!("{}^{}", reference, back)],
+                )
                 .ok()?;
-            self.get_all_output(process).ok()
+            self.get_all_output(process)
+                .ok()
+                .map(|s| s.trim().to_string())
         };
 
         let mut prev_ref_a_pointer = None;

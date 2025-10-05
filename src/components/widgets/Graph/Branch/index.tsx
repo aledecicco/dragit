@@ -79,6 +79,7 @@ const GraphBranch = (props: GraphBranchProps) => {
       anchor.distance > virtualRow.index + 1
 
     const isUnconfirmed =
+      !isBase &&
       !!mainDivergenceQuery.data &&
       ancestorIsDivergent(virtualRow.index, mainDivergenceQuery.data)
 
@@ -86,7 +87,7 @@ const GraphBranch = (props: GraphBranchProps) => {
       <GraphCommit
         key={commitData.hash}
         commitId={commitData.hash}
-        commitType={!isBase && isUnconfirmed ? 'unconfirmed' : 'confirmed'}
+        commitType={isUnconfirmed ? 'unconfirmed' : 'confirmed'}
         elementId={COMMIT_ELEMENT_ID(commitData.hash, currentRefName)}
         parent={mapFn(commitData.parent, (parentCommit) => ({
           id: COMMIT_ELEMENT_ID(
