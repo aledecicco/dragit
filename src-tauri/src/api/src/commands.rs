@@ -400,21 +400,11 @@ pub async fn get_file_diff(
             ),
             DiffScope::Unstaged => (
                 h.get_file_contents(&channel, path, ":0", filepath)?,
-                std::fs::read_to_string(Path::new(path).join(filepath)).or(Err(
-                    GitError::GetFileContentsFailed {
-                        reference: "Worktree".to_string(),
-                        filepath: filepath.to_string(),
-                    },
-                ))?,
+                std::fs::read_to_string(Path::new(path).join(filepath)).or(Ok("".to_string()))?,
             ),
             DiffScope::Uncommitted => (
                 h.get_file_contents(&channel, path, "HEAD", filepath)?,
-                std::fs::read_to_string(Path::new(path).join(filepath)).or(Err(
-                    GitError::GetFileContentsFailed {
-                        reference: "Worktree".to_string(),
-                        filepath: filepath.to_string(),
-                    },
-                ))?,
+                std::fs::read_to_string(Path::new(path).join(filepath)).or(Ok("".to_string()))?,
             ),
         };
 

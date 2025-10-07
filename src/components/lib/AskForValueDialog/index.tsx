@@ -9,6 +9,15 @@ interface AskForValueProps<T extends AnyObject> {
   submitValue: (value: T | undefined) => void
 }
 
+/**
+ * Opens a dialog component that asks the user for a value.
+ * Creates a promise that resolves when the user submits the value from the dialog.
+ *
+ * @param AskDialog - The dialog component to render, that must accept a submit callback.
+ * @param dialogProps - Optional props to pass to the dialog component.
+ *
+ * @returns A promise that resolves with the value provided by the user.
+ */
 function askForValue<T extends AnyObject>(
   AskDialog: ComponentType<AskForValueProps<T>>,
 ): Promise<T>

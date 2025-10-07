@@ -77,28 +77,24 @@ const UnstagedChangesItem = withContextMenu<UnstagedChangesItemProps>(
           }}
         >
           <div className={cn('min-w-0 w-full')}>
-            <div className={cn('flex flex-row gap-x-1 items-center')}>
-              <Icon
-                Glyph={Glyph}
-                size="md"
-                className={cn(
-                  match(file)
-                    .with({ status: 'unstaged' }, (file) =>
-                      match(file.changes)
-                        .with('added', () => 'text-success-200/90')
-                        .with('deleted', () => 'text-danger-200/90')
-                        .with('modified', () => 'text-success-200/90')
-                        .with('typeChanged', () => 'text-light-600')
-                        .exhaustive(),
-                    )
-                    .with({ status: 'untracked' }, () => 'text-light-200/90')
-                    .exhaustive(),
-                )}
-              />
-
-              <Marquee className={cn('text-sm text-light-600')}>
-                {file.path}
-              </Marquee>
+            <div
+              className={cn(
+                'flex flex-row gap-x-1 items-center',
+                match(file)
+                  .with({ status: 'unstaged' }, (file) =>
+                    match(file.changes)
+                      .with('added', () => 'text-success-200/90')
+                      .with('deleted', () => 'text-danger-200/90')
+                      .with('modified', () => 'text-success-200/90')
+                      .with('typeChanged', () => 'text-light-600')
+                      .exhaustive(),
+                  )
+                  .with({ status: 'untracked' }, () => 'text-light-600')
+                  .exhaustive(),
+              )}
+            >
+              <Icon Glyph={Glyph} size="md" />
+              <Marquee className={cn('text-sm')}>{file.path}</Marquee>
             </div>
 
             <p

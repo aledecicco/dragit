@@ -1,11 +1,11 @@
 import { BranchesList } from '@/widgets/BranchesList'
 import { CurrentDirectory } from '@/widgets/CurrentDirectory'
 import { CurrentRemote } from '@/widgets/CurrentRemote'
-import { FileStatuses } from '@/widgets/FileStatuses'
 import { Graph } from '@/widgets/Graph'
 import { MainToolbar } from '@/widgets/MainToolbar'
 import { StashesList } from '@/widgets/StashesList'
-import { UnstagedChanges } from '@/widgets/UnstagedChanges'
+import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
+import { UnstagedWorktreeChanges } from '@/widgets/WorktreeChanges/Unstaged'
 
 import { useQueryCurrentDir } from '@/api/queries'
 import { useReferencesSync } from '@/context/branches'
@@ -27,7 +27,7 @@ const App = () => {
       <div
         className={cn(
           'px-8 py-4 w-full h-full max-h-full',
-          'grid grid-cols-[1fr_2fr_1fr] grid-rows-[max-content_1fr_4fr_max-content] gap-4',
+          'grid grid-cols-[1fr_2fr_1fr] grid-rows-[max-content_max-content_1fr_1fr_max-content] gap-4',
         )}
       >
         <CurrentDirectory
@@ -56,11 +56,19 @@ const InRepository = () => {
   return (
     <>
       <StashesList className={cn('col-start-1 row-start-1 row-span-2')} />
-      <UnstagedChanges className={cn('col-start-1 row-start-3')} />
-      <MainToolbar className={cn('col-start-1 row-start-4')} />
-      <Graph className={cn('col-start-2 row-start-2 row-span-3')} />
+      <div
+        className={cn(
+          'col-start-1 row-start-3 row-span-2',
+          'flex flex-col gap-y-4',
+        )}
+      >
+        <UnstagedWorktreeChanges className={cn('grow')} />
+        <StagedWorktreeChanges className={cn('grow')} />
+      </div>
+      <MainToolbar className={cn('col-start-1 row-start-5')} />
+      <Graph className={cn('col-start-2 row-start-2 row-span-4')} />
       <CurrentRemote className={cn('col-start-3 row-start-1')} />
-      <BranchesList className={cn('col-start-3 row-start-2 row-span-2')} />
+      <BranchesList className={cn('col-start-3 row-start-2 row-span-3')} />
     </>
   )
 }
