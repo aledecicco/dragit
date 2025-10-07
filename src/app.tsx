@@ -5,6 +5,7 @@ import { FileStatuses } from '@/widgets/FileStatuses'
 import { Graph } from '@/widgets/Graph'
 import { MainToolbar } from '@/widgets/MainToolbar'
 import { StashesList } from '@/widgets/StashesList'
+import { UnstagedChanges } from '@/widgets/UnstagedChanges'
 
 import { useQueryCurrentDir } from '@/api/queries'
 import { useReferencesSync } from '@/context/branches'
@@ -55,7 +56,7 @@ const InRepository = () => {
   return (
     <>
       <StashesList className={cn('col-start-1 row-start-1 row-span-2')} />
-      <FileStatuses className={cn('col-start-1 row-start-3')} />
+      <UnstagedChanges className={cn('col-start-1 row-start-3')} />
       <MainToolbar className={cn('col-start-1 row-start-4')} />
       <Graph className={cn('col-start-2 row-start-2 row-span-3')} />
       <CurrentRemote className={cn('col-start-3 row-start-1')} />

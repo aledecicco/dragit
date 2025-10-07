@@ -1,13 +1,12 @@
 import { useState } from 'react'
 
-import type { RemoteInfo } from '@/api/models'
 import { useQueryRemotes } from '@/api/queries'
 import { showDialog } from '@/context/dialogs'
 import { QueryList } from '@/lib/QueryList'
 import { Button } from '@/ui/Button'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { cn, propsWithCn } from '@/utils/styles'
-import { idFn, mapFn } from '@/utils/types'
+import { mapFn } from '@/utils/types'
 
 import { RemoteForm } from './Form'
 import { RemotesDialogItem } from './Item'
@@ -40,10 +39,7 @@ const RemotesDialog = (props: RemotesDialogProps) => {
         <QueryList
           name="remotes"
           query={remotesQuery}
-          getItems={idFn}
-          renderItem={(remote: RemoteInfo) => (
-            <RemotesDialogItem remote={remote} />
-          )}
+          renderItem={(remote) => <RemotesDialogItem remote={remote} />}
           itemSize={34}
           size="md"
           options={mapFn(remotesQuery.data, (remotes) => ({

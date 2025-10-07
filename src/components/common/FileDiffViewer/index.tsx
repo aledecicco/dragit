@@ -50,7 +50,7 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
         'grid grid-rows-[max-content_max-content_1fr]',
       )}
     >
-      <div className="flex flex-row items-center gap-x-2 p-2 pr-9">
+      <div className={cn('flex flex-row items-center gap-x-2 p-2 pr-9')}>
         <Icon Glyph={IconFile} size="lg" />
         <Marquee className={cn('text-md text-light-500')}>{filepath}</Marquee>
       </div>

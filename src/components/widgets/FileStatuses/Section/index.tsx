@@ -1,8 +1,7 @@
 import { match } from 'ts-pattern'
 
-import type { FileInfo, FileType } from '@/api/models'
+import type { FileType } from '@/api/models'
 import { useQueryFiles } from '@/api/queries'
-import { getPageItems } from '@/api/utils'
 import { useHandleFilesPageSync } from '@/context/pages'
 import { QueryList } from '@/lib/QueryList'
 import {
@@ -43,8 +42,8 @@ const FileStatusesSection = (props: FileStatusesSectionProps) => {
       <QueryList
         name={`${type} files`}
         query={filesQuery}
-        getItems={getPageItems}
-        renderItem={(file: FileInfo) =>
+        getItems={(d) => d.items}
+        renderItem={(file) =>
           match(file)
             .with({ status: 'staged' }, (file) => (
               <StagedFileStatusItem file={file} />
@@ -70,7 +69,6 @@ const FileStatusesSection = (props: FileStatusesSectionProps) => {
         options={mapFn(filesQuery.data, (files) => ({
           getItemKey: (index: number) => files.items[index].path,
         }))}
-        isStandalone={false}
       />
     </AccordionSection>
   )

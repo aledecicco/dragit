@@ -1,13 +1,12 @@
 import type { ComponentProps } from 'react'
 
-import type { BranchInfo } from '@/api/models'
 import { useQueryBranches } from '@/api/queries'
 import { QueryList } from '@/lib/QueryList'
 import { Accordion } from '@/ui/Accordion'
 import { AccordionSection } from '@/ui/Accordion/Section'
 import { Chip } from '@/ui/Chip'
 import { propsWithCn } from '@/utils/styles'
-import { idFn, mapFn } from '@/utils/types'
+import { mapFn } from '@/utils/types'
 
 import { BranchesListItem } from './Item'
 
@@ -32,10 +31,7 @@ const BranchesList = (props: BranchesListProps) => {
         <QueryList
           name="branches"
           query={branchesQuery}
-          getItems={idFn}
-          renderItem={(branch: BranchInfo) => (
-            <BranchesListItem branch={branch} />
-          )}
+          renderItem={(branch) => <BranchesListItem branch={branch} />}
           size="sm"
           itemSize={74}
           options={mapFn(branchesQuery.data, (branches) => ({

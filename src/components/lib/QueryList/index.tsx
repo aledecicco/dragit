@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 import type { UseQueryResult } from '@tanstack/react-query'
 import { usePrevious } from 'react-use'
@@ -24,13 +25,7 @@ interface QueryListProps<T, I> extends Omit<VirtualizedDivProps<I>, 'items'> {
    *
    * @param data - The data returned by the query.
    */
-  getItems: (data: T) => I[]
-
-  /**
-   * Whether this list is standalone or rendered in a group of lists.
-   * If not standalone, it's rendered as a composite element to allow navigating between lists.
-   */
-  isStandalone?: boolean
+  getItems?: (data: T) => I[]
 
   /**
    * The number of placeholder list items to display while loading.
@@ -39,21 +34,25 @@ interface QueryListProps<T, I> extends Omit<VirtualizedDivProps<I>, 'items'> {
   placeholdersCount?: number
 }
 
-/**
- * A virtualized list that displays data from a query, with fallback loading and error states.
- */
-const QueryList = <T, I>(props: QueryListProps<T, I>) => {
-  const {
-    query,
-    name,
-    getItems,
-    isStandalone = true,
-    placeholdersCount,
-    ...virtualizedDivProps
-  } = props
+function QueryList<T, I>(
+  props: QueryListProps<T, I> & { getItems: (data: T) => I[] },
+): ReactNode
+
+function QueryList<I>(
+  props: QueryListProps<I[], I> & { getItems?: undefined },
+): ReactNode
+
+function QueryList<T, I>(props: QueryListProps<T, I>) {
+  const { query, name, getItems, placeholdersCount, ...virtualizedDivProps } =
+    props
 
   const prevCount = usePrevious(
-    query.data ? Math.min(getItems(query.data).length, 10) : undefined,
+    query.data
+      ? Math.min(
+          (getItems ? getItems(query.data) : (query.data as I[])).length,
+          10,
+        )
+      : undefined,
   )
 
   return (
@@ -79,7 +78,7 @@ const QueryList = <T, I>(props: QueryListProps<T, I>) => {
       }
     >
       {(data) => {
-        const items = getItems(data)
+        const items = getItems ? getItems(data) : (data as I[])
 
         const list = (
           <VirtualizedDiv
@@ -94,12 +93,10 @@ const QueryList = <T, I>(props: QueryListProps<T, I>) => {
           />
         )
 
-        return isStandalone ? (
+        return (
           <Ariakit.CompositeProvider focusLoop>
             <Ariakit.Composite render={list} />
           </Ariakit.CompositeProvider>
-        ) : (
-          <Ariakit.CompositeRow render={list} />
         )
       }}
     </QueryLoader>

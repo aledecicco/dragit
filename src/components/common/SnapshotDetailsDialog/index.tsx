@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import * as Ariakit from '@ariakit/react'
 
-import type { SnapshotId, SnapshotInfo, VersionedFileInfo } from '@/api/models'
+import type { SnapshotId, SnapshotInfo } from '@/api/models'
 import { SNAPSHOT_FILES_PAGE_SIZE, useQuerySnapshotFiles } from '@/api/queries'
-import { getPageItems } from '@/api/utils'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { FileDiffViewer } from '@/common/FileDiffViewer'
 import { ProfilePicture } from '@/common/ProfilePicture'
@@ -120,10 +119,8 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
               <QueryList
                 name="modified files"
                 query={filesQuery}
-                getItems={getPageItems}
-                renderItem={(file: VersionedFileInfo) => (
-                  <SnapshotDetailsDialogItem file={file} />
-                )}
+                getItems={(d) => d.items}
+                renderItem={(file) => <SnapshotDetailsDialogItem file={file} />}
                 itemSize={48}
                 size="md"
                 options={mapFn(filesQuery.data, (page) => ({

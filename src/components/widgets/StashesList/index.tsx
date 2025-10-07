@@ -1,13 +1,12 @@
 import type { ComponentProps } from 'react'
 
-import type { StashInfo } from '@/api/models'
 import { useQueryStashes } from '@/api/queries'
 import { QueryList } from '@/lib/QueryList'
 import { Accordion } from '@/ui/Accordion'
 import { AccordionSection } from '@/ui/Accordion/Section'
 import { Chip } from '@/ui/Chip'
 import { propsWithCn } from '@/utils/styles'
-import { idFn, mapFn } from '@/utils/types'
+import { mapFn } from '@/utils/types'
 
 import { StashesListItem } from './Item'
 
@@ -32,8 +31,7 @@ const StashesList = (props: StashesListProps) => {
         <QueryList
           name="stashes"
           query={stashesQuery}
-          getItems={idFn}
-          renderItem={(stash: StashInfo) => <StashesListItem stash={stash} />}
+          renderItem={(stash) => <StashesListItem stash={stash} />}
           size="sm"
           itemSize={74}
           options={mapFn(stashesQuery.data, (stashes) => ({
