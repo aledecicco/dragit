@@ -13,17 +13,17 @@ interface AddRemoteArgs {
   url: string
 }
 
-const addRemoteKey = (path: string) =>
+const addRemoteKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'add_remote',
   }) as const
 
-const addRemoteMutation = (path: string) =>
+const addRemoteMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [addRemoteKey(path)],
+    mutationKey: [addRemoteKey(repoPath)],
     mutationFn: (args: AddRemoteArgs) => {
-      return invoke('add_remote', { path: path, ...args })
+      return invoke('add_remote', { repoPath, ...args })
     },
     networkMode: 'always',
   })

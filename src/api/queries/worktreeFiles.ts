@@ -29,31 +29,31 @@ import { pathQueryKey } from '.'
 export const WORKTREE_FILES_PAGE_SIZE = 1000
 
 const worktreeFilesQueryKeys = {
-  all: (path: string) =>
+  all: (repoPath: string) =>
     ({
-      ...pathQueryKey(path),
+      ...pathQueryKey(repoPath),
       key: 'worktree_files',
     }) as const,
-  status: (path: string, types: WorktreeFileType | WorktreeFileType[]) => ({
+  status: (repoPath: string, types: WorktreeFileType | WorktreeFileType[]) => ({
     all: {
-      ...worktreeFilesQueryKeys.all(path),
+      ...worktreeFilesQueryKeys.all(repoPath),
       ...getFileTypeFilter(types),
     } as const,
     pathspec: (pathspec: string | undefined) =>
       ({
-        ...worktreeFilesQueryKeys.status(path, types).all,
+        ...worktreeFilesQueryKeys.status(repoPath, types).all,
         pathspec: pathspec,
       }) as const,
     page: (pathspec: string | undefined, page: number) =>
       ({
-        ...worktreeFilesQueryKeys.status(path, types).pathspec(pathspec),
+        ...worktreeFilesQueryKeys.status(repoPath, types).pathspec(pathspec),
         page: page,
       }) as const,
   }),
 }
 
 const fetchWorktreeFilesPage = async <T extends WorktreeFileType>(
-  path: string,
+  repoPath: string,
   types: T | T[],
   pathspec: string | null,
   page: number,
@@ -63,7 +63,7 @@ const fetchWorktreeFilesPage = async <T extends WorktreeFileType>(
   const res = await fetchAndDeserialize(
     'get_worktree_files_page',
     {
-      path,
+      repoPath,
       filter,
       pathspec,
       startAfter: page * WORKTREE_FILES_PAGE_SIZE,
@@ -149,7 +149,7 @@ const fetchWorktreeFilesPage = async <T extends WorktreeFileType>(
 }
 
 const worktreeFilesQuery = <T extends WorktreeFileType>(
-  path: string,
+  repoPath: string,
   types: T | T[],
   page: number,
   pathspec?: string,
@@ -157,12 +157,12 @@ const worktreeFilesQuery = <T extends WorktreeFileType>(
   queryOptions({
     queryKey: [
       worktreeFilesQueryKeys
-        .status(path, types)
+        .status(repoPath, types)
         .page(pathspec ? pathspec : undefined, page),
     ],
     queryFn: (context) =>
       fetchWorktreeFilesPage(
-        path,
+        repoPath,
         types,
         pathspec ? pathspec : null,
         page,

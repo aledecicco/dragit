@@ -7,17 +7,17 @@ import type { RemoteName } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
-const removeRemoteKey = (path: string) =>
+const removeRemoteKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'remove_remote',
   }) as const
 
-const removeRemoteMutation = (path: string) =>
+const removeRemoteMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [removeRemoteKey(path)],
+    mutationKey: [removeRemoteKey(repoPath)],
     mutationFn: (args: { name: RemoteName }) => {
-      return invoke('remove_remote', { path: path, ...args })
+      return invoke('remove_remote', { repoPath, ...args })
     },
     networkMode: 'always',
   })

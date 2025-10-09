@@ -31,7 +31,7 @@ export { saveStashKey, useSaveStash } from './saveStash'
 export { setSettingsKey, useSaveSettings } from './setSettings'
 export { setUpstreamKey, useSetUpstream } from './setUpstream'
 
-export const pathMutationKey = (path: string) =>
+export const pathMutationKey = (repoPath: string) =>
   ({
-    path,
+    repoPath,
   }) as const

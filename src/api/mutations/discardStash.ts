@@ -7,17 +7,17 @@ import type { StashInfo } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
-const discardStashKey = (path: string) =>
+const discardStashKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'discard_stash',
   }) as const
 
-const discardStashMutation = (path: string) =>
+const discardStashMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [discardStashKey(path)],
+    mutationKey: [discardStashKey(repoPath)],
     mutationFn: (args: { stashId: string }) => {
-      return invoke('discard_stash', { path: path, ...args })
+      return invoke('discard_stash', { repoPath, ...args })
     },
     networkMode: 'always',
   })

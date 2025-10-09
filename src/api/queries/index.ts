@@ -34,7 +34,7 @@ export {
   worktreeFilesQueryKeys,
 } from './worktreeFiles'
 
-export const pathQueryKey = (path: string) =>
+export const pathQueryKey = (repo_path: string) =>
   ({
-    path,
+    repo_path,
   }) as const

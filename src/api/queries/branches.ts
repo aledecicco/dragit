@@ -9,20 +9,20 @@ import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
 const branchesQueryKeys = {
-  all: (path: string) =>
+  all: (repoPath: string) =>
     ({
-      ...pathQueryKey(path),
+      ...pathQueryKey(repoPath),
       key: 'branches',
     }) as const,
 }
 
 const fetchBranches = async (
-  path: string,
+  repoPath: string,
   context: QueryFunctionContext,
 ): Promise<BranchInfo[]> => {
   const res = await fetchAndDeserialize(
     'get_branches',
-    { path },
+    { repoPath },
     BRANCHES_SCHEMA,
     context,
   )
@@ -45,10 +45,10 @@ const fetchBranches = async (
   )
 }
 
-const branchesQuery = (path: string) =>
+const branchesQuery = (repoPath: string) =>
   queryOptions({
-    queryKey: [branchesQueryKeys.all(path)],
-    queryFn: (context) => fetchBranches(path, context),
+    queryKey: [branchesQueryKeys.all(repoPath)],
+    queryFn: (context) => fetchBranches(repoPath, context),
   })
 
 const useQueryBranches = () => useRepositoryQuery(branchesQuery)

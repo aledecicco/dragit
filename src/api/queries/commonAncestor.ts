@@ -10,56 +10,57 @@ import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
 const commonAncestorQueryKeys = {
-  all: (path: string) =>
+  all: (repoPath: string) =>
     ({
-      ...pathQueryKey(path),
+      ...pathQueryKey(repoPath),
       key: 'common_ancestor',
     }) as const,
-  reference: (path: string, reference: string | undefined) =>
+  reference: (repoPath: string, reference: string | undefined) =>
     ({
-      ...commonAncestorQueryKeys.all(path),
+      ...commonAncestorQueryKeys.all(repoPath),
       reference: reference,
     }) as const,
-  baseReference: (path: string, baseReference: string | undefined) =>
+  baseReference: (repoPath: string, baseReference: string | undefined) =>
     ({
-      ...commonAncestorQueryKeys.all(path),
+      ...commonAncestorQueryKeys.all(repoPath),
       baseReference: baseReference,
     }) as const,
   pair: (
-    path: string,
+    repoPath: string,
     reference: string | undefined,
     baseReference: string | undefined,
   ) =>
     ({
-      ...commonAncestorQueryKeys.reference(path, reference),
-      ...commonAncestorQueryKeys.baseReference(path, baseReference),
+      ...commonAncestorQueryKeys.reference(repoPath, reference),
+      ...commonAncestorQueryKeys.baseReference(repoPath, baseReference),
     }) as const,
 }
 
 const fetchCommonAncestor = (
-  path: string,
+  repoPath: string,
   refName: string,
   baseRefName: string,
   context: QueryFunctionContext,
 ): Promise<CommonAncestorInfo | null> => {
   return fetchAndDeserialize(
     'get_common_ancestor',
-    { path, referenceA: refName, referenceB: baseRefName },
+    { repoPath, referenceA: refName, referenceB: baseRefName },
     COMMON_ANCESTOR_INFO_SCHEMA,
     context,
   )
 }
 
 const commonAncestorQuery = (
-  path: string,
+  repoPath: string,
   refName: string | undefined,
   baseRefName: string | undefined,
 ) =>
   queryOptions({
-    queryKey: [commonAncestorQueryKeys.pair(path, refName, baseRefName)],
+    queryKey: [commonAncestorQueryKeys.pair(repoPath, refName, baseRefName)],
     queryFn:
       refName && baseRefName
-        ? (context) => fetchCommonAncestor(path, refName, baseRefName, context)
+        ? (context) =>
+            fetchCommonAncestor(repoPath, refName, baseRefName, context)
         : skipToken,
   })
 

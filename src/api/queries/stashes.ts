@@ -8,20 +8,20 @@ import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
 const stashesQueryKeys = {
-  all: (path: string) =>
+  all: (repoPath: string) =>
     ({
-      ...pathQueryKey(path),
+      ...pathQueryKey(repoPath),
       key: 'stashes',
     }) as const,
 }
 
 const fetchStashes = async (
-  path: string,
+  repoPath: string,
   context: QueryFunctionContext,
 ): Promise<StashInfo[]> => {
   const res = await fetchAndDeserialize(
     'get_stashes',
-    { path },
+    { repoPath },
     STASHES_SCHEMA,
     context,
   )
@@ -32,10 +32,10 @@ const fetchStashes = async (
   }))
 }
 
-const stashesQuery = (path: string) =>
+const stashesQuery = (repoPath: string) =>
   queryOptions({
-    queryKey: [stashesQueryKeys.all(path)],
-    queryFn: (context) => fetchStashes(path, context),
+    queryKey: [stashesQueryKeys.all(repoPath)],
+    queryFn: (context) => fetchStashes(repoPath, context),
   })
 
 const useQueryStashes = () => useRepositoryQuery(stashesQuery)

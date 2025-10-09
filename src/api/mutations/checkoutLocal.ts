@@ -8,17 +8,17 @@ import type { BranchInfo } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
-const checkoutLocalKey = (path: string) =>
+const checkoutLocalKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'checkout_local',
   }) as const
 
-const checkoutLocalMutation = (path: string) =>
+const checkoutLocalMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [checkoutLocalKey(path)],
+    mutationKey: [checkoutLocalKey(repoPath)],
     mutationFn: (args: { reference: string }) => {
-      return invoke('checkout', { path: path, ...args })
+      return invoke('checkout', { repoPath, ...args })
     },
     networkMode: 'always',
   })

@@ -19,26 +19,26 @@ import { pathQueryKey } from '.'
 export const SNAPSHOT_FILES_PAGE_SIZE = 1000
 
 const snapshotFilesQueryKeys = {
-  all: (path: string) =>
+  all: (repoPath: string) =>
     ({
-      ...pathQueryKey(path),
+      ...pathQueryKey(repoPath),
       key: 'snapshot_files',
     }) as const,
-  snapshot: (path: string, snapshot: SnapshotId) => ({
+  snapshot: (repoPath: string, snapshot: SnapshotId) => ({
     all: {
-      ...snapshotFilesQueryKeys.all(path),
+      ...snapshotFilesQueryKeys.all(repoPath),
       snapshot,
     } as const,
     page: (page: number) =>
       ({
-        ...snapshotFilesQueryKeys.snapshot(path, snapshot).all,
+        ...snapshotFilesQueryKeys.snapshot(repoPath, snapshot).all,
         page: page,
       }) as const,
   }),
 }
 
 const fetchSnapshotFilesPage = async (
-  path: string,
+  repoPath: string,
   snapshotId: SnapshotId,
   page: number,
   context: QueryFunctionContext,
@@ -46,7 +46,7 @@ const fetchSnapshotFilesPage = async (
   const res = await fetchAndDeserialize(
     'get_snapshot_files_page',
     {
-      path,
+      repoPath,
       snapshotId,
       startAfter: page * SNAPSHOT_FILES_PAGE_SIZE,
       limit: SNAPSHOT_FILES_PAGE_SIZE,
@@ -89,14 +89,16 @@ const fetchSnapshotFilesPage = async (
 }
 
 const snapshotFilesQuery = (
-  path: string,
+  repoPath: string,
   page: number,
   snapshotId: SnapshotId,
 ) =>
   queryOptions({
-    queryKey: [snapshotFilesQueryKeys.snapshot(path, snapshotId).page(page)],
+    queryKey: [
+      snapshotFilesQueryKeys.snapshot(repoPath, snapshotId).page(page),
+    ],
     queryFn: (context) =>
-      fetchSnapshotFilesPage(path, snapshotId, page, context),
+      fetchSnapshotFilesPage(repoPath, snapshotId, page, context),
   })
 
 const useQuerySnapshotFiles = (

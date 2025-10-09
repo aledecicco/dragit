@@ -11,17 +11,17 @@ interface AddToIndexArgs {
   files: string[]
 }
 
-const addToIndexKey = (path: string) =>
+const addToIndexKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'add_to_index',
   }) as const
 
-const addToIndexMutation = (path: string) =>
+const addToIndexMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [addToIndexKey(path)],
+    mutationKey: [addToIndexKey(repoPath)],
     mutationFn: (args: AddToIndexArgs) => {
-      return invoke('add_to_index', { path, ...args })
+      return invoke('add_to_index', { repoPath, ...args })
     },
     networkMode: 'always',
   })

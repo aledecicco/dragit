@@ -6,17 +6,17 @@ import type { Action } from '@/context/actions'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
-const initRepositoryKey = (path: string) =>
+const initRepositoryKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'init_repository',
   }) as const
 
-const initRepositoryMutation = (path: string) =>
+const initRepositoryMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [initRepositoryKey(path)],
+    mutationKey: [initRepositoryKey(repoPath)],
     mutationFn: () => {
-      return invoke('init_repository', { path: path })
+      return invoke('init_repository', { repoPath })
     },
     networkMode: 'always',
   })

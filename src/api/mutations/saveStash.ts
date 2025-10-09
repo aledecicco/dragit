@@ -6,21 +6,21 @@ import type { Action } from '@/context/actions'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
-const saveStashKey = (path: string) =>
+const saveStashKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'stash',
   }) as const
 
-const saveStashMutation = (path: string) =>
+const saveStashMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [saveStashKey(path)],
+    mutationKey: [saveStashKey(repoPath)],
     mutationFn: (args: {
       files: string[]
       message: string | null
       includeUntracked: boolean
     }) => {
-      return invoke('stash', { path: path, ...args })
+      return invoke('stash', { repoPath, ...args })
     },
     networkMode: 'always',
   })

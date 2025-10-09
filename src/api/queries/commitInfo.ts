@@ -8,26 +8,26 @@ import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
 const commitInfoQueryKeys = {
-  all: (path: string) =>
+  all: (repoPath: string) =>
     ({
-      ...pathQueryKey(path),
+      ...pathQueryKey(repoPath),
       key: 'commit_info',
     }) as const,
-  commit: (path: string, commit: CommitId) =>
+  commit: (repoPath: string, commit: CommitId) =>
     ({
-      ...commitInfoQueryKeys.all(path),
+      ...commitInfoQueryKeys.all(repoPath),
       commit: commit,
     }) as const,
 }
 
 const fetchCommitInfo = async (
-  path: string,
+  repoPath: string,
   commitId: CommitId,
   context: QueryFunctionContext,
 ): Promise<CommitInfo> => {
   const res = await fetchAndDeserialize(
     'get_commit_info',
-    { path, reference: commitId },
+    { repoPath, reference: commitId },
     COMMIT_INFO_SCHEMA,
     context,
   )
@@ -38,10 +38,10 @@ const fetchCommitInfo = async (
   }
 }
 
-const commitInfoQuery = (path: string, commitId: CommitId) =>
+const commitInfoQuery = (repoPath: string, commitId: CommitId) =>
   queryOptions({
-    queryKey: [commitInfoQueryKeys.commit(path, commitId)],
-    queryFn: (context) => fetchCommitInfo(path, commitId, context),
+    queryKey: [commitInfoQueryKeys.commit(repoPath, commitId)],
+    queryFn: (context) => fetchCommitInfo(repoPath, commitId, context),
   })
 
 const useQueryCommitInfo = (commitId: CommitId) =>

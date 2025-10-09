@@ -7,15 +7,15 @@ import type { BranchInfo, BranchName, RemoteName } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
-const pushBranchKey = (path: string) =>
+const pushBranchKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'push_branch',
   }) as const
 
-const pushBranchMutation = (path: string) =>
+const pushBranchMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [pushBranchKey(path)],
+    mutationKey: [pushBranchKey(repoPath)],
     mutationFn: (args: {
       branch: BranchName
       remote: RemoteName
@@ -23,7 +23,7 @@ const pushBranchMutation = (path: string) =>
       isForce: boolean
       setUpstream: boolean
     }) => {
-      return invoke('push_branch', { path: path, ...args })
+      return invoke('push_branch', { repoPath, ...args })
     },
     networkMode: 'online',
   })

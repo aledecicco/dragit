@@ -87,9 +87,9 @@ pub async fn get_current_dir(state: State<'_, AppState>) -> Result<Response, App
 
 /// Initializes the current open folder as a git repository.
 #[tauri::command]
-pub async fn init_repository(state: State<'_, AppState>, path: &str) -> Result<(), AppError> {
+pub async fn init_repository(state: State<'_, AppState>, repo_path: &str) -> Result<(), AppError> {
     with_handler(&state, &|h: &Box<dyn GitHandler + Send + Sync>| {
-        h.init_repository(path)
+        h.init_repository(repo_path)
     })
 }
 
@@ -98,32 +98,32 @@ pub async fn init_repository(state: State<'_, AppState>, path: &str) -> Result<(
 pub async fn get_branches(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
-    path: &str,
+    repo_path: &str,
 ) -> Result<Response, AppError> {
-    with_handler(&state, &|h| h.get_branches(&channel, path)).and_then(serialize_response)
+    with_handler(&state, &|h| h.get_branches(&channel, repo_path)).and_then(serialize_response)
 }
 
 /// Switches the current repository to a different branch.
 #[tauri::command]
 pub async fn checkout(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     reference: &str,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.checkout(path, reference))
+    with_handler(&state, &|h| h.checkout(repo_path, reference))
 }
 
 #[tauri::command]
 pub async fn get_commit_history_page(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
-    path: &str,
+    repo_path: &str,
     reference: &str,
     start_after: usize,
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_commit_history_page(&channel, path, reference, start_after, limit)
+        h.get_commit_history_page(&channel, repo_path, reference, start_after, limit)
     })
     .and_then(serialize_response)
 }
@@ -132,34 +132,36 @@ pub async fn get_commit_history_page(
 pub async fn get_commit_info(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
-    path: &str,
+    repo_path: &str,
     reference: &str,
 ) -> Result<Response, AppError> {
-    with_handler(&state, &|h| h.get_commit_info(&channel, path, reference))
-        .and_then(serialize_response)
+    with_handler(&state, &|h| {
+        h.get_commit_info(&channel, repo_path, reference)
+    })
+    .and_then(serialize_response)
 }
 
 #[tauri::command]
 pub async fn get_head_info(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
-    path: &str,
+    repo_path: &str,
 ) -> Result<Response, AppError> {
-    with_handler(&state, &|h| h.get_head_info(&channel, path)).and_then(serialize_response)
+    with_handler(&state, &|h| h.get_head_info(&channel, repo_path)).and_then(serialize_response)
 }
 
 #[tauri::command]
 pub async fn get_worktree_files_page(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
-    path: &str,
+    repo_path: &str,
     filter: FileTypesFilter,
     pathspec: Option<&str>,
     start_after: usize,
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_worktree_files_page(&channel, path, &filter, pathspec, start_after, limit)
+        h.get_worktree_files_page(&channel, repo_path, &filter, pathspec, start_after, limit)
     })
     .and_then(serialize_response)
 }
@@ -168,13 +170,13 @@ pub async fn get_worktree_files_page(
 pub async fn get_snapshot_files_page(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
-    path: &str,
+    repo_path: &str,
     snapshot_id: &str,
     start_after: usize,
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_snapshot_files_page(&channel, path, snapshot_id, start_after, limit)
+        h.get_snapshot_files_page(&channel, repo_path, snapshot_id, start_after, limit)
     })
     .and_then(serialize_response)
 }
@@ -182,50 +184,50 @@ pub async fn get_snapshot_files_page(
 #[tauri::command]
 pub async fn add_to_index(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     files: Vec<&str>,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.add_to_index(path, &files))
+    with_handler(&state, &|h| h.add_to_index(repo_path, &files))
 }
 
 #[tauri::command]
 pub async fn remove_from_index(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     files: Vec<&str>,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.remove_from_index(path, &files))
+    with_handler(&state, &|h| h.remove_from_index(repo_path, &files))
 }
 
 #[tauri::command]
 pub async fn remove_from_tree(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     files: Vec<&str>,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.remove_from_tree(path, &files))
+    with_handler(&state, &|h| h.remove_from_tree(repo_path, &files))
 }
 
 #[tauri::command]
 pub async fn commit_index(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     message: &str,
     is_amend: bool,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.commit_index(path, message, is_amend))
+    with_handler(&state, &|h| h.commit_index(repo_path, message, is_amend))
 }
 
 #[tauri::command]
 pub async fn get_common_ancestor(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
-    path: &str,
+    repo_path: &str,
     reference_a: &str,
     reference_b: &str,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_common_ancestor(&channel, path, reference_a, reference_b)
+        h.get_common_ancestor(&channel, repo_path, reference_a, reference_b)
     })
     .and_then(serialize_response)
 }
@@ -234,12 +236,12 @@ pub async fn get_common_ancestor(
 pub async fn get_branch_divergence(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
-    path: &str,
+    repo_path: &str,
     branch: &str,
     base_branch: &str,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_branch_divergence(&channel, path, branch, base_branch)
+        h.get_branch_divergence(&channel, repo_path, branch, base_branch)
     })
     .and_then(serialize_response)
 }
@@ -247,7 +249,7 @@ pub async fn get_branch_divergence(
 #[tauri::command]
 pub async fn push_branch(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     branch: &str,
     remote: &str,
     remote_branch: &str,
@@ -255,21 +257,28 @@ pub async fn push_branch(
     set_upstream: bool,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| {
-        h.push_branch(path, branch, remote, remote_branch, is_force, set_upstream)
+        h.push_branch(
+            repo_path,
+            branch,
+            remote,
+            remote_branch,
+            is_force,
+            set_upstream,
+        )
     })
 }
 
 #[tauri::command]
 pub async fn pull_branch(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     branch: &str,
     remote: &str,
     remote_branch: &str,
     is_rebase: bool,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| {
-        h.pull_branch(path, branch, remote, remote_branch, is_rebase)
+        h.pull_branch(repo_path, branch, remote, remote_branch, is_rebase)
     })
 }
 
@@ -277,130 +286,130 @@ pub async fn pull_branch(
 pub async fn get_remotes(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
-    path: &str,
+    repo_path: &str,
 ) -> Result<Response, AppError> {
-    with_handler(&state, &|h| h.get_remotes(&channel, path)).and_then(serialize_response)
+    with_handler(&state, &|h| h.get_remotes(&channel, repo_path)).and_then(serialize_response)
 }
 
 #[tauri::command]
 pub async fn fetch_remote(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     remote: &str,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.fetch_remote(path, remote))
+    with_handler(&state, &|h| h.fetch_remote(repo_path, remote))
 }
 
 #[tauri::command]
 pub async fn set_upstream(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     branch: &str,
     remote_ref: &str,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.set_upstream(path, branch, remote_ref))
+    with_handler(&state, &|h| h.set_upstream(repo_path, branch, remote_ref))
 }
 
 #[tauri::command]
 pub async fn add_remote(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     name: &str,
     url: &str,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.add_remote(path, name, url))
+    with_handler(&state, &|h| h.add_remote(repo_path, name, url))
 }
 
 #[tauri::command]
 pub async fn remove_remote(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     name: &str,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.remove_remote(path, name))
+    with_handler(&state, &|h| h.remove_remote(repo_path, name))
 }
 
 #[tauri::command]
 pub async fn rename_remote(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     name: &str,
     new_name: &str,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.rename_remote(path, name, new_name))
+    with_handler(&state, &|h| h.rename_remote(repo_path, name, new_name))
 }
 
 #[tauri::command]
 pub async fn change_remote_url(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     name: &str,
     new_url: &str,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.change_remote_url(path, name, new_url))
+    with_handler(&state, &|h| h.change_remote_url(repo_path, name, new_url))
 }
 
 #[tauri::command]
 pub async fn get_stashes(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
-    path: &str,
+    repo_path: &str,
 ) -> Result<Response, AppError> {
-    with_handler(&state, &|h| h.get_stashes(&channel, path)).and_then(serialize_response)
+    with_handler(&state, &|h| h.get_stashes(&channel, repo_path)).and_then(serialize_response)
 }
 
 #[tauri::command]
 pub async fn stash(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     message: Option<&str>,
     files: Vec<&str>,
     include_untracked: bool,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| {
-        h.stash(path, message, &files, include_untracked)
+        h.stash(repo_path, message, &files, include_untracked)
     })
 }
 
 #[tauri::command]
 pub async fn apply_stash(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     stash_id: &str,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.apply_stash(path, stash_id))
+    with_handler(&state, &|h| h.apply_stash(repo_path, stash_id))
 }
 
 #[tauri::command]
 pub async fn discard_stash(
     state: State<'_, AppState>,
-    path: &str,
+    repo_path: &str,
     stash_id: &str,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.discard_stash(path, stash_id))
+    with_handler(&state, &|h| h.discard_stash(repo_path, stash_id))
 }
 
 #[tauri::command]
 pub async fn get_file_diff(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
-    path: &str,
+    repo_path: &str,
     filepath: &str,
     scope: DiffScope,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
         let (before, after) = match &scope {
             DiffScope::Snapshot { snapshot_id } => (
-                h.get_file_contents(&channel, path, &format!("{snapshot_id}^1"), filepath)?,
-                h.get_file_contents(&channel, path, &snapshot_id, filepath)?,
+                h.get_file_contents(&channel, repo_path, &format!("{snapshot_id}^1"), filepath)?,
+                h.get_file_contents(&channel, repo_path, &snapshot_id, filepath)?,
             ),
             DiffScope::Staged => (
-                h.get_file_contents(&channel, path, "HEAD", filepath)?,
-                h.get_file_contents(&channel, path, ":0", filepath)?,
+                h.get_file_contents(&channel, repo_path, "HEAD", filepath)?,
+                h.get_file_contents(&channel, repo_path, ":0", filepath)?,
             ),
             DiffScope::Unstaged => (
-                h.get_file_contents(&channel, path, ":0", filepath)?,
-                std::fs::read_to_string(Path::new(path).join(filepath)).or(Err(
+                h.get_file_contents(&channel, repo_path, ":0", filepath)?,
+                std::fs::read_to_string(Path::new(repo_path).join(filepath)).or(Err(
                     GitError::GetFileContentsFailed {
                         reference: "worktree".to_string(),
                         filepath: filepath.to_string(),

@@ -7,20 +7,20 @@ import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
 const headInfoQueryKeys = {
-  all: (path: string) =>
+  all: (repoPath: string) =>
     ({
-      ...pathQueryKey(path),
+      ...pathQueryKey(repoPath),
       key: 'head_info',
     }) as const,
 }
 
 const fetchHeadInfo = async (
-  path: string,
+  repoPath: string,
   context: QueryFunctionContext,
 ): Promise<HeadInfo> => {
   const res = await fetchAndDeserialize(
     'get_head_info',
-    { path },
+    { repoPath },
     HEAD_INFO_SCHEMA,
     context,
   )
@@ -38,10 +38,10 @@ const fetchHeadInfo = async (
     .exhaustive()
 }
 
-const headInfoQuery = (path: string) =>
+const headInfoQuery = (repoPath: string) =>
   queryOptions({
-    queryKey: [headInfoQueryKeys.all(path)],
-    queryFn: (context) => fetchHeadInfo(path, context),
+    queryKey: [headInfoQueryKeys.all(repoPath)],
+    queryFn: (context) => fetchHeadInfo(repoPath, context),
   })
 
 const useQueryHeadInfo = () => useRepositoryQuery(headInfoQuery)

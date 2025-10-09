@@ -6,24 +6,29 @@ import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
 const remotesQueryKeys = {
-  all: (path: string) =>
+  all: (repoPath: string) =>
     ({
-      ...pathQueryKey(path),
+      ...pathQueryKey(repoPath),
       key: 'remotes',
     }) as const,
 }
 
 const fetchRemotes = (
-  path: string,
+  repoPath: string,
   context: QueryFunctionContext,
 ): Promise<RemoteInfo[]> => {
-  return fetchAndDeserialize('get_remotes', { path }, REMOTES_SCHEMA, context)
+  return fetchAndDeserialize(
+    'get_remotes',
+    { repoPath },
+    REMOTES_SCHEMA,
+    context,
+  )
 }
 
-const remotesQuery = (path: string) =>
+const remotesQuery = (repoPath: string) =>
   queryOptions({
-    queryKey: [remotesQueryKeys.all(path)],
-    queryFn: (context) => fetchRemotes(path, context),
+    queryKey: [remotesQueryKeys.all(repoPath)],
+    queryFn: (context) => fetchRemotes(repoPath, context),
   })
 
 const useQueryRemotes = () => useRepositoryQuery(remotesQuery)

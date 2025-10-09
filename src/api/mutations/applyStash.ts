@@ -11,17 +11,17 @@ interface ApplyStashArgs {
   stashId: string
 }
 
-const applyStashKey = (path: string) =>
+const applyStashKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'apply_stash',
   }) as const
 
-const applyStashMutation = (path: string) =>
+const applyStashMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [applyStashKey(path)],
+    mutationKey: [applyStashKey(repoPath)],
     mutationFn: (args: ApplyStashArgs) => {
-      return invoke('apply_stash', { path: path, ...args })
+      return invoke('apply_stash', { repoPath, ...args })
     },
     networkMode: 'always',
   })

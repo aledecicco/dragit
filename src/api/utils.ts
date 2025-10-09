@@ -70,13 +70,13 @@ const getPaginatedLength = <T>(
  * @throws If the repository path is not available.
  */
 const useCurrentPath = () => {
-  const path = useQueryCurrentDir().data?.path
+  const repoPath = useQueryCurrentDir().data?.path
 
-  if (!path) {
+  if (!repoPath) {
     throw new Error('Repository path is not available')
   }
 
-  return path
+  return repoPath
 }
 
 /**
@@ -93,13 +93,13 @@ const useRepositoryMutation = <
   TContext = unknown,
 >(
   repositoryMutation: (
-    path: string,
+    repoPath: string,
     ...args: A
   ) => UseMutationOptions<TData, TError, TVariables, TContext>,
   ...args: A
 ) => {
-  const path = useCurrentPath()
-  return useMutation(repositoryMutation(path, ...args))
+  const repoPath = useCurrentPath()
+  return useMutation(repositoryMutation(repoPath, ...args))
 }
 
 /**
@@ -116,13 +116,13 @@ const useRepositoryQuery = <
   TQueryKey extends QueryKey = readonly unknown[],
 >(
   repositoryQuery: (
-    path: string,
+    repoPath: string,
     ...args: A
   ) => UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
   ...args: A
 ) => {
-  const path = useCurrentPath()
-  return useQuery(repositoryQuery(path, ...args))
+  const repoPath = useCurrentPath()
+  return useQuery(repositoryQuery(repoPath, ...args))
 }
 
 /**
@@ -140,7 +140,7 @@ const useRepositoryInfiniteQuery = <
   TPageParam = unknown,
 >(
   repositoryQuery: (
-    path: string,
+    repoPath: string,
     ...args: A
   ) => UseInfiniteQueryOptions<
     TQueryFnData,
@@ -152,8 +152,8 @@ const useRepositoryInfiniteQuery = <
   >,
   ...args: A
 ) => {
-  const path = useCurrentPath()
-  return useInfiniteQuery(repositoryQuery(path, ...args))
+  const repoPath = useCurrentPath()
+  return useInfiniteQuery(repositoryQuery(repoPath, ...args))
 }
 
 /**

@@ -7,17 +7,17 @@ import type { BranchName, RemoteRef } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
-const setUpstreamKey = (path: string) =>
+const setUpstreamKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'set_upstream',
   }) as const
 
-const setUpstreamMutation = (path: string) =>
+const setUpstreamMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [setUpstreamKey(path)],
+    mutationKey: [setUpstreamKey(repoPath)],
     mutationFn: (args: { branch: BranchName; remoteRef: RemoteRef }) => {
-      return invoke('set_upstream', { path: path, ...args })
+      return invoke('set_upstream', { repoPath, ...args })
     },
     networkMode: 'always',
   })

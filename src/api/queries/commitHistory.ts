@@ -12,20 +12,20 @@ import { pathQueryKey } from '.'
 export const HISTORY_PAGE_SIZE = 50
 
 const commitHistoryQueryKeys = {
-  all: (path: string) =>
+  all: (repoPath: string) =>
     ({
-      ...pathQueryKey(path),
+      ...pathQueryKey(repoPath),
       key: 'commit_history',
     }) as const,
-  reference: (path: string, reference: string | undefined) =>
+  reference: (repoPath: string, reference: string | undefined) =>
     ({
-      ...commitHistoryQueryKeys.all(path),
+      ...commitHistoryQueryKeys.all(repoPath),
       reference: reference,
     }) as const,
 }
 
 const fetchCommitHistoryPage = (
-  path: string,
+  repoPath: string,
   refName: string,
   page: number,
   context: QueryFunctionContext,
@@ -33,7 +33,7 @@ const fetchCommitHistoryPage = (
   return fetchAndDeserialize(
     'get_commit_history_page',
     {
-      path,
+      repoPath,
       reference: refName,
       startAfter: page * HISTORY_PAGE_SIZE,
       limit: HISTORY_PAGE_SIZE,
@@ -43,12 +43,12 @@ const fetchCommitHistoryPage = (
   )
 }
 
-const commitHistoryQuery = (path: string, refName: string | undefined) =>
+const commitHistoryQuery = (repoPath: string, refName: string | undefined) =>
   infiniteQueryOptions({
-    queryKey: [commitHistoryQueryKeys.reference(path, refName)],
+    queryKey: [commitHistoryQueryKeys.reference(repoPath, refName)],
     queryFn: refName
       ? (context) =>
-          fetchCommitHistoryPage(path, refName, context.pageParam, context)
+          fetchCommitHistoryPage(repoPath, refName, context.pageParam, context)
       : skipToken,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _, lastPageParam) => {

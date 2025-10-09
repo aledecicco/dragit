@@ -96,22 +96,22 @@ impl CmdGit {
 }
 
 impl GitHandler for CmdGit {
-    fn init_repository(&self, path: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["init"])
+    fn init_repository(&self, repo_path: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["init"])
     }
 
-    fn is_repository(&self, path: &str) -> bool {
-        self.spawn_and_await(path, ["rev-parse"]).is_ok()
+    fn is_repository(&self, repo_path: &str) -> bool {
+        self.spawn_and_await(repo_path, ["rev-parse"]).is_ok()
     }
 
     fn get_branches(
         &self,
         channel: &Channel<AppMessage>,
-        path: &str,
+        repo_path: &str,
     ) -> Result<Vec<BranchInfo>, GitError> {
         let process = self.spawn_and_notify(
             channel,
-            path,
+            repo_path,
             ["branch", "--list", "-a", BRANCHES_INFO_FORMAT],
         )?;
         let lines = self.get_output_lines_stream(process)?;
@@ -122,8 +122,8 @@ impl GitHandler for CmdGit {
         Ok(branches)
     }
 
-    fn checkout(&self, path: &str, reference: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["checkout", reference])
+    fn checkout(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["checkout", reference])
             .or(Err(GitError::CheckoutFailed {
                 reference: reference.to_string(),
             }))
@@ -132,7 +132,7 @@ impl GitHandler for CmdGit {
     fn get_commit_history_page(
         &self,
         channel: &Channel<AppMessage>,
-        path: &str,
+        repo_path: &str,
         reference: &str,
         start_after: usize,
         limit: usize,
@@ -143,7 +143,7 @@ impl GitHandler for CmdGit {
 
         let process = self.spawn_and_notify(
             channel,
-            path,
+            repo_path,
             [
                 "rev-list",
                 &reference_arg,
@@ -171,12 +171,12 @@ impl GitHandler for CmdGit {
     fn get_commit_info(
         &self,
         channel: &Channel<AppMessage>,
-        path: &str,
+        repo_path: &str,
         reference: &str,
     ) -> Result<CommitInfo, GitError> {
         let process = self.spawn_and_notify(
             channel,
-            path,
+            repo_path,
             [
                 "show",
                 reference,
@@ -195,11 +195,11 @@ impl GitHandler for CmdGit {
     fn get_head_info(
         &self,
         channel: &Channel<AppMessage>,
-        path: &str,
+        repo_path: &str,
     ) -> Result<HeadInfo, GitError> {
         let process = self.spawn_and_notify(
             channel,
-            path,
+            repo_path,
             [
                 "--no-optional-locks",
                 "status",
@@ -218,7 +218,7 @@ impl GitHandler for CmdGit {
     fn get_worktree_files_page(
         &self,
         channel: &Channel<AppMessage>,
-        path: &str,
+        repo_path: &str,
         filter: &FileTypesFilter,
         pathspec: Option<&str>,
         start_after: usize,
@@ -269,7 +269,7 @@ impl GitHandler for CmdGit {
             None
         };
 
-        let process = self.spawn_and_notify(channel, path, args)?;
+        let process = self.spawn_and_notify(channel, repo_path, args)?;
         let lines = self.get_output_lines_stream(process)?;
 
         let mut items_iter = lines
@@ -284,14 +284,14 @@ impl GitHandler for CmdGit {
     fn get_snapshot_files_page(
         &self,
         channel: &Channel<AppMessage>,
-        path: &str,
+        repo_path: &str,
         snapshot_id: &str,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<VersionedFileInfo>, GitError> {
         let process = self.spawn_and_notify(
             channel,
-            path,
+            repo_path,
             [
                 "diff-tree",
                 "-r",
@@ -314,32 +314,32 @@ impl GitHandler for CmdGit {
         Ok(Page { items, has_next })
     }
 
-    fn add_to_index(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError> {
+    fn add_to_index(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
         let args = [vec!["add"], files.clone()].concat();
-        self.spawn_and_await(path, args)
+        self.spawn_and_await(repo_path, args)
             .or(Err(GitError::AddToIndexFailed {}))
     }
 
-    fn remove_from_index(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError> {
+    fn remove_from_index(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
         let args = [vec!["reset", "--"], files.clone()].concat();
-        self.spawn_and_await(path, args)
+        self.spawn_and_await(repo_path, args)
             .or(Err(GitError::RemoveFromIndexFailed {}))
     }
 
-    fn remove_from_tree(&self, path: &str, files: &Vec<&str>) -> Result<(), GitError> {
+    fn remove_from_tree(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
         let args = [vec!["rm"], files.clone()].concat();
-        self.spawn_and_await(path, args)
+        self.spawn_and_await(repo_path, args)
             .or(Err(GitError::RemoveFromTreeFailed {}))
     }
 
-    fn commit_index(&self, path: &str, message: &str, is_amend: bool) -> Result<(), GitError> {
+    fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError> {
         let mut args = vec!["commit", "-m", message];
 
         if is_amend {
             args.push("--amend");
         }
 
-        self.spawn_and_await(path, args)
+        self.spawn_and_await(repo_path, args)
             .or(Err(GitError::CommitFailed {}))
     }
 
@@ -347,7 +347,7 @@ impl GitHandler for CmdGit {
     fn get_common_ancestor(
         &self,
         channel: &Channel<AppMessage>,
-        path: &str,
+        repo_path: &str,
         reference_a: &str,
         reference_b: &str,
     ) -> Result<Option<CommonAncestorInfo>, GitError> {
@@ -355,7 +355,7 @@ impl GitHandler for CmdGit {
             let process = self
                 .spawn_and_notify(
                     channel,
-                    path,
+                    repo_path,
                     ["rev-parse", &format!("{}^{}", reference, back)],
                 )
                 .ok()?;
@@ -424,13 +424,13 @@ impl GitHandler for CmdGit {
     fn get_branch_divergence(
         &self,
         channel: &Channel<AppMessage>,
-        path: &str,
+        repo_path: &str,
         branch: &str,
         base_branch: &str,
     ) -> Result<BranchDivergence, GitError> {
         let process = self.spawn_and_notify(
             channel,
-            path,
+            repo_path,
             [
                 "rev-list",
                 "--left-right",
@@ -448,7 +448,7 @@ impl GitHandler for CmdGit {
 
     fn push_branch(
         &self,
-        path: &str,
+        repo_path: &str,
         branch: &str,
         remote: &str,
         remote_branch: &str,
@@ -466,7 +466,7 @@ impl GitHandler for CmdGit {
             args.push("--set-upstream");
         }
 
-        self.spawn_and_await(path, args)
+        self.spawn_and_await(repo_path, args)
             .or(Err(GitError::PushBranchFailed {
                 branch: branch.to_string(),
                 remote: remote.to_string(),
@@ -476,7 +476,7 @@ impl GitHandler for CmdGit {
 
     fn pull_branch(
         &self,
-        path: &str,
+        repo_path: &str,
         branch: &str,
         remote: &str,
         remote_branch: &str,
@@ -489,7 +489,7 @@ impl GitHandler for CmdGit {
             args.push("--rebase");
         }
 
-        self.spawn_and_await(path, args)
+        self.spawn_and_await(repo_path, args)
             .or(Err(GitError::PullBranchFailed {
                 branch: branch.to_string(),
                 remote: remote.to_string(),
@@ -500,52 +500,62 @@ impl GitHandler for CmdGit {
     fn get_remotes(
         &self,
         channel: &Channel<AppMessage>,
-        path: &str,
+        repo_path: &str,
     ) -> Result<Vec<RemoteInfo>, GitError> {
-        let process = self.spawn_and_notify(channel, path, ["remote", "--verbose"])?;
+        let process = self.spawn_and_notify(channel, repo_path, ["remote", "--verbose"])?;
         let lines = self.get_all_output_lines(process)?;
 
         Ok(parse_remote_infos(&lines))
     }
 
-    fn fetch_remote(&self, path: &str, name: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["fetch", name])
+    fn fetch_remote(&self, repo_path: &str, name: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["fetch", name])
             .or(Err(GitError::FetchRemoteFailed {
                 name: name.to_string(),
             }))
     }
 
-    fn set_upstream(&self, path: &str, branch: &str, remote_ref: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["branch", "-u", remote_ref, branch])
+    fn set_upstream(
+        &self,
+        repo_path: &str,
+        branch: &str,
+        remote_ref: &str,
+    ) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["branch", "-u", remote_ref, branch])
             .or(Err(GitError::SetUpstreamFailed {
                 branch: branch.to_string(),
                 remote_ref: remote_ref.to_string(),
             }))
     }
 
-    fn add_remote(&self, path: &str, name: &str, url: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["remote", "add", name, url])
+    fn add_remote(&self, repo_path: &str, name: &str, url: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["remote", "add", name, url])
             .or(Err(GitError::AddRemoteFailed {
                 name: name.to_string(),
             }))
     }
 
-    fn remove_remote(&self, path: &str, name: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["remote", "remove", name])
+    fn remove_remote(&self, repo_path: &str, name: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["remote", "remove", name])
             .or(Err(GitError::RemoveRemoteFailed {
                 name: name.to_string(),
             }))
     }
 
-    fn rename_remote(&self, path: &str, name: &str, new_name: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["remote", "rename", name, new_name])
+    fn rename_remote(&self, repo_path: &str, name: &str, new_name: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["remote", "rename", name, new_name])
             .or(Err(GitError::RenameRemoteFailed {
                 name: name.to_string(),
             }))
     }
 
-    fn change_remote_url(&self, path: &str, name: &str, new_url: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["remote", "set-url", name, new_url])
+    fn change_remote_url(
+        &self,
+        repo_path: &str,
+        name: &str,
+        new_url: &str,
+    ) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["remote", "set-url", name, new_url])
             .or(Err(GitError::ChangeRemoteUrlFailed {
                 name: name.to_string(),
             }))
@@ -554,11 +564,11 @@ impl GitHandler for CmdGit {
     fn get_stashes(
         &self,
         channel: &Channel<AppMessage>,
-        path: &str,
+        repo_path: &str,
     ) -> Result<Vec<StashInfo>, GitError> {
         let process = self.spawn_and_notify(
             channel,
-            path,
+            repo_path,
             ["stash", "list", STASH_INFO_FORMAT, "--shortstat"],
         )?;
         let mut lines = self.get_output_lines_stream(process)?.peekable();
@@ -594,7 +604,7 @@ impl GitHandler for CmdGit {
 
     fn stash(
         &self,
-        path: &str,
+        repo_path: &str,
         message: Option<&str>,
         files: &Vec<&str>,
         include_untracked: bool,
@@ -613,19 +623,19 @@ impl GitHandler for CmdGit {
         args.push("--");
         args.extend(files);
 
-        self.spawn_and_await(path, args)
+        self.spawn_and_await(repo_path, args)
             .or(Err(GitError::CreateStashFailed {}))
     }
 
-    fn apply_stash(&self, path: &str, stash_id: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["stash", "pop", &stash_id])
+    fn apply_stash(&self, repo_path: &str, stash_id: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["stash", "pop", &stash_id])
             .or(Err(GitError::ApplyStashFailed {
                 stash_id: stash_id.to_string(),
             }))
     }
 
-    fn discard_stash(&self, path: &str, stash_id: &str) -> Result<(), GitError> {
-        self.spawn_and_await(path, ["stash", "drop", &stash_id])
+    fn discard_stash(&self, repo_path: &str, stash_id: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["stash", "drop", &stash_id])
             .or(Err(GitError::DiscardStashFailed {
                 stash_id: stash_id.to_string(),
             }))
@@ -634,13 +644,13 @@ impl GitHandler for CmdGit {
     fn get_file_contents(
         &self,
         channel: &Channel<AppMessage>,
-        path: &str,
+        repo_path: &str,
         reference: &str,
         filepath: &str,
     ) -> Result<String, GitError> {
         let process = self.spawn_and_notify(
             channel,
-            path,
+            repo_path,
             ["show", &format!("{}:{}", reference, filepath)],
         )?;
 

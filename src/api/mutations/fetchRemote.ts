@@ -7,17 +7,17 @@ import type { RemoteName } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
-const fetchRemoteKey = (path: string) =>
+const fetchRemoteKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'fetch_remote',
   }) as const
 
-const fetchRemoteMutation = (path: string) =>
+const fetchRemoteMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [fetchRemoteKey(path)],
+    mutationKey: [fetchRemoteKey(repoPath)],
     mutationFn: (args: { remote: RemoteName }) => {
-      return invoke('fetch_remote', { path: path, ...args })
+      return invoke('fetch_remote', { repoPath, ...args })
     },
     networkMode: 'online',
   })

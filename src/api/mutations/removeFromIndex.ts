@@ -7,17 +7,17 @@ import type { WorktreeFileInfo } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
-const removeFromIndexKey = (path: string) =>
+const removeFromIndexKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'remove_from_index',
   }) as const
 
-const removeFromIndexMutation = (path: string) =>
+const removeFromIndexMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [removeFromIndexKey(path)],
+    mutationKey: [removeFromIndexKey(repoPath)],
     mutationFn: (args: { files: string[] }) => {
-      return invoke('remove_from_index', { path: path, ...args })
+      return invoke('remove_from_index', { repoPath, ...args })
     },
     networkMode: 'always',
   })

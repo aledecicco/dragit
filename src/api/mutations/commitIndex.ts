@@ -11,17 +11,17 @@ interface CommitIndexArgs {
   isAmend: boolean
 }
 
-const commitIndexKey = (path: string) =>
+const commitIndexKey = (repoPath: string) =>
   ({
-    ...pathMutationKey(path),
+    ...pathMutationKey(repoPath),
     key: 'commit_index',
   }) as const
 
-const commitIndexMutation = (path: string) =>
+const commitIndexMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [commitIndexKey(path)],
+    mutationKey: [commitIndexKey(repoPath)],
     mutationFn: (args: CommitIndexArgs) => {
-      return invoke('commit_index', { path, ...args })
+      return invoke('commit_index', { repoPath, ...args })
     },
     networkMode: 'always',
   })

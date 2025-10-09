@@ -10,57 +10,57 @@ import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
 const branchDivergenceQueryKeys = {
-  all: (path: string) =>
+  all: (repoPath: string) =>
     ({
-      ...pathQueryKey(path),
+      ...pathQueryKey(repoPath),
       key: 'branch_divergence',
     }) as const,
-  branch: (path: string, branch: BranchName | undefined) =>
+  branch: (repoPath: string, branch: BranchName | undefined) =>
     ({
-      ...branchDivergenceQueryKeys.all(path),
+      ...branchDivergenceQueryKeys.all(repoPath),
       branch: branch,
     }) as const,
-  baseBranch: (path: string, baseBranch: BranchName | undefined) =>
+  baseBranch: (repoPath: string, baseBranch: BranchName | undefined) =>
     ({
-      ...branchDivergenceQueryKeys.all(path),
+      ...branchDivergenceQueryKeys.all(repoPath),
       baseBranch: baseBranch,
     }) as const,
   pair: (
-    path: string,
+    repoPath: string,
     branch: BranchName | undefined,
     baseBranch: BranchName | undefined,
   ) =>
     ({
-      ...branchDivergenceQueryKeys.branch(path, branch),
-      ...branchDivergenceQueryKeys.baseBranch(path, baseBranch),
+      ...branchDivergenceQueryKeys.branch(repoPath, branch),
+      ...branchDivergenceQueryKeys.baseBranch(repoPath, baseBranch),
     }) as const,
 }
 
 const fetchBranchDivergence = (
-  path: string,
+  repoPath: string,
   branch: BranchName,
   baseBranch: BranchName,
   context: QueryFunctionContext,
 ): Promise<BranchDivergence> => {
   return fetchAndDeserialize(
     'get_branch_divergence',
-    { path, branch, baseBranch },
+    { repoPath, branch, baseBranch },
     BRANCH_DIVERGENCE_SCHEMA,
     context,
   )
 }
 
 const branchDivergenceQuery = (
-  path: string,
+  repoPath: string,
   refName: string | undefined,
   baseRefName: string | undefined,
 ) =>
   queryOptions({
-    queryKey: [branchDivergenceQueryKeys.pair(path, refName, baseRefName)],
+    queryKey: [branchDivergenceQueryKeys.pair(repoPath, refName, baseRefName)],
     queryFn:
       refName && baseRefName
         ? (context) =>
-            fetchBranchDivergence(path, refName, baseRefName, context)
+            fetchBranchDivergence(repoPath, refName, baseRefName, context)
         : skipToken,
   })
 

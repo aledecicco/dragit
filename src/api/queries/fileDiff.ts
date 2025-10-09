@@ -11,25 +11,25 @@ import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
 const filesDiffQueryKeys = {
-  all: (path: string) =>
+  all: (repoPath: string) =>
     ({
-      ...pathQueryKey(path),
+      ...pathQueryKey(repoPath),
       key: 'file_diff',
     }) as const,
-  scope: (path: string, scope: DiffScope) =>
+  scope: (repoPath: string, scope: DiffScope) =>
     ({
-      ...filesDiffQueryKeys.all(path),
+      ...filesDiffQueryKeys.all(repoPath),
       scope,
     }) as const,
-  file: (path: string, filepath: string | undefined, scope: DiffScope) =>
+  file: (repoPath: string, filepath: string | undefined, scope: DiffScope) =>
     ({
-      ...filesDiffQueryKeys.scope(path, scope),
+      ...filesDiffQueryKeys.scope(repoPath, scope),
       filepath: filepath,
     }) as const,
 }
 
 const fetchFileDiff = async (
-  path: string,
+  repoPath: string,
   filepath: string,
   scope: DiffScope,
   context: QueryFunctionContext,
@@ -37,7 +37,7 @@ const fetchFileDiff = async (
   const res = await fetchAndDeserialize(
     'get_file_diff',
     {
-      path,
+      repoPath,
       filepath,
       scope,
     },
@@ -65,14 +65,14 @@ const fetchFileDiff = async (
 }
 
 const fileDiffQuery = (
-  path: string,
+  repoPath: string,
   filepath: string | undefined,
   scope: DiffScope,
 ) =>
   queryOptions({
-    queryKey: [filesDiffQueryKeys.file(path, filepath, scope)],
+    queryKey: [filesDiffQueryKeys.file(repoPath, filepath, scope)],
     queryFn: filepath
-      ? (context) => fetchFileDiff(path, filepath, scope, context)
+      ? (context) => fetchFileDiff(repoPath, filepath, scope, context)
       : skipToken,
   })
 
