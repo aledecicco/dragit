@@ -3,7 +3,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
-import type { FileInfo } from '../models'
+import type { WorktreeFileInfo } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
@@ -22,7 +22,7 @@ const removeFromTreeMutation = (path: string) =>
     networkMode: 'always',
   })
 
-const useMarkAsRemoved = (file: FileInfo): Action => {
+const useMarkAsRemoved = (file: WorktreeFileInfo): Action => {
   const remove = useRepositoryMutation(removeFromTreeMutation)
 
   return {

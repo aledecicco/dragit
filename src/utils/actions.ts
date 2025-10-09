@@ -1,6 +1,6 @@
 import { IconEye } from '@tabler/icons-react'
 
-import type { FileInfo, StashInfo } from '@/api/models'
+import type { StashInfo, WorktreeFileInfo } from '@/api/models'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
 import type { InstantAction } from '@/context/actions'
@@ -15,7 +15,9 @@ export const viewStash = (stash: StashInfo): InstantAction => ({
   },
 })
 
-export const viewWorktreeFileDiff = (file: FileInfo): InstantAction => ({
+export const viewWorktreeFileDiff = (
+  file: WorktreeFileInfo,
+): InstantAction => ({
   id: `view_worktree_file_diff:${file.status}:${file.path}`,
   type: 'instant',
   label: 'View changes',

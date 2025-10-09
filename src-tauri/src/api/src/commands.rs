@@ -149,7 +149,7 @@ pub async fn get_head_info(
 }
 
 #[tauri::command]
-pub async fn get_files_page(
+pub async fn get_worktree_files_page(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
     path: &str,
@@ -159,7 +159,7 @@ pub async fn get_files_page(
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_files_page(&channel, path, &filter, pathspec, start_after, limit)
+        h.get_worktree_files_page(&channel, path, &filter, pathspec, start_after, limit)
     })
     .and_then(serialize_response)
 }
@@ -400,11 +400,12 @@ pub async fn get_file_diff(
             ),
             DiffScope::Unstaged => (
                 h.get_file_contents(&channel, path, ":0", filepath)?,
-                std::fs::read_to_string(Path::new(path).join(filepath)).or(Ok("".to_string()))?,
-            ),
-            DiffScope::Uncommitted => (
-                h.get_file_contents(&channel, path, "HEAD", filepath)?,
-                std::fs::read_to_string(Path::new(path).join(filepath)).or(Ok("".to_string()))?,
+                std::fs::read_to_string(Path::new(path).join(filepath)).or(Err(
+                    GitError::GetFileContentsFailed {
+                        reference: "worktree".to_string(),
+                        filepath: filepath.to_string(),
+                    },
+                ))?,
             ),
         };
 

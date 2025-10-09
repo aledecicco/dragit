@@ -1,4 +1,4 @@
-import type { FileType } from '@/api/models'
+import type { WorktreeFileType } from '@/api/models'
 import { useAddFiles, useCommitIndex, useSaveStash } from '@/api/mutations'
 import { showCommitDialog } from '@/common/CommitDialog'
 import { FileSelectorDialog } from '@/common/FileSelectorDialog'
@@ -29,7 +29,11 @@ const MainToolbar = (props: MainToolbarProps) => {
           mainAction: addFiles,
           trackOnly: true,
           onClick: () => {
-            const types: FileType[] = ['unstaged', 'unmerged', 'untracked']
+            const types: WorktreeFileType[] = [
+              'unstaged',
+              'unmerged',
+              'untracked',
+            ]
 
             askForValue(FileSelectorDialog, {
               types,
@@ -42,7 +46,11 @@ const MainToolbar = (props: MainToolbarProps) => {
           mainAction: saveStash,
           trackOnly: true,
           onClick: () => {
-            const types: FileType[] = ['unstaged', 'unmerged', 'untracked']
+            const types: WorktreeFileType[] = [
+              'unstaged',
+              'unmerged',
+              'untracked',
+            ]
 
             askForValue(FileSelectorDialog, {
               types,

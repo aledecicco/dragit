@@ -1,8 +1,8 @@
 use tauri::ipc::Channel;
 
 use crate::{
-    AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, FileInfo, GitError,
-    HeadInfo, HistoryItem, Page, RemoteInfo, StashInfo, VersionedFileInfo,
+    AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError, HeadInfo,
+    HistoryItem, Page, RemoteInfo, StashInfo, VersionedFileInfo, WorktreeFileInfo,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -49,7 +49,7 @@ pub trait GitHandler {
     ) -> Result<HeadInfo, GitError>;
 
     /// Returns (a page of) the list of files with the given types.
-    fn get_files_page(
+    fn get_worktree_files_page(
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
@@ -57,7 +57,7 @@ pub trait GitHandler {
         pathspec: Option<&str>,
         start_after: usize,
         limit: usize,
-    ) -> Result<Page<FileInfo>, GitError>;
+    ) -> Result<Page<WorktreeFileInfo>, GitError>;
 
     /// Returns (a page of) the list of files in the given snapshot.
     fn get_snapshot_files_page(

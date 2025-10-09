@@ -6,10 +6,11 @@ import {
 import { match, P } from 'ts-pattern'
 
 import type {
+  ChangeStatus,
+  MovedStatus,
   Page,
   SnapshotId,
   VersionedFileInfo,
-  VersionedFileStatus,
 } from '../models'
 import { SNAPSHOT_FILES_PAGE_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
@@ -54,18 +55,32 @@ const fetchSnapshotFilesPage = async (
     context,
   )
 
-  const files: VersionedFileInfo[] = res.items.map((item) => ({
-    path: item.path,
-    status: match(item.status)
-      .returnType<VersionedFileStatus>()
-      .with({ Modified: P._ }, () => 'modified')
-      .with({ TypeChanged: P._ }, () => 'typeChanged')
-      .with({ Added: P._ }, () => 'added')
-      .with({ Deleted: P._ }, () => 'deleted')
-      .with({ Renamed: P._ }, () => 'renamed')
-      .with({ Copied: P._ }, () => 'copied')
+  const files: VersionedFileInfo[] = res.items.map((file) =>
+    match(file)
+      .returnType<VersionedFileInfo>()
+      .with({ status: { Changed: P.select() } }, (status) => ({
+        path: file.path,
+        status: 'staged',
+        changes: match(status.changes)
+          .returnType<ChangeStatus>()
+          .with({ Added: P.any }, () => 'added')
+          .with({ Deleted: P.any }, () => 'deleted')
+          .with({ Modified: P.any }, () => 'modified')
+          .with({ TypeChanged: P.any }, () => 'typeChanged')
+          .exhaustive(),
+      }))
+      .with({ status: { Moved: P.select() } }, (status) => ({
+        path: file.path,
+        status: 'staged',
+        oldPath: status.oldPath,
+        changes: match(status.changes)
+          .returnType<MovedStatus>()
+          .with({ Copied: P.any }, () => 'copied')
+          .with({ Renamed: P.any }, () => 'renamed')
+          .exhaustive(),
+      }))
       .exhaustive(),
-  }))
+  )
 
   return {
     hasNext: res.hasNext,
@@ -84,10 +99,10 @@ const snapshotFilesQuery = (
       fetchSnapshotFilesPage(path, snapshotId, page, context),
   })
 
-function useQuerySnapshotFiles(
+const useQuerySnapshotFiles = (
   snapshotId: SnapshotId,
   page: number,
-): UseQueryResult<Page<VersionedFileInfo>> {
+): UseQueryResult<Page<VersionedFileInfo>> => {
   return useRepositoryQuery(snapshotFilesQuery, page, snapshotId)
 }
 

@@ -10,7 +10,7 @@ import {
 import { match } from 'ts-pattern'
 
 import type { FileOfType } from '@/api/models'
-import { useStageFile } from '@/api/mutations'
+import { useUnstageFile } from '@/api/mutations'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
 import { withContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
@@ -89,9 +89,9 @@ const StagedChangesItem = withContextMenu<StagedChangesItemProps>(
                       .with('added', () => 'text-success-200/90')
                       .with('deleted', () => 'text-danger-200/90')
                       .with('modified', () => 'text-success-200/90')
-                      .with('typeChanged', () => 'text-light-600')
-                      .with('copied', () => 'text-light-600')
-                      .with('renamed', () => 'text-light-600')
+                      .with('typeChanged', () => 'text-light-400')
+                      .with('copied', () => 'text-light-400')
+                      .with('renamed', () => 'text-light-400')
                       .exhaustive(),
                   )
                   .exhaustive(),
@@ -126,8 +126,8 @@ const StagedChangesItem = withContextMenu<StagedChangesItemProps>(
     )
   },
   ({ file }) => {
-    const stage = useStageFile(file)
-    return [viewWorktreeFileDiff(file), stage]
+    const unstage = useUnstageFile(file)
+    return [viewWorktreeFileDiff(file), unstage]
   },
 )
 

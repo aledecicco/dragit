@@ -15,7 +15,12 @@ import { Child } from '@tauri-apps/plugin-shell'
 import { type BorshSchema, borshDeserialize } from 'borsher'
 import { match } from 'ts-pattern'
 
-import type { AppMessage, FileType, FileTypeFilter, Page } from './models'
+import type {
+  AppMessage,
+  FileTypeFilter,
+  Page,
+  WorktreeFileType,
+} from './models'
 import { useQueryCurrentDir } from './queries'
 
 /**
@@ -221,7 +226,9 @@ const fetchAndDeserialize = async <T>(
  *
  * @param types - The file types to filter by. Can be a single type or an array of types.
  */
-const getFileTypeFilter = (types: FileType | FileType[]): FileTypeFilter => {
+const getFileTypeFilter = (
+  types: WorktreeFileType | WorktreeFileType[],
+): FileTypeFilter => {
   const filter: FileTypeFilter = {}
 
   if (typeof types === 'string') {

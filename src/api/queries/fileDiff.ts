@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
-import type { DiffLine, DiffScope, FileDiff, SnapshotId } from '../models'
+import type { DiffLine, DiffScope, FileDiff } from '../models'
 import { FILE_DIFF_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'

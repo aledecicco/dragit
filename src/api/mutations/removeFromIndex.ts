@@ -3,7 +3,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
-import type { FileInfo } from '../models'
+import type { WorktreeFileInfo } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
@@ -22,7 +22,7 @@ const removeFromIndexMutation = (path: string) =>
     networkMode: 'always',
   })
 
-const useUnstageFile = (file: FileInfo): Action => {
+const useUnstageFile = (file: WorktreeFileInfo): Action => {
   const unstage = useRepositoryMutation(removeFromIndexMutation)
 
   return {

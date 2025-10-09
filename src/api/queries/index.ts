@@ -14,7 +14,6 @@ export {
   useQueryCommonAncestor,
 } from './commonAncestor'
 export { currentDirQueryKey, useQueryCurrentDir } from './currentDir'
-export { FILE_STATUSES_PAGE_SIZE, filesQueryKeys, useQueryFiles } from './files'
 export { headInfoQueryKeys, useQueryHeadInfo } from './headInfo'
 export { useQueryProfilePicture } from './profilePicture'
 export {
@@ -29,6 +28,11 @@ export {
   useQuerySnapshotFiles,
 } from './snapshotFiles'
 export { stashesQueryKeys, useQueryStashes } from './stashes'
+export {
+  useQueryWorktreeFiles,
+  WORKTREE_FILES_PAGE_SIZE,
+  worktreeFilesQueryKeys,
+} from './worktreeFiles'
 
 export const pathQueryKey = (path: string) =>
   ({

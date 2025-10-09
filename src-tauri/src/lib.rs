@@ -51,7 +51,7 @@ pub fn run() {
             api::init_repository,
             api::get_branches,
             api::get_head_info,
-            api::get_files_page,
+            api::get_worktree_files_page,
             api::get_snapshot_files_page,
             api::checkout,
             api::get_commit_history_page,

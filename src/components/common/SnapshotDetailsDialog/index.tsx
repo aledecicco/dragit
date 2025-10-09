@@ -7,10 +7,10 @@ import { ChangesSummary } from '@/common/DiffSummary'
 import { FileDiffViewer } from '@/common/FileDiffViewer'
 import { ProfilePicture } from '@/common/ProfilePicture'
 import { showDialog } from '@/context/dialogs'
-import { useHandlePageSync, useNeedsPagination } from '@/context/pages'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
+import { useNeedsPagination } from '@/utils/pagination'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 import { mapFn } from '@/utils/types'
@@ -37,9 +37,6 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
 
   const timeAgo = useDateDifference(snapshotInfo.timestamp)
   const [page, setPage] = useState(0)
-  const clearPage = () => {
-    setPage(0)
-  }
 
   const snapshotName =
     'stashNumber' in snapshotInfo
@@ -48,10 +45,12 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
 
   const filesQuery = useQuerySnapshotFiles(snapshotInfo.id, page)
   const showPagination = useNeedsPagination(filesQuery, page)
-  useHandlePageSync(filesQuery, page, clearPage)
 
   const store = Ariakit.useCheckboxStore()
-  const selectedFile = Ariakit.useStoreState(store, 'value')
+  const selectedFilePath = Ariakit.useStoreState(store, 'value')
+  const selectedFile = filesQuery.data?.items.find(
+    (f) => f.path === selectedFilePath,
+  )
 
   return (
     <Dialog
@@ -61,12 +60,12 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
         className: cn('grid grid-rows-[max-content_max-content]'),
       }}
       sideContent={
-        typeof selectedFile === 'string' ? (
+        selectedFile && (
           <FileDiffViewer
-            filepath={selectedFile}
+            file={selectedFile}
             diffScope={{ type: 'snapshot', snapshotId: snapshotInfo.id }}
           />
-        ) : undefined
+        )
       }
       {...propsWithCn(dialogProps, 'max-w-[90%] max-h-[85%]')}
     >

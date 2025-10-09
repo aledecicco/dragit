@@ -3,7 +3,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
-import type { FileInfo } from '../models'
+import type { WorktreeFileInfo } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
@@ -26,7 +26,7 @@ const addToIndexMutation = (path: string) =>
     networkMode: 'always',
   })
 
-const useStageFile = (file: FileInfo): Action => {
+const useStageFile = (file: WorktreeFileInfo): Action => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
@@ -44,7 +44,7 @@ const useStageFile = (file: FileInfo): Action => {
   }
 }
 
-const useMarkAsResolved = (file: FileInfo): Action => {
+const useMarkAsResolved = (file: WorktreeFileInfo): Action => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {

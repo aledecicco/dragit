@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react'
 
-import type { FileType } from '@/api/models'
+import type { WorktreeFileType } from '@/api/models'
 
 import { WorktreeChanges } from '..'
 import { UnstagedChangesItem } from './Item'
@@ -8,7 +8,7 @@ import { UnstagedChangesItem } from './Item'
 export const FILE_TYPES = [
   'unstaged',
   'untracked',
-] as const satisfies FileType[]
+] as const satisfies WorktreeFileType[]
 
 interface UnstagedWorktreeChangesProps extends ComponentProps<'div'> {}
 

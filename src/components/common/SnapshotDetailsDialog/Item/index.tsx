@@ -1,7 +1,16 @@
 import * as Ariakit from '@ariakit/react'
+import {
+  IconFileArrowRight,
+  IconFileCode2,
+  IconFileMinus,
+  IconFilePencil,
+  IconFilePlus,
+  IconFiles,
+} from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { VersionedFileInfo } from '@/api/models'
+import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -20,6 +29,23 @@ interface SnapshotDetailsDialogItemProps extends ListItemProps {
  */
 const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
   const { file, ...itemProps } = props
+  const Glyph = match(file.changes)
+    .with('added', () => IconFilePlus)
+    .with('deleted', () => IconFileMinus)
+    .with('modified', () => IconFilePencil)
+    .with('typeChanged', () => IconFileCode2)
+    .with('copied', () => IconFiles)
+    .with('renamed', () => IconFileArrowRight)
+    .exhaustive()
+
+  const statusMessage = match(file.changes)
+    .with('added', () => 'New')
+    .with('deleted', () => 'Deleted')
+    .with('modified', () => 'Edited')
+    .with('typeChanged', () => 'Converted')
+    .with('copied', () => 'Copied')
+    .with('renamed', () => 'Renamed')
+    .exhaustive()
 
   return (
     <Ariakit.Checkbox
@@ -29,32 +55,45 @@ const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
           interactive
           {...propsWithCn(
             itemProps,
-            'flex flex-col items-start',
+            'flex flex-row text-start items-start justify-between gap-x-8',
             'border-1 border-solid border-transparent',
             'aria-checked:border-accent-300',
           )}
         >
-          <Marquee className={cn('text-sm text-light-600')} reverse>
-            {file.path}
-          </Marquee>
+          <div className={cn('min-w-0 w-full')}>
+            <div
+              className={cn(
+                'flex flex-row gap-x-1 items-center',
+                match(file.changes)
+                  .with('added', () => 'text-success-200/90')
+                  .with('deleted', () => 'text-danger-200/90')
+                  .with('modified', () => 'text-success-200/90')
+                  .with('typeChanged', () => 'text-light-400')
+                  .with('copied', () => 'text-light-400')
+                  .with('renamed', () => 'text-light-400')
+                  .exhaustive(),
+              )}
+            >
+              <Icon Glyph={Glyph} size="md" />
+              <Marquee className={cn('text-sm')}>{file.path}</Marquee>
+            </div>
 
-          <p
-            className={cn(
-              'text-xs',
-              file.status === 'deleted'
-                ? 'text-danger-300/50'
-                : 'text-success-300/50',
-            )}
-          >
-            {match(file.status)
-              .with('added', () => 'Created')
-              .with('deleted', () => 'Deleted')
-              .with('modified', () => 'Edited')
-              .with('copied', () => 'Copied')
-              .with('renamed', () => 'Renamed')
-              .with('typeChanged', () => 'Converted')
-              .exhaustive()}
-          </p>
+            <p
+              className={cn(
+                'text-xs',
+                match(file.changes)
+                  .with('added', () => 'text-success-300/70')
+                  .with('deleted', () => 'text-danger-300/70')
+                  .with('modified', () => 'text-success-300/70')
+                  .with('typeChanged', () => 'text-light-600')
+                  .with('copied', () => 'text-light-600')
+                  .with('renamed', () => 'text-light-600')
+                  .exhaustive(),
+              )}
+            >
+              {statusMessage}
+            </p>
+          </div>
         </ListItem>
       }
     />

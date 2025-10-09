@@ -86,7 +86,7 @@ const UnstagedChangesItem = withContextMenu<UnstagedChangesItemProps>(
                       .with('added', () => 'text-success-200/90')
                       .with('deleted', () => 'text-danger-200/90')
                       .with('modified', () => 'text-success-200/90')
-                      .with('typeChanged', () => 'text-light-600')
+                      .with('typeChanged', () => 'text-light-400')
                       .exhaustive(),
                   )
                   .with({ status: 'untracked' }, () => 'text-light-600')

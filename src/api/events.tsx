@@ -11,11 +11,11 @@ import {
   branchesQueryKeys,
   commitHistoryQueryKeys,
   commonAncestorQueryKeys,
-  filesQueryKeys,
   headInfoQueryKeys,
   pathQueryKey,
   remotesQueryKeys,
   stashesQueryKeys,
+  worktreeFilesQueryKeys,
 } from './queries'
 
 const EVENT_ID = 'app-event'
@@ -83,7 +83,7 @@ const useEventsHandler = () => {
                 queryKey: [headInfoQueryKeys.all(path)],
               })
               client.invalidateQueries({
-                queryKey: [filesQueryKeys.all(path)],
+                queryKey: [worktreeFilesQueryKeys.all(path)],
               })
             }
           },
@@ -95,11 +95,11 @@ const useEventsHandler = () => {
         })
         .with({ type: 'filesModified', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [filesQueryKeys.status(path, 'unstaged').all],
+            queryKey: [worktreeFilesQueryKeys.status(path, 'unstaged').all],
           })
 
           client.invalidateQueries({
-            queryKey: [filesQueryKeys.status(path, 'untracked').all],
+            queryKey: [worktreeFilesQueryKeys.status(path, 'untracked').all],
           })
         })
         .with({ type: 'configUpdated', path: P.string }, ({ path }) => {
@@ -113,7 +113,7 @@ const useEventsHandler = () => {
         })
         .with({ type: 'indexUpdated', path: P.string }, ({ path }) => {
           client.invalidateQueries({
-            queryKey: [filesQueryKeys.all(path)],
+            queryKey: [worktreeFilesQueryKeys.all(path)],
           })
         })
         .with({ type: 'stashesUpdated', path: P.string }, ({ path }) => {

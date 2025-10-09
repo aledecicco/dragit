@@ -1,20 +1,20 @@
 import { match } from 'ts-pattern'
 
-import type { FileInfo } from '@/api/models'
+import type { WorktreeFileInfo } from '@/api/models'
 import { showDialog } from '@/context/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { propsWithCn } from '@/utils/styles'
 
 import { FileDiffViewer } from '../FileDiffViewer'
 
-export const WORKTREE_FILE_DIFF_DIALOG = (file: FileInfo) =>
+export const WORKTREE_FILE_DIFF_DIALOG = (file: WorktreeFileInfo) =>
   `snapshot_details_dialog__${file.status}_${file.path}`
 
 interface WorktreeFileDiffDialogProps extends Omit<DialogProps, 'dialogKey'> {
   /**
    * The file that should be displayed.
    */
-  file: FileInfo
+  file: WorktreeFileInfo
 }
 
 /**
@@ -36,23 +36,22 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
     >
       {match(file.status)
         .with('unstaged', () => (
-          <FileDiffViewer
-            filepath={file.path}
-            diffScope={{ type: 'unstaged' }}
-          />
+          <FileDiffViewer file={file} diffScope={{ type: 'unstaged' }} />
         ))
         .with('staged', () => (
-          <FileDiffViewer filepath={file.path} diffScope={{ type: 'staged' }} />
+          <FileDiffViewer file={file} diffScope={{ type: 'staged' }} />
         ))
         .with('unmerged', () => undefined)
-        .with('untracked', () => undefined)
+        .with('untracked', () => (
+          <FileDiffViewer file={file} diffScope={{ type: 'unstaged' }} />
+        ))
         .exhaustive()}
     </Dialog>
   )
 }
 
 const showWorktreeFileDiffDialog = (
-  file: FileInfo,
+  file: WorktreeFileInfo,
   props?: Partial<WorktreeFileDiffDialogProps>,
 ) => {
   showDialog(

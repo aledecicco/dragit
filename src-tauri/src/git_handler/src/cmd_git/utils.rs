@@ -175,15 +175,24 @@ pub(crate) fn parse_untracked_file_info(line: &String) -> Option<UntrackedFileIn
 }
 
 pub(crate) fn parse_versioned_file_info(line: &String) -> Option<VersionedFileInfo> {
-    let versioned_str = line.chars().nth(0)?.to_string();
-    let versioned_status = VersionedFileStatus::from_str(&versioned_str).ok()?;
+    let segments: Vec<&str> = line.split_ascii_whitespace().collect();
+    let status_str = segments.get(0)?.chars().nth(0)?.to_string();
+    let path = segments.last()?.to_string();
 
-    let path = line.split_ascii_whitespace().last()?;
-
-    Some(VersionedFileInfo {
-        path: path.to_string(),
-        status: versioned_status,
-    })
+    if let Some(changes) = ChangeStatus::from_str(&status_str).ok() {
+        Some(VersionedFileInfo {
+            path,
+            status: VersionedFileStatus::Changed { changes },
+        })
+    } else if let Some(changes) = MovedStatus::from_str(&status_str).ok() {
+        let old_path = segments.get(1)?.to_string();
+        Some(VersionedFileInfo {
+            path,
+            status: VersionedFileStatus::Moved { changes, old_path },
+        })
+    } else {
+        None
+    }
 }
 
 pub(crate) fn parse_history_item(line: &String) -> Option<HistoryItem> {

@@ -130,26 +130,25 @@ export const UNTRACKED_FILE_INFO_SCHEMA = BorshSchema.Struct({
   path: BorshSchema.String,
 })
 
-export const FILE_INFO_SCHEMA = BorshSchema.Enum({
+export const WORKTREE_FILE_INFO_SCHEMA = BorshSchema.Enum({
   Staged: STAGED_FILE_INFO_SCHEMA,
   Unstaged: UNSTAGED_FILE_INFO_SCHEMA,
   Unmerged: UNMERGED_FILE_INFO_SCHEMA,
   Untracked: UNTRACKED_FILE_INFO_SCHEMA,
 })
-export const FILES_PAGE_SCHEMA = PAGE_SCHEMA(FILE_INFO_SCHEMA)
-
-export const VERSIONED_FILE_STATUS_SCHEMA = BorshSchema.Enum({
-  Modified: BorshSchema.Unit,
-  TypeChanged: BorshSchema.Unit,
-  Added: BorshSchema.Unit,
-  Deleted: BorshSchema.Unit,
-  Renamed: BorshSchema.Unit,
-  Copied: BorshSchema.Unit,
-})
+export const WORKTREE_FILES_PAGE_SCHEMA = PAGE_SCHEMA(WORKTREE_FILE_INFO_SCHEMA)
 
 export const VERSIONED_FILE_INFO_SCHEMA = BorshSchema.Struct({
   path: BorshSchema.String,
-  status: VERSIONED_FILE_STATUS_SCHEMA,
+  status: BorshSchema.Enum({
+    Changed: BorshSchema.Struct({
+      changes: CHANGE_STATUS_SCHEMA,
+    }),
+    Moved: BorshSchema.Struct({
+      changes: MOVED_STATUS_SCHEMA,
+      oldPath: BorshSchema.String,
+    }),
+  }),
 })
 export const SNAPSHOT_FILES_PAGE_SCHEMA = PAGE_SCHEMA(
   VERSIONED_FILE_INFO_SCHEMA,

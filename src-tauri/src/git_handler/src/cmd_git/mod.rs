@@ -11,8 +11,8 @@ use utils::*;
 
 use models::{
     AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    FileInfo, FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
-    StashInfo, VersionedFileInfo,
+    FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo, StashInfo,
+    VersionedFileInfo, WorktreeFileInfo,
 };
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
@@ -215,7 +215,7 @@ impl GitHandler for CmdGit {
         parse_head_info(&lines).ok_or(GitError::GetHeadInfoFailed {})
     }
 
-    fn get_files_page(
+    fn get_worktree_files_page(
         &self,
         channel: &Channel<AppMessage>,
         path: &str,
@@ -223,7 +223,7 @@ impl GitHandler for CmdGit {
         pathspec: Option<&str>,
         start_after: usize,
         limit: usize,
-    ) -> Result<Page<FileInfo>, GitError> {
+    ) -> Result<Page<WorktreeFileInfo>, GitError> {
         let mut args = vec![
             "--no-optional-locks",
             "status",
@@ -244,25 +244,25 @@ impl GitHandler for CmdGit {
             args.push(pathspec);
         }
 
-        let parse_line = |line: String| -> Option<FileInfo> {
+        let parse_line = |line: String| -> Option<WorktreeFileInfo> {
             if filter.staged.unwrap_or(false) {
                 if let Some(info) = parse_staged_file_info(&line) {
-                    return Some(FileInfo::Staged(info));
+                    return Some(WorktreeFileInfo::Staged(info));
                 }
             }
             if filter.unstaged.unwrap_or(false) {
                 if let Some(info) = parse_unstaged_file_info(&line) {
-                    return Some(FileInfo::Unstaged(info));
+                    return Some(WorktreeFileInfo::Unstaged(info));
                 }
             }
             if filter.unmerged.unwrap_or(false) {
                 if let Some(info) = parse_unmerged_file_info(&line) {
-                    return Some(FileInfo::Unmerged(info));
+                    return Some(WorktreeFileInfo::Unmerged(info));
                 }
             }
             if filter.untracked.unwrap_or(false) {
                 if let Some(info) = parse_untracked_file_info(&line) {
-                    return Some(FileInfo::Untracked(info));
+                    return Some(WorktreeFileInfo::Untracked(info));
                 }
             }
 

@@ -113,38 +113,27 @@ export interface UntrackedFileInfo extends BaseFileInfo {
   status: 'untracked'
 }
 
-export type FileInfo =
+export type WorktreeFileInfo =
   | StagedFileInfo
   | UnstagedFileInfo
   | UnmergedFileInfo
   | UntrackedFileInfo
 
-export type FileTypes = {
+export type WorktreeFileTypes = {
   staged: StagedFileInfo
   unstaged: UnstagedFileInfo
   unmerged: UnmergedFileInfo
   untracked: UntrackedFileInfo
 }
-export type FileType = keyof FileTypes
+export type WorktreeFileType = keyof WorktreeFileTypes
 
-export type FileOfType<T extends FileType> = FileTypes[T]
+export type FileOfType<T extends WorktreeFileType> = WorktreeFileTypes[T]
 
 export type FileTypeFilter = {
-  [T in FileType]?: boolean
+  [T in WorktreeFileType]?: boolean
 }
-
-export type VersionedFileStatus =
-  | 'modified'
-  | 'typeChanged'
-  | 'added'
-  | 'deleted'
-  | 'renamed'
-  | 'copied'
-
-export interface VersionedFileInfo {
-  path: string
-  status: VersionedFileStatus
-}
+export type VersionedFileInfo = BaseFileInfo &
+  ({ changes: ChangeStatus } | { changes: MovedStatus; oldPath: string })
 
 export interface RemoteInfo {
   name: RemoteName
@@ -199,7 +188,6 @@ export interface DiffLine {
 export type FileDiff = DiffLine[]
 
 export type DiffScope =
-  | { type: 'uncommitted' }
   | { type: 'staged' }
   | { type: 'unstaged' }
   | { type: 'snapshot'; snapshotId: SnapshotId }

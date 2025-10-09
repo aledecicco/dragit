@@ -1,17 +1,17 @@
 import type { ComponentProps, ReactNode } from 'react'
 
 import type { FileOfType } from '@/api/models'
-import { FILE_STATUSES_PAGE_SIZE, useQueryFiles } from '@/api/queries'
+import { useQueryWorktreeFiles, WORKTREE_FILES_PAGE_SIZE } from '@/api/queries'
 import {
   type FileType,
   setNextPage,
   setPrevPage,
   useFilesPage,
-  useNeedsPagination,
 } from '@/context/pages'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
 import { Chip } from '@/ui/Chip'
+import { useNeedsPagination } from '@/utils/pagination'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
@@ -43,13 +43,18 @@ const WorktreeChanges = <T extends FileType[]>(
 ) => {
   const { label, fileTypes, extraInfo, renderFile, ...divProps } = props
 
-  const filesQuery = useQueryFiles<T[number]>(fileTypes)
+  const filesQuery = useQueryWorktreeFiles<T[number]>(fileTypes)
   const page = useFilesPage(fileTypes)
 
   const showPagination = useNeedsPagination(filesQuery, page)
 
   return (
-    <div {...propsWithCn(divProps, 'flex flex-col gap-y-1')}>
+    <div
+      {...propsWithCn(
+        divProps,
+        'flex flex-col gap-y-1 overflow-hidden min-h-50',
+      )}
+    >
       <div className={cn('flex flex-row items-center justify-between')}>
         <div
           className={cn(
@@ -62,7 +67,7 @@ const WorktreeChanges = <T extends FileType[]>(
           {showPagination ? (
             <Pagination
               page={page}
-              pageSize={FILE_STATUSES_PAGE_SIZE}
+              pageSize={WORKTREE_FILES_PAGE_SIZE}
               hasNext={!!filesQuery.data?.hasNext}
               setPrevPage={() => {
                 setPrevPage(fileTypes)

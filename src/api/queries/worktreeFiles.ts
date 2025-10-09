@@ -9,16 +9,16 @@ import { useFilesPage } from '@/context/pages'
 
 import type {
   ChangeStatus,
-  FileInfo,
   FileOfType,
-  FileType,
-  FileTypes,
   MergeStatus,
   MovedStatus,
   Page,
   StagedFileInfo,
+  WorktreeFileInfo,
+  WorktreeFileType,
+  WorktreeFileTypes,
 } from '../models'
-import { FILES_PAGE_SCHEMA } from '../schemas'
+import { WORKTREE_FILES_PAGE_SCHEMA } from '../schemas'
 import {
   fetchAndDeserialize,
   getFileTypeFilter,
@@ -26,33 +26,33 @@ import {
 } from '../utils'
 import { pathQueryKey } from '.'
 
-export const FILE_STATUSES_PAGE_SIZE = 1000
+export const WORKTREE_FILES_PAGE_SIZE = 1000
 
-const filesQueryKeys = {
+const worktreeFilesQueryKeys = {
   all: (path: string) =>
     ({
       ...pathQueryKey(path),
-      key: 'files',
+      key: 'worktree_files',
     }) as const,
-  status: (path: string, types: FileType | FileType[]) => ({
+  status: (path: string, types: WorktreeFileType | WorktreeFileType[]) => ({
     all: {
-      ...filesQueryKeys.all(path),
+      ...worktreeFilesQueryKeys.all(path),
       ...getFileTypeFilter(types),
     } as const,
     pathspec: (pathspec: string | undefined) =>
       ({
-        ...filesQueryKeys.status(path, types).all,
+        ...worktreeFilesQueryKeys.status(path, types).all,
         pathspec: pathspec,
       }) as const,
     page: (pathspec: string | undefined, page: number) =>
       ({
-        ...filesQueryKeys.status(path, types).pathspec(pathspec),
+        ...worktreeFilesQueryKeys.status(path, types).pathspec(pathspec),
         page: page,
       }) as const,
   }),
 }
 
-const fetchFilesPage = async <T extends FileType>(
+const fetchWorktreeFilesPage = async <T extends WorktreeFileType>(
   path: string,
   types: T | T[],
   pathspec: string | null,
@@ -61,21 +61,21 @@ const fetchFilesPage = async <T extends FileType>(
 ): Promise<Page<FileOfType<T>>> => {
   const filter = getFileTypeFilter(types)
   const res = await fetchAndDeserialize(
-    'get_files_page',
+    'get_worktree_files_page',
     {
       path,
       filter,
       pathspec,
-      startAfter: page * FILE_STATUSES_PAGE_SIZE,
-      limit: FILE_STATUSES_PAGE_SIZE,
+      startAfter: page * WORKTREE_FILES_PAGE_SIZE,
+      limit: WORKTREE_FILES_PAGE_SIZE,
     },
-    FILES_PAGE_SCHEMA,
+    WORKTREE_FILES_PAGE_SCHEMA,
     context,
   )
 
   const files = res.items.map((item) =>
     match(item)
-      .returnType<FileInfo>()
+      .returnType<WorktreeFileInfo>()
       .with({ Staged: P.select() }, (file) => {
         return match(file)
           .returnType<StagedFileInfo>()
@@ -148,7 +148,7 @@ const fetchFilesPage = async <T extends FileType>(
   }
 }
 
-const filesQuery = <T extends FileType>(
+const worktreeFilesQuery = <T extends WorktreeFileType>(
   path: string,
   types: T | T[],
   page: number,
@@ -156,19 +156,30 @@ const filesQuery = <T extends FileType>(
 ) =>
   queryOptions({
     queryKey: [
-      filesQueryKeys
+      worktreeFilesQueryKeys
         .status(path, types)
         .page(pathspec ? pathspec : undefined, page),
     ],
     queryFn: (context) =>
-      fetchFilesPage(path, types, pathspec ? pathspec : null, page, context),
+      fetchWorktreeFilesPage(
+        path,
+        types,
+        pathspec ? pathspec : null,
+        page,
+        context,
+      ),
   })
 
-function useQueryFiles<T extends FileType>(
+const useQueryWorktreeFiles = <T extends WorktreeFileType>(
   types: T | T[],
   pathspec?: string,
-): UseQueryResult<Page<FileTypes[T]>> {
-  return useRepositoryQuery(filesQuery, types, useFilesPage(types), pathspec)
+): UseQueryResult<Page<WorktreeFileTypes[T]>> => {
+  return useRepositoryQuery(
+    worktreeFilesQuery,
+    types,
+    useFilesPage(types),
+    pathspec,
+  )
 }
 
-export { filesQueryKeys, useQueryFiles }
+export { worktreeFilesQueryKeys, useQueryWorktreeFiles }

@@ -107,21 +107,18 @@ pub enum StagedFileStatus {
 #[derive(borsh::BorshSerialize, Debug)]
 pub struct StagedFileInfo {
     pub path: String,
-
     pub status: StagedFileStatus,
 }
 
 #[derive(borsh::BorshSerialize, Debug)]
 pub struct UnstagedFileInfo {
     pub path: String,
-
     pub status: ChangeStatus,
 }
 
 #[derive(borsh::BorshSerialize, Debug)]
 pub struct UnmergedFileInfo {
     pub path: String,
-
     pub status: MergeStatus,
 }
 
@@ -131,32 +128,23 @@ pub struct UntrackedFileInfo {
 }
 
 #[derive(borsh::BorshSerialize, Debug)]
-pub enum FileInfo {
+pub enum WorktreeFileInfo {
     Staged(StagedFileInfo),
     Unstaged(UnstagedFileInfo),
     Unmerged(UnmergedFileInfo),
     Untracked(UntrackedFileInfo),
 }
 
-#[derive(borsh::BorshSerialize, strum::EnumString, Debug)]
+#[derive(borsh::BorshSerialize, Debug)]
 pub enum VersionedFileStatus {
-    #[strum(serialize = "M")]
-    Modified,
+    Changed {
+        changes: ChangeStatus,
+    },
 
-    #[strum(serialize = "T")]
-    TypeChanged,
-
-    #[strum(serialize = "A")]
-    Added,
-
-    #[strum(serialize = "D")]
-    Deleted,
-
-    #[strum(serialize = "R")]
-    Renamed,
-
-    #[strum(serialize = "C")]
-    Copied,
+    Moved {
+        changes: MovedStatus,
+        old_path: String,
+    },
 }
 
 #[derive(borsh::BorshSerialize, Debug)]
@@ -186,7 +174,6 @@ pub struct CommonAncestorInfo {
 #[derive(borsh::BorshSerialize, Debug)]
 pub struct HistoryItem {
     pub hash: String,
-    // TODO: could not be needed
     pub other_parents: Vec<String>,
 }
 
@@ -249,7 +236,6 @@ pub enum DiffLine {
 #[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
 #[serde(rename_all(deserialize = "snake_case"), tag = "type")]
 pub enum DiffScope {
-    Uncommitted,
     Staged,
     Unstaged,
     Snapshot {

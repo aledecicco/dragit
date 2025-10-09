@@ -1,14 +1,13 @@
 import { useState } from 'react'
 
-import type { FileType } from '@/api/models'
-import { FILE_STATUSES_PAGE_SIZE, useQueryFiles } from '@/api/queries'
+import type { WorktreeFileType } from '@/api/models'
+import { useQueryWorktreeFiles, WORKTREE_FILES_PAGE_SIZE } from '@/api/queries'
 import { hideDialog } from '@/context/dialogs'
 import {
   setNextPage,
   setPrevPage,
   useFilesPage,
   useHandleFilesPageSync,
-  useNeedsPagination,
 } from '@/context/pages'
 import type { AskForValueProps } from '@/lib/AskForValueDialog'
 import { Pagination } from '@/lib/Pagination'
@@ -16,10 +15,11 @@ import type { Shortcut } from '@/lib/ShortcutsCheatsheet'
 import { VirtualizedDiv } from '@/lib/VirtualizedDiv'
 import { CommandMenu } from '@/ui/CommandMenu'
 import { CommandMenuItem } from '@/ui/CommandMenu/Item'
+import { useNeedsPagination } from '@/utils/pagination'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-interface FileSelectorDialogProps<T extends FileType>
+interface FileSelectorDialogProps<T extends WorktreeFileType>
   extends AskForValueProps<{ path: string }> {
   /**
    * The types of files to match.
@@ -60,13 +60,13 @@ const PAGINATION_SHORTCUTS: Shortcut[] = [
 /**
  * Dialog that allows the user to search for files matching a pathspec, and select one (or all) of them.
  */
-const FileSelectorDialog = <T extends FileType>(
+const FileSelectorDialog = <T extends WorktreeFileType>(
   props: FileSelectorDialogProps<T>,
 ) => {
   const { types, submitValue, ...askForValueProps } = props
 
   const [search, setSearch] = useState('')
-  const filesQuery = useQueryFiles(types, search)
+  const filesQuery = useQueryWorktreeFiles(types, search)
   useHandleFilesPageSync(types, search)
 
   const items = filesQuery.data?.items.map((file) => file.path)
@@ -106,7 +106,7 @@ const FileSelectorDialog = <T extends FileType>(
         showPagination && (
           <Pagination
             page={page}
-            pageSize={FILE_STATUSES_PAGE_SIZE}
+            pageSize={WORKTREE_FILES_PAGE_SIZE}
             hasNext={!!filesQuery.data?.hasNext}
             setPrevPage={() => {
               setPrevPage(types)

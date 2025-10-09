@@ -1,14 +1,18 @@
 import type { ComponentProps } from 'react'
 
-import type { FileDiff } from '@/api/models'
+import type {
+  FileDiff,
+  VersionedFileInfo,
+  WorktreeFileInfo,
+} from '@/api/models'
 import { highlightDiff } from '@/utils/highlighting'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface DiffViewerContentProps extends ComponentProps<'div'> {
   /**
-   * The full path of the file being diffed.
+   * The file being diffed.
    */
-  filepath: string
+  file: WorktreeFileInfo | VersionedFileInfo
 
   /**
    * The diff to display.
@@ -20,7 +24,7 @@ interface DiffViewerContentProps extends ComponentProps<'div'> {
  * Displays the contents of a file in a diff viewer.
  */
 const DiffViewerContent = (props: DiffViewerContentProps) => {
-  const { filepath, fileDiff, ...divProps } = props
+  const { file, fileDiff, ...divProps } = props
   return (
     <div
       {...propsWithCn(
@@ -35,7 +39,7 @@ const DiffViewerContent = (props: DiffViewerContentProps) => {
           'whitespace-pre font-mono leading-7',
         )}
       >
-        {highlightDiff(fileDiff, filepath)}
+        {highlightDiff(fileDiff, file.path)}
       </div>
     </div>
   )
