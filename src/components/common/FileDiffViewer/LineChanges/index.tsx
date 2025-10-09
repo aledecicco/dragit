@@ -18,30 +18,40 @@ const DiffViewerLineChanges = (props: DiffViewerLineChangesProps) => {
   const { fileDiff, ...divProps } = props
 
   return (
-    <div {...propsWithCn(divProps, 'select-none row-start-1 -row-end-1')}>
+    <div {...propsWithCn(divProps, 'flex flex-col select-none')}>
       {fileDiff.map((diffLine, i) => (
-        <LineChangesCell key={`${i + 1}`} diffType={diffLine.type} />
+        <LineChangeCell key={`${i + 1}`} diffType={diffLine.type} />
       ))}
 
-      <LineChangesCell diffType={fileDiff.at(-1)?.type ?? 'unchanged'} empty />
+      <LineChangeCell className={cn('grow')} diffType="unchanged" empty />
     </div>
   )
 }
 
+interface LineChangeCellProps extends ComponentProps<'div'> {
+  /**
+   * The type of diff for the line.
+   */
+  diffType: DiffType
+
+  /**
+   * Whether this cell should be empty.
+   */
+  empty?: boolean
+}
+
 /**
  * Displays a single diff type for a line with the appropriate styling.
- *
- * @param props.diffType - The type of diff for the line.
- * @param props.empty - Whether this cell should be empty.
  */
-const LineChangesCell = (props: { diffType: DiffType; empty?: boolean }) => {
-  const { diffType, empty } = props
+const LineChangeCell = (props: LineChangeCellProps) => {
+  const { diffType, empty, ...divProps } = props
 
   return (
     <div
-      className={cn(
-        'h-7 flex flex-row items-center justify-center font-mono',
-        'w-4 font-bold',
+      {...propsWithCn(
+        divProps,
+        'h-7 flex flex-row justify-center font-mono',
+        'w-4 py-1.25 font-bold',
         match(diffType)
           .with('added', () => 'bg-success-500/30 text-success-500')
           .with('removed', () => 'bg-danger-600/30 text-danger-600')

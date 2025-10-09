@@ -18,10 +18,27 @@ const DiffViewerLineNumbers = (props: DiffViewerLineNumbersProps) => {
   const { fileDiff, ...divProps } = props
 
   return (
-    <div {...propsWithCn(divProps, 'select-none row-start-1 -row-end-1')}>
+    <div {...propsWithCn(divProps, 'flex flex-col select-none')}>
       {getLineNumbers(fileDiff)}
     </div>
   )
+}
+
+interface LineNumberCellProps extends ComponentProps<'div'> {
+  /**
+   * The line number to display.
+   */
+  lineNumber: number | undefined
+
+  /**
+   * The type of diff for the line.
+   */
+  diffType: DiffType
+
+  /**
+   * Whether to display the line number in a faded style.
+   */
+  faded?: boolean
 }
 
 /**
@@ -31,18 +48,15 @@ const DiffViewerLineNumbers = (props: DiffViewerLineNumbersProps) => {
  * @param props.diffType - The type of diff for the line.
  * @param props.faded - Whether to display the line number in a faded style.
  */
-const LineNumbersCell = (props: {
-  lineNumber: number | undefined
-  diffType: DiffType
-  faded?: boolean
-}) => {
-  const { lineNumber, diffType, faded } = props
+const LineNumberCell = (props: LineNumberCellProps) => {
+  const { lineNumber, diffType, faded, ...divProps } = props
 
   return (
     <div
-      className={cn(
-        'h-7 flex flex-row items-center font-mono',
-        'text-xs w-15 px-1 overflow-hidden',
+      {...propsWithCn(
+        divProps,
+        'h-7 flex flex-row font-mono',
+        'text-xs w-15 px-1 py-1.75 overflow-hidden',
         match(diffType)
           .with('added', () => [
             'bg-success-500/30',
@@ -85,7 +99,7 @@ const getLineNumbers = (fileDiff: FileDiff): ReactNode => {
     }
 
     res.push(
-      <LineNumbersCell
+      <LineNumberCell
         key={`${i + 1}`}
         lineNumber={i + 1 + offset}
         diffType={diffLine.type}
@@ -94,11 +108,12 @@ const getLineNumbers = (fileDiff: FileDiff): ReactNode => {
   })
 
   res.push(
-    <LineNumbersCell
+    <LineNumberCell
       key={fileDiff.length + 1}
       lineNumber={fileDiff.length + 1 + offset}
-      diffType={fileDiff.at(-1)?.type ?? 'unchanged'}
+      diffType="unchanged"
       faded
+      className={cn('grow ')}
     />,
   )
 

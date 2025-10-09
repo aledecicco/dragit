@@ -431,13 +431,8 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
       .exhaustive()
   }
 
-  // We add an empty line at the end with the style of the previous one for continuity.
-  res.push(
-    wrapLineInDiff(
-      [{ type: 'text', value: '\n' }],
-      fileDiff.at(-1)?.type ?? 'unchanged',
-    ),
-  )
+  // We add an empty line at the end for continuity.
+  res.push(wrapLineInDiff([{ type: 'text', value: '\n' }], 'unchanged'))
 
   return renderTree({ type: 'root', children: res })
 }
