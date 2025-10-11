@@ -1,11 +1,7 @@
 import { type ComponentProps, Fragment, useEffect, useRef } from 'react'
 import { IconFile } from '@tabler/icons-react'
 
-import type {
-  DiffScope,
-  VersionedFileInfo,
-  WorktreeFileInfo,
-} from '@/api/models'
+import type { DiffScope } from '@/api/models'
 import { useQueryFileDiff } from '@/api/queries/fileDiff'
 import { QueryLoader } from '@/lib/Loader/Query'
 import { Icon } from '@/ui/Icon'
@@ -21,11 +17,6 @@ import { DiffViewerLineNumbers } from './LineNumbers'
 
 interface FileDiffViewerProps extends ComponentProps<'div'> {
   /**
-   * The file to display the diff for.
-   */
-  file: WorktreeFileInfo | VersionedFileInfo
-
-  /**
    * The scope of the diff to display (staged changes, unstaged changes, or a specific snapshot).
    */
   diffScope: DiffScope
@@ -35,16 +26,16 @@ interface FileDiffViewerProps extends ComponentProps<'div'> {
  * Displays the contents of a file, showing changes made to it on each line.
  */
 const FileDiffViewer = (props: FileDiffViewerProps) => {
-  const { file, diffScope, ...divProps } = props
+  const { diffScope, ...divProps } = props
 
-  const fileDiffQuery = useQueryFileDiff(file.path, diffScope)
+  const fileDiffQuery = useQueryFileDiff(diffScope)
 
   const viewerRef = useRef<HTMLDivElement>(null)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset scroll when a different file is selected
   useEffect(() => {
     viewerRef.current?.scrollTo({ top: 0, left: 0 })
-  }, [file.path])
+  }, [diffScope.file.path])
 
   return (
     <div
@@ -56,7 +47,9 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
     >
       <div className={cn('flex flex-row items-center gap-x-2 p-2 pr-9')}>
         <Icon Glyph={IconFile} size="lg" />
-        <Marquee className={cn('text-md text-light-500')}>{file.path}</Marquee>
+        <Marquee className={cn('text-md text-light-500')}>
+          {diffScope.file.path}
+        </Marquee>
       </div>
 
       <Separator />
@@ -108,7 +101,7 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
                 />
 
                 <DiffViewerContent
-                  file={file}
+                  file={diffScope.file}
                   fileDiff={fileDiff}
                   className={cn('col-start-3')}
                 />

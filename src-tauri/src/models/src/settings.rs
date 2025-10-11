@@ -1,5 +1,5 @@
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
-#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 pub struct Settings {
     pub open_last_on_start: bool,
 }

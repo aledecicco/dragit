@@ -1,14 +1,14 @@
-use diffs::compute_diff;
 use std::path::Path;
 use tauri::{
     ipc::{Channel, Response},
     AppHandle, Emitter, Manager, State,
 };
 
-use crate::{serialize_response, with_handler};
+use crate::{serialize_response, utils::get_disk_file_contents, with_handler};
+use diffs::{compute_diff, get_diff_sources};
 use models::{
-    AppError, AppEvent, AppMessage, AppState, CurrentDirInfo, DiffScope, FileTypesFilter, GitError,
-    GitHandler, RepoWatcherError, Settings, EVENT_ID,
+    AppError, AppEvent, AppMessage, AppState, CurrentDirInfo, DiffScope, DiffSource,
+    FileTypesFilter, GitHandler, RepoWatcherError, Settings, EVENT_ID,
 };
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
@@ -394,31 +394,27 @@ pub async fn get_file_diff(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
     repo_path: &str,
-    filepath: &str,
     scope: DiffScope,
 ) -> Result<Response, AppError> {
-    with_handler(&state, &|h| {
-        let (before, after) = match &scope {
-            DiffScope::Snapshot { snapshot_id } => (
-                h.get_file_contents(&channel, repo_path, &format!("{snapshot_id}^1"), filepath)?,
-                h.get_file_contents(&channel, repo_path, &snapshot_id, filepath)?,
-            ),
-            DiffScope::Staged => (
-                h.get_file_contents(&channel, repo_path, "HEAD", filepath)?,
-                h.get_file_contents(&channel, repo_path, ":0", filepath)?,
-            ),
-            DiffScope::Unstaged => (
-                h.get_file_contents(&channel, repo_path, ":0", filepath)?,
-                std::fs::read_to_string(Path::new(repo_path).join(filepath)).or(Err(
-                    GitError::GetFileContentsFailed {
-                        reference: "worktree".to_string(),
-                        filepath: filepath.to_string(),
-                    },
-                ))?,
-            ),
-        };
+    let (before_source, after_source) = get_diff_sources(scope);
 
-        Ok(compute_diff(&before, &after))
-    })
-    .and_then(serialize_response)
+    let before_content = match before_source {
+        DiffSource::Empty => "".to_string(),
+        DiffSource::DiskFile(path) => get_disk_file_contents(repo_path, &path)?,
+        DiffSource::GitReference(reference, path) => with_handler(&state, &|h| {
+            h.get_file_contents(&channel, repo_path, &reference, &path)
+        })?,
+    };
+
+    let after_content = match after_source {
+        DiffSource::Empty => "".to_string(),
+        DiffSource::DiskFile(path) => get_disk_file_contents(repo_path, &path)?,
+        DiffSource::GitReference(reference, path) => with_handler(&state, &|h| {
+            h.get_file_contents(&channel, repo_path, &reference, &path)
+        })?,
+    };
+
+    let diff = compute_diff(&before_content, &after_content);
+
+    serialize_response(diff)
 }

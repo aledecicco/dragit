@@ -44,7 +44,7 @@ pub enum StatusType {
     Untracked,
 }
 
-#[derive(borsh::BorshSerialize, strum::EnumString, Debug)]
+#[derive(borsh::BorshSerialize, strum::EnumString, Debug, serde::Deserialize)]
 pub enum ChangeStatus {
     #[strum(serialize = "M")]
     Modified,
@@ -59,7 +59,7 @@ pub enum ChangeStatus {
     Deleted,
 }
 
-#[derive(borsh::BorshSerialize, strum::EnumString, Debug)]
+#[derive(borsh::BorshSerialize, strum::EnumString, Debug, serde::Deserialize)]
 pub enum MovedStatus {
     #[strum(serialize = "R")]
     Renamed,
@@ -68,7 +68,7 @@ pub enum MovedStatus {
     Copied,
 }
 
-#[derive(borsh::BorshSerialize, strum::EnumString, Debug)]
+#[derive(borsh::BorshSerialize, strum::EnumString, Debug, serde::Deserialize)]
 pub enum MergeStatus {
     #[strum(serialize = "AA")]
     BothAdded,
@@ -92,7 +92,8 @@ pub enum MergeStatus {
     DeletedByThem,
 }
 
-#[derive(borsh::BorshSerialize, Debug)]
+#[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
+#[serde(rename_all_fields = "camelCase")]
 pub enum StagedFileStatus {
     Changed {
         changes: ChangeStatus,
@@ -104,30 +105,30 @@ pub enum StagedFileStatus {
     },
 }
 
-#[derive(borsh::BorshSerialize, Debug)]
+#[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
 pub struct StagedFileInfo {
     pub path: String,
     pub status: StagedFileStatus,
 }
 
-#[derive(borsh::BorshSerialize, Debug)]
+#[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
 pub struct UnstagedFileInfo {
     pub path: String,
     pub status: ChangeStatus,
 }
 
-#[derive(borsh::BorshSerialize, Debug)]
+#[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
 pub struct UnmergedFileInfo {
     pub path: String,
     pub status: MergeStatus,
 }
 
-#[derive(borsh::BorshSerialize, Debug)]
+#[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
 pub struct UntrackedFileInfo {
     pub path: String,
 }
 
-#[derive(borsh::BorshSerialize, Debug)]
+#[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
 pub enum WorktreeFileInfo {
     Staged(StagedFileInfo),
     Unstaged(UnstagedFileInfo),
@@ -135,7 +136,8 @@ pub enum WorktreeFileInfo {
     Untracked(UntrackedFileInfo),
 }
 
-#[derive(borsh::BorshSerialize, Debug)]
+#[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
+#[serde(rename_all_fields = "camelCase")]
 pub enum VersionedFileStatus {
     Changed {
         changes: ChangeStatus,
@@ -147,7 +149,7 @@ pub enum VersionedFileStatus {
     },
 }
 
-#[derive(borsh::BorshSerialize, Debug)]
+#[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
 pub struct VersionedFileInfo {
     pub path: String,
     pub status: VersionedFileStatus,
@@ -231,15 +233,4 @@ pub enum DiffLine {
     Added(Vec<String>),
     Removed(Vec<String>),
     Unchanged(Vec<String>),
-}
-
-#[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
-#[serde(rename_all(deserialize = "snake_case"), tag = "type")]
-pub enum DiffScope {
-    Staged,
-    Unstaged,
-    Snapshot {
-        #[serde(rename(deserialize = "snapshotId"))]
-        snapshot_id: String,
-    },
 }

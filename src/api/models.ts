@@ -94,10 +94,9 @@ interface BaseFileInfo {
   path: string
 }
 
-export type StagedFileInfo = {
+export type StagedFileInfo = BaseFileInfo & {
   status: 'staged'
-} & BaseFileInfo &
-  ({ changes: ChangeStatus } | { changes: MovedStatus; oldPath: string })
+} & ({ changes: ChangeStatus } | { changes: MovedStatus; oldPath: string })
 
 export interface UnstagedFileInfo extends BaseFileInfo {
   status: 'unstaged'
@@ -188,9 +187,8 @@ export interface DiffLine {
 export type FileDiff = DiffLine[]
 
 export type DiffScope =
-  | { type: 'staged' }
-  | { type: 'unstaged' }
-  | { type: 'snapshot'; snapshotId: SnapshotId }
+  | { type: 'worktree'; file: WorktreeFileInfo }
+  | { type: 'snapshot'; snapshotId: SnapshotId; file: VersionedFileInfo }
 
 export type AppMessage = {
   type: 'processStarted'

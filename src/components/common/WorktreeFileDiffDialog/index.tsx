@@ -1,5 +1,3 @@
-import { match } from 'ts-pattern'
-
 import type { WorktreeFileInfo } from '@/api/models'
 import { showDialog } from '@/context/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
@@ -34,18 +32,7 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
       )}
       contentProps={propsWithCn(dialogProps.contentProps, 'p-0 bg-dark-900')}
     >
-      {match(file.status)
-        .with('unstaged', () => (
-          <FileDiffViewer file={file} diffScope={{ type: 'unstaged' }} />
-        ))
-        .with('staged', () => (
-          <FileDiffViewer file={file} diffScope={{ type: 'staged' }} />
-        ))
-        .with('unmerged', () => undefined)
-        .with('untracked', () => (
-          <FileDiffViewer file={file} diffScope={{ type: 'unstaged' }} />
-        ))
-        .exhaustive()}
+      <FileDiffViewer diffScope={{ type: 'worktree', file }} />
     </Dialog>
   )
 }

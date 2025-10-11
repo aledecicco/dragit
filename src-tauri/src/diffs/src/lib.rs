@@ -1,58 +1,13 @@
+mod utils;
+use utils::*;
+
+use imara_diff::{Diff, InternedInput};
 use std::fmt::Debug;
 
-use imara_diff::{Algorithm, Diff, Hunk, InternedInput};
-use models::{DiffLine, DiffMode};
-use regex::Regex;
-use std::sync::LazyLock;
-
-// TODO: better split for code
-// TODO: maybe using a lexer for specific languages
-static SPLIT_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"\n|\r\n|\s+|\w+|[^\w\s]+"#).unwrap());
-
-/// Checks if a string is a newline (either `\n` or `\r\n`).
-fn is_newline(s: &str) -> bool {
-    s == "\n" || s == "\r\n"
-}
-
-/// Base computation of a line-based diff for the whole file.
-fn get_file_diff<'a>(before: &'a str, after: &'a str) -> (Diff, InternedInput<&'a str>) {
-    let input = InternedInput::new(before, after);
-    let mut diff = Diff::compute(Algorithm::Histogram, &input);
-    diff.postprocess_lines(&input);
-
-    (diff, input)
-}
-
-/// Computation of a word-based diff for a specific hunk.
-fn get_hunk_diff<'a>(hunk_before: &'a str, hunk_after: &'a str) -> (Diff, InternedInput<&'a str>) {
-    let mut hunk_input = InternedInput::default();
-
-    let words_before = SPLIT_REGEX.find_iter(hunk_before).map(|word| word.as_str());
-    hunk_input.update_before(words_before);
-    let words_after = SPLIT_REGEX.find_iter(&hunk_after).map(|word| word.as_str());
-    hunk_input.update_after(words_after);
-
-    let mut hunk_diff = Diff::compute(Algorithm::Histogram, &hunk_input);
-    hunk_diff.postprocess_no_heuristic(&hunk_input);
-
-    (hunk_diff, hunk_input)
-}
-
-/// Recovers the contents contained in a hunk from the full file diff.
-fn get_hunk_contents(hunk: &Hunk, file_input: &InternedInput<&str>) -> (String, String) {
-    let hunk_before = file_input.before[hunk.before.start as usize..hunk.before.end as usize]
-        .iter()
-        .map(|token| file_input.interner[*token])
-        .collect::<String>();
-
-    let hunk_after = file_input.after[hunk.after.start as usize..hunk.after.end as usize]
-        .iter()
-        .map(|token| file_input.interner[*token])
-        .collect::<String>();
-
-    (hunk_before, hunk_after)
-}
+use models::{
+    ChangeStatus, DiffLine, DiffMode, DiffScope, DiffSource, StagedFileStatus, VersionedFileStatus,
+    WorktreeFileInfo,
+};
 
 /// Adds a range of unchanged context lines to the result.
 fn add_context_lines<T, U>(from: T, to: U, input: &InternedInput<&str>, res: &mut Vec<DiffLine>)
@@ -179,7 +134,7 @@ fn process_hunk(
 }
 
 pub fn compute_diff(before: &str, after: &str) -> Vec<DiffLine> {
-    let (file_diff, file_input) = get_file_diff(before, after);
+    let (file_diff, file_input) = get_line_diff(before, after);
     let mut res = Vec::new();
 
     let mut current_line = 0;
@@ -188,7 +143,7 @@ pub fn compute_diff(before: &str, after: &str) -> Vec<DiffLine> {
         add_context_lines(current_line, hunk.before.start, &file_input, &mut res);
 
         let (hunk_before, hunk_after) = get_hunk_contents(&hunk, &file_input);
-        let (hunk_diff, hunk_input) = get_hunk_diff(&hunk_before, &hunk_after);
+        let (hunk_diff, hunk_input) = get_hunk_word_diff(&hunk_before, &hunk_after);
         let mut line_buffer = Vec::new();
 
         process_hunk(
@@ -213,4 +168,66 @@ pub fn compute_diff(before: &str, after: &str) -> Vec<DiffLine> {
     add_context_lines(current_line, file_input.before.len(), &file_input, &mut res);
 
     res
+}
+
+pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
+    match &scope {
+        DiffScope::Snapshot { snapshot_id, file } => (
+            match &file.status {
+                VersionedFileStatus::Moved {
+                    changes: _,
+                    old_path,
+                } => DiffSource::GitReference(format!("{snapshot_id}^1"), old_path.to_string()),
+                VersionedFileStatus::Changed {
+                    changes: ChangeStatus::Added,
+                } => DiffSource::Empty,
+                _ => DiffSource::GitReference(format!("{snapshot_id}^1"), file.path.to_string()),
+            },
+            match file.status {
+                VersionedFileStatus::Changed {
+                    changes: ChangeStatus::Deleted,
+                } => DiffSource::Empty,
+                _ => DiffSource::GitReference(snapshot_id.to_string(), file.path.to_string()),
+            },
+        ),
+
+        DiffScope::Worktree { file } => match file {
+            WorktreeFileInfo::Staged(file) => (
+                match &file.status {
+                    StagedFileStatus::Moved {
+                        changes: _,
+                        old_path,
+                    } => DiffSource::GitReference(":HEAD".to_string(), old_path.to_string()),
+                    StagedFileStatus::Changed {
+                        changes: ChangeStatus::Added,
+                    } => DiffSource::Empty,
+                    _ => DiffSource::GitReference(":HEAD".to_string(), file.path.to_string()),
+                },
+                match file.status {
+                    StagedFileStatus::Changed {
+                        changes: ChangeStatus::Deleted,
+                    } => DiffSource::Empty,
+                    _ => DiffSource::GitReference(":0".to_string(), file.path.to_string()),
+                },
+            ),
+
+            WorktreeFileInfo::Unstaged(file) => (
+                match file.status {
+                    ChangeStatus::Added => DiffSource::Empty,
+                    _ => DiffSource::GitReference(":0".to_string(), file.path.to_string()),
+                },
+                match file.status {
+                    ChangeStatus::Deleted => DiffSource::Empty,
+                    _ => DiffSource::DiskFile(file.path.to_string()),
+                },
+            ),
+
+            WorktreeFileInfo::Untracked(file) => (
+                DiffSource::Empty,
+                DiffSource::DiskFile(file.path.to_string()),
+            ),
+
+            WorktreeFileInfo::Unmerged(_) => todo!(),
+        },
+    }
 }

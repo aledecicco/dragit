@@ -62,8 +62,11 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
       sideContent={
         selectedFile && (
           <FileDiffViewer
-            file={selectedFile}
-            diffScope={{ type: 'snapshot', snapshotId: snapshotInfo.id }}
+            diffScope={{
+              type: 'snapshot',
+              snapshotId: snapshotInfo.id,
+              file: selectedFile,
+            }}
           />
         )
       }

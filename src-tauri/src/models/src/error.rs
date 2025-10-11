@@ -153,6 +153,9 @@ pub enum AppError {
 
     #[error("Failed to serialize the result")]
     SerializationFailed,
+
+    #[error("Failed to read contents of file at \"{path}\"")]
+    ReadFileFailed { path: String },
 }
 
 impl From<GitError> for AppError {
