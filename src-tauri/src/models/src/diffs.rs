@@ -1,4 +1,21 @@
-use crate::{VersionedFileInfo, WorktreeFileInfo};
+use crate::{
+    StagedFileInfo, UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo, VersionedFileInfo,
+};
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum DiffStage {
+    Ours,
+    Theirs,
+    Both,
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub enum CleanFileInfo {
+    Staged(StagedFileInfo),
+    Unstaged(UnstagedFileInfo),
+    Untracked(UntrackedFileInfo),
+}
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(
@@ -7,13 +24,18 @@ use crate::{VersionedFileInfo, WorktreeFileInfo};
     tag = "type"
 )]
 pub enum DiffScope {
+    Unmerged {
+        file: UnmergedFileInfo,
+        stage: DiffStage,
+    },
+
     Worktree {
-        file: WorktreeFileInfo,
+        file: CleanFileInfo,
     },
 
     Snapshot {
-        snapshot_id: String,
         file: VersionedFileInfo,
+        snapshot_id: String,
     },
 }
 

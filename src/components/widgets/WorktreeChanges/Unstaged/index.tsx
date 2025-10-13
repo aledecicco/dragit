@@ -8,6 +8,7 @@ import { UnstagedChangesItem } from './Item'
 export const FILE_TYPES = [
   'unstaged',
   'untracked',
+  'unmerged',
 ] as const satisfies WorktreeFileType[]
 
 interface UnstagedWorktreeChangesProps extends ComponentProps<'div'> {}

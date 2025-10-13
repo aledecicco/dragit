@@ -18,11 +18,15 @@ const NEWLINE_REGEX = /\r\n|\r|\n/
  * @param content - The full content to highlight.
  * @param identifier - The language identifier (can be a filepath).
  */
-const getTree = (content: string, identifier: string): Root | undefined => {
+const getTree = (content: string, identifier: string): Root => {
   const scope = starryNight.flagToScope(identifier)
   if (!scope) {
-    return undefined
+    return {
+      type: 'root',
+      children: [{ type: 'text', value: content }],
+    }
   }
+
   return starryNight.highlight(content, scope)
 }
 

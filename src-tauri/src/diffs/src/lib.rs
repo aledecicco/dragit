@@ -5,8 +5,8 @@ use imara_diff::{Diff, InternedInput};
 use std::fmt::Debug;
 
 use models::{
-    ChangeStatus, DiffLine, DiffMode, DiffScope, DiffSource, StagedFileStatus, VersionedFileStatus,
-    WorktreeFileInfo,
+    ChangeStatus, CleanFileInfo, DiffLine, DiffMode, DiffScope, DiffSource, DiffStage, MergeStatus,
+    StagedFileStatus, VersionedFileStatus,
 };
 
 /// Adds a range of unchanged context lines to the result.
@@ -192,7 +192,7 @@ pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
         ),
 
         DiffScope::Worktree { file } => match file {
-            WorktreeFileInfo::Staged(file) => (
+            CleanFileInfo::Staged(file) => (
                 match &file.status {
                     StagedFileStatus::Moved {
                         changes: _,
@@ -211,7 +211,7 @@ pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
                 },
             ),
 
-            WorktreeFileInfo::Unstaged(file) => (
+            CleanFileInfo::Unstaged(file) => (
                 match file.status {
                     ChangeStatus::Added => DiffSource::Empty,
                     _ => DiffSource::GitReference(":0".to_string(), file.path.to_string()),
@@ -222,12 +222,38 @@ pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
                 },
             ),
 
-            WorktreeFileInfo::Untracked(file) => (
+            CleanFileInfo::Untracked(file) => (
                 DiffSource::Empty,
                 DiffSource::DiskFile(file.path.to_string()),
             ),
-
-            WorktreeFileInfo::Unmerged(_) => todo!(),
         },
+
+        DiffScope::Unmerged { file, stage } => (
+            match file.status {
+                MergeStatus::AddedByUs | MergeStatus::DeletedByThem | MergeStatus::BothDeleted => {
+                    DiffSource::Empty
+                }
+                _ => match stage {
+                    DiffStage::Ours | DiffStage::Theirs => {
+                        DiffSource::GitReference(":1".to_string(), file.path.to_string())
+                    }
+                    DiffStage::Both => DiffSource::DiskFile(file.path.to_string()),
+                },
+            },
+            match file.status {
+                MergeStatus::AddedByThem | MergeStatus::DeletedByUs | MergeStatus::BothDeleted => {
+                    DiffSource::Empty
+                }
+                _ => match stage {
+                    DiffStage::Ours => {
+                        DiffSource::GitReference(":2".to_string(), file.path.to_string())
+                    }
+                    DiffStage::Theirs => {
+                        DiffSource::GitReference(":3".to_string(), file.path.to_string())
+                    }
+                    DiffStage::Both => DiffSource::DiskFile(file.path.to_string()),
+                },
+            },
+        ),
     }
 }

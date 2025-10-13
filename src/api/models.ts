@@ -186,8 +186,13 @@ export interface DiffLine {
 
 export type FileDiff = DiffLine[]
 
+export type DiffStage = 'ours' | 'theirs' | 'both'
+
+export type CleanFileInfo = Exclude<WorktreeFileInfo, UnmergedFileInfo>
+
 export type DiffScope =
-  | { type: 'worktree'; file: WorktreeFileInfo }
+  | { type: 'worktree'; file: CleanFileInfo }
+  | { type: 'unmerged'; file: UnmergedFileInfo; stage: DiffStage }
   | { type: 'snapshot'; snapshotId: SnapshotId; file: VersionedFileInfo }
 
 export type AppMessage = {

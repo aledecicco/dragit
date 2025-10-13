@@ -1,7 +1,7 @@
 import type { WorktreeFileInfo } from '@/api/models'
 import { showDialog } from '@/context/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
-import { propsWithCn } from '@/utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 
 import { FileDiffViewer } from '../FileDiffViewer'
 
@@ -24,15 +24,29 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
   return (
     <Dialog
       dialogKey={WORKTREE_FILE_DIFF_DIALOG(file)}
-      showClose={false}
       heading={undefined}
       {...propsWithCn(
         dialogProps,
         'max-w-[70%] max-h-[85%] grid-cols-[1fr] w-full',
+        file.status === 'unmerged' && 'grid-cols-[1fr_1fr] max-w-[90%]',
       )}
       contentProps={propsWithCn(dialogProps.contentProps, 'p-0 bg-dark-900')}
+      sideContent={
+        file.status === 'unmerged' && (
+          <FileDiffViewer
+            className={cn('border-l border-dark-700')}
+            diffScope={{ type: 'unmerged', stage: 'theirs', file }}
+          />
+        )
+      }
     >
-      <FileDiffViewer diffScope={{ type: 'worktree', file }} />
+      <FileDiffViewer
+        diffScope={
+          file.status === 'unmerged'
+            ? { type: 'unmerged', stage: 'ours', file }
+            : { type: 'worktree', file }
+        }
+      />
     </Dialog>
   )
 }

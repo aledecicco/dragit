@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react'
 import {
+  IconFileAlert,
   IconFileCode2,
   IconFileMinus,
   IconFilePencil,
@@ -49,6 +50,7 @@ const UnstagedChangesItem = withContextMenu<UnstagedChangesItemProps>(
           .exhaustive(),
       )
       .with({ status: 'untracked' }, () => IconFileUnknown)
+      .with({ status: 'unmerged' }, () => IconFileAlert)
       .exhaustive()
 
     const statusMessage = match(file)
@@ -61,6 +63,17 @@ const UnstagedChangesItem = withContextMenu<UnstagedChangesItemProps>(
           .exhaustive(),
       )
       .with({ status: 'untracked' }, () => 'Untracked')
+      .with({ status: 'unmerged' }, (file) =>
+        match(file.changes)
+          .with('addedByUs', () => 'Conflict - Added by us')
+          .with('addedByThem', () => 'Conflict - Added by them')
+          .with('deletedByUs', () => 'Conflict - Deleted by us')
+          .with('deletedByThem', () => 'Conflict - Deleted by them')
+          .with('bothAdded', () => 'Conflict - Both added')
+          .with('bothDeleted', () => 'Conflict - Both deleted')
+          .with('bothModified', () => 'Conflict - Both modified')
+          .exhaustive(),
+      )
       .exhaustive()
 
     return (
@@ -90,6 +103,7 @@ const UnstagedChangesItem = withContextMenu<UnstagedChangesItemProps>(
                       .exhaustive(),
                   )
                   .with({ status: 'untracked' }, () => 'text-light-600')
+                  .with({ status: 'unmerged' }, () => 'text-warning-100/90')
                   .exhaustive(),
               )}
             >
@@ -110,6 +124,7 @@ const UnstagedChangesItem = withContextMenu<UnstagedChangesItemProps>(
                       .exhaustive(),
                   )
                   .with({ status: 'untracked' }, () => 'text-light-700/70')
+                  .with({ status: 'unmerged' }, () => 'text-warning-200/70')
                   .exhaustive(),
               )}
             >

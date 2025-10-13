@@ -1,5 +1,6 @@
 import { type ComponentProps, Fragment, useEffect, useRef } from 'react'
 import { IconFile } from '@tabler/icons-react'
+import { match } from 'ts-pattern'
 
 import type { DiffScope } from '@/api/models'
 import { useQueryFileDiff } from '@/api/queries/fileDiff'
@@ -49,6 +50,15 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
         <Icon Glyph={IconFile} size="lg" />
         <Marquee className={cn('text-md text-light-500')}>
           {diffScope.file.path}
+          {diffScope.type === 'unmerged' && (
+            <span className={cn('text-light-900 text-sm italic')}>
+              {match(diffScope.stage)
+                .with('ours', () => ' (ours)')
+                .with('theirs', () => ' (theirs)')
+                .with('both', () => ' (inline)')
+                .exhaustive()}
+            </span>
+          )}
         </Marquee>
       </div>
 
@@ -81,33 +91,25 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
             </Fragment>
           ))}
         >
-          {(fileDiff) => {
-            if (fileDiff.length === 0) {
-              return (
-                <p className={cn('text-light-950/50 italic')}>Empty file</p>
-              )
-            }
+          {(fileDiff) => (
+            <>
+              <DiffViewerLineNumbers
+                fileDiff={fileDiff}
+                className={cn('col-start-1')}
+              />
 
-            return (
-              <>
-                <DiffViewerLineNumbers
-                  fileDiff={fileDiff}
-                  className={cn('col-start-1')}
-                />
+              <DiffViewerLineChanges
+                fileDiff={fileDiff}
+                className={cn('col-start-2')}
+              />
 
-                <DiffViewerLineChanges
-                  fileDiff={fileDiff}
-                  className={cn('col-start-2')}
-                />
-
-                <DiffViewerContent
-                  file={diffScope.file}
-                  fileDiff={fileDiff}
-                  className={cn('col-start-3')}
-                />
-              </>
-            )
-          }}
+              <DiffViewerContent
+                file={diffScope.file}
+                fileDiff={fileDiff}
+                className={cn('col-start-3')}
+              />
+            </>
+          )}
         </QueryLoader>
       </div>
     </div>

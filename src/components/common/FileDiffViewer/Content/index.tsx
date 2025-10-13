@@ -39,7 +39,11 @@ const DiffViewerContent = (props: DiffViewerContentProps) => {
           'whitespace-pre font-mono leading-7',
         )}
       >
-        {highlightDiff(fileDiff, file.path)}
+        {fileDiff.length === 0 ? (
+          <p className={cn('text-light-950/50 italic')}>Empty file</p>
+        ) : (
+          highlightDiff(fileDiff, file.path)
+        )}
       </div>
     </div>
   )

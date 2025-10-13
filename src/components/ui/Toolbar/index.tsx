@@ -72,7 +72,11 @@ const Toolbar = (props: ToolbarProps) => {
       >
         {tools.map((tool, index) => (
           <ActionButton
-            key={`${tool.mainAction.type === 'instant' ? tool.mainAction.label : tool.mainAction.label.idle}_${index}`}
+            key={
+              tool.mainAction.type === 'instant'
+                ? `${tool.mainAction.label}_${index}`
+                : `${tool.mainAction.label.idle}_${index}`
+            }
             size={size}
             variant={variant}
             status={status}

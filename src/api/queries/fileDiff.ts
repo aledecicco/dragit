@@ -1,5 +1,4 @@
 import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
-import type { BorshSchema } from 'borsher'
 import { match, P } from 'ts-pattern'
 
 import type {
@@ -9,12 +8,7 @@ import type {
   VersionedFileInfo,
   WorktreeFileInfo,
 } from '../models'
-import {
-  FILE_DIFF_SCHEMA,
-  type STAGED_FILE_INFO_SCHEMA,
-  type VERSIONED_FILE_INFO_SCHEMA,
-  type WORKTREE_FILE_INFO_SCHEMA,
-} from '../schemas'
+import { FILE_DIFF_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
@@ -44,6 +38,9 @@ const fetchFileDiff = async (
         ...scope,
         file: match(scope)
           .with({ type: 'worktree', file: P.select() }, (file) =>
+            serializeWorktreeFile(file),
+          )
+          .with({ type: 'unmerged', file: P.select() }, (file) =>
             serializeWorktreeFile(file),
           )
           .with({ type: 'snapshot', file: P.select() }, (file) =>
@@ -84,21 +81,12 @@ const fileDiffQuery = (repoPath: string, scope: DiffScope) =>
 const useQueryFileDiff = (scope: DiffScope) =>
   useRepositoryQuery(fileDiffQuery, scope)
 
-type SchemaType<T extends BorshSchema<unknown>> = ReturnType<T['deserialize']>
-
-type SerializedWorktreeFile = SchemaType<typeof WORKTREE_FILE_INFO_SCHEMA>
-type StagedFileStatus = SchemaType<typeof STAGED_FILE_INFO_SCHEMA>['status']
-
-const serializeWorktreeFile = (
-  file: WorktreeFileInfo,
-): SerializedWorktreeFile => {
+const serializeWorktreeFile = (file: WorktreeFileInfo) => {
   return match(file)
-    .returnType<SerializedWorktreeFile>()
     .with({ status: 'staged' }, (file) => ({
       Staged: {
         path: file.path,
         status: match(file)
-          .returnType<StagedFileStatus>()
           .with({ changes: 'added' }, () => ({
             Changed: { changes: { Added: {} } },
           }))
@@ -132,18 +120,16 @@ const serializeWorktreeFile = (
       },
     }))
     .with({ status: 'unmerged' }, (file) => ({
-      Unmerged: {
-        path: file.path,
-        status: match(file.changes)
-          .with('bothAdded', () => ({ BothAdded: {} }))
-          .with('bothDeleted', () => ({ BothDeleted: {} }))
-          .with('bothModified', () => ({ BothModified: {} }))
-          .with('addedByThem', () => ({ AddedByThem: {} }))
-          .with('addedByUs', () => ({ AddedByUs: {} }))
-          .with('deletedByThem', () => ({ DeletedByThem: {} }))
-          .with('deletedByUs', () => ({ DeletedByUs: {} }))
-          .exhaustive(),
-      },
+      path: file.path,
+      status: match(file.changes)
+        .with('bothAdded', () => ({ BothAdded: {} }))
+        .with('bothDeleted', () => ({ BothDeleted: {} }))
+        .with('bothModified', () => ({ BothModified: {} }))
+        .with('addedByThem', () => ({ AddedByThem: {} }))
+        .with('addedByUs', () => ({ AddedByUs: {} }))
+        .with('deletedByThem', () => ({ DeletedByThem: {} }))
+        .with('deletedByUs', () => ({ DeletedByUs: {} }))
+        .exhaustive(),
     }))
     .with({ status: 'untracked' }, (file) => ({
       Untracked: { path: file.path },
@@ -151,15 +137,10 @@ const serializeWorktreeFile = (
     .exhaustive()
 }
 
-type SerializedVersionedFile = SchemaType<typeof VERSIONED_FILE_INFO_SCHEMA>
-
-const serializeVersionedFile = (
-  file: VersionedFileInfo,
-): SerializedVersionedFile => {
+const serializeVersionedFile = (file: VersionedFileInfo) => {
   return {
     path: file.path,
     status: match(file)
-      .returnType<SerializedVersionedFile['status']>()
       .with({ changes: 'added' }, () => ({
         Changed: { changes: { Added: {} } },
       }))
