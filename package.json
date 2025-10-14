@@ -13,7 +13,7 @@
   "dependencies": {
     "@ariakit/react": "^0.4.17",
     "@fontsource/inter": "^5.1.0",
-    "@tabler/icons-react": "^3.29.0",
+    "@tabler/icons-react": "^3.35.0",
     "@tailwindcss/vite": "4.1.4",
     "@tanstack/react-query": "^5.66.8",
     "@tanstack/react-query-devtools": "^5.66.8",

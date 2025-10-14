@@ -3,10 +3,14 @@ import { match, P } from 'ts-pattern'
 import type { UnmergedFileInfo } from '@/api/models'
 import { useMarkAsResolved } from '@/api/mutations'
 import { useMarkAsRemoved } from '@/api/mutations/removeFromTree'
-import { Toolbar, type ToolbarProps, type ToolbarTool } from '@/ui/Toolbar'
+import {
+  ActionToolbar,
+  type ActionToolbarProps,
+  type ToolbarTool,
+} from '@/lib/ActionToolbar'
 import { viewWorktreeFileDiff } from '@/utils/actions'
 
-interface UnmergedFileToolbarProps extends Partial<ToolbarProps> {
+interface UnmergedFileToolbarProps extends Partial<ActionToolbarProps> {
   /**
    * The file to operate on.
    */
@@ -37,7 +41,7 @@ const UnmergedFileToolbar = (props: UnmergedFileToolbarProps) => {
       .otherwise(() => []),
   ]
 
-  return <Toolbar size="sm" tools={tools} compact {...toolbarProps} />
+  return <ActionToolbar size="sm" tools={tools} compact {...toolbarProps} />
 }
 
 export { UnmergedFileToolbar }

@@ -15,8 +15,8 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0
       '@tabler/icons-react':
-        specifier: ^3.29.0
-        version: 3.29.0(react@19.1.0)
+        specifier: ^3.35.0
+        version: 3.35.0(react@19.1.0)
       '@tailwindcss/vite':
         specifier: 4.1.4
         version: 4.1.4(vite@5.4.8(@types/node@20.19.0)(lightningcss@1.29.3))
@@ -794,13 +794,13 @@ packages:
     resolution: {integrity: sha512-4BAffykYOgO+5nzBWYwE3W90sBgLJoUPRWWcL8wlyiM8IB8ipJz3UMJ9KXQd1RKQXpKp8Tutn80HZtWsu2u76w==}
     engines: {node: '>=10'}
 
-  '@tabler/icons-react@3.29.0':
-    resolution: {integrity: sha512-jaa3b3j91CplY7TPgx/Gj/e+PcOnQgYiK6c5qtp1P0ytfKM5WPc1qtXyRLE3NcYlfxS2Pcst4YGy1vUML7SjbQ==}
+  '@tabler/icons-react@3.35.0':
+    resolution: {integrity: sha512-XG7t2DYf3DyHT5jxFNp5xyLVbL4hMJYJhiSdHADzAjLRYfL7AnjlRfiHDHeXxkb2N103rEIvTsBRazxXtAUz2g==}
     peerDependencies:
       react: '>= 16'
 
-  '@tabler/icons@3.29.0':
-    resolution: {integrity: sha512-VWNINymdmhay3MDvWVREmRwuWLSrX3YiInKvs5L4AHRF4bAfJabLlEReE0BW/XFsBt22ff8/C8Eam/LXlF97mA==}
+  '@tabler/icons@3.35.0':
+    resolution: {integrity: sha512-yYXe+gJ56xlZFiXwV9zVoe3FWCGuZ/D7/G4ZIlDtGxSx5CGQK110wrnT29gUj52kEZoxqF7oURTk97GQxELOFQ==}
 
   '@tailwindcss/node@4.1.4':
     resolution: {integrity: sha512-MT5118zaiO6x6hNA04OWInuAiP1YISXql8Z+/Y8iisV5nuhM8VXlyhRuqc2PEviPszcXI66W44bCIk500Oolhw==}
@@ -1290,6 +1290,10 @@ packages:
 
   detect-libc@2.0.3:
     resolution: {integrity: sha512-bwy0MGW55bG41VqxxypOsdSdGqLwXPI/focwgTYCFMbdUiBAxLg9CFzG08sz2aqzknwiX7Hkl0bQENjg8iLByw==}
+    engines: {node: '>=8'}
+
+  detect-libc@2.1.2:
+    resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
 
   detect-node@2.1.0:
@@ -3021,12 +3025,12 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tabler/icons-react@3.29.0(react@19.1.0)':
+  '@tabler/icons-react@3.35.0(react@19.1.0)':
     dependencies:
-      '@tabler/icons': 3.29.0
+      '@tabler/icons': 3.35.0
       react: 19.1.0
 
-  '@tabler/icons@3.29.0': {}
+  '@tabler/icons@3.35.0': {}
 
   '@tailwindcss/node@4.1.4':
     dependencies:
@@ -3497,6 +3501,9 @@ snapshots:
 
   detect-libc@2.0.3: {}
 
+  detect-libc@2.1.2:
+    optional: true
+
   detect-node@2.1.0:
     optional: true
 
@@ -3959,7 +3966,7 @@ snapshots:
 
   lightningcss@1.29.3:
     dependencies:
-      detect-libc: 2.0.3
+      detect-libc: 2.1.2
     optionalDependencies:
       lightningcss-darwin-arm64: 1.29.3
       lightningcss-darwin-x64: 1.29.3

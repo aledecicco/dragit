@@ -4,9 +4,13 @@ import {
   usePullBranch,
   usePushBranch,
 } from '@/api/mutations'
-import { Toolbar, type ToolbarProps, type ToolbarTool } from '@/ui/Toolbar'
+import {
+  ActionToolbar,
+  type ActionToolbarProps,
+  type ToolbarTool,
+} from '@/lib/ActionToolbar'
 
-interface BranchToolbarProps extends Partial<ToolbarProps> {
+interface BranchToolbarProps extends Partial<ActionToolbarProps> {
   /**
    * The branch to operate on.
    */
@@ -34,7 +38,7 @@ const BranchToolbar = (props: BranchToolbarProps) => {
   ]
 
   return (
-    <Toolbar
+    <ActionToolbar
       tools={tools}
       {...toolbarProps}
       disabled={toolbarProps.disabled || !branch || branch.type !== 'local'}

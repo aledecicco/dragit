@@ -1,9 +1,13 @@
 import type { StashInfo } from '@/api/models'
 import { useApplyStash, useDiscardStash } from '@/api/mutations'
-import { Toolbar, type ToolbarProps, type ToolbarTool } from '@/ui/Toolbar'
+import {
+  ActionToolbar,
+  type ActionToolbarProps,
+  type ToolbarTool,
+} from '@/lib/ActionToolbar'
 import { viewStash } from '@/utils/actions'
 
-interface StashToolbarProps extends Partial<ToolbarProps> {
+interface StashToolbarProps extends Partial<ActionToolbarProps> {
   /**
    * The stash to operate on.
    */
@@ -31,7 +35,7 @@ const StashToolbar = (props: StashToolbarProps) => {
     },
   ]
 
-  return <Toolbar tools={tools} size="sm" compact {...toolbarProps} />
+  return <ActionToolbar tools={tools} size="sm" compact {...toolbarProps} />
 }
 
 export { StashToolbar, type StashToolbarProps }

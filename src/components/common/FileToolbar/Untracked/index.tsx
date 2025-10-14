@@ -1,9 +1,13 @@
 import type { UntrackedFileInfo } from '@/api/models'
 import { useStageFile } from '@/api/mutations'
-import { Toolbar, type ToolbarProps, type ToolbarTool } from '@/ui/Toolbar'
+import {
+  ActionToolbar,
+  type ActionToolbarProps,
+  type ToolbarTool,
+} from '@/lib/ActionToolbar'
 import { viewWorktreeFileDiff } from '@/utils/actions'
 
-interface UntrackedFileToolbarProps extends Partial<ToolbarProps> {
+interface UntrackedFileToolbarProps extends Partial<ActionToolbarProps> {
   /**
    * The file to operate on.
    */
@@ -26,7 +30,7 @@ const UntrackedFileToolbar = (props: UntrackedFileToolbarProps) => {
     },
   ]
 
-  return <Toolbar size="sm" tools={tools} compact {...toolbarProps} />
+  return <ActionToolbar size="sm" tools={tools} compact {...toolbarProps} />
 }
 
 export { UntrackedFileToolbar }

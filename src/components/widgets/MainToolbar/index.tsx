@@ -3,10 +3,10 @@ import { useAddFiles, useCommitIndex, useSaveStash } from '@/api/mutations'
 import { showCommitDialog } from '@/common/CommitDialog'
 import { FileSelectorDialog } from '@/common/FileSelectorDialog'
 import { runAction } from '@/context/actions'
+import { ActionToolbar, type ActionToolbarProps } from '@/lib/ActionToolbar'
 import { askForValue } from '@/lib/AskForValueDialog'
-import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 
-interface MainToolbarProps extends Partial<ToolbarProps> {}
+interface MainToolbarProps extends Partial<ActionToolbarProps> {}
 
 /**
  * Main app widget that displays a toolbar with the most important actions for file handling.
@@ -19,7 +19,7 @@ const MainToolbar = (props: MainToolbarProps) => {
   const commit = useCommitIndex()
 
   return (
-    <Toolbar
+    <ActionToolbar
       status="primary"
       size="md"
       compact={false}

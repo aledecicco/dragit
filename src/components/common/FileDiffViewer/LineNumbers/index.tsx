@@ -113,7 +113,7 @@ const getLineNumbers = (fileDiff: FileDiff): ReactNode => {
       lineNumber={fileDiff.length + 1 + offset}
       diffType="unchanged"
       faded
-      className={cn('grow ')}
+      className={cn('grow rounded-bl-sm')}
     />,
   )
 

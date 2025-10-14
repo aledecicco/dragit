@@ -67,7 +67,7 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
       <div
         ref={viewerRef}
         className={cn(
-          'pl-1 pt-1 text-sm overflow-y-auto',
+          'pl-1 py-1 text-sm overflow-y-auto',
           'grid grid-cols-[max-content_max-content_1fr] grid-rows-[1fr]',
         )}
       >

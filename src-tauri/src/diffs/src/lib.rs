@@ -228,32 +228,81 @@ pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
             ),
         },
 
-        DiffScope::Unmerged { file, stage } => (
-            match file.status {
-                MergeStatus::AddedByUs | MergeStatus::DeletedByThem | MergeStatus::BothDeleted => {
-                    DiffSource::Empty
-                }
-                _ => match stage {
-                    DiffStage::Ours | DiffStage::Theirs => {
+        DiffScope::Unmerged { file, stage } => {
+            let disk_exists = matches!(
+                file.status,
+                MergeStatus::AddedByThem
+                    | MergeStatus::AddedByUs
+                    | MergeStatus::BothAdded
+                    | MergeStatus::BothModified
+                    | MergeStatus::DeletedByThem
+                    | MergeStatus::DeletedByUs
+            );
+
+            let base_exists = matches!(
+                file.status,
+                MergeStatus::BothDeleted
+                    | MergeStatus::BothModified
+                    | MergeStatus::DeletedByThem
+                    | MergeStatus::DeletedByUs
+            );
+
+            let ours_exists = matches!(
+                file.status,
+                MergeStatus::AddedByUs
+                    | MergeStatus::BothAdded
+                    | MergeStatus::BothModified
+                    | MergeStatus::DeletedByThem
+            );
+
+            let theirs_exists = matches!(
+                file.status,
+                MergeStatus::AddedByThem
+                    | MergeStatus::BothAdded
+                    | MergeStatus::BothModified
+                    | MergeStatus::DeletedByUs
+            );
+
+            match stage {
+                DiffStage::Both => (
+                    if disk_exists {
+                        DiffSource::DiskFile(file.path.to_string())
+                    } else {
+                        DiffSource::Empty
+                    },
+                    if disk_exists {
+                        DiffSource::DiskFile(file.path.to_string())
+                    } else {
+                        DiffSource::Empty
+                    },
+                ),
+
+                DiffStage::Ours => (
+                    if base_exists {
                         DiffSource::GitReference(":1".to_string(), file.path.to_string())
-                    }
-                    DiffStage::Both => DiffSource::DiskFile(file.path.to_string()),
-                },
-            },
-            match file.status {
-                MergeStatus::AddedByThem | MergeStatus::DeletedByUs | MergeStatus::BothDeleted => {
-                    DiffSource::Empty
-                }
-                _ => match stage {
-                    DiffStage::Ours => {
+                    } else {
+                        DiffSource::Empty
+                    },
+                    if ours_exists {
                         DiffSource::GitReference(":2".to_string(), file.path.to_string())
-                    }
-                    DiffStage::Theirs => {
+                    } else {
+                        DiffSource::Empty
+                    },
+                ),
+
+                DiffStage::Theirs => (
+                    if base_exists {
+                        DiffSource::GitReference(":1".to_string(), file.path.to_string())
+                    } else {
+                        DiffSource::Empty
+                    },
+                    if theirs_exists {
                         DiffSource::GitReference(":3".to_string(), file.path.to_string())
-                    }
-                    DiffStage::Both => DiffSource::DiskFile(file.path.to_string()),
-                },
-            },
-        ),
+                    } else {
+                        DiffSource::Empty
+                    },
+                ),
+            }
+        }
     }
 }
