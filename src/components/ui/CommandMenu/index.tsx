@@ -60,7 +60,7 @@ export const DEFAULT_SHORTCUTS: Shortcut[] = [
 /**
  * Dialog that displays a list of command options that can be searched through. Each one triggers an action when selected.
  *
- * Should contain a list of {@link CommandMenuItem}s as children.
+ * Should contain {@link CommandMenuItem} components as children.
  *
  * Displays a keyboard shortcuts cheatsheet at the bottom.
  */

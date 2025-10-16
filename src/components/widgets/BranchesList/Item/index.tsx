@@ -4,10 +4,11 @@ import { match } from 'ts-pattern'
 import type { BranchInfo } from '@/api/models'
 import { usePullBranch } from '@/api/mutations'
 import { useCheckoutBranch } from '@/api/mutations/checkoutLocal'
-import { withContextMenu } from '@/lib/ContextMenu'
+import { ContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
+import { MenuItem } from '@/ui/Menu/Item'
 import { getRemoteCounterpart, useSelectedBranches } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
@@ -21,17 +22,27 @@ interface BranchesListItemProps extends ListItemProps {
  *
  * Uses {@link Marquee}s to display long branch names.
  */
-const BranchesListItem = withContextMenu<BranchesListItemProps>(
-  (props) => {
-    const { branch, ...itemProps } = props
-    const lastModified = useDateDifference(branch.timestamp)
+const BranchesListItem = (props: BranchesListItemProps) => {
+  const { branch, ...itemProps } = props
+  const lastModified = useDateDifference(branch.timestamp)
 
-    const remoteCounterpart = getRemoteCounterpart(branch)
+  const remoteCounterpart = getRemoteCounterpart(branch)
 
-    const { branch: currentBranch } = useSelectedBranches()
-    const isCurrentBranch = currentBranch && branch.name === currentBranch.name
+  const { branch: currentBranch } = useSelectedBranches()
+  const isCurrentBranch = currentBranch && branch.name === currentBranch.name
 
-    return (
+  const checkout = useCheckoutBranch(branch)
+  const pull = usePullBranch(branch)
+
+  return (
+    <ContextMenu
+      items={
+        <>
+          <MenuItem action={checkout} />
+          {branch.type === 'local' && <MenuItem action={pull} />}
+        </>
+      }
+    >
       <ListItem
         aria-selected={isCurrentBranch}
         {...propsWithCn(
@@ -82,14 +93,8 @@ const BranchesListItem = withContextMenu<BranchesListItemProps>(
           Last modified {lastModified}
         </p>
       </ListItem>
-    )
-  },
-  ({ branch }) => {
-    const checkout = useCheckoutBranch(branch)
-    const pull = usePullBranch(branch)
-
-    return [checkout, ...(branch.type === 'local' ? [pull] : [])]
-  },
-)
+    </ContextMenu>
+  )
+}
 
 export { BranchesListItem, type BranchesListItemProps }

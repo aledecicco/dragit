@@ -1,10 +1,11 @@
-import { IconColumns1Filled, IconColumns2Filled } from '@tabler/icons-react'
+import { IconColumns2Filled, IconColumns3Filled } from '@tabler/icons-react'
 
 import type { WorktreeFileInfo } from '@/api/models'
 import { showDialog } from '@/context/dialogs'
-import { ToggleGroup, type ToggleItem } from '@/lib/ToggleGroup'
-import { useToggleHandler } from '@/lib/ToggleGroup/utils'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
+import { ToggleGroup } from '@/ui/ToggleGroup'
+import { ToggleGroupItem } from '@/ui/ToggleGroup/Item'
+import { useToggleHandler } from '@/ui/ToggleGroup/utils'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { FileDiffViewer } from '../FileDiffViewer'
@@ -20,18 +21,6 @@ interface WorktreeFileDiffDialogProps extends Omit<DialogProps, 'dialogKey'> {
 }
 
 const diffViewModes = ['inline', 'side_by_side'] as const
-const TOGGLES: ToggleItem<(typeof diffViewModes)[number]>[] = [
-  {
-    value: 'side_by_side',
-    label: 'View side by side',
-    Glyph: IconColumns2Filled,
-  },
-  {
-    value: 'inline',
-    label: 'View inline',
-    Glyph: IconColumns1Filled,
-  },
-]
 
 /**
  * Dialog that displays a file diff for a file in the worktree.
@@ -39,7 +28,7 @@ const TOGGLES: ToggleItem<(typeof diffViewModes)[number]>[] = [
 const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
   const { file, ...dialogProps } = props
 
-  const { store, value } = useToggleHandler(TOGGLES, 'side_by_side')
+  const { store, value } = useToggleHandler(diffViewModes, 'side_by_side')
   const isSideBySide = value === 'side_by_side' && file.status === 'unmerged'
 
   return (
@@ -76,9 +65,23 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
       {file.status === 'unmerged' && (
         <ToggleGroup
           className="absolute -bottom-3 left-half -translate-x-half"
-          toggles={TOGGLES}
           radioProps={{ store }}
-        />
+        >
+          <ToggleGroupItem
+            value="side_by_side"
+            compact
+            label="View side by side"
+            Glyph={IconColumns2Filled}
+          />
+
+          <ToggleGroupItem
+            value="inline"
+            compact
+            label="View inline"
+            Glyph={IconColumns3Filled}
+            iconProps={{ className: cn('rotate-90') }}
+          />
+        </ToggleGroup>
       )}
     </Dialog>
   )

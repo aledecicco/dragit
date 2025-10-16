@@ -11,7 +11,7 @@ import { useQueryCurrentDir } from '@/api/queries'
 import { useReferencesSync } from '@/context/branches'
 import { useDialog } from '@/context/dialogs'
 import { useUpstreamSync } from '@/context/upstream'
-import { useContextMenuHandler } from '@/lib/ContextMenu'
+import { useContextMenuHandler } from '@/lib/ContextMenu/utils'
 import { cn } from '@/utils/styles'
 
 import { useEventsHandler } from './api/events'

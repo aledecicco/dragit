@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react'
 import {
+  IconEye,
   IconFileArrowRight,
   IconFileCode2,
   IconFileMinus,
@@ -12,11 +13,11 @@ import { match } from 'ts-pattern'
 import type { FileOfType } from '@/api/models'
 import { useUnstageFile } from '@/api/mutations'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
-import { withContextMenu } from '@/lib/ContextMenu'
+import { ContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
-import { viewWorktreeFileDiff } from '@/utils/actions'
+import { MenuItem } from '@/ui/Menu/Item'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { FILE_TYPES } from '..'
@@ -36,37 +37,52 @@ interface StagedChangesItemProps extends ListItemProps {
 /**
  * The list item for files in the 'staged' file statuses widget section.
  */
-const StagedChangesItem = withContextMenu<StagedChangesItemProps>(
-  (props) => {
-    const { file, containerProps, ...itemProps } = props
+const StagedChangesItem = (props: StagedChangesItemProps) => {
+  const { file, containerProps, ...itemProps } = props
 
-    const Glyph = match(file)
-      .with({ status: 'staged' }, (file) =>
-        match(file.changes)
-          .with('added', () => IconFilePlus)
-          .with('deleted', () => IconFileMinus)
-          .with('modified', () => IconFilePencil)
-          .with('typeChanged', () => IconFileCode2)
-          .with('copied', () => IconFiles)
-          .with('renamed', () => IconFileArrowRight)
-          .exhaustive(),
-      )
-      .exhaustive()
+  const Glyph = match(file)
+    .with({ status: 'staged' }, (file) =>
+      match(file.changes)
+        .with('added', () => IconFilePlus)
+        .with('deleted', () => IconFileMinus)
+        .with('modified', () => IconFilePencil)
+        .with('typeChanged', () => IconFileCode2)
+        .with('copied', () => IconFiles)
+        .with('renamed', () => IconFileArrowRight)
+        .exhaustive(),
+    )
+    .exhaustive()
 
-    const statusMessage = match(file)
-      .with({ status: 'staged' }, (file) =>
-        match(file.changes)
-          .with('added', () => 'New')
-          .with('deleted', () => 'Deleted')
-          .with('modified', () => 'Edited')
-          .with('typeChanged', () => 'Converted')
-          .with('copied', () => 'Copied')
-          .with('renamed', () => 'Renamed')
-          .exhaustive(),
-      )
-      .exhaustive()
+  const statusMessage = match(file)
+    .with({ status: 'staged' }, (file) =>
+      match(file.changes)
+        .with('added', () => 'New')
+        .with('deleted', () => 'Deleted')
+        .with('modified', () => 'Edited')
+        .with('typeChanged', () => 'Converted')
+        .with('copied', () => 'Copied')
+        .with('renamed', () => 'Renamed')
+        .exhaustive(),
+    )
+    .exhaustive()
 
-    return (
+  const unstage = useUnstageFile(file)
+
+  return (
+    <ContextMenu
+      items={
+        <>
+          <MenuItem
+            label="View changes"
+            Glyph={IconEye}
+            onClick={() => {
+              showWorktreeFileDiffDialog(file)
+            }}
+          />
+          <MenuItem action={unstage} />
+        </>
+      }
+    >
       <div {...containerProps}>
         <ListItem
           interactive
@@ -123,12 +139,8 @@ const StagedChangesItem = withContextMenu<StagedChangesItemProps>(
           </div>
         </ListItem>
       </div>
-    )
-  },
-  ({ file }) => {
-    const unstage = useUnstageFile(file)
-    return [viewWorktreeFileDiff(file), unstage]
-  },
-)
+    </ContextMenu>
+  )
+}
 
 export { StagedChangesItem, type StagedChangesItemProps }

@@ -3,6 +3,7 @@ import { match } from 'ts-pattern'
 
 import { type Action, runAction } from '@/context/actions'
 import { Button, type ButtonStatus } from '@/ui/Button'
+import { MenuItem } from '@/ui/Menu/Item'
 import { SplitButton } from '@/ui/SplitButton'
 import { propsWithCn } from '@/utils/styles'
 
@@ -100,18 +101,18 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   return alternatives ? (
     <SplitButton
       {...commonProps}
-      items={alternatives.map((alternative) => ({
-        label:
-          alternative.type === 'instant'
-            ? alternative.label
-            : alternative.label.idle,
-        Glyph: alternative.Glyph,
-        onClick: () => {
-          if (actionStatus !== 'running') {
-            runAction(alternative)
-          }
-        },
-      }))}
+      items={alternatives.map((alternative) => (
+        <MenuItem
+          key={alternative.label.idle}
+          label={alternative.label.idle}
+          Glyph={alternative.Glyph}
+          onClick={() => {
+            if (actionStatus !== 'running') {
+              runAction(alternative)
+            }
+          }}
+        />
+      ))}
       menuButtonProps={{
         label: 'View alternatives',
         ...menuButtonProps,

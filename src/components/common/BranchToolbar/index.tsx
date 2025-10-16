@@ -4,13 +4,10 @@ import {
   usePullBranch,
   usePushBranch,
 } from '@/api/mutations'
-import {
-  ActionToolbar,
-  type ActionToolbarProps,
-  type ToolbarTool,
-} from '@/lib/ActionToolbar'
+import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
+import { ToolbarItem } from '@/ui/Toolbar/Item'
 
-interface BranchToolbarProps extends Partial<ActionToolbarProps> {
+interface BranchToolbarProps extends Partial<ToolbarProps> {
   /**
    * The branch to operate on.
    */
@@ -27,22 +24,21 @@ const BranchToolbar = (props: BranchToolbarProps) => {
   const push = usePushBranch(branch)
   const forcePush = useForcePushBranch(branch)
 
-  const tools: ToolbarTool[] = [
-    {
-      mainAction: pull,
-    },
-    {
-      mainAction: push,
-      alternatives: [forcePush],
-    },
-  ]
-
   return (
-    <ActionToolbar
-      tools={tools}
-      {...toolbarProps}
-      disabled={toolbarProps.disabled || !branch || branch.type !== 'local'}
-    />
+    <Toolbar {...toolbarProps} fixed>
+      <ToolbarItem
+        compact
+        fixed
+        tool={{ mainAction: pull }}
+        disabled={toolbarProps.disabled || !branch || branch.type !== 'local'}
+      />
+      <ToolbarItem
+        compact
+        fixed
+        tool={{ mainAction: push, alternatives: [forcePush] }}
+        disabled={toolbarProps.disabled || !branch || branch.type !== 'local'}
+      />
+    </Toolbar>
   )
 }
 

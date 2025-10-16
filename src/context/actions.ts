@@ -16,9 +16,7 @@ type ActionStatus = 'idle' | 'running' | 'success' | 'error'
 /**
  * An action that can be triggered and tracked, involving an async workload.
  */
-interface WorkloadAction<T> {
-  type?: 'workload'
-
+interface Action<T = void> {
   /**
    * The unique identifier of the action.
    */
@@ -41,35 +39,6 @@ interface WorkloadAction<T> {
    */
   run: (args: T) => Promise<void>
 }
-
-/**
- * An action that doesn't need tracking and is executed immediately.
- */
-interface InstantAction {
-  type: 'instant'
-
-  /**
-   * The unique identifier of the action.
-   */
-  id: ActionId
-
-  /**
-   * The label of the action.
-   */
-  label: string
-
-  /**
-   * The icon of the action.
-   */
-  Glyph: Glyph
-
-  /**
-   * Function that performs the action.
-   */
-  run: () => void
-}
-
-type Action<T = void> = WorkloadAction<T> | InstantAction
 
 interface ActionsTracker {
   /**
@@ -165,11 +134,6 @@ function useActionStatuses(ids: ActionId | ActionId[]) {
 async function runAction<T>(action: Action<T>, args: T): Promise<void>
 async function runAction(action: Action<void>): Promise<void>
 async function runAction<T>(action: Action<T>, args?: T): Promise<void> {
-  if (action.type === 'instant') {
-    action.run()
-    return Promise.resolve()
-  }
-
   const status = actionsTracker.state.actions.get(action.id) ?? 'idle'
 
   if (status !== 'running') {
@@ -234,7 +198,7 @@ function useActionPresenters(actions: AnyAction | AnyAction[]) {
 
     return {
       Glyph: getActionGlyph(action, status),
-      label: action.type === 'instant' ? action.label : action.label[status],
+      label: action.label[status],
       actionStatus: status,
     }
   }
@@ -244,18 +208,11 @@ function useActionPresenters(actions: AnyAction | AnyAction[]) {
 
     return {
       Glyph: getActionGlyph(action, status),
-      label: action.type === 'instant' ? action.label : action.label[status],
+      label: action.label[status],
       actionStatus: status,
     }
   })
 }
 
 export { useActionStatuses, runAction, useActionPresenters }
-export type {
-  Action,
-  WorkloadAction,
-  InstantAction,
-  ActionId,
-  ActionStatus,
-  ActionPresenter,
-}
+export type { Action, ActionId, ActionStatus, ActionPresenter }

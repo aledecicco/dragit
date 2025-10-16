@@ -3,10 +3,11 @@ import { useAddFiles, useCommitIndex, useSaveStash } from '@/api/mutations'
 import { showCommitDialog } from '@/common/CommitDialog'
 import { FileSelectorDialog } from '@/common/FileSelectorDialog'
 import { runAction } from '@/context/actions'
-import { ActionToolbar, type ActionToolbarProps } from '@/lib/ActionToolbar'
 import { askForValue } from '@/lib/AskForValueDialog'
+import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
+import { ToolbarItem } from '@/ui/Toolbar/Item'
 
-interface MainToolbarProps extends Partial<ActionToolbarProps> {}
+interface MainToolbarProps extends Partial<ToolbarProps> {}
 
 /**
  * Main app widget that displays a toolbar with the most important actions for file handling.
@@ -19,13 +20,13 @@ const MainToolbar = (props: MainToolbarProps) => {
   const commit = useCommitIndex()
 
   return (
-    <ActionToolbar
-      status="primary"
-      size="md"
-      compact={false}
-      fixed
-      tools={[
-        {
+    <Toolbar {...toolbarProps} fixed>
+      <ToolbarItem
+        status="primary"
+        size="md"
+        compact={false}
+        fixed
+        tool={{
           mainAction: addFiles,
           trackOnly: true,
           onClick: () => {
@@ -41,8 +42,15 @@ const MainToolbar = (props: MainToolbarProps) => {
               runAction(addFiles, [filesParam.path])
             })
           },
-        },
-        {
+        }}
+      />
+
+      <ToolbarItem
+        status="primary"
+        size="md"
+        compact={false}
+        fixed
+        tool={{
           mainAction: saveStash,
           trackOnly: true,
           onClick: () => {
@@ -58,17 +66,23 @@ const MainToolbar = (props: MainToolbarProps) => {
               runAction(saveStash, [filesParam.path])
             })
           },
-        },
-        {
+        }}
+      />
+
+      <ToolbarItem
+        status="primary"
+        size="md"
+        compact={false}
+        fixed
+        tool={{
           mainAction: commit,
           trackOnly: true,
           onClick: () => {
             showCommitDialog()
           },
-        },
-      ]}
-      {...toolbarProps}
-    />
+        }}
+      />
+    </Toolbar>
   )
 }
 

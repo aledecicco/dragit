@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react'
 import {
+  IconEye,
   IconFileAlert,
   IconFileCode2,
   IconFileMinus,
@@ -12,11 +13,11 @@ import { match } from 'ts-pattern'
 import type { FileOfType } from '@/api/models'
 import { useStageFile } from '@/api/mutations'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
-import { withContextMenu } from '@/lib/ContextMenu'
+import { ContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
-import { viewWorktreeFileDiff } from '@/utils/actions'
+import { MenuItem } from '@/ui/Menu/Item'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { FILE_TYPES } from '..'
@@ -36,47 +37,62 @@ interface UnstagedChangesItemProps extends ListItemProps {
 /**
  * The list item for files in the 'unstaged' file statuses widget section.
  */
-const UnstagedChangesItem = withContextMenu<UnstagedChangesItemProps>(
-  (props) => {
-    const { file, containerProps, ...itemProps } = props
+const UnstagedChangesItem = (props: UnstagedChangesItemProps) => {
+  const { file, containerProps, ...itemProps } = props
 
-    const Glyph = match(file)
-      .with({ status: 'unstaged' }, (file) =>
-        match(file.changes)
-          .with('added', () => IconFilePlus)
-          .with('deleted', () => IconFileMinus)
-          .with('modified', () => IconFilePencil)
-          .with('typeChanged', () => IconFileCode2)
-          .exhaustive(),
-      )
-      .with({ status: 'untracked' }, () => IconFileUnknown)
-      .with({ status: 'unmerged' }, () => IconFileAlert)
-      .exhaustive()
+  const Glyph = match(file)
+    .with({ status: 'unstaged' }, (file) =>
+      match(file.changes)
+        .with('added', () => IconFilePlus)
+        .with('deleted', () => IconFileMinus)
+        .with('modified', () => IconFilePencil)
+        .with('typeChanged', () => IconFileCode2)
+        .exhaustive(),
+    )
+    .with({ status: 'untracked' }, () => IconFileUnknown)
+    .with({ status: 'unmerged' }, () => IconFileAlert)
+    .exhaustive()
 
-    const statusMessage = match(file)
-      .with({ status: 'unstaged' }, (file) =>
-        match(file.changes)
-          .with('added', () => 'New')
-          .with('deleted', () => 'Deleted')
-          .with('modified', () => 'Edited')
-          .with('typeChanged', () => 'Converted')
-          .exhaustive(),
-      )
-      .with({ status: 'untracked' }, () => 'Untracked')
-      .with({ status: 'unmerged' }, (file) =>
-        match(file.changes)
-          .with('addedByUs', () => 'Conflict - Added by us')
-          .with('addedByThem', () => 'Conflict - Added by them')
-          .with('deletedByUs', () => 'Conflict - Deleted by us')
-          .with('deletedByThem', () => 'Conflict - Deleted by them')
-          .with('bothAdded', () => 'Conflict - Both added')
-          .with('bothDeleted', () => 'Conflict - Both deleted')
-          .with('bothModified', () => 'Conflict - Both modified')
-          .exhaustive(),
-      )
-      .exhaustive()
+  const statusMessage = match(file)
+    .with({ status: 'unstaged' }, (file) =>
+      match(file.changes)
+        .with('added', () => 'New')
+        .with('deleted', () => 'Deleted')
+        .with('modified', () => 'Edited')
+        .with('typeChanged', () => 'Converted')
+        .exhaustive(),
+    )
+    .with({ status: 'untracked' }, () => 'Untracked')
+    .with({ status: 'unmerged' }, (file) =>
+      match(file.changes)
+        .with('addedByUs', () => 'Conflict - Added by us')
+        .with('addedByThem', () => 'Conflict - Added by them')
+        .with('deletedByUs', () => 'Conflict - Deleted by us')
+        .with('deletedByThem', () => 'Conflict - Deleted by them')
+        .with('bothAdded', () => 'Conflict - Both added')
+        .with('bothDeleted', () => 'Conflict - Both deleted')
+        .with('bothModified', () => 'Conflict - Both modified')
+        .exhaustive(),
+    )
+    .exhaustive()
 
-    return (
+  const stage = useStageFile(file)
+
+  return (
+    <ContextMenu
+      items={
+        <>
+          <MenuItem
+            label="View changes"
+            Glyph={IconEye}
+            onClick={() => {
+              showWorktreeFileDiffDialog(file)
+            }}
+          />
+          <MenuItem action={stage} />
+        </>
+      }
+    >
       <div {...containerProps}>
         <ListItem
           interactive
@@ -133,12 +149,8 @@ const UnstagedChangesItem = withContextMenu<UnstagedChangesItemProps>(
           </div>
         </ListItem>
       </div>
-    )
-  },
-  ({ file }) => {
-    const stage = useStageFile(file)
-    return [viewWorktreeFileDiff(file), stage]
-  },
-)
+    </ContextMenu>
+  )
+}
 
 export { UnstagedChangesItem, type UnstagedChangesItemProps }

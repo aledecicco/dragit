@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { type ReactNode, useRef } from 'react'
 import { IconChevronDown } from '@tabler/icons-react'
 import { match, P } from 'ts-pattern'
 
@@ -7,14 +7,13 @@ import {
   type DecoratedButtonProps,
 } from '@/lib/DecoratedButton'
 import { Dropdown } from '@/ui/Dropdown'
-import type { MenuItem } from '@/ui/Menu'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface SplitButtonProps extends Omit<DecoratedButtonProps, 'round'> {
   /**
    * The list of items to display in the dropdown menu.
    */
-  items: MenuItem[]
+  items: ReactNode
 
   /**
    * Props for the button that triggers the dropdown menu.
@@ -78,8 +77,6 @@ const SplitButton = (props: SplitButtonProps) => {
       />
 
       <Dropdown
-        items={items}
-        size={menuSize}
         anchor={
           <DecoratedButton
             label="More"
@@ -107,7 +104,9 @@ const SplitButton = (props: SplitButtonProps) => {
           />
         }
         getAnchorRect={getAnchorRect}
-      />
+      >
+        {items}
+      </Dropdown>
     </div>
   )
 }

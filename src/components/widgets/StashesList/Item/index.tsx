@@ -1,14 +1,14 @@
-import { IconArchive, IconGitBranch } from '@tabler/icons-react'
+import { IconArchive, IconEye, IconGitBranch } from '@tabler/icons-react'
 
 import type { StashInfo } from '@/api/models'
 import { useApplyStash, useDiscardStash } from '@/api/mutations'
 import { ChangesSummary } from '@/common/DiffSummary'
-import { StashToolbar } from '@/common/StashToolbar'
-import { withContextMenu } from '@/lib/ContextMenu'
+import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
+import { ContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
-import { viewStash } from '@/utils/actions'
+import { MenuItem } from '@/ui/Menu/Item'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
@@ -24,12 +24,28 @@ interface StashesListItemProps extends ListItemProps {
  *
  * Includes a toolbar to apply or delete the stash.
  */
-const StashesListItem = withContextMenu<StashesListItemProps>(
-  (props) => {
-    const { stash, ...itemProps } = props
-    const stashedTime = useDateDifference(stash.timestamp)
+const StashesListItem = (props: StashesListItemProps) => {
+  const { stash, ...itemProps } = props
+  const stashedTime = useDateDifference(stash.timestamp)
+  const apply = useApplyStash(stash)
+  const discard = useDiscardStash(stash)
 
-    return (
+  return (
+    <ContextMenu
+      items={
+        <>
+          <MenuItem
+            label="View"
+            Glyph={IconEye}
+            onClick={() => {
+              showSnapshotDetailsDialog(stash)
+            }}
+          />
+          <MenuItem action={apply} />
+          <MenuItem action={discard} />
+        </>
+      }
+    >
       <ListItem
         {...propsWithCn(
           itemProps,
@@ -37,45 +53,31 @@ const StashesListItem = withContextMenu<StashesListItemProps>(
           'border-1 border-solid border-transparent',
         )}
       >
-        <div
-          className={cn(
-            'min-w-0 w-full',
-            'flex flex-row justify-between items-start gap-x-2',
-          )}
-        >
-          <div className={cn('w-full overflow-hidden')}>
-            <div
-              className={cn(
-                'flex flex-row gap-x-1 items-center text-light-600',
-              )}
-            >
-              <Icon Glyph={IconArchive} size="md" />
+        <div className={cn('min-w-0 w-full overflow-hidden')}>
+          <div
+            className={cn('flex flex-row gap-x-1 items-center text-light-600')}
+          >
+            <Icon Glyph={IconArchive} size="md" />
 
-              <Marquee className={cn('text-sm')} reverse={false}>
-                #{stash.stashNumber} -{' '}
-                <span className={cn('text-light-950')}>
-                  <Icon
-                    Glyph={IconGitBranch}
-                    size="sm"
-                    className={cn('inline-block')}
-                  />{' '}
-                  {stash.createdOn}
-                </span>
-              </Marquee>
-            </div>
-
-            <Marquee
-              className={cn(
-                'text-xs text-light-950',
-                !stash.message && 'italic',
-              )}
-              reverse={false}
-            >
-              {stash.message ?? 'No description'}
+            <Marquee className={cn('text-sm')} reverse={false}>
+              #{stash.stashNumber} -{' '}
+              <span className={cn('text-light-950')}>
+                <Icon
+                  Glyph={IconGitBranch}
+                  size="sm"
+                  className={cn('inline-block')}
+                />{' '}
+                {stash.createdOn}
+              </span>
             </Marquee>
           </div>
 
-          <StashToolbar stash={stash} size="sm" />
+          <Marquee
+            className={cn('text-xs text-light-950', !stash.message && 'italic')}
+            reverse={false}
+          >
+            {stash.message ?? 'No description'}
+          </Marquee>
         </div>
 
         <div
@@ -102,13 +104,8 @@ const StashesListItem = withContextMenu<StashesListItemProps>(
           </Marquee>
         </div>
       </ListItem>
-    )
-  },
-  ({ stash }) => {
-    const apply = useApplyStash(stash)
-    const discard = useDiscardStash(stash)
-    return [viewStash(stash), apply, discard]
-  },
-)
+    </ContextMenu>
+  )
+}
 
 export { StashesListItem, type StashesListItemProps }

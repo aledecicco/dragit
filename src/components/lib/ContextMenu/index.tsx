@@ -1,94 +1,48 @@
-import { type ComponentType, type HTMLAttributes, useState } from 'react'
+import React, { type ReactNode, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
-import { IconLoader2 } from '@tabler/icons-react'
-import { useEffectOnce } from 'react-use'
 
-import { type Action, runAction, useActionStatuses } from '@/context/actions'
-import { Menu, type MenuItem } from '@/ui/Menu'
-import { cn } from '@/utils/styles'
-import type { AnyObject } from '@/utils/types'
+import { Menu, type MenuProps } from '@/ui/Menu'
+import { propsWithCn } from '@/utils/styles'
 
-interface ContextMenuProps {
-  actions: Action[]
+interface ContextMenuProps extends Omit<MenuProps, 'children'> {
+  children: Ariakit.MenuButtonProps['render']
+
+  /**
+   * The contents to be displayed in the context menu.
+   */
+  items: ReactNode
 }
 
-/**
- * HOC that wraps a component and gives it a context menu.
- *
- * @param WrappedComponent - The constructor of the component to augment.
- * @param useActions - A hook that returns the actions that can be triggered from the context menu.
- */
-const withContextMenu = <P extends AnyObject>(
-  WrappedComponent: ComponentType<
-    HTMLAttributes<HTMLElement> & Omit<P, keyof ContextMenuProps>
-  >,
-  useActions: (props: P) => ContextMenuProps['actions'],
-) => {
-  const TrackedComponent = (props: P) => {
-    const { ...componentProps } = props
+const ContextMenu = (props: ContextMenuProps) => {
+  const { children, items, ...menuProps } = props
 
-    const actions = useActions(props)
-    const actionStatuses = useActionStatuses(actions.map((action) => action.id))
+  const menu = Ariakit.useMenuStore()
+  const [anchorRect, setAnchorRect] = useState({ x: 0, y: 0 })
 
-    const menuItems: MenuItem[] =
-      actions.map((action, index) => {
-        const status = actionStatuses.at(index) ?? 'idle'
+  return (
+    <>
+      <Ariakit.Button
+        render={children}
+        onContextMenu={(e: React.MouseEvent) => {
+          setAnchorRect({ x: e.clientX + 5, y: e.clientY - 5 })
+          menu.show()
+        }}
+        onClick={(e: React.MouseEvent) => {
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+      />
 
-        return {
-          label:
-            action.type === 'instant'
-              ? action.label
-              : status === 'running'
-                ? action.label.running
-                : action.label.idle,
-          Glyph: status === 'running' ? IconLoader2 : action.Glyph,
-          iconProps: {
-            className: cn(status === 'running' && 'animate-spin'),
-          },
-          disabled: status === 'running',
-          onClick: () => {
-            runAction(action)
-          },
-        }
-      }) ?? []
-
-    const menu = Ariakit.useMenuStore()
-    const [anchorRect, setAnchorRect] = useState({ x: 0, y: 0 })
-
-    return (
-      <>
-        <WrappedComponent
-          {...componentProps}
-          onContextMenu={(e) => {
-            setAnchorRect({ x: e.clientX + 5, y: e.clientY - 5 })
-            menu.show()
-          }}
-        />
-
-        <Menu
-          className={cn('min-w-30 border-1 border-dark-50')}
-          modal
-          size="md"
-          store={menu}
-          items={menuItems}
-          getAnchorRect={() => anchorRect}
-        />
-      </>
-    )
-  }
-
-  return TrackedComponent
+      <Menu
+        store={menu}
+        modal
+        getAnchorRect={() => anchorRect}
+        {...propsWithCn(menuProps, 'min-w-30 border-1 border-dark-50')}
+      >
+        {items}
+      </Menu>
+    </>
+  )
 }
 
-/**
- * Hook that prevents the default context menu from appearing on right-click.
- */
-const useContextMenuHandler = () => {
-  useEffectOnce(() => {
-    window.addEventListener('contextmenu', (event) => {
-      event.preventDefault()
-    })
-  })
-}
-
-export { withContextMenu, useContextMenuHandler }
+export { ContextMenu, type ContextMenuProps }

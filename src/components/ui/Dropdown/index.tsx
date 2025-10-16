@@ -24,7 +24,6 @@ const Dropdown = (props: DropdownProps) => {
       <Ariakit.MenuButton render={anchor} className={cn('group/menu')}>
         <Icon
           Glyph={IconChevronDown}
-          size={menuProps.size}
           className={cn('group-aria-expanded/menu:rotate-180')}
         />
       </Ariakit.MenuButton>
