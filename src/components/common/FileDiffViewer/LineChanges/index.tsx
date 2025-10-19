@@ -1,27 +1,42 @@
 import type { ComponentProps } from 'react'
-import { match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
 import type { DiffType, FileDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
+
+import type { DiffFilter } from '../utils'
 
 interface DiffViewerLineChangesProps extends ComponentProps<'div'> {
   /**
    * The diff to display.
    */
   fileDiff: FileDiff
+
+  /**
+   * A filter indicating which parts of the diff to show changes for.
+   */
+  filter: DiffFilter
 }
 
 /**
  * Displays a column with the diff type of each line in a diff viewer.
  */
 const DiffViewerLineChanges = (props: DiffViewerLineChangesProps) => {
-  const { fileDiff, ...divProps } = props
+  const { fileDiff, filter, ...divProps } = props
 
   return (
     <div {...propsWithCn(divProps, 'flex flex-col select-none')}>
-      {fileDiff.map((diffLine, i) => (
-        <LineChangeCell key={`${i + 1}`} diffType={diffLine.type} />
-      ))}
+      {fileDiff.map((diffLine, i) => {
+        const show = match([filter, diffLine.type])
+          .with(['both', P._], () => true)
+          .with(['ours', P.select()], (lineType) => lineType !== 'removed')
+          .with(['theirs', P.select()], (lineType) => lineType !== 'added')
+          .exhaustive()
+
+        if (show) {
+          return <LineChangeCell key={`${i + 1}`} diffType={diffLine.type} />
+        }
+      })}
 
       <LineChangeCell className={cn('grow')} diffType="unchanged" empty />
     </div>

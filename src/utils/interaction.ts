@@ -1,0 +1,24 @@
+import { writeText } from '@tauri-apps/plugin-clipboard-manager'
+import { openPath } from '@tauri-apps/plugin-opener'
+
+/**
+ * Opens the given file using the specified application, or the default for its type.
+ *
+ * @param path - The path to the file to open.
+ * @returns A promise that resolves when the file is opened.
+ */
+export const openFile = (path: string, openWith?: string) => {
+  return openPath(path, openWith)
+}
+
+/**
+ * Copies the given text to the clipboard, with an optional label that describes it.
+ *
+ * @param text - The content to copy.
+ * @param label - The label that describes it.
+ *
+ * @returns A promise that indicates the success of the copy operation.
+ */
+export const copyToClipboard = (text: string, label?: string) => {
+  return writeText(text, { label })
+}

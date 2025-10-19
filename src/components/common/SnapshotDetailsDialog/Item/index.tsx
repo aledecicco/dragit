@@ -48,7 +48,7 @@ const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
     .exhaustive()
 
   return (
-    <Ariakit.Checkbox
+    <Ariakit.Radio
       value={file.path}
       render={
         <ListItem

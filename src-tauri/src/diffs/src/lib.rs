@@ -1,137 +1,10 @@
 mod utils;
 use utils::*;
 
-use imara_diff::{Diff, InternedInput};
-use std::fmt::Debug;
-
 use models::{
-    ChangeStatus, CleanFileInfo, DiffLine, DiffMode, DiffScope, DiffSource, DiffStage, MergeStatus,
-    StagedFileStatus, VersionedFileStatus,
+    ChangeStatus, CleanFileInfo, DiffLine, DiffMode, DiffScope, DiffSource, MergeDiffStage,
+    MergeStatus, StagedFileStatus, VersionedFileStatus,
 };
-
-/// Adds a range of unchanged context lines to the result.
-fn add_context_lines<T, U>(from: T, to: U, input: &InternedInput<&str>, res: &mut Vec<DiffLine>)
-where
-    T: TryInto<usize>,
-    T::Error: Debug,
-    U: TryInto<usize>,
-    U::Error: Debug,
-{
-    for &token in &input.before[from.try_into().unwrap()..to.try_into().unwrap()] {
-        let line = input.interner[token];
-        res.push(DiffLine::Unchanged(vec![format!(" {line}")]));
-    }
-}
-
-/// Adds the contents of the buffer as a new line and clears it.
-fn flush_buffer(line_buffer: &mut Vec<String>, res: &mut Vec<DiffLine>, line_mode: &DiffMode) {
-    let line_constructor = match line_mode {
-        DiffMode::Unchanged => DiffLine::Unchanged,
-        DiffMode::Added => DiffLine::Added,
-        DiffMode::Removed => DiffLine::Removed,
-    };
-
-    if !line_buffer.is_empty() {
-        res.push(line_constructor(std::mem::take(line_buffer)));
-    }
-}
-
-/// Processes a range in one side of the hunk according to the given modes.
-fn process_hunk_segments<T, U>(
-    from: T,
-    to: U,
-    hunk_input: &InternedInput<&str>,
-    line_buffer: &mut Vec<String>,
-    res: &mut Vec<DiffLine>,
-    line_mode: &DiffMode,
-    segment_mode: &DiffMode,
-) where
-    T: TryInto<usize>,
-    T::Error: Debug,
-    U: TryInto<usize>,
-    U::Error: Debug,
-{
-    let stream = match line_mode {
-        DiffMode::Unchanged => &hunk_input.before,
-        DiffMode::Added => &hunk_input.after,
-        DiffMode::Removed => &hunk_input.before,
-    };
-
-    let indicator = match segment_mode {
-        DiffMode::Unchanged => ' ',
-        DiffMode::Added => '+',
-        DiffMode::Removed => '-',
-    };
-
-    for &token in &stream[from.try_into().unwrap()..to.try_into().unwrap()] {
-        let segment = hunk_input.interner[token];
-        line_buffer.push(format!("{indicator}{segment}"));
-        if is_newline(segment) {
-            flush_buffer(line_buffer, res, &line_mode);
-        }
-    }
-}
-
-/// Processes a side of the hunk according to the given mode.
-fn process_hunk(
-    hunk_diff: &Diff,
-    hunk_input: &InternedInput<&str>,
-    line_buffer: &mut Vec<String>,
-    res: &mut Vec<DiffLine>,
-    diff_mode: &DiffMode,
-) {
-    let mut current_pos = 0;
-
-    hunk_diff.hunks().for_each(|section_hunk| {
-        let stream = match diff_mode {
-            DiffMode::Unchanged => &section_hunk.before,
-            DiffMode::Added => &section_hunk.after,
-            DiffMode::Removed => &section_hunk.before,
-        };
-
-        process_hunk_segments(
-            current_pos,
-            stream.start,
-            &hunk_input,
-            line_buffer,
-            res,
-            diff_mode,
-            &DiffMode::Unchanged,
-        );
-
-        process_hunk_segments(
-            stream.start,
-            stream.end,
-            &hunk_input,
-            line_buffer,
-            res,
-            diff_mode,
-            diff_mode,
-        );
-
-        current_pos = stream.end;
-    });
-
-    let stream = match diff_mode {
-        DiffMode::Unchanged => &hunk_input.before,
-        DiffMode::Added => &hunk_input.after,
-        DiffMode::Removed => &hunk_input.before,
-    };
-
-    process_hunk_segments(
-        current_pos,
-        stream.len(),
-        &hunk_input,
-        line_buffer,
-        res,
-        diff_mode,
-        &DiffMode::Unchanged,
-    );
-
-    if !line_buffer.is_empty() {
-        flush_buffer(line_buffer, res, diff_mode);
-    }
-}
 
 pub fn compute_diff(before: &str, after: &str) -> Vec<DiffLine> {
     let (file_diff, file_input) = get_line_diff(before, after);
@@ -197,11 +70,11 @@ pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
                     StagedFileStatus::Moved {
                         changes: _,
                         old_path,
-                    } => DiffSource::GitReference(":HEAD".to_string(), old_path.to_string()),
+                    } => DiffSource::GitReference("HEAD".to_string(), old_path.to_string()),
                     StagedFileStatus::Changed {
                         changes: ChangeStatus::Added,
                     } => DiffSource::Empty,
-                    _ => DiffSource::GitReference(":HEAD".to_string(), file.path.to_string()),
+                    _ => DiffSource::GitReference("HEAD".to_string(), file.path.to_string()),
                 },
                 match file.status {
                     StagedFileStatus::Changed {
@@ -229,16 +102,6 @@ pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
         },
 
         DiffScope::Unmerged { file, stage } => {
-            let disk_exists = matches!(
-                file.status,
-                MergeStatus::AddedByThem
-                    | MergeStatus::AddedByUs
-                    | MergeStatus::BothAdded
-                    | MergeStatus::BothModified
-                    | MergeStatus::DeletedByThem
-                    | MergeStatus::DeletedByUs
-            );
-
             let base_exists = matches!(
                 file.status,
                 MergeStatus::BothDeleted
@@ -263,46 +126,31 @@ pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
                     | MergeStatus::DeletedByUs
             );
 
-            match stage {
-                DiffStage::Both => (
-                    if disk_exists {
-                        DiffSource::DiskFile(file.path.to_string())
-                    } else {
-                        DiffSource::Empty
-                    },
-                    if disk_exists {
-                        DiffSource::DiskFile(file.path.to_string())
-                    } else {
-                        DiffSource::Empty
-                    },
-                ),
+            let base = if base_exists {
+                DiffSource::GitReference(":1".to_string(), file.path.to_string())
+            } else {
+                DiffSource::Empty
+            };
 
-                DiffStage::Ours => (
-                    if base_exists {
-                        DiffSource::GitReference(":1".to_string(), file.path.to_string())
-                    } else {
-                        DiffSource::Empty
-                    },
+            let target = match stage {
+                MergeDiffStage::Ours => {
                     if ours_exists {
                         DiffSource::GitReference(":2".to_string(), file.path.to_string())
                     } else {
                         DiffSource::Empty
-                    },
-                ),
+                    }
+                }
 
-                DiffStage::Theirs => (
-                    if base_exists {
-                        DiffSource::GitReference(":1".to_string(), file.path.to_string())
-                    } else {
-                        DiffSource::Empty
-                    },
+                MergeDiffStage::Theirs => {
                     if theirs_exists {
                         DiffSource::GitReference(":3".to_string(), file.path.to_string())
                     } else {
                         DiffSource::Empty
-                    },
-                ),
-            }
+                    }
+                }
+            };
+
+            (base, target)
         }
     }
 }

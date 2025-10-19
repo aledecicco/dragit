@@ -3,8 +3,7 @@ import { Store, useStore } from '@tanstack/react-store'
 
 import type { WorktreeFileType } from '@/api/models'
 import { useQueryWorktreeFiles } from '@/api/queries'
-import { getFileTypeFilter } from '@/api/utils'
-import { useHandlePageSync } from '@/utils/pagination'
+import { getFileTypeFilter, useHandlePageSync } from '@/api/utils'
 
 type FilePages = Map<string, number>
 const filesPages = new Store<FilePages>(new Map())
@@ -91,6 +90,7 @@ const useHandleFilesPageSync = (
   useEffect(() => {
     clearPage(types)
   }, [types, pathspec, clearPage])
+
   useHandlePageSync(filesQuery, page, clear)
 }
 
@@ -99,7 +99,5 @@ export {
   setNextPage,
   setPrevPage,
   clearPage,
-  type useHandlePageSync,
   useHandleFilesPageSync,
-  type WorktreeFileType as FileType,
 }

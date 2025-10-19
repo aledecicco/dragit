@@ -4,30 +4,39 @@ import { match } from 'ts-pattern'
 
 import type { DiffScope } from '@/api/models'
 import { useQueryFileDiff } from '@/api/queries/fileDiff'
+import { useCurrentPath } from '@/api/utils'
 import { QueryLoader } from '@/lib/Loader/Query'
 import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { Separator } from '@/ui/Separator'
 import { Skeleton } from '@/ui/Skeleton'
 import { range } from '@/utils/array'
+import { openFile } from '@/utils/interaction'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { DiffViewerContent } from './Content'
 import { DiffViewerLineChanges } from './LineChanges'
 import { DiffViewerLineNumbers } from './LineNumbers'
+import type { DiffFilter } from './utils'
 
 interface FileDiffViewerProps extends ComponentProps<'div'> {
   /**
    * The scope of the diff to display (staged changes, unstaged changes, or a specific snapshot).
    */
   diffScope: DiffScope
+
+  /**
+   * An optional filter to apply to the displayed diff lines.
+   */
+  filter?: DiffFilter
 }
 
 /**
  * Displays the contents of a file, showing changes made to it on each line.
  */
 const FileDiffViewer = (props: FileDiffViewerProps) => {
-  const { diffScope, ...divProps } = props
+  const { diffScope, filter = 'both', ...divProps } = props
+  const repoPath = useCurrentPath()
 
   const fileDiffQuery = useQueryFileDiff(diffScope)
 
@@ -48,17 +57,31 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
     >
       <div className={cn('flex flex-row items-center gap-x-2 p-2 pr-9')}>
         <Icon Glyph={IconFile} size="lg" />
-        <Marquee className={cn('text-md text-light-500')}>
+        <Marquee
+          className={cn('text-md text-light-500')}
+          onClick={() => {
+            if (
+              diffScope.type === 'worktree' ||
+              diffScope.type === 'unmerged'
+            ) {
+              // ToDo: make more usable
+              openFile(`${repoPath}/${diffScope.file.path}`)
+            }
+          }}
+        >
           {diffScope.file.path}
-          {diffScope.type === 'unmerged' && (
-            <span className={cn('text-light-900 text-sm italic')}>
-              {match(diffScope.stage)
-                .with('ours', () => ' (ours)')
-                .with('theirs', () => ' (theirs)')
-                .with('both', () => ' (inline)')
-                .exhaustive()}
-            </span>
-          )}
+          <span className={cn('text-light-900 text-sm italic ml-2')}>
+            {diffScope.type === 'unmerged'
+              ? match(diffScope.stage)
+                  .with('ours', () => ' (ours)')
+                  .with('theirs', () => ' (theirs)')
+                  .exhaustive()
+              : match(filter)
+                  .with('ours', () => ' (after changes)')
+                  .with('theirs', () => ' (before changes)')
+                  .with('both', () => undefined)
+                  .exhaustive()}
+          </span>
         </Marquee>
       </div>
 
@@ -95,17 +118,20 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
             <>
               <DiffViewerLineNumbers
                 fileDiff={fileDiff}
+                filter={filter}
                 className={cn('col-start-1')}
               />
 
               <DiffViewerLineChanges
                 fileDiff={fileDiff}
+                filter={filter}
                 className={cn('col-start-2')}
               />
 
               <DiffViewerContent
                 file={diffScope.file}
                 fileDiff={fileDiff}
+                filter={filter}
                 className={cn('col-start-3')}
               />
             </>

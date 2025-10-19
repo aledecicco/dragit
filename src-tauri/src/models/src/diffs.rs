@@ -4,10 +4,9 @@ use crate::{
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub enum DiffStage {
+pub enum MergeDiffStage {
     Ours,
     Theirs,
-    Both,
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -26,7 +25,7 @@ pub enum CleanFileInfo {
 pub enum DiffScope {
     Unmerged {
         file: UnmergedFileInfo,
-        stage: DiffStage,
+        stage: MergeDiffStage,
     },
 
     Worktree {

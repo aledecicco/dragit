@@ -1,17 +1,3 @@
-import { writeText } from '@tauri-apps/plugin-clipboard-manager'
-
-/**
- * Copies the given text to the clipboard, with an optional label that describes it.
- *
- * @param text - The content to copy.
- * @param label - The label that describes it.
- *
- * @returns A promise that indicates the success of the copy operation.
- */
-export const copyToClipboard = (text: string, label?: string) => {
-  return writeText(text, { label })
-}
-
 /**
  * Given a word and a count, returns the pluralized form of the word if gramatically correct.
  *

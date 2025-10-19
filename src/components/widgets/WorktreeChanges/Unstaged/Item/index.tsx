@@ -1,4 +1,3 @@
-import type { ComponentProps } from 'react'
 import {
   IconEye,
   IconFileAlert,
@@ -27,18 +26,13 @@ interface UnstagedChangesItemProps extends ListItemProps {
    * Information about the unstaged file to display.
    */
   file: FileOfType<(typeof FILE_TYPES)[number]>
-
-  /**
-   * Additional props for the container element.
-   */
-  containerProps?: ComponentProps<'div'>
 }
 
 /**
  * The list item for files in the 'unstaged' file statuses widget section.
  */
 const UnstagedChangesItem = (props: UnstagedChangesItemProps) => {
-  const { file, containerProps, ...itemProps } = props
+  const { file, ...itemProps } = props
 
   const Glyph = match(file)
     .with({ status: 'unstaged' }, (file) =>
@@ -82,6 +76,7 @@ const UnstagedChangesItem = (props: UnstagedChangesItemProps) => {
     <ContextMenu
       items={
         <>
+          <MenuItem action={stage} />
           <MenuItem
             label="View changes"
             Glyph={IconEye}
@@ -89,66 +84,63 @@ const UnstagedChangesItem = (props: UnstagedChangesItemProps) => {
               showWorktreeFileDiffDialog(file)
             }}
           />
-          <MenuItem action={stage} />
         </>
       }
     >
-      <div {...containerProps}>
-        <ListItem
-          interactive
-          {...propsWithCn(
-            itemProps,
-            'flex flex-row text-start items-start justify-between gap-x-8',
-          )}
-          onClick={(e) => {
-            itemProps.onClick?.(e)
-            showWorktreeFileDiffDialog(file)
-          }}
-        >
-          <div className={cn('min-w-0 w-full')}>
-            <div
-              className={cn(
-                'flex flex-row gap-x-1 items-center',
-                match(file)
-                  .with({ status: 'unstaged' }, (file) =>
-                    match(file.changes)
-                      .with('added', () => 'text-success-200/90')
-                      .with('deleted', () => 'text-danger-200/90')
-                      .with('modified', () => 'text-success-200/90')
-                      .with('typeChanged', () => 'text-light-400')
-                      .exhaustive(),
-                  )
-                  .with({ status: 'untracked' }, () => 'text-light-600')
-                  .with({ status: 'unmerged' }, () => 'text-warning-100/90')
-                  .exhaustive(),
-              )}
-            >
-              <Icon Glyph={Glyph} size="md" />
-              <Marquee className={cn('text-sm')}>{file.path}</Marquee>
-            </div>
-
-            <p
-              className={cn(
-                'text-xs',
-                match(file)
-                  .with({ status: 'unstaged' }, (file) =>
-                    match(file.changes)
-                      .with('added', () => 'text-success-300/70')
-                      .with('deleted', () => 'text-danger-300/70')
-                      .with('modified', () => 'text-success-300/70')
-                      .with('typeChanged', () => 'text-light-600')
-                      .exhaustive(),
-                  )
-                  .with({ status: 'untracked' }, () => 'text-light-700/70')
-                  .with({ status: 'unmerged' }, () => 'text-warning-200/70')
-                  .exhaustive(),
-              )}
-            >
-              {statusMessage}
-            </p>
+      <ListItem
+        interactive
+        {...propsWithCn(
+          itemProps,
+          'flex flex-row text-start items-start justify-between gap-x-8',
+        )}
+        onClick={(e) => {
+          itemProps.onClick?.(e)
+          showWorktreeFileDiffDialog(file)
+        }}
+      >
+        <div className={cn('min-w-0 w-full')}>
+          <div
+            className={cn(
+              'flex flex-row gap-x-1 items-center',
+              match(file)
+                .with({ status: 'unstaged' }, (file) =>
+                  match(file.changes)
+                    .with('added', () => 'text-success-200/90')
+                    .with('deleted', () => 'text-danger-200/90')
+                    .with('modified', () => 'text-success-200/90')
+                    .with('typeChanged', () => 'text-light-400')
+                    .exhaustive(),
+                )
+                .with({ status: 'untracked' }, () => 'text-light-600')
+                .with({ status: 'unmerged' }, () => 'text-warning-100/90')
+                .exhaustive(),
+            )}
+          >
+            <Icon Glyph={Glyph} size="md" />
+            <Marquee className={cn('text-sm')}>{file.path}</Marquee>
           </div>
-        </ListItem>
-      </div>
+
+          <p
+            className={cn(
+              'text-xs',
+              match(file)
+                .with({ status: 'unstaged' }, (file) =>
+                  match(file.changes)
+                    .with('added', () => 'text-success-300/70')
+                    .with('deleted', () => 'text-danger-300/70')
+                    .with('modified', () => 'text-success-300/70')
+                    .with('typeChanged', () => 'text-light-600')
+                    .exhaustive(),
+                )
+                .with({ status: 'untracked' }, () => 'text-light-700/70')
+                .with({ status: 'unmerged' }, () => 'text-warning-200/70')
+                .exhaustive(),
+            )}
+          >
+            {statusMessage}
+          </p>
+        </div>
+      </ListItem>
     </ContextMenu>
   )
 }

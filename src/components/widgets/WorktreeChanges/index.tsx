@@ -1,21 +1,21 @@
 import type { ComponentProps, ReactNode } from 'react'
 
-import type { FileOfType } from '@/api/models'
+import type { FileOfType, WorktreeFileType } from '@/api/models'
 import { useQueryWorktreeFiles, WORKTREE_FILES_PAGE_SIZE } from '@/api/queries'
+import { useNeedsPagination } from '@/api/utils'
 import {
-  type FileType,
   setNextPage,
   setPrevPage,
   useFilesPage,
+  useHandleFilesPageSync,
 } from '@/context/pages'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
 import { Chip } from '@/ui/Chip'
-import { useNeedsPagination } from '@/utils/pagination'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-interface WorktreeChangesProps<T extends FileType[]>
+interface WorktreeChangesProps<T extends WorktreeFileType[]>
   extends ComponentProps<'div'> {
   /**
    * The label for the section, displayed in the header.
@@ -38,13 +38,14 @@ interface WorktreeChangesProps<T extends FileType[]>
   renderFile: (file: FileOfType<T[number]>) => ReactNode
 }
 
-const WorktreeChanges = <T extends FileType[]>(
+const WorktreeChanges = <T extends WorktreeFileType[]>(
   props: WorktreeChangesProps<T>,
 ) => {
   const { label, fileTypes, extraInfo, renderFile, ...divProps } = props
 
   const filesQuery = useQueryWorktreeFiles<T[number]>(fileTypes)
   const page = useFilesPage(fileTypes)
+  useHandleFilesPageSync(fileTypes)
 
   const showPagination = useNeedsPagination(filesQuery, page)
 

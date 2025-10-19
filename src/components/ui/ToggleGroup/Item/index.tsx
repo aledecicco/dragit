@@ -1,7 +1,10 @@
 import * as Ariakit from '@ariakit/react'
 
-import type { DecoratedButtonProps } from '@/lib/DecoratedButton'
-import { ToolbarItem } from '@/ui/Toolbar/Item'
+import {
+  DecoratedButton,
+  type DecoratedButtonProps,
+} from '@/lib/DecoratedButton'
+import { propsWithCn } from '@/utils/styles'
 
 import { ToggleGroup } from '..'
 
@@ -16,9 +19,21 @@ interface ToggleGroupItemProps extends DecoratedButtonProps {
  * A single item in a {@link ToggleGroup} component.
  */
 const ToggleGroupItem = (props: ToggleGroupItemProps) => {
-  const { value, ...itemProps } = props
+  const { value, ...buttonProps } = props
 
-  return <Ariakit.Radio render={<ToolbarItem {...itemProps} />} value={value} />
+  return (
+    <Ariakit.Radio
+      render={
+        <DecoratedButton
+          {...propsWithCn(
+            buttonProps,
+            'not-first:rounded-l-none not-last:rounded-r-none',
+          )}
+        />
+      }
+      value={value}
+    />
+  )
 }
 
 export { ToggleGroupItem, type ToggleGroupItemProps }

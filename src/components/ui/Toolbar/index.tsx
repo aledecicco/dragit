@@ -19,15 +19,13 @@ const Toolbar = (props: ToolbarProps) => {
   const { fixed = false, ...toolbarProps } = props
 
   return (
-    <Ariakit.ToolbarProvider>
-      <Ariakit.Toolbar
-        {...propsWithCn(
-          toolbarProps,
-          'grid grid-flow-col',
-          fixed ? 'auto-cols-fr' : 'auto-cols-max',
-        )}
-      />
-    </Ariakit.ToolbarProvider>
+    <Ariakit.Toolbar
+      {...propsWithCn(
+        toolbarProps,
+        'grid grid-flow-col',
+        fixed ? 'auto-cols-fr' : 'auto-cols-max',
+      )}
+    />
   )
 }
 

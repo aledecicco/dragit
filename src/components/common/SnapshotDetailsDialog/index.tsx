@@ -1,21 +1,21 @@
 import { useState } from 'react'
-import * as Ariakit from '@ariakit/react'
 
 import type { SnapshotId, SnapshotInfo } from '@/api/models'
 import { SNAPSHOT_FILES_PAGE_SIZE, useQuerySnapshotFiles } from '@/api/queries'
+import { useNeedsPagination } from '@/api/utils'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { FileDiffViewer } from '@/common/FileDiffViewer'
-import { ProfilePicture } from '@/common/ProfilePicture'
 import { showDialog } from '@/context/dialogs'
 import { Pagination } from '@/lib/Pagination'
-import { QueryList } from '@/lib/QueryList'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
-import { useNeedsPagination } from '@/utils/pagination'
 import { cn, propsWithCn } from '@/utils/styles'
-import { useDateDifference } from '@/utils/time'
-import { mapFn } from '@/utils/types'
 
-import { SnapshotDetailsDialogItem } from './Item'
+import {
+  DiffViewerFilterSelector,
+  useDiffFilterSelector,
+} from '../FileDiffViewer/FilterSelector'
+import { SnapshotDialogDescription } from './Description'
+import { SnapshotDialogFileList, useFileSelector } from './FileList'
 
 export const SNAPSHOT_DETAILS_DIALOG_KEY = (snapshotId: SnapshotId) =>
   `snapshot_details_dialog:${snapshotId}`
@@ -35,7 +35,6 @@ interface SnapshotDetailsDialogProps extends Omit<DialogProps, 'dialogKey'> {
 const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
   const { snapshotInfo, ...dialogProps } = props
 
-  const timeAgo = useDateDifference(snapshotInfo.timestamp)
   const [page, setPage] = useState(0)
 
   const snapshotName =
@@ -45,12 +44,9 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
 
   const filesQuery = useQuerySnapshotFiles(snapshotInfo.id, page)
   const showPagination = useNeedsPagination(filesQuery, page)
+  const fileSelector = useFileSelector(filesQuery.data)
 
-  const store = Ariakit.useCheckboxStore()
-  const selectedFilePath = Ariakit.useStoreState(store, 'value')
-  const selectedFile = filesQuery.data?.items.find(
-    (f) => f.path === selectedFilePath,
-  )
+  const filterSelector = useDiffFilterSelector()
 
   return (
     <Dialog
@@ -60,17 +56,18 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
         className: cn('grid grid-rows-[max-content_max-content]'),
       }}
       sideContent={
-        selectedFile && (
+        fileSelector.selectedFile && (
           <FileDiffViewer
             diffScope={{
               type: 'snapshot',
               snapshotId: snapshotInfo.id,
-              file: selectedFile,
+              file: fileSelector.selectedFile,
             }}
+            filter={filterSelector.value}
           />
         )
       }
-      {...propsWithCn(dialogProps, 'max-w-[90%] max-h-[85%]')}
+      {...propsWithCn(dialogProps, 'max-w-[90%] max-h-[85%] overflow-visible')}
     >
       <ChangesSummary
         diff={snapshotInfo.changes}
@@ -83,61 +80,14 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
           'grid gap-y-6 overflow-y-hidden grid-rows-[max-content_1fr]',
         )}
       >
-        <div>
-          <div
-            className={cn(
-              'border-1 border-dark-50 rounded-sm',
-              'bg-dark-500 text-light-400 text-sm whitespace-pre-wrap',
-              'p-3 max-h-40 overflow-y-auto',
-              'mb-2',
-              !snapshotInfo.message && 'italic text-light-950',
-            )}
-          >
-            {snapshotInfo.message ?? 'No message.'}
-          </div>
+        <SnapshotDialogDescription snapshotInfo={snapshotInfo} />
 
-          {'authorName' in snapshotInfo ? (
-            <div className={cn('flex flex-row items-center gap-x-1')}>
-              <ProfilePicture username={snapshotInfo.authorName} size="md" />
-              <p className={cn('text-xs text-light-950')}>
-                {snapshotInfo.authorName}, {timeAgo}
-              </p>
-            </div>
-          ) : (
-            <p className={cn('text-xs text-light-950 first-letter:capitalize')}>
-              {timeAgo}
-            </p>
-          )}
-        </div>
-
-        <div className={cn('grid gap-y-2 overflow-y-hidden')}>
-          <div
-            className={cn(
-              'overflow-y-hidden',
-              'bg-dark-700 border-1 border-dark-300 rounded-lg',
-            )}
-          >
-            <Ariakit.CheckboxProvider store={store}>
-              <QueryList
-                name="modified files"
-                query={filesQuery}
-                getItems={(d) => d.items}
-                renderItem={(file) => <SnapshotDetailsDialogItem file={file} />}
-                itemSize={48}
-                size="md"
-                options={mapFn(filesQuery.data, (page) => ({
-                  getItemKey: (index: number) => page.items[index].path,
-                }))}
-                placeholdersCount={Math.min(
-                  10,
-                  snapshotInfo.changes?.filesCount
-                    ? snapshotInfo.changes.filesCount
-                    : 1,
-                )}
-              />
-            </Ariakit.CheckboxProvider>
-          </div>
-        </div>
+        <SnapshotDialogFileList
+          store={fileSelector.store}
+          snapshotInfo={snapshotInfo}
+          filesQuery={filesQuery}
+          className={cn('grid gap-y-2 overflow-y-hidden')}
+        />
       </div>
 
       {showPagination && (
@@ -152,6 +102,13 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
           setNextPage={() => {
             setPage((_page) => _page + 1)
           }}
+        />
+      )}
+
+      {fileSelector.selectedFile && (
+        <DiffViewerFilterSelector
+          className="absolute -bottom-3 left-[calc(50%+215px)] -translate-x-half z-1"
+          store={filterSelector.store}
         />
       )}
     </Dialog>

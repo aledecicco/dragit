@@ -1,13 +1,8 @@
 import * as Ariakit from '@ariakit/react'
 
-import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
+import { propsWithCn } from '@/utils/styles'
 
-interface ToggleGroupProps extends ToolbarProps {
-  /**
-   * Extra props for the underlying provider.
-   */
-  radioProps?: Ariakit.RadioProviderProps
-}
+interface ToggleGroupProps extends Ariakit.RadioGroupProps {}
 
 /**
  * A group of toggle buttons that only allows one to be active at a time.
@@ -15,12 +10,12 @@ interface ToggleGroupProps extends ToolbarProps {
  * Should contain {@link ToggleGroupItem} components as children.
  */
 const ToggleGroup = (props: ToggleGroupProps) => {
-  const { radioProps, ...toolbarProps } = props
+  const { ...radioProps } = props
 
   return (
-    <Ariakit.RadioProvider {...radioProps}>
-      <Ariakit.RadioGroup render={<Toolbar {...toolbarProps} />} />
-    </Ariakit.RadioProvider>
+    <Ariakit.RadioGroup
+      {...propsWithCn(radioProps, 'grid grid-flow-col auto-cols-max')}
+    />
   )
 }
 

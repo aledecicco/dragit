@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import type { WorktreeFileType } from '@/api/models'
 import { useQueryWorktreeFiles, WORKTREE_FILES_PAGE_SIZE } from '@/api/queries'
+import { useNeedsPagination } from '@/api/utils'
 import { hideDialog } from '@/context/dialogs'
 import {
   setNextPage,
@@ -15,7 +16,6 @@ import type { Shortcut } from '@/lib/ShortcutsCheatsheet'
 import { VirtualizedDiv } from '@/lib/VirtualizedDiv'
 import { CommandMenu } from '@/ui/CommandMenu'
 import { CommandMenuItem } from '@/ui/CommandMenu/Item'
-import { useNeedsPagination } from '@/utils/pagination'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 

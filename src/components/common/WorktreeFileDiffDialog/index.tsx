@@ -1,14 +1,17 @@
-import { IconColumns2Filled, IconColumns3Filled } from '@tabler/icons-react'
-
 import type { WorktreeFileInfo } from '@/api/models'
 import { showDialog } from '@/context/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
-import { ToggleGroup } from '@/ui/ToggleGroup'
-import { ToggleGroupItem } from '@/ui/ToggleGroup/Item'
-import { useToggleHandler } from '@/ui/ToggleGroup/utils'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { FileDiffViewer } from '../FileDiffViewer'
+import {
+  DiffViewerFilterSelector,
+  useDiffFilterSelector,
+} from '../FileDiffViewer/FilterSelector'
+import {
+  UnmergedFileViewSelector,
+  useViewModeSelector,
+} from './UnmergedViewSelector'
 
 export const WORKTREE_FILE_DIFF_DIALOG = (file: WorktreeFileInfo) =>
   `snapshot_details_dialog__${file.status}_${file.path}`
@@ -20,16 +23,16 @@ interface WorktreeFileDiffDialogProps extends Omit<DialogProps, 'dialogKey'> {
   file: WorktreeFileInfo
 }
 
-const diffViewModes = ['inline', 'side_by_side'] as const
-
 /**
  * Dialog that displays a file diff for a file in the worktree.
  */
 const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
   const { file, ...dialogProps } = props
 
-  const { store, value } = useToggleHandler(diffViewModes, 'side_by_side')
-  const isSideBySide = value === 'side_by_side' && file.status === 'unmerged'
+  const viewModeSelector = useViewModeSelector()
+  const isSideBySide =
+    viewModeSelector.value === 'side_by_side' && file.status === 'unmerged'
+  const filterSelector = useDiffFilterSelector()
 
   return (
     <Dialog
@@ -44,44 +47,40 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
       sideContent={
         isSideBySide && (
           <FileDiffViewer
+            filter="both"
             className={cn('border-l border-dark-700')}
             diffScope={{ type: 'unmerged', stage: 'theirs', file }}
           />
         )
       }
     >
-      <FileDiffViewer
-        diffScope={
-          file.status === 'unmerged'
-            ? {
-                type: 'unmerged',
-                stage: isSideBySide ? 'ours' : 'both',
-                file,
-              }
-            : { type: 'worktree', file }
-        }
-      />
+      {file.status === 'unmerged' && !isSideBySide ? (
+        'TODO: conflict viewer'
+      ) : (
+        <FileDiffViewer
+          filter={file.status === 'unmerged' ? 'both' : filterSelector.value}
+          diffScope={
+            file.status === 'unmerged'
+              ? {
+                  type: 'unmerged',
+                  stage: 'ours',
+                  file,
+                }
+              : { type: 'worktree', file }
+          }
+        />
+      )}
 
-      {file.status === 'unmerged' && (
-        <ToggleGroup
+      {file.status === 'unmerged' ? (
+        <UnmergedFileViewSelector
           className="absolute -bottom-3 left-half -translate-x-half"
-          radioProps={{ store }}
-        >
-          <ToggleGroupItem
-            value="side_by_side"
-            compact
-            label="View side by side"
-            Glyph={IconColumns2Filled}
-          />
-
-          <ToggleGroupItem
-            value="inline"
-            compact
-            label="View inline"
-            Glyph={IconColumns3Filled}
-            iconProps={{ className: cn('rotate-90') }}
-          />
-        </ToggleGroup>
+          store={viewModeSelector.store}
+        />
+      ) : (
+        <DiffViewerFilterSelector
+          className="absolute -bottom-3 left-half -translate-x-half"
+          store={filterSelector.store}
+        />
       )}
     </Dialog>
   )

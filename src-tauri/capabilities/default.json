@@ -15,8 +15,21 @@
     "shell:allow-execute",
     "shell:allow-kill",
     {
+      "identifier": "opener:allow-open-path",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
       "identifier": "http:default",
-      "allow": [{ "url": "https://api.github.com/search/users"}]
-    }
+      "allow": [
+        {
+          "url": "https://api.github.com/search/users"
+        }
+      ]
+    },
+    "opener:default"
   ]
 }

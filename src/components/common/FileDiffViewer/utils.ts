@@ -7,6 +7,9 @@ import { match } from 'ts-pattern'
 
 import type { DiffLineSegment, DiffType, FileDiff } from '@/api/models'
 
+export const DIFF_FILTERS = ['ours', 'theirs', 'both'] as const
+export type DiffFilter = (typeof DIFF_FILTERS)[number]
+
 type LineNode = Element | Text
 
 const starryNight = await createStarryNight(all)
@@ -388,8 +391,13 @@ const addWordDiff = (
  *
  * @param fileDiff - The diff to highlight.
  * @param path - The path of the file being diffed (used to determine the language).
+ * @param filter - A filter indicating which parts of the diff to show.
  */
-export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
+export const highlightDiff = (
+  fileDiff: FileDiff,
+  path: string,
+  filter: DiffFilter,
+): ReactNode => {
   // Recover the contents of the file from the diff, before and after.
   // Then syntax-highlight both versions completely.
   const treeBefore = getTree(getContentBefore(fileDiff), path)
@@ -417,12 +425,16 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
     match(diffLine.type)
       .with('added', () => {
         // If this is an added line, we take it from the "after" content.
-        res.push(wrapLineInDiff(lineAfter, diffLine.type))
+        if (filter !== 'theirs') {
+          res.push(wrapLineInDiff(lineAfter, diffLine.type))
+        }
         pointerAfter++
       })
       .with('removed', () => {
         // If this is a removed line, we take it from the "before" content.
-        res.push(wrapLineInDiff(lineBefore, diffLine.type))
+        if (filter !== 'ours') {
+          res.push(wrapLineInDiff(lineBefore, diffLine.type))
+        }
         pointerBefore++
       })
       .with('unchanged', () => {
@@ -433,6 +445,25 @@ export const highlightDiff = (fileDiff: FileDiff, path: string): ReactNode => {
         pointerAfter++
       })
       .exhaustive()
+  }
+
+  if (res.length === 0) {
+    return renderTree({
+      type: 'root',
+      children: [
+        wrapLineInDiff(
+          [
+            {
+              type: 'element',
+              tagName: 'p',
+              properties: { className: 'text-light-950/50 italic' },
+              children: [{ type: 'text', value: 'Empty' }],
+            },
+          ],
+          'unchanged',
+        ),
+      ],
+    })
   }
 
   // We add an empty line at the end for continuity.
