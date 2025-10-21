@@ -172,11 +172,12 @@ pub async fn get_snapshot_files_page(
     channel: Channel<AppMessage>,
     repo_path: &str,
     snapshot_id: &str,
+    parent: Option<&str>,
     start_after: usize,
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_snapshot_files_page(&channel, repo_path, snapshot_id, start_after, limit)
+        h.get_snapshot_files_page(&channel, repo_path, snapshot_id, parent, start_after, limit)
     })
     .and_then(serialize_response)
 }
@@ -279,6 +280,19 @@ pub async fn pull_branch(
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| {
         h.pull_branch(repo_path, branch, remote, remote_branch, is_rebase)
+    })
+}
+
+#[tauri::command]
+pub async fn fast_forward_branch(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    branch: &str,
+    remote: &str,
+    remote_branch: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| {
+        h.fast_forward_branch(repo_path, branch, remote, remote_branch)
     })
 }
 

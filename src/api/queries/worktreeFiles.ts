@@ -173,13 +173,7 @@ const worktreeFilesQuery = <T extends WorktreeFileType>(
 const useQueryWorktreeFiles = <T extends WorktreeFileType>(
   types: T | T[],
   pathspec?: string,
-): UseQueryResult<Page<WorktreeFileTypes[T]>> => {
-  return useRepositoryQuery(
-    worktreeFilesQuery,
-    types,
-    useFilesPage(types),
-    pathspec,
-  )
-}
+): UseQueryResult<Page<WorktreeFileTypes[T]>> =>
+  useRepositoryQuery(worktreeFilesQuery, types, useFilesPage(types), pathspec)
 
 export { worktreeFilesQueryKeys, useQueryWorktreeFiles }

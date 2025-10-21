@@ -46,15 +46,16 @@ const Graph = (props: GraphProps) => {
         <BranchSelectors />
 
         <BranchToolbar
+          className={cn('col-start-1 row-start-2 w-40')}
           branch={branch}
           fixed
-          className={cn('col-start-1 row-start-2 w-40')}
         />
 
         <BranchToolbar
-          branch={baseBranch}
-          fixed
           className={cn('col-start-3 row-start-2 w-40')}
+          branch={baseBranch}
+          isBase
+          fixed
         />
 
         <GraphInner />
@@ -139,7 +140,10 @@ const GraphInner = () => {
             )}
 
             {baseReference && (
-              <GraphBranch items={virtualizer.getVirtualItems()} isBase />
+              <GraphBranch
+                items={virtualizer.getVirtualItems()}
+                isBase={true}
+              />
             )}
           </SvgOverlay>
         </div>

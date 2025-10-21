@@ -31,6 +31,7 @@ export interface DiffSummary {
 
 export interface StashInfo {
   id: StashId
+  type: 'stash'
   stashNumber: string
   message: string | null
   timestamp: number
@@ -40,6 +41,7 @@ export interface StashInfo {
 
 export interface CommitInfo {
   id: CommitId
+  type: 'commit'
   shortHash: string
   authorName: string
   authorEmail: string
@@ -49,6 +51,7 @@ export interface CommitInfo {
 }
 
 export type SnapshotInfo = CommitInfo | StashInfo
+export type SnapshotType = SnapshotInfo['type']
 
 export interface AncestorInfo {
   distance: number

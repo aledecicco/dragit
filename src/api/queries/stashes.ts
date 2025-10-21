@@ -28,6 +28,7 @@ const fetchStashes = async (
 
   return res.map((resItem) => ({
     ...resItem,
+    type: 'stash',
     timestamp: resItem.timestamp * MS_IN_SECOND,
   }))
 }

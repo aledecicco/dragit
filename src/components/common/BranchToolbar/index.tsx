@@ -1,5 +1,6 @@
 import type { BranchInfo } from '@/api/models'
 import {
+  useFastForwardBranch,
   useForcePushBranch,
   usePullBranch,
   usePushBranch,
@@ -12,24 +13,30 @@ interface BranchToolbarProps extends Partial<ToolbarProps> {
    * The branch to operate on.
    */
   branch: BranchInfo | undefined
+
+  /**
+   * Whether this is the branch being used as base for comparison.
+   */
+  isBase?: boolean
 }
 
 /**
  * The common set of tools for branches (both local and remote).
  */
 const BranchToolbar = (props: BranchToolbarProps) => {
-  const { branch, ...toolbarProps } = props
+  const { branch, isBase = false, ...toolbarProps } = props
 
-  const pull = usePullBranch(branch)
   const push = usePushBranch(branch)
   const forcePush = useForcePushBranch(branch)
+  const pull = usePullBranch(branch)
+  const fastForward = useFastForwardBranch(branch)
 
   return (
     <Toolbar {...toolbarProps} fixed>
       <ToolbarItem
         compact
         fixed
-        tool={{ mainAction: pull }}
+        tool={{ mainAction: isBase ? fastForward : pull }}
         disabled={toolbarProps.disabled || !branch || branch.type !== 'local'}
       />
       <ToolbarItem

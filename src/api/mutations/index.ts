@@ -14,6 +14,10 @@ export {
 } from './checkoutLocal'
 export { commitIndexKey, useCommitIndex } from './commitIndex'
 export { discardStashKey, useDiscardStash } from './discardStash'
+export {
+  fastForwardBranchKey,
+  useFastForwardBranch,
+} from './fastForwardBranch'
 export { fetchRemoteKey, useFetchRemote } from './fetchRemote'
 export { initRepositoryKey, useInitRepository } from './initRepository'
 export { openFolderKey, useOpenFolder } from './openFolder'

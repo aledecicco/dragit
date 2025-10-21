@@ -65,6 +65,7 @@ pub fn run() {
             api::get_branch_divergence,
             api::push_branch,
             api::pull_branch,
+            api::fast_forward_branch,
             api::get_remotes,
             api::fetch_remote,
             api::set_upstream,

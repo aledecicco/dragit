@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react'
+import { match } from 'ts-pattern'
 
 import type { SnapshotInfo } from '@/api/models'
 import { ProfilePicture } from '@/common/ProfilePicture'
@@ -18,6 +19,10 @@ interface SnapshotDialogDescriptionProps extends ComponentProps<'div'> {
 const SnapshotDialogDescription = (props: SnapshotDialogDescriptionProps) => {
   const { snapshotInfo, ...divProps } = props
   const timeAgo = useDateDifference(snapshotInfo.timestamp)
+  const timeMessage = match(snapshotInfo)
+    .with({ type: 'commit' }, () => 'Committed')
+    .with({ type: 'stash' }, () => 'Stashed')
+    .exhaustive()
 
   return (
     <div {...divProps}>
@@ -41,8 +46,8 @@ const SnapshotDialogDescription = (props: SnapshotDialogDescriptionProps) => {
           </p>
         </div>
       ) : (
-        <p className={cn('text-xs text-light-950 first-letter:capitalize')}>
-          {timeAgo}
+        <p className={cn('text-xs text-light-950')}>
+          {timeMessage} {timeAgo}
         </p>
       )}
     </div>

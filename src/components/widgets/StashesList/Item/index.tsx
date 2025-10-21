@@ -47,11 +47,16 @@ const StashesListItem = (props: StashesListItemProps) => {
       }
     >
       <ListItem
+        interactive
         {...propsWithCn(
           itemProps,
-          'flex-col justify-between',
+          'flex flex-col justify-between',
           'border-1 border-solid border-transparent',
         )}
+        onClick={(e) => {
+          itemProps.onClick?.(e)
+          showSnapshotDetailsDialog(stash)
+        }}
       >
         <div className={cn('min-w-0 w-full overflow-hidden')}>
           <div

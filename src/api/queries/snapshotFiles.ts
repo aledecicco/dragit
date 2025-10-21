@@ -10,6 +10,8 @@ import type {
   MovedStatus,
   Page,
   SnapshotId,
+  SnapshotInfo,
+  SnapshotType,
   VersionedFileInfo,
 } from '../models'
 import { SNAPSHOT_FILES_PAGE_SCHEMA } from '../schemas'
@@ -24,14 +26,15 @@ const snapshotFilesQueryKeys = {
       ...pathQueryKey(repoPath),
       key: 'snapshot_files',
     }) as const,
-  snapshot: (repoPath: string, snapshot: SnapshotId) => ({
+  snapshot: (repoPath: string, snapshot: SnapshotId, type: SnapshotType) => ({
     all: {
       ...snapshotFilesQueryKeys.all(repoPath),
       snapshot,
+      type,
     } as const,
     page: (page: number) =>
       ({
-        ...snapshotFilesQueryKeys.snapshot(repoPath, snapshot).all,
+        ...snapshotFilesQueryKeys.snapshot(repoPath, snapshot, type).all,
         page: page,
       }) as const,
   }),
@@ -40,6 +43,7 @@ const snapshotFilesQueryKeys = {
 const fetchSnapshotFilesPage = async (
   repoPath: string,
   snapshotId: SnapshotId,
+  parent: SnapshotId | null,
   page: number,
   context: QueryFunctionContext,
 ): Promise<Page<VersionedFileInfo>> => {
@@ -48,6 +52,7 @@ const fetchSnapshotFilesPage = async (
     {
       repoPath,
       snapshotId,
+      parent,
       startAfter: page * SNAPSHOT_FILES_PAGE_SIZE,
       limit: SNAPSHOT_FILES_PAGE_SIZE,
     },
@@ -92,20 +97,26 @@ const snapshotFilesQuery = (
   repoPath: string,
   page: number,
   snapshotId: SnapshotId,
+  type: SnapshotType,
 ) =>
   queryOptions({
     queryKey: [
-      snapshotFilesQueryKeys.snapshot(repoPath, snapshotId).page(page),
+      snapshotFilesQueryKeys.snapshot(repoPath, snapshotId, type).page(page),
     ],
     queryFn: (context) =>
-      fetchSnapshotFilesPage(repoPath, snapshotId, page, context),
+      fetchSnapshotFilesPage(
+        repoPath,
+        snapshotId,
+        type === 'stash' ? `${snapshotId}^` : null,
+        page,
+        context,
+      ),
   })
 
 const useQuerySnapshotFiles = (
-  snapshotId: SnapshotId,
+  snapshot: SnapshotInfo,
   page: number,
-): UseQueryResult<Page<VersionedFileInfo>> => {
-  return useRepositoryQuery(snapshotFilesQuery, page, snapshotId)
-}
+): UseQueryResult<Page<VersionedFileInfo>> =>
+  useRepositoryQuery(snapshotFilesQuery, page, snapshot.id, snapshot.type)
 
 export { snapshotFilesQueryKeys, useQuerySnapshotFiles }

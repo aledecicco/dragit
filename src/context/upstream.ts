@@ -53,6 +53,7 @@ const changeUpstreamBranch = (remoteBranch: BranchName | undefined) => {
  * Chooses sensible defaults when the branch has no remote set in Git.
  */
 const useUpstreamSync = () => {
+  // TODO: this is not too robust
   const { remote } = useSelectedUpstream()
   const { branch } = useSelectedBranches()
   const prevBranch = usePrevious(branch)

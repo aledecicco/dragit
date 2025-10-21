@@ -34,6 +34,7 @@ const fetchCommitInfo = async (
 
   return {
     ...res,
+    type: 'commit',
     timestamp: res.timestamp * MS_IN_SECOND,
   }
 }

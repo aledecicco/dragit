@@ -286,22 +286,27 @@ impl GitHandler for CmdGit {
         channel: &Channel<AppMessage>,
         repo_path: &str,
         snapshot_id: &str,
+        parent: Option<&str>,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<VersionedFileInfo>, GitError> {
-        let process = self.spawn_and_notify(
-            channel,
-            repo_path,
-            [
-                "diff-tree",
-                "-r",
-                "--root",
-                "--name-status",
-                "--find-copies",
-                "--no-commit-id",
-                snapshot_id,
-            ],
-        )?;
+        let mut args = vec![
+            "diff-tree",
+            "-r",
+            "--root",
+            "--name-status",
+            "--find-copies",
+            "--no-commit-id",
+        ];
+
+        if let Some(parent) = parent {
+            args.push(snapshot_id);
+            args.push(parent);
+        } else {
+            args.push(snapshot_id);
+        }
+
+        let process = self.spawn_and_notify(channel, repo_path, args)?;
         let lines = self.get_output_lines_stream(process)?;
 
         let mut items_iter = lines
@@ -486,10 +491,30 @@ impl GitHandler for CmdGit {
 
         if is_rebase {
             args.push("--rebase");
+        } else {
+            args.push("--no-rebase");
         }
 
         self.spawn_and_await(repo_path, args)
             .or(Err(GitError::PullBranchFailed {
+                branch: branch.to_string(),
+                remote: remote.to_string(),
+                remote_branch: remote_branch.to_string(),
+            }))
+    }
+
+    fn fast_forward_branch(
+        &self,
+        repo_path: &str,
+        branch: &str,
+        remote: &str,
+        remote_branch: &str,
+    ) -> Result<(), GitError> {
+        let remote_ref = format!("+{}:{}", branch, remote_branch);
+        let args = vec!["fetch", remote, &remote_ref];
+
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::FastForwardBranchFailed {
                 branch: branch.to_string(),
                 remote: remote.to_string(),
                 remote_branch: remote_branch.to_string(),

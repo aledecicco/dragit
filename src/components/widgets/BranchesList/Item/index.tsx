@@ -2,7 +2,7 @@ import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@/api/models'
-import { usePullBranch } from '@/api/mutations'
+import { useFastForwardBranch, usePullBranch } from '@/api/mutations'
 import { useCheckoutBranch } from '@/api/mutations/checkoutLocal'
 import { ContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
@@ -32,6 +32,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
   const isCurrentBranch = currentBranch && branch.name === currentBranch.name
 
   const checkout = useCheckoutBranch(branch)
+  const fastForward = useFastForwardBranch(branch)
   const pull = usePullBranch(branch)
 
   return (
@@ -39,7 +40,9 @@ const BranchesListItem = (props: BranchesListItemProps) => {
       items={
         <>
           <MenuItem action={checkout} />
-          {branch.type === 'local' && <MenuItem action={pull} />}
+          {branch.type === 'local' && (
+            <MenuItem action={isCurrentBranch ? pull : fastForward} />
+          )}
         </>
       }
     >

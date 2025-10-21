@@ -65,6 +65,7 @@ pub trait GitHandler {
         channel: &Channel<AppMessage>,
         repo_path: &str,
         snapshot_id: &str,
+        parent: Option<&str>,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<VersionedFileInfo>, GitError>;
@@ -118,6 +119,16 @@ pub trait GitHandler {
         remote: &str,
         remote_branch: &str,
         is_rebase: bool,
+    ) -> Result<(), GitError>;
+
+    /// Fast-forwards the given branch, updating it from the refspec specified by the remote name and the remote branch.
+    /// This is similar to pulling, but can be used without checking out the branch first.
+    fn fast_forward_branch(
+        &self,
+        repo_path: &str,
+        branch: &str,
+        remote: &str,
+        remote_branch: &str,
     ) -> Result<(), GitError>;
 
     /// Returns the list of available remotes.

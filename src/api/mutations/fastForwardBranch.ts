@@ -7,31 +7,30 @@ import type { BranchInfo, BranchName, RemoteName } from '../models'
 import { mutationOptions, useRepositoryMutation } from '../utils'
 import { pathMutationKey } from '.'
 
-const pullBranchKey = (repoPath: string) =>
+const fastForwardBranchKey = (repoPath: string) =>
   ({
     ...pathMutationKey(repoPath),
-    key: 'pull_branch',
+    key: 'fast_forward_branch',
   }) as const
 
-const pullBranchMutation = (repoPath: string) =>
+const fastForwardBranchMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [pullBranchKey(repoPath)],
+    mutationKey: [fastForwardBranchKey(repoPath)],
     mutationFn: (args: {
       branch: BranchName
       remote: RemoteName
       remoteBranch: BranchName
-      isRebase: boolean
     }) => {
-      return invoke('pull_branch', { repoPath, ...args })
+      return invoke('fast_forward_branch', { repoPath, ...args })
     },
     networkMode: 'online',
   })
 
-const usePullBranch = (branch: BranchInfo | undefined): Action => {
-  const pullBranch = useRepositoryMutation(pullBranchMutation)
+const useFastForwardBranch = (branch: BranchInfo | undefined): Action => {
+  const fastForwardBranch = useRepositoryMutation(fastForwardBranchMutation)
 
   return {
-    id: `pull_branch:${branch?.name}`,
+    id: `fast_forward_branch:${branch?.name}`,
     run: async () => {
       if (!branch) {
         throw new Error('No branch specified')
@@ -42,21 +41,20 @@ const usePullBranch = (branch: BranchInfo | undefined): Action => {
       }
 
       // TODO: check if this should use the global remote set.
-      await pullBranch.mutateAsync({
+      await fastForwardBranch.mutateAsync({
         branch: branch.name,
         remote: branch.remote?.remoteName ?? 'origin',
         remoteBranch: branch.remote?.branchName ?? branch.name,
-        isRebase: false,
       })
     },
     label: {
-      idle: 'Pull',
-      running: 'Pulling',
-      success: 'Pulled',
-      error: 'Failed to pull',
+      idle: 'Fast-forward',
+      running: 'Fast-forwarding',
+      success: 'Fast-forwarded',
+      error: 'Failed to fast-forward',
     },
     Glyph: IconDownload,
   }
 }
 
-export { usePullBranch, pullBranchKey }
+export { useFastForwardBranch, fastForwardBranchKey }

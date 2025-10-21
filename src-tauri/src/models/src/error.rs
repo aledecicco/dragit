@@ -78,6 +78,13 @@ pub enum GitError {
         remote_branch: String,
     },
 
+    #[error("Failed to fast-forward \"{branch}\" from refspec \"{remote}\"/\"{remote_branch}\"")]
+    FastForwardBranchFailed {
+        branch: String,
+        remote: String,
+        remote_branch: String,
+    },
+
     #[error("Failed to retrieve remotes")]
     GetRemotesFailed {},
 

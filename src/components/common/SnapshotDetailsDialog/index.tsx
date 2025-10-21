@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { match } from 'ts-pattern'
 
 import type { SnapshotId, SnapshotInfo } from '@/api/models'
 import { SNAPSHOT_FILES_PAGE_SIZE, useQuerySnapshotFiles } from '@/api/queries'
@@ -37,12 +38,15 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
 
   const [page, setPage] = useState(0)
 
-  const snapshotName =
-    'stashNumber' in snapshotInfo
-      ? `Stash #${snapshotInfo.stashNumber}`
-      : `#${snapshotInfo.shortHash}`
+  const snapshotName = match(snapshotInfo)
+    .with(
+      { type: 'stash' },
+      (snapshotInfo) => `Stash #${snapshotInfo.stashNumber}`,
+    )
+    .with({ type: 'commit' }, (snapshotInfo) => `#${snapshotInfo.shortHash}`)
+    .exhaustive()
 
-  const filesQuery = useQuerySnapshotFiles(snapshotInfo.id, page)
+  const filesQuery = useQuerySnapshotFiles(snapshotInfo, page)
   const showPagination = useNeedsPagination(filesQuery, page)
   const fileSelector = useFileSelector(filesQuery.data)
 
