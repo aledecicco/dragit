@@ -5,11 +5,11 @@ import { ToggleGroupItem } from '@/ui/ToggleGroup/Item'
 import { useToggleHandler } from '@/ui/ToggleGroup/utils'
 import { cn } from '@/utils/styles'
 
-interface UnmergedFileViewSelectorProps extends ToggleGroupProps {}
+interface UnmergedViewSelectorProps extends ToggleGroupProps {}
 
 const diffViewModes = ['inline', 'side_by_side'] as const
 
-const UnmergedFileViewSelector = (props: UnmergedFileViewSelectorProps) => {
+const UnmergedViewSelector = (props: UnmergedViewSelectorProps) => {
   const { ...toggleGroupProps } = props
 
   return (
@@ -36,7 +36,7 @@ const useViewModeSelector = () =>
   useToggleHandler(diffViewModes, 'side_by_side')
 
 export {
-  UnmergedFileViewSelector,
+  UnmergedViewSelector,
   useViewModeSelector,
-  type UnmergedFileViewSelectorProps,
+  type UnmergedViewSelectorProps,
 }

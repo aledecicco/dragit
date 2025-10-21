@@ -1,37 +1,41 @@
 pub static EVENT_ID: &str = "app-event";
 
 #[derive(Debug, Clone, serde::Serialize)]
-#[serde(rename_all(serialize = "camelCase"), tag = "type")]
+#[serde(
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase",
+    tag = "type"
+)]
 pub enum AppEvent {
     /// The app tried to open the last folder used, but it's no longer there.
-    DirDisappeared { path: String },
+    DirDisappeared { repo_path: String },
 
     /// The app opened a new directory.
     DirChanged,
 
     /// The .git folder was modified. The result of [`GitHandler::is_repository`] might've changed.
-    GitFolderModified { path: String },
+    GitFolderModified { repo_path: String },
 
     /// Branches were created or deleted.
-    BranchesListUpdated { path: String },
+    BranchesListUpdated { repo_path: String },
 
     /// The state or history of a branch was updated.
-    BranchUpdated { path: String, name: String },
+    BranchUpdated { repo_path: String, name: String },
 
     /// A new reference was checked out.
-    HeadChanged { path: String },
+    HeadChanged { repo_path: String },
 
     /// Non-git file/s were created, deleted, or updated.
-    FilesModified { path: String },
+    FilesModified { repo_path: String },
 
     /// The config file was updated.
-    ConfigUpdated { path: String },
+    ConfigUpdated { repo_path: String },
 
     /// The status of the current commit was updated.
-    IndexUpdated { path: String },
+    IndexUpdated { repo_path: String },
 
     /// The stashes were updated.
-    StashesUpdated { path: String },
+    StashesUpdated { repo_path: String },
 }
 
 #[derive(Debug, Clone, serde::Serialize)]

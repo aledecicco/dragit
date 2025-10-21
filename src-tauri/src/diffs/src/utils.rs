@@ -9,7 +9,7 @@ static SPLIT_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"\n|\r\n|\s+|\w+|[^\w\s]+"#).unwrap());
 
 /// Checks if a string is a newline (either `\n` or `\r\n`).
-pub fn is_newline(s: &str) -> bool {
+fn is_newline(s: &str) -> bool {
     s == "\n" || s == "\r\n"
 }
 

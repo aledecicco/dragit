@@ -1,47 +1,22 @@
 import type { ReactNode } from 'react'
-import { all, createStarryNight } from '@wooorm/starry-night'
-import type { Element, Root, RootContent, Text } from 'hast'
-import { toJsxRuntime } from 'hast-util-to-jsx-runtime'
-import { Fragment, jsx, jsxs } from 'react/jsx-runtime'
+import type { RootContent, Text } from 'hast'
 import { match } from 'ts-pattern'
 
 import type { DiffLineSegment, DiffType, FileDiff } from '@/api/models'
 
+import {
+  getNodeChildren,
+  getTree,
+  type LineNode,
+  NEWLINE_REGEX,
+  renderTree,
+  splitIntoLines,
+  wrapLineInType,
+  wrapNodeInType,
+} from '../utils'
+
 export const DIFF_FILTERS = ['ours', 'theirs', 'both'] as const
 export type DiffFilter = (typeof DIFF_FILTERS)[number]
-
-type LineNode = Element | Text
-
-const starryNight = await createStarryNight(all)
-const NEWLINE_REGEX = /\r\n|\r|\n/
-
-/**
- * Builds a syntax-highlighted tree for the given content and language identifier.
- *
- * @param content - The full content to highlight.
- * @param identifier - The language identifier (can be a filepath).
- */
-const getTree = (content: string, identifier: string): Root => {
-  const scope = starryNight.flagToScope(identifier)
-  if (!scope) {
-    return {
-      type: 'root',
-      children: [{ type: 'text', value: content }],
-    }
-  }
-
-  return starryNight.highlight(content, scope)
-}
-
-/**
- * Renders a syntax-highlighted tree into a React node.
- *
- * @param tree - The hast tree to render.
- */
-const renderTree = (tree: Root): ReactNode => {
-  const node = toJsxRuntime(tree, { Fragment, jsx, jsxs })
-  return node
-}
 
 /**
  * Gets the type of a diff segment based on its first character.
@@ -81,119 +56,6 @@ const getContentAfter = (fileDiff: FileDiff): string => {
 }
 
 /**
- * Splits a syntax-highlighted tree into lines.
- *
- * @param tree - The hast tree to split.
- */
-const splitIntoLines = (tree: Root): LineNode[][] => {
-  const lines: LineNode[][] = []
-  let line: LineNode[] = []
-
-  tree.children.forEach((node) => {
-    if (node.type === 'text') {
-      const parts = node.value.split(NEWLINE_REGEX)
-      parts.forEach((part, index) => {
-        if (index > 0) {
-          line.push({ type: 'text', value: '\n' })
-          lines.push(line)
-          line = []
-        }
-
-        if (part.length > 0) {
-          line.push({ ...node, value: part })
-        }
-      })
-    } else if (node.type === 'element') {
-      line.push(node)
-    }
-  })
-
-  if (line.length > 0) {
-    lines.push(line)
-  }
-
-  return lines
-}
-
-/**
- * Builds a shallow copy of the relevant children of a node.
- *
- * @param node - The node to get the children of.
- */
-const getNodeChildren = (node: Element): LineNode[] => {
-  const res: LineNode[] = []
-
-  for (const child of node.children) {
-    if (child.type === 'text' || child.type === 'element') {
-      res.push(child)
-    }
-  }
-
-  return res
-}
-
-/**
- * Wraps the given node with the appropriate highlighting for the given segment type.
- *
- * @param node - The node to wrap.
- * @param diffType - The type of diff to apply.
- */
-const wrapNodeInDiff = (node: Text, diffType: DiffType): LineNode => {
-  return match(diffType)
-    .returnType<LineNode>()
-    .with('added', () => ({
-      type: 'element',
-      tagName: 'span',
-      properties: {
-        className: 'bg-success-400/15 py-0.5',
-      },
-      children: [node],
-    }))
-    .with('removed', () => ({
-      type: 'element',
-      tagName: 'span',
-      properties: {
-        className: 'bg-danger-400/15 py-0.5',
-      },
-      children: [node],
-    }))
-    .with('unchanged', () => node)
-    .exhaustive()
-}
-
-/**
- * Wraps the given line with the appropriate highlighting for the given diff type.
- *
- * @param line - The line to wrap.
- * @param diffType - The type of diff to apply.
- */
-const wrapLineInDiff = (line: LineNode[], diffType: DiffType): Element => {
-  return match(diffType)
-    .returnType<Element>()
-    .with('added', () => ({
-      type: 'element',
-      children: line,
-      tagName: 'span',
-      properties: {
-        className: 'bg-success-500/8 w-full block -ml-2 pl-2 pr-5',
-      },
-    }))
-    .with('removed', () => ({
-      type: 'element',
-      children: line,
-      tagName: 'span',
-      properties: { className: 'bg-danger-500/8 w-full block -ml-2 pl-2 pr-5' },
-    }))
-    .with('unchanged', () => ({
-      type: 'element',
-      children: line,
-      tagName: 'span',
-      properties: { className: 'w-full block -ml-2 pl-2 pr-5' },
-    }))
-    .exhaustive()
-}
-
-/**
  * Applies a diff segment to a text node, returning a new node
  * and the number of characters covered.
  *
@@ -210,13 +72,13 @@ const applyDiffSegment = (
 
   if (segmentLength >= nodeLength) {
     // The diff segment covers the whole text node, so we wrap it completely,
-    const newNode = wrapNodeInDiff(node, segmentType)
+    const newNode = wrapNodeInType(node, segmentType)
     return [newNode, nodeLength]
   }
 
   // The diff segment only covers part of the text node, so we wrap only that.
   const coveredPart = node.value.slice(0, segmentLength)
-  const newNode = wrapNodeInDiff(
+  const newNode = wrapNodeInType(
     { type: 'text', value: coveredPart },
     segmentType,
   )
@@ -298,7 +160,7 @@ const applyDiffLineInner = (
  * @param diffSegments - The diff segments for the line.
  * @param line - The line to modify.
  */
-const addVisislbeNewlines = (
+const addVisibleNewlines = (
   diffSegments: DiffLineSegment[],
   line: LineNode[],
 ) => {
@@ -345,7 +207,7 @@ const applyDiffLine = (
   const newLine = [...line]
   const newSegments = [...diffSegments]
 
-  addVisislbeNewlines(newSegments, newLine)
+  addVisibleNewlines(newSegments, newLine)
 
   return applyDiffLineInner(newSegments, newLine)
 }
@@ -426,48 +288,41 @@ export const highlightDiff = (
       .with('added', () => {
         // If this is an added line, we take it from the "after" content.
         if (filter !== 'theirs') {
-          res.push(wrapLineInDiff(lineAfter, diffLine.type))
+          res.push(wrapLineInType(lineAfter, diffLine.type))
         }
         pointerAfter++
       })
       .with('removed', () => {
         // If this is a removed line, we take it from the "before" content.
         if (filter !== 'ours') {
-          res.push(wrapLineInDiff(lineBefore, diffLine.type))
+          res.push(wrapLineInType(lineBefore, diffLine.type))
         }
         pointerBefore++
       })
       .with('unchanged', () => {
         // If this is an unchanged line, either one should be the same,
         // and so we move both pointers.
-        res.push(wrapLineInDiff(lineBefore, diffLine.type))
+        res.push(wrapLineInType(lineBefore, diffLine.type))
         pointerBefore++
         pointerAfter++
       })
       .exhaustive()
   }
 
-  if (res.length === 0) {
-    return renderTree({
-      type: 'root',
-      children: [
-        wrapLineInDiff(
-          [
-            {
-              type: 'element',
-              tagName: 'p',
-              properties: { className: 'text-light-950/50 italic' },
-              children: [{ type: 'text', value: 'Empty' }],
-            },
-          ],
-          'unchanged',
-        ),
-      ],
-    })
-  }
-
   // We add an empty line at the end for continuity.
-  res.push(wrapLineInDiff([{ type: 'text', value: '\n' }], 'unchanged'))
+  const finalLine: LineNode[] =
+    res.length === 0
+      ? [
+          {
+            type: 'element',
+            tagName: 'p',
+            properties: { className: 'text-light-950/50 italic select-none' },
+            children: [{ type: 'text', value: 'Empty' }],
+          },
+        ]
+      : [{ type: 'text', value: '\n' }]
+
+  res.push(wrapLineInType(finalLine, 'unchanged'))
 
   return renderTree({ type: 'root', children: res })
 }

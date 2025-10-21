@@ -12,7 +12,7 @@ import { FILE_DIFF_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
-const filesDiffQueryKeys = {
+const fileDiffQueryKeys = {
   all: (repoPath: string) =>
     ({
       ...pathQueryKey(repoPath),
@@ -20,7 +20,7 @@ const filesDiffQueryKeys = {
     }) as const,
   file: (repoPath: string, scope: DiffScope) =>
     ({
-      ...filesDiffQueryKeys.all(repoPath),
+      ...fileDiffQueryKeys.all(repoPath),
       scope,
     }) as const,
 }
@@ -74,7 +74,7 @@ const fetchFileDiff = async (
 
 const fileDiffQuery = (repoPath: string, scope: DiffScope) =>
   queryOptions({
-    queryKey: [filesDiffQueryKeys.file(repoPath, scope)],
+    queryKey: [fileDiffQueryKeys.file(repoPath, scope)],
     queryFn: (context) => fetchFileDiff(repoPath, scope, context),
   })
 
@@ -163,4 +163,4 @@ const serializeVersionedFile = (file: VersionedFileInfo) => {
   }
 }
 
-export { filesDiffQueryKeys, useQueryFileDiff }
+export { fileDiffQueryKeys, useQueryFileDiff }

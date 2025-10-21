@@ -3,13 +3,14 @@ import { showDialog } from '@/context/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { cn, propsWithCn } from '@/utils/styles'
 
-import { FileDiffViewer } from '../FileDiffViewer'
+import { FileConflictViewer } from '../FileViewer/Conflict'
+import { FileDiffViewer } from '../FileViewer/Diff'
 import {
-  DiffViewerFilterSelector,
+  DiffFilterSelector,
   useDiffFilterSelector,
-} from '../FileDiffViewer/FilterSelector'
+} from '../FileViewer/Diff/FilterSelector'
 import {
-  UnmergedFileViewSelector,
+  UnmergedViewSelector,
   useViewModeSelector,
 } from './UnmergedViewSelector'
 
@@ -55,7 +56,7 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
       }
     >
       {file.status === 'unmerged' && !isSideBySide ? (
-        'TODO: conflict viewer'
+        <FileConflictViewer file={file} />
       ) : (
         <FileDiffViewer
           filter={file.status === 'unmerged' ? 'both' : filterSelector.value}
@@ -72,12 +73,12 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
       )}
 
       {file.status === 'unmerged' ? (
-        <UnmergedFileViewSelector
+        <UnmergedViewSelector
           className="absolute -bottom-3 left-half -translate-x-half"
           store={viewModeSelector.store}
         />
       ) : (
-        <DiffViewerFilterSelector
+        <DiffFilterSelector
           className="absolute -bottom-3 left-half -translate-x-half"
           store={filterSelector.store}
         />

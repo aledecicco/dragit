@@ -4,16 +4,16 @@ import type { SnapshotId, SnapshotInfo } from '@/api/models'
 import { SNAPSHOT_FILES_PAGE_SIZE, useQuerySnapshotFiles } from '@/api/queries'
 import { useNeedsPagination } from '@/api/utils'
 import { ChangesSummary } from '@/common/DiffSummary'
-import { FileDiffViewer } from '@/common/FileDiffViewer'
 import { showDialog } from '@/context/dialogs'
 import { Pagination } from '@/lib/Pagination'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { cn, propsWithCn } from '@/utils/styles'
 
+import { FileDiffViewer } from '../FileViewer/Diff'
 import {
-  DiffViewerFilterSelector,
+  DiffFilterSelector,
   useDiffFilterSelector,
-} from '../FileDiffViewer/FilterSelector'
+} from '../FileViewer/Diff/FilterSelector'
 import { SnapshotDialogDescription } from './Description'
 import { SnapshotDialogFileList, useFileSelector } from './FileList'
 
@@ -106,7 +106,7 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
       )}
 
       {fileSelector.selectedFile && (
-        <DiffViewerFilterSelector
+        <DiffFilterSelector
           className="absolute -bottom-3 left-[calc(50%+215px)] -translate-x-half z-1"
           store={filterSelector.store}
         />

@@ -101,7 +101,7 @@ impl DebouncedWatcher {
                                         EVENT_ID,
                                         AppEvent::BranchUpdated {
                                             name: branch_name.to_string(),
-                                            path: pathname.to_string(),
+                                            repo_path: pathname.to_string(),
                                         },
                                     );
                                     //println!("branch updated {}", branch_name);
@@ -116,7 +116,7 @@ impl DebouncedWatcher {
                                         EVENT_ID,
                                         AppEvent::BranchUpdated {
                                             name: branch_name.to_string(),
-                                            path: pathname.to_string(),
+                                            repo_path: pathname.to_string(),
                                         },
                                     );
                                     //println!("remote branch updated {}", branch_name);
@@ -168,7 +168,7 @@ impl DebouncedWatcher {
                         let _ = app_handle.emit(
                             EVENT_ID,
                             AppEvent::FilesModified {
-                                path: pathname.to_string(),
+                                repo_path: pathname.to_string(),
                             },
                         );
                     }
@@ -177,7 +177,7 @@ impl DebouncedWatcher {
                         let _ = app_handle.emit(
                             EVENT_ID,
                             AppEvent::HeadChanged {
-                                path: pathname.to_string(),
+                                repo_path: pathname.to_string(),
                             },
                         );
                     }
@@ -186,7 +186,7 @@ impl DebouncedWatcher {
                         let _ = app_handle.emit(
                             EVENT_ID,
                             AppEvent::BranchesListUpdated {
-                                path: pathname.to_string(),
+                                repo_path: pathname.to_string(),
                             },
                         );
                     }
@@ -195,7 +195,7 @@ impl DebouncedWatcher {
                         let _ = app_handle.emit(
                             EVENT_ID,
                             AppEvent::GitFolderModified {
-                                path: pathname.to_string(),
+                                repo_path: pathname.to_string(),
                             },
                         );
                     }
@@ -204,7 +204,7 @@ impl DebouncedWatcher {
                         let _ = app_handle.emit(
                             EVENT_ID,
                             AppEvent::ConfigUpdated {
-                                path: pathname.to_string(),
+                                repo_path: pathname.to_string(),
                             },
                         );
                     }
@@ -213,7 +213,7 @@ impl DebouncedWatcher {
                         let _ = app_handle.emit(
                             EVENT_ID,
                             AppEvent::IndexUpdated {
-                                path: pathname.to_string(),
+                                repo_path: pathname.to_string(),
                             },
                         );
                     }
@@ -222,7 +222,7 @@ impl DebouncedWatcher {
                         let _ = app_handle.emit(
                             EVENT_ID,
                             AppEvent::StashesUpdated {
-                                path: pathname.to_string(),
+                                repo_path: pathname.to_string(),
                             },
                         );
                     }

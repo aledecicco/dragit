@@ -17,6 +17,8 @@ import {
   stashesQueryKeys,
   worktreeFilesQueryKeys,
 } from './queries'
+import { fileConflictsQueryKeys } from './queries/fileConflicts'
+import { fileDiffQueryKeys } from './queries/fileDiff'
 
 const EVENT_ID = 'app-event'
 
@@ -31,46 +33,58 @@ const useEventsHandler = () => {
     const unlisten = listen<AppEvent>(EVENT_ID, (event) => {
       console.log(`Received event: ${JSON.stringify(event)}`)
       match(event.payload)
-        .with({ type: 'dirDisappeared' }, () => {
+        .with({ type: 'dirDisappeared', repoPath: P._ }, () => {
           // TODO: show a notification that the directory is gone
         })
         .with({ type: 'dirChanged' }, () => {
           client.resetQueries()
         })
-        .with({ type: 'gitFolderModified', path: P.string }, ({ path }) => {
-          client.invalidateQueries({
-            queryKey: [pathQueryKey(path)],
-          })
-        })
-        .with({ type: 'branchesListUpdated', path: P.string }, ({ path }) => {
-          client.invalidateQueries({
-            queryKey: [branchesQueryKeys.all(path)],
-          })
-        })
         .with(
-          { type: 'branchUpdated', path: P.string, name: P.string },
-          ({ name: branchName, path }) => {
+          { type: 'gitFolderModified', repoPath: P.string },
+          ({ repoPath }) => {
             client.invalidateQueries({
-              queryKey: [commitHistoryQueryKeys.reference(path, branchName)],
+              queryKey: [pathQueryKey(repoPath)],
             })
-
+          },
+        )
+        .with(
+          { type: 'branchesListUpdated', repoPath: P.string },
+          ({ repoPath }) => {
             client.invalidateQueries({
-              queryKey: [branchDivergenceQueryKeys.branch(path, branchName)],
+              queryKey: [branchesQueryKeys.all(repoPath)],
             })
-
+          },
+        )
+        .with(
+          { type: 'branchUpdated', repoPath: P.string, name: P.string },
+          ({ name: branchName, repoPath }) => {
             client.invalidateQueries({
               queryKey: [
-                branchDivergenceQueryKeys.baseBranch(path, branchName),
+                commitHistoryQueryKeys.reference(repoPath, branchName),
               ],
             })
 
             client.invalidateQueries({
-              queryKey: [commonAncestorQueryKeys.reference(path, branchName)],
+              queryKey: [
+                branchDivergenceQueryKeys.branch(repoPath, branchName),
+              ],
             })
 
             client.invalidateQueries({
               queryKey: [
-                commonAncestorQueryKeys.baseReference(path, branchName),
+                branchDivergenceQueryKeys.baseBranch(repoPath, branchName),
+              ],
+            })
+
+            client.invalidateQueries({
+              queryKey: [
+                commonAncestorQueryKeys.reference(repoPath, branchName),
+              ],
+            })
+
+            client.invalidateQueries({
+              queryKey: [
+                commonAncestorQueryKeys.baseReference(repoPath, branchName),
               ],
             })
 
@@ -80,47 +94,57 @@ const useEventsHandler = () => {
               reference.refName === branchName
             ) {
               client.invalidateQueries({
-                queryKey: [headInfoQueryKeys.all(path)],
+                queryKey: [headInfoQueryKeys.all(repoPath)],
               })
               client.invalidateQueries({
-                queryKey: [worktreeFilesQueryKeys.all(path)],
+                queryKey: [worktreeFilesQueryKeys.all(repoPath)],
               })
             }
           },
         )
-        .with({ type: 'headChanged', path: P.string }, ({ path }) => {
+        .with({ type: 'headChanged', repoPath: P.string }, ({ repoPath }) => {
           client.invalidateQueries({
-            queryKey: [headInfoQueryKeys.all(path)],
+            queryKey: [headInfoQueryKeys.all(repoPath)],
           })
         })
-        .with({ type: 'filesModified', path: P.string }, ({ path }) => {
+        .with({ type: 'filesModified', repoPath: P.string }, ({ repoPath }) => {
           client.invalidateQueries({
-            queryKey: [worktreeFilesQueryKeys.status(path, 'unstaged').all],
+            queryKey: [
+              worktreeFilesQueryKeys.status(repoPath, ['unstaged', 'untracked'])
+                .all,
+            ],
           })
 
           client.invalidateQueries({
-            queryKey: [worktreeFilesQueryKeys.status(path, 'untracked').all],
+            queryKey: [fileConflictsQueryKeys.all(repoPath)],
           })
         })
-        .with({ type: 'configUpdated', path: P.string }, ({ path }) => {
+        .with({ type: 'configUpdated', repoPath: P.string }, ({ repoPath }) => {
           client.invalidateQueries({
-            queryKey: [branchesQueryKeys.all(path)],
+            queryKey: [branchesQueryKeys.all(repoPath)],
           })
 
           client.invalidateQueries({
-            queryKey: [remotesQueryKeys.all(path)],
+            queryKey: [remotesQueryKeys.all(repoPath)],
           })
         })
-        .with({ type: 'indexUpdated', path: P.string }, ({ path }) => {
+        .with({ type: 'indexUpdated', repoPath: P.string }, ({ repoPath }) => {
           client.invalidateQueries({
-            queryKey: [worktreeFilesQueryKeys.all(path)],
+            queryKey: [worktreeFilesQueryKeys.all(repoPath)],
           })
-        })
-        .with({ type: 'stashesUpdated', path: P.string }, ({ path }) => {
+
           client.invalidateQueries({
-            queryKey: [stashesQueryKeys.all(path)],
+            queryKey: [fileDiffQueryKeys.all(repoPath)],
           })
         })
+        .with(
+          { type: 'stashesUpdated', repoPath: P.string },
+          ({ repoPath }) => {
+            client.invalidateQueries({
+              queryKey: [stashesQueryKeys.all(repoPath)],
+            })
+          },
+        )
         .exhaustive()
     })
 

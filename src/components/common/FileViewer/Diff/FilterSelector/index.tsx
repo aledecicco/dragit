@@ -11,9 +11,9 @@ import { cn } from '@/utils/styles'
 
 import { DIFF_FILTERS } from '../utils'
 
-interface DiffViewerFilterSelectorProps extends ToggleGroupProps {}
+interface DiffFilterSelectorProps extends ToggleGroupProps {}
 
-const DiffViewerFilterSelector = (props: DiffViewerFilterSelectorProps) => {
+const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
   const { ...toggleGroupProps } = props
 
   return (
@@ -48,7 +48,7 @@ const DiffViewerFilterSelector = (props: DiffViewerFilterSelectorProps) => {
 const useDiffFilterSelector = () => useToggleHandler(DIFF_FILTERS, 'both')
 
 export {
-  DiffViewerFilterSelector,
+  DiffFilterSelector,
   useDiffFilterSelector,
-  type DiffViewerFilterSelectorProps,
+  type DiffFilterSelectorProps,
 }

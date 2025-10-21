@@ -90,25 +90,25 @@ export type MergeStatus =
   | 'addedByThem'
   | 'deletedByThem'
 
-interface BaseFileInfo {
+export interface FileInfo {
   path: string
 }
 
-export type StagedFileInfo = BaseFileInfo & {
+export type StagedFileInfo = FileInfo & {
   status: 'staged'
 } & ({ changes: ChangeStatus } | { changes: MovedStatus; oldPath: string })
 
-export interface UnstagedFileInfo extends BaseFileInfo {
+export interface UnstagedFileInfo extends FileInfo {
   status: 'unstaged'
   changes: ChangeStatus
 }
 
-export interface UnmergedFileInfo extends BaseFileInfo {
+export interface UnmergedFileInfo extends FileInfo {
   status: 'unmerged'
   changes: MergeStatus
 }
 
-export interface UntrackedFileInfo extends BaseFileInfo {
+export interface UntrackedFileInfo extends FileInfo {
   status: 'untracked'
 }
 
@@ -131,7 +131,7 @@ export type FileOfType<T extends WorktreeFileType> = WorktreeFileTypes[T]
 export type FileTypeFilter = {
   [T in WorktreeFileType]?: boolean
 }
-export type VersionedFileInfo = BaseFileInfo &
+export type VersionedFileInfo = FileInfo &
   ({ changes: ChangeStatus } | { changes: MovedStatus; oldPath: string })
 
 export interface RemoteInfo {
@@ -195,19 +195,28 @@ export type DiffScope =
   | { type: 'unmerged'; file: UnmergedFileInfo; stage: MergeDiffStage }
   | { type: 'snapshot'; snapshotId: SnapshotId; file: VersionedFileInfo }
 
+export type ConflictType = 'ours' | 'theirs' | 'unchanged'
+
+export interface ConflictLine {
+  type: ConflictType
+  content: string
+}
+
+export type FileConflicts = ConflictLine[]
+
 export type AppMessage = {
   type: 'processStarted'
   pid: number
 }
 
 export type AppEvent =
-  | { type: 'dirDisappeared'; path: string }
+  | { type: 'dirDisappeared'; repoPath: string }
   | { type: 'dirChanged' }
-  | { type: 'gitFolderModified'; path: string }
-  | { type: 'branchesListUpdated'; path: string }
-  | { type: 'branchUpdated'; path: string; name: string }
-  | { type: 'headChanged'; path: string }
-  | { type: 'filesModified'; path: string }
-  | { type: 'configUpdated'; path: string }
-  | { type: 'indexUpdated'; path: string }
-  | { type: 'stashesUpdated'; path: string }
+  | { type: 'gitFolderModified'; repoPath: string }
+  | { type: 'branchesListUpdated'; repoPath: string }
+  | { type: 'branchUpdated'; repoPath: string; name: string }
+  | { type: 'headChanged'; repoPath: string }
+  | { type: 'filesModified'; repoPath: string }
+  | { type: 'configUpdated'; repoPath: string }
+  | { type: 'indexUpdated'; repoPath: string }
+  | { type: 'stashesUpdated'; repoPath: string }

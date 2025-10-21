@@ -7,8 +7,8 @@ use tauri::{
 use crate::{serialize_response, utils::get_disk_file_contents, with_handler};
 use diffs::{compute_diff, get_diff_sources};
 use models::{
-    AppError, AppEvent, AppMessage, AppState, CurrentDirInfo, DiffScope, DiffSource,
-    FileTypesFilter, GitHandler, RepoWatcherError, Settings, EVENT_ID,
+    AppError, AppEvent, AppMessage, AppState, ConflictLine, ConflictMode, CurrentDirInfo,
+    DiffScope, DiffSource, FileTypesFilter, GitHandler, RepoWatcherError, Settings, EVENT_ID,
 };
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
@@ -400,21 +400,56 @@ pub async fn get_file_diff(
 
     let before_content = match before_source {
         DiffSource::Empty => "".to_string(),
-        DiffSource::DiskFile(path) => get_disk_file_contents(repo_path, &path)?,
-        DiffSource::GitReference(reference, path) => with_handler(&state, &|h| {
-            h.get_file_contents(&channel, repo_path, &reference, &path)
+        DiffSource::DiskFile(filepath) => get_disk_file_contents(repo_path, &filepath)?,
+        DiffSource::GitReference(reference, filepath) => with_handler(&state, &|h| {
+            h.get_file_contents(&channel, repo_path, &reference, &filepath)
         })?,
     };
 
     let after_content = match after_source {
         DiffSource::Empty => "".to_string(),
-        DiffSource::DiskFile(path) => get_disk_file_contents(repo_path, &path)?,
-        DiffSource::GitReference(reference, path) => with_handler(&state, &|h| {
-            h.get_file_contents(&channel, repo_path, &reference, &path)
+        DiffSource::DiskFile(filepath) => get_disk_file_contents(repo_path, &filepath)?,
+        DiffSource::GitReference(reference, filepath) => with_handler(&state, &|h| {
+            h.get_file_contents(&channel, repo_path, &reference, &filepath)
         })?,
     };
 
     let diff = compute_diff(&before_content, &after_content);
 
     serialize_response(diff)
+}
+
+#[tauri::command]
+pub async fn get_file_conflicts(repo_path: &str, filepath: &str) -> Result<Response, AppError> {
+    let content = get_disk_file_contents(repo_path, filepath)?;
+
+    let mut current_section = ConflictMode::Unchanged;
+
+    let conflicts = content
+        .lines()
+        .map(|line| {
+            // TODO: Handle cases where conflict markers appear in the actual file content
+            if line.starts_with("<<<<<<< ") {
+                current_section = ConflictMode::Ours;
+                return None;
+            } else if line.starts_with("=======") {
+                current_section = ConflictMode::Theirs;
+                return None;
+            } else if line.starts_with(">>>>>>> ") {
+                current_section = ConflictMode::Unchanged;
+                return None;
+            }
+
+            let conflict_line = match current_section {
+                ConflictMode::Unchanged => ConflictLine::Unchanged(line.to_string()),
+                ConflictMode::Ours => ConflictLine::Ours(line.to_string()),
+                ConflictMode::Theirs => ConflictLine::Theirs(line.to_string()),
+            };
+
+            Some(conflict_line)
+        })
+        .flatten()
+        .collect::<Vec<ConflictLine>>();
+
+    serialize_response(conflicts)
 }

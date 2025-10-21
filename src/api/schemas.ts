@@ -171,16 +171,18 @@ export const STASH_INFO_SCHEMA = BorshSchema.Struct({
 })
 export const STASHES_SCHEMA = BorshSchema.Vec(STASH_INFO_SCHEMA)
 
-export const DIFF_TYPE_SCHEMA = BorshSchema.Enum({
-  Added: BorshSchema.Unit,
-  Removed: BorshSchema.Unit,
-  Unchanged: BorshSchema.Unit,
-})
-
 export const FILE_DIFF_SCHEMA = BorshSchema.Vec(
   BorshSchema.Enum({
     Added: BorshSchema.Vec(BorshSchema.String),
     Removed: BorshSchema.Vec(BorshSchema.String),
     Unchanged: BorshSchema.Vec(BorshSchema.String),
+  }),
+)
+
+export const FILE_CONFLICTS_SCHEMA = BorshSchema.Vec(
+  BorshSchema.Enum({
+    Ours: BorshSchema.String,
+    Theirs: BorshSchema.String,
+    Unchanged: BorshSchema.String,
   }),
 )

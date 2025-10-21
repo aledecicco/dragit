@@ -29,7 +29,7 @@ pub fn run() {
                         let _ = app_handle.emit(
                             EVENT_ID,
                             AppEvent::DirDisappeared {
-                                path: last.to_string(),
+                                repo_path: last.to_string(),
                             },
                         );
                         let _ = remove_recent_folder(app_handle, &last);
@@ -77,6 +77,7 @@ pub fn run() {
             api::apply_stash,
             api::discard_stash,
             api::get_file_diff,
+            api::get_file_conflicts,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");
