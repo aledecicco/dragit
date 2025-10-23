@@ -17,7 +17,7 @@ const InputField = (props: InputFieldProps) => {
         fieldProps,
         'p-3 text-sm bg-dark-800 rounded-sm text-light-800',
         fieldProps.compact && 'px-2 py-1',
-        'border-1 border-transparent',
+        'border border-transparent',
         'aria-invalid:border-danger-300',
       )}
     />

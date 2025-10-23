@@ -24,7 +24,7 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
     <Ariakit.Button
       {...propsWithCn(
         buttonProps,
-        'p-2 border-1 border-dark-100 rounded-sm',
+        'p-2 border border-dark-100 rounded-sm',
         'cursor-pointer',
         'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
         'hover:dithered-bg-dark-500 data-active-item:dithered-bg-dark-500',

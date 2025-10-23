@@ -16,11 +16,11 @@ const AutosuggestItem = (props: AutosuggestItemProps) => {
         'p-2 rounded-sm cursor-pointer',
         'wrap-anywhere',
         itemProps.value === '' && 'italic',
-        'data-[active-item]:bg-dark-100',
+        'data-active-item:bg-dark-100',
       )}
     >
       <Ariakit.ComboboxItemValue
-        className={cn('*:data-[user-value]:text-accent-300')}
+        className={cn('*:data-user-value:text-accent-300')}
       />
     </Ariakit.ComboboxItem>
   )

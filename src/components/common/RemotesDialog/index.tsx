@@ -33,7 +33,7 @@ const RemotesDialog = (props: RemotesDialogProps) => {
       <div
         className={cn(
           'grid max-h-60 overflow-y-hidden mb-4',
-          'bg-dark-700 border-1 border-dark-300 rounded-lg',
+          'bg-dark-700 border border-dark-300 rounded-lg',
         )}
       >
         <QueryList

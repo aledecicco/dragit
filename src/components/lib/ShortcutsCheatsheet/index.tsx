@@ -90,7 +90,7 @@ const ShortcutKey = (props: {
       className={cn(
         'bg-dark-600',
         'rounded-sm border-[0.5px] border-light-950/40',
-        pressed ? 'pb-0.5 mt-0.25' : 'pb-0.75',
+        pressed ? 'pb-0.5 mt-px' : 'pb-0.75',
       )}
       aria-label={props.withLabel ? props.shortcutKey.keyName : undefined}
     >

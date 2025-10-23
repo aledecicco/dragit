@@ -31,7 +31,7 @@ const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
       {...propsWithCn(
         radioProps,
         'overflow-y-hidden',
-        'bg-dark-700 border-1 border-dark-300 rounded-lg',
+        'bg-dark-700 border border-dark-300 rounded-lg',
       )}
     >
       <QueryList

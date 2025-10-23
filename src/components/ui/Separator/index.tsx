@@ -11,7 +11,7 @@ const Separator = (props: SeparatorProps) => {
   const { ...separatorProps } = props
   return (
     <Ariakit.Separator
-      {...propsWithCn(separatorProps, 'border-t-[1px] border-dark-600')}
+      {...propsWithCn(separatorProps, 'border-t border-dark-600')}
     />
   )
 }

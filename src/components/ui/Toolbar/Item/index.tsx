@@ -82,7 +82,7 @@ const BaseToolbarItem = (props: BaseToolbarItemProps) => {
         fixed && 'w-full',
         'not-first:rounded-l-none',
         'not-last:rounded-r-none',
-        'not-last:border-solid not-last:border-r-1',
+        'not-last:border-solid not-last:border-r',
         match(status)
           .with('primary', () => 'not-last:border-r-primary-800')
           .with('cta', () => 'not-last:border-r-accent-700')

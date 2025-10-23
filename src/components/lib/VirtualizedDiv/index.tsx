@@ -40,6 +40,8 @@ interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
 }
 
 /**
+ * TODO: is this being optimized by the compiler?
+ *
  * A div that automatically initializes a virtualized list.
  *
  * Displays shadows to signal scrollable content.

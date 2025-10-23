@@ -17,7 +17,7 @@ const TextField = (props: TextFieldProps) => {
       {...propsWithCn(
         fieldProps,
         'p-3 bg-dark-800 rounded-sm text-sm text-light-800 resize-none',
-        'border-1 border-transparent',
+        'border border-transparent',
         'aria-invalid:border-danger-300',
       )}
     />

@@ -17,6 +17,13 @@ interface SvgOverlayProps extends ComponentProps<'div'> {
   RenderOverlay: ComponentType<Pick<SvgOverlayState, 'elements'>>
 }
 
+/**
+ * TODO: is this being optimized by the compiler?
+ *
+ * Renders the given children with an SVG overlay.
+ *
+ * Takes a component that should take care of rendering the SVG elements based on the state.
+ */
 const SvgOverlay = (props: SvgOverlayProps) => {
   return (
     <SvgOverlayContextProvider>
@@ -24,12 +31,6 @@ const SvgOverlay = (props: SvgOverlayProps) => {
     </SvgOverlayContextProvider>
   )
 }
-
-/**
- * Renders the given children with an SVG overlay.
- *
- * Takes a component that should take care of rendering the SVG elements based on the state.
- */
 const SvgOverlayInner = (props: SvgOverlayProps) => {
   const { children, RenderOverlay, ...divProps } = props
   const svgOverlay = useSvgOverlay()

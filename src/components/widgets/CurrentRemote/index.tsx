@@ -78,7 +78,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
               : 'primary'
             : 'neutral'
         }
-        className={cn('max-w-half -mr-[2px] pr-4 rounded-r-none')}
+        className={cn('max-w-half -mr-0.5 pr-4 rounded-r-none')}
         style={{
           clipPath: 'polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
         }}

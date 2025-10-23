@@ -28,7 +28,7 @@ const SnapshotDialogDescription = (props: SnapshotDialogDescriptionProps) => {
     <div {...divProps}>
       <div
         className={cn(
-          'border-1 border-dark-50 rounded-sm',
+          'border border-dark-50 rounded-sm',
           'bg-dark-500 text-light-400 text-sm whitespace-pre-wrap',
           'p-3 max-h-40 overflow-y-auto',
           'mb-2',

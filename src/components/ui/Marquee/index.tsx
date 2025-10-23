@@ -160,7 +160,7 @@ const Marquee = (props: MarqueeProps) => {
           <div
             className={cn(
               'absolute top-0 -left-0.5 h-full',
-              'w-2 bg-linear-to-r from-dark-950/70 to-[transparent] rounded-r-xs',
+              'w-2 bg-linear-to-r from-dark-950/70 to-transparent rounded-r-xs',
               reverse
                 ? [
                     'opacity-100',
@@ -177,7 +177,7 @@ const Marquee = (props: MarqueeProps) => {
           <div
             className={cn(
               'absolute top-0 -right-0.5 h-full',
-              'opacity-100 w-2 bg-linear-to-l from-dark-950/70 to-[transparent] rounded-r-xs',
+              'opacity-100 w-2 bg-linear-to-l from-dark-950/70 to-transparent rounded-r-xs',
               reverse
                 ? 'opacity-0 group-hover/marquee:animate-fade-in'
                 : [

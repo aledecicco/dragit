@@ -59,7 +59,7 @@ const SplitButton = (props: SplitButtonProps) => {
         round={false}
         className={cn(
           'rounded-l-[inherit] rounded-r-none grow',
-          'border-r-1 border-solid',
+          'border-r border-solid',
           match(buttonProps.status)
             .with('primary', () => 'border-r-primary-800')
             .with('cta', () => 'border-r-accent-700')

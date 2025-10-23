@@ -51,7 +51,7 @@ const StashesListItem = (props: StashesListItemProps) => {
         {...propsWithCn(
           itemProps,
           'flex flex-col justify-between',
-          'border-1 border-solid border-transparent',
+          'border border-solid border-transparent',
         )}
         onClick={(e) => {
           itemProps.onClick?.(e)

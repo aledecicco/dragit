@@ -38,6 +38,8 @@ interface GraphCommitProps extends ComponentProps<'div'> {
 }
 
 /**
+ * TODO: is this being optimized by the compiler?
+ *
  * A single commit which displays a card with a short summary about it, and a node for edges to use as anchor.
  *
  * Registers/unregisters itself in the SVG overlay when mounted/unmounted.

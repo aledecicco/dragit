@@ -149,7 +149,6 @@ const useRepositoryInfiniteQuery = <
     TQueryFnData,
     TError,
     TData,
-    TQueryFnData,
     TQueryKey,
     TPageParam
   >,
@@ -187,7 +186,9 @@ const fetchAndDeserialize = async <T>(
     // When the query is aborted, we set a flag to kill processes later.
     shouldStop = true
     // And we kill any processes we already have the pid for.
-    processIds.forEach((pid) => new Child(pid).kill())
+    processIds.forEach((pid) => {
+      new Child(pid).kill()
+    })
   }
 
   const channel = new Channel<AppMessage>()

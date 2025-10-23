@@ -1,9 +1,9 @@
 import type { ComponentProps } from 'react'
 import { IconReload } from '@tabler/icons-react'
 
-import { Button } from '@/ui/Button'
-import { Icon } from '@/ui/Icon'
-import { cn, propsWithCn } from '@/utils/styles'
+import { propsWithCn } from '@/utils/styles'
+
+import { DecoratedButton } from '../DecoratedButton'
 
 interface RetryErrorProps extends ComponentProps<'div'> {
   /**
@@ -34,18 +34,16 @@ const RetryError = (props: RetryErrorProps) => {
       )}
     >
       <p>{message}</p>
-      <Button
-        className={cn('bg-none')}
+      <DecoratedButton
+        label="Retry"
+        Glyph={IconReload}
         size="sm"
         variant="plain"
         status="error"
-        round
         onClick={() => {
           retry()
         }}
-      >
-        <Icon Glyph={IconReload} size="sm" />
-      </Button>
+      />
     </div>
   )
 }

@@ -56,7 +56,7 @@ const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
           {...propsWithCn(
             itemProps,
             'flex flex-row text-start items-start justify-between gap-x-8',
-            'border-1 border-solid border-transparent',
+            'border border-solid border-transparent',
             'aria-checked:border-accent-300',
           )}
         >

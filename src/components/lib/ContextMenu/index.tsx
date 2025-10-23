@@ -37,7 +37,7 @@ const ContextMenu = (props: ContextMenuProps) => {
         store={menu}
         modal
         getAnchorRect={() => anchorRect}
-        {...propsWithCn(menuProps, 'min-w-30 border-1 border-dark-50')}
+        {...propsWithCn(menuProps, 'min-w-30 border border-dark-50')}
       >
         {items}
       </Menu>

@@ -22,9 +22,9 @@ const ComboboxItem = <T,>(props: ComboboxItemProps<T>) => {
             'p-2 rounded-sm cursor-pointer',
             'wrap-anywhere',
             item.value === '' && 'italic not-aria-selected:text-light-800',
-            'data-[active-item]:bg-dark-100',
+            'data-active-item:bg-dark-100',
             'aria-selected:bg-accent-300/15',
-            'data-[active-item]:aria-selected:bg-accent-300/20',
+            'data-active-item:aria-selected:bg-accent-300/20',
           )}
         />
       }

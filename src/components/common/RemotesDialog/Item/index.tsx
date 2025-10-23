@@ -59,11 +59,11 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
         label="Remote URL"
         buttonProps={{
           className: cn(
-            'justify-start flex-1 rounded-none border-x-1 border-x-dark-600 border-solid',
+            'justify-start flex-1 rounded-none border-x border-x-dark-600 border-solid',
           ),
         }}
         className={cn(
-          'flex-1 rounded-none border-x-1 border-x-dark-600 border-solid',
+          'flex-1 rounded-none border-x border-x-dark-600 border-solid',
         )}
       />
 
