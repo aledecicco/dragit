@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from 'react'
 import { match } from 'ts-pattern'
 
-import type { FileConflicts, FileDiff } from '@/api/models'
+import type { ConflictType, FileConflicts, FileDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { DiffFilter } from '../Diff/utils'
@@ -81,6 +81,8 @@ const getLineNumbers = (
   let ignored = 0
   let deletions = 0
 
+  let sectionType: ConflictType = 'unchanged'
+
   content.forEach((line, i) => {
     match(filter)
       .with('both', () => {
@@ -89,6 +91,20 @@ const getLineNumbers = (
         } else if (deletions > 0) {
           offset -= deletions
           deletions = 0
+        }
+
+        if (
+          sectionType !== line.type &&
+          (line.type === 'ours' || line.type === 'theirs')
+        ) {
+          res.push(
+            <LineNumber
+              key={`indicator-${i + 1}`}
+              lineNumber={undefined}
+              className="h-4.5"
+              type={line.type}
+            />,
+          )
         }
 
         res.push(
@@ -126,6 +142,14 @@ const getLineNumbers = (
         }
       })
       .exhaustive()
+
+    if (
+      line.type === 'ours' ||
+      line.type === 'theirs' ||
+      line.type === 'unchanged'
+    ) {
+      sectionType = line.type
+    }
   })
 
   res.push(

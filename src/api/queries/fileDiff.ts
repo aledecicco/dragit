@@ -1,14 +1,13 @@
 import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
-import type {
-  DiffLine,
-  DiffScope,
-  FileDiff,
-  VersionedFileInfo,
-  WorktreeFileInfo,
-} from '../models'
+import type { DiffLine, DiffScope, FileDiff } from '../models'
 import { FILE_DIFF_SCHEMA } from '../schemas'
+import {
+  serializeUnmergedFile,
+  serializeVersionedFile,
+  serializeWorktreeFile,
+} from '../serialization'
 import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
 import { pathQueryKey } from '.'
 
@@ -41,7 +40,7 @@ const fetchFileDiff = async (
             serializeWorktreeFile(file),
           )
           .with({ type: 'unmerged', file: P.select() }, (file) =>
-            serializeWorktreeFile(file),
+            serializeUnmergedFile(file),
           )
           .with({ type: 'snapshot', file: P.select() }, (file) =>
             serializeVersionedFile(file),
@@ -80,87 +79,5 @@ const fileDiffQuery = (repoPath: string, scope: DiffScope) =>
 
 const useQueryFileDiff = (scope: DiffScope) =>
   useRepositoryQuery(fileDiffQuery, scope)
-
-const serializeWorktreeFile = (file: WorktreeFileInfo) => {
-  return match(file)
-    .with({ status: 'staged' }, (file) => ({
-      Staged: {
-        path: file.path,
-        status: match(file)
-          .with({ changes: 'added' }, () => ({
-            Changed: { changes: { Added: {} } },
-          }))
-          .with({ changes: 'deleted' }, () => ({
-            Changed: { changes: { Deleted: {} } },
-          }))
-          .with({ changes: 'modified' }, () => ({
-            Changed: { changes: { Modified: {} } },
-          }))
-          .with({ changes: 'typeChanged' }, () => ({
-            Changed: { changes: { TypeChanged: {} } },
-          }))
-          .with({ changes: 'renamed', oldPath: P.select() }, (oldPath) => ({
-            Moved: { changes: { Renamed: {} }, oldPath },
-          }))
-          .with({ changes: 'copied', oldPath: P.select() }, (oldPath) => ({
-            Moved: { changes: { Copied: {} }, oldPath },
-          }))
-          .exhaustive(),
-      },
-    }))
-    .with({ status: 'unstaged' }, (file) => ({
-      Unstaged: {
-        path: file.path,
-        status: match(file.changes)
-          .with('added', () => ({ Added: {} }))
-          .with('deleted', () => ({ Deleted: {} }))
-          .with('modified', () => ({ Modified: {} }))
-          .with('typeChanged', () => ({ TypeChanged: {} }))
-          .exhaustive(),
-      },
-    }))
-    .with({ status: 'unmerged' }, (file) => ({
-      path: file.path,
-      status: match(file.changes)
-        .with('bothAdded', () => ({ BothAdded: {} }))
-        .with('bothDeleted', () => ({ BothDeleted: {} }))
-        .with('bothModified', () => ({ BothModified: {} }))
-        .with('addedByThem', () => ({ AddedByThem: {} }))
-        .with('addedByUs', () => ({ AddedByUs: {} }))
-        .with('deletedByThem', () => ({ DeletedByThem: {} }))
-        .with('deletedByUs', () => ({ DeletedByUs: {} }))
-        .exhaustive(),
-    }))
-    .with({ status: 'untracked' }, (file) => ({
-      Untracked: { path: file.path },
-    }))
-    .exhaustive()
-}
-
-const serializeVersionedFile = (file: VersionedFileInfo) => {
-  return {
-    path: file.path,
-    status: match(file)
-      .with({ changes: 'added' }, () => ({
-        Changed: { changes: { Added: {} } },
-      }))
-      .with({ changes: 'deleted' }, () => ({
-        Changed: { changes: { Deleted: {} } },
-      }))
-      .with({ changes: 'modified' }, () => ({
-        Changed: { changes: { Modified: {} } },
-      }))
-      .with({ changes: 'typeChanged' }, () => ({
-        Changed: { changes: { TypeChanged: {} } },
-      }))
-      .with({ changes: 'renamed', oldPath: P.select() }, (oldPath) => ({
-        Moved: { changes: { Renamed: {} }, oldPath },
-      }))
-      .with({ changes: 'copied', oldPath: P.select() }, (oldPath) => ({
-        Moved: { changes: { Copied: {} }, oldPath },
-      }))
-      .exhaustive(),
-  }
-}
 
 export { fileDiffQueryKeys, useQueryFileDiff }

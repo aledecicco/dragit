@@ -198,7 +198,8 @@ export type DiffScope =
   | { type: 'unmerged'; file: UnmergedFileInfo; stage: MergeDiffStage }
   | { type: 'snapshot'; snapshotId: SnapshotId; file: VersionedFileInfo }
 
-export type ConflictType = 'ours' | 'theirs' | 'unchanged'
+export const conflictTypes = ['ours', 'theirs', 'unchanged'] as const
+export type ConflictType = (typeof conflictTypes)[number]
 
 export interface ConflictLine {
   type: ConflictType

@@ -1,7 +1,12 @@
 import type { ComponentProps, ReactNode } from 'react'
 import { match, P } from 'ts-pattern'
 
-import type { FileConflicts, FileDiff } from '@/api/models'
+import {
+  type ConflictType,
+  conflictTypes,
+  type FileConflicts,
+  type FileDiff,
+} from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { DiffFilter } from '../Diff/utils'
@@ -57,6 +62,7 @@ const getLineIndicators = (
   filter: DiffFilter = 'both',
 ): ReactNode => {
   const res: ReactNode[] = []
+  let sectionType: ConflictType = 'unchanged'
 
   content.forEach((line, i) => {
     const show = match([filter, line.type])
@@ -66,7 +72,29 @@ const getLineIndicators = (
       .exhaustive()
 
     if (show) {
+      if (
+        sectionType !== line.type &&
+        (line.type === 'ours' || line.type === 'theirs')
+      ) {
+        res.push(
+          <LineIndicator
+            key={`indicator-${i + 1}`}
+            type={line.type}
+            empty
+            className="h-4.5"
+          />,
+        )
+      }
+
       res.push(<LineIndicator key={`${i + 1}`} type={line.type} />)
+    }
+
+    if (
+      line.type === 'ours' ||
+      line.type === 'theirs' ||
+      line.type === 'unchanged'
+    ) {
+      sectionType = line.type
     }
   })
 

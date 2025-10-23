@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { RootContent } from 'hast'
 import { match } from 'ts-pattern'
 
-import type { FileConflicts } from '@/api/models'
+import type { ConflictType, FileConflicts } from '@/api/models'
 
 import {
   getTree,
@@ -38,6 +38,43 @@ const getContentTheirs = (fileConflicts: FileConflicts): string => {
 }
 
 /**
+ * Builds a line that indicates the beginning of a conflict section.
+ *
+ * @param type - The type of conflict section.
+ */
+const getIndicatorLine = (
+  type: Exclude<ConflictType, 'unchanged'>,
+): RootContent => {
+  const content = match(type)
+    .with('ours', () => 'Ours')
+    .with('theirs', () => 'Theirs')
+    .exhaustive()
+  const colorClass = match(type)
+    .with('ours', () => 'text-primary-500')
+    .with('theirs', () => 'text-warning-500')
+    .exhaustive()
+
+  return wrapLineInType(
+    [
+      {
+        type: 'element',
+        tagName: 'p',
+        properties: {
+          className: `${colorClass} italic select-none text-xs leading-4.5`,
+        },
+        children: [
+          {
+            type: 'text',
+            value: content,
+          },
+        ],
+      },
+    ],
+    type,
+  )
+}
+
+/**
  * Adds syntax and conflict highlighting to a file conflict.
  *
  * @param fileConflicts - The conflicts to highlight.
@@ -64,8 +101,17 @@ export const highlightConflicts = (
   let pointerTheirs = 0
 
   const res: RootContent[] = []
+  let currentSection: ConflictType = 'unchanged'
 
   for (const conflictLine of fileConflicts) {
+    if (
+      conflictLine.type !== currentSection &&
+      conflictLine.type !== 'unchanged'
+    ) {
+      res.push(getIndicatorLine(conflictLine.type))
+    }
+    currentSection = conflictLine.type
+
     const lineOurs = linesOurs.at(pointerOurs) ?? []
     const lineTheirs = linesTheirs.at(pointerTheirs) ?? []
 

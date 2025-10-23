@@ -29,7 +29,7 @@ const RetryError = (props: RetryErrorProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'flex flex-row gap-x-1 p-2',
+        'flex flex-row gap-x-1 p-2 items-center',
         'text-sm text-danger-600',
       )}
     >
@@ -37,12 +37,14 @@ const RetryError = (props: RetryErrorProps) => {
       <DecoratedButton
         label="Retry"
         Glyph={IconReload}
-        size="sm"
+        size="md"
         variant="plain"
         status="error"
         onClick={() => {
           retry()
         }}
+        compact
+        round
       />
     </div>
   )

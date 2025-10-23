@@ -23,7 +23,7 @@ pub(crate) fn with_handler<T>(
     fun(&state.git_handler).map_err(AppError::from)
 }
 
-/// Reads the contents of a file from disk, given the repository path and the file path.
+/// Reads the contents of a file from disk, given the repository path and the relative file path.
 pub(crate) fn get_disk_file_contents(repo_path: &str, filepath: &str) -> Result<String, AppError> {
     let full_path = Path::new(repo_path).join(filepath);
     let contents = fs::read_to_string(full_path).or(Err(AppError::ReadFileFailed {
