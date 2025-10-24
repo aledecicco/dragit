@@ -456,12 +456,20 @@ pub async fn get_file_conflicts(
             } else if line.starts_with("=======") {
                 current_section = ConflictMode::Theirs;
                 return None;
+            } else if line.starts_with("||||||| ") {
+                current_section = ConflictMode::Common;
+                return None;
             } else if line.starts_with(">>>>>>> ") {
                 current_section = ConflictMode::Unchanged;
                 return None;
             }
 
-            let line_content = line.to_string();
+            if let ConflictMode::Common = current_section {
+                // Skip common ancestor lines in diff3 or zdiff3 merge styles.
+                return None;
+            }
+
+            let line_content = line.to_string() + "\n";
             let constructor = match file.status {
                 MergeStatus::AddedByThem => ConflictLine::Theirs,
                 MergeStatus::AddedByUs => ConflictLine::Ours,
@@ -470,7 +478,7 @@ pub async fn get_file_conflicts(
                 MergeStatus::BothModified | MergeStatus::BothAdded => match current_section {
                     ConflictMode::Ours => ConflictLine::Ours,
                     ConflictMode::Theirs => ConflictLine::Theirs,
-                    ConflictMode::Unchanged => ConflictLine::Unchanged,
+                    _ => ConflictLine::Unchanged,
                 },
                 MergeStatus::BothDeleted => ConflictLine::Unchanged,
             };

@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react'
+import { match } from 'ts-pattern'
 
 import type { UnmergedFileInfo } from '@/api/models'
 import { useQueryFileConflicts } from '@/api/queries/fileConflicts'
@@ -27,6 +28,15 @@ const FileConflictViewer = (props: FileConflictViewerProps) => {
       {...divProps}
       query={fileConflictsQuery}
       filepath={file.path}
+      annotation={match(file.changes)
+        .with('bothAdded', () => '(added by both)')
+        .with('bothDeleted', () => '(deleted by both)')
+        .with('bothModified', () => '(modified by both)')
+        .with('addedByUs', () => '(added by us)')
+        .with('deletedByUs', () => '(deleted by us)')
+        .with('addedByThem', () => '(added by them)')
+        .with('deletedByThem', () => '(deleted by them)')
+        .exhaustive()}
     >
       {(fileConflicts) => (
         <>

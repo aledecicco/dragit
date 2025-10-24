@@ -32,8 +32,7 @@ const UnmergedViewSelector = (props: UnmergedViewSelectorProps) => {
   )
 }
 
-const useViewModeSelector = () =>
-  useToggleHandler(diffViewModes, 'side_by_side')
+const useViewModeSelector = () => useToggleHandler(diffViewModes, 'inline')
 
 export {
   UnmergedViewSelector,

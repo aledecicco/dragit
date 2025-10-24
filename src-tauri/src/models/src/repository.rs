@@ -238,6 +238,7 @@ pub enum DiffLine {
 #[derive(Debug)]
 pub enum ConflictMode {
     Unchanged,
+    Common,
     Ours,
     Theirs,
 }
