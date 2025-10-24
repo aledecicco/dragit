@@ -4,8 +4,8 @@ import { match } from 'ts-pattern'
 import type { ConflictType, FileConflicts, FileDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
 
-import type { DiffFilter } from '../Diff/utils'
-import type { LineType } from '../utils'
+import type { DiffFilter } from '../../Diff/utils'
+import type { LineType } from '../../utils'
 
 interface LineNumberProps extends ComponentProps<'div'> {
   /**

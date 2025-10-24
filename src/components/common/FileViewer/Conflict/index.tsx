@@ -1,14 +1,18 @@
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { match } from 'ts-pattern'
 
-import type { UnmergedFileInfo } from '@/api/models'
+import type {
+  ConflictType,
+  FileConflicts,
+  UnmergedFileInfo,
+} from '@/api/models'
 import { useQueryFileConflicts } from '@/api/queries/fileConflicts'
 import { cn } from '@/utils/styles'
 
-import { FileViewerContainer } from '../Container'
-import { FileViewerContent } from '../Content'
-import { getLineIndicators } from '../LineIndicator'
-import { getLineNumbers } from '../LineNumber'
+import { FileViewerContainer } from '../common/Container'
+import { FileViewerContent } from '../common/Content'
+import { LineIndicator } from '../common/LineIndicator'
+import { LineNumber } from '../common/LineNumber'
 import { highlightConflicts } from './utils'
 
 interface FileConflictViewerProps extends ComponentProps<'div'> {
@@ -55,6 +59,77 @@ const FileConflictViewer = (props: FileConflictViewerProps) => {
       )}
     </FileViewerContainer>
   )
+}
+
+/**
+ * Generates the line indicators for a given file conflict.
+ *
+ * Adds empty indicators when switching between conflict sections.
+ */
+const getLineIndicators = (content: FileConflicts): ReactNode => {
+  const res: ReactNode[] = []
+  let sectionType: ConflictType = 'unchanged'
+
+  content.forEach((line, i) => {
+    if (sectionType !== line.type && line.type !== 'unchanged') {
+      res.push(
+        <LineIndicator
+          key={`indicator-${i + 1}`}
+          type={line.type}
+          className="h-4.5"
+          empty
+        />,
+      )
+    }
+
+    res.push(<LineIndicator key={`${i + 1}`} type={line.type} />)
+    sectionType = line.type
+  })
+
+  res.push(<LineIndicator type="unchanged" className={cn('grow')} empty />)
+
+  return res
+}
+
+/**
+ * Generates the line numbers for a given file conflict.
+ *
+ * Adds empty cells when switching between conflict sections.
+ */
+const getLineNumbers = (content: FileConflicts): ReactNode => {
+  const res: ReactNode[] = []
+
+  let sectionType: ConflictType = 'unchanged'
+
+  content.forEach((line, i) => {
+    if (sectionType !== line.type && line.type !== 'unchanged') {
+      res.push(
+        <LineNumber
+          key={`indicator-${i + 1}`}
+          type={line.type}
+          className="h-4.5"
+          lineNumber={undefined}
+        />,
+      )
+    }
+
+    res.push(
+      <LineNumber key={`${i + 1}`} type={line.type} lineNumber={i + 1} />,
+    )
+    sectionType = line.type
+  })
+
+  res.push(
+    <LineNumber
+      key={`${content.length + 1}`}
+      type="unchanged"
+      className={cn('grow rounded-bl-sm')}
+      lineNumber={content.length + 1}
+      faded
+    />,
+  )
+
+  return res
 }
 
 export { FileConflictViewer, type FileConflictViewerProps }
