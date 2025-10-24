@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react'
 
-import { useQueryBranches } from '@/api/queries'
+import { useQueryBranches } from '@/api/queries/branches'
 import { QueryList } from '@/lib/QueryList'
 import { Accordion } from '@/ui/Accordion'
 import { AccordionSection } from '@/ui/Accordion/Section'

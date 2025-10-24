@@ -6,8 +6,11 @@ import {
 
 import type { HistoryItem, Page } from '../models'
 import { HISTORY_PAGE_SCHEMA } from '../schemas'
-import { fetchAndDeserialize, useRepositoryInfiniteQuery } from '../utils'
-import { pathQueryKey } from '.'
+import {
+  fetchAndDeserialize,
+  pathQueryKey,
+  useRepositoryInfiniteQuery,
+} from '../utils'
 
 export const HISTORY_PAGE_SIZE = 50
 

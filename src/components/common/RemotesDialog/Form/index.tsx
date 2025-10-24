@@ -1,7 +1,7 @@
 import { IconX } from '@tabler/icons-react'
 
-import { useAddRemote } from '@/api/mutations'
-import { useQueryRemotes } from '@/api/queries'
+import { useAddRemote } from '@/api/mutations/addRemote'
+import { useQueryRemotes } from '@/api/queries/remotes'
 import { useActionStatuses } from '@/context/actions'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { Form, type FormProps } from '@/ui/Form'

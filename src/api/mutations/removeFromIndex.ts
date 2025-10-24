@@ -4,8 +4,15 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Action } from '@/context/actions'
 
 import type { WorktreeFileInfo } from '../models'
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
+
+interface RemoveFromIndexArgs {
+  files: string[]
+}
 
 const removeFromIndexKey = (repoPath: string) =>
   ({
@@ -16,7 +23,7 @@ const removeFromIndexKey = (repoPath: string) =>
 const removeFromIndexMutation = (repoPath: string) =>
   mutationOptions({
     mutationKey: [removeFromIndexKey(repoPath)],
-    mutationFn: (args: { files: string[] }) => {
+    mutationFn: (args: RemoveFromIndexArgs) => {
       return invoke('remove_from_index', { repoPath, ...args })
     },
     networkMode: 'always',
@@ -40,4 +47,9 @@ const useUnstageFile = (file: WorktreeFileInfo): Action => {
   }
 }
 
-export { useUnstageFile, removeFromIndexKey }
+export {
+  useUnstageFile,
+  removeFromIndexKey,
+  removeFromIndexMutation,
+  type RemoveFromIndexArgs,
+}

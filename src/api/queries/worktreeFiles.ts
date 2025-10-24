@@ -22,9 +22,9 @@ import { WORKTREE_FILES_PAGE_SCHEMA } from '../schemas'
 import {
   fetchAndDeserialize,
   getFileTypeFilter,
+  pathQueryKey,
   useRepositoryQuery,
 } from '../utils'
-import { pathQueryKey } from '.'
 
 export const WORKTREE_FILES_PAGE_SIZE = 1000
 

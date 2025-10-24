@@ -4,8 +4,7 @@ import { match, P } from 'ts-pattern'
 import type { ConflictLine, FileConflicts, UnmergedFileInfo } from '../models'
 import { FILE_CONFLICTS_SCHEMA } from '../schemas'
 import { serializeUnmergedFile } from '../serialization'
-import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
-import { pathQueryKey } from '.'
+import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 
 const fileConflictsQueryKeys = {
   all: (repoPath: string) =>

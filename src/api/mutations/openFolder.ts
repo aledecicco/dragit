@@ -4,15 +4,19 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
-import { useQueryCurrentDir } from '../queries'
+import { useQueryCurrentDir } from '../queries/currentDir'
 import { mutationOptions } from '../utils'
+
+interface OpenFolderArgs {
+  newPath: string
+}
 
 const openFolderKey = ['open_folder'] as const
 
 const openFolderMutation = mutationOptions({
   mutationKey: openFolderKey,
-  mutationFn: (args: { newPath: string }) => {
-    return invoke('open_folder', args)
+  mutationFn: (args: OpenFolderArgs) => {
+    return invoke('open_folder', { ...args })
   },
   networkMode: 'always',
 })
@@ -23,7 +27,7 @@ const useOpenFolder = (): Action<string> => {
 
   return {
     id: 'open_folder',
-    run: async (newPath: string) => {
+    run: async (newPath) => {
       await openFolder.mutateAsync({ newPath })
     },
     label: {
@@ -40,4 +44,4 @@ const useOpenFolder = (): Action<string> => {
   }
 }
 
-export { useOpenFolder, openFolderKey }
+export { useOpenFolder, openFolderKey, openFolderMutation, type OpenFolderArgs }

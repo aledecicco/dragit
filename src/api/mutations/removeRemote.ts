@@ -4,8 +4,15 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Action } from '@/context/actions'
 
 import type { RemoteName } from '../models'
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
+
+interface RemoveRemoteArgs {
+  name: RemoteName
+}
 
 const removeRemoteKey = (repoPath: string) =>
   ({
@@ -16,7 +23,7 @@ const removeRemoteKey = (repoPath: string) =>
 const removeRemoteMutation = (repoPath: string) =>
   mutationOptions({
     mutationKey: [removeRemoteKey(repoPath)],
-    mutationFn: (args: { name: RemoteName }) => {
+    mutationFn: (args: RemoveRemoteArgs) => {
       return invoke('remove_remote', { repoPath, ...args })
     },
     networkMode: 'always',
@@ -40,4 +47,9 @@ const useRemoveRemote = (name: RemoteName): Action => {
   }
 }
 
-export { useRemoveRemote, removeRemoteKey }
+export {
+  useRemoveRemote,
+  removeRemoteKey,
+  removeRemoteMutation,
+  type RemoveRemoteArgs,
+}

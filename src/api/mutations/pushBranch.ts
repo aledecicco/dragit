@@ -4,8 +4,19 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Action } from '@/context/actions'
 
 import type { BranchInfo, BranchName, RemoteName } from '../models'
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
+
+interface PushBranchArgs {
+  branch: BranchName
+  remote: RemoteName
+  remoteBranch: BranchName
+  isForce: boolean
+  setUpstream: boolean
+}
 
 const pushBranchKey = (repoPath: string) =>
   ({
@@ -16,13 +27,7 @@ const pushBranchKey = (repoPath: string) =>
 const pushBranchMutation = (repoPath: string) =>
   mutationOptions({
     mutationKey: [pushBranchKey(repoPath)],
-    mutationFn: (args: {
-      branch: BranchName
-      remote: RemoteName
-      remoteBranch: BranchName
-      isForce: boolean
-      setUpstream: boolean
-    }) => {
+    mutationFn: (args: PushBranchArgs) => {
       return invoke('push_branch', { repoPath, ...args })
     },
     networkMode: 'online',
@@ -92,4 +97,10 @@ const useForcePushBranch = (branch: BranchInfo | undefined): Action => {
   }
 }
 
-export { usePushBranch, useForcePushBranch, pushBranchKey }
+export {
+  usePushBranch,
+  useForcePushBranch,
+  pushBranchKey,
+  pushBranchMutation,
+  type PushBranchArgs,
+}

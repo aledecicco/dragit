@@ -8,8 +8,7 @@ import {
   serializeVersionedFile,
   serializeWorktreeFile,
 } from '../serialization'
-import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
-import { pathQueryKey } from '.'
+import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 
 const fileDiffQueryKeys = {
   all: (repoPath: string) =>

@@ -7,14 +7,13 @@ import { StashesList } from '@/widgets/StashesList'
 import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
 import { UnstagedWorktreeChanges } from '@/widgets/WorktreeChanges/Unstaged'
 
-import { useQueryCurrentDir } from '@/api/queries'
+import { useEventsHandler } from '@/api/events'
+import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { useReferencesSync } from '@/context/branches'
 import { useDialog } from '@/context/dialogs'
 import { useUpstreamSync } from '@/context/upstream'
 import { useContextMenuHandler } from '@/lib/ContextMenu/utils'
 import { cn } from '@/utils/styles'
-
-import { useEventsHandler } from './api/events'
 
 const App = () => {
   useEventsHandler()

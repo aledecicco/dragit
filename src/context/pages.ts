@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Store, useStore } from '@tanstack/react-store'
 
 import type { WorktreeFileType } from '@/api/models'
-import { useQueryWorktreeFiles } from '@/api/queries'
+import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { getFileTypeFilter, useHandlePageSync } from '@/api/utils'
 
 type FilePages = Map<string, number>

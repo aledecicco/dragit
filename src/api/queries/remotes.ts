@@ -2,8 +2,7 @@ import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
 
 import type { RemoteInfo } from '../models'
 import { REMOTES_SCHEMA } from '../schemas'
-import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
-import { pathQueryKey } from '.'
+import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 
 const remotesQueryKeys = {
   all: (repoPath: string) =>

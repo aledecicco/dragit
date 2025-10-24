@@ -3,7 +3,7 @@ import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 
 import type { CommitId } from '@/api/models'
-import { useQueryCommitInfo } from '@/api/queries'
+import { useQueryCommitInfo } from '@/api/queries/commitInfo'
 import { QueryLoader } from '@/lib/Loader/Query'
 import { makeTracked } from '@/lib/SvgOverlay'
 import { cn, propsWithCn } from '@/utils/styles'

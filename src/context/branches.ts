@@ -3,7 +3,7 @@ import { Store, useStore } from '@tanstack/react-store'
 import { match } from 'ts-pattern'
 
 import type { Reference } from '@/api/models'
-import { useQueryHeadInfo } from '@/api/queries'
+import { useQueryHeadInfo } from '@/api/queries/headInfo'
 
 interface SelectedRefs {
   reference: Reference | undefined

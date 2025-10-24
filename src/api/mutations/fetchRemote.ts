@@ -4,8 +4,15 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Action } from '@/context/actions'
 
 import type { RemoteName } from '../models'
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
+
+interface FetchRemoteArgs {
+  remote: RemoteName
+}
 
 const fetchRemoteKey = (repoPath: string) =>
   ({
@@ -16,7 +23,7 @@ const fetchRemoteKey = (repoPath: string) =>
 const fetchRemoteMutation = (repoPath: string) =>
   mutationOptions({
     mutationKey: [fetchRemoteKey(repoPath)],
-    mutationFn: (args: { remote: RemoteName }) => {
+    mutationFn: (args: FetchRemoteArgs) => {
       return invoke('fetch_remote', { repoPath, ...args })
     },
     networkMode: 'online',
@@ -46,4 +53,9 @@ const useFetchRemote = (remote: RemoteName | undefined): Action => {
   }
 }
 
-export { useFetchRemote, fetchRemoteKey }
+export {
+  useFetchRemote,
+  fetchRemoteKey,
+  fetchRemoteMutation,
+  type FetchRemoteArgs,
+}

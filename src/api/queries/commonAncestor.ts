@@ -6,8 +6,7 @@ import {
 
 import type { CommonAncestorInfo } from '../models'
 import { COMMON_ANCESTOR_INFO_SCHEMA } from '../schemas'
-import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
-import { pathQueryKey } from '.'
+import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 
 const commonAncestorQueryKeys = {
   all: (repoPath: string) =>

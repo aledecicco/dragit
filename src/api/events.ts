@@ -6,19 +6,17 @@ import { match, P } from 'ts-pattern'
 import { useSelectedRefs } from '@/context/branches'
 
 import type { AppEvent } from './models'
-import {
-  branchDivergenceQueryKeys,
-  branchesQueryKeys,
-  commitHistoryQueryKeys,
-  commonAncestorQueryKeys,
-  headInfoQueryKeys,
-  pathQueryKey,
-  remotesQueryKeys,
-  stashesQueryKeys,
-  worktreeFilesQueryKeys,
-} from './queries'
+import { branchDivergenceQueryKeys } from './queries/branchDivergence'
+import { branchesQueryKeys } from './queries/branches'
+import { commitHistoryQueryKeys } from './queries/commitHistory'
+import { commonAncestorQueryKeys } from './queries/commonAncestor'
 import { fileConflictsQueryKeys } from './queries/fileConflicts'
 import { fileDiffQueryKeys } from './queries/fileDiff'
+import { headInfoQueryKeys } from './queries/headInfo'
+import { remotesQueryKeys } from './queries/remotes'
+import { stashesQueryKeys } from './queries/stashes'
+import { worktreeFilesQueryKeys } from './queries/worktreeFiles'
+import { pathQueryKey } from './utils'
 
 const EVENT_ID = 'app-event'
 

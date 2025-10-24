@@ -1,11 +1,14 @@
-import { IconCheck, IconListCheck, IconPlus } from '@tabler/icons-react'
+import { IconListCheck, IconPlus } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
 import type { WorktreeFileInfo } from '../models'
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
 
 interface AddToIndexArgs {
   files: string[]
@@ -43,25 +46,6 @@ const useStageFile = (file: WorktreeFileInfo): Action => {
     Glyph: IconPlus,
   }
 }
-
-const useMarkAsResolved = (file: WorktreeFileInfo): Action => {
-  const addToIndex = useRepositoryMutation(addToIndexMutation)
-
-  return {
-    id: `add_file:${file.path}`,
-    run: async () => {
-      await addToIndex.mutateAsync({ files: [file.path] })
-    },
-    label: {
-      idle: 'Mark as resolved',
-      running: 'Resolving',
-      success: 'Resolved',
-      error: 'Failed to resolve',
-    },
-    Glyph: IconCheck,
-  }
-}
-
 const useAddFiles = (): Action<string[]> => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
@@ -84,8 +68,8 @@ const useAddFiles = (): Action<string[]> => {
 
 export {
   useStageFile,
-  useMarkAsResolved,
   useAddFiles,
   addToIndexKey,
+  addToIndexMutation,
   type AddToIndexArgs,
 }

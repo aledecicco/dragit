@@ -4,8 +4,18 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Action } from '@/context/actions'
 
 import type { BranchInfo, BranchName, RemoteName } from '../models'
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
+
+interface PullBranchArgs {
+  branch: BranchName
+  remote: RemoteName
+  remoteBranch: BranchName
+  isRebase: boolean
+}
 
 const pullBranchKey = (repoPath: string) =>
   ({
@@ -16,12 +26,7 @@ const pullBranchKey = (repoPath: string) =>
 const pullBranchMutation = (repoPath: string) =>
   mutationOptions({
     mutationKey: [pullBranchKey(repoPath)],
-    mutationFn: (args: {
-      branch: BranchName
-      remote: RemoteName
-      remoteBranch: BranchName
-      isRebase: boolean
-    }) => {
+    mutationFn: (args: PullBranchArgs) => {
       return invoke('pull_branch', { repoPath, ...args })
     },
     networkMode: 'online',
@@ -59,4 +64,4 @@ const usePullBranch = (branch: BranchInfo | undefined): Action => {
   }
 }
 
-export { usePullBranch, pullBranchKey }
+export { usePullBranch, pullBranchKey, pullBranchMutation, type PullBranchArgs }

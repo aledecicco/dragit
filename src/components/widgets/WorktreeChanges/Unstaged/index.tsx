@@ -5,7 +5,7 @@ import type { WorktreeFileType } from '@/api/models'
 import { WorktreeChanges } from '..'
 import { UnstagedChangesItem } from './Item'
 
-export const FILE_TYPES = [
+export const UNSTAGED_FILE_TYPES = [
   'unstaged',
   'untracked',
   'unmerged',
@@ -21,7 +21,7 @@ const UnstagedWorktreeChanges = (props: UnstagedWorktreeChangesProps) => {
       {...divProps}
       label="unstaged changes"
       extraInfo={undefined}
-      fileTypes={FILE_TYPES}
+      fileTypes={UNSTAGED_FILE_TYPES}
       renderFile={(file) => <UnstagedChangesItem file={file} />}
     />
   )

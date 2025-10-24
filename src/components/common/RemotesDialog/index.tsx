@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { useQueryRemotes } from '@/api/queries'
+import { useQueryRemotes } from '@/api/queries/remotes'
 import { showDialog } from '@/context/dialogs'
 import { QueryList } from '@/lib/QueryList'
 import { Button } from '@/ui/Button'

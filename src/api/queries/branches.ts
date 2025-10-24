@@ -5,8 +5,7 @@ import { MS_IN_SECOND } from '@/utils/time'
 
 import type { BranchInfo, RemoteRef } from '../models'
 import { BRANCHES_SCHEMA } from '../schemas'
-import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
-import { pathQueryKey } from '.'
+import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 
 const branchesQueryKeys = {
   all: (repoPath: string) =>

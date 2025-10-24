@@ -3,8 +3,7 @@ import { match, P } from 'ts-pattern'
 
 import type { HeadInfo } from '../models'
 import { HEAD_INFO_SCHEMA } from '../schemas'
-import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
-import { pathQueryKey } from '.'
+import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 
 const headInfoQueryKeys = {
   all: (repoPath: string) =>

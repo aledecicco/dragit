@@ -1,12 +1,7 @@
 import type { ComponentProps, ReactNode } from 'react'
 import { match, P } from 'ts-pattern'
 
-import {
-  type ConflictType,
-  conflictTypes,
-  type FileConflicts,
-  type FileDiff,
-} from '@/api/models'
+import type { ConflictType, FileConflicts, FileDiff } from '@/api/models'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { DiffFilter } from '../Diff/utils'

@@ -52,9 +52,6 @@ pub enum GitError {
     #[error("Failed to remove files from the index")]
     RemoveFromIndexFailed {},
 
-    #[error("Failed to remove files from the tree")]
-    RemoveFromTreeFailed {},
-
     #[error("Failed to commit the current index")]
     CommitFailed {},
 
@@ -120,6 +117,9 @@ pub enum GitError {
 
     #[error("Failed to get contents of file \"#{filepath}\" on \"#{reference}\"")]
     GetFileContentsFailed { reference: String, filepath: String },
+
+    #[error("Failed to solve file conflict for \"{filepath}\"")]
+    SolveFileConflictFailed { filepath: String },
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug)]

@@ -6,7 +6,7 @@ import {
   useVirtualizer,
 } from '@tanstack/react-virtual'
 
-import { useQueryCommitHistory } from '@/api/queries'
+import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { getPaginatedLength } from '@/api/utils'
 import { BranchToolbar } from '@/common/BranchToolbar'
 import { useSelectedRefs } from '@/context/branches'

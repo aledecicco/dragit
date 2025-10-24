@@ -7,8 +7,9 @@ import {
 } from '@tabler/icons-react'
 
 import type { RemoteInfo } from '@/api/models'
-import { useFetchRemote } from '@/api/mutations'
-import { useQueryBranches, useQueryRemotes } from '@/api/queries'
+import { useFetchRemote } from '@/api/mutations/fetchRemote'
+import { useQueryBranches } from '@/api/queries/branches'
+import { useQueryRemotes } from '@/api/queries/remotes'
 import { showRemotesDialog } from '@/common/RemotesDialog'
 import {
   changeUpstreamBranch,

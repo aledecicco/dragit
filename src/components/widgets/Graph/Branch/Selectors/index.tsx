@@ -1,8 +1,12 @@
 import { IconGitBranch } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
-import { useCheckoutLocal, useSwitchBranches } from '@/api/mutations'
-import { useQueryBranches, useQueryHeadInfo } from '@/api/queries'
+import {
+  useCheckoutLocal,
+  useSwitchBranches,
+} from '@/api/mutations/checkoutLocal'
+import { useQueryBranches } from '@/api/queries/branches'
+import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { BranchSelector } from '@/common/BranchSelector'
 import { runAction, useActionPresenters } from '@/context/actions'
 import { changeBaseRef, useSelectedRefs } from '@/context/branches'

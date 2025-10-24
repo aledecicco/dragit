@@ -76,9 +76,6 @@ pub trait GitHandler {
     /// Removes the given list of files from the current index.
     fn remove_from_index(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
 
-    /// Removes the given list of files from the tree and the current index.
-    fn remove_from_tree(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
-
     /// Commits the current index with the given message.
     fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError>;
 
@@ -188,6 +185,14 @@ pub trait GitHandler {
         reference: &str,
         filepath: &str,
     ) -> Result<String, GitError>;
+
+    /// Solves a file conflict using the given strategy.
+    fn solve_file_conflict(
+        &self,
+        repo_path: &str,
+        filepath: &str,
+        strategy: &ResolutionStrategy,
+    ) -> Result<(), GitError>;
 }
 
 #[derive(serde::Deserialize, Debug)]
@@ -196,4 +201,11 @@ pub struct FileTypesFilter {
     pub unstaged: Option<bool>,
     pub unmerged: Option<bool>,
     pub untracked: Option<bool>,
+}
+
+#[derive(serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub enum ResolutionStrategy {
+    Ours,
+    Theirs,
 }

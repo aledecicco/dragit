@@ -1,7 +1,10 @@
 import type { ComponentProps, ReactNode } from 'react'
 
 import type { FileOfType, WorktreeFileType } from '@/api/models'
-import { useQueryWorktreeFiles, WORKTREE_FILES_PAGE_SIZE } from '@/api/queries'
+import {
+  useQueryWorktreeFiles,
+  WORKTREE_FILES_PAGE_SIZE,
+} from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
 import {
   setNextPage,

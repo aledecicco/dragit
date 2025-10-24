@@ -3,8 +3,11 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { FormAction } from '@/ui/Form'
 
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
 
 interface CommitIndexArgs {
   message: string
@@ -49,4 +52,9 @@ const useCommitIndex = (): FormAction<CommitIndexArgs> => {
   }
 }
 
-export { useCommitIndex, commitIndexKey, type CommitIndexArgs }
+export {
+  useCommitIndex,
+  commitIndexKey,
+  commitIndexMutation,
+  type CommitIndexArgs,
+}

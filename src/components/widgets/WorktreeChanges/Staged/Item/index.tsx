@@ -10,7 +10,7 @@ import {
 import { match } from 'ts-pattern'
 
 import type { FileOfType } from '@/api/models'
-import { useUnstageFile } from '@/api/mutations'
+import { useUnstageFile } from '@/api/mutations/removeFromIndex'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
 import { ContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
@@ -19,13 +19,13 @@ import { Marquee } from '@/ui/Marquee'
 import { MenuItem } from '@/ui/Menu/Item'
 import { cn, propsWithCn } from '@/utils/styles'
 
-import type { FILE_TYPES } from '..'
+import type { STAGED_FILE_TYPES } from '..'
 
 interface StagedChangesItemProps extends ListItemProps {
   /**
    * Information about the staged file to display.
    */
-  file: FileOfType<(typeof FILE_TYPES)[number]>
+  file: FileOfType<(typeof STAGED_FILE_TYPES)[number]>
 }
 
 /**

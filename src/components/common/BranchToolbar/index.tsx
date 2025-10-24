@@ -1,10 +1,7 @@
 import type { BranchInfo } from '@/api/models'
-import {
-  useFastForwardBranch,
-  useForcePushBranch,
-  usePullBranch,
-  usePushBranch,
-} from '@/api/mutations'
+import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
+import { usePullBranch } from '@/api/mutations/pullBranch'
+import { useForcePushBranch, usePushBranch } from '@/api/mutations/pushBranch'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 

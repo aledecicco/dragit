@@ -24,7 +24,7 @@ import type {
   Page,
   WorktreeFileType,
 } from './models'
-import { useQueryCurrentDir } from './queries'
+import { useQueryCurrentDir } from './queries/currentDir'
 
 /**
  * An implementation of `queryOptions` for mutations.
@@ -46,7 +46,7 @@ export function mutationOptions<
  * @param data - The paginated data structure.
  * @param index - The index of the item to retrieve.
  */
-const getPaginatedItem = <T>(
+export const getPaginatedItem = <T>(
   data: InfiniteData<{ items: T[] }> | undefined,
   index: number,
   pageSize: number,
@@ -62,7 +62,7 @@ const getPaginatedItem = <T>(
  *
  * @param data - The paginated data structure.
  */
-const getPaginatedLength = <T>(
+export const getPaginatedLength = <T>(
   data: InfiniteData<{ items: T[] }> | undefined,
 ): number => {
   return data?.pages?.reduce((sum, page) => sum + page.items.length, 0) ?? 0
@@ -72,7 +72,7 @@ const getPaginatedLength = <T>(
  * @returns The current repository path, assuming it's available.
  * @throws If the repository path is not available.
  */
-const useCurrentPath = () => {
+export const useCurrentPath = () => {
   const repoPath = useQueryCurrentDir().data?.path
 
   if (!repoPath) {
@@ -88,7 +88,7 @@ const useCurrentPath = () => {
  * @param repositoryMutation - The inner mutation, which should accept a path as the first argument.
  * @param args - The rest of the arguments to pass to the mutation.
  */
-const useRepositoryMutation = <
+export const useRepositoryMutation = <
   A extends unknown[],
   TData = unknown,
   TError = DefaultError,
@@ -111,7 +111,7 @@ const useRepositoryMutation = <
  * @param repositoryQuery - The inner query, which should accept a path as the first argument.
  * @param args - The rest of the arguments to pass to the query.
  */
-const useRepositoryQuery = <
+export const useRepositoryQuery = <
   A extends unknown[],
   TQueryFnData = unknown,
   TError = DefaultError,
@@ -134,7 +134,7 @@ const useRepositoryQuery = <
  * @param repositoryQuery - The inner infinite query, which should accept a path as the first argument.
  * @param args - The rest of the arguments to pass to the infinite query.
  */
-const useRepositoryInfiniteQuery = <
+export const useRepositoryInfiniteQuery = <
   A extends unknown[],
   TQueryFnData = unknown,
   TError = DefaultError,
@@ -172,7 +172,7 @@ const useRepositoryInfiniteQuery = <
  * @returns A promise that resolves to the deserialized result.
  * @throws If the query is aborted.
  */
-const fetchAndDeserialize = async <T>(
+export const fetchAndDeserialize = async <T>(
   command: string,
   args: Record<string, unknown>,
   schema: BorshSchema<T>,
@@ -230,7 +230,7 @@ const fetchAndDeserialize = async <T>(
  *
  * @param types - The file types to filter by. Can be a single type or an array of types.
  */
-const getFileTypeFilter = (
+export const getFileTypeFilter = (
   types: WorktreeFileType | WorktreeFileType[],
 ): FileTypeFilter => {
   const filter: FileTypeFilter = {}
@@ -247,21 +247,13 @@ const getFileTypeFilter = (
 }
 
 /**
- * Retrieves just the items from a paginated data structure.
- * @param page - The paginated data structure.
- */
-const getPageItems = <T>(page: Page<T>): T[] => {
-  return page.items
-}
-
-/**
  * Hook that clears the current page of an arbitrary query if it has no data.
  *
  * @param query - The query to check for data.
  * @param page - The page that the query was fetched for.
  * @param clearPage - A callback to clear the page if the query has no data.
  */
-const useHandlePageSync = (
+export const useHandlePageSync = (
   query: UseQueryResult<Page<unknown>>,
   page: number,
   clearPage: () => void,
@@ -281,7 +273,7 @@ const useHandlePageSync = (
  * @param query - The query to check for pagination.
  * @param page - The current page of the query.
  */
-const useNeedsPagination = (
+export const useNeedsPagination = (
   query: UseQueryResult<Page<unknown>>,
   page: number,
 ): boolean => {
@@ -291,16 +283,12 @@ const useNeedsPagination = (
   return paginate || (!!prevPaginate && query.isLoading)
 }
 
-export {
-  getPaginatedItem,
-  getPaginatedLength,
-  useRepositoryQuery,
-  useRepositoryInfiniteQuery,
-  useCurrentPath,
-  useRepositoryMutation,
-  fetchAndDeserialize,
-  getFileTypeFilter,
-  getPageItems,
-  useHandlePageSync,
-  useNeedsPagination,
-}
+export const pathMutationKey = (repoPath: string) =>
+  ({
+    repoPath,
+  }) as const
+
+export const pathQueryKey = (repoPath: string) =>
+  ({
+    repoPath,
+  }) as const

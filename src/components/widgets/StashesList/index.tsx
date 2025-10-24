@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react'
 
-import { useQueryStashes } from '@/api/queries'
+import { useQueryStashes } from '@/api/queries/stashes'
 import { QueryList } from '@/lib/QueryList'
 import { Accordion } from '@/ui/Accordion'
 import { AccordionSection } from '@/ui/Accordion/Section'

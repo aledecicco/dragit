@@ -2,7 +2,7 @@ import type { PropsWithChildren } from 'react'
 
 import { useCurrentCommonAncestor } from '@/widgets/Graph/utils'
 
-import { useQueryCommitHistory } from '@/api/queries'
+import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { useSelectedRefs } from '@/context/branches'
 import { cn } from '@/utils/styles'
 

@@ -208,6 +208,8 @@ export interface ConflictLine {
 
 export type FileConflicts = ConflictLine[]
 
+export type ResolutionStrategy = 'ours' | 'theirs'
+
 export type AppMessage = {
   type: 'processStarted'
   pid: number

@@ -3,7 +3,7 @@ import { Store, useStore } from '@tanstack/react-store'
 import { usePrevious } from 'react-use'
 
 import type { BranchName, RemoteInfo } from '@/api/models'
-import { useQueryRemotes } from '@/api/queries'
+import { useQueryRemotes } from '@/api/queries/remotes'
 import { DEFAULT_REMOTE_NAME, useSelectedBranches } from '@/utils/repository'
 
 interface SelectedUpstream {

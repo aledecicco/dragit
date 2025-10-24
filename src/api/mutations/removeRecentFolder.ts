@@ -6,12 +6,16 @@ import type { Action } from '@/context/actions'
 
 import { mutationOptions } from '../utils'
 
+interface RemoveRecentFolderArgs {
+  recentPath: string
+}
+
 const removeRecentFolderKey = ['remove_recent_folder'] as const
 
 const removeRecentFolderMutation = mutationOptions({
   mutationKey: removeRecentFolderKey,
-  mutationFn: (args: { recentPath: string }) => {
-    return invoke('remove_recent', args)
+  mutationFn: (args: RemoveRecentFolderArgs) => {
+    return invoke('remove_recent', { ...args })
   },
   networkMode: 'always',
 })
@@ -34,4 +38,9 @@ const useRemoveRecentFolder = (recentPath: string): Action => {
   }
 }
 
-export { useRemoveRecentFolder, removeRecentFolderKey }
+export {
+  useRemoveRecentFolder,
+  removeRecentFolderKey,
+  removeRecentFolderMutation,
+  type RemoveRecentFolderArgs,
+}

@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { match } from 'ts-pattern'
 
 import type { SnapshotId, SnapshotInfo } from '@/api/models'
-import { SNAPSHOT_FILES_PAGE_SIZE, useQuerySnapshotFiles } from '@/api/queries'
+import {
+  SNAPSHOT_FILES_PAGE_SIZE,
+  useQuerySnapshotFiles,
+} from '@/api/queries/snapshotFiles'
 import { useNeedsPagination } from '@/api/utils'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { showDialog } from '@/context/dialogs'

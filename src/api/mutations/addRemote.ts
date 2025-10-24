@@ -5,8 +5,11 @@ import type { RemoteFormValues } from '@/common/RemotesDialog/Form'
 import type { FormAction } from '@/ui/Form'
 
 import type { RemoteName } from '../models'
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
 
 interface AddRemoteArgs {
   name: RemoteName
@@ -51,4 +54,4 @@ const useAddRemote = (): FormAction<RemoteFormValues> => {
   }
 }
 
-export { useAddRemote, addRemoteKey, type AddRemoteArgs }
+export { useAddRemote, addRemoteKey, addRemoteMutation, type AddRemoteArgs }

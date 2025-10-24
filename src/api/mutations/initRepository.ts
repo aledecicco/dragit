@@ -3,8 +3,11 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
 
 const initRepositoryKey = (repoPath: string) =>
   ({
@@ -39,4 +42,4 @@ const useInitRepository = (): Action => {
   }
 }
 
-export { useInitRepository, initRepositoryKey }
+export { useInitRepository, initRepositoryKey, initRepositoryMutation }

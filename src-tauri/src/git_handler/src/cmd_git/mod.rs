@@ -11,8 +11,8 @@ use utils::*;
 
 use models::{
     AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo, StashInfo,
-    VersionedFileInfo, WorktreeFileInfo,
+    FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
+    ResolutionStrategy, StashInfo, VersionedFileInfo, WorktreeFileInfo,
 };
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
@@ -328,12 +328,6 @@ impl GitHandler for CmdGit {
         let args = [vec!["reset", "--"], files.clone()].concat();
         self.spawn_and_await(repo_path, args)
             .or(Err(GitError::RemoveFromIndexFailed {}))
-    }
-
-    fn remove_from_tree(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
-        let args = [vec!["rm"], files.clone()].concat();
-        self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::RemoveFromTreeFailed {}))
     }
 
     fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError> {
@@ -684,5 +678,26 @@ impl GitHandler for CmdGit {
                 reference: reference.to_string(),
                 filepath: filepath.to_string(),
             }))?)
+    }
+
+    fn solve_file_conflict(
+        &self,
+        repo_path: &str,
+        filepath: &str,
+        strategy: &ResolutionStrategy,
+    ) -> Result<(), GitError> {
+        let args = [
+            "checkout",
+            filepath,
+            match strategy {
+                ResolutionStrategy::Ours => "--ours",
+                ResolutionStrategy::Theirs => "--theirs",
+            },
+        ];
+
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::SolveFileConflictFailed {
+                filepath: filepath.to_string(),
+            }))
     }
 }

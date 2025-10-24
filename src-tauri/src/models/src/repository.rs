@@ -221,13 +221,6 @@ pub struct StashInfo {
     pub changes: Option<DiffSummary>,
 }
 
-#[derive(Debug)]
-pub enum DiffMode {
-    Unchanged,
-    Added,
-    Removed,
-}
-
 #[derive(borsh::BorshSerialize, Debug)]
 pub enum DiffLine {
     Added(Vec<String>),

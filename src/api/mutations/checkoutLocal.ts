@@ -5,8 +5,15 @@ import type { Action } from '@/context/actions'
 import { useSelectedBranches } from '@/utils/repository'
 
 import type { BranchInfo } from '../models'
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
+
+interface CheckoutLocalArgs {
+  reference: string
+}
 
 const checkoutLocalKey = (repoPath: string) =>
   ({
@@ -17,7 +24,7 @@ const checkoutLocalKey = (repoPath: string) =>
 const checkoutLocalMutation = (repoPath: string) =>
   mutationOptions({
     mutationKey: [checkoutLocalKey(repoPath)],
-    mutationFn: (args: { reference: string }) => {
+    mutationFn: (args: CheckoutLocalArgs) => {
       return invoke('checkout', { repoPath, ...args })
     },
     networkMode: 'always',
@@ -80,4 +87,6 @@ export {
   useCheckoutBranch,
   useSwitchBranches,
   checkoutLocalKey,
+  checkoutLocalMutation,
+  type CheckoutLocalArgs,
 }

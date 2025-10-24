@@ -44,3 +44,10 @@ pub enum DiffSource {
     DiskFile(String),
     Empty,
 }
+
+#[derive(Debug)]
+pub enum DiffMode {
+    Unchanged,
+    Added,
+    Removed,
+}

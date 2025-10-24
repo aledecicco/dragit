@@ -4,8 +4,7 @@ import { MS_IN_SECOND } from '@/utils/time'
 
 import type { StashInfo } from '../models'
 import { STASHES_SCHEMA } from '../schemas'
-import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
-import { pathQueryKey } from '.'
+import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 
 const stashesQueryKeys = {
   all: (repoPath: string) =>

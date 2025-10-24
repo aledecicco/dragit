@@ -1,7 +1,7 @@
 import { open } from '@tauri-apps/plugin-dialog'
 
-import { useOpenFolder } from '@/api/mutations'
-import { useQueryCurrentDir } from '@/api/queries'
+import { useOpenFolder } from '@/api/mutations/openFolder'
+import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { runAction } from '@/context/actions'
 import { ActionButton } from '@/lib/ActionButton'
 import type { ButtonProps } from '@/ui/Button'
@@ -14,8 +14,8 @@ interface CurrentDirectoryProps extends Partial<ButtonProps> {}
  */
 const CurrentDirectory = (props: CurrentDirectoryProps) => {
   const { ...buttonProps } = props
-  const currentDirQuery = useQueryCurrentDir()
 
+  const currentDirQuery = useQueryCurrentDir()
   const openFolder = useOpenFolder()
 
   return (

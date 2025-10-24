@@ -12,7 +12,8 @@ import type {
   HistoryItem,
   Page,
 } from '@/api/models'
-import { HISTORY_PAGE_SIZE, useQueryCommonAncestor } from '@/api/queries'
+import { HISTORY_PAGE_SIZE } from '@/api/queries/commitHistory'
+import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { getPaginatedItem, getPaginatedLength } from '@/api/utils'
 import { useSelectedRefs } from '@/context/branches'
 

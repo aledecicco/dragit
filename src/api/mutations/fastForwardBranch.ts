@@ -4,8 +4,17 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Action } from '@/context/actions'
 
 import type { BranchInfo, BranchName, RemoteName } from '../models'
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
+
+interface FastForwardBranchArgs {
+  branch: BranchName
+  remote: RemoteName
+  remoteBranch: BranchName
+}
 
 const fastForwardBranchKey = (repoPath: string) =>
   ({
@@ -16,11 +25,7 @@ const fastForwardBranchKey = (repoPath: string) =>
 const fastForwardBranchMutation = (repoPath: string) =>
   mutationOptions({
     mutationKey: [fastForwardBranchKey(repoPath)],
-    mutationFn: (args: {
-      branch: BranchName
-      remote: RemoteName
-      remoteBranch: BranchName
-    }) => {
+    mutationFn: (args: FastForwardBranchArgs) => {
       return invoke('fast_forward_branch', { repoPath, ...args })
     },
     networkMode: 'online',
@@ -57,4 +62,9 @@ const useFastForwardBranch = (branch: BranchInfo | undefined): Action => {
   }
 }
 
-export { useFastForwardBranch, fastForwardBranchKey }
+export {
+  useFastForwardBranch,
+  fastForwardBranchKey,
+  fastForwardBranchMutation,
+  type FastForwardBranchArgs,
+}

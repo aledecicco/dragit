@@ -1,7 +1,8 @@
 import { IconArchive, IconEye, IconGitBranch } from '@tabler/icons-react'
 
 import type { StashInfo } from '@/api/models'
-import { useApplyStash, useDiscardStash } from '@/api/mutations'
+import { useApplyStash } from '@/api/mutations/applyStash'
+import { useDiscardStash } from '@/api/mutations/discardStash'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { ContextMenu } from '@/lib/ContextMenu'

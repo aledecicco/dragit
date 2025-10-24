@@ -1,6 +1,7 @@
 import type { VirtualItem } from '@tanstack/react-virtual'
 
-import { useQueryBranchDivergence, useQueryCommitHistory } from '@/api/queries'
+import { useQueryBranchDivergence } from '@/api/queries/branchDivergence'
+import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { useSelectedRefs } from '@/context/branches'
 import { useSelectedUpstream } from '@/context/upstream'
 import { useBranch } from '@/utils/repository'

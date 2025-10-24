@@ -3,8 +3,17 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
+
+interface SaveStashArgs {
+  files: string[]
+  message: string | null
+  includeUntracked: boolean
+}
 
 const saveStashKey = (repoPath: string) =>
   ({
@@ -15,11 +24,7 @@ const saveStashKey = (repoPath: string) =>
 const saveStashMutation = (repoPath: string) =>
   mutationOptions({
     mutationKey: [saveStashKey(repoPath)],
-    mutationFn: (args: {
-      files: string[]
-      message: string | null
-      includeUntracked: boolean
-    }) => {
+    mutationFn: (args: SaveStashArgs) => {
       return invoke('stash', { repoPath, ...args })
     },
     networkMode: 'always',
@@ -29,7 +34,7 @@ const useSaveStash = (): Action<string[]> => {
   const saveStash = useRepositoryMutation(saveStashMutation)
   return {
     id: 'save_stash',
-    run: async (files: string[]) => {
+    run: async (files) => {
       await saveStash.mutateAsync({
         files,
         message: null, // TODO: allow messages
@@ -46,4 +51,4 @@ const useSaveStash = (): Action<string[]> => {
   }
 }
 
-export { useSaveStash, saveStashKey }
+export { useSaveStash, saveStashKey, saveStashMutation, type SaveStashArgs }

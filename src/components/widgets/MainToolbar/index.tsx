@@ -1,5 +1,7 @@
 import type { WorktreeFileType } from '@/api/models'
-import { useAddFiles, useCommitIndex, useSaveStash } from '@/api/mutations'
+import { useAddFiles } from '@/api/mutations/addToIndex'
+import { useCommitIndex } from '@/api/mutations/commitIndex'
+import { useSaveStash } from '@/api/mutations/saveStash'
 import { showCommitDialog } from '@/common/CommitDialog'
 import { FileSelectorDialog } from '@/common/FileSelectorDialog'
 import { runAction } from '@/context/actions'

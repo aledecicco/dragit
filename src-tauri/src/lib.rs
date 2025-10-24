@@ -59,7 +59,6 @@ pub fn run() {
             api::get_commit_info,
             api::add_to_index,
             api::remove_from_index,
-            api::remove_from_tree,
             api::commit_index,
             api::get_common_ancestor,
             api::get_branch_divergence,
@@ -79,6 +78,7 @@ pub fn run() {
             api::discard_stash,
             api::get_file_diff,
             api::get_file_conflicts,
+            api::solve_file_conflict,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

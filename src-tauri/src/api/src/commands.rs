@@ -8,8 +8,8 @@ use crate::{serialize_response, utils::get_disk_file_contents, with_handler};
 use diffs::{compute_diff, get_diff_sources};
 use models::{
     AppError, AppEvent, AppMessage, AppState, ConflictLine, ConflictMode, CurrentDirInfo,
-    DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus, RepoWatcherError, Settings,
-    UnmergedFileInfo, EVENT_ID,
+    DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus, RepoWatcherError,
+    ResolutionStrategy, Settings, UnmergedFileInfo, EVENT_ID,
 };
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
@@ -114,6 +114,7 @@ pub async fn checkout(
     with_handler(&state, &|h| h.checkout(repo_path, reference))
 }
 
+/// Returns a paginated list of commits leading up to the given reference.
 #[tauri::command]
 pub async fn get_commit_history_page(
     state: State<'_, AppState>,
@@ -129,6 +130,7 @@ pub async fn get_commit_history_page(
     .and_then(serialize_response)
 }
 
+/// Returns detailed information about the commit pointed at by the given reference.
 #[tauri::command]
 pub async fn get_commit_info(
     state: State<'_, AppState>,
@@ -142,6 +144,7 @@ pub async fn get_commit_info(
     .and_then(serialize_response)
 }
 
+/// Returns the current status of the repository's HEAD.
 #[tauri::command]
 pub async fn get_head_info(
     state: State<'_, AppState>,
@@ -151,6 +154,7 @@ pub async fn get_head_info(
     with_handler(&state, &|h| h.get_head_info(&channel, repo_path)).and_then(serialize_response)
 }
 
+/// Returns a paginated list of the files in the working tree.
 #[tauri::command]
 pub async fn get_worktree_files_page(
     state: State<'_, AppState>,
@@ -167,6 +171,8 @@ pub async fn get_worktree_files_page(
     .and_then(serialize_response)
 }
 
+/// Returns a paginated list of the files versioned in the given snapshot.
+/// Optionally receives a parent to compare against.
 #[tauri::command]
 pub async fn get_snapshot_files_page(
     state: State<'_, AppState>,
@@ -183,6 +189,7 @@ pub async fn get_snapshot_files_page(
     .and_then(serialize_response)
 }
 
+/// Staged the given files.
 #[tauri::command]
 pub async fn add_to_index(
     state: State<'_, AppState>,
@@ -192,6 +199,7 @@ pub async fn add_to_index(
     with_handler(&state, &|h| h.add_to_index(repo_path, &files))
 }
 
+/// Unstages the given files.
 #[tauri::command]
 pub async fn remove_from_index(
     state: State<'_, AppState>,
@@ -201,15 +209,7 @@ pub async fn remove_from_index(
     with_handler(&state, &|h| h.remove_from_index(repo_path, &files))
 }
 
-#[tauri::command]
-pub async fn remove_from_tree(
-    state: State<'_, AppState>,
-    repo_path: &str,
-    files: Vec<&str>,
-) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.remove_from_tree(repo_path, &files))
-}
-
+/// Commits the current index with the given message.
 #[tauri::command]
 pub async fn commit_index(
     state: State<'_, AppState>,
@@ -220,6 +220,7 @@ pub async fn commit_index(
     with_handler(&state, &|h| h.commit_index(repo_path, message, is_amend))
 }
 
+/// Returns the commit hash of the latest common ancestor between the two given references.
 #[tauri::command]
 pub async fn get_common_ancestor(
     state: State<'_, AppState>,
@@ -234,6 +235,7 @@ pub async fn get_common_ancestor(
     .and_then(serialize_response)
 }
 
+/// Returns the divergence between the two given branches.
 #[tauri::command]
 pub async fn get_branch_divergence(
     state: State<'_, AppState>,
@@ -248,6 +250,7 @@ pub async fn get_branch_divergence(
     .and_then(serialize_response)
 }
 
+/// Pushes the given branch to the given remote.
 #[tauri::command]
 pub async fn push_branch(
     state: State<'_, AppState>,
@@ -270,6 +273,7 @@ pub async fn push_branch(
     })
 }
 
+/// Pulls the given branch from the given remote.
 #[tauri::command]
 pub async fn pull_branch(
     state: State<'_, AppState>,
@@ -284,6 +288,8 @@ pub async fn pull_branch(
     })
 }
 
+/// Fast-forwards a branch to match the given remote branch.
+/// Can be called without checking-out first.
 #[tauri::command]
 pub async fn fast_forward_branch(
     state: State<'_, AppState>,
@@ -297,6 +303,7 @@ pub async fn fast_forward_branch(
     })
 }
 
+/// Returns the list of currently known remotes.
 #[tauri::command]
 pub async fn get_remotes(
     state: State<'_, AppState>,
@@ -306,6 +313,7 @@ pub async fn get_remotes(
     with_handler(&state, &|h| h.get_remotes(&channel, repo_path)).and_then(serialize_response)
 }
 
+/// Fetches the status of the given remote.
 #[tauri::command]
 pub async fn fetch_remote(
     state: State<'_, AppState>,
@@ -315,6 +323,7 @@ pub async fn fetch_remote(
     with_handler(&state, &|h| h.fetch_remote(repo_path, remote))
 }
 
+/// Sets the upstream of a branch to the given remote reference.
 #[tauri::command]
 pub async fn set_upstream(
     state: State<'_, AppState>,
@@ -325,6 +334,7 @@ pub async fn set_upstream(
     with_handler(&state, &|h| h.set_upstream(repo_path, branch, remote_ref))
 }
 
+/// Adds a new remote with the given name and URL.
 #[tauri::command]
 pub async fn add_remote(
     state: State<'_, AppState>,
@@ -335,6 +345,7 @@ pub async fn add_remote(
     with_handler(&state, &|h| h.add_remote(repo_path, name, url))
 }
 
+/// Removes the given remote.
 #[tauri::command]
 pub async fn remove_remote(
     state: State<'_, AppState>,
@@ -344,6 +355,7 @@ pub async fn remove_remote(
     with_handler(&state, &|h| h.remove_remote(repo_path, name))
 }
 
+/// Renames the given remote.
 #[tauri::command]
 pub async fn rename_remote(
     state: State<'_, AppState>,
@@ -354,6 +366,7 @@ pub async fn rename_remote(
     with_handler(&state, &|h| h.rename_remote(repo_path, name, new_name))
 }
 
+/// Changes the URL of the given remote.
 #[tauri::command]
 pub async fn change_remote_url(
     state: State<'_, AppState>,
@@ -364,6 +377,7 @@ pub async fn change_remote_url(
     with_handler(&state, &|h| h.change_remote_url(repo_path, name, new_url))
 }
 
+/// Returns the current list of stashes.
 #[tauri::command]
 pub async fn get_stashes(
     state: State<'_, AppState>,
@@ -373,6 +387,7 @@ pub async fn get_stashes(
     with_handler(&state, &|h| h.get_stashes(&channel, repo_path)).and_then(serialize_response)
 }
 
+/// Creates a new stash including the given files.
 #[tauri::command]
 pub async fn stash(
     state: State<'_, AppState>,
@@ -386,6 +401,7 @@ pub async fn stash(
     })
 }
 
+/// Pops a stash entry.
 #[tauri::command]
 pub async fn apply_stash(
     state: State<'_, AppState>,
@@ -395,6 +411,7 @@ pub async fn apply_stash(
     with_handler(&state, &|h| h.apply_stash(repo_path, stash_id))
 }
 
+/// Discards a stash entry.
 #[tauri::command]
 pub async fn discard_stash(
     state: State<'_, AppState>,
@@ -404,6 +421,7 @@ pub async fn discard_stash(
     with_handler(&state, &|h| h.discard_stash(repo_path, stash_id))
 }
 
+/// Returns the diff of a file between two sources.
 #[tauri::command]
 pub async fn get_file_diff(
     state: State<'_, AppState>,
@@ -434,6 +452,7 @@ pub async fn get_file_diff(
     serialize_response(diff)
 }
 
+/// Returns the conflict sections of a file with merge conflicts.
 #[tauri::command]
 pub async fn get_file_conflicts(
     repo_path: &str,
@@ -489,4 +508,17 @@ pub async fn get_file_conflicts(
         .collect::<Vec<ConflictLine>>();
 
     serialize_response(conflicts)
+}
+
+/// Solves the conflicts of a file using the given startegy.
+#[tauri::command]
+pub async fn solve_file_conflict(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    filepath: &str,
+    strategy: ResolutionStrategy,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| {
+        h.solve_file_conflict(repo_path, filepath, &strategy)
+    })
 }

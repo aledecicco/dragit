@@ -1,11 +1,9 @@
 import type { ComponentProps } from 'react'
 
 import type { RemoteInfo } from '@/api/models'
-import {
-  useChangeRemoteUrl,
-  useRemoveRemote,
-  useRenameRemote,
-} from '@/api/mutations'
+import { useChangeRemoteUrl } from '@/api/mutations/changeRemoteUrl'
+import { useRemoveRemote } from '@/api/mutations/removeRemote'
+import { useRenameRemote } from '@/api/mutations/renameRemote'
 import { runAction } from '@/context/actions'
 import { ActionButton } from '@/lib/ActionButton'
 import { EditableText } from '@/ui/EditableText'

@@ -7,12 +7,16 @@ import type { Action } from '@/context/actions'
 import type { Settings } from '../models'
 import { mutationOptions } from '../utils'
 
+interface SetSettingsArgs {
+  settings: Settings
+}
+
 const setSettingsKey = ['set_settings'] as const
 
 const setSettingsMutation = mutationOptions({
   mutationKey: setSettingsKey,
-  mutationFn: (args: { settings: Settings }) => {
-    return invoke('set_settings', args)
+  mutationFn: (args: SetSettingsArgs) => {
+    return invoke('set_settings', { ...args })
   },
   networkMode: 'always',
 })
@@ -22,7 +26,7 @@ const useSaveSettings = (): Action<Settings> => {
 
   return {
     id: 'set_settings',
-    run: async (settings: Settings) => {
+    run: async (settings) => {
       await setSettings.mutateAsync({ settings })
     },
     label: {
@@ -35,4 +39,9 @@ const useSaveSettings = (): Action<Settings> => {
   }
 }
 
-export { useSaveSettings, setSettingsKey }
+export {
+  useSaveSettings,
+  setSettingsKey,
+  setSettingsMutation,
+  type SetSettingsArgs,
+}

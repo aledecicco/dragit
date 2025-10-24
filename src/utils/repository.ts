@@ -7,7 +7,8 @@ import type {
   RemoteName,
   RemoteRef,
 } from '@/api/models'
-import { useQueryBranches, useQueryRemotes } from '@/api/queries'
+import { useQueryBranches } from '@/api/queries/branches'
+import { useQueryRemotes } from '@/api/queries/remotes'
 import { useSelectedRefs } from '@/context/branches'
 
 import { mapFn } from './types'

@@ -4,8 +4,11 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Action } from '@/context/actions'
 
 import type { StashInfo } from '../models'
-import { mutationOptions, useRepositoryMutation } from '../utils'
-import { pathMutationKey } from '.'
+import {
+  mutationOptions,
+  pathMutationKey,
+  useRepositoryMutation,
+} from '../utils'
 
 interface ApplyStashArgs {
   stashId: string
@@ -44,4 +47,4 @@ const useApplyStash = (stash: StashInfo): Action => {
   }
 }
 
-export { useApplyStash, applyStashKey, type ApplyStashArgs }
+export { useApplyStash, applyStashKey, applyStashMutation, type ApplyStashArgs }

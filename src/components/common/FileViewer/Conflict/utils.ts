@@ -30,7 +30,6 @@ const getContentOurs = (fileConflicts: FileConflicts): string => {
  * @param fileConflicts - The diff to recover the content from.
  */
 const getContentTheirs = (fileConflicts: FileConflicts): string => {
-  console.log(fileConflicts)
   return fileConflicts
     .filter((line) => line.type !== 'ours')
     .map((line) => line.content)
@@ -88,7 +87,6 @@ export const highlightConflicts = (
   // Then syntax-highlight both versions completely.
   const treeOurs = getTree(getContentOurs(fileConflicts), path)
   const treeTheirs = getTree(getContentTheirs(fileConflicts), path)
-  console.log(treeOurs, treeTheirs)
 
   // Split the syntax-highlighted trees into lines, so we can interleave them
   // according to the conflicts, without losing the syntax highlighting.

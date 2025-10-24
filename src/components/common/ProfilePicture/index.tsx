@@ -3,7 +3,7 @@ import { IconUserFilled } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { ProfilePictureSource } from '@/api/models'
-import { useQueryProfilePicture } from '@/api/queries'
+import { useQueryProfilePicture } from '@/api/queries/profilePicture'
 import { Icon } from '@/ui/Icon'
 import { cn, propsWithCn } from '@/utils/styles'
 import type { Size } from '@/utils/types'

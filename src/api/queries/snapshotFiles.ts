@@ -15,8 +15,7 @@ import type {
   VersionedFileInfo,
 } from '../models'
 import { SNAPSHOT_FILES_PAGE_SCHEMA } from '../schemas'
-import { fetchAndDeserialize, useRepositoryQuery } from '../utils'
-import { pathQueryKey } from '.'
+import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 
 export const SNAPSHOT_FILES_PAGE_SIZE = 1000
 
