@@ -51,7 +51,6 @@ export interface CommitInfo {
 }
 
 export type SnapshotInfo = CommitInfo | StashInfo
-export type SnapshotType = SnapshotInfo['type']
 
 export interface AncestorInfo {
   distance: number

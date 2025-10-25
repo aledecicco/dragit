@@ -286,27 +286,24 @@ impl GitHandler for CmdGit {
         channel: &Channel<AppMessage>,
         repo_path: &str,
         snapshot_id: &str,
-        parent: Option<&str>,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<VersionedFileInfo>, GitError> {
-        let mut args = vec![
-            "diff-tree",
-            "-r",
-            "--root",
-            "--name-status",
-            "--find-copies",
-            "--no-commit-id",
-        ];
-
-        if let Some(parent) = parent {
-            args.push(snapshot_id);
-            args.push(parent);
-        } else {
-            args.push(snapshot_id);
-        }
-
-        let process = self.spawn_and_notify(channel, repo_path, args)?;
+        // TODO: doesn't work for initial commit
+        let process = self.spawn_and_notify(
+            channel,
+            repo_path,
+            [
+                "diff-tree",
+                "-r",
+                "--root",
+                "--name-status",
+                "--find-copies",
+                "--no-commit-id",
+                &format!("{}^1", snapshot_id),
+                snapshot_id,
+            ],
+        )?;
         let lines = self.get_output_lines_stream(process)?;
 
         let mut items_iter = lines

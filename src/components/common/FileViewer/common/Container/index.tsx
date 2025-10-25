@@ -54,6 +54,8 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
     viewerRef.current?.scrollTo({ top: 0, left: 0 })
   }, [filepath])
 
+  // TODO: open file on title click
+  // TODO: show old path on moved files
   return (
     <div
       {...propsWithCn(

@@ -57,6 +57,7 @@ const WorktreeChanges = <T extends WorktreeFileType[]>(
       {...propsWithCn(
         divProps,
         'flex flex-col gap-y-1 overflow-hidden min-h-50',
+        showPagination && 'h-full',
       )}
     >
       <div className={cn('flex flex-row items-center justify-between')}>

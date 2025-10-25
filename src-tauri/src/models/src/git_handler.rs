@@ -65,7 +65,6 @@ pub trait GitHandler {
         channel: &Channel<AppMessage>,
         repo_path: &str,
         snapshot_id: &str,
-        parent: Option<&str>,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<VersionedFileInfo>, GitError>;

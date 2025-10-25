@@ -11,7 +11,6 @@ import type {
   Page,
   SnapshotId,
   SnapshotInfo,
-  SnapshotType,
   VersionedFileInfo,
 } from '../models'
 import { SNAPSHOT_FILES_PAGE_SCHEMA } from '../schemas'
@@ -25,15 +24,14 @@ const snapshotFilesQueryKeys = {
       ...pathQueryKey(repoPath),
       key: 'snapshot_files',
     }) as const,
-  snapshot: (repoPath: string, snapshot: SnapshotId, type: SnapshotType) => ({
+  snapshot: (repoPath: string, snapshot: SnapshotId) => ({
     all: {
       ...snapshotFilesQueryKeys.all(repoPath),
       snapshot,
-      type,
     } as const,
     page: (page: number) =>
       ({
-        ...snapshotFilesQueryKeys.snapshot(repoPath, snapshot, type).all,
+        ...snapshotFilesQueryKeys.snapshot(repoPath, snapshot).all,
         page: page,
       }) as const,
   }),
@@ -42,7 +40,6 @@ const snapshotFilesQueryKeys = {
 const fetchSnapshotFilesPage = async (
   repoPath: string,
   snapshotId: SnapshotId,
-  parent: SnapshotId | null,
   page: number,
   context: QueryFunctionContext,
 ): Promise<Page<VersionedFileInfo>> => {
@@ -51,7 +48,6 @@ const fetchSnapshotFilesPage = async (
     {
       repoPath,
       snapshotId,
-      parent,
       startAfter: page * SNAPSHOT_FILES_PAGE_SIZE,
       limit: SNAPSHOT_FILES_PAGE_SIZE,
     },
@@ -96,26 +92,19 @@ const snapshotFilesQuery = (
   repoPath: string,
   page: number,
   snapshotId: SnapshotId,
-  type: SnapshotType,
 ) =>
   queryOptions({
     queryKey: [
-      snapshotFilesQueryKeys.snapshot(repoPath, snapshotId, type).page(page),
+      snapshotFilesQueryKeys.snapshot(repoPath, snapshotId).page(page),
     ],
     queryFn: (context) =>
-      fetchSnapshotFilesPage(
-        repoPath,
-        snapshotId,
-        type === 'stash' ? `${snapshotId}^` : null,
-        page,
-        context,
-      ),
+      fetchSnapshotFilesPage(repoPath, snapshotId, page, context),
   })
 
 const useQuerySnapshotFiles = (
   snapshot: SnapshotInfo,
   page: number,
 ): UseQueryResult<Page<VersionedFileInfo>> =>
-  useRepositoryQuery(snapshotFilesQuery, page, snapshot.id, snapshot.type)
+  useRepositoryQuery(snapshotFilesQuery, page, snapshot.id)
 
 export { snapshotFilesQueryKeys, useQuerySnapshotFiles }

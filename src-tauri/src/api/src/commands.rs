@@ -179,12 +179,11 @@ pub async fn get_snapshot_files_page(
     channel: Channel<AppMessage>,
     repo_path: &str,
     snapshot_id: &str,
-    parent: Option<&str>,
     start_after: usize,
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_snapshot_files_page(&channel, repo_path, snapshot_id, parent, start_after, limit)
+        h.get_snapshot_files_page(&channel, repo_path, snapshot_id, start_after, limit)
     })
     .and_then(serialize_response)
 }
