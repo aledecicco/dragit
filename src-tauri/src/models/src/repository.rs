@@ -11,22 +11,42 @@ pub struct CurrentDirInfo {
     pub exists: bool,
 }
 
-#[derive(borsh::BorshSerialize, Debug)]
+#[derive(borsh::BorshSerialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct DiffSummary {
     pub files_count: u32,
     pub insertions: u32,
     pub deletions: u32,
 }
 
-#[derive(borsh::BorshSerialize, Debug)]
+#[derive(borsh::BorshSerialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct CommitInfo {
-    pub hash: String,
+    pub id: String,
     pub short_hash: String,
     pub author_name: String,
     pub author_email: String,
     pub timestamp: u32,
     pub message: Option<String>,
     pub changes: Option<DiffSummary>,
+}
+
+#[derive(borsh::BorshSerialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct StashInfo {
+    pub id: String,
+    pub stash_number: String,
+    pub message: Option<String>,
+    pub timestamp: u32,
+    pub created_on: String,
+    pub changes: Option<DiffSummary>,
+}
+
+#[derive(serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase", tag = "type")]
+pub enum SnapshotInfo {
+    Commit(CommitInfo),
+    Stash(StashInfo),
 }
 
 #[derive(strum::EnumString, Debug)]
@@ -209,16 +229,6 @@ pub struct RemoteInfo {
     pub name: String,
     pub fetch_url: String,
     pub push_url: String,
-}
-
-#[derive(borsh::BorshSerialize, Debug)]
-pub struct StashInfo {
-    pub id: String,
-    pub stash_number: String,
-    pub message: Option<String>,
-    pub timestamp: u32,
-    pub created_on: String,
-    pub changes: Option<DiffSummary>,
 }
 
 #[derive(borsh::BorshSerialize, Debug)]

@@ -9,7 +9,7 @@ use diffs::{compute_diff, get_diff_sources};
 use models::{
     AppError, AppEvent, AppMessage, AppState, ConflictLine, ConflictMode, CurrentDirInfo,
     DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus, RepoWatcherError,
-    ResolutionStrategy, Settings, UnmergedFileInfo, EVENT_ID,
+    ResolutionStrategy, Settings, SnapshotInfo, UnmergedFileInfo, EVENT_ID,
 };
 use settings::{
     add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
@@ -178,12 +178,12 @@ pub async fn get_snapshot_files_page(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
     repo_path: &str,
-    snapshot_id: &str,
+    snapshot: SnapshotInfo,
     start_after: usize,
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_snapshot_files_page(&channel, repo_path, snapshot_id, start_after, limit)
+        h.get_snapshot_files_page(&channel, repo_path, &snapshot, start_after, limit)
     })
     .and_then(serialize_response)
 }

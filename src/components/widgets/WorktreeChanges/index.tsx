@@ -53,13 +53,7 @@ const WorktreeChanges = <T extends WorktreeFileType[]>(
   const showPagination = useNeedsPagination(filesQuery, page)
 
   return (
-    <div
-      {...propsWithCn(
-        divProps,
-        'flex flex-col gap-y-1 overflow-hidden min-h-50',
-        showPagination && 'h-full',
-      )}
-    >
+    <div {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}>
       <div className={cn('flex flex-row items-center justify-between')}>
         <div
           className={cn(

@@ -5,6 +5,8 @@ import {
 } from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
+import { MS_IN_SECOND } from '@/utils/time'
+
 import type {
   ChangeStatus,
   MovedStatus,
@@ -39,7 +41,7 @@ const snapshotFilesQueryKeys = {
 
 const fetchSnapshotFilesPage = async (
   repoPath: string,
-  snapshotId: SnapshotId,
+  snapshot: SnapshotInfo,
   page: number,
   context: QueryFunctionContext,
 ): Promise<Page<VersionedFileInfo>> => {
@@ -47,7 +49,10 @@ const fetchSnapshotFilesPage = async (
     'get_snapshot_files_page',
     {
       repoPath,
-      snapshotId,
+      snapshot: {
+        ...snapshot,
+        timestamp: snapshot.timestamp / MS_IN_SECOND,
+      },
       startAfter: page * SNAPSHOT_FILES_PAGE_SIZE,
       limit: SNAPSHOT_FILES_PAGE_SIZE,
     },
@@ -91,20 +96,20 @@ const fetchSnapshotFilesPage = async (
 const snapshotFilesQuery = (
   repoPath: string,
   page: number,
-  snapshotId: SnapshotId,
+  snapshot: SnapshotInfo,
 ) =>
   queryOptions({
     queryKey: [
-      snapshotFilesQueryKeys.snapshot(repoPath, snapshotId).page(page),
+      snapshotFilesQueryKeys.snapshot(repoPath, snapshot.id).page(page),
     ],
     queryFn: (context) =>
-      fetchSnapshotFilesPage(repoPath, snapshotId, page, context),
+      fetchSnapshotFilesPage(repoPath, snapshot, page, context),
   })
 
 const useQuerySnapshotFiles = (
   snapshot: SnapshotInfo,
   page: number,
 ): UseQueryResult<Page<VersionedFileInfo>> =>
-  useRepositoryQuery(snapshotFilesQuery, page, snapshot.id)
+  useRepositoryQuery(snapshotFilesQuery, page, snapshot)
 
 export { snapshotFilesQueryKeys, useQuerySnapshotFiles }

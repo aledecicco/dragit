@@ -26,13 +26,9 @@ const App = () => {
       <div
         className={cn(
           'px-8 py-4 w-full h-full max-h-full',
-          'grid grid-cols-[1fr_2fr_1fr] grid-rows-[max-content_max-content_1fr_1fr_max-content] gap-4',
+          'grid grid-cols-[1fr_2fr_1fr] grid-rows-1 gap-4',
         )}
       >
-        <CurrentDirectory
-          className={cn('col-start-2 row-start-1', 'justify-self-center')}
-        />
-
         {currentDirQuery.data?.path &&
           currentDirQuery.data.isRepository &&
           currentDirQuery.data.exists && <InRepository />}
@@ -54,20 +50,28 @@ const InRepository = () => {
 
   return (
     <>
-      <StashesList className={cn('col-start-1 row-start-1 row-span-2')} />
       <div
-        className={cn(
-          'col-start-1 row-start-3 row-span-2',
-          'flex flex-col gap-y-4',
-        )}
+        className={cn('grid grid-rows-[1fr_minmax(0,4fr)_max-content] gap-4')}
       >
-        <UnstagedWorktreeChanges className={cn('grow')} />
-        <StagedWorktreeChanges className={cn('grow')} />
+        <StashesList className={cn('min-h-30')} />
+
+        <div className={cn('grid grid-rows-[auto_auto] gap-4')}>
+          <UnstagedWorktreeChanges className={cn('h-full min-h-50')} />
+          <StagedWorktreeChanges className={cn('h-full min-h-50')} />
+        </div>
+
+        <MainToolbar />
       </div>
-      <MainToolbar className={cn('col-start-1 row-start-5')} />
-      <Graph className={cn('col-start-2 row-start-2 row-span-4')} />
-      <CurrentRemote className={cn('col-start-3 row-start-1')} />
-      <BranchesList className={cn('col-start-3 row-start-2 row-span-3')} />
+
+      <div className={cn('grid grid-rows-[max-content_1fr] gap-4')}>
+        <CurrentDirectory className={cn('justify-self-center')} />
+        <Graph />
+      </div>
+
+      <div className={cn('grid grid-rows-[max-content_1fr] gap-4')}>
+        <CurrentRemote />
+        <BranchesList />
+      </div>
     </>
   )
 }

@@ -2,7 +2,7 @@ use tauri::ipc::Channel;
 
 use crate::{
     AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError, HeadInfo,
-    HistoryItem, Page, RemoteInfo, StashInfo, VersionedFileInfo, WorktreeFileInfo,
+    HistoryItem, Page, RemoteInfo, SnapshotInfo, StashInfo, VersionedFileInfo, WorktreeFileInfo,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -64,7 +64,7 @@ pub trait GitHandler {
         &self,
         channel: &Channel<AppMessage>,
         repo_path: &str,
-        snapshot_id: &str,
+        snapshot: &SnapshotInfo,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<VersionedFileInfo>, GitError>;

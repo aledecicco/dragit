@@ -74,12 +74,12 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
 
       {file.status === 'unmerged' ? (
         <UnmergedViewSelector
-          className="absolute -bottom-3 left-half -translate-x-half"
+          className={cn('absolute -bottom-3 left-half -translate-x-half')}
           store={viewModeSelector.store}
         />
       ) : (
         <DiffFilterSelector
-          className="absolute -bottom-3 left-half -translate-x-half"
+          className={cn('absolute -bottom-3 left-half -translate-x-half')}
           store={filterSelector.store}
         />
       )}

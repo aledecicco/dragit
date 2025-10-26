@@ -1,7 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 import type { UseQueryResult } from '@tanstack/react-query'
 
-import type { Page, SnapshotInfo, VersionedFileInfo } from '@/api/models'
+import type { Page, VersionedFileInfo } from '@/api/models'
 import { QueryList } from '@/lib/QueryList'
 import { propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
@@ -9,11 +9,6 @@ import { mapFn } from '@/utils/types'
 import { SnapshotDetailsDialogItem } from '../Item'
 
 interface SnapshotDialogFileListProps extends Ariakit.RadioGroupProps {
-  /**
-   * The snapshot that contains the files.
-   */
-  snapshotInfo: SnapshotInfo
-
   /**
    * The query that fetches the files.
    */
@@ -24,7 +19,7 @@ interface SnapshotDialogFileListProps extends Ariakit.RadioGroupProps {
  * Displays a list of files that can be selected.
  */
 const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
-  const { snapshotInfo, filesQuery, ...radioProps } = props
+  const { filesQuery, ...radioProps } = props
 
   return (
     <Ariakit.RadioGroup
@@ -44,12 +39,6 @@ const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
         options={mapFn(filesQuery.data, (page) => ({
           getItemKey: (index: number) => page.items[index].path,
         }))}
-        placeholdersCount={Math.min(
-          10,
-          snapshotInfo.changes?.filesCount
-            ? snapshotInfo.changes.filesCount
-            : 1,
-        )}
       />
     </Ariakit.RadioGroup>
   )

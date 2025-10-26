@@ -50,7 +50,7 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
     query.data
       ? Math.min(
           (getItems ? getItems(query.data) : (query.data as I[])).length,
-          10,
+          30,
         )
       : undefined,
   )
@@ -67,7 +67,7 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
             gap: virtualizedDivProps.options?.gap ?? 8,
           }}
         >
-          {range(placeholdersCount ?? prevCount ?? 10).map((i) => (
+          {range(placeholdersCount ?? prevCount ?? 30).map((i) => (
             <Skeleton
               key={i}
               style={{ height: virtualizedDivProps.itemSize }}

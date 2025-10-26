@@ -50,7 +50,7 @@ pub(crate) fn parse_commit_info(line: &String) -> Option<CommitInfo> {
     let mut segments = line.split('\0');
 
     Some(CommitInfo {
-        hash: segments.next()?.to_string(),
+        id: segments.next()?.to_string(),
         short_hash: segments.next()?.to_string(),
         author_name: segments.next()?.to_string(),
         author_email: segments.next()?.to_string(),
@@ -323,16 +323,17 @@ pub(crate) fn parse_stash_info(lines: &Vec<String>) -> Option<StashInfo> {
         .strip_suffix('}')?
         .to_string();
     let timestamp = u32::from_str(timestamp_line).ok()?;
-    let (creation_details, message) = creation_line.split_once(':')?;
-    let mut creation_details = creation_details.split_ascii_whitespace();
-    let message = if creation_details.next()?.eq(STASH_INFO_QUICK) {
+    let (creation_details, message) = creation_line.split_once(": ")?;
+    let message = if creation_details.starts_with(STASH_INFO_QUICK) {
         None
     } else {
-        Some((&message[1..]).to_string())
+        Some(message.to_string())
     };
-    let created_on = match creation_details.last()? {
-        STASH_INFO_DETACHED => hashes_line.split_ascii_whitespace().last()?,
-        created_on => created_on,
+
+    let created_on = if creation_details.ends_with(STASH_INFO_DETACHED) {
+        hashes_line.split_ascii_whitespace().next()?
+    } else {
+        creation_details.split_ascii_whitespace().last()?
     }
     .to_string();
 

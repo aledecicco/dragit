@@ -12,7 +12,7 @@ use utils::*;
 use models::{
     AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
     FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
-    ResolutionStrategy, StashInfo, VersionedFileInfo, WorktreeFileInfo,
+    ResolutionStrategy, SnapshotInfo, StashInfo, VersionedFileInfo, WorktreeFileInfo,
 };
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
@@ -285,25 +285,39 @@ impl GitHandler for CmdGit {
         &self,
         channel: &Channel<AppMessage>,
         repo_path: &str,
-        snapshot_id: &str,
+        snapshot: &SnapshotInfo,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<VersionedFileInfo>, GitError> {
-        // TODO: doesn't work for initial commit
-        let process = self.spawn_and_notify(
-            channel,
-            repo_path,
-            [
-                "diff-tree",
+        let parent;
+        let args = match snapshot {
+            SnapshotInfo::Commit(commit) => {
+                parent = format!("{}^{}", commit.id, 1);
+                vec![
+                    "diff-tree",
+                    "-r",
+                    "--root",
+                    "--name-status",
+                    "--find-copies",
+                    "--no-commit-id",
+                    &parent,
+                    &commit.id,
+                ]
+            }
+            SnapshotInfo::Stash(stash) => vec![
+                "stash",
+                "show",
                 "-r",
-                "--root",
+                "-u",
                 "--name-status",
                 "--find-copies",
                 "--no-commit-id",
-                &format!("{}^1", snapshot_id),
-                snapshot_id,
+                &stash.id,
             ],
-        )?;
+        };
+
+        // TODO: doesn't work for initial commit
+        let process = self.spawn_and_notify(channel, repo_path, args)?;
         let lines = self.get_output_lines_stream(process)?;
 
         let mut items_iter = lines

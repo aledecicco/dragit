@@ -91,7 +91,6 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
 
         <SnapshotDialogFileList
           store={fileSelector.store}
-          snapshotInfo={snapshotInfo}
           filesQuery={filesQuery}
           className={cn('grid gap-y-2 overflow-y-hidden')}
         />
