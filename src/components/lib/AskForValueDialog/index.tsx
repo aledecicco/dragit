@@ -34,20 +34,17 @@ function askForValue<T extends AnyObject, P>(
   return new Promise((resolve, reject) => {
     const dialogKey = getUniqueId()
 
-    showDialog(
+    showDialog(dialogKey, AskDialog, {
+      ...(dialogProps as P),
       dialogKey,
-      <AskDialog
-        {...(dialogProps as P)}
-        dialogKey={dialogKey}
-        submitValue={(value) => {
-          if (value === undefined) {
-            reject(new Error('Value not provided'))
-          } else {
-            resolve(value)
-          }
-        }}
-      />,
-    )
+      submitValue: (value) => {
+        if (value === undefined) {
+          reject(new Error('Value not provided'))
+        } else {
+          resolve(value)
+        }
+      },
+    })
   })
 }
 

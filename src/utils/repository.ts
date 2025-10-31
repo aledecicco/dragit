@@ -8,12 +8,11 @@ import type {
   RemoteRef,
 } from '@/api/models'
 import { useQueryBranches } from '@/api/queries/branches'
+import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { useQueryRemotes } from '@/api/queries/remotes'
-import { useSelectedRefs } from '@/context/branches'
+import { useSelectedBase } from '@/context/branches'
 
 import { mapFn } from './types'
-
-export const DEFAULT_REMOTE_NAME = 'origin'
 
 /**
  * Finds a branch's info by name in a list of available branches.
@@ -32,6 +31,7 @@ const findBranchInfo = (
  * @returns The remote counterpart of a local branch, if any.
  */
 const getRemoteCounterpart = (branch: BranchInfo): RemoteRef | undefined => {
+  // TODO: get from upstream store
   return match(branch)
     .with({ type: 'local', remote: P.select() }, (remote) =>
       mapFn(
@@ -64,22 +64,25 @@ const useBranch = (
 }
 
 /**
- * Listens to the currently selected reference and base reference,
- * and evaluates them to branches if possible.
- *
- * @returns An object containing:
- * - `branch`: The branch pointed at by the selected reference, if any.
- * - `baseBranch`: The branch pointed at by the base reference, if any.
+ * Hook that tracks the currently checked out reference.
  */
-const useSelectedBranches = () => {
-  const { reference, baseReference } = useSelectedRefs()
-  const branch = useBranch(reference)
-  const baseBranch = useBranch(baseReference)
+const useCurrentRef = (): Reference | undefined => {
+  const headInfoQuery = useQueryHeadInfo()
 
-  return {
-    branch,
-    baseBranch,
-  }
+  const currentRef = match(headInfoQuery.data)
+    .returnType<Reference | undefined>()
+    .with({ type: 'branch' }, (reference) => ({
+      type: 'branch',
+      refName: reference.name,
+    }))
+    .with({ type: 'detached' }, (reference) => ({
+      type: 'commit',
+      refName: reference.commit,
+    }))
+    .with(undefined, () => undefined)
+    .exhaustive()
+
+  return currentRef
 }
 
 /**
@@ -119,7 +122,7 @@ export {
   findBranchInfo,
   getRemoteCounterpart,
   useBranch,
-  useSelectedBranches,
+  useCurrentRef,
   findRemoteInfo,
   useRemote,
 }

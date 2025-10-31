@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
-import { useFilesPage } from '@/context/pages'
+import { useWorktreeFilesPage } from '@/context/pages'
 
 import type {
   ChangeStatus,
@@ -174,6 +174,11 @@ const useQueryWorktreeFiles = <T extends WorktreeFileType>(
   types: T | T[],
   pathspec?: string,
 ): UseQueryResult<Page<WorktreeFileTypes[T]>> =>
-  useRepositoryQuery(worktreeFilesQuery, types, useFilesPage(types), pathspec)
+  useRepositoryQuery(
+    worktreeFilesQuery,
+    types,
+    useWorktreeFilesPage(types),
+    pathspec,
+  )
 
 export { worktreeFilesQueryKeys, useQueryWorktreeFiles }

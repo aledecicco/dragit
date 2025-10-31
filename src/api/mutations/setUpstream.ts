@@ -1,9 +1,13 @@
-import { IconWorldUpload } from '@tabler/icons-react'
+import {
+  IconWorld,
+  IconWorldCancel,
+  IconWorldQuestion,
+} from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
-import type { BranchName, RemoteRef } from '../models'
+import type { BranchInfo, BranchName, RemoteRef } from '../models'
 import {
   mutationOptions,
   pathMutationKey,
@@ -30,13 +34,21 @@ const setUpstreamMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useSetUpstream = (branch: BranchName): Action<RemoteRef> => {
+const useSetUpstream = (branch: BranchInfo | undefined): Action<RemoteRef> => {
   const setUpstream = useRepositoryMutation(setUpstreamMutation)
 
   return {
     id: `set_upstream:${branch}`,
     run: async (remoteRef: RemoteRef) => {
-      await setUpstream.mutateAsync({ branch, remoteRef })
+      if (!branch) {
+        throw new Error('No branch specified')
+      }
+
+      if (branch.type !== 'local') {
+        throw new Error('Branch is not local')
+      }
+
+      await setUpstream.mutateAsync({ branch: branch.name, remoteRef })
     },
     label: {
       idle: 'Set upstream',
@@ -44,7 +56,12 @@ const useSetUpstream = (branch: BranchName): Action<RemoteRef> => {
       success: 'Upstream set',
       error: 'Failed to set upstream',
     },
-    Glyph: IconWorldUpload,
+    Glyph:
+      branch?.type === 'local'
+        ? branch.remote === undefined
+          ? IconWorldQuestion
+          : IconWorld
+        : IconWorldCancel,
   }
 }
 

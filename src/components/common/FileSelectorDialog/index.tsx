@@ -10,8 +10,8 @@ import { hideDialog } from '@/context/dialogs'
 import {
   setNextPage,
   setPrevPage,
-  useFilesPage,
   useHandleFilesPageSync,
+  useWorktreeFilesPage,
 } from '@/context/pages'
 import type { AskForValueProps } from '@/lib/AskForValueDialog'
 import { Pagination } from '@/lib/Pagination'
@@ -74,7 +74,7 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
 
   const items = filesQuery.data?.items.map((file) => file.path)
 
-  const page = useFilesPage(types)
+  const page = useWorktreeFilesPage(types)
   const showPagination = useNeedsPagination(filesQuery, page)
 
   const shortcuts = showPagination

@@ -71,7 +71,7 @@ const RemotesDialog = (props: RemotesDialogProps) => {
 }
 
 const showRemotesDialog = (props?: Partial<RemotesDialogProps>) => {
-  showDialog(REMOTES_DIALOG_KEY, <RemotesDialog {...props} />)
+  showDialog(REMOTES_DIALOG_KEY, RemotesDialog, props ?? {})
 }
 
 export { RemotesDialog, showRemotesDialog, type RemotesDialogProps }

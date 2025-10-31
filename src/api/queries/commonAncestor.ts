@@ -35,18 +35,20 @@ const commonAncestorQueryKeys = {
     }) as const,
 }
 
-const fetchCommonAncestor = (
+const fetchCommonAncestor = async (
   repoPath: string,
   refName: string,
   baseRefName: string,
   context: QueryFunctionContext,
-): Promise<CommonAncestorInfo | null> => {
-  return fetchAndDeserialize(
+): Promise<CommonAncestorInfo | undefined> => {
+  const res = await fetchAndDeserialize(
     'get_common_ancestor',
     { repoPath, referenceA: refName, referenceB: baseRefName },
     COMMON_ANCESTOR_INFO_SCHEMA,
     context,
   )
+
+  return res ?? undefined
 }
 
 const commonAncestorQuery = (

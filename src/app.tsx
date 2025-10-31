@@ -1,3 +1,5 @@
+import { enableMapSet } from 'immer'
+
 import { BranchesList } from '@/widgets/BranchesList'
 import { CurrentDirectory } from '@/widgets/CurrentDirectory'
 import { CurrentRemote } from '@/widgets/CurrentRemote'
@@ -14,6 +16,8 @@ import { useDialog } from '@/context/dialogs'
 import { useUpstreamSync } from '@/context/upstream'
 import { useContextMenuHandler } from '@/lib/ContextMenu/utils'
 import { cn } from '@/utils/styles'
+
+enableMapSet()
 
 const App = () => {
   useEventsHandler()
@@ -41,7 +45,7 @@ const App = () => {
 const Dialogs = () => {
   const dialog = useDialog()
 
-  return dialog
+  return dialog ? <dialog.DialogComponent {...dialog.props} /> : undefined
 }
 
 const InRepository = () => {

@@ -91,10 +91,10 @@ const showWorktreeFileDiffDialog = (
   file: WorktreeFileInfo,
   props?: Partial<WorktreeFileDiffDialogProps>,
 ) => {
-  showDialog(
-    WORKTREE_FILE_DIFF_DIALOG(file),
-    <WorktreeFileDiffDialog file={file} {...props} />,
-  )
+  showDialog(WORKTREE_FILE_DIFF_DIALOG(file), WorktreeFileDiffDialog, {
+    file,
+    ...props,
+  })
 }
 
 export {

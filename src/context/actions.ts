@@ -3,8 +3,10 @@ import {
   IconCircleCheckFilled,
   IconLoader2,
 } from '@tabler/icons-react'
-import { Store, useStore } from '@tanstack/react-store'
 import { match } from 'ts-pattern'
+import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
+import { useShallow } from 'zustand/react/shallow'
 
 import type { Glyph } from '@/ui/Icon'
 import { MS_IN_SECOND } from '@/utils/time'
@@ -52,55 +54,55 @@ interface ActionsTracker {
   timers: Map<ActionId, number>
 }
 
-const actionsTracker = new Store<ActionsTracker>({
-  actions: new Map(),
-  timers: new Map(),
-})
+interface Setters {
+  /**
+   * Updates the status of an action in the tracker.
+   *
+   * @param id - The unique identifier of the action.
+   * @param status - The new status of the action. If `undefined`, the action will be removed.
+   */
+  setActionStatus: (id: ActionId, status: ActionStatus | undefined) => void
 
-/**
- * Updates the status of an action in the tracker.
- *
- * @param id - The unique identifier of the action.
- * @param status - The new status of the action. If `undefined`, the action will be removed.
- */
-const setActionStatus = (id: ActionId, status: ActionStatus | undefined) => {
-  actionsTracker.setState((state) => {
-    const actions = new Map(state.actions)
-
-    if (status === undefined) {
-      actions.delete(id)
-    } else {
-      actions.set(id, status)
-    }
-
-    return { ...state, actions }
-  })
+  /**
+   * Updates the timer for an action in the tracker.
+   *
+   * @param id - The unique identifier of the action.
+   * @param timeoutId - The ID of the new timer. If `undefined`, the timer will be cleared.
+   */
+  setActionTimer: (id: ActionId, timeoutId: number | undefined) => void
 }
 
-/**
- * Updates the timer for an action in the tracker.
- *
- * @param id - The unique identifier of the action.
- * @param timeoutId - The ID of the timeout to set or clear. If `undefined`, the timer will be cleared.
- */
-const setActionTimer = (id: ActionId, timeoutId: number | undefined) => {
-  actionsTracker.setState((state) => {
-    const timers = new Map(state.timers)
+const useActionsStore = create<ActionsTracker & Setters>()(
+  immer((setState) => ({
+    actions: new Map(),
+    timers: new Map(),
 
-    const timer = timers.get(id)
-    if (timer !== undefined) {
-      clearTimeout(timer)
-    }
+    setActionStatus: (id: ActionId, status: ActionStatus | undefined) => {
+      setState((state) => {
+        if (status === undefined) {
+          state.actions.delete(id)
+        } else {
+          state.actions.set(id, status)
+        }
+      })
+    },
 
-    if (timeoutId === undefined) {
-      timers.delete(id)
-    } else {
-      timers.set(id, timeoutId)
-    }
+    setActionTimer: (id: ActionId, timeoutId: number | undefined) => {
+      setState((state) => {
+        const timer = state.timers.get(id)
+        if (timer !== undefined) {
+          clearTimeout(timer)
+        }
 
-    return { ...state, timers }
-  })
-}
+        if (timeoutId === undefined) {
+          state.timers.delete(id)
+        } else {
+          state.timers.set(id, timeoutId)
+        }
+      })
+    },
+  })),
+)
 
 /**
  * Hook that facilitates tracking the status of one or more actions.
@@ -111,18 +113,20 @@ const setActionTimer = (id: ActionId, timeoutId: number | undefined) => {
 function useActionStatuses(id: ActionId): ActionStatus
 function useActionStatuses(ids: ActionId[]): ActionStatus[]
 function useActionStatuses(ids: ActionId | ActionId[]) {
-  return useStore(actionsTracker, (state) => {
-    if (!Array.isArray(ids)) {
-      const actionId = ids
-      return state.actions.get(actionId) || 'idle'
-    }
+  return useActionsStore(
+    useShallow((state) => {
+      if (!Array.isArray(ids)) {
+        const actionId = ids
+        return state.actions.get(actionId) || 'idle'
+      }
 
-    const statuses = ids.map(
-      (actionId) => state.actions.get(actionId) || 'idle',
-    )
+      const statuses = ids.map(
+        (actionId) => state.actions.get(actionId) || 'idle',
+      )
 
-    return statuses
-  })
+      return statuses
+    }),
+  )
 }
 
 /**
@@ -134,25 +138,26 @@ function useActionStatuses(ids: ActionId | ActionId[]) {
 async function runAction<T>(action: Action<T>, args: T): Promise<void>
 async function runAction(action: Action<void>): Promise<void>
 async function runAction<T>(action: Action<T>, args?: T): Promise<void> {
-  const status = actionsTracker.state.actions.get(action.id) ?? 'idle'
+  const store = useActionsStore.getState()
+  const status = store.actions.get(action.id) ?? 'idle'
 
   if (status !== 'running') {
-    setActionStatus(action.id, 'running')
-    setActionTimer(action.id, undefined)
+    store.setActionStatus(action.id, 'running')
+    store.setActionTimer(action.id, undefined)
 
     return action
       .run(args as T)
       .then(() => {
-        setActionStatus(action.id, 'success')
+        store.setActionStatus(action.id, 'success')
       })
       .catch(() => {
-        setActionStatus(action.id, 'error')
+        store.setActionStatus(action.id, 'error')
       })
       .finally(() => {
         const timeoutId = setTimeout(() => {
-          setActionStatus(action.id, undefined)
+          store.setActionStatus(action.id, undefined)
         }, MS_IN_SECOND * 2)
-        setActionTimer(action.id, timeoutId)
+        store.setActionTimer(action.id, timeoutId)
       })
   }
 }

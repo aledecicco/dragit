@@ -2,7 +2,7 @@ import { IconGitBranch, IconSwitchHorizontal } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
-import { useSelectedBranches } from '@/utils/repository'
+import { useSelectedBranches } from '@/context/branches'
 
 import type { BranchInfo } from '../models'
 import {

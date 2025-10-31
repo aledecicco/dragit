@@ -1,51 +1,74 @@
 import { useEffect } from 'react'
-import { Store, useStore } from '@tanstack/react-store'
-import { usePrevious } from 'react-use'
+import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
+import { useShallow } from 'zustand/react/shallow'
 
-import type { BranchName, RemoteInfo } from '@/api/models'
+import type { BranchName, RemoteName, Upstream } from '@/api/models'
 import { useQueryRemotes } from '@/api/queries/remotes'
-import { DEFAULT_REMOTE_NAME, useSelectedBranches } from '@/utils/repository'
 
-interface SelectedUpstream {
-  remote: RemoteInfo | undefined
-  remoteBranch: BranchName | undefined
+import { useSelectedBranches } from './branches'
+
+const MAX_UPSTREAMS = 50
+const DEFAULT_REMOTE_NAME: RemoteName = 'origin'
+
+// TODO: store persistence.
+interface SelectedUpstreams {
+  /**
+   * The selected upstream for each branch.
+   */
+  upstreams: Map<BranchName, Upstream>
 }
 
-const selectedUpstream = new Store<SelectedUpstream>({
-  remote: undefined,
-  remoteBranch: undefined,
-})
+interface Setters {
+  /**
+   * Change the selected upstream for a given branch.
+   */
+  changeUpstream: (branch: BranchName, upstream: Upstream) => void
+}
+
+const useSelectedUpstreamsStore = create<SelectedUpstreams & Setters>()(
+  immer((setState) => ({
+    upstreams: new Map(),
+
+    changeUpstream: (branch, upstream) => {
+      setState((state) => {
+        const isNew = !state.upstreams.has(branch)
+        if (isNew && state.upstreams.size >= MAX_UPSTREAMS) {
+          const oldest = state.upstreams.keys().next().value
+          if (oldest) {
+            state.upstreams.delete(oldest)
+          }
+        }
+
+        state.upstreams.delete(branch)
+        state.upstreams.set(branch, upstream)
+      })
+    },
+  })),
+)
 
 /**
- * @returns An object containing:
- * - `remote`: The currently selected remote in the application.
- * - `remoteBranch`: The currently selected remote branch in the application.
+ * Hook that facilitates tracking the selected upstream for the current branch.
  */
-const useSelectedUpstream = () => useStore(selectedUpstream)
+const useCurrentUpstream = (): Upstream | undefined => {
+  const { currentBranch } = useSelectedBranches()
+  const upstream = useSelectedUpstreamsStore(
+    useShallow((state) => {
+      if (currentBranch?.type !== 'local') {
+        return undefined
+      }
+      return state.upstreams.get(currentBranch.name)
+    }),
+  )
 
-/**
- * Selects a remote to use for upstream operations.
- *
- * @param remote - The remote to select.
- */
-const changeUpstreamRemote = (remote: RemoteInfo | undefined) => {
-  selectedUpstream.setState((state) => ({
-    ...state,
-    remote,
-  }))
+  return upstream
 }
 
 /**
- * Selects a remote branch to use for upstream operations.
- *
- * @param remoteBranch - The remote branch to select.
+ * Change the selected upstream for a given branch.
  */
-const changeUpstreamBranch = (remoteBranch: BranchName | undefined) => {
-  selectedUpstream.setState((state) => ({
-    ...state,
-    remoteBranch,
-  }))
-}
+const changeSelectedUpstream =
+  useSelectedUpstreamsStore.getState().changeUpstream
 
 /**
  * Hook that synchronizes the selected remote and remote branch when the checked out branch changes.
@@ -53,67 +76,42 @@ const changeUpstreamBranch = (remoteBranch: BranchName | undefined) => {
  * Chooses sensible defaults when the branch has no remote set in Git.
  */
 const useUpstreamSync = () => {
-  // TODO: this is not too robust
-  const { remote } = useSelectedUpstream()
-  const { branch } = useSelectedBranches()
-  const prevBranch = usePrevious(branch)
-
+  const { currentBranch } = useSelectedBranches()
   const remotesQuery = useQueryRemotes()
 
   useEffect(() => {
-    if (branch?.type !== 'local') {
-      changeUpstreamRemote(undefined)
-      changeUpstreamBranch(undefined)
+    if (!remotesQuery.data || currentBranch?.type !== 'local') {
       return
     }
 
-    if (branch.name !== prevBranch?.name) {
-      if (branch.remote) {
-        changeUpstreamBranch(branch.remote.branchName)
-      } else {
-        changeUpstreamBranch(branch.name)
-      }
-    }
-  }, [branch, prevBranch])
+    const store = useSelectedUpstreamsStore.getState()
 
-  useEffect(() => {
-    if (branch?.type === 'local' && remotesQuery.data) {
-      const exists =
-        remote &&
-        remotesQuery.data.some((_remote) => _remote.name === remote.name)
+    const newRemote: RemoteName =
+      // First check if there's an override set in the store.
+      store.upstreams.get(currentBranch.name)?.remote ??
+      // If no overrides are found, try to find the remote set in git.
+      remotesQuery.data.find(
+        (_remote) => _remote.name === currentBranch.remote?.remoteName,
+      )?.name ??
+      // If not found, and there's only one remote, use that one.
+      (remotesQuery.data.length === 1 ? remotesQuery.data.at(0) : undefined)
+        ?.name ??
+      // Otherwise fall back to the default remote name and try to find that one.
+      DEFAULT_REMOTE_NAME
 
-      if (!exists) {
-        if (branch.remote) {
-          const branchRemote = branch.remote
-          const newRemote = remotesQuery.data.find(
-            (_remote) => _remote.name === branchRemote.remoteName,
-          )
+    const newRemoteBranch: BranchName =
+      // First check if there's an override set in the store.
+      store.upstreams.get(currentBranch.name)?.remoteBranch ??
+      // If the current branch is tracking a remote branch, use that.
+      currentBranch.remote?.branchName ??
+      // Otherwise, fall back to using the current branch name.
+      currentBranch.name
 
-          if (newRemote) {
-            changeUpstreamRemote(newRemote)
-            return
-          }
-        }
-
-        if (remotesQuery.data.length === 1) {
-          changeUpstreamRemote(remotesQuery.data.at(0))
-          return
-        }
-
-        changeUpstreamRemote(
-          remotesQuery.data.find(
-            (_remote) => _remote.name === DEFAULT_REMOTE_NAME,
-          ),
-        )
-      }
-    }
-  }, [remote, remotesQuery.data, branch])
+    store.changeUpstream(currentBranch.name, {
+      remote: newRemote,
+      remoteBranch: newRemoteBranch,
+    })
+  }, [currentBranch, remotesQuery.data])
 }
 
-export {
-  useSelectedUpstream,
-  changeUpstreamRemote,
-  changeUpstreamBranch,
-  useUpstreamSync,
-  type SelectedUpstream,
-}
+export { useCurrentUpstream, changeSelectedUpstream, useUpstreamSync }

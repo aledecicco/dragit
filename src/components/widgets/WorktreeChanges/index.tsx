@@ -9,8 +9,8 @@ import { useNeedsPagination } from '@/api/utils'
 import {
   setNextPage,
   setPrevPage,
-  useFilesPage,
   useHandleFilesPageSync,
+  useWorktreeFilesPage,
 } from '@/context/pages'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
@@ -47,7 +47,7 @@ const WorktreeChanges = <T extends WorktreeFileType[]>(
   const { label, fileTypes, extraInfo, renderFile, ...divProps } = props
 
   const filesQuery = useQueryWorktreeFiles<T[number]>(fileTypes)
-  const page = useFilesPage(fileTypes)
+  const page = useWorktreeFilesPage(fileTypes)
   useHandleFilesPageSync(fileTypes)
 
   const showPagination = useNeedsPagination(filesQuery, page)

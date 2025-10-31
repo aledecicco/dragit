@@ -1,53 +1,94 @@
-import type { ReactNode } from 'react'
-import { Store, useStore } from '@tanstack/react-store'
+import type { ComponentType } from 'react'
+import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
+
+import type { AnyObject } from '@/utils/types'
 
 type DialogKey = string
 
-interface Dialogs {
-  mounted: Map<DialogKey, ReactNode>
+interface DialogEntry<T extends AnyObject> {
+  DialogComponent: ComponentType<T>
+  props: T
 }
 
-const dialogs = new Store<Dialogs>({
-  mounted: new Map(),
-})
+interface Dialogs {
+  mounted: Map<DialogKey, DialogEntry<AnyObject>>
+}
+
+interface Setters {
+  /**
+   * Add a dialog to the top of the stack, or bump an existing one with the same key.
+   *
+   * @param key - The unique identifier of the dialog.
+   * @param DialogComponent - The constructor of the dialog component to render.
+   * @param props - The props to pass to the dialog component.
+   */
+  showDialog: <T extends AnyObject>(
+    key: DialogKey,
+    DialogComponent: ComponentType<T>,
+    props: T,
+  ) => void
+
+  /**
+   * Remove a dialog from the stack.
+   *
+   * @param key - The unique identifier of the dialog.
+   */
+  hideDialog: (key: DialogKey) => void
+}
+
+const useDialogsStore = create<Dialogs & Setters>()(
+  immer((setState) => ({
+    mounted: new Map(),
+
+    showDialog: <T extends AnyObject>(
+      key: DialogKey,
+      DialogComponent: ComponentType<T>,
+      props: T,
+    ) => {
+      setState((state) => {
+        state.mounted.delete(key)
+        state.mounted.set(key, {
+          DialogComponent: DialogComponent as ComponentType<AnyObject>,
+          props: props as AnyObject,
+        })
+      })
+    },
+
+    hideDialog: (key: DialogKey) => {
+      setState((state) => {
+        state.mounted.delete(key)
+      })
+    },
+  })),
+)
 
 /**
  * @returns The highest priority dialog that should be mounted.
  */
-const useDialog = (): ReactNode | undefined =>
-  useStore(dialogs, (allDialogs) => {
-    let entry: [DialogKey, ReactNode] | undefined
-    for (entry of allDialogs.mounted);
+const useDialog = (): DialogEntry<AnyObject> | undefined => {
+  const dialogs = useDialogsStore((state) => state.mounted)
 
-    return entry?.[1]
-  })
+  let entry: [DialogKey, DialogEntry<AnyObject>] | undefined
+  for (entry of dialogs);
+
+  return entry?.[1]
+}
 
 /**
- * Add a dialog to the top of the stack, or bump an existing one with the same key.
+ * Display a dialog with highest priority.
+ *
+ * @param key - The unique key identifying the dialog.
+ * @param DialogComponent - The constructor of the dialog component to render.
+ * @param props - The props to pass to the dialog component.
+ */
+const showDialog = useDialogsStore.getState().showDialog
+
+/**
+ * Hide a dialog.
  *
  * @param key - The unique identifier of the dialog.
- * @param dialog - The content of the dialog.
  */
-const showDialog = (key: DialogKey, dialog: ReactNode) => {
-  dialogs.setState((dialogs) => {
-    const newDialogs = new Map(dialogs.mounted)
-    newDialogs.delete(key)
-    newDialogs.set(key, dialog)
-    return { mounted: newDialogs }
-  })
-}
-
-/**
- * Remove a dialog from the stack.
- *
- * @param key - The unique identifier of the dialog to remove.
- */
-const hideDialog = (key: DialogKey) => {
-  dialogs.setState((dialogs) => {
-    const newDialogs = new Map(dialogs.mounted)
-    newDialogs.delete(key)
-    return { mounted: newDialogs }
-  })
-}
+const hideDialog = useDialogsStore.getState().hideDialog
 
 export { useDialog, showDialog, hideDialog, type Dialogs, type DialogKey }

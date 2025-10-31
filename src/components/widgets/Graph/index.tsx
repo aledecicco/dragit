@@ -9,10 +9,9 @@ import {
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { getPaginatedLength } from '@/api/utils'
 import { BranchToolbar } from '@/common/BranchToolbar'
-import { useSelectedRefs } from '@/context/branches'
+import { useSelectedBranches, useSelectedReferences } from '@/context/branches'
 import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
 import { SvgOverlay } from '@/lib/SvgOverlay'
-import { useSelectedBranches } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { GraphBranch } from './Branch'
@@ -32,7 +31,7 @@ interface GraphProps extends ComponentProps<'div'> {}
  */
 const Graph = (props: GraphProps) => {
   const { ...divProps } = props
-  const { branch, baseBranch } = useSelectedBranches()
+  const { currentBranch, baseBranch } = useSelectedBranches()
 
   return (
     <div {...propsWithCn(divProps, 'h-full w-full min-h-0')}>
@@ -47,7 +46,7 @@ const Graph = (props: GraphProps) => {
 
         <BranchToolbar
           className={cn('col-start-1 row-start-2 w-40')}
-          branch={branch}
+          branch={currentBranch}
           fixed
         />
 
@@ -65,16 +64,18 @@ const Graph = (props: GraphProps) => {
 }
 
 const GraphInner = () => {
-  const { reference, baseReference } = useSelectedRefs()
+  const { currentReference, baseReference } = useSelectedReferences()
   const commonAncestor = useCurrentCommonAncestor()
 
-  const branchHistoryQuery = useQueryCommitHistory(reference?.refName)
+  const currentBranchHistoryQuery = useQueryCommitHistory(
+    currentReference?.refName,
+  )
   const baseBranchHistoryQuery = useQueryCommitHistory(baseReference?.refName)
 
-  const baseLength = getPaginatedLength(baseBranchHistoryQuery.data)
-  const branchLength = Math.min(
+  const baseBranchLength = getPaginatedLength(baseBranchHistoryQuery.data)
+  const currentBranchLength = Math.min(
     (commonAncestor?.lastCommit?.distance ?? Number.POSITIVE_INFINITY) + 1,
-    getPaginatedLength(branchHistoryQuery.data),
+    getPaginatedLength(currentBranchHistoryQuery.data),
   )
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -96,7 +97,7 @@ const GraphInner = () => {
     gap: EDGE_LENGTH,
     paddingStart: CURVE_SIZE * 2 + EDGE_OFFSET,
     paddingEnd: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
-    count: Math.max(branchLength, baseLength),
+    count: Math.max(currentBranchLength, baseBranchLength),
     overscan: 3,
   })
 
@@ -132,7 +133,7 @@ const GraphInner = () => {
             className={cn('w-full')}
             style={{ height: virtualizer.getTotalSize() }}
           >
-            {reference && (
+            {currentReference && (
               <GraphBranch
                 items={virtualizer.getVirtualItems()}
                 isBase={false}

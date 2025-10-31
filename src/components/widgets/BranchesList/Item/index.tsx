@@ -5,12 +5,13 @@ import type { BranchInfo } from '@/api/models'
 import { useCheckoutBranch } from '@/api/mutations/checkoutLocal'
 import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { usePullBranch } from '@/api/mutations/pullBranch'
+import { useSelectedBranches } from '@/context/branches'
 import { ContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { MenuItem } from '@/ui/Menu/Item'
-import { getRemoteCounterpart, useSelectedBranches } from '@/utils/repository'
+import { getRemoteCounterpart } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
@@ -29,7 +30,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
 
   const remoteCounterpart = getRemoteCounterpart(branch)
 
-  const { branch: currentBranch } = useSelectedBranches()
+  const { currentBranch } = useSelectedBranches()
   const isCurrentBranch = currentBranch && branch.name === currentBranch.name
 
   const checkout = useCheckoutBranch(branch)

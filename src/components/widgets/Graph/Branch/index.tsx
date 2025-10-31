@@ -2,8 +2,8 @@ import type { VirtualItem } from '@tanstack/react-virtual'
 
 import { useQueryBranchDivergence } from '@/api/queries/branchDivergence'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
-import { useSelectedRefs } from '@/context/branches'
-import { useSelectedUpstream } from '@/context/upstream'
+import { useSelectedReferences } from '@/context/branches'
+import { useCurrentUpstream } from '@/context/upstream'
 import { useBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
@@ -37,17 +37,17 @@ interface GraphBranchProps {
 const GraphBranch = (props: GraphBranchProps) => {
   const { items, isBase } = props
 
-  const { reference, baseReference } = useSelectedRefs()
-  const currentRef = isBase ? baseReference : reference
+  const { currentReference, baseReference } = useSelectedReferences()
+  const currentRef = isBase ? baseReference : currentReference
 
   const historyQuery = useQueryCommitHistory(currentRef?.refName)
   useInfiniteScroll(historyQuery, items)
 
-  const { remote, remoteBranch } = useSelectedUpstream()
-  const mainBranch = useBranch(reference)
+  const upstream = useCurrentUpstream()
+  const mainBranch = useBranch(currentReference)
   const mainDivergenceQuery = useQueryBranchDivergence(
     mainBranch?.type === 'local' ? mainBranch.name : undefined,
-    remote && remoteBranch ? `${remote.name}/${remoteBranch}` : undefined,
+    upstream ? `${upstream.remote}/${upstream.remoteBranch}` : undefined,
   )
 
   const commonAncestor = useCurrentCommonAncestor()

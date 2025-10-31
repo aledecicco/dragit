@@ -15,7 +15,7 @@ import type {
 import { HISTORY_PAGE_SIZE } from '@/api/queries/commitHistory'
 import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { getPaginatedItem, getPaginatedLength } from '@/api/utils'
-import { useSelectedRefs } from '@/context/branches'
+import { useSelectedReferences } from '@/context/branches'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<Page<HistoryItem>>>
 
@@ -84,13 +84,13 @@ const useInfiniteScroll = (
  * Tracks the two selected refs and returns information about their common ancestor.
  */
 const useCurrentCommonAncestor = (): CommonAncestorInfo | undefined => {
-  const { reference, baseReference } = useSelectedRefs()
+  const { currentReference, baseReference } = useSelectedReferences()
   const commonAncestorQuery = useQueryCommonAncestor(
-    reference?.refName,
+    currentReference?.refName,
     baseReference?.refName,
   )
 
-  return commonAncestorQuery.data ?? undefined
+  return commonAncestorQuery.data
 }
 
 /**

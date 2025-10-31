@@ -12,8 +12,9 @@ import { cn, propsWithCn } from '@/utils/styles'
 import { type Glyph, Icon, type IconProps } from '../Icon'
 import { ComboboxItem } from './Item'
 
-interface ComboboxOption<T> {
+type ComboboxOption<T> = {
   value: string
+  // TODO: don't require data
   data: T
 }
 

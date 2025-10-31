@@ -38,7 +38,7 @@ const CommitDialog = (props: CommitDialogProps) => {
 }
 
 const showCommitDialog = (props?: Partial<CommitDialogProps>) => {
-  showDialog(COMMIT_DIALOG_KEY, <CommitDialog {...props} />)
+  showDialog(COMMIT_DIALOG_KEY, CommitDialog, props ?? {})
 }
 
 export { CommitDialog, showCommitDialog, type CommitDialogProps }

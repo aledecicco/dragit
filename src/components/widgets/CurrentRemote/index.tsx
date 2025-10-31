@@ -6,21 +6,17 @@ import {
   IconWorldQuestion,
 } from '@tabler/icons-react'
 
-import type { RemoteInfo } from '@/api/models'
+import type { RemoteName } from '@/api/models'
 import { useFetchRemote } from '@/api/mutations/fetchRemote'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryRemotes } from '@/api/queries/remotes'
 import { showRemotesDialog } from '@/common/RemotesDialog'
-import {
-  changeUpstreamBranch,
-  changeUpstreamRemote,
-  useSelectedUpstream,
-} from '@/context/upstream'
+import { useSelectedBranches } from '@/context/branches'
+import { changeSelectedUpstream, useCurrentUpstream } from '@/context/upstream'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { Combobox, type ComboboxOption } from '@/ui/Combobox'
 import { EditableText } from '@/ui/EditableText'
-import { useSelectedBranches } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface CurrentRemoteProps extends ComponentProps<'div'> {}
@@ -31,55 +27,67 @@ interface CurrentRemoteProps extends ComponentProps<'div'> {}
 const CurrentRemote = (props: CurrentRemoteProps) => {
   const { ...divProps } = props
 
-  const { branch } = useSelectedBranches()
-  const { remote, remoteBranch } = useSelectedUpstream()
+  const { currentBranch } = useSelectedBranches()
+  const upstream = useCurrentUpstream()
 
-  const fetchRemote = useFetchRemote(remote?.name)
+  const fetchRemote = useFetchRemote(upstream?.remote)
   const remotesQuery = useQueryRemotes()
   const branchesQuery = useQueryBranches()
 
-  const remoteOptions: ComboboxOption<RemoteInfo>[] =
+  const remoteOptions: ComboboxOption<RemoteName>[] =
     remotesQuery.data?.map((remote) => {
       const option = {
         value: remote.name,
-        data: remote,
+        data: remote.name,
       }
       return option
     }) ?? []
 
-  const remoteBranchOptions = !remote
+  const remoteBranchOptions = !upstream
     ? []
     : (branchesQuery.data
         ?.filter((branch) => branch.type === 'remote')
-        .filter((branch) => branch.name.startsWith(`${remote.name}/`))
-        .map((branch) => branch.name.substring(remote.name.length + 1)) ?? [])
+        .filter((branch) => branch.name.startsWith(`${upstream.remote}/`))
+        .map((branch) => branch.name.substring(upstream.remote.length + 1)) ??
+      [])
 
   return (
-    <div {...propsWithCn(divProps, 'w-full flex flex-row items-center')}>
+    <div
+      {...propsWithCn(divProps, 'w-full flex flex-row items-center min-w-0')}
+    >
       <Combobox
-        option={remote ? { value: remote.name, data: remote } : undefined}
+        option={
+          upstream
+            ? { value: upstream.remote, data: upstream.remote }
+            : undefined
+        }
         options={remoteOptions}
+        setOption={(newOption) => {
+          if (currentBranch?.type === 'local' && upstream) {
+            changeSelectedUpstream(currentBranch.name, {
+              remote: newOption.value,
+              remoteBranch: upstream.remoteBranch,
+            })
+          }
+        }}
+        renderOption={(option) => option.value}
+        placeholder={currentBranch?.type === 'local' ? 'Remote...' : '-'}
+        disabled={!remoteOptions || currentBranch?.type !== 'local'}
         Glyph={
-          branch?.type === 'local'
-            ? remote === undefined
+          currentBranch?.type === 'local'
+            ? currentBranch.remote === undefined
               ? IconWorldQuestion
               : IconWorld
             : IconWorldCancel
         }
-        setOption={(newOption) => {
-          changeUpstreamRemote(newOption.data)
-        }}
-        renderOption={(option) => option.data?.name ?? 'No remote'}
-        placeholder={branch?.type === 'local' ? 'Remote...' : '-'}
-        disabled={!remotesQuery.data || branch?.type !== 'local'}
         status={
-          branch?.type === 'local'
-            ? remote === undefined
+          currentBranch?.type === 'local'
+            ? upstream === undefined
               ? 'error'
               : 'primary'
             : 'neutral'
         }
-        className={cn('max-w-half -mr-0.5 pr-4 rounded-r-none')}
+        className={cn('max-w-half -mr-0.5 pr-4 rounded-r-none min-w-0')}
         style={{
           clipPath: 'polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
         }}
@@ -88,22 +96,29 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
       <p className={cn('text-2xl -mx-2 text-light-950/50')}>/</p>
 
       <EditableText
-        value={remoteBranch}
+        value={upstream?.remoteBranch ?? ''}
         label="Remote branch"
         suggestions={remoteBranchOptions}
-        setValue={changeUpstreamBranch}
-        placeholder={branch?.type === 'local' ? 'Branch...' : '-'}
+        setValue={(newValue) => {
+          if (currentBranch?.type === 'local' && upstream && newValue) {
+            changeSelectedUpstream(currentBranch.name, {
+              remote: upstream.remote,
+              remoteBranch: newValue,
+            })
+          }
+        }}
+        placeholder={currentBranch?.type === 'local' ? 'Branch...' : '-'}
         className={cn('pl-5 rounded-l-none flex-1')}
         style={{
           clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%)',
         }}
         buttonProps={{
-          disabled: branch?.type !== 'local',
+          disabled: currentBranch?.type !== 'local',
           variant: 'plain',
           className: cn(
             'text-light-700',
-            remoteBranch === undefined && 'text-light-950',
-            'pl-5 rounded-l-none flex-1 justify-start',
+            upstream === undefined && 'text-light-950',
+            'pl-5 rounded-l-none flex-1 justify-start min-w-0',
           ),
           style: {
             clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%)',
@@ -114,7 +129,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
       <ActionButton
         compact
         round
-        disabled={!remote}
+        disabled={!upstream}
         className={cn('mx-2')}
         mainAction={fetchRemote}
       />

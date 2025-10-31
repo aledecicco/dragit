@@ -1,17 +1,47 @@
 import { useEffect } from 'react'
-import { Store, useStore } from '@tanstack/react-store'
+import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 
-import type { WorktreeFileType } from '@/api/models'
+import type { FileTypeFilter, WorktreeFileType } from '@/api/models'
 import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { getFileTypeFilter, useHandlePageSync } from '@/api/utils'
 
-type FilePages = Map<string, number>
-const filesPages = new Store<FilePages>(new Map())
+interface FilePages {
+  /**
+   * A map from file types to page numbers.
+   */
+  worktree: Map<FileTypeFilter, number>
+}
 
-const getMapKey = (types: WorktreeFileType | WorktreeFileType[]): string =>
-  JSON.stringify(getFileTypeFilter(types))
+interface Setters {
+  /**
+   * Sets the current page for a given set of file types.
+   *
+   * @param types - The set of file types being paginated.
+   * @param page - The new page number to set. If `undefined`, the page will be cleared.
+   */
+  setPage: (
+    types: WorktreeFileType | WorktreeFileType[],
+    page: number | undefined,
+  ) => void
+}
 
-const useWorktreeFilesPages = () => useStore(filesPages)
+const useFilesPagesStore = create<FilePages & Setters>()(
+  immer((setState) => ({
+    worktree: new Map(),
+
+    setPage: (types, page) => {
+      setState((state) => {
+        const key = getFileTypeFilter(types)
+        if (page === undefined) {
+          state.worktree.delete(key)
+        } else {
+          state.worktree.set(key, page)
+        }
+      })
+    },
+  })),
+)
 
 /**
  * Returns the page that the application is currently on for the given file types.
@@ -20,12 +50,10 @@ const useWorktreeFilesPages = () => useStore(filesPages)
  * @param types - The set of file types being paginated.
  */
 const useWorktreeFilesPage = (types: WorktreeFileType | WorktreeFileType[]) => {
-  const pages = useWorktreeFilesPages()
-
-  const key = getMapKey(types)
-  const page = pages.get(key)
-
-  return page ?? 0
+  return useFilesPagesStore((state) => {
+    const key = getFileTypeFilter(types)
+    return state.worktree.get(key) ?? 0
+  })
 }
 
 /**
@@ -34,12 +62,8 @@ const useWorktreeFilesPage = (types: WorktreeFileType | WorktreeFileType[]) => {
  * @param types - The set of file types to clear the page for.
  */
 const clearPage = (types: WorktreeFileType | WorktreeFileType[]) => {
-  filesPages.setState((state) => {
-    const key = getMapKey(types)
-    const newState = new Map(state)
-    newState.set(key, 0)
-    return newState
-  })
+  const store = useFilesPagesStore.getState()
+  store.setPage(types, undefined)
 }
 
 /**
@@ -48,12 +72,9 @@ const clearPage = (types: WorktreeFileType | WorktreeFileType[]) => {
  * @param types - The set of file types to change the page for.
  */
 const setNextPage = (types: WorktreeFileType | WorktreeFileType[]) => {
-  filesPages.setState((state) => {
-    const key = getMapKey(types)
-    const newState = new Map(state)
-    newState.set(key, (newState.get(key) ?? 0) + 1)
-    return newState
-  })
+  const store = useFilesPagesStore.getState()
+  const key = getFileTypeFilter(types)
+  store.setPage(types, (store.worktree.get(key) ?? 0) + 1)
 }
 
 /**
@@ -62,12 +83,9 @@ const setNextPage = (types: WorktreeFileType | WorktreeFileType[]) => {
  * @param types - The set of file types to change the page for.
  */
 const setPrevPage = (types: WorktreeFileType | WorktreeFileType[]) => {
-  filesPages.setState((state) => {
-    const key = getMapKey(types)
-    const newState = new Map(state)
-    newState.set(key, Math.max(0, (newState.get(key) ?? 0) - 1))
-    return newState
-  })
+  const store = useFilesPagesStore.getState()
+  const key = getFileTypeFilter(types)
+  store.setPage(types, Math.max(0, (store.worktree.get(key) ?? 0) - 1))
 }
 
 /**
@@ -95,7 +113,7 @@ const useHandleFilesPageSync = (
 }
 
 export {
-  useWorktreeFilesPage as useFilesPage,
+  useWorktreeFilesPage,
   setNextPage,
   setPrevPage,
   clearPage,

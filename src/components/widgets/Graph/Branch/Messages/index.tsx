@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react'
 import { useCurrentCommonAncestor } from '@/widgets/Graph/utils'
 
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
-import { useSelectedRefs } from '@/context/branches'
+import { useSelectedReferences } from '@/context/branches'
 import { cn } from '@/utils/styles'
 
 /**
@@ -11,17 +11,16 @@ import { cn } from '@/utils/styles'
  * in cases where no commits are displayed.
  */
 const BranchMessages = () => {
-  const { reference, baseReference } = useSelectedRefs()
-  const commonAncestorQuery = useCurrentCommonAncestor()
-  const branchHistoryQuery = useQueryCommitHistory(reference?.refName)
+  const { currentReference, baseReference } = useSelectedReferences()
+  const commonAncestor = useCurrentCommonAncestor()
+  const branchHistoryQuery = useQueryCommitHistory(currentReference?.refName)
   const baseBranchHistory = useQueryCommitHistory(baseReference?.refName)
 
   const branchMessages = [
-    { when: !reference, message: 'No branch checked out' },
+    { when: !currentReference, message: 'No branch checked out' },
     {
       when:
-        branchHistoryQuery.data?.pages &&
-        commonAncestorQuery?.lastCommit === null,
+        branchHistoryQuery.data?.pages && commonAncestor?.lastCommit === null,
       message: 'No new commits',
     },
     {

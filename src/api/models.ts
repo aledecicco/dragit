@@ -22,6 +22,10 @@ export type SnapshotId = CommitId | StashId
 export type BranchName = string
 export type RemoteName = string
 export type RemoteRef = `${RemoteName}/${BranchName}`
+export interface Upstream {
+  remote: RemoteName
+  remoteBranch: BranchName
+}
 
 export interface DiffSummary {
   filesCount: number

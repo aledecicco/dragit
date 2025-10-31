@@ -127,7 +127,8 @@ const showSnapshotDetailsDialog = (
 ) => {
   showDialog(
     SNAPSHOT_DETAILS_DIALOG_KEY(snapshotInfo.id),
-    <SnapshotDetailsDialog snapshotInfo={snapshotInfo} {...props} />,
+    SnapshotDetailsDialog,
+    { snapshotInfo, ...props },
   )
 }
 
