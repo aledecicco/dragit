@@ -75,7 +75,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         disabled={!remoteOptions || currentBranch?.type !== 'local'}
         Glyph={
           currentBranch?.type === 'local'
-            ? currentBranch.remote === undefined
+            ? currentBranch.upstream === undefined
               ? IconWorldQuestion
               : IconWorld
             : IconWorldCancel

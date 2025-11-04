@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
 import { match, P } from 'ts-pattern'
 
-import { useCurrentRef } from '@/utils/repository'
+import { useSelectedReferences } from '@/context/branches'
 
 import type { AppEvent } from './models'
 import { branchDivergenceQueryKeys } from './queries/branchDivergence'
@@ -25,7 +25,7 @@ const EVENT_ID = 'app-event'
  */
 const useEventsHandler = () => {
   const client = useQueryClient()
-  const currentReference = useCurrentRef()
+  const { currentReference } = useSelectedReferences()
 
   useEffect(() => {
     const unlisten = listen<AppEvent>(EVENT_ID, (event) => {

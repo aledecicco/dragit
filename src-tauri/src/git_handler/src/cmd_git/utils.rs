@@ -2,8 +2,8 @@ use std::{str::FromStr, u32};
 
 use models::{
     BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, DiffSummary, HeadInfo, HistoryItem,
-    MergeStatus, MovedStatus, RemoteInfo, RemoteRef, StagedFileInfo, StagedFileStatus, StashInfo,
-    StatusType, UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo, VersionedFileInfo,
+    MergeStatus, MovedStatus, RemoteInfo, StagedFileInfo, StagedFileStatus, StashInfo, StatusType,
+    UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo, Upstream, VersionedFileInfo,
     VersionedFileStatus,
 };
 
@@ -218,10 +218,10 @@ pub(crate) fn parse_branch_info(line: &String) -> Option<BranchInfo> {
         Some(BranchInfo::Local {
             name: strip_branch_prefix(&branch_name, BRANCH_PREFIX),
             timestamp: timestamp,
-            remote: match (remote_name, remote_branch_name) {
-                (Some(remote_name), Some(remote_branch_name)) => Some(RemoteRef {
-                    remote_name,
-                    branch_name: strip_branch_prefix(&remote_branch_name, BRANCH_PREFIX),
+            upstream: match (remote_name, remote_branch_name) {
+                (Some(remote_name), Some(remote_branch_name)) => Some(Upstream {
+                    remote: remote_name,
+                    remote_branch: strip_branch_prefix(&remote_branch_name, BRANCH_PREFIX),
                 }),
                 _ => None,
             },

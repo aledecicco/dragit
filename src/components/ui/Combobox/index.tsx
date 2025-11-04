@@ -59,8 +59,6 @@ interface ComboboxProps<T> extends Partial<ButtonProps> {
   placeholder?: string
 }
 
-const LIMIT = 20
-
 /**
  * A select field that allows searching through a list of options.
  *
@@ -151,23 +149,12 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
               >
                 No matches found
               </div>,
-              matchingOptions.slice(0, LIMIT),
+              matchingOptions,
               (option) => (
                 <ComboboxItem key={option.value} item={option}>
                   {renderOption(option)}
                 </ComboboxItem>
               ),
-            )}
-
-            {matchingOptions.length > LIMIT && (
-              <div
-                className={cn(
-                  'text-center p-2',
-                  'text-xs italic text-light-950',
-                )}
-              >
-                ...
-              </div>
             )}
           </Ariakit.ComboboxList>
         </Ariakit.SelectPopover>

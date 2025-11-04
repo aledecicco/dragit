@@ -208,14 +208,14 @@ pub enum BranchInfo {
     Local {
         name: String,
         timestamp: u32,
-        remote: Option<RemoteRef>,
+        upstream: Option<Upstream>,
     },
 }
 
 #[derive(borsh::BorshSerialize, Debug)]
-pub struct RemoteRef {
-    pub remote_name: String,
-    pub branch_name: String,
+pub struct Upstream {
+    pub remote: String,
+    pub remote_branch: String,
 }
 
 #[derive(borsh::BorshSerialize, Debug)]

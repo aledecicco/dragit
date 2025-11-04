@@ -14,7 +14,8 @@ import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
 import { SvgOverlay } from '@/lib/SvgOverlay'
 import { cn, propsWithCn } from '@/utils/styles'
 
-import { GraphBranch } from './Branch'
+import { GraphBaseBranch } from './Branch/Base'
+import { GraphCurrentBranch } from './Branch/Current'
 import { BranchMessages } from './Branch/Messages'
 import { BranchSelectors } from './Branch/Selectors'
 import { NODE_SIZE } from './Commit/Node'
@@ -134,17 +135,11 @@ const GraphInner = () => {
             style={{ height: virtualizer.getTotalSize() }}
           >
             {currentReference && (
-              <GraphBranch
-                items={virtualizer.getVirtualItems()}
-                isBase={false}
-              />
+              <GraphCurrentBranch items={virtualizer.getVirtualItems()} />
             )}
 
             {baseReference && (
-              <GraphBranch
-                items={virtualizer.getVirtualItems()}
-                isBase={true}
-              />
+              <GraphBaseBranch items={virtualizer.getVirtualItems()} />
             )}
           </SvgOverlay>
         </div>

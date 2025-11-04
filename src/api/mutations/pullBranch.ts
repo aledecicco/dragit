@@ -49,8 +49,8 @@ const usePullBranch = (branch: BranchInfo | undefined): Action => {
       // TODO: check if this should use the global remote set.
       await pullBranch.mutateAsync({
         branch: branch.name,
-        remote: branch.remote?.remoteName ?? 'origin',
-        remoteBranch: branch.remote?.branchName ?? branch.name,
+        remote: branch.upstream?.remote ?? 'origin',
+        remoteBranch: branch.upstream?.remoteBranch ?? branch.name,
         isRebase: false,
       })
     },

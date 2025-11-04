@@ -39,6 +39,18 @@ impl CmdGit {
             }))
     }
 
+    fn await_child(&self, mut process: Child) -> Result<(), GitError> {
+        let status = process
+            .wait()
+            .map_err(|_| GitError::GetCommandOutputFailed {})?;
+
+        if status.success() {
+            Ok(())
+        } else {
+            Err(GitError::GetCommandOutputFailed {})
+        }
+    }
+
     fn spawn_and_notify<'a, I>(
         &self,
         channel: &Channel<AppMessage>,
@@ -58,11 +70,8 @@ impl CmdGit {
     where
         I: IntoIterator<Item = &'a str> + Debug,
     {
-        let res = self.spawn_command(path, args)?.wait_with_output();
-        match res.map(|res| res.status.success()) {
-            Ok(true) => Ok(()),
-            _ => Err(GitError::GetCommandOutputFailed {}),
-        }
+        let res = self.spawn_command(path, args)?;
+        self.await_child(res)
     }
 
     fn get_output_lines_stream<'a>(
@@ -75,21 +84,18 @@ impl CmdGit {
         Ok(reader.lines())
     }
 
-    fn get_all_output_lines<'a>(&self, process: Child) -> Result<Vec<String>, GitError> {
-        let lines = self.get_output_lines_stream(process)?;
-        let lines: Result<_, _> = lines.collect();
+    fn get_all_output<'a>(&self, mut process: Child) -> Result<String, GitError> {
+        let stdout = process
+            .stdout
+            .take()
+            .ok_or(GitError::GetCommandOutputFailed {})?;
 
-        lines.or(Err(GitError::GetCommandOutputFailed {}))
-    }
-
-    fn get_all_output<'a>(&self, process: Child) -> Result<String, GitError> {
-        let stdout = process.stdout.ok_or(GitError::GetCommandOutputFailed {})?;
-
-        let mut reader = BufReader::new(stdout);
         let mut buffer = String::new();
-        reader
+        BufReader::new(stdout)
             .read_to_string(&mut buffer)
-            .or(Err(GitError::GetCommandOutputFailed {}))?;
+            .map_err(|_| GitError::GetCommandOutputFailed {})?;
+
+        self.await_child(process)?;
 
         Ok(buffer)
     }
@@ -210,7 +216,11 @@ impl GitHandler for CmdGit {
                 ".git",
             ],
         )?;
-        let lines = self.get_all_output_lines(process)?;
+        let lines = self
+            .get_all_output(process)?
+            .lines()
+            .map(String::from)
+            .collect();
 
         parse_head_info(&lines).ok_or(GitError::GetHeadInfoFailed {})
     }
@@ -352,7 +362,6 @@ impl GitHandler for CmdGit {
             .or(Err(GitError::CommitFailed {}))
     }
 
-    // TODO: optimize this. It can be very slow in some cases.
     fn get_common_ancestor(
         &self,
         channel: &Channel<AppMessage>,
@@ -360,22 +369,27 @@ impl GitHandler for CmdGit {
         reference_a: &str,
         reference_b: &str,
     ) -> Result<Option<CommonAncestorInfo>, GitError> {
-        let parse_ref = |reference: &str, back: u32| -> Option<String> {
-            let process = self
-                .spawn_and_notify(
-                    channel,
-                    repo_path,
-                    ["rev-parse", &format!("{}^{}", reference, back)],
-                )
-                .ok()?;
-            self.get_all_output(process)
-                .ok()
-                .map(|s| s.trim().to_string())
-        };
+        let process_a = self.spawn_and_notify(
+            channel,
+            repo_path,
+            ["rev-list", "--first-parent", reference_a],
+        )?;
+        let process_b = self.spawn_and_notify(
+            channel,
+            repo_path,
+            ["rev-list", "--first-parent", reference_b],
+        )?;
+
+        let mut iter_a = self
+            .get_output_lines_stream(process_a)?
+            .filter_map(Result::ok);
+        let mut iter_b = self
+            .get_output_lines_stream(process_b)?
+            .filter_map(Result::ok);
 
         let mut prev_ref_a_pointer = None;
-        let mut ref_a_pointer = parse_ref(reference_a, 0).map(|hash| (hash, 0));
-        let mut ref_b_pointer = parse_ref(reference_b, 0).map(|hash| (hash, 0));
+        let mut ref_a_pointer = iter_a.next().map(|hash| (hash, 0));
+        let mut ref_b_pointer = iter_b.next().map(|hash| (hash, 0));
 
         // For each ancestor of reference_a, keep track of the commit that comes immediately next and its depth.
         let mut found_in_ref_a: HashMap<String, Option<(String, u32)>> = HashMap::new();
@@ -401,7 +415,7 @@ impl GitHandler for CmdGit {
 
                 found_in_ref_a.insert(ref_a_hash.to_owned(), prev_ref_a_pointer);
                 prev_ref_a_pointer = Some((ref_a_hash.to_string(), ref_a_distance));
-                ref_a_pointer = parse_ref(&ref_a_hash, 1).map(|hash| (hash, ref_a_distance + 1))
+                ref_a_pointer = iter_a.next().map(|hash| (hash, ref_a_distance + 1))
             }
 
             if let Some((ref_b_hash, ref_b_distance)) = ref_b_pointer {
@@ -421,7 +435,7 @@ impl GitHandler for CmdGit {
                 }
 
                 found_in_ref_b.insert(ref_b_hash.to_owned(), ref_b_distance);
-                ref_b_pointer = parse_ref(&ref_b_hash, 1).map(|hash| (hash, ref_b_distance + 1))
+                ref_b_pointer = iter_b.next().map(|hash| (hash, ref_b_distance + 1))
             }
 
             if ref_a_pointer.is_none() && ref_b_pointer.is_none() {
@@ -532,7 +546,11 @@ impl GitHandler for CmdGit {
         repo_path: &str,
     ) -> Result<Vec<RemoteInfo>, GitError> {
         let process = self.spawn_and_notify(channel, repo_path, ["remote", "--verbose"])?;
-        let lines = self.get_all_output_lines(process)?;
+        let lines: Vec<String> = self
+            .get_all_output(process)?
+            .lines()
+            .map(String::from)
+            .collect();
 
         Ok(parse_remote_infos(&lines))
     }

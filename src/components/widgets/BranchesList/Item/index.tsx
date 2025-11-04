@@ -6,12 +6,12 @@ import { useCheckoutBranch } from '@/api/mutations/checkoutLocal'
 import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { usePullBranch } from '@/api/mutations/pullBranch'
 import { useSelectedBranches } from '@/context/branches'
+import { useSelectedUpstream } from '@/context/upstream'
 import { ContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { MenuItem } from '@/ui/Menu/Item'
-import { getRemoteCounterpart } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
@@ -28,7 +28,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
   const { branch, ...itemProps } = props
   const lastModified = useDateDifference(branch.timestamp)
 
-  const remoteCounterpart = getRemoteCounterpart(branch)
+  const remoteCounterpart = useSelectedUpstream(branch)
 
   const { currentBranch } = useSelectedBranches()
   const isCurrentBranch = currentBranch && branch.name === currentBranch.name
@@ -85,7 +85,9 @@ const BranchesListItem = (props: BranchesListItemProps) => {
           {remoteCounterpart && (
             <>
               , tracking{' '}
-              <span className={cn('text-light-400')}>{remoteCounterpart}</span>
+              <span className={cn('text-light-400')}>
+                {remoteCounterpart.remote}/{remoteCounterpart.remoteBranch}
+              </span>
             </>
           )}
         </p>

@@ -14,8 +14,14 @@ Stash of ideas in ~planned implementation order:
 - [x] Performance pass
 - [x] Global action tracking
 - [x] Word diffs
+- [x] Store bases and upstreams
 - [ ] Checkout of remote branches, create branch from commit
+- [ ] Tabs for filtering in branches widget
 - [ ] "Create" option on empty comboboxes
+- [ ] Highlight file sections in scrollbar
+- [ ] Merge continuation
+- [ ] Open files on click
+- [ ] Display old paths in file viewers for moved files
 - [x] Paginate pathspec searches
 - [ ] "Init", "empty dir", and "not a repository" screens
 - [ ] Highlight matches during pathspec search

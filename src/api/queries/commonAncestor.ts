@@ -40,7 +40,7 @@ const fetchCommonAncestor = async (
   refName: string,
   baseRefName: string,
   context: QueryFunctionContext,
-): Promise<CommonAncestorInfo | undefined> => {
+): Promise<CommonAncestorInfo | null> => {
   const res = await fetchAndDeserialize(
     'get_common_ancestor',
     { repoPath, referenceA: refName, referenceB: baseRefName },
@@ -48,7 +48,7 @@ const fetchCommonAncestor = async (
     context,
   )
 
-  return res ?? undefined
+  return res
 }
 
 const commonAncestorQuery = (

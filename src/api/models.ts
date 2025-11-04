@@ -158,10 +158,7 @@ export interface LocalBranch {
   name: BranchName
   timestamp: number
   type: 'local'
-  remote: {
-    remoteName: RemoteName
-    branchName: BranchName
-  } | null
+  upstream: Upstream | null
 }
 
 export interface RemoteBranch {
@@ -180,6 +177,7 @@ export type Reference =
       type: 'branch'
       refName: BranchName
     }
+export type RefName = Reference['refName']
 
 export type DiffType = 'added' | 'removed' | 'unchanged'
 

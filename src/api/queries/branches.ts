@@ -33,7 +33,7 @@ const fetchBranches = async (
         type: 'local',
         name: branch.name,
         timestamp: branch.timestamp * MS_IN_SECOND,
-        remote: branch.remote,
+        upstream: branch.upstream,
       }))
       .with({ Remote: P.select() }, (branch) => ({
         type: 'remote',

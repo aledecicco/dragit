@@ -4,22 +4,32 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { useShallow } from 'zustand/react/shallow'
 
-import type { Reference } from '@/api/models'
-import { useBranch, useCurrentRef } from '@/utils/repository'
+import type { Reference, RefName } from '@/api/models'
+import { useBranch, useHeadReference } from '@/utils/repository'
 
-import { useCurrentUpstream } from './upstream'
+import { useSelectedUpstream } from './upstream'
 
 const MAX_BRANCHES = 50
 
 // TODO: store persistence.
 interface SelectedReferences {
   /**
+   * The currently selected reference.
+   */
+  current: Reference | null
+
+  /**
    * The selected base used for comparison for each reference.
    */
-  bases: Map<Reference, Reference | undefined>
+  bases: Map<RefName, Reference | undefined>
 }
 
 interface Setters {
+  /**
+   * Change the currently selected reference.
+   */
+  changeCurrent: (reference: Reference | null) => void
+
   /**
    * Change the selected base for a given reference.
    */
@@ -28,16 +38,24 @@ interface Setters {
 
 const useSelectedRefsStore = create<SelectedReferences & Setters>()(
   immer((setState) => ({
+    current: null,
+
     bases: new Map(),
+
+    changeCurrent: (reference: Reference | null) => {
+      setState((state) => {
+        state.current = reference
+      })
+    },
 
     changeBase: (reference: Reference, base: Reference | undefined) => {
       setState((state) => {
         if (!base) {
-          state.bases.delete(reference)
+          state.bases.delete(reference.refName)
           return
         }
 
-        const isNew = !state.bases.has(reference)
+        const isNew = !state.bases.has(reference.refName)
         if (isNew && state.bases.size >= MAX_BRANCHES) {
           const oldest = state.bases.keys().next().value
           if (oldest) {
@@ -45,12 +63,25 @@ const useSelectedRefsStore = create<SelectedReferences & Setters>()(
           }
         }
 
-        state.bases.delete(reference)
-        state.bases.set(reference, base)
+        state.bases.delete(reference.refName)
+        state.bases.set(reference.refName, base)
       })
     },
   })),
 )
+
+/**
+ * Hook that facilitates tracking the currently checked-out reference.
+ */
+const useCurrentReference = (): Reference | undefined => {
+  const currentReference = useSelectedRefsStore(
+    useShallow((state) => {
+      return state.current ?? undefined
+    }),
+  )
+
+  return currentReference
+}
 
 /**
  * Change the selected base for a given reference.
@@ -68,7 +99,7 @@ const useSelectedBase = (
       if (!reference) {
         return undefined
       }
-      return state.bases.get(reference)
+      return state.bases.get(reference.refName)
     }),
   )
 
@@ -83,7 +114,7 @@ const useSelectedBase = (
  * - `baseReference`: The selected base reference for the current reference.
  */
 const useSelectedReferences = () => {
-  const currentReference = useCurrentRef()
+  const currentReference = useCurrentReference()
   const baseReference = useSelectedBase(currentReference)
 
   return {
@@ -117,31 +148,34 @@ const useSelectedBranches = () => {
  * Chooses sensible defaults when there is no base set.
  */
 const useReferencesSync = () => {
-  const currentReference = useCurrentRef()
-  const currentUpstream = useCurrentUpstream()
-  const prevReference = usePrevious(currentReference)
+  const headReference = useHeadReference()
+  const branch = useBranch(headReference)
+  const currentUpstream = useSelectedUpstream(branch)
+  const prevReference = usePrevious(headReference)
 
   useEffect(() => {
-    if (!currentReference) {
+    const store = useSelectedRefsStore.getState()
+
+    store.changeCurrent(headReference ?? null)
+
+    if (!headReference) {
       return
     }
 
-    const store = useSelectedRefsStore.getState()
-
     let newBase: Reference | undefined =
       // First check if there's an override set in the store.
-      store.bases.get(currentReference) ??
+      store.bases.get(headReference.refName) ??
       // Otherwise, try to use the upstream of the branch as a base.
-      (currentReference.type === 'branch' && currentUpstream
+      (headReference.type === 'branch' && currentUpstream
         ? {
             type: 'branch',
             refName: `${currentUpstream.remote}/${currentUpstream.remoteBranch}`,
           }
         : undefined)
 
-    if (newBase && newBase.refName === currentReference.refName) {
+    if (newBase && newBase.refName === headReference.refName) {
       // If the new base collides with the current reference, try to fall back to the previous base.
-      if (prevReference && prevReference.refName !== currentReference.refName) {
+      if (prevReference && prevReference.refName !== headReference.refName) {
         newBase = prevReference
       } else {
         // Otherwise, clear the base.
@@ -149,12 +183,11 @@ const useReferencesSync = () => {
       }
     }
 
-    store.changeBase(currentReference, newBase)
-  }, [currentReference, prevReference, currentUpstream])
+    store.changeBase(headReference, newBase)
+  }, [headReference, prevReference, currentUpstream])
 }
 
 export {
-  useSelectedBase,
   changeSelectedBase,
   useSelectedReferences,
   useSelectedBranches,

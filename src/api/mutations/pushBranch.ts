@@ -49,8 +49,8 @@ const usePushBranch = (branch: BranchInfo | undefined): Action => {
 
       await pushBranch.mutateAsync({
         branch: branch.name,
-        remote: branch.remote?.remoteName ?? 'origin',
-        remoteBranch: branch.remote?.branchName ?? branch.name,
+        remote: branch.upstream?.remote ?? 'origin',
+        remoteBranch: branch.upstream?.remoteBranch ?? branch.name,
         isForce: false,
         setUpstream: true,
       })
@@ -81,8 +81,8 @@ const useForcePushBranch = (branch: BranchInfo | undefined): Action => {
 
       await pushBranch.mutateAsync({
         branch: branch.name,
-        remote: branch.remote?.remoteName ?? 'origin',
-        remoteBranch: branch.remote?.branchName ?? branch.name,
+        remote: branch.upstream?.remote ?? 'origin',
+        remoteBranch: branch.upstream?.remoteBranch ?? branch.name,
         isForce: true,
         setUpstream: true,
       })

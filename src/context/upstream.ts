@@ -3,7 +3,14 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { useShallow } from 'zustand/react/shallow'
 
-import type { BranchName, RemoteName, Upstream } from '@/api/models'
+import type {
+  BranchInfo,
+  BranchName,
+  LocalBranch,
+  RemoteInfo,
+  RemoteName,
+  Upstream,
+} from '@/api/models'
 import { useQueryRemotes } from '@/api/queries/remotes'
 
 import { useSelectedBranches } from './branches'
@@ -48,20 +55,66 @@ const useSelectedUpstreamsStore = create<SelectedUpstreams & Setters>()(
 )
 
 /**
- * Hook that facilitates tracking the selected upstream for the current branch.
+ * Chooses a sensible upstream for a given branch.
  */
-const useCurrentUpstream = (): Upstream | undefined => {
-  const { currentBranch } = useSelectedBranches()
+const chooseUpstream = (
+  branch: LocalBranch,
+  remotes: RemoteInfo[],
+): Upstream => {
+  const store = useSelectedUpstreamsStore.getState()
+
+  const newRemote: RemoteName =
+    // First check if there's an override set in the store.
+    store.upstreams.get(branch.name)?.remote ??
+    // If no overrides are found, try to find the remote set in git.
+    remotes.find((_remote) => _remote.name === branch.upstream?.remote)?.name ??
+    // If not found, and there's only one remote, use that one.
+    (remotes.length === 1 ? remotes.at(0) : undefined)?.name ??
+    // Otherwise fall back to the default remote name.
+    DEFAULT_REMOTE_NAME
+
+  const newRemoteBranch: BranchName =
+    // First check if there's an override set in the store.
+    store.upstreams.get(branch.name)?.remoteBranch ??
+    // If the current branch is tracking a remote branch, use that.
+    branch.upstream?.remoteBranch ??
+    // Otherwise, fall back to using the current branch name.
+    branch.name
+
+  // TODO: validate that the chosen remote and remote branch actually exist?
+  // Otherwise the branch selector UI gets confused.
+
+  return {
+    remote: newRemote,
+    remoteBranch: newRemoteBranch,
+  }
+}
+
+/**
+ * Hook that facilitates tracking the selected upstream for a branch.
+ */
+const useSelectedUpstream = (
+  branch: BranchInfo | undefined,
+): Upstream | undefined => {
   const upstream = useSelectedUpstreamsStore(
     useShallow((state) => {
-      if (currentBranch?.type !== 'local') {
-        return undefined
+      if (branch?.type !== 'local') {
+        return
       }
-      return state.upstreams.get(currentBranch.name)
+
+      return state.upstreams.get(branch.name) ?? branch.upstream ?? undefined
     }),
   )
 
   return upstream
+}
+
+/**
+ * Hook that facilitates tracking the selected upstream for the current branch.
+ */
+const useCurrentUpstream = (): Upstream | undefined => {
+  const { currentBranch } = useSelectedBranches()
+  return useSelectedUpstream(currentBranch)
 }
 
 /**
@@ -86,32 +139,16 @@ const useUpstreamSync = () => {
 
     const store = useSelectedUpstreamsStore.getState()
 
-    const newRemote: RemoteName =
-      // First check if there's an override set in the store.
-      store.upstreams.get(currentBranch.name)?.remote ??
-      // If no overrides are found, try to find the remote set in git.
-      remotesQuery.data.find(
-        (_remote) => _remote.name === currentBranch.remote?.remoteName,
-      )?.name ??
-      // If not found, and there's only one remote, use that one.
-      (remotesQuery.data.length === 1 ? remotesQuery.data.at(0) : undefined)
-        ?.name ??
-      // Otherwise fall back to the default remote name and try to find that one.
-      DEFAULT_REMOTE_NAME
-
-    const newRemoteBranch: BranchName =
-      // First check if there's an override set in the store.
-      store.upstreams.get(currentBranch.name)?.remoteBranch ??
-      // If the current branch is tracking a remote branch, use that.
-      currentBranch.remote?.branchName ??
-      // Otherwise, fall back to using the current branch name.
-      currentBranch.name
-
-    store.changeUpstream(currentBranch.name, {
-      remote: newRemote,
-      remoteBranch: newRemoteBranch,
-    })
+    store.changeUpstream(
+      currentBranch.name,
+      chooseUpstream(currentBranch, remotesQuery.data),
+    )
   }, [currentBranch, remotesQuery.data])
 }
 
-export { useCurrentUpstream, changeSelectedUpstream, useUpstreamSync }
+export {
+  useSelectedUpstream,
+  useCurrentUpstream,
+  changeSelectedUpstream,
+  useUpstreamSync,
+}

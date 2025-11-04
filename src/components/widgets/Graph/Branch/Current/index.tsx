@@ -3,69 +3,59 @@ import type { VirtualItem } from '@tanstack/react-virtual'
 import { useQueryBranchDivergence } from '@/api/queries/branchDivergence'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { useSelectedReferences } from '@/context/branches'
-import { useCurrentUpstream } from '@/context/upstream'
+import { useSelectedUpstream } from '@/context/upstream'
 import { useBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-import { COMMIT_ELEMENT_ID, GraphCommit } from '../Commit'
+import { COMMIT_ELEMENT_ID, GraphCommit } from '../../Commit'
 import {
   ancestorIsDivergent,
   getGraphCommitData,
   useCurrentCommonAncestor,
   useInfiniteScroll,
-} from '../utils'
+} from '../../utils'
 
-interface GraphBranchProps {
+interface GraphCurrentBranchProps {
   /**
    * The virtual items representing the commits currently being displayed.
    */
   items: VirtualItem[]
-
-  /**
-   * Whether this is the branch being used as base for comparison.
-   */
-  isBase: boolean
 }
 
 /**
- * Loads commits for a branch from the given virtual items,
+ * Loads commits for the current branch from the given virtual items,
  * and displays them as a graph correctly setting their styles, positions, and parents.
  *
  * TODO: The compiler's memoization might cause issues here: https://github.com/TanStack/virtual/issues/736
  */
-const GraphBranch = (props: GraphBranchProps) => {
-  const { items, isBase } = props
+const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
+  const { items } = props
 
   const { currentReference, baseReference } = useSelectedReferences()
-  const currentRef = isBase ? baseReference : currentReference
 
-  const historyQuery = useQueryCommitHistory(currentRef?.refName)
+  const historyQuery = useQueryCommitHistory(currentReference?.refName)
   useInfiniteScroll(historyQuery, items)
 
-  const upstream = useCurrentUpstream()
-  const mainBranch = useBranch(currentReference)
+  const currentBranch = useBranch(currentReference)
+  const upstream = useSelectedUpstream(currentBranch)
   const mainDivergenceQuery = useQueryBranchDivergence(
-    mainBranch?.type === 'local' ? mainBranch.name : undefined,
+    currentBranch?.type === 'local' ? currentBranch.name : undefined,
     upstream ? `${upstream.remote}/${upstream.remoteBranch}` : undefined,
   )
 
   const commonAncestor = useCurrentCommonAncestor()
-  const anchor = isBase
-    ? commonAncestor?.commonCommit
-    : commonAncestor?.lastCommit
-  const stopAtAnchor = !isBase
-  if (stopAtAnchor && commonAncestor && anchor === null) {
+  const anchor = commonAncestor?.lastCommit
+  if (commonAncestor && anchor === null) {
     return
   }
 
-  if (!historyQuery.data?.pages || !currentRef) {
+  if (!historyQuery.data?.pages || !currentReference) {
     return
   }
-  const currentRefName = currentRef.refName
 
   return items.map((virtualRow) => {
-    if (anchor && stopAtAnchor && virtualRow.index > anchor.distance) {
+    if (anchor && virtualRow.index > anchor.distance) {
       return undefined
     }
 
@@ -80,7 +70,6 @@ const GraphBranch = (props: GraphBranchProps) => {
       anchor.distance > virtualRow.index + 1
 
     const isUnconfirmed =
-      !isBase &&
       !!mainDivergenceQuery.data &&
       ancestorIsDivergent(virtualRow.index, mainDivergenceQuery.data)
 
@@ -89,13 +78,13 @@ const GraphBranch = (props: GraphBranchProps) => {
         key={commitData.hash}
         commitId={commitData.hash}
         commitType={isUnconfirmed ? 'unconfirmed' : 'confirmed'}
-        elementId={COMMIT_ELEMENT_ID(commitData.hash, currentRefName)}
+        elementId={COMMIT_ELEMENT_ID(commitData.hash, currentReference.refName)}
         parent={mapFn(commitData.parent, (parentCommit) => ({
           id: COMMIT_ELEMENT_ID(
             parentCommit,
             commitData.isAnchor && !!baseReference
               ? baseReference.refName
-              : currentRefName,
+              : currentReference.refName,
           ),
           type: parentIsDistantAnchor
             ? 'dashed'
@@ -104,7 +93,7 @@ const GraphBranch = (props: GraphBranchProps) => {
               : 'solid',
         }))}
         distance={virtualRow.index}
-        className={cn('absolute top-0', isBase ? 'left-[55%]' : 'left-[3%]')}
+        className={cn('absolute top-0 left-[3%]')}
         style={{
           transform: `translateY(${virtualRow.start}px)`,
         }}
@@ -113,4 +102,4 @@ const GraphBranch = (props: GraphBranchProps) => {
   })
 }
 
-export { GraphBranch, type GraphBranchProps }
+export { GraphCurrentBranch, type GraphCurrentBranchProps }

@@ -90,7 +90,7 @@ const useCurrentCommonAncestor = (): CommonAncestorInfo | undefined => {
     baseReference?.refName,
   )
 
-  return commonAncestorQuery.data
+  return commonAncestorQuery.data ?? undefined
 }
 
 /**

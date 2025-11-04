@@ -71,10 +71,10 @@ export const BRANCH_INFO_SCHEMA = BorshSchema.Enum({
   Local: BorshSchema.Struct({
     name: BorshSchema.String,
     timestamp: BorshSchema.u32,
-    remote: BorshSchema.Option(
+    upstream: BorshSchema.Option(
       BorshSchema.Struct({
-        remoteName: BorshSchema.String,
-        branchName: BorshSchema.String,
+        remote: BorshSchema.String,
+        remoteBranch: BorshSchema.String,
       }),
     ),
   }),

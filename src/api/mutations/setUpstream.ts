@@ -58,7 +58,7 @@ const useSetUpstream = (branch: BranchInfo | undefined): Action<RemoteRef> => {
     },
     Glyph:
       branch?.type === 'local'
-        ? branch.remote === undefined
+        ? branch.upstream === undefined
           ? IconWorldQuestion
           : IconWorld
         : IconWorldCancel,

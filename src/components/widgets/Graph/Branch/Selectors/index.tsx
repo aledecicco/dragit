@@ -9,13 +9,10 @@ import {
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { runAction, useActionPresenters } from '@/context/actions'
-import {
-  changeSelectedBase,
-  useSelectedBranches,
-  useSelectedReferences,
-} from '@/context/branches'
+import { changeSelectedBase, useSelectedReferences } from '@/context/branches'
 import { ActionButton } from '@/lib/ActionButton'
 import { Combobox, type ComboboxOption } from '@/ui/Combobox'
+import { useBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
@@ -27,7 +24,8 @@ const BranchSelectors = () => {
   const branchesQuery = useQueryBranches()
 
   const { currentReference, baseReference } = useSelectedReferences()
-  const { currentBranch, baseBranch } = useSelectedBranches()
+  const currentBranch = useBranch(currentReference)
+  const baseBranch = useBranch(baseReference)
 
   const checkout = useCheckoutLocal()
   const checkoutTracker = useActionPresenters(checkout)

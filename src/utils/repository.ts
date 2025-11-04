@@ -1,18 +1,14 @@
-import { match, P } from 'ts-pattern'
+import { match } from 'ts-pattern'
 
 import type {
   BranchInfo,
   Reference,
   RemoteInfo,
   RemoteName,
-  RemoteRef,
 } from '@/api/models'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { useQueryRemotes } from '@/api/queries/remotes'
-import { useSelectedBase } from '@/context/branches'
-
-import { mapFn } from './types'
 
 /**
  * Finds a branch's info by name in a list of available branches.
@@ -25,22 +21,6 @@ const findBranchInfo = (
   branches: BranchInfo[],
 ): BranchInfo | undefined => {
   return branches.find((branch) => branch.name === refName)
-}
-
-/**
- * @returns The remote counterpart of a local branch, if any.
- */
-const getRemoteCounterpart = (branch: BranchInfo): RemoteRef | undefined => {
-  // TODO: get from upstream store
-  return match(branch)
-    .with({ type: 'local', remote: P.select() }, (remote) =>
-      mapFn(
-        remote,
-        (remote) => `${remote.remoteName}/${remote.branchName}` as const,
-      ),
-    )
-    .with({ type: 'remote' }, () => undefined)
-    .exhaustive()
 }
 
 /**
@@ -66,7 +46,7 @@ const useBranch = (
 /**
  * Hook that tracks the currently checked out reference.
  */
-const useCurrentRef = (): Reference | undefined => {
+const useHeadReference = (): Reference | undefined => {
   const headInfoQuery = useQueryHeadInfo()
 
   const currentRef = match(headInfoQuery.data)
@@ -120,9 +100,8 @@ const useRemote = (
 
 export {
   findBranchInfo,
-  getRemoteCounterpart,
   useBranch,
-  useCurrentRef,
+  useHeadReference,
   findRemoteInfo,
   useRemote,
 }
