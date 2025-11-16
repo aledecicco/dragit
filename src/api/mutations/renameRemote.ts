@@ -30,7 +30,7 @@ const renameRemoteMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useRenameRemote = (name: RemoteName): Action<string> => {
+const useRenameRemote = (name: RemoteName): Action<RemoteName> => {
   const renameRemote = useRepositoryMutation(renameRemoteMutation)
 
   return {

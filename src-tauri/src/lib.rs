@@ -55,6 +55,8 @@ pub fn run() {
             api::get_worktree_files_page,
             api::get_snapshot_files_page,
             api::checkout,
+            api::create_branch,
+            api::remove_branch,
             api::get_commit_history_page,
             api::get_commit_info,
             api::add_to_index,

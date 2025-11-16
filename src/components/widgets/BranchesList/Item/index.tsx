@@ -2,9 +2,12 @@ import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@/api/models'
-import { useCheckoutBranch } from '@/api/mutations/checkoutLocal'
+import { useCheckoutBranch } from '@/api/mutations/checkout'
+import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
+import { useRemoveBranch } from '@/api/mutations/deleteBranch'
 import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { usePullBranch } from '@/api/mutations/pullBranch'
+import { showCreateBranchDialog } from '@/common/CreateBranchDialog'
 import { useSelectedBranches } from '@/context/branches'
 import { useSelectedUpstream } from '@/context/upstream'
 import { ContextMenu } from '@/lib/ContextMenu'
@@ -36,14 +39,43 @@ const BranchesListItem = (props: BranchesListItemProps) => {
   const checkout = useCheckoutBranch(branch)
   const fastForward = useFastForwardBranch(branch)
   const pull = usePullBranch(branch)
+  const remove = useRemoveBranch(branch)
+  const createBranch = useCreateBranchAt(branch.name)
+  const branchOff = useBranchOff(branch.name)
 
   return (
     <ContextMenu
       items={
         <>
-          <MenuItem action={checkout} />
+          {!isCurrentBranch && <MenuItem action={checkout} />}
           {branch.type === 'local' && (
-            <MenuItem action={isCurrentBranch ? pull : fastForward} />
+            <>
+              <MenuItem action={isCurrentBranch ? pull : fastForward} />
+
+              <MenuItem
+                action={createBranch}
+                trackOnly
+                onClick={() => {
+                  showCreateBranchDialog({
+                    fromReference: branch.name,
+                    jump: false,
+                  })
+                }}
+              />
+
+              <MenuItem
+                action={branchOff}
+                trackOnly
+                onClick={() => {
+                  showCreateBranchDialog({
+                    fromReference: branch.name,
+                    jump: true,
+                  })
+                }}
+              />
+
+              {!isCurrentBranch && <MenuItem action={remove} />}
+            </>
           )}
         </>
       }

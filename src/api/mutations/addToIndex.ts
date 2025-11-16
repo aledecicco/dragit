@@ -1,4 +1,4 @@
-import { IconListCheck, IconPlus } from '@tabler/icons-react'
+import { IconPlaylistAdd, IconPlus } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
@@ -46,7 +46,8 @@ const useStageFile = (file: WorktreeFileInfo): Action => {
     Glyph: IconPlus,
   }
 }
-const useAddFiles = (): Action<string[]> => {
+
+const useStageFiles = (): Action<string[]> => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
@@ -57,18 +58,18 @@ const useAddFiles = (): Action<string[]> => {
       })
     },
     label: {
-      idle: 'Add Files',
-      running: 'Adding',
-      success: 'Added',
-      error: 'Failed to add',
+      idle: 'Stage Files',
+      running: 'Staging',
+      success: 'Staged',
+      error: 'Staging failed',
     },
-    Glyph: IconListCheck,
+    Glyph: IconPlaylistAdd,
   }
 }
 
 export {
   useStageFile,
-  useAddFiles,
+  useStageFiles,
   addToIndexKey,
   addToIndexMutation,
   type AddToIndexArgs,

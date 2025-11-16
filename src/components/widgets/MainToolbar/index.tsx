@@ -1,6 +1,7 @@
 import type { WorktreeFileType } from '@/api/models'
-import { useAddFiles } from '@/api/mutations/addToIndex'
+import { useStageFiles } from '@/api/mutations/addToIndex'
 import { useCommitIndex } from '@/api/mutations/commitIndex'
+import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
 import { useSaveStash } from '@/api/mutations/saveStash'
 import { showCommitDialog } from '@/common/CommitDialog'
 import { FileSelectorDialog } from '@/common/FileSelectorDialog'
@@ -17,7 +18,8 @@ interface MainToolbarProps extends Partial<ToolbarProps> {}
 const MainToolbar = (props: MainToolbarProps) => {
   const { ...toolbarProps } = props
 
-  const addFiles = useAddFiles()
+  const stageFiles = useStageFiles()
+  const unstageFiles = useUnstageFiles()
   const saveStash = useSaveStash()
   const commit = useCommitIndex()
 
@@ -29,7 +31,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         compact={false}
         fixed
         tool={{
-          mainAction: addFiles,
+          mainAction: stageFiles,
           trackOnly: true,
           onClick: () => {
             const types: WorktreeFileType[] = [
@@ -41,7 +43,27 @@ const MainToolbar = (props: MainToolbarProps) => {
             askForValue(FileSelectorDialog, {
               types,
             }).then((filesParam) => {
-              runAction(addFiles, [filesParam.path])
+              runAction(stageFiles, [filesParam.path])
+            })
+          },
+        }}
+      />
+
+      <ToolbarItem
+        status="primary"
+        size="md"
+        compact={false}
+        fixed
+        tool={{
+          mainAction: unstageFiles,
+          trackOnly: true,
+          onClick: () => {
+            const types: WorktreeFileType[] = ['staged']
+
+            askForValue(FileSelectorDialog, {
+              types,
+            }).then((filesParam) => {
+              runAction(unstageFiles, [filesParam.path])
             })
           },
         }}

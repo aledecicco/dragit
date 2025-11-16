@@ -36,10 +36,7 @@ const useCommitIndex = (): FormAction<CommitIndexArgs> => {
     id: 'commit_index',
     run: async ([formState]) => {
       if (formState.values.message) {
-        await commitIndex.mutateAsync({
-          message: formState.values.message,
-          isAmend: false,
-        })
+        await commitIndex.mutateAsync(formState.values)
       }
     },
     label: {

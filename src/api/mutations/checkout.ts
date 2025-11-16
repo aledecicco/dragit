@@ -4,39 +4,41 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Action } from '@/context/actions'
 import { useSelectedBranches } from '@/context/branches'
 
-import type { BranchInfo } from '../models'
+import type { BranchInfo, RefName } from '../models'
 import {
   mutationOptions,
   pathMutationKey,
   useRepositoryMutation,
 } from '../utils'
 
-interface CheckoutLocalArgs {
-  reference: string
+interface CheckoutArgs {
+  reference: RefName
+  isNew: boolean
+  fromReference?: RefName
 }
 
-const checkoutLocalKey = (repoPath: string) =>
+const checkoutKey = (repoPath: string) =>
   ({
     ...pathMutationKey(repoPath),
-    key: 'checkout_local',
+    key: 'checkout',
   }) as const
 
-const checkoutLocalMutation = (repoPath: string) =>
+const checkoutMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [checkoutLocalKey(repoPath)],
-    mutationFn: (args: CheckoutLocalArgs) => {
+    mutationKey: [checkoutKey(repoPath)],
+    mutationFn: (args: CheckoutArgs) => {
       return invoke('checkout', { repoPath, ...args })
     },
     networkMode: 'always',
   })
 
-const useCheckoutLocal = (): Action<string> => {
-  const checkout = useRepositoryMutation(checkoutLocalMutation)
+const useCheckout = (): Action<CheckoutArgs> => {
+  const checkout = useRepositoryMutation(checkoutMutation)
 
   return {
-    id: 'checkout_local',
-    run: async (reference) => {
-      await checkout.mutateAsync({ reference })
+    id: 'checkout',
+    run: async (args) => {
+      await checkout.mutateAsync(args)
     },
     Glyph: IconGitBranch,
     label: {
@@ -48,26 +50,27 @@ const useCheckoutLocal = (): Action<string> => {
   }
 }
 
-const useCheckoutBranch = (branch: BranchInfo): Action<void> => {
-  const checkoutLocal = useCheckoutLocal()
+const useCheckoutBranch = (branch: BranchInfo): Action => {
+  const checkout = useCheckout()
 
   return {
-    ...checkoutLocal,
-    run: async () => {
-      await checkoutLocal.run(branch.name)
-    },
+    ...checkout,
+    run: () => checkout.run({ reference: branch.name, isNew: false }),
   }
 }
 
 const useSwitchBranches = (): Action => {
   const { baseBranch } = useSelectedBranches()
-  const checkoutLocal = useRepositoryMutation(checkoutLocalMutation)
+  const checkout = useRepositoryMutation(checkoutMutation)
 
   return {
     id: 'switch_branches',
     run: async () => {
       if (baseBranch) {
-        await checkoutLocal.mutateAsync({ reference: baseBranch.name })
+        await checkout.mutateAsync({
+          reference: baseBranch.name,
+          isNew: false,
+        })
       } else {
         throw new Error('No base branch selected')
       }
@@ -83,10 +86,10 @@ const useSwitchBranches = (): Action => {
 }
 
 export {
-  useCheckoutLocal,
+  useCheckout,
   useCheckoutBranch,
   useSwitchBranches,
-  checkoutLocalKey,
-  checkoutLocalMutation,
-  type CheckoutLocalArgs,
+  checkoutKey,
+  checkoutMutation,
+  type CheckoutArgs,
 }

@@ -25,6 +25,12 @@ pub enum GitError {
     #[error("Failed to checkout \"{reference}\"")]
     CheckoutFailed { reference: String },
 
+    #[error("Failed to create branch \"{branch_name}\"")]
+    CreateBranchFailed { branch_name: String },
+
+    #[error("Failed to delete branch \"{branch_name}\"")]
+    DeleteBranchFailed { branch_name: String },
+
     #[error("Failed to get commit history of \"{reference}\"")]
     GetReferenceHistoryFailed { reference: String },
 
@@ -51,6 +57,9 @@ pub enum GitError {
 
     #[error("Failed to remove files from the index")]
     RemoveFromIndexFailed {},
+
+    #[error("Failed to remove files from tree")]
+    RemoveFromTreeFailed {},
 
     #[error("Failed to commit the current index")]
     CommitFailed {},

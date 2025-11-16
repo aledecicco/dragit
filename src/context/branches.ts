@@ -152,6 +152,7 @@ const useReferencesSync = () => {
   const branch = useBranch(headReference)
   const currentUpstream = useSelectedUpstream(branch)
   const prevReference = usePrevious(headReference)
+  const baseReference = useSelectedBase(prevReference)
 
   useEffect(() => {
     const store = useSelectedRefsStore.getState()
@@ -173,7 +174,7 @@ const useReferencesSync = () => {
           }
         : undefined)
 
-    if (newBase && newBase.refName === headReference.refName) {
+    if (baseReference && baseReference.refName === headReference.refName) {
       // If the new base collides with the current reference, try to fall back to the previous base.
       if (prevReference && prevReference.refName !== headReference.refName) {
         newBase = prevReference
@@ -184,7 +185,7 @@ const useReferencesSync = () => {
     }
 
     store.changeBase(headReference, newBase)
-  }, [headReference, prevReference, currentUpstream])
+  }, [headReference, prevReference, baseReference, currentUpstream])
 }
 
 export {

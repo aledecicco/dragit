@@ -1,4 +1,4 @@
-import { IconMinus } from '@tabler/icons-react'
+import { IconMinus, IconPlaylistX } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
@@ -47,8 +47,29 @@ const useUnstageFile = (file: WorktreeFileInfo): Action => {
   }
 }
 
+const useUnstageFiles = (): Action<string[]> => {
+  const removeFromIndex = useRepositoryMutation(removeFromIndexMutation)
+
+  return {
+    id: 'unstage_files',
+    run: async (files) => {
+      await removeFromIndex.mutateAsync({
+        files,
+      })
+    },
+    label: {
+      idle: 'Unstage Files',
+      running: 'Unstaging',
+      success: 'Unstaged',
+      error: 'Unstaging failed',
+    },
+    Glyph: IconPlaylistX,
+  }
+}
+
 export {
   useUnstageFile,
+  useUnstageFiles,
   removeFromIndexKey,
   removeFromIndexMutation,
   type RemoveFromIndexArgs,

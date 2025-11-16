@@ -21,7 +21,24 @@ pub trait GitHandler {
     ) -> Result<Vec<BranchInfo>, GitError>;
 
     /// Switches the current repository to the given ref.
-    fn checkout(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
+    fn checkout(
+        &self,
+        repo_path: &str,
+        reference: &str,
+        is_new: bool,
+        from_reference: Option<&str>,
+    ) -> Result<(), GitError>;
+
+    /// Creates a new branch pointing to the given reference.
+    fn create_branch(
+        &self,
+        repo_path: &str,
+        branch_name: &str,
+        from_reference: Option<&str>,
+    ) -> Result<(), GitError>;
+
+    /// Deletes the given branch.
+    fn remove_branch(&self, repo_path: &str, branch_name: &str) -> Result<(), GitError>;
 
     /// Returns (a page of) the list of commit hashes leading up to a reference.
     fn get_commit_history_page(
@@ -74,6 +91,9 @@ pub trait GitHandler {
 
     /// Removes the given list of files from the current index.
     fn remove_from_index(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
+
+    /// Removes the given list of files from the tree.
+    fn remove_from_tree(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
 
     /// Commits the current index with the given message.
     fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError>;

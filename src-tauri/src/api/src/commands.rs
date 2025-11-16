@@ -110,8 +110,35 @@ pub async fn checkout(
     state: State<'_, AppState>,
     repo_path: &str,
     reference: &str,
+    is_new: bool,
+    from_reference: Option<&str>,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.checkout(repo_path, reference))
+    with_handler(&state, &|h| {
+        h.checkout(repo_path, reference, is_new, from_reference)
+    })
+}
+
+/// Creates a new branch pointing to the given reference.
+#[tauri::command]
+pub async fn create_branch(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    branch_name: &str,
+    from_reference: Option<&str>,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| {
+        h.create_branch(repo_path, branch_name, from_reference)
+    })
+}
+
+/// Deletes the given branch.
+#[tauri::command]
+pub async fn remove_branch(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    branch_name: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.remove_branch(repo_path, branch_name))
 }
 
 /// Returns a paginated list of commits leading up to the given reference.
@@ -206,6 +233,16 @@ pub async fn remove_from_index(
     files: Vec<&str>,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| h.remove_from_index(repo_path, &files))
+}
+
+/// Removes the given files from the tree.
+#[tauri::command]
+pub async fn remove_from_tree(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    files: Vec<&str>,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.remove_from_tree(repo_path, &files))
 }
 
 /// Commits the current index with the given message.

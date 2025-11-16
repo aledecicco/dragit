@@ -167,7 +167,7 @@ const useIgnoreFile = (file: UnmergedFileInfo): Action => {
     },
     label: {
       idle: 'Ignore new file',
-      running: 'Ignoreing new file',
+      running: 'Ignoring new file',
       success: 'Ignored new file',
       error: 'Failed to ignore new file',
     },

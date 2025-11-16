@@ -128,10 +128,49 @@ impl GitHandler for CmdGit {
         Ok(branches)
     }
 
-    fn checkout(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
-        self.spawn_and_await(repo_path, ["checkout", reference])
+    fn checkout(
+        &self,
+        repo_path: &str,
+        reference: &str,
+        is_new: bool,
+        from_reference: Option<&str>,
+    ) -> Result<(), GitError> {
+        let mut args = vec!["checkout"];
+        if is_new {
+            args.push("-b");
+        }
+        args.push(reference);
+        if let Some(from_reference) = from_reference {
+            args.push(from_reference);
+        }
+
+        self.spawn_and_await(repo_path, args)
             .or(Err(GitError::CheckoutFailed {
                 reference: reference.to_string(),
+            }))
+    }
+
+    fn create_branch(
+        &self,
+        repo_path: &str,
+        branch_name: &str,
+        from_reference: Option<&str>,
+    ) -> Result<(), GitError> {
+        let mut args = vec!["branch", branch_name];
+        if let Some(from_reference) = from_reference {
+            args.push(from_reference);
+        }
+
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::CreateBranchFailed {
+                branch_name: branch_name.to_string(),
+            }))
+    }
+
+    fn remove_branch(&self, repo_path: &str, branch_name: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["branch", "-D", branch_name])
+            .or(Err(GitError::DeleteBranchFailed {
+                branch_name: branch_name.to_string(),
             }))
     }
 
@@ -349,6 +388,12 @@ impl GitHandler for CmdGit {
         let args = [vec!["reset", "--"], files.clone()].concat();
         self.spawn_and_await(repo_path, args)
             .or(Err(GitError::RemoveFromIndexFailed {}))
+    }
+
+    fn remove_from_tree(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
+        let args = [vec!["rm"], files.clone()].concat();
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::RemoveFromTreeFailed {}))
     }
 
     fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError> {

@@ -2,10 +2,7 @@ import { IconGitBranch } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo, BranchName } from '@/api/models'
-import {
-  useCheckoutLocal,
-  useSwitchBranches,
-} from '@/api/mutations/checkoutLocal'
+import { useCheckout, useSwitchBranches } from '@/api/mutations/checkout'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { runAction, useActionPresenters } from '@/context/actions'
@@ -27,7 +24,7 @@ const BranchSelectors = () => {
   const currentBranch = useBranch(currentReference)
   const baseBranch = useBranch(baseReference)
 
-  const checkout = useCheckoutLocal()
+  const checkout = useCheckout()
   const checkoutTracker = useActionPresenters(checkout)
   const switchBranches = useSwitchBranches()
 
@@ -53,7 +50,7 @@ const BranchSelectors = () => {
         }
         options={checkoutOptions}
         setOption={(newOption) => {
-          runAction(checkout, newOption.data.name)
+          runAction(checkout, { reference: newOption.data.name, isNew: false })
         }}
         renderOption={(option) => option.data.name}
         placeholder={
@@ -83,7 +80,7 @@ const BranchSelectors = () => {
         className={cn('mx-1 col-start-2 row-start-1')}
         variant="filled"
         status="neutral"
-        disabled={!currentReference || !baseReference}
+        disabled={!currentReference || !baseBranch}
         size="md"
         round
         compact

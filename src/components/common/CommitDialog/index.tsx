@@ -26,6 +26,7 @@ const CommitDialog = (props: CommitDialogProps) => {
   return (
     <FormDialog
       dialogKey={COMMIT_DIALOG_KEY}
+      heading="Commit Changes"
       formOptions={{
         defaultValues,
         formAction: commit,

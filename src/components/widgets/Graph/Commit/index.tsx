@@ -3,9 +3,13 @@ import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 
 import type { CommitId } from '@/api/models'
+import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
 import { useQueryCommitInfo } from '@/api/queries/commitInfo'
+import { showCreateBranchDialog } from '@/common/CreateBranchDialog'
+import { ContextMenu } from '@/lib/ContextMenu'
 import { QueryLoader } from '@/lib/Loader/Query'
 import { makeTracked } from '@/lib/SvgOverlay'
+import { MenuItem } from '@/ui/Menu/Item'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { ParentCommitType } from '../Edges'
@@ -52,33 +56,57 @@ const GraphCommit = makeTracked<
   const { commitId, commitType, distance, trackRef, ...divProps } = props
   const commitInfoQuery = useQueryCommitInfo(commitId)
 
-  return (
-    <div
-      {...propsWithCn(divProps, 'relative')}
-      ref={mergeRefs([trackRef, divProps.ref])}
-    >
-      <GraphCommitNode commitType={commitType} />
+  const createBranch = useCreateBranchAt(commitId)
+  const branchOff = useBranchOff(commitId)
 
+  return (
+    <ContextMenu
+      items={
+        <>
+          <MenuItem
+            action={createBranch}
+            trackOnly
+            onClick={() => {
+              showCreateBranchDialog({ fromReference: commitId, jump: false })
+            }}
+          />
+          <MenuItem
+            action={branchOff}
+            trackOnly
+            onClick={() => {
+              showCreateBranchDialog({ fromReference: commitId, jump: true })
+            }}
+          />
+        </>
+      }
+    >
       <div
-        className={cn(
-          'absolute left-full top-half translate-x-2 -translate-y-half',
-          'border-4 border-dark-600 rounded-lg shadow-md',
-        )}
-        style={{
-          width: COMMIT_WIDTH,
-          height: COMMIT_HEIGHT,
-        }}
+        {...propsWithCn(divProps, 'relative')}
+        ref={mergeRefs([trackRef, divProps.ref])}
       >
-        <QueryLoader query={commitInfoQuery}>
-          {(commitInfo) => (
-            <Ariakit.CompositeItem
-              rowId={`${distance}`}
-              render={<GraphCommitCard commitInfo={commitInfo} />}
-            />
+        <GraphCommitNode commitType={commitType} />
+
+        <div
+          className={cn(
+            'absolute left-full top-half translate-x-2 -translate-y-half',
+            'border-4 border-dark-600 rounded-lg shadow-md',
           )}
-        </QueryLoader>
+          style={{
+            width: COMMIT_WIDTH,
+            height: COMMIT_HEIGHT,
+          }}
+        >
+          <QueryLoader query={commitInfoQuery}>
+            {(commitInfo) => (
+              <Ariakit.CompositeItem
+                rowId={`${distance}`}
+                render={<GraphCommitCard commitInfo={commitInfo} />}
+              />
+            )}
+          </QueryLoader>
+        </div>
       </div>
-    </div>
+    </ContextMenu>
   )
 })
 

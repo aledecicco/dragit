@@ -268,14 +268,10 @@ impl RepoWatcher for DebouncedWatcher {
     }
 
     fn unwatch_repository(&mut self) -> Result<(), RepoWatcherError> {
-        let repo_path = self.get_path()?;
-        self.debouncer
-            .as_mut()
-            .ok_or(RepoWatcherError::RepositoryNotWatched {})?
-            .watcher()
-            .unwatch(&PathBuf::from(repo_path.to_string()))
-            .or(Err(RepoWatcherError::UnwatchFolderFailed {
-                path: repo_path.to_string(),
-            }))
+        // Drop watcher and let it handle things.
+        self.debouncer = None;
+        self.path = None;
+
+        Ok(())
     }
 }

@@ -29,12 +29,16 @@ interface CommonMenuItemProps extends BaseMenuItemProps {
   Glyph: Glyph
 }
 
-interface ActionMenuItemProps extends BaseMenuItemProps {
-  /**
-   * The action associated with the item.
-   */
-  action: Action
-}
+type ActionMenuItemProps = BaseMenuItemProps &
+  (
+    | {
+        // biome-ignore lint/suspicious/noExplicitAny: Menu items need to accept actions with different parameter types.
+        action: Action<any>
+        trackOnly: true
+        onClick: () => void
+      }
+    | { action: Action<void>; trackOnly?: false }
+  )
 
 /**
  * A single menu item inside a {@link Menu}.
@@ -55,7 +59,7 @@ const MenuItem = (props: MenuItemProps) => {
 }
 
 const ActionMenuItem = (props: ActionMenuItemProps) => {
-  const { action, ...itemProps } = props
+  const { action, trackOnly, ...itemProps } = props
   const { Glyph, label, actionStatus } = useActionPresenters(action)
 
   return (
@@ -63,7 +67,10 @@ const ActionMenuItem = (props: ActionMenuItemProps) => {
       {...itemProps}
       onClick={(e) => {
         itemProps.onClick?.(e)
-        runAction(action)
+
+        if (!trackOnly && actionStatus !== 'running') {
+          runAction(action)
+        }
       }}
     >
       <Icon
