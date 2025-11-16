@@ -16,7 +16,7 @@ interface ContextMenuProps extends Omit<MenuProps, 'children'> {
 const ContextMenu = (props: ContextMenuProps) => {
   const { children, items, ...menuProps } = props
 
-  const menu = Ariakit.useMenuStore()
+  const menu = Ariakit.useMenuStore({ focusLoop: true })
   const [anchorRect, setAnchorRect] = useState({ x: 0, y: 0 })
 
   return (

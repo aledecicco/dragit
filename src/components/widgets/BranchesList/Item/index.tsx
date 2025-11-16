@@ -4,9 +4,9 @@ import { match } from 'ts-pattern'
 import type { BranchInfo } from '@/api/models'
 import { useCheckoutBranch } from '@/api/mutations/checkout'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
-import { useRemoveBranch } from '@/api/mutations/deleteBranch'
 import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { usePullBranch } from '@/api/mutations/pullBranch'
+import { useRemoveBranch } from '@/api/mutations/removeBranch'
 import { showCreateBranchDialog } from '@/common/CreateBranchDialog'
 import { useSelectedBranches } from '@/context/branches'
 import { useSelectedUpstream } from '@/context/upstream'
@@ -15,6 +15,7 @@ import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { MenuItem } from '@/ui/Menu/Item'
+import { Separator } from '@/ui/Separator'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
@@ -52,6 +53,8 @@ const BranchesListItem = (props: BranchesListItemProps) => {
             <>
               <MenuItem action={isCurrentBranch ? pull : fastForward} />
 
+              <Separator />
+
               <MenuItem
                 action={createBranch}
                 trackOnly
@@ -74,7 +77,12 @@ const BranchesListItem = (props: BranchesListItemProps) => {
                 }}
               />
 
-              {!isCurrentBranch && <MenuItem action={remove} />}
+              {!isCurrentBranch && (
+                <>
+                  <Separator />
+                  <MenuItem action={remove} status="error" />
+                </>
+              )}
             </>
           )}
         </>

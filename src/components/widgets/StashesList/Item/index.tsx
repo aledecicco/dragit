@@ -10,6 +10,7 @@ import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { MenuItem } from '@/ui/Menu/Item'
+import { Separator } from '@/ui/Separator'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
@@ -43,7 +44,10 @@ const StashesListItem = (props: StashesListItemProps) => {
             }}
           />
           <MenuItem action={apply} />
-          <MenuItem action={discard} />
+
+          <Separator />
+
+          <MenuItem action={discard} status="error" />
         </>
       }
     >

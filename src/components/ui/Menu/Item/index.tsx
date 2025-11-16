@@ -1,35 +1,23 @@
 import * as Ariakit from '@ariakit/react'
-import { match } from 'ts-pattern'
 
-import { type Action, runAction, useActionPresenters } from '@/context/actions'
-import { type Glyph, Icon } from '@/ui/Icon'
-import { cn, propsWithCn } from '@/utils/styles'
-import type { Size } from '@/utils/types'
+import type { Action } from '@/context/actions'
+import { ActionButton } from '@/lib/ActionButton'
+import {
+  DecoratedButton,
+  type DecoratedButtonProps,
+} from '@/lib/DecoratedButton'
+import { propsWithCn } from '@/utils/styles'
 
 import { Menu } from '..'
 
-interface BaseMenuItemProps extends Ariakit.MenuItemProps {
-  /**
-   * The size of the item.
-   */
-  size?: Size
-}
+interface BaseMenuItemProps extends Ariakit.MenuItemProps {}
 
 type MenuItemProps = CommonMenuItemProps | ActionMenuItemProps
 
-interface CommonMenuItemProps extends BaseMenuItemProps {
-  /**
-   * The label of the item.
-   */
-  label: string
-
-  /**
-   * The icon of the item.
-   */
-  Glyph: Glyph
-}
+type CommonMenuItemProps = BaseMenuItemProps & DecoratedButtonProps
 
 type ActionMenuItemProps = BaseMenuItemProps &
+  Partial<DecoratedButtonProps> &
   (
     | {
         // biome-ignore lint/suspicious/noExplicitAny: Menu items need to accept actions with different parameter types.
@@ -48,56 +36,45 @@ const MenuItem = (props: MenuItemProps) => {
     return <ActionMenuItem {...props} />
   }
 
-  const { label, Glyph, ...itemProps } = props
-
   return (
-    <BaseMenuItem {...itemProps}>
-      <Icon Glyph={Glyph} />
-      {label}
-    </BaseMenuItem>
+    <BaseMenuItem
+      render={<DecoratedButton variant="plain" size="sm" {...props} />}
+    />
   )
 }
 
 const ActionMenuItem = (props: ActionMenuItemProps) => {
   const { action, trackOnly, ...itemProps } = props
-  const { Glyph, label, actionStatus } = useActionPresenters(action)
+
+  const actionProps = trackOnly
+    ? { onClick: props.onClick, mainAction: action, trackOnly }
+    : { mainAction: action, trackOnly }
 
   return (
     <BaseMenuItem
-      {...itemProps}
-      onClick={(e) => {
-        itemProps.onClick?.(e)
-
-        if (!trackOnly && actionStatus !== 'running') {
-          runAction(action)
-        }
-      }}
-    >
-      <Icon
-        Glyph={Glyph}
-        className={cn(actionStatus === 'running' && 'animate-spin')}
-      />
-      {label}
-    </BaseMenuItem>
+      render={
+        <ActionButton
+          variant="plain"
+          size="sm"
+          {...actionProps}
+          {...itemProps}
+        />
+      }
+    />
   )
 }
 
 const BaseMenuItem = (props: BaseMenuItemProps) => {
-  const { size = 'md', ...itemProps } = props
+  const { ...itemProps } = props
 
   return (
     <Ariakit.MenuItem
       focusable
       {...propsWithCn(
         itemProps,
-        'flex flex-row shrink-0 items-center gap-x-2 text-nowrap min-w-max',
-        'rounded-sm text-light-50 aria-disabled:text-light-50/50',
-        match(size)
-          .with('sm', () => 'text-xs p-0.5')
-          .with('md', () => 'text-xs p-1')
-          .with('lg', () => 'text-sm p-2')
-          .exhaustive(),
-        'cursor-pointer hover:bg-dark-100 data-[active-item]:bg-dark-100',
+        'shrink-0 gap-x-2 justify-start text-nowrap min-w-max w-full',
+        'font-medium',
+        'nth-[n+3]:rounded-t-none not-last-of-type:rounded-b-none',
       )}
     />
   )

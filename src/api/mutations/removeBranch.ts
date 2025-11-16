@@ -40,7 +40,7 @@ const useRemoveBranch = (branch: BranchInfo): Action => {
     Glyph: IconTrash,
     label: {
       idle: 'Delete branch',
-      running: 'Creating branch',
+      running: 'Deleting branch',
       success: 'Branch deleted',
       error: 'Failed to delete branch',
     },

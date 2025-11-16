@@ -29,19 +29,20 @@ type ToolbarItemProps = CommonMenuItemProps | ActionToolbarItemProps
 
 type CommonMenuItemProps = BaseToolbarItemProps & DecoratedButtonProps
 
-type ActionToolbarItemProps = BaseToolbarItemProps & {
-  tool: {
-    alternatives?: Action[]
-  } & (
-    | {
-        // biome-ignore lint/suspicious/noExplicitAny: Toolbars need to accept actions with different parameter types.
-        mainAction: Action<any>
-        trackOnly: true
-        onClick: () => void
-      }
-    | { mainAction: Action<void>; trackOnly?: false }
-  )
-}
+type ActionToolbarItemProps = BaseToolbarItemProps &
+  Partial<DecoratedButtonProps> & {
+    tool: {
+      alternatives?: Action[]
+    } & (
+      | {
+          // biome-ignore lint/suspicious/noExplicitAny: Toolbars need to accept actions with different parameter types.
+          mainAction: Action<any>
+          trackOnly: true
+          onClick: () => void
+        }
+      | { mainAction: Action<void>; trackOnly?: false }
+    )
+  }
 
 /**
  * A single item inside a {@link Toolbar}.
