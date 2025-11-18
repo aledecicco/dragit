@@ -17,7 +17,7 @@ import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { UNSTAGED_FILE_TYPES } from '..'
-import { UnstagedFileMenuItems } from '../Menu'
+import { UnstagedFileContextMenu } from './Menu'
 
 interface UnstagedChangesItemProps extends ListItemProps {
   /**
@@ -69,7 +69,7 @@ const UnstagedChangesItem = (props: UnstagedChangesItemProps) => {
     .exhaustive()
 
   return (
-    <ContextMenu items={<UnstagedFileMenuItems file={file} />}>
+    <ContextMenu items={<UnstagedFileContextMenu file={file} />}>
       <ListItem
         interactive
         {...propsWithCn(

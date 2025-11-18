@@ -1,5 +1,4 @@
 import {
-  IconEye,
   IconFileArrowRight,
   IconFileCode2,
   IconFileMinus,
@@ -10,16 +9,15 @@ import {
 import { match } from 'ts-pattern'
 
 import type { FileOfType } from '@/api/models'
-import { useUnstageFile } from '@/api/mutations/removeFromIndex'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
 import { ContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
-import { MenuItem } from '@/ui/Menu/Item'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { STAGED_FILE_TYPES } from '..'
+import { StagedFileContextMenu } from './Menu'
 
 interface StagedChangesItemProps extends ListItemProps {
   /**
@@ -60,23 +58,8 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
     )
     .exhaustive()
 
-  const unstage = useUnstageFile(file)
-
   return (
-    <ContextMenu
-      items={
-        <>
-          <MenuItem action={unstage} />
-          <MenuItem
-            label="View changes"
-            Glyph={IconEye}
-            onClick={() => {
-              showWorktreeFileDiffDialog(file)
-            }}
-          />
-        </>
-      }
-    >
+    <ContextMenu items={<StagedFileContextMenu file={file} />}>
       <ListItem
         interactive
         {...propsWithCn(

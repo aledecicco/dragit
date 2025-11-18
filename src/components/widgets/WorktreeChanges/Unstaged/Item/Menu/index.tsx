@@ -15,13 +15,13 @@ import {
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
 import { MenuItem } from '@/ui/Menu/Item'
 
-import type { UNSTAGED_FILE_TYPES } from '..'
+import type { UNSTAGED_FILE_TYPES } from '../..'
 
-interface UnstagedFileMenuItemsProps {
+interface UnstagedFileContextMenuProps {
   file: FileOfType<(typeof UNSTAGED_FILE_TYPES)[number]>
 }
 
-const UnstagedFileMenuItems = (props: UnstagedFileMenuItemsProps) => {
+const UnstagedFileContextMenu = (props: UnstagedFileContextMenuProps) => {
   const { file } = props
 
   const stage = useStageFile(file)
@@ -85,4 +85,4 @@ const UnmergedFileMenuItems = (props: UnmergedFileMenuItemsProps) => {
   )
 }
 
-export { UnstagedFileMenuItems }
+export { UnstagedFileContextMenu }

@@ -1,18 +1,16 @@
-import { IconArchive, IconEye, IconGitBranch } from '@tabler/icons-react'
+import { IconArchive, IconGitBranch } from '@tabler/icons-react'
 
 import type { StashInfo } from '@/api/models'
-import { useApplyStash } from '@/api/mutations/applyStash'
-import { useDiscardStash } from '@/api/mutations/discardStash'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { ContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
-import { MenuItem } from '@/ui/Menu/Item'
-import { Separator } from '@/ui/Separator'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
+
+import { StashContextMenu } from './Menu'
 
 interface StashesListItemProps extends ListItemProps {
   /**
@@ -29,28 +27,9 @@ interface StashesListItemProps extends ListItemProps {
 const StashesListItem = (props: StashesListItemProps) => {
   const { stash, ...itemProps } = props
   const stashedTime = useDateDifference(stash.timestamp)
-  const apply = useApplyStash(stash)
-  const discard = useDiscardStash(stash)
 
   return (
-    <ContextMenu
-      items={
-        <>
-          <MenuItem
-            label="View"
-            Glyph={IconEye}
-            onClick={() => {
-              showSnapshotDetailsDialog(stash)
-            }}
-          />
-          <MenuItem action={apply} />
-
-          <Separator />
-
-          <MenuItem action={discard} status="error" />
-        </>
-      }
-    >
+    <ContextMenu items={<StashContextMenu stash={stash} />}>
       <ListItem
         interactive
         {...propsWithCn(

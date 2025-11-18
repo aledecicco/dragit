@@ -3,17 +3,15 @@ import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 
 import type { CommitId } from '@/api/models'
-import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
 import { useQueryCommitInfo } from '@/api/queries/commitInfo'
-import { showCreateBranchDialog } from '@/common/CreateBranchDialog'
 import { ContextMenu } from '@/lib/ContextMenu'
 import { QueryLoader } from '@/lib/Loader/Query'
 import { makeTracked } from '@/lib/SvgOverlay'
-import { MenuItem } from '@/ui/Menu/Item'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { ParentCommitType } from '../Edges'
 import { GraphCommitCard } from './Card'
+import { CommitContextMenu } from './Menu'
 import { GraphCommitNode } from './Node'
 
 export type CommitType = 'confirmed' | 'unconfirmed'
@@ -56,30 +54,8 @@ const GraphCommit = makeTracked<
   const { commitId, commitType, distance, trackRef, ...divProps } = props
   const commitInfoQuery = useQueryCommitInfo(commitId)
 
-  const createBranch = useCreateBranchAt(commitId)
-  const branchOff = useBranchOff(commitId)
-
   return (
-    <ContextMenu
-      items={
-        <>
-          <MenuItem
-            action={createBranch}
-            trackOnly
-            onClick={() => {
-              showCreateBranchDialog({ fromReference: commitId, jump: false })
-            }}
-          />
-          <MenuItem
-            action={branchOff}
-            trackOnly
-            onClick={() => {
-              showCreateBranchDialog({ fromReference: commitId, jump: true })
-            }}
-          />
-        </>
-      }
-    >
+    <ContextMenu items={<CommitContextMenu commitId={commitId} />}>
       <div
         {...propsWithCn(divProps, 'relative')}
         ref={mergeRefs([trackRef, divProps.ref])}
