@@ -1,7 +1,7 @@
 use std::{str::FromStr, u32};
 
 use models::{
-    BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, DiffSummary, HeadInfo, HistoryItem,
+    BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, DiffSummary, HeadState, HistoryItem,
     MergeStatus, MovedStatus, RemoteInfo, StagedFileInfo, StagedFileStatus, StashInfo, StatusType,
     UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo, Upstream, VersionedFileInfo,
     VersionedFileStatus,
@@ -64,16 +64,16 @@ pub(crate) fn parse_commit_info(line: &String) -> Option<CommitInfo> {
     })
 }
 
-pub(crate) fn parse_head_info(lines: &Vec<String>) -> Option<HeadInfo> {
+pub(crate) fn parse_head_state(lines: &Vec<String>) -> Option<HeadState> {
     let commit = lines.get(0)?.strip_prefix(HEAD_INFO_COMMIT_PREFIX)?;
     let branch = lines.get(1)?.strip_prefix(HEAD_INFO_BRANCH_PREFIX)?;
 
     match (commit, branch) {
         (HEAD_INFO_INITIAL_COMMIT, HEAD_INFO_DETACHED_BRANCH) => None,
-        (commit_id, HEAD_INFO_DETACHED_BRANCH) => Some(HeadInfo::Detached {
+        (commit_id, HEAD_INFO_DETACHED_BRANCH) => Some(HeadState::Detached {
             commit: commit_id.to_string(),
         }),
-        (_, branch_name) => Some(HeadInfo::Branch {
+        (_, branch_name) => Some(HeadState::Branch {
             name: branch_name.to_string(),
         }),
     }

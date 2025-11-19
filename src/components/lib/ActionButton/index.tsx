@@ -78,7 +78,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     .with('idle', () => status ?? 'neutral')
     .with('running', () => status ?? 'neutral')
     .with('success', () => 'success')
-    .with('error', () => 'error')
+    .with('error', () => 'danger')
     .exhaustive()
 
   const commonProps = {

@@ -212,6 +212,18 @@ pub trait GitHandler {
         filepath: &str,
         strategy: &ResolutionStrategy,
     ) -> Result<(), GitError>;
+
+    /// Aborts the ongoing merge operation.
+    fn abort_merge(&self, repo_path: &str) -> Result<(), GitError>;
+
+    /// Continues the ongoing merge operation.
+    fn continue_merge(&self, repo_path: &str) -> Result<(), GitError>;
+
+    /// Aborts the ongoing rebase operation.
+    fn abort_rebase(&self, repo_path: &str) -> Result<(), GitError>;
+
+    /// Continues the ongoing rebase operation.
+    fn continue_rebase(&self, repo_path: &str) -> Result<(), GitError>;
 }
 
 #[derive(serde::Deserialize, Debug)]

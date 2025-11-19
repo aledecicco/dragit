@@ -30,7 +30,7 @@ const StashContextMenu = (props: StashContextMenuProps) => {
 
       <Separator />
 
-      <MenuItem action={discard} status="error" />
+      <MenuItem action={discard} status="danger" />
     </>
   )
 }

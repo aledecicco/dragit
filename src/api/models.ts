@@ -150,9 +150,16 @@ export interface Settings {
   openLastOnStart: boolean
 }
 
-export type HeadInfo =
+export type HeadState =
   | { type: 'detached'; commit: CommitId }
   | { type: 'branch'; name: BranchName }
+
+export type WorktreeStatus = 'clean' | 'merging' | 'rebasing'
+
+export type HeadInfo = {
+  state: HeadState
+  worktreeStatus: WorktreeStatus
+}
 
 export interface LocalBranch {
   name: BranchName

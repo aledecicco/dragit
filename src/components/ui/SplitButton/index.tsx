@@ -64,7 +64,8 @@ const SplitButton = (props: SplitButtonProps) => {
             .with('primary', () => 'border-r-primary-800')
             .with('cta', () => 'border-r-accent-700')
             .with('success', () => 'border-r-green-800')
-            .with('error', () => 'border-r-danger-900')
+            .with('warning', () => 'border-r-warning-700')
+            .with('danger', () => 'border-r-danger-900')
             .with(P.union('neutral', undefined), () => 'border-r-dark-500')
             .exhaustive(),
           match(size)

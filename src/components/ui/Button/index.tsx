@@ -6,7 +6,13 @@ import type { Size } from '@/utils/types'
 
 type ButtonVariant = 'filled' | 'plain'
 
-type ButtonStatus = 'primary' | 'cta' | 'neutral' | 'success' | 'error'
+type ButtonStatus =
+  | 'primary'
+  | 'cta'
+  | 'neutral'
+  | 'success'
+  | 'warning'
+  | 'danger'
 
 interface ButtonProps extends Ariakit.ButtonProps {
   /**
@@ -138,7 +144,23 @@ const Button = (props: ButtonProps) => {
             'focus:bg-success-300/4 data-focus:bg-success-300/4',
             'aria-disabled:text-success-200/30',
           ])
-          .with({ variant: 'filled', status: 'error' }, () => [
+          .with({ variant: 'filled', status: 'warning' }, () => [
+            'bg-warning-600 text-light-50',
+            'hover:bg-warning-500',
+            'aria-expanded:bg-warning-500',
+            'aria-checked:bg-warning-500',
+            'focus:bg-warning-500 data-focus:bg-warning-500',
+            'aria-disabled:bg-warning-600/40 aria-disabled:text-light-700',
+          ])
+          .with({ variant: 'plain', status: 'warning' }, () => [
+            'text-warning-600',
+            'hover:bg-warning-600/4',
+            'aria-expanded:bg-warning-600/4',
+            'aria-checked:bg-warning-600/4',
+            'focus:bg-warning-600/4 data-focus:bg-warning-600/4',
+            'aria-disabled:text-warning-500/40',
+          ])
+          .with({ variant: 'filled', status: 'danger' }, () => [
             'bg-danger-800 text-light-50',
             'hover:bg-danger-700',
             'aria-expanded:bg-danger-700',
@@ -146,7 +168,7 @@ const Button = (props: ButtonProps) => {
             'focus:bg-danger-700 data-focus:bg-danger-700',
             'aria-disabled:bg-danger-300/30 aria-disabled:text-light-800',
           ])
-          .with({ variant: 'plain', status: 'error' }, () => [
+          .with({ variant: 'plain', status: 'danger' }, () => [
             'text-danger-600',
             'hover:bg-danger-300/4',
             'aria-expanded:bg-danger-300/4',

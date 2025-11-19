@@ -1,7 +1,7 @@
 import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
-import type { HeadInfo } from '../models'
+import type { HeadInfo, HeadState, WorktreeStatus } from '../models'
 import { HEAD_INFO_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 
@@ -24,17 +24,25 @@ const fetchHeadInfo = async (
     context,
   )
 
-  return match(res)
-    .returnType<HeadInfo>()
-    .with({ Branch: { name: P.select() } }, (branchName) => ({
-      type: 'branch',
-      name: branchName,
-    }))
-    .with({ Detached: { commit: P.select() } }, (commit) => ({
-      type: 'detached',
-      commit: commit,
-    }))
-    .exhaustive()
+  return {
+    state: match(res.state)
+      .returnType<HeadState>()
+      .with({ Branch: P.select() }, (headInfo) => ({
+        type: 'branch',
+        name: headInfo.name,
+      }))
+      .with({ Detached: { commit: P.select() } }, (commit) => ({
+        type: 'detached',
+        commit: commit,
+      }))
+      .exhaustive(),
+    worktreeStatus: match(res.worktreeStatus)
+      .returnType<WorktreeStatus>()
+      .with({ Clean: {} }, () => 'clean')
+      .with({ Merging: {} }, () => 'merging')
+      .with({ Rebasing: {} }, () => 'rebasing')
+      .exhaustive(),
+  }
 }
 
 const headInfoQuery = (repoPath: string) =>

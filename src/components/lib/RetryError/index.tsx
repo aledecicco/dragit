@@ -39,7 +39,7 @@ const RetryError = (props: RetryErrorProps) => {
         Glyph={IconReload}
         size="md"
         variant="plain"
-        status="error"
+        status="danger"
         onClick={() => {
           retry()
         }}

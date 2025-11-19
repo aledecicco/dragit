@@ -83,7 +83,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         status={
           currentBranch?.type === 'local'
             ? upstream === undefined
-              ? 'error'
+              ? 'danger'
               : 'primary'
             : 'neutral'
         }

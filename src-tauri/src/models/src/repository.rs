@@ -176,9 +176,22 @@ pub struct VersionedFileInfo {
 }
 
 #[derive(borsh::BorshSerialize, Debug)]
-pub enum HeadInfo {
+pub enum HeadState {
     Detached { commit: String },
     Branch { name: String },
+}
+
+#[derive(borsh::BorshSerialize, Debug)]
+pub enum WorktreeStatus {
+    Clean,
+    Merging,
+    Rebasing,
+}
+
+#[derive(borsh::BorshSerialize, Debug)]
+pub struct HeadInfo {
+    pub state: HeadState,
+    pub worktree_status: WorktreeStatus,
 }
 
 #[derive(borsh::BorshSerialize, Debug)]

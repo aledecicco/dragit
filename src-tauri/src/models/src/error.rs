@@ -129,6 +129,18 @@ pub enum GitError {
 
     #[error("Failed to solve file conflict for \"{filepath}\"")]
     SolveFileConflictFailed { filepath: String },
+
+    #[error("Failed to abort merge in progress")]
+    AbortMergeFailed {},
+
+    #[error("Failed to continue merge in progress")]
+    ContinueMergeFailed {},
+
+    #[error("Failed to abort rebase in progress")]
+    AbortRebaseFailed {},
+
+    #[error("Failed to continue rebase in progress")]
+    ContinueRebaseFailed {},
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug)]

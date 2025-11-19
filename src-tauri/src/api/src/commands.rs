@@ -558,3 +558,27 @@ pub async fn solve_file_conflict(
         h.solve_file_conflict(repo_path, filepath, &strategy)
     })
 }
+
+/// Aborts the ongoing merge operation.
+#[tauri::command]
+pub async fn abort_merge(state: State<'_, AppState>, repo_path: &str) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.abort_merge(repo_path))
+}
+
+/// Continues the ongoing merge operation.
+#[tauri::command]
+pub async fn continue_merge(state: State<'_, AppState>, repo_path: &str) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.continue_merge(repo_path))
+}
+
+/// Aborts the ongoing rebase operation.
+#[tauri::command]
+pub async fn abort_rebase(state: State<'_, AppState>, repo_path: &str) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.abort_rebase(repo_path))
+}
+
+/// Continues the ongoing rebase operation.
+#[tauri::command]
+pub async fn continue_rebase(state: State<'_, AppState>, repo_path: &str) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.continue_rebase(repo_path))
+}

@@ -54,13 +54,24 @@ export const HISTORY_ITEM_SCHEMA = BorshSchema.Struct({
 })
 export const HISTORY_PAGE_SCHEMA = PAGE_SCHEMA(HISTORY_ITEM_SCHEMA)
 
-export const HEAD_INFO_SCHEMA = BorshSchema.Enum({
+export const HEAD_STATE_SCHEMA = BorshSchema.Enum({
   Detached: BorshSchema.Struct({
     commit: BorshSchema.String,
   }),
   Branch: BorshSchema.Struct({
     name: BorshSchema.String,
   }),
+})
+
+export const WORKTREE_STATUS_SCHEMA = BorshSchema.Enum({
+  Clean: BorshSchema.Unit,
+  Merging: BorshSchema.Unit,
+  Rebasing: BorshSchema.Unit,
+})
+
+export const HEAD_INFO_SCHEMA = BorshSchema.Struct({
+  state: HEAD_STATE_SCHEMA,
+  worktreeStatus: WORKTREE_STATUS_SCHEMA,
 })
 
 export const BRANCH_INFO_SCHEMA = BorshSchema.Enum({

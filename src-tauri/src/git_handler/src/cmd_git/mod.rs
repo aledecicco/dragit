@@ -1,7 +1,9 @@
 use std::{
     collections::HashMap,
     fmt::Debug,
+    fs,
     io::{BufRead, BufReader, Lines, Read},
+    path::Path,
     process::{Child, ChildStdout, Command, Stdio},
 };
 use tauri::ipc::Channel;
@@ -13,6 +15,7 @@ use models::{
     AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
     FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
     ResolutionStrategy, SnapshotInfo, StashInfo, VersionedFileInfo, WorktreeFileInfo,
+    WorktreeStatus,
 };
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
@@ -261,7 +264,22 @@ impl GitHandler for CmdGit {
             .map(String::from)
             .collect();
 
-        parse_head_info(&lines).ok_or(GitError::GetHeadInfoFailed {})
+        let head_state = parse_head_state(&lines).ok_or(GitError::GetHeadInfoFailed {})?;
+        let merge_in_progress =
+            fs::exists(Path::new(repo_path).join(".git").join("MERGE_HEAD")).unwrap_or(false);
+        let rebase_in_progress =
+            fs::exists(Path::new(repo_path).join(".git").join("rebase-merge")).unwrap_or(false);
+
+        Ok(HeadInfo {
+            state: head_state,
+            worktree_status: if merge_in_progress {
+                WorktreeStatus::Merging
+            } else if rebase_in_progress {
+                WorktreeStatus::Rebasing
+            } else {
+                WorktreeStatus::Clean
+            },
+        })
     }
 
     fn get_worktree_files_page(
@@ -773,5 +791,25 @@ impl GitHandler for CmdGit {
             .or(Err(GitError::SolveFileConflictFailed {
                 filepath: filepath.to_string(),
             }))
+    }
+
+    fn abort_merge(&self, repo_path: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["merge", "--abort"])
+            .or(Err(GitError::AbortMergeFailed {}))
+    }
+
+    fn continue_merge(&self, repo_path: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["merge", "--continue"])
+            .or(Err(GitError::ContinueMergeFailed {}))
+    }
+
+    fn abort_rebase(&self, repo_path: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["rebase", "--abort"])
+            .or(Err(GitError::AbortRebaseFailed {}))
+    }
+
+    fn continue_rebase(&self, repo_path: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["rebase", "--continue"])
+            .or(Err(GitError::ContinueRebaseFailed {}))
     }
 }

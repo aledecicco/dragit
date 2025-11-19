@@ -49,7 +49,7 @@ const useBranch = (
 const useHeadReference = (): Reference | undefined => {
   const headInfoQuery = useQueryHeadInfo()
 
-  const currentRef = match(headInfoQuery.data)
+  const currentRef = match(headInfoQuery.data?.state)
     .returnType<Reference | undefined>()
     .with({ type: 'branch' }, (reference) => ({
       type: 'branch',

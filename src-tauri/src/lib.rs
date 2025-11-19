@@ -81,6 +81,10 @@ pub fn run() {
             api::get_file_diff,
             api::get_file_conflicts,
             api::solve_file_conflict,
+            api::abort_merge,
+            api::continue_merge,
+            api::abort_rebase,
+            api::continue_rebase,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

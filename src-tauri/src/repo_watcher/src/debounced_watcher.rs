@@ -14,6 +14,7 @@ use tauri::{AppHandle, Emitter};
 use crate::{
     get_branches_folder, get_config_folder, get_git_folder, get_head_file, get_index_file,
     get_objects_folder, get_remotes_folder, get_stashes_file,
+    utils::{get_merge_file, get_rebase_folder},
 };
 use models::{AppEvent, RepoWatcher, RepoWatcherError, EVENT_ID};
 
@@ -37,17 +38,19 @@ impl DebouncedWatcher {
         let pathname = pathname.to_string();
         let app_handle = self.app_handle.clone();
 
-        move |res: Result<Vec<DebouncedEvent>, Vec<notify::Error>>| {
-            let repo_path = Path::new(&pathname);
-            let git_folder = get_git_folder(repo_path);
-            let head_file = get_head_file(repo_path);
-            let branches_folder = get_branches_folder(repo_path);
-            let remotes_folder = get_remotes_folder(repo_path);
-            let config_folder = get_config_folder(repo_path);
-            let objects_folder = get_objects_folder(repo_path);
-            let index_file = get_index_file(repo_path);
-            let stashes_file = get_stashes_file(repo_path);
+        let repo_path = PathBuf::from(&pathname);
+        let git_folder = get_git_folder(&repo_path);
+        let head_file = get_head_file(&repo_path);
+        let branches_folder = get_branches_folder(&repo_path);
+        let remotes_folder = get_remotes_folder(&repo_path);
+        let config_folder = get_config_folder(&repo_path);
+        let objects_folder = get_objects_folder(&repo_path);
+        let index_file = get_index_file(&repo_path);
+        let stashes_file = get_stashes_file(&repo_path);
+        let rebase_folder = get_rebase_folder(&repo_path);
+        let merge_file = get_merge_file(&repo_path);
 
+        move |res: Result<Vec<DebouncedEvent>, Vec<notify::Error>>| {
             match res {
                 Ok(events) => {
                     let mut folder_modified = false;
@@ -63,7 +66,7 @@ impl DebouncedWatcher {
                         println!("{:?}", event.kind);
                         event.paths.iter().for_each(|path| println!("{:?}", path));
 
-                        if event.paths.iter().any(|path| path.eq(repo_path)) {
+                        if event.paths.iter().any(|path| path.eq(&repo_path)) {
                             folder_modified = true;
                         }
 
@@ -89,6 +92,11 @@ impl DebouncedWatcher {
 
                         if event.paths.contains(&stashes_file) {
                             stashes_updated = true;
+                        }
+
+                        if event.paths.contains(&rebase_folder) || event.paths.contains(&merge_file)
+                        {
+                            head_changed = true;
                         }
 
                         event.paths.iter().for_each(|path| {

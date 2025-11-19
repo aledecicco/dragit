@@ -5,6 +5,7 @@ import { CurrentDirectory } from '@/widgets/CurrentDirectory'
 import { CurrentRemote } from '@/widgets/CurrentRemote'
 import { Graph } from '@/widgets/Graph'
 import { MainToolbar } from '@/widgets/MainToolbar'
+import { PendingActions } from '@/widgets/PendingActions'
 import { StashesList } from '@/widgets/StashesList'
 import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
 import { UnstagedWorktreeChanges } from '@/widgets/WorktreeChanges/Unstaged'
@@ -59,9 +60,11 @@ const InRepository = () => {
       >
         <StashesList className={cn('min-h-30')} />
 
-        <div className={cn('grid grid-rows-[auto_auto] gap-4')}>
+        <div className={cn('grid grid-rows-[auto_auto_max-content] gap-4')}>
           <UnstagedWorktreeChanges className={cn('h-full min-h-50')} />
           <StagedWorktreeChanges className={cn('h-full min-h-50')} />
+
+          <PendingActions />
         </div>
 
         <MainToolbar />

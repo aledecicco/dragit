@@ -9,6 +9,8 @@ static REFS_FOLDER_NAME: &str = "refs";
 static HEADS_FOLDER_NAME: &str = "heads";
 static REMOTES_FOLDER_NAME: &str = "remotes";
 static STASHES_FILE_NAME: &str = "stash";
+static REBASE_FOLDER_NAME: &str = "rebase-merge";
+static MERGE_FILE_NAME: &str = "MERGE_HEAD";
 
 pub(crate) fn get_git_folder(repo_path: &Path) -> PathBuf {
     repo_path.join(GIT_FOLDER_NAME)
@@ -46,4 +48,12 @@ pub(crate) fn get_remotes_folder(repo_path: &Path) -> PathBuf {
     get_git_folder(repo_path)
         .join(REFS_FOLDER_NAME)
         .join(REMOTES_FOLDER_NAME)
+}
+
+pub(crate) fn get_rebase_folder(repo_path: &Path) -> PathBuf {
+    get_git_folder(repo_path).join(REBASE_FOLDER_NAME)
+}
+
+pub(crate) fn get_merge_file(repo_path: &Path) -> PathBuf {
+    get_git_folder(repo_path).join(MERGE_FILE_NAME)
 }
