@@ -2,6 +2,7 @@ import type { BranchInfo } from '@/api/models'
 import { useCheckoutBranch } from '@/api/mutations/checkout'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
 import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
+import { useMergeBranch } from '@/api/mutations/merge'
 import { usePullBranch } from '@/api/mutations/pullBranch'
 import { useRemoveBranch } from '@/api/mutations/removeBranch'
 import { showCreateBranchDialog } from '@/common/CreateBranchDialog'
@@ -25,6 +26,7 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
   const remove = useRemoveBranch(branch)
   const createBranch = useCreateBranchAt(branch.name)
   const branchOff = useBranchOff(branch.name)
+  const merge = useMergeBranch(branch)
 
   return (
     <>
@@ -59,6 +61,7 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
 
           {!isCurrentBranch && (
             <>
+              <MenuItem action={merge} />
               <Separator />
               <MenuItem action={remove} status="danger" />
             </>

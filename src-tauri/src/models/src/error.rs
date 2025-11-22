@@ -141,6 +141,9 @@ pub enum GitError {
 
     #[error("Failed to continue rebase in progress")]
     ContinueRebaseFailed {},
+
+    #[error("Failed to merge \"{reference}\" into current branch")]
+    MergeFailed { reference: String },
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug)]

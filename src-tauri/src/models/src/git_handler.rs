@@ -224,6 +224,9 @@ pub trait GitHandler {
 
     /// Continues the ongoing rebase operation.
     fn continue_rebase(&self, repo_path: &str) -> Result<(), GitError>;
+
+    /// Merges the given reference into the current branch.
+    fn merge(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
 }
 
 #[derive(serde::Deserialize, Debug)]

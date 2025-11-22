@@ -582,3 +582,13 @@ pub async fn abort_rebase(state: State<'_, AppState>, repo_path: &str) -> Result
 pub async fn continue_rebase(state: State<'_, AppState>, repo_path: &str) -> Result<(), AppError> {
     with_handler(&state, &|h| h.continue_rebase(repo_path))
 }
+
+/// Merges the given reference into the current branch.
+#[tauri::command]
+pub async fn merge(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    reference: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.merge(repo_path, reference))
+}

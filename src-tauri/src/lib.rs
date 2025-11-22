@@ -85,6 +85,7 @@ pub fn run() {
             api::continue_merge,
             api::abort_rebase,
             api::continue_rebase,
+            api::merge,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

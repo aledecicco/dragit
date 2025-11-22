@@ -812,4 +812,11 @@ impl GitHandler for CmdGit {
         self.spawn_and_await(repo_path, ["rebase", "--continue"])
             .or(Err(GitError::ContinueRebaseFailed {}))
     }
+
+    fn merge(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["merge", reference])
+            .or(Err(GitError::MergeFailed {
+                reference: reference.to_string(),
+            }))
+    }
 }

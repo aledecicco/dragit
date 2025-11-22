@@ -1,5 +1,6 @@
 import type { CommitId } from '@/api/models'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
+import { useMergeCommit } from '@/api/mutations/merge'
 import { showCreateBranchDialog } from '@/common/CreateBranchDialog'
 import { MenuItem } from '@/ui/Menu/Item'
 
@@ -12,6 +13,7 @@ const CommitContextMenu = (props: CommitContextMenuProps) => {
 
   const createBranch = useCreateBranchAt(commitId)
   const branchOff = useBranchOff(commitId)
+  const merge = useMergeCommit(commitId)
 
   return (
     <>
@@ -22,6 +24,7 @@ const CommitContextMenu = (props: CommitContextMenuProps) => {
           showCreateBranchDialog({ fromReference: commitId, jump: false })
         }}
       />
+
       <MenuItem
         action={branchOff}
         trackOnly
@@ -29,6 +32,8 @@ const CommitContextMenu = (props: CommitContextMenuProps) => {
           showCreateBranchDialog({ fromReference: commitId, jump: true })
         }}
       />
+
+      <MenuItem action={merge} />
     </>
   )
 }
