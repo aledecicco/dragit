@@ -33,7 +33,7 @@ const useContinueMerge = (): Action => {
       await continueMerge.mutateAsync()
     },
     label: {
-      idle: 'Continue merge',
+      idle: 'Continue',
       running: 'Merging',
       success: 'Merged',
       error: 'Failed to merge',

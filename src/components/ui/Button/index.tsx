@@ -60,9 +60,13 @@ const Button = (props: ButtonProps) => {
         round && 'aspect-square',
 
         match(size)
-          .with('sm', () => [
+          .with('xs', () => [
             'text-xs gap-2',
             round ? 'p-1 rounded-full' : 'px-1.75 py-1 rounded-sm',
+          ])
+          .with('sm', () => [
+            'text-xs gap-2',
+            round ? 'p-1.25 rounded-full' : 'px-2 py-1.25 rounded-sm',
           ])
           .with('md', () => [
             'text-sm gap-2',
@@ -145,7 +149,7 @@ const Button = (props: ButtonProps) => {
             'aria-disabled:text-success-200/30',
           ])
           .with({ variant: 'filled', status: 'warning' }, () => [
-            'bg-warning-600 text-light-50',
+            'bg-warning-600 text-dark-500',
             'hover:bg-warning-500',
             'aria-expanded:bg-warning-500',
             'aria-checked:bg-warning-500',
@@ -153,12 +157,12 @@ const Button = (props: ButtonProps) => {
             'aria-disabled:bg-warning-600/40 aria-disabled:text-light-700',
           ])
           .with({ variant: 'plain', status: 'warning' }, () => [
-            'text-warning-600',
-            'hover:bg-warning-600/4',
-            'aria-expanded:bg-warning-600/4',
-            'aria-checked:bg-warning-600/4',
-            'focus:bg-warning-600/4 data-focus:bg-warning-600/4',
-            'aria-disabled:text-warning-500/40',
+            'text-warning-200/90',
+            'hover:bg-warning-200/4',
+            'aria-expanded:bg-warning-200/4',
+            'aria-checked:bg-warning-200/4',
+            'focus:bg-warning-200/4 data-focus:bg-warning-200/4',
+            'aria-disabled:text-warning-300/40',
           ])
           .with({ variant: 'filled', status: 'danger' }, () => [
             'bg-danger-800 text-light-50',

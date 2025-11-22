@@ -97,7 +97,7 @@ const GraphInner = () => {
     },
     gap: EDGE_LENGTH,
     paddingStart: CURVE_SIZE * 2 + EDGE_OFFSET,
-    paddingEnd: CURVE_SIZE * 2.5 + EDGE_OFFSET * 2,
+    paddingEnd: CURVE_SIZE * 2 + EDGE_OFFSET + 75,
     count: Math.max(currentBranchLength, baseBranchLength),
     overscan: 3,
   })

@@ -4,7 +4,7 @@ type LiteralUnion<LiteralType extends string> =
   | LiteralType
   | (string & Record<never, never>)
 
-type Size = 'sm' | 'md' | 'lg'
+type Size = 'xs' | 'sm' | 'md' | 'lg'
 
 /**
  * The identity function.

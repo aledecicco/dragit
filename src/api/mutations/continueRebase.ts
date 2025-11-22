@@ -33,7 +33,7 @@ const useContinueRebase = (): Action => {
       await continueRebase.mutateAsync()
     },
     label: {
-      idle: 'Continue rebase',
+      idle: 'Continue',
       running: 'Rebasing',
       success: 'Rebased',
       error: 'Failed to rebase',

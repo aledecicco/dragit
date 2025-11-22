@@ -60,11 +60,9 @@ const InRepository = () => {
       >
         <StashesList className={cn('min-h-30')} />
 
-        <div className={cn('grid grid-rows-[auto_auto_max-content] gap-4')}>
+        <div className={cn('grid grid-rows-[auto_auto] gap-4')}>
           <UnstagedWorktreeChanges className={cn('h-full min-h-50')} />
           <StagedWorktreeChanges className={cn('h-full min-h-50')} />
-
-          <PendingActions />
         </div>
 
         <MainToolbar />
@@ -72,7 +70,13 @@ const InRepository = () => {
 
       <div className={cn('grid grid-rows-[max-content_1fr] gap-4')}>
         <CurrentDirectory className={cn('justify-self-center')} />
-        <Graph />
+
+        <div className={cn('h-full w-full min-h-0', 'relative')}>
+          <Graph />
+          <PendingActions
+            className={cn('absolute bottom-2 left-half -translate-x-half')}
+          />
+        </div>
       </div>
 
       <div className={cn('grid grid-rows-[max-content_1fr] gap-4')}>

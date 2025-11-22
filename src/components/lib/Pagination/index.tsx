@@ -59,7 +59,7 @@ const Pagination = (props: PaginationProps) => {
       )}
     >
       <DecoratedButton
-        size="sm"
+        size="xs"
         round
         variant="filled"
         status="neutral"
@@ -76,7 +76,7 @@ const Pagination = (props: PaginationProps) => {
         {`${page * pageSize + 1} - ${(page + 1) * pageSize}`}
       </span>
       <DecoratedButton
-        size="sm"
+        size="xs"
         round
         variant="filled"
         status="neutral"

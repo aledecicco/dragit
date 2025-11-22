@@ -84,7 +84,7 @@ const BaseToolbarItem = (props: BaseToolbarItemProps) => {
     <Ariakit.ToolbarItem
       {...propsWithCn(
         itemProps,
-        'flex flex-row items-center justify-center',
+        'flex flex-row items-center justify-center h-full',
         fixed && 'w-full',
         'not-first:rounded-l-none',
         'not-last:rounded-r-none',
@@ -93,7 +93,7 @@ const BaseToolbarItem = (props: BaseToolbarItemProps) => {
           .with('primary', () => 'not-last:border-r-primary-800')
           .with('cta', () => 'not-last:border-r-accent-700')
           .with('success', () => 'not-last:border-r-green-800')
-          .with('warning', () => 'not-last:border-r-accent-700')
+          .with('warning', () => 'not-last:border-r-warning-600')
           .with('danger', () => 'not-last:border-r-danger-900')
           .with('neutral', () => 'not-last:border-r-dark-500')
           .exhaustive(),

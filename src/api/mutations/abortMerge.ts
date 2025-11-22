@@ -33,7 +33,7 @@ const useAbortMerge = (): Action => {
       await abortMerge.mutateAsync()
     },
     label: {
-      idle: 'Abort merge',
+      idle: 'Abort',
       running: 'Aborting',
       success: 'Aborted',
       error: 'Failed to abort',

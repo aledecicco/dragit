@@ -56,6 +56,7 @@ const ProfilePicture = (props: ProfilePictureProps) => {
         divProps,
         'rounded-full overflow-hidden',
         match(size)
+          .with('xs', () => 'size-3.75')
           .with('sm', () => 'size-4')
           .with('md', () => 'size-5.5')
           .with('lg', () => 'size-7')

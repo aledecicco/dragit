@@ -69,6 +69,7 @@ const SplitButton = (props: SplitButtonProps) => {
             .with(P.union('neutral', undefined), () => 'border-r-dark-500')
             .exhaustive(),
           match(size)
+            .with('xs', () => 'pr-1')
             .with('sm', () => 'pr-1')
             .with('md', () => 'pr-1.5')
             .with('lg', () => 'pr-2')
@@ -88,6 +89,7 @@ const SplitButton = (props: SplitButtonProps) => {
               'h-full',
               'rounded-l-none rounded-r-[inherit]',
               match(menuSize)
+                .with('xs', () => 'px-0.5')
                 .with('sm', () => 'px-0.5')
                 .with('md', () => 'px-0.75')
                 .with('lg', () => 'px-1')

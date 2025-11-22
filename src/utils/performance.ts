@@ -1,5 +1,4 @@
 import { useReducer, useRef } from 'react'
-import type { useVirtualizer } from '@tanstack/react-virtual'
 
 import { MS_IN_SECOND } from './time'
 
@@ -136,10 +135,5 @@ const useRerender = () => {
   return { rerenderTrigger, rerender }
 }
 
-type VirtualListOptions<T extends HTMLElement> = Omit<
-  Parameters<typeof useVirtualizer<T, Element>>['0'],
-  'getScrollElement'
->
-
 export { useDebouncedCallback, useThrottledCallback, useRerender }
-export type { DebounceOptions, ThrottleOptions, VirtualListOptions }
+export type { DebounceOptions, ThrottleOptions }

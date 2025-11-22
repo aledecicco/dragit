@@ -25,8 +25,9 @@ const Chip = (props: ChipProps) => {
         'p-1 text-center rounded-4xl',
         'shadow-xs bg-dark-50 text-light-500',
         match(size)
+          .with('xs', () => 'text-xs px-1.25 py-0.5')
           .with('sm', () => 'text-xs px-1.5 py-0.5')
-          .with('md', () => 'text-xs px-2 py-1')
+          .with('md', () => 'text-sm px-1.75 py-0.75')
           .with('lg', () => 'text-sm px-2.5 py-1.5')
           .exhaustive(),
       )}
