@@ -2,10 +2,8 @@ import type { ComponentProps } from 'react'
 
 import { useQueryBranches } from '@/api/queries/branches'
 import { QueryList } from '@/lib/QueryList'
-import { Accordion } from '@/ui/Accordion'
-import { AccordionSection } from '@/ui/Accordion/Section'
 import { Chip } from '@/ui/Chip'
-import { propsWithCn } from '@/utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
 import { BranchesListItem } from './Item'
@@ -20,13 +18,25 @@ const BranchesList = (props: BranchesListProps) => {
   const branchesQuery = useQueryBranches()
 
   return (
-    <Accordion {...propsWithCn(divProps, 'overflow-hidden')}>
-      <AccordionSection
-        defaultOpen
-        label="All branches"
-        extraInfo={mapFn(branchesQuery.data, (branches) => (
-          <Chip size="sm">{branches.length}</Chip>
-        ))}
+    <div {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}>
+      <div className={cn('flex flex-row items-center justify-between')}>
+        <div
+          className={cn(
+            'text-sm text-light-600 text-start',
+            'py-2 flex flex-row gap-x-2 items-center',
+          )}
+        >
+          <p>All Branches</p>
+
+          <Chip size="sm">{branchesQuery.data?.length ?? '...'}</Chip>
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          'overflow-y-hidden grow',
+          'w-full bg-dark-800 rounded-sm',
+        )}
       >
         <QueryList
           name="branches"
@@ -38,8 +48,8 @@ const BranchesList = (props: BranchesListProps) => {
             getItemKey: (index: number) => branches[index].name,
           }))}
         />
-      </AccordionSection>
-    </Accordion>
+      </div>
+    </div>
   )
 }
 

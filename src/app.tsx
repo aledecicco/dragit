@@ -56,9 +56,11 @@ const InRepository = () => {
   return (
     <>
       <div
-        className={cn('grid grid-rows-[1fr_minmax(0,4fr)_max-content] gap-4')}
+        className={cn(
+          'grid grid-rows-[minmax(0,1fr)_minmax(0,5fr)_max-content] gap-4',
+        )}
       >
-        <StashesList className={cn('min-h-30')} />
+        <StashesList />
 
         <div className={cn('grid grid-rows-[auto_auto] gap-4')}>
           <UnstagedWorktreeChanges className={cn('h-full min-h-50')} />
