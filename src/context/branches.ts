@@ -7,7 +7,7 @@ import { useShallow } from 'zustand/react/shallow'
 import type { Reference, RefName } from '@/api/models'
 import { useBranch, useHeadReference } from '@/utils/repository'
 
-import { useSelectedUpstream } from './upstream'
+import { getUpstreamReference, useSelectedUpstream } from './upstream'
 
 const MAX_BRANCHES = 50
 
@@ -168,10 +168,7 @@ const useReferencesSync = () => {
       store.bases.get(headReference.refName) ??
       // Otherwise, try to use the upstream of the branch as a base.
       (headReference.type === 'branch' && currentUpstream
-        ? {
-            type: 'branch',
-            refName: `${currentUpstream.remote}/${currentUpstream.remoteBranch}`,
-          }
+        ? getUpstreamReference(currentUpstream)
         : undefined)
 
     if (baseReference && baseReference.refName === headReference.refName) {

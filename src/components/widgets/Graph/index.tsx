@@ -16,7 +16,6 @@ import { cn, propsWithCn } from '@/utils/styles'
 
 import { GraphBaseBranch } from './Branch/Base'
 import { GraphCurrentBranch } from './Branch/Current'
-import { BranchMessages } from './Branch/Messages'
 import { BranchSelectors } from './Branch/Selectors'
 import { NODE_SIZE } from './Commit/Node'
 import { CURVE_SIZE, EDGE_LENGTH, EDGE_OFFSET, Edges } from './Edges'
@@ -143,7 +142,6 @@ const GraphInner = () => {
             )}
           </SvgOverlay>
         </div>
-        <BranchMessages />
       </Ariakit.Composite>
     </Ariakit.CompositeProvider>
   )

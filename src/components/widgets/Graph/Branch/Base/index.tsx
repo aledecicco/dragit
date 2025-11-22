@@ -1,6 +1,7 @@
 import type { VirtualItem } from '@tanstack/react-virtual'
 
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
+import { getPaginatedLength } from '@/api/utils'
 import { useSelectedReferences } from '@/context/branches'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
@@ -11,6 +12,7 @@ import {
   useCurrentCommonAncestor,
   useInfiniteScroll,
 } from '../../utils'
+import { BranchMessage } from '../Message'
 
 interface GraphBaseBranchProps {
   /**
@@ -36,8 +38,16 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
   const commonAncestor = useCurrentCommonAncestor()
   const anchor = commonAncestor?.commonCommit
 
-  if (!historyQuery.data?.pages || !baseReference) {
-    return
+  if (!baseReference) {
+    return <BranchMessage isBase={true}>No base branch selected</BranchMessage>
+  }
+
+  if (!historyQuery.data || !getPaginatedLength(historyQuery.data)) {
+    return (
+      <BranchMessage isBase={true}>
+        {historyQuery.isFetching ? 'Loading history...' : 'No commits found'}
+      </BranchMessage>
+    )
   }
 
   return items.map((virtualRow) => {

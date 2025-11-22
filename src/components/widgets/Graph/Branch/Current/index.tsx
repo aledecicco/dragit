@@ -2,6 +2,7 @@ import type { VirtualItem } from '@tanstack/react-virtual'
 
 import { useQueryBranchDivergence } from '@/api/queries/branchDivergence'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
+import { getPaginatedLength } from '@/api/utils'
 import { useSelectedReferences } from '@/context/branches'
 import { useSelectedUpstream } from '@/context/upstream'
 import { useBranch } from '@/utils/repository'
@@ -15,6 +16,7 @@ import {
   useCurrentCommonAncestor,
   useInfiniteScroll,
 } from '../../utils'
+import { BranchMessage } from '../Message'
 
 interface GraphCurrentBranchProps {
   /**
@@ -46,12 +48,21 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
 
   const commonAncestor = useCurrentCommonAncestor()
   const anchor = commonAncestor?.lastCommit
-  if (commonAncestor && anchor === null) {
-    return
+
+  if (!currentReference) {
+    return <BranchMessage isBase={false}>No branch checked out</BranchMessage>
   }
 
-  if (!historyQuery.data?.pages || !currentReference) {
-    return
+  if (commonAncestor && anchor === null) {
+    return <BranchMessage isBase={false}>No new commits</BranchMessage>
+  }
+
+  if (!historyQuery.data || !getPaginatedLength(historyQuery.data)) {
+    return (
+      <BranchMessage isBase={false}>
+        {historyQuery.isFetching ? 'Loading history...' : 'No commits found'}
+      </BranchMessage>
+    )
   }
 
   return items.map((virtualRow) => {

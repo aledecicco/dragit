@@ -8,14 +8,18 @@ import type { VirtualItem } from '@tanstack/react-virtual'
 import type {
   AncestorInfo,
   BranchDivergence,
+  BranchInfo,
   CommonAncestorInfo,
   HistoryItem,
   Page,
+  Reference,
+  RefName,
 } from '@/api/models'
 import { HISTORY_PAGE_SIZE } from '@/api/queries/commitHistory'
 import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { getPaginatedItem, getPaginatedLength } from '@/api/utils'
 import { useSelectedReferences } from '@/context/branches'
+import type { ComboboxOption } from '@/ui/Combobox'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<Page<HistoryItem>>>
 
@@ -128,10 +132,77 @@ const getGraphCommitData = (
   return { hash, isAnchor, parent }
 }
 
+/**
+ * Generates the appropriate options for the current branch selector.
+ *
+ * @param branches The list of all available branches.
+ *
+ * @returns An array of combobox options.
+ */
+const getCurrentBranchOptions = (
+  branches: BranchInfo[],
+): ComboboxOption<BranchInfo>[] => {
+  return (
+    branches?.map((branch) => {
+      const option = {
+        value: branch.name,
+        data: branch,
+      }
+      return option
+    }) ?? []
+  )
+}
+
+/**
+ * Generates the appropriate options for the base branch selector based on the provided config.
+ *
+ * @param branches The list of all available branches.
+ * @param exclude An optional name to exclude from the options.
+ * @param include An optional reference to always include in the options.
+ *
+ * @returns An array of combobox options.
+ */
+const getBaseBranchOptions = (
+  branches: BranchInfo[],
+  exclude?: RefName,
+  include?: Reference,
+): ComboboxOption<Reference | null>[] => {
+  let options =
+    branches?.map((branch) => {
+      const option = {
+        value: branch.name,
+        data: { type: 'branch', refName: branch.name } as Reference | null,
+      }
+      return option
+    }) ?? []
+
+  options.unshift({ value: '', data: null })
+
+  if (exclude) {
+    options = options.filter((option) => option.value !== exclude)
+  }
+
+  if (include) {
+    const isIncluded = options.some(
+      (option) => option.value === include.refName,
+    )
+    if (!isIncluded) {
+      options.unshift({
+        value: include.refName,
+        data: include,
+      })
+    }
+  }
+
+  return options
+}
+
 export {
   ancestorNotInRange,
   ancestorIsDivergent,
   useInfiniteScroll,
   useCurrentCommonAncestor,
   getGraphCommitData,
+  getCurrentBranchOptions,
+  getBaseBranchOptions,
 }

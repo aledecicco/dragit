@@ -1,17 +1,18 @@
 import { IconGitBranch } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
-import type { BranchInfo, BranchName } from '@/api/models'
 import { useCheckout, useSwitchBranches } from '@/api/mutations/checkout'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { runAction, useActionPresenters } from '@/context/actions'
 import { changeSelectedBase, useSelectedReferences } from '@/context/branches'
+import { getUpstreamReference, useCurrentUpstream } from '@/context/upstream'
 import { ActionButton } from '@/lib/ActionButton'
-import { Combobox, type ComboboxOption } from '@/ui/Combobox'
+import { Combobox } from '@/ui/Combobox'
 import { useBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
-import { mapFn } from '@/utils/types'
+
+import { getBaseBranchOptions, getCurrentBranchOptions } from '../../utils'
 
 /**
  * Controls to select the main branch and the base branch.
@@ -20,6 +21,7 @@ const BranchSelectors = () => {
   const headInfoQuery = useQueryHeadInfo()
   const branchesQuery = useQueryBranches()
 
+  const currentUpstream = useCurrentUpstream()
   const { currentReference, baseReference } = useSelectedReferences()
   const currentBranch = useBranch(currentReference)
   const baseBranch = useBranch(baseReference)
@@ -28,13 +30,15 @@ const BranchSelectors = () => {
   const checkoutTracker = useActionPresenters(checkout)
   const switchBranches = useSwitchBranches()
 
-  const checkoutOptions: ComboboxOption<BranchInfo>[] = getBranchOptions(
-    branchesQuery.data,
+  const checkoutOptions = getCurrentBranchOptions(branchesQuery.data ?? [])
+
+  const baseOptions = getBaseBranchOptions(
+    branchesQuery.data ?? [],
+    currentBranch?.name,
+    currentBranch && currentUpstream
+      ? getUpstreamReference(currentUpstream)
+      : undefined,
   )
-  const baseOptions: ComboboxOption<BranchInfo | null>[] = [
-    { value: '', data: null },
-    ...getBranchOptions(branchesQuery.data, currentBranch?.name),
-  ]
 
   return (
     <>
@@ -89,26 +93,20 @@ const BranchSelectors = () => {
       <Combobox
         className={cn('w-65 col-start-3 row-start-1')}
         option={
-          baseBranch
+          baseReference
             ? {
-                value: baseBranch.name,
-                data: baseBranch,
+                value: baseReference.refName,
+                data: baseReference,
               }
             : undefined
         }
         options={baseOptions}
         setOption={(newOption) => {
           if (currentReference) {
-            changeSelectedBase(
-              currentReference,
-              mapFn(newOption.data, (newOption) => ({
-                type: 'branch',
-                refName: newOption.name,
-              })),
-            )
+            changeSelectedBase(currentReference, newOption.data ?? undefined)
           }
         }}
-        renderOption={(option) => option.data?.name ?? 'No base branch'}
+        renderOption={(option) => option.data?.refName ?? 'No base branch'}
         placeholder={
           baseReference?.type === 'commit'
             ? `#${baseReference.refName}`
@@ -119,35 +117,6 @@ const BranchSelectors = () => {
       />
     </>
   )
-}
-
-/**
- * Generates the appropriate options for a branch selector based on the provided config.
- *
- * @param branches The list of all available branches.
- * @param allowEmpty Whether to allow selecting an empty option.
- * @param exclude An optional branch name to exclude from the options.
- *
- * @returns An array of combobox options.
- */
-const getBranchOptions = (
-  branches: BranchInfo[] | undefined,
-  exclude?: BranchName,
-) => {
-  let options =
-    branches?.map((branch) => {
-      const option = {
-        value: branch.name,
-        data: branch,
-      }
-      return option
-    }) ?? []
-
-  if (exclude) {
-    options = options.filter((option) => option.value !== exclude)
-  }
-
-  return options
 }
 
 export { BranchSelectors }

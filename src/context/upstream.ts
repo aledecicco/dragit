@@ -7,6 +7,7 @@ import type {
   BranchInfo,
   BranchName,
   LocalBranch,
+  Reference,
   RemoteInfo,
   RemoteName,
   Upstream,
@@ -117,6 +118,11 @@ const useCurrentUpstream = (): Upstream | undefined => {
   return useSelectedUpstream(currentBranch)
 }
 
+const getUpstreamReference = (upstream: Upstream): Reference => ({
+  type: 'branch',
+  refName: `${upstream.remote}/${upstream.remoteBranch}`,
+})
+
 /**
  * Change the selected upstream for a given branch.
  */
@@ -149,6 +155,7 @@ const useUpstreamSync = () => {
 export {
   useSelectedUpstream,
   useCurrentUpstream,
+  getUpstreamReference,
   changeSelectedUpstream,
   useUpstreamSync,
 }
