@@ -1,24 +1,29 @@
 import type { ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 
-import { hideDialog } from '@/context/dialogs'
 import { type Shortcut, ShortcutCheatsheet } from '@/lib/ShortcutsCheatsheet'
-import { Dialog, type DialogProps } from '@/ui/Dialog'
+import {
+  ValueRequesterDialog,
+  type ValueRequesterDialogProps,
+} from '@/lib/ValueRequester/Dialog'
 import { Separator } from '@/ui/Separator'
 import { cn, propsWithCn } from '@/utils/styles'
-import type { PickPartial } from '@/utils/types'
+import type { MakeOptional } from '@/utils/types'
 
 import { CommandMenuItem } from './Item'
 
 interface CommandMenuProps
-  extends Omit<
-    PickPartial<DialogProps, 'dialogKey'>,
-    'heading' | 'showClose' | 'children'
+  extends MakeOptional<
+    Omit<
+      ValueRequesterDialogProps<{ value: string }>,
+      'heading' | 'showClose' | 'children'
+    >,
+    'formOptions'
   > {
   /**
    * The children of the command menu, which should be a list of command items.
    */
-  children: Ariakit.ComboboxListProps['render']
+  children?: Ariakit.ComboboxListProps['render']
 
   /**
    * A list of keyboard shortcuts to display at the bottom of the command menu.
@@ -35,14 +40,7 @@ interface CommandMenuProps
    *
    * @param value - The new search value.
    */
-  onSearchChange: (value: string) => void
-
-  /**
-   * Callback that submits an item to trigger its action.
-   *
-   * @param value - The value of the item to submit, or `undefined` if no item was selected.
-   */
-  submitValue: (value: string | undefined) => void
+  onSearchChange?: (value: string) => void
 }
 
 export const DEFAULT_SHORTCUTS: Shortcut[] = [
@@ -70,20 +68,18 @@ const CommandMenu = (props: CommandMenuProps) => {
     shortcuts = DEFAULT_SHORTCUTS,
     footer,
     onSearchChange,
-    submitValue,
     ...dialogProps
   } = props
 
   return (
-    <Dialog
+    <ValueRequesterDialog
       {...propsWithCn(dialogProps, 'rounded-md')}
+      formOptions={{
+        defaultValues: { value: '' },
+      }}
       showClose={false}
       heading={undefined}
       contentProps={propsWithCn(dialogProps.contentProps, 'p-0 bg-dark-300')}
-      onClose={(e) => {
-        dialogProps.onClose?.(e)
-        submitValue(undefined)
-      }}
     >
       <Ariakit.ComboboxProvider
         open
@@ -91,8 +87,8 @@ const CommandMenu = (props: CommandMenuProps) => {
         focusLoop={false}
         setValue={onSearchChange}
         setSelectedValue={(value) => {
-          submitValue(typeof value === 'string' ? value : value.at(0))
-          hideDialog(dialogProps.dialogKey)
+          const arg = typeof value === 'string' ? value : value.at(0)
+          dialogProps.submitValue(arg ? { value: arg } : undefined)
         }}
         resetValueOnHide
       >
@@ -121,7 +117,7 @@ const CommandMenu = (props: CommandMenuProps) => {
           className={cn('p-1 self-center')}
         />
       )}
-    </Dialog>
+    </ValueRequesterDialog>
   )
 }
 

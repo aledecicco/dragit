@@ -33,7 +33,16 @@ type AnyObject = Record<never, never>
 /**
  * Makes the keys of a type `T` optional, except for the ones specified in `K`.
  */
-type PickPartial<T, K extends keyof T> = Partial<T> & Pick<T, K>
+type RequireOnly<T, K extends keyof T> = Partial<T> & Pick<T, K>
 
-export type { ReactSetter, LiteralUnion, Size, AnyObject, PickPartial }
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+
+export type {
+  ReactSetter,
+  LiteralUnion,
+  Size,
+  AnyObject,
+  RequireOnly,
+  MakeOptional,
+}
 export { idFn, mapFn }

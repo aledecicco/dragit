@@ -5,16 +5,12 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 const host = process.env.TAURI_DEV_HOST
 
-const ReactCompilerConfig = {
-  /* */
-}
-
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
   plugins: [
     react({
       babel: {
-        plugins: [['babel-plugin-react-compiler', ReactCompilerConfig]],
+        plugins: [['babel-plugin-react-compiler']],
       },
     }),
     tailwindcss(),

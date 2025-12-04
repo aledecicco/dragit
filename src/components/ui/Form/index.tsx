@@ -1,8 +1,6 @@
-import type { ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
+import { useEffectOnce } from 'react-use'
 
-import { type Action, runAction } from '@/context/actions'
-import { ActionButton } from '@/lib/ActionButton'
 import { propsWithCn } from '@/utils/styles'
 import type { AnyObject } from '@/utils/types'
 
@@ -11,19 +9,11 @@ type FormCallback<T extends AnyObject> = (
   form: Ariakit.FormStore<T>,
 ) => void | Promise<void>
 
-type FormAction<T extends AnyObject> = Action<Parameters<FormCallback<T>>>
-
-interface FormProps<T extends AnyObject>
-  extends Omit<Ariakit.FormProps, 'children'> {
+interface FormProps<T extends AnyObject> extends Ariakit.FormProps {
   /**
    * The default values for the form fields.
    */
   defaultValues: T
-
-  /**
-   * The action performed by the form.
-   */
-  formAction: FormAction<T>
 
   /**
    * Callback triggered for form validation.
@@ -34,49 +24,38 @@ interface FormProps<T extends AnyObject>
    * Callback triggered when the form is submitted.
    */
   onFormSubmit?: FormCallback<T>
-
-  /**
-   * The children of the form, which can be a function that receives the status of the tracked form action.
-   */
-  children?: ReactNode | ((action: FormAction<T>) => ReactNode)
 }
 
 /**
  * Form component that handles validation and submission, and provides its state to the fields it contains.
  *
- * The form submission callback is treated as an {@link Action}, and the submission button is an {@link ActionButton} that tracks it.
- *
  * @template T - The type of the form values.
  */
 const Form = <T extends AnyObject>(props: FormProps<T>) => {
-  const {
-    defaultValues,
-    formAction,
-    validateForm,
-    onFormSubmit,
-    children,
-    ...formProps
-  } = props
+  const { defaultValues, validateForm, onFormSubmit, ...formProps } = props
 
   const form = Ariakit.useFormStore({ defaultValues })
 
-  form.useSubmit((formState) => {
-    return runAction(formAction, [formState, form]).then(() => {
-      onFormSubmit?.(formState, form)
+  useEffectOnce(() => {
+    const cleanupSubmit = form.onSubmit((formState) => {
+      return onFormSubmit?.(formState, form)
     })
-  })
 
-  form.useValidate((formState) => {
-    return validateForm?.(formState, form)
+    const cleanupValidate = form.onValidate((formState) => {
+      return validateForm?.(formState, form)
+    })
+
+    return () => {
+      cleanupSubmit()
+      cleanupValidate()
+    }
   })
 
   return (
     <Ariakit.FormProvider store={form}>
-      <Ariakit.Form {...propsWithCn(formProps, 'flex flex-col gap-8')}>
-        {typeof children === 'function' ? children(formAction) : children}
-      </Ariakit.Form>
+      <Ariakit.Form {...propsWithCn(formProps, 'flex flex-col gap-8')} />
     </Ariakit.FormProvider>
   )
 }
 
-export { Form, type FormProps, type FormCallback, type FormAction }
+export { Form, type FormProps, type FormCallback }

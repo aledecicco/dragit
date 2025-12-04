@@ -19,7 +19,7 @@ Stash of ideas in ~planned implementation order:
 - [ ] Tabs for filtering in branches widget
 - [ ] "Create" option on empty comboboxes
 - [ ] Highlight file sections in scrollbar
-- [ ] Merge continuation
+- [x] Merge continuation
 - [ ] Open files on click
 - [ ] Display old paths in file viewers for moved files
 - [x] Paginate pathspec searches

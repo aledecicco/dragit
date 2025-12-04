@@ -1,11 +1,16 @@
 import type { BranchInfo } from '@/api/models'
 import { useCheckoutBranch } from '@/api/mutations/checkout'
-import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
+import {
+  useBranchOff,
+  useCreateBranchAt,
+  useTrackBranch,
+} from '@/api/mutations/createBranch'
 import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { useMergeBranch } from '@/api/mutations/merge'
 import { usePullBranch } from '@/api/mutations/pullBranch'
 import { useRemoveBranch } from '@/api/mutations/removeBranch'
-import { showCreateBranchDialog } from '@/common/CreateBranchDialog'
+import { requestBranchName } from '@/common/CreateBranchDialog'
+import { runAction } from '@/context/actions'
 import { useSelectedBranches } from '@/context/branches'
 import { MenuItem } from '@/ui/Menu/Item'
 import { Separator } from '@/ui/Separator'
@@ -27,12 +32,14 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
   const createBranch = useCreateBranchAt(branch.name)
   const branchOff = useBranchOff(branch.name)
   const merge = useMergeBranch(branch)
+  const track = useTrackBranch(branch)
 
   return (
     <>
-      {!isCurrentBranch && <MenuItem action={checkout} />}
       {branch.type === 'local' && (
         <>
+          {!isCurrentBranch && <MenuItem action={checkout} />}
+
           <MenuItem action={isCurrentBranch ? pull : fastForward} />
 
           <Separator />
@@ -41,9 +48,8 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
             action={createBranch}
             trackOnly
             onClick={() => {
-              showCreateBranchDialog({
-                fromReference: branch.name,
-                jump: false,
+              requestBranchName(branch.name).then((newBranchName) => {
+                runAction(createBranch, newBranchName)
               })
             }}
           />
@@ -52,9 +58,8 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
             action={branchOff}
             trackOnly
             onClick={() => {
-              showCreateBranchDialog({
-                fromReference: branch.name,
-                jump: true,
+              requestBranchName(branch.name).then((newBranchName) => {
+                runAction(branchOff, newBranchName)
               })
             }}
           />
@@ -67,6 +72,20 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
             </>
           )}
         </>
+      )}
+
+      {branch.type === 'remote' && (
+        <MenuItem
+          action={track}
+          trackOnly
+          onClick={() => {
+            requestBranchName(branch.name, branch.name.split('/').at(-1)).then(
+              (newBranchName) => {
+                runAction(branchOff, newBranchName)
+              },
+            )
+          }}
+        />
       )}
     </>
   )

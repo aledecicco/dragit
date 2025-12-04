@@ -6,24 +6,23 @@ import {
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
-import { hideDialog } from '@/context/dialogs'
 import {
   setNextPage,
   setPrevPage,
   useHandleFilesPageSync,
   useWorktreeFilesPage,
 } from '@/context/pages'
-import type { AskForValueProps } from '@/lib/AskForValueDialog'
 import { Pagination } from '@/lib/Pagination'
 import type { Shortcut } from '@/lib/ShortcutsCheatsheet'
+import { requestValueFromDialog } from '@/lib/ValueRequester/Dialog'
 import { VirtualizedDiv } from '@/lib/VirtualizedDiv'
-import { CommandMenu } from '@/ui/CommandMenu'
+import { CommandMenu, type CommandMenuProps } from '@/ui/CommandMenu'
 import { CommandMenuItem } from '@/ui/CommandMenu/Item'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
 interface FileSelectorDialogProps<T extends WorktreeFileType>
-  extends AskForValueProps<{ path: string }> {
+  extends CommandMenuProps {
   /**
    * The types of files to match.
    */
@@ -66,7 +65,7 @@ const PAGINATION_SHORTCUTS: Shortcut[] = [
 const FileSelectorDialog = <T extends WorktreeFileType>(
   props: FileSelectorDialogProps<T>,
 ) => {
-  const { types, submitValue, ...askForValueProps } = props
+  const { types, ...commandMenuProps } = props
 
   const [search, setSearch] = useState('')
   const filesQuery = useQueryWorktreeFiles(types, search)
@@ -84,13 +83,13 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
   return (
     <CommandMenu
       shortcuts={shortcuts}
-      onSearchChange={setSearch}
       onKeyDown={(e) => {
         if (e.ctrlKey && e.key === 'Enter') {
           e.preventDefault()
           e.stopPropagation()
-          submitValue({ path: search.length ? search : '.' })
-          hideDialog(askForValueProps.dialogKey)
+          commandMenuProps.submitValue({
+            value: search.length ? search : '.',
+          })
         }
 
         if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
@@ -103,8 +102,11 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
           }
         }
       }}
-      {...askForValueProps}
-      submitValue={(path) => submitValue(path ? { path } : undefined)}
+      {...commandMenuProps}
+      onSearchChange={(newSearch) => {
+        commandMenuProps.onSearchChange?.(newSearch)
+        setSearch(newSearch)
+      }}
       footer={
         showPagination && (
           <Pagination
@@ -147,4 +149,9 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
   )
 }
 
-export { FileSelectorDialog, type FileSelectorDialogProps }
+const requestFilePath = <T extends WorktreeFileType[]>(types: T) =>
+  requestValueFromDialog(FileSelectorDialog, { types }).then(
+    ({ value }) => value,
+  )
+
+export { FileSelectorDialog, type FileSelectorDialogProps, requestFilePath }

@@ -101,7 +101,7 @@ const Dialog = (props: DialogProps) => {
 
           {heading && (
             <Ariakit.DialogHeading
-              className={cn('text-xl font-bold text-center -mt-2 mb-6')}
+              className={cn('text-xl font-semibold text-center -mt-2 mb-6')}
             >
               {heading}
             </Ariakit.DialogHeading>

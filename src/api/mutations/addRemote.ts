@@ -1,8 +1,7 @@
 import { IconDeviceFloppy } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { RemoteFormValues } from '@/common/RemotesDialog/Form'
-import type { FormAction } from '@/ui/Form'
+import type { Action } from '@/context/actions'
 
 import type { RemoteName } from '../models'
 import {
@@ -31,7 +30,7 @@ const addRemoteMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useAddRemote = (): FormAction<RemoteFormValues> => {
+const useAddRemote = (): Action<AddRemoteArgs> => {
   const addRemote = useRepositoryMutation(addRemoteMutation)
 
   return {
@@ -43,13 +42,8 @@ const useAddRemote = (): FormAction<RemoteFormValues> => {
       success: 'Saved',
       error: 'Failed',
     },
-    run: async ([formState]) => {
-      if (formState.values.name && formState.values.url) {
-        await addRemote.mutateAsync({
-          name: formState.values.name,
-          url: formState.values.url,
-        })
-      }
+    run: async (args) => {
+      await addRemote.mutateAsync(args)
     },
   }
 }

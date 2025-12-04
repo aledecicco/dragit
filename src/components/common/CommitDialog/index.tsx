@@ -1,12 +1,14 @@
 import { useCommitIndex } from '@/api/mutations/commitIndex'
-import { showDialog } from '@/context/dialogs'
-import type { DialogProps } from '@/ui/Dialog'
+import { DecoratedButton } from '@/lib/DecoratedButton'
+import {
+  requestValueFromDialog,
+  ValueRequesterDialog,
+  type ValueRequesterDialogProps,
+} from '@/lib/ValueRequester/Dialog'
 import { TextField } from '@/ui/Form/TextField'
-import { FormDialog } from '@/ui/FormDialog'
 
-const COMMIT_DIALOG_KEY = 'commit_dialog'
-
-interface CommitDialogProps extends Omit<DialogProps, 'dialogKey'> {}
+interface CommitDialogProps
+  extends ValueRequesterDialogProps<CommitFormValues> {}
 
 interface CommitFormValues {
   message: string
@@ -20,26 +22,24 @@ interface CommitFormValues {
  */
 const CommitDialog = (props: CommitDialogProps) => {
   const { ...dialogProps } = props
-  const defaultValues: CommitFormValues = { message: '', isAmend: false }
   const commit = useCommitIndex()
 
   return (
-    <FormDialog
-      dialogKey={COMMIT_DIALOG_KEY}
-      heading="Commit Changes"
-      formOptions={{
-        defaultValues,
-        formAction: commit,
-      }}
-      {...dialogProps}
-    >
+    <ValueRequesterDialog heading="Commit Changes" {...dialogProps}>
       <TextField label="Commit Message" name="message" autoFocus required />
-    </FormDialog>
+
+      <DecoratedButton
+        type="submit"
+        label={commit.label.idle}
+        Glyph={commit.Glyph}
+      />
+    </ValueRequesterDialog>
   )
 }
 
-const showCommitDialog = (props?: Partial<CommitDialogProps>) => {
-  showDialog(COMMIT_DIALOG_KEY, CommitDialog, props ?? {})
-}
+const requestCommitParams = () =>
+  requestValueFromDialog(CommitDialog, {
+    formOptions: { defaultValues: { message: '', isAmend: false } },
+  })
 
-export { CommitDialog, showCommitDialog, type CommitDialogProps }
+export { CommitDialog, requestCommitParams, type CommitDialogProps }

@@ -1,11 +1,14 @@
-import { IconGitBranch, IconPlus, IconRouteAltLeft } from '@tabler/icons-react'
+import {
+  IconCloudDown,
+  IconGitBranch,
+  IconPlus,
+  IconRouteAltLeft,
+} from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { CreateBranchFormValues } from '@/common/CreateBranchDialog'
 import type { Action } from '@/context/actions'
-import type { FormAction } from '@/ui/Form'
 
-import type { BranchName, RefName } from '../models'
+import type { BranchInfo, BranchName, RefName } from '../models'
 import {
   mutationOptions,
   pathMutationKey,
@@ -51,9 +54,7 @@ const useCreateBranch = (): Action<CreateBranchArgs> => {
   }
 }
 
-const useCreateBranchAt = (
-  reference: RefName,
-): FormAction<CreateBranchFormValues> => {
+const useCreateBranchAt = (reference: RefName): Action<BranchName> => {
   const createBranch = useCreateBranch()
 
   return {
@@ -65,21 +66,39 @@ const useCreateBranchAt = (
       error: 'Failed to create branch',
     },
     Glyph: IconPlus,
-    run: ([formState]) =>
+    run: (name) =>
       createBranch.run({
-        branchName: formState.values.name,
+        branchName: name,
         fromReference: reference,
       }),
   }
 }
 
-const useBranchOff = (
-  reference: RefName,
-): FormAction<CreateBranchFormValues> => {
+const useTrackBranch = (branch: BranchInfo): Action<BranchName> => {
+  const createBranch = useCreateBranch()
+
+  return {
+    id: `create_branch:${branch.name}`,
+    label: {
+      idle: 'Track this branch',
+      running: 'Creating branch',
+      success: 'Branch created',
+      error: 'Failed to create branch',
+    },
+    Glyph: IconCloudDown,
+    run: (name) =>
+      createBranch.run({
+        branchName: name,
+        fromReference: branch.name,
+      }),
+  }
+}
+
+const useBranchOff = (reference: RefName): Action<BranchName> => {
   const checkout = useCheckout()
 
   return {
-    id: 'checkout',
+    id: `create_branch:${reference}`,
     label: {
       idle: 'Branch off from here',
       running: 'Creating branch',
@@ -87,9 +106,9 @@ const useBranchOff = (
       error: 'Failed to create branch',
     },
     Glyph: IconRouteAltLeft,
-    run: ([formState]) =>
+    run: (name) =>
       checkout.run({
-        reference: formState.values.name,
+        reference: name,
         isNew: true,
         fromReference: reference,
       }),
@@ -99,6 +118,7 @@ const useBranchOff = (
 export {
   useCreateBranch,
   useCreateBranchAt,
+  useTrackBranch,
   useBranchOff,
   createBranchKey,
   createBranchMutation,

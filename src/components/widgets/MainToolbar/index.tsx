@@ -3,10 +3,9 @@ import { useStageFiles } from '@/api/mutations/addToIndex'
 import { useCommitIndex } from '@/api/mutations/commitIndex'
 import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
 import { useSaveStash } from '@/api/mutations/saveStash'
-import { showCommitDialog } from '@/common/CommitDialog'
-import { FileSelectorDialog } from '@/common/FileSelectorDialog'
+import { requestCommitParams } from '@/common/CommitDialog'
+import { requestFilePath } from '@/common/FileSelectorDialog'
 import { runAction } from '@/context/actions'
-import { askForValue } from '@/lib/AskForValueDialog'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 
@@ -40,10 +39,8 @@ const MainToolbar = (props: MainToolbarProps) => {
               'untracked',
             ]
 
-            askForValue(FileSelectorDialog, {
-              types,
-            }).then((filesParam) => {
-              runAction(stageFiles, [filesParam.path])
+            requestFilePath(types).then((path) => {
+              runAction(stageFiles, [path])
             })
           },
         }}
@@ -60,10 +57,8 @@ const MainToolbar = (props: MainToolbarProps) => {
           onClick: () => {
             const types: WorktreeFileType[] = ['staged']
 
-            askForValue(FileSelectorDialog, {
-              types,
-            }).then((filesParam) => {
-              runAction(unstageFiles, [filesParam.path])
+            requestFilePath(types).then((path) => {
+              runAction(unstageFiles, [path])
             })
           },
         }}
@@ -84,10 +79,8 @@ const MainToolbar = (props: MainToolbarProps) => {
               'untracked',
             ]
 
-            askForValue(FileSelectorDialog, {
-              types,
-            }).then((filesParam) => {
-              runAction(saveStash, [filesParam.path])
+            requestFilePath(types).then((path) => {
+              runAction(saveStash, [path])
             })
           },
         }}
@@ -102,7 +95,9 @@ const MainToolbar = (props: MainToolbarProps) => {
           mainAction: commit,
           trackOnly: true,
           onClick: () => {
-            showCommitDialog()
+            requestCommitParams().then((commitParams) => {
+              runAction(commit, commitParams)
+            })
           },
         }}
       />

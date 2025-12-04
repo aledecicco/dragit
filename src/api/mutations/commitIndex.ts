@@ -1,7 +1,7 @@
 import { IconMessageCheck } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { FormAction } from '@/ui/Form'
+import type { Action } from '@/context/actions'
 
 import {
   mutationOptions,
@@ -29,15 +29,13 @@ const commitIndexMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useCommitIndex = (): FormAction<CommitIndexArgs> => {
+const useCommitIndex = (): Action<CommitIndexArgs> => {
   const commitIndex = useRepositoryMutation(commitIndexMutation)
 
   return {
     id: 'commit_index',
-    run: async ([formState]) => {
-      if (formState.values.message) {
-        await commitIndex.mutateAsync(formState.values)
-      }
+    run: async (args) => {
+      await commitIndex.mutateAsync(args)
     },
     label: {
       idle: 'Commit',
