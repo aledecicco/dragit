@@ -33,7 +33,8 @@ const saveStashMutation = (repoPath: string) =>
 const useSaveStash = (): Action<string[]> => {
   const saveStash = useRepositoryMutation(saveStashMutation)
   return {
-    id: 'save_stash',
+    id: { key: 'files_operation', operation: 'save_stash' },
+    blockedBy: [{ key: 'files_operation' }],
     run: async (files) => {
       await saveStash.mutateAsync({
         files,

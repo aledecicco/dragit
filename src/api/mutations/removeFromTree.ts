@@ -33,7 +33,8 @@ const useMarkAsRemoved = (file: WorktreeFileInfo): Action => {
   const remove = useRepositoryMutation(removeFromTreeMutation)
 
   return {
-    id: `remove_from_tree:${file.path}`,
+    id: { key: 'file_operation', operation: 'remove_file', file: file.path },
+    blockedBy: [{ key: 'file_operation' }],
     run: async () => {
       await remove.mutateAsync({ files: [file.path] })
     },

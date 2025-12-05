@@ -33,7 +33,8 @@ const useDiscardStash = (stash: StashInfo): Action => {
   const discardStash = useRepositoryMutation(discardStashMutation)
 
   return {
-    id: `discard_stash:${stash.id}`,
+    id: { key: 'stash_operation', operation: 'discard', stash: stash.id },
+    blockedBy: [{ stash: stash.id }],
     run: async () => {
       await discardStash.mutateAsync({ stashId: stash.id })
     },

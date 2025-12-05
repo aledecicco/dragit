@@ -9,7 +9,7 @@ interface BranchToolbarProps extends Partial<ToolbarProps> {
   /**
    * The branch to operate on.
    */
-  branch: BranchInfo | undefined
+  branch: BranchInfo
 
   /**
    * Whether this is the branch being used as base for comparison.

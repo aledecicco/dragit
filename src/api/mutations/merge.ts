@@ -33,7 +33,12 @@ const useMerge = (): Action<MergeArgs> => {
   const merge = useRepositoryMutation(mergeMutation)
 
   return {
-    id: 'merge',
+    id: {
+      key: 'modify_branch',
+      operation: 'merge',
+      type: 'current',
+    },
+    blockedBy: [{ key: 'modify_branch', type: 'current' }],
     run: async (args) => {
       await merge.mutateAsync(args)
     },
@@ -51,7 +56,12 @@ const useMergeBranch = (branch: BranchInfo): Action => {
   const merge = useRepositoryMutation(mergeMutation)
 
   return {
-    id: `merge:${branch.name}`,
+    id: {
+      key: 'modify_branch',
+      operation: 'merge',
+      type: 'current',
+    },
+    blockedBy: [{ key: 'modify_branch', type: 'current' }],
     run: async () => {
       await merge.mutateAsync({ reference: branch.name })
     },
@@ -69,7 +79,12 @@ const useMergeCommit = (commit: CommitId): Action => {
   const merge = useRepositoryMutation(mergeMutation)
 
   return {
-    id: `merge:${commit}`,
+    id: {
+      key: 'modify_branch',
+      operation: 'merge',
+      type: 'current',
+    },
+    blockedBy: [{ key: 'modify_branch', type: 'current' }],
     run: async () => {
       await merge.mutateAsync({ reference: commit })
     },

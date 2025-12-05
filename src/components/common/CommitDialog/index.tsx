@@ -6,6 +6,7 @@ import {
   type ValueRequesterDialogProps,
 } from '@/lib/ValueRequester/Dialog'
 import { TextField } from '@/ui/Form/TextField'
+import { cn } from '@/utils/styles'
 
 interface CommitDialogProps
   extends ValueRequesterDialogProps<CommitFormValues> {}
@@ -32,6 +33,8 @@ const CommitDialog = (props: CommitDialogProps) => {
         type="submit"
         label={commit.label.idle}
         Glyph={commit.Glyph}
+        className={cn('w-full')}
+        status="primary"
       />
     </ValueRequesterDialog>
   )

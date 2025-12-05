@@ -28,7 +28,8 @@ const useAbortRebase = (): Action => {
   const abortRebase = useRepositoryMutation(abortRebaseMutation)
 
   return {
-    id: 'abort_rebase',
+    id: { key: 'merge_operation', operation: 'abort_rebase' },
+    blockedBy: [{ key: 'merge_operation' }],
     run: async () => {
       await abortRebase.mutateAsync()
     },

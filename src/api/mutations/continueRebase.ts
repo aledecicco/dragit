@@ -28,7 +28,8 @@ const useContinueRebase = (): Action => {
   const continueRebase = useRepositoryMutation(continueRebaseMutation)
 
   return {
-    id: 'continue_rebase',
+    id: { key: 'merge_operation', operation: 'continue_rebase' },
+    blockedBy: [{ key: 'merge_operation' }],
     run: async () => {
       await continueRebase.mutateAsync()
     },

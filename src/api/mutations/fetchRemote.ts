@@ -29,18 +29,19 @@ const fetchRemoteMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const useFetchRemote = (remote: RemoteName | undefined): Action => {
+const useFetchRemote = (name: RemoteName): Action => {
   const fetchRemote = useRepositoryMutation(fetchRemoteMutation)
 
   return {
-    id: `fetch_remote:${remote}`,
+    id: {
+      key: 'remote_operation',
+      operation: 'fetch',
+      remote: name,
+    },
+    blockedBy: [{ key: 'remote_operation', remote: name }],
     run: async () => {
-      if (!remote) {
-        throw new Error('No remote specified')
-      }
-
       await fetchRemote.mutateAsync({
-        remote,
+        remote: name,
       })
     },
     label: {

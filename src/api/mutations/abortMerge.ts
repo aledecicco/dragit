@@ -28,7 +28,8 @@ const useAbortMerge = (): Action => {
   const abortMerge = useRepositoryMutation(abortMergeMutation)
 
   return {
-    id: 'abort_merge',
+    id: { key: 'merge_operation', operation: 'abort_merge' },
+    blockedBy: [{ key: 'merge_operation' }],
     run: async () => {
       await abortMerge.mutateAsync()
     },

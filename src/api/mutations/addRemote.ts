@@ -34,7 +34,7 @@ const useAddRemote = (): Action<AddRemoteArgs> => {
   const addRemote = useRepositoryMutation(addRemoteMutation)
 
   return {
-    id: 'add_remote',
+    id: { key: 'add_remote' },
     Glyph: IconDeviceFloppy,
     label: {
       idle: 'Save',

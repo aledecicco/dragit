@@ -33,16 +33,17 @@ const pushBranchMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const usePushBranch = (branch: BranchInfo | undefined): Action => {
+const usePushBranch = (branch: BranchInfo): Action => {
   const pushBranch = useRepositoryMutation(pushBranchMutation)
 
   return {
-    id: `push_branch:${branch?.name}`,
+    id: {
+      key: 'modify_branch',
+      operation: 'push',
+      branch: branch.name,
+    },
+    blockedBy: [{ key: 'modify_branch', branch: branch.name }],
     run: async () => {
-      if (!branch) {
-        throw new Error('No branch specified')
-      }
-
       if (branch.type !== 'local') {
         throw new Error('Branch is not local')
       }
@@ -65,16 +66,17 @@ const usePushBranch = (branch: BranchInfo | undefined): Action => {
   }
 }
 
-const useForcePushBranch = (branch: BranchInfo | undefined): Action => {
+const useForcePushBranch = (branch: BranchInfo): Action => {
   const pushBranch = useRepositoryMutation(pushBranchMutation)
 
   return {
-    id: `force_push_branch:${branch?.name}`,
+    id: {
+      key: 'modify_branch',
+      operation: 'force_push',
+      branch: branch.name,
+    },
+    blockedBy: [{ key: 'modify_branch', branch: branch.name }],
     run: async () => {
-      if (!branch) {
-        throw new Error('No branch specified')
-      }
-
       if (branch.type !== 'local') {
         throw new Error('Branch is not local')
       }

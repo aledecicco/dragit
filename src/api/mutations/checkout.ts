@@ -36,7 +36,11 @@ const useCheckout = (): Action<CheckoutArgs> => {
   const checkout = useRepositoryMutation(checkoutMutation)
 
   return {
-    id: 'checkout',
+    id: {
+      key: 'branch_operation',
+      operation: 'checkout',
+    },
+    blockedBy: [{ key: 'branch_operation' }],
     run: async (args) => {
       await checkout.mutateAsync(args)
     },
@@ -55,6 +59,12 @@ const useCheckoutBranch = (branch: BranchInfo): Action => {
 
   return {
     ...checkout,
+    id: {
+      key: 'branch_operation',
+      operation: 'checkout',
+      branch: branch.name,
+    },
+    blockedBy: [{ key: 'branch_operation' }],
     run: () => checkout.run({ reference: branch.name, isNew: false }),
   }
 }
@@ -64,7 +74,11 @@ const useSwitchBranches = (): Action => {
   const checkout = useRepositoryMutation(checkoutMutation)
 
   return {
-    id: 'switch_branches',
+    id: {
+      key: 'branch_operation',
+      operation: 'switch',
+    },
+    blockedBy: [{ key: 'branch_operation' }],
     run: async () => {
       if (baseBranch) {
         await checkout.mutateAsync({

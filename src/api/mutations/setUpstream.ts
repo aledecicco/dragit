@@ -34,16 +34,17 @@ const setUpstreamMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useSetUpstream = (branch: BranchInfo | undefined): Action<RemoteRef> => {
+const useSetUpstream = (branch: BranchInfo): Action<RemoteRef> => {
   const setUpstream = useRepositoryMutation(setUpstreamMutation)
 
   return {
-    id: `set_upstream:${branch}`,
+    id: {
+      key: 'modify_branch',
+      operation: 'set_upstream',
+      branch: branch.name,
+    },
+    blockedBy: [{ key: 'modify_branch', branch: branch.name }],
     run: async (remoteRef: RemoteRef) => {
-      if (!branch) {
-        throw new Error('No branch specified')
-      }
-
       if (branch.type !== 'local') {
         throw new Error('Branch is not local')
       }

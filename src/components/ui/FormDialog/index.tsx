@@ -20,10 +20,9 @@ const FormDialog = <T extends AnyObject>(props: FormDialogProps<T>) => {
     <Dialog {...dialogProps}>
       <Form
         {...formOptions}
-        onFormSubmit={(formState, form) => {
-          formOptions.onFormSubmit?.(formState, form)?.then(() => {
-            hideDialog(dialogProps.dialogKey)
-          })
+        onFormSubmit={async (formState, form) => {
+          await formOptions.onFormSubmit?.(formState, form)
+          hideDialog(dialogProps.dialogKey)
         }}
       >
         {children}

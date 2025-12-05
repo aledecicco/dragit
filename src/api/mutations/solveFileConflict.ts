@@ -44,7 +44,13 @@ const useAcceptOurs = (file: UnmergedFileInfo): Action => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
-    id: `solve_file_conflict:ours:${file.path}`,
+    id: {
+      key: 'file_operation',
+      operation: 'solve_conflict',
+      file: file.path,
+      resolution: 'ours',
+    },
+    blockedBy: [{ key: 'file_operation', file: file.path }],
     run: async () => {
       await solveFileConflict.mutateAsync({
         filepath: file.path,
@@ -67,7 +73,13 @@ const useAcceptTheirs = (file: UnmergedFileInfo): Action => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
-    id: `solve_file_conflict:theirs:${file.path}`,
+    id: {
+      key: 'file_operation',
+      operation: 'solve_conflict',
+      file: file.path,
+      resolution: 'theirs',
+    },
+    blockedBy: [{ key: 'file_operation', file: file.path }],
     run: async () => {
       await solveFileConflict.mutateAsync({
         filepath: file.path,
@@ -89,7 +101,13 @@ const useAcceptAsIs = (file: UnmergedFileInfo): Action => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
-    id: `solve_file_conflict:manual:${file.path}`,
+    id: {
+      key: 'file_operation',
+      operation: 'solve_conflict',
+      file: file.path,
+      resolution: 'manual',
+    },
+    blockedBy: [{ key: 'file_operation', file: file.path }],
     run: async () => {
       await addToIndex.mutateAsync({ files: [file.path] })
     },
@@ -107,7 +125,13 @@ const useAcceptDeletion = (file: UnmergedFileInfo): Action => {
   const removeFromTree = useRepositoryMutation(removeFromTreeMutation)
 
   return {
-    id: `solve_file_conflict:delete:${file.path}`,
+    id: {
+      key: 'file_operation',
+      operation: 'solve_conflict',
+      file: file.path,
+      resolution: 'delete',
+    },
+    blockedBy: [{ key: 'file_operation', file: file.path }],
     run: async () => {
       await removeFromTree.mutateAsync({ files: [file.path] })
     },
@@ -125,7 +149,13 @@ const useIgnoreDeletion = (file: UnmergedFileInfo): Action => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
-    id: `solve_file_conflict:dont_delete:${file.path}`,
+    id: {
+      key: 'file_operation',
+      operation: 'solve_conflict',
+      file: file.path,
+      resolution: 'dont_delete',
+    },
+    blockedBy: [{ key: 'file_operation', file: file.path }],
     run: async () => {
       await addToIndex.mutateAsync({ files: [file.path] })
     },
@@ -143,7 +173,13 @@ const useAcceptFile = (file: UnmergedFileInfo): Action => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
-    id: `solve_file_conflict:accept:${file.path}`,
+    id: {
+      key: 'file_operation',
+      operation: 'solve_conflict',
+      file: file.path,
+      resolution: 'accept',
+    },
+    blockedBy: [{ key: 'file_operation', file: file.path }],
     run: async () => {
       await addToIndex.mutateAsync({ files: [file.path] })
     },
@@ -161,7 +197,13 @@ const useIgnoreFile = (file: UnmergedFileInfo): Action => {
   const removeFromTree = useRepositoryMutation(removeFromTreeMutation)
 
   return {
-    id: `solve_file_conflict:ignore:${file.path}`,
+    id: {
+      key: 'file_operation',
+      operation: 'solve_conflict',
+      file: file.path,
+      resolution: 'ignore',
+    },
+    blockedBy: [{ key: 'file_operation', file: file.path }],
     run: async () => {
       await removeFromTree.mutateAsync({ files: [file.path] })
     },

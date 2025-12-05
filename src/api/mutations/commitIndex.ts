@@ -33,7 +33,12 @@ const useCommitIndex = (): Action<CommitIndexArgs> => {
   const commitIndex = useRepositoryMutation(commitIndexMutation)
 
   return {
-    id: 'commit_index',
+    id: {
+      key: 'modify_branch',
+      operation: 'commit',
+      type: 'current',
+    },
+    blockedBy: [{ key: 'modify_branch', type: 'current' }],
     run: async (args) => {
       await commitIndex.mutateAsync(args)
     },

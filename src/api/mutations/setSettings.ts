@@ -25,7 +25,7 @@ const useSaveSettings = (): Action<Settings> => {
   const setSettings = useMutation(setSettingsMutation)
 
   return {
-    id: 'set_settings',
+    id: { key: 'set_settings' },
     run: async (settings) => {
       await setSettings.mutateAsync({ settings })
     },

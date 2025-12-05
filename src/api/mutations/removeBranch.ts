@@ -33,7 +33,12 @@ const useRemoveBranch = (branch: BranchInfo): Action => {
   const removeBranch = useRepositoryMutation(removeBranchMutation)
 
   return {
-    id: `remove_branch:${branch.name}`,
+    id: {
+      key: 'modify_branch',
+      operation: 'remove',
+      branch: branch.name,
+    },
+    blockedBy: [{ key: 'modify_branch', branch: branch.name }],
     run: async () => {
       await removeBranch.mutateAsync({ branchName: branch.name })
     },

@@ -8,6 +8,7 @@ import {
   type ValueRequesterDialogProps,
 } from '@/lib/ValueRequester/Dialog'
 import { InputField } from '@/ui/Form/InputField'
+import { cn } from '@/utils/styles'
 
 interface CreateBranchDialogProps
   extends ValueRequesterDialogProps<CreateBranchFormValues> {
@@ -55,6 +56,8 @@ const CreateBranchDialog = (props: CreateBranchDialogProps) => {
         type="submit"
         label={createBranch.label.idle}
         Glyph={createBranch.Glyph}
+        className={cn('w-full')}
+        status="primary"
       />
     </ValueRequesterDialog>
   )

@@ -28,7 +28,7 @@ const useInitRepository = (): Action => {
   const initRepository = useRepositoryMutation(initRepositoryMutation)
 
   return {
-    id: 'init_repository',
+    id: { key: 'init_repository' },
     run: async () => {
       await initRepository.mutateAsync()
     },

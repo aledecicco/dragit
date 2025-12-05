@@ -20,7 +20,7 @@ const useActionButtonTracker = <T>(
   alternatives: Action[] | undefined,
 ): ActionPresenter => {
   const actions = [mainAction, ...(alternatives ?? [])]
-  const statuses = useActionStatuses(actions.map((action) => action.id))
+  const statuses = useActionStatuses(actions)
 
   const activeAction =
     actions.find((_, index) => statuses[index] === 'running') ??

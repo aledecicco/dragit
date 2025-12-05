@@ -40,7 +40,9 @@ const useCreateBranch = (): Action<CreateBranchArgs> => {
   const createBranch = useRepositoryMutation(createBranchMutation)
 
   return {
-    id: 'create_branch',
+    id: {
+      key: 'create_branch',
+    },
     run: async (args) => {
       await createBranch.mutateAsync(args)
     },
@@ -58,7 +60,10 @@ const useCreateBranchAt = (reference: RefName): Action<BranchName> => {
   const createBranch = useCreateBranch()
 
   return {
-    id: `create_branch:${reference}`,
+    id: {
+      key: 'create_branch_at',
+      at: reference,
+    },
     label: {
       idle: 'Create branch here',
       running: 'Creating branch',
@@ -78,7 +83,10 @@ const useTrackBranch = (branch: BranchInfo): Action<BranchName> => {
   const createBranch = useCreateBranch()
 
   return {
-    id: `create_branch:${branch.name}`,
+    id: {
+      key: 'create_branch_at',
+      at: branch.name,
+    },
     label: {
       idle: 'Track this branch',
       running: 'Creating branch',
@@ -98,7 +106,12 @@ const useBranchOff = (reference: RefName): Action<BranchName> => {
   const checkout = useCheckout()
 
   return {
-    id: `create_branch:${reference}`,
+    id: {
+      key: 'branch_operation',
+      operation: 'checkout',
+      at: reference,
+    },
+    blockedBy: [{ key: 'branch_operation' }],
     label: {
       idle: 'Branch off from here',
       running: 'Creating branch',

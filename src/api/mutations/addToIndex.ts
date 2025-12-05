@@ -33,7 +33,8 @@ const useStageFile = (file: WorktreeFileInfo): Action => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
-    id: `add_file:${file.path}`,
+    id: { key: 'file_operation', operation: 'add_file', file: file.path },
+    blockedBy: [{ key: 'file_operation', file: file.path }],
     run: async () => {
       await addToIndex.mutateAsync({ files: [file.path] })
     },
@@ -51,7 +52,8 @@ const useStageFiles = (): Action<string[]> => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
-    id: 'add_files',
+    id: { key: 'file_operation', operation: 'add_files' },
+    blockedBy: [{ key: 'file_operation' }],
     run: async (files) => {
       await addToIndex.mutateAsync({
         files,

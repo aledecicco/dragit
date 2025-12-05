@@ -33,7 +33,8 @@ const useApplyStash = (stash: StashInfo): Action => {
   const applyStash = useRepositoryMutation(applyStashMutation)
 
   return {
-    id: `apply_stash:${stash.id}`,
+    id: { key: 'file_operation', operation: 'apply_stash', stash: stash.id },
+    blockedBy: [{ key: 'file_operation' }, { stash: stash.id }],
     run: async () => {
       await applyStash.mutateAsync({ stashId: stash.id })
     },

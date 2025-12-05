@@ -44,18 +44,22 @@ const Graph = (props: GraphProps) => {
       >
         <BranchSelectors />
 
-        <BranchToolbar
-          className={cn('col-start-1 row-start-2 w-40')}
-          branch={currentBranch}
-          fixed
-        />
+        {currentBranch && (
+          <BranchToolbar
+            className={cn('col-start-1 row-start-2 w-40')}
+            branch={currentBranch}
+            fixed
+          />
+        )}
 
-        <BranchToolbar
-          className={cn('col-start-3 row-start-2 w-40')}
-          branch={baseBranch}
-          isBase
-          fixed
-        />
+        {baseBranch && (
+          <BranchToolbar
+            className={cn('col-start-3 row-start-2 w-40')}
+            branch={baseBranch}
+            isBase
+            fixed
+          />
+        )}
 
         <GraphInner />
       </div>

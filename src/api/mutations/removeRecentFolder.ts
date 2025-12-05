@@ -24,7 +24,7 @@ const useRemoveRecentFolder = (recentPath: string): Action => {
   const remove = useMutation(removeRecentFolderMutation)
 
   return {
-    id: `remove_recent:${recentPath}`,
+    id: { key: 'remove_recent_folder', path: recentPath },
     run: async () => {
       await remove.mutateAsync({ recentPath })
     },

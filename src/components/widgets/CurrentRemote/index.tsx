@@ -6,7 +6,7 @@ import {
   IconWorldQuestion,
 } from '@tabler/icons-react'
 
-import type { RemoteName } from '@/api/models'
+import type { RemoteName, Upstream } from '@/api/models'
 import { useFetchRemote } from '@/api/mutations/fetchRemote'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryRemotes } from '@/api/queries/remotes'
@@ -30,7 +30,6 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
   const { currentBranch } = useSelectedBranches()
   const upstream = useCurrentUpstream()
 
-  const fetchRemote = useFetchRemote(upstream?.remote)
   const remotesQuery = useQueryRemotes()
   const branchesQuery = useQueryBranches()
 
@@ -126,13 +125,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         }}
       />
 
-      <ActionButton
-        compact
-        round
-        disabled={!upstream}
-        className={cn('mx-2')}
-        mainAction={fetchRemote}
-      />
+      {upstream && <FetchUpstream upstream={upstream} />}
 
       <DecoratedButton
         compact
@@ -144,6 +137,20 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         }}
       />
     </div>
+  )
+}
+
+const FetchUpstream = (props: { upstream: Upstream }) => {
+  const { upstream } = props
+  const fetchRemote = useFetchRemote(upstream.remote)
+
+  return (
+    <ActionButton
+      compact
+      round
+      className={cn('mx-2')}
+      mainAction={fetchRemote}
+    />
   )
 }
 

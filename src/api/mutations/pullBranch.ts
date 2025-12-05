@@ -32,16 +32,20 @@ const pullBranchMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const usePullBranch = (branch: BranchInfo | undefined): Action => {
+const usePullBranch = (branch: BranchInfo): Action => {
   const pullBranch = useRepositoryMutation(pullBranchMutation)
 
   return {
-    id: `pull_branch:${branch?.name}`,
+    id: {
+      key: 'modify_branch',
+      operation: 'pull',
+      type: 'current',
+    },
+    blockedBy: [
+      { key: 'modify_branch', branch: branch.name },
+      { key: 'modify_branch', type: 'current' },
+    ],
     run: async () => {
-      if (!branch) {
-        throw new Error('No branch specified')
-      }
-
       if (branch.type !== 'local') {
         throw new Error('Branch is not local')
       }

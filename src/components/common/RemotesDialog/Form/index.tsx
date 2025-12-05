@@ -2,7 +2,7 @@ import { IconX } from '@tabler/icons-react'
 
 import { useAddRemote } from '@/api/mutations/addRemote'
 import { useQueryRemotes } from '@/api/queries/remotes'
-import { useActionStatuses } from '@/context/actions'
+import { runAction, useActionStatuses } from '@/context/actions'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { Form, type FormProps } from '@/ui/Form'
@@ -29,12 +29,20 @@ const RemoteForm = (props: RemoteFormProps) => {
 
   const remotesQuery = useQueryRemotes()
   const addRemote = useAddRemote()
-  const status = useActionStatuses(addRemote.id)
+  const status = useActionStatuses(addRemote)
 
   return (
     <Form
       defaultValues={{ name: '', url: '' }}
       {...propsWithCn(formProps, 'flex flex-row gap-1')}
+      onFormSubmit={(formState) => {
+        if (formState.values.name && formState.values.url) {
+          runAction(addRemote, {
+            name: formState.values.name,
+            url: formState.values.url,
+          })
+        }
+      }}
       validateForm={(formState, form) => {
         formProps.validateForm?.(formState, form)
 
@@ -48,6 +56,7 @@ const RemoteForm = (props: RemoteFormProps) => {
       }}
     >
       <InputField name="name" label="Remote name" required autoFocus compact />
+
       <InputField
         name="url"
         label="Remote URL"
@@ -60,6 +69,8 @@ const RemoteForm = (props: RemoteFormProps) => {
         type="submit"
         className={cn('w-max')}
         mainAction={addRemote}
+        status="primary"
+        trackOnly
         compact
       />
 

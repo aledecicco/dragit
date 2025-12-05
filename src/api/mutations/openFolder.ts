@@ -26,7 +26,7 @@ const useOpenFolder = (): Action<string> => {
   const currentDirQuery = useQueryCurrentDir()
 
   return {
-    id: 'open_folder',
+    id: { key: 'open_folder' },
     run: async (newPath) => {
       await openFolder.mutateAsync({ newPath })
     },

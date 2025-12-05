@@ -28,7 +28,8 @@ const useContinueMerge = (): Action => {
   const continueMerge = useRepositoryMutation(continueMergeMutation)
 
   return {
-    id: 'continue_merge',
+    id: { key: 'merge_operation', operation: 'continue_merge' },
+    blockedBy: [{ key: 'merge_operation' }],
     run: async () => {
       await continueMerge.mutateAsync()
     },

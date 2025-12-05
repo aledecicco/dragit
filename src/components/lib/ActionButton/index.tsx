@@ -79,6 +79,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     .with('running', () => status ?? 'neutral')
     .with('success', () => 'success')
     .with('error', () => 'danger')
+    .with('disabled', () => status ?? 'neutral')
     .exhaustive()
 
   const commonProps = {
@@ -86,6 +87,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     label: label,
     Glyph: Glyph,
     status: buttonStatus,
+    disabled: buttonProps.disabled || actionStatus === 'disabled',
     iconProps: propsWithCn(
       buttonProps.iconProps,
       actionStatus === 'running' ? 'animate-spin' : undefined,
@@ -107,7 +109,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
           label={alternative.label.idle}
           Glyph={alternative.Glyph}
           onClick={() => {
-            if (actionStatus !== 'running') {
+            if (actionStatus !== 'running' && actionStatus !== 'disabled') {
               runAction(alternative)
             }
           }}
@@ -118,6 +120,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
         ...menuButtonProps,
         disabled:
           actionStatus === 'running' ||
+          actionStatus === 'disabled' ||
           menuButtonProps?.disabled ||
           buttonProps.disabled,
       }}

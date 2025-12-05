@@ -34,7 +34,12 @@ const useChangeRemoteUrl = (name: RemoteName): Action<string> => {
   const changeRemoteUrl = useRepositoryMutation(changeRemoteUrlMutation)
 
   return {
-    id: `change_remote_url:${name}`,
+    id: {
+      key: 'remote_operation',
+      operation: 'change_url',
+      remote: name,
+    },
+    blockedBy: [{ key: 'remote_operation' }],
     run: async (newUrl) => {
       await changeRemoteUrl.mutateAsync({ name, newUrl })
     },

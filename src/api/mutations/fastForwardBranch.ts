@@ -31,16 +31,17 @@ const fastForwardBranchMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const useFastForwardBranch = (branch: BranchInfo | undefined): Action => {
+const useFastForwardBranch = (branch: BranchInfo): Action => {
   const fastForwardBranch = useRepositoryMutation(fastForwardBranchMutation)
 
   return {
-    id: `fast_forward_branch:${branch?.name}`,
+    id: {
+      key: 'modify_branch',
+      operation: 'fast_forward',
+      branch: branch.name,
+    },
+    blockedBy: [{ key: 'modify_branch', branch: branch.name }],
     run: async () => {
-      if (!branch) {
-        throw new Error('No branch specified')
-      }
-
       if (branch.type !== 'local') {
         throw new Error('Branch is not local')
       }

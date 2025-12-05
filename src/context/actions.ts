@@ -11,9 +11,10 @@ import { useShallow } from 'zustand/react/shallow'
 import type { Glyph } from '@/ui/Icon'
 import { MS_IN_SECOND } from '@/utils/time'
 
-type ActionId = string
+type ActionId = Record<string, string>
+type HashedId = string
 
-type ActionStatus = 'idle' | 'running' | 'success' | 'error'
+type ActionStatus = 'idle' | 'running' | 'success' | 'error' | 'disabled'
 
 /**
  * An action that can be triggered and tracked, involving an async workload.
@@ -25,10 +26,15 @@ interface Action<T = void> {
   id: ActionId
 
   /**
+   * List of action IDs that block this action while running.
+   */
+  blockedBy?: ActionId[]
+
+  /**
    * Collection of labels for the action, depending on its state.
    */
   label: {
-    [k in ActionStatus]: string
+    [k in Exclude<ActionStatus, 'disabled'>]: string
   }
 
   /**
@@ -46,15 +52,29 @@ interface ActionsTracker {
   /**
    * Map of action IDs to their current status.
    */
-  actions: Map<ActionId, ActionStatus>
+  actions: Map<HashedId, ActionStatus>
 
   /**
    * Map of action IDs to their timeout IDs for managing timers.
    */
-  timers: Map<ActionId, number>
+  timers: Map<HashedId, number>
 }
 
-interface Setters {
+interface Methods {
+  /**
+   * Searches for the status of an action in the tracker.
+   *
+   * @param id - The unique identifier of the action.
+   */
+  getActionStatus: (id: ActionId) => ActionStatus | undefined
+
+  /**
+   * Searches for the timer for an action in the tracker.
+   *
+   * @param id - The unique identifier of the action.
+   */
+  getActionTimer: (id: ActionId) => number | undefined
+
   /**
    * Updates the status of an action in the tracker.
    *
@@ -72,32 +92,40 @@ interface Setters {
   setActionTimer: (id: ActionId, timeoutId: number | undefined) => void
 }
 
-const useActionsStore = create<ActionsTracker & Setters>()(
-  immer((setState) => ({
+const useActionsStore = create<ActionsTracker & Methods>()(
+  immer((setState, getState) => ({
     actions: new Map(),
     timers: new Map(),
+
+    getActionStatus: (id: ActionId) => {
+      return getState().actions.get(hashId(id))
+    },
+
+    getActionTimer: (id: ActionId): number | undefined => {
+      return getState().timers.get(hashId(id))
+    },
 
     setActionStatus: (id: ActionId, status: ActionStatus | undefined) => {
       setState((state) => {
         if (status === undefined) {
-          state.actions.delete(id)
+          state.actions.delete(hashId(id))
         } else {
-          state.actions.set(id, status)
+          state.actions.set(hashId(id), status)
         }
       })
     },
 
     setActionTimer: (id: ActionId, timeoutId: number | undefined) => {
       setState((state) => {
-        const timer = state.timers.get(id)
+        const timer = state.timers.get(hashId(id))
         if (timer !== undefined) {
           clearTimeout(timer)
         }
 
         if (timeoutId === undefined) {
-          state.timers.delete(id)
+          state.timers.delete(hashId(id))
         } else {
-          state.timers.set(id, timeoutId)
+          state.timers.set(hashId(id), timeoutId)
         }
       })
     },
@@ -105,23 +133,88 @@ const useActionsStore = create<ActionsTracker & Setters>()(
 )
 
 /**
+ * Hashes an action ID to be used as a key.
+ */
+const hashId = (id: ActionId): HashedId => {
+  return JSON.stringify(id)
+}
+
+/**
+ * Whether an action's ID contains another action's ID.
+ *
+ * @param search The ID to search for.
+ * @param target The ID to search in.
+ */
+const containsId = (search: ActionId, target: ActionId): boolean => {
+  return Object.entries(search).every(([key, value]) => target[key] === value)
+}
+
+/**
+ * Computes an action's status based on the statuses of all contained actions.
+ */
+const computeActionStatus = (
+  store: ActionsTracker,
+  action: AnyAction,
+): ActionStatus => {
+  const containedStatus: ActionStatus[] = []
+
+  store.actions.forEach((status, actionIdHash) => {
+    const actionId = JSON.parse(actionIdHash) as ActionId
+    if (containsId(action.id, actionId)) {
+      containedStatus.push(status)
+    }
+  })
+
+  if (containedStatus.includes('running')) {
+    return 'running'
+  }
+
+  if (containedStatus.includes('error')) {
+    return 'error'
+  }
+
+  if (containedStatus.includes('success')) {
+    return 'success'
+  }
+
+  let isBlocked = false
+
+  store.actions.forEach((status, actionIdHash) => {
+    const actionId: ActionId = JSON.parse(actionIdHash) as ActionId
+
+    if (
+      status === 'running' &&
+      action.blockedBy?.some((blockingId) => containsId(blockingId, actionId))
+    ) {
+      isBlocked = true
+    }
+  })
+
+  if (isBlocked) {
+    return 'disabled'
+  }
+
+  return 'idle'
+}
+
+/**
  * Hook that facilitates tracking the status of one or more actions.
  *
- * @param id - The unique identifier/s of the action/s to track.
- * @returns An {@link ActionStatus}  for each action ID provided.
+ * @param action - The action/s to track.
+ * @returns An {@link ActionStatus}  for each action provided.
  */
-function useActionStatuses(id: ActionId): ActionStatus
-function useActionStatuses(ids: ActionId[]): ActionStatus[]
-function useActionStatuses(ids: ActionId | ActionId[]) {
+function useActionStatuses(action: AnyAction): ActionStatus
+function useActionStatuses(actions: AnyAction[]): ActionStatus[]
+function useActionStatuses(actions: AnyAction | AnyAction[]) {
   return useActionsStore(
     useShallow((state) => {
-      if (!Array.isArray(ids)) {
-        const actionId = ids
-        return state.actions.get(actionId) || 'idle'
+      if (!Array.isArray(actions)) {
+        const action = actions
+        return computeActionStatus(state, action)
       }
 
-      const statuses = ids.map(
-        (actionId) => state.actions.get(actionId) || 'idle',
+      const statuses = actions.map((action) =>
+        computeActionStatus(state, action),
       )
 
       return statuses
@@ -139,7 +232,7 @@ async function runAction<T>(action: Action<T>, args: T): Promise<void>
 async function runAction(action: Action<void>): Promise<void>
 async function runAction<T>(action: Action<T>, args?: T): Promise<void> {
   const store = useActionsStore.getState()
-  const status = store.actions.get(action.id) ?? 'idle'
+  const status = store.getActionStatus(action.id) ?? 'idle'
 
   if (status !== 'running') {
     store.setActionStatus(action.id, 'running')
@@ -175,6 +268,7 @@ const getActionGlyph = (action: AnyAction, status: ActionStatus): Glyph => {
     .with('running', () => IconLoader2)
     .with('success', () => IconCircleCheckFilled)
     .with('error', () => IconAlertTriangleFilled)
+    .with('disabled', () => action.Glyph)
     .exhaustive()
 }
 
@@ -183,6 +277,7 @@ interface ActionPresenter {
   label: string
   actionStatus: ActionStatus
 }
+
 /**
  * A hook that provides the necessary info to correctly display one or more actions.
  *
@@ -194,7 +289,7 @@ function useActionPresenters(action: AnyAction): ActionPresenter
 function useActionPresenters(actions: AnyAction[]): ActionPresenter[]
 function useActionPresenters(actions: AnyAction | AnyAction[]) {
   const actionStatuses = useActionStatuses(
-    Array.isArray(actions) ? actions.map((action) => action.id) : [actions.id],
+    Array.isArray(actions) ? actions : [actions],
   )
 
   if (!Array.isArray(actions)) {
@@ -203,7 +298,7 @@ function useActionPresenters(actions: AnyAction | AnyAction[]) {
 
     return {
       Glyph: getActionGlyph(action, status),
-      label: action.label[status],
+      label: action.label[status === 'disabled' ? 'idle' : status],
       actionStatus: status,
     }
   }
@@ -213,7 +308,7 @@ function useActionPresenters(actions: AnyAction | AnyAction[]) {
 
     return {
       Glyph: getActionGlyph(action, status),
-      label: action.label[status],
+      label: action.label[status === 'disabled' ? 'idle' : status],
       actionStatus: status,
     }
   })

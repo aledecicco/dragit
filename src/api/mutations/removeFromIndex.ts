@@ -33,7 +33,8 @@ const useUnstageFile = (file: WorktreeFileInfo): Action => {
   const unstage = useRepositoryMutation(removeFromIndexMutation)
 
   return {
-    id: `unstage:${file.path}`,
+    id: { key: 'file_operation', operation: 'unstage_file', file: file.path },
+    blockedBy: [{ key: 'file_operation' }],
     run: async () => {
       await unstage.mutateAsync({ files: [file.path] })
     },
@@ -51,7 +52,8 @@ const useUnstageFiles = (): Action<string[]> => {
   const removeFromIndex = useRepositoryMutation(removeFromIndexMutation)
 
   return {
-    id: 'unstage_files',
+    id: { key: 'file_operation', operation: 'unstage_files' },
+    blockedBy: [{ key: 'file_operation' }],
     run: async (files) => {
       await removeFromIndex.mutateAsync({
         files,
