@@ -86,7 +86,14 @@ const getLineIndicators = (content: FileConflicts): ReactNode => {
     sectionType = line.type
   })
 
-  res.push(<LineIndicator type="unchanged" className={cn('grow')} empty />)
+  res.push(
+    <LineIndicator
+      key={`${content.length + 1}`}
+      type="unchanged"
+      className={cn('grow')}
+      empty
+    />,
+  )
 
   return res
 }

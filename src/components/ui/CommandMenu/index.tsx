@@ -76,6 +76,7 @@ const CommandMenu = (props: CommandMenuProps) => {
       {...propsWithCn(dialogProps, 'rounded-md')}
       formOptions={{
         defaultValues: { value: '' },
+        className: cn('gap-0'),
       }}
       showClose={false}
       heading={undefined}

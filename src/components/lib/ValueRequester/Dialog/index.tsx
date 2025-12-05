@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react'
 
-import { showDialog } from '@/context/dialogs'
+import { hideDialog, showDialog } from '@/context/dialogs'
 import { getUniqueId } from '@/context/ids'
 import { FormDialog, type FormDialogProps } from '@/ui/FormDialog'
 import type { AnyObject, RequireOnly } from '@/utils/types'
@@ -63,7 +63,10 @@ function requestValueFromDialog<T extends AnyObject, P>(
     showDialog(dialogKey, DialogComponent, {
       ...(dialogProps as P),
       dialogKey,
-      submitValue,
+      submitValue: (value) => {
+        submitValue(value)
+        hideDialog(dialogKey)
+      },
     })
   })
 }

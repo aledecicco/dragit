@@ -314,5 +314,5 @@ function useActionPresenters(actions: AnyAction | AnyAction[]) {
   })
 }
 
-export { useActionStatuses, runAction, useActionPresenters }
+export { useActionStatuses, runAction, useActionPresenters, hashId }
 export type { Action, ActionId, ActionStatus, ActionPresenter }

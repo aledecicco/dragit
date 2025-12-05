@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react'
 import { match } from 'ts-pattern'
 
-import { type Action, runAction } from '@/context/actions'
+import { type Action, hashId, runAction } from '@/context/actions'
 import { Button, type ButtonStatus } from '@/ui/Button'
 import { MenuItem } from '@/ui/Menu/Item'
 import { SplitButton } from '@/ui/SplitButton'
@@ -105,7 +105,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
       {...commonProps}
       items={alternatives.map((alternative) => (
         <MenuItem
-          key={alternative.label.idle}
+          key={hashId(alternative.id)}
           label={alternative.label.idle}
           Glyph={alternative.Glyph}
           onClick={() => {
