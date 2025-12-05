@@ -137,8 +137,11 @@ pub async fn remove_branch(
     state: State<'_, AppState>,
     repo_path: &str,
     branch_name: &str,
+    is_remote: bool,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.remove_branch(repo_path, branch_name))
+    with_handler(&state, &|h| {
+        h.remove_branch(repo_path, branch_name, is_remote)
+    })
 }
 
 /// Returns a paginated list of commits leading up to the given reference.

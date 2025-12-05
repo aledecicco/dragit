@@ -8,6 +8,7 @@ import {
 import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { useMergeBranch } from '@/api/mutations/merge'
 import { usePullBranch } from '@/api/mutations/pullBranch'
+import { usePushBranch } from '@/api/mutations/pushBranch'
 import { useRemoveBranch } from '@/api/mutations/removeBranch'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { runAction } from '@/context/actions'
@@ -28,6 +29,7 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
   const checkout = useCheckoutBranch(branch)
   const fastForward = useFastForwardBranch(branch)
   const pull = usePullBranch(branch)
+  const push = usePushBranch(branch)
   const remove = useRemoveBranch(branch)
   const createBranch = useCreateBranchAt(branch.name)
   const branchOff = useBranchOff(branch.name)
@@ -41,6 +43,8 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
           {!isCurrentBranch && <MenuItem action={checkout} />}
 
           <MenuItem action={isCurrentBranch ? pull : fastForward} />
+
+          {isCurrentBranch && <MenuItem action={push} />}
 
           <Separator />
 
@@ -64,13 +68,7 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
             }}
           />
 
-          {!isCurrentBranch && (
-            <>
-              <MenuItem action={merge} />
-              <Separator />
-              <MenuItem action={remove} status="danger" />
-            </>
-          )}
+          {!isCurrentBranch && <MenuItem action={merge} />}
         </>
       )}
 
@@ -87,6 +85,9 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
           }}
         />
       )}
+
+      <Separator />
+      <MenuItem action={remove} status="danger" />
     </>
   )
 }

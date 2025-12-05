@@ -12,6 +12,7 @@ import {
 
 interface RemoveBranchArgs {
   branchName: BranchName
+  isRemote: boolean
 }
 
 const removeBranchKey = (repoPath: string) =>
@@ -40,7 +41,10 @@ const useRemoveBranch = (branch: BranchInfo): Action => {
     },
     blockedBy: [{ key: 'modify_branch', branch: branch.name }],
     run: async () => {
-      await removeBranch.mutateAsync({ branchName: branch.name })
+      await removeBranch.mutateAsync({
+        branchName: branch.name,
+        isRemote: branch.type === 'remote',
+      })
     },
     Glyph: IconTrash,
     label: {

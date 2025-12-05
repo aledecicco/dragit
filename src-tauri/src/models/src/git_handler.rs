@@ -38,7 +38,12 @@ pub trait GitHandler {
     ) -> Result<(), GitError>;
 
     /// Deletes the given branch.
-    fn remove_branch(&self, repo_path: &str, branch_name: &str) -> Result<(), GitError>;
+    fn remove_branch(
+        &self,
+        repo_path: &str,
+        branch_name: &str,
+        is_remote: bool,
+    ) -> Result<(), GitError>;
 
     /// Returns (a page of) the list of commit hashes leading up to a reference.
     fn get_commit_history_page(

@@ -170,8 +170,18 @@ impl GitHandler for CmdGit {
             }))
     }
 
-    fn remove_branch(&self, repo_path: &str, branch_name: &str) -> Result<(), GitError> {
-        self.spawn_and_await(repo_path, ["branch", "-D", branch_name])
+    fn remove_branch(
+        &self,
+        repo_path: &str,
+        branch_name: &str,
+        is_remote: bool,
+    ) -> Result<(), GitError> {
+        let mut args = vec!["branch", "-D", branch_name];
+        if is_remote {
+            args.push("--remote");
+        }
+
+        self.spawn_and_await(repo_path, args)
             .or(Err(GitError::DeleteBranchFailed {
                 branch_name: branch_name.to_string(),
             }))

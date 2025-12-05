@@ -84,9 +84,11 @@ const useTrackBranch = (branch: BranchInfo): Action<BranchName> => {
 
   return {
     id: {
-      key: 'create_branch_at',
+      key: 'branch_operation',
+      operation: 'checkout',
       at: branch.name,
     },
+    blockedBy: [{ key: 'branch_operation' }],
     label: {
       idle: 'Track this branch',
       running: 'Creating branch',

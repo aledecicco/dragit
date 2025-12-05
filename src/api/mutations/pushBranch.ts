@@ -2,6 +2,7 @@ import { IconUpload } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
+import { useSelectedBranches } from '@/context/branches'
 
 import type { BranchInfo, BranchName, RemoteName } from '../models'
 import {
@@ -35,6 +36,7 @@ const pushBranchMutation = (repoPath: string) =>
 
 const usePushBranch = (branch: BranchInfo): Action => {
   const pushBranch = useRepositoryMutation(pushBranchMutation)
+  const { currentBranch } = useSelectedBranches()
 
   return {
     id: {
@@ -42,7 +44,12 @@ const usePushBranch = (branch: BranchInfo): Action => {
       operation: 'push',
       branch: branch.name,
     },
-    blockedBy: [{ key: 'modify_branch', branch: branch.name }],
+    blockedBy: [
+      { key: 'modify_branch', branch: branch.name },
+      ...(currentBranch?.name === branch.name
+        ? [{ key: 'modify_branch', type: 'current' }]
+        : []),
+    ],
     run: async () => {
       if (branch.type !== 'local') {
         throw new Error('Branch is not local')
