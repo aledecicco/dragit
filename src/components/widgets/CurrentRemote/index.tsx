@@ -145,12 +145,7 @@ const FetchUpstream = (props: { upstream: Upstream }) => {
   const fetchRemote = useFetchRemote(upstream.remote)
 
   return (
-    <ActionButton
-      compact
-      round
-      className={cn('mx-2')}
-      mainAction={fetchRemote}
-    />
+    <ActionButton compact round className={cn('mx-2')} action={fetchRemote} />
   )
 }
 

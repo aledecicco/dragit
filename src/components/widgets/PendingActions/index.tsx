@@ -55,12 +55,12 @@ const PendingActions = (props: PendingActionsProps) => {
                   size="sm"
                   status="neutral"
                   compact
-                  tool={{ mainAction: abortMerge }}
+                  action={abortMerge}
                 />
                 <ToolbarItem
                   size="sm"
                   status="neutral"
-                  tool={{ mainAction: continueMerge }}
+                  action={continueMerge}
                 />
               </>
             ))
@@ -70,12 +70,12 @@ const PendingActions = (props: PendingActionsProps) => {
                   size="sm"
                   status="neutral"
                   compact
-                  tool={{ mainAction: abortRebase }}
+                  action={abortRebase}
                 />
                 <ToolbarItem
                   size="sm"
                   status="neutral"
-                  tool={{ mainAction: continueRebase }}
+                  action={continueRebase}
                 />
               </>
             ))

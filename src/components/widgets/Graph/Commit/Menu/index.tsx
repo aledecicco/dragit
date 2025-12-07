@@ -18,16 +18,16 @@ const CommitContextMenu = (props: CommitContextMenuProps) => {
   return (
     <>
       <MenuItem
-        mainAction={createBranch}
+        action={createBranch}
         argsRequester={() => requestBranchName(commitId)}
       />
 
       <MenuItem
-        mainAction={branchOff}
+        action={branchOff}
         argsRequester={() => requestBranchName(commitId)}
       />
 
-      <MenuItem mainAction={merge} />
+      <MenuItem action={merge} />
     </>
   )
 }

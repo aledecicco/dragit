@@ -81,7 +81,7 @@ const BranchSelectors = () => {
       />
 
       <ActionButton
-        mainAction={switchBranches}
+        action={switchBranches}
         className={cn('mx-1 col-start-2 row-start-1')}
         variant="filled"
         status="neutral"

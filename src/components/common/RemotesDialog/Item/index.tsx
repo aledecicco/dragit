@@ -66,7 +66,7 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
       />
 
       <ActionButton
-        mainAction={removeRemote}
+        action={removeRemote}
         compact
         variant="filled"
         status="neutral"

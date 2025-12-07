@@ -15,13 +15,14 @@ type MenuItemProps<T = void> = CommonMenuItemProps | ActionMenuItemProps<T>
 
 type CommonMenuItemProps = BaseMenuItemProps & DecoratedButtonProps
 
-type ActionMenuItemProps<T = void> = BaseMenuItemProps & ActionButtonProps<T>
+type ActionMenuItemProps<T = void> = BaseMenuItemProps &
+  Omit<ActionButtonProps<T>, 'alternatives'>
 
 /**
  * A single menu item inside a {@link Menu}.
  */
 const MenuItem = <T = void>(props: MenuItemProps<T>) => {
-  if ('mainAction' in props) {
+  if ('action' in props) {
     return <ActionMenuItem {...props} />
   }
 
@@ -35,7 +36,13 @@ const MenuItem = <T = void>(props: MenuItemProps<T>) => {
 const ActionMenuItem = <T = void>(props: ActionMenuItemProps<T>) => {
   return (
     <BaseMenuItem
-      render={<ActionButton variant="plain" size="sm" {...props} />}
+      render={
+        <ActionButton
+          variant="plain"
+          size="sm"
+          {...(props as ActionButtonProps<T>)}
+        />
+      }
     />
   )
 }

@@ -21,60 +21,35 @@ interface BaseActionButtonProps extends Partial<DecoratedButtonProps> {
    *
    * When selected, they are run and tracked like the main action.
    */
-  alternatives?: Action[]
+  // biome-ignore lint/suspicious/noExplicitAny: We don't care about the shape of the actions.
+  alternatives?: ActionProps<any>[]
 }
 
-type TrackOnlyActionButtonProps<T> = BaseActionButtonProps & {
-  /**
-   * The action that is tracked by the button.
-   */
-  mainAction: Action<T>
+type ActionProps<T> =
+  | {
+      /**
+       * The action that is triggered when the button is clicked.
+       */
+      action: Action<T>
 
-  /**
-   * If `true`, the button will only track the action's state, and not trigger it when clicked.
-   * If `false`, the button will run the action when clicked.
-   */
-  trackOnly: true
-}
+      /**
+       * Callback that requests the arguments to run the action.
+       */
+      argsRequester: () => Promise<T>
+    }
+  | {
+      /**
+       * The action that is triggered when the button is clicked.
+       */
+      action: Action
 
-type RunnerActionButtonProps = BaseActionButtonProps & {
-  /**
-   * The action that is triggered when the button is clicked.
-   */
-  mainAction: Action
+      /**
+       * Callback that requests the arguments to run the action.
+       */
+      argsRequester?: never
+    }
 
-  /**
-   * If `true`, the button will only track the action's state, and not trigger it when clicked.
-   * If `false`, the button will run the action when clicked.
-   */
-  trackOnly?: false
-}
-
-type ActionButtonProps<T> = BaseActionButtonProps &
-  (
-    | {
-        /**
-         * The action that is triggered when the button is clicked.
-         */
-        mainAction: Action<T>
-
-        /**
-         * Callback that requests the arguments to run the action.
-         */
-        argsRequester: () => Promise<T>
-      }
-    | {
-        /**
-         * The action that is triggered when the button is clicked.
-         */
-        mainAction: Action
-
-        /**
-         * Callback that requests the arguments to run the action.
-         */
-        argsRequester?: never
-      }
-  )
+type ActionButtonProps<T> = BaseActionButtonProps & ActionProps<T>
 
 /**
  * A {@link Button} that triggers and tracks an action, reflecting its state during its lifecycle.
@@ -84,7 +59,7 @@ type ActionButtonProps<T> = BaseActionButtonProps &
 const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   const {
     status,
-    mainAction,
+    action,
     argsRequester,
     alternatives,
     menuButtonProps,
@@ -93,8 +68,8 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   } = props
 
   const { Glyph, label, actionStatus } = useActionButtonTracker(
-    mainAction,
-    alternatives,
+    action,
+    alternatives?.map((alt) => alt.action),
   )
   const buttonStatus = match(actionStatus)
     .returnType<ButtonStatus>()
@@ -121,9 +96,9 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
       if (actionStatus !== 'running') {
         if (argsRequester) {
           const args = await argsRequester()
-          runAction(mainAction, args)
+          runAction(action, args)
         } else {
-          runAction(mainAction)
+          runAction(action)
         }
       }
     },
@@ -133,16 +108,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     <SplitButton
       {...commonProps}
       items={alternatives.map((alternative) => (
-        <MenuItem
-          key={hashId(alternative.id)}
-          label={alternative.label.idle}
-          Glyph={alternative.Glyph}
-          onClick={() => {
-            if (actionStatus !== 'running' && actionStatus !== 'disabled') {
-              runAction(alternative)
-            }
-          }}
-        />
+        <MenuItem key={hashId(alternative.action.id)} {...alternative} />
       ))}
       menuButtonProps={{
         label: 'View alternatives',
@@ -159,9 +125,4 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   )
 }
 
-export {
-  ActionButton,
-  type ActionButtonProps,
-  type TrackOnlyActionButtonProps,
-  type RunnerActionButtonProps,
-}
+export { ActionButton, type ActionButtonProps }

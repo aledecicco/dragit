@@ -31,15 +31,13 @@ type ToolbarItemProps<T = void> =
 type CommonMenuItemProps = BaseToolbarItemProps & DecoratedButtonProps
 
 type ActionToolbarItemProps<T = void> = BaseToolbarItemProps &
-  Partial<DecoratedButtonProps> & {
-    tool: ActionButtonProps<T>
-  }
+  ActionButtonProps<T>
 
 /**
  * A single item inside a {@link Toolbar}.
  */
 const ToolbarItem = <T = void>(props: ToolbarItemProps<T>) => {
-  if ('tool' in props) {
+  if ('action' in props) {
     return <ActionToolbarItem {...props} />
   }
 
@@ -53,7 +51,8 @@ const ToolbarItem = <T = void>(props: ToolbarItemProps<T>) => {
 }
 
 const ActionToolbarItem = <T = void>(props: ActionToolbarItemProps<T>) => {
-  const { fixed, tool, ...itemProps } = props
+  const { fixed, ...itemProps } = props
+
   return (
     <BaseToolbarItem
       fixed={fixed}
@@ -61,7 +60,6 @@ const ActionToolbarItem = <T = void>(props: ActionToolbarItemProps<T>) => {
       render={
         <ActionButton
           menuButtonProps={{ render: <Ariakit.ToolbarItem /> }}
-          {...tool}
           {...itemProps}
         />
       }

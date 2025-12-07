@@ -33,13 +33,14 @@ const BranchToolbar = (props: BranchToolbarProps) => {
       <ToolbarItem
         compact
         fixed
-        tool={{ mainAction: isBase ? fastForward : pull }}
+        action={isBase ? fastForward : pull}
         disabled={toolbarProps.disabled || !branch || branch.type !== 'local'}
       />
       <ToolbarItem
         compact
         fixed
-        tool={{ mainAction: push, alternatives: [forcePush] }}
+        action={push}
+        alternatives={[{ action: forcePush }]}
         disabled={toolbarProps.disabled || !branch || branch.type !== 'local'}
       />
     </Toolbar>

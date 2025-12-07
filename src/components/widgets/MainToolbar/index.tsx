@@ -30,10 +30,8 @@ const MainToolbar = (props: MainToolbarProps) => {
         size="md"
         compact={false}
         fixed
-        tool={{
-          mainAction: stageFiles,
-          argsRequester: () => requestFilePath(UNSTAGED_FILE_TYPES),
-        }}
+        action={stageFiles}
+        argsRequester={() => requestFilePath(UNSTAGED_FILE_TYPES)}
       />
 
       <ToolbarItem
@@ -41,10 +39,8 @@ const MainToolbar = (props: MainToolbarProps) => {
         size="md"
         compact={false}
         fixed
-        tool={{
-          mainAction: unstageFiles,
-          argsRequester: () => requestFilePath(STAGED_FILE_TYPES),
-        }}
+        action={unstageFiles}
+        argsRequester={() => requestFilePath(STAGED_FILE_TYPES)}
       />
 
       <ToolbarItem
@@ -52,10 +48,8 @@ const MainToolbar = (props: MainToolbarProps) => {
         size="md"
         compact={false}
         fixed
-        tool={{
-          mainAction: saveStash,
-          argsRequester: () => requestFilePath(UNSTAGED_FILE_TYPES),
-        }}
+        action={saveStash}
+        argsRequester={() => requestFilePath(UNSTAGED_FILE_TYPES)}
       />
 
       <ToolbarItem
@@ -63,10 +57,8 @@ const MainToolbar = (props: MainToolbarProps) => {
         size="md"
         compact={false}
         fixed
-        tool={{
-          mainAction: commit,
-          argsRequester: requestCommitParams,
-        }}
+        action={commit}
+        argsRequester={requestCommitParams}
       />
     </Toolbar>
   )

@@ -39,31 +39,31 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
     <>
       {branch.type === 'local' && (
         <>
-          {!isCurrentBranch && <MenuItem mainAction={checkout} />}
+          {!isCurrentBranch && <MenuItem action={checkout} />}
 
-          <MenuItem mainAction={isCurrentBranch ? pull : fastForward} />
+          <MenuItem action={isCurrentBranch ? pull : fastForward} />
 
-          {isCurrentBranch && <MenuItem mainAction={push} />}
+          {isCurrentBranch && <MenuItem action={push} />}
 
           <Separator />
 
           <MenuItem
-            mainAction={createBranch}
+            action={createBranch}
             argsRequester={() => requestBranchName(branch.name)}
           />
 
           <MenuItem
-            mainAction={branchOff}
+            action={branchOff}
             argsRequester={() => requestBranchName(branch.name)}
           />
 
-          {!isCurrentBranch && <MenuItem mainAction={merge} />}
+          {!isCurrentBranch && <MenuItem action={merge} />}
         </>
       )}
 
       {branch.type === 'remote' && (
         <MenuItem
-          mainAction={track}
+          action={track}
           argsRequester={() =>
             requestBranchName(branch.name, branch.name.split('/').at(-1))
           }
@@ -71,7 +71,7 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
       )}
 
       <Separator />
-      <MenuItem mainAction={remove} status="danger" />
+      <MenuItem action={remove} status="danger" />
     </>
   )
 }

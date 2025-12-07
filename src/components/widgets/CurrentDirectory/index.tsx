@@ -19,7 +19,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
 
   return (
     <ActionButton
-      mainAction={openFolder}
+      action={openFolder}
       argsRequester={async () => {
         const path = await open({
           multiple: false,

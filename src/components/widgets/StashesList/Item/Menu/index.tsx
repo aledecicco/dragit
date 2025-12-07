@@ -26,11 +26,11 @@ const StashContextMenu = (props: StashContextMenuProps) => {
           showSnapshotDetailsDialog(stash)
         }}
       />
-      <MenuItem mainAction={apply} />
+      <MenuItem action={apply} />
 
       <Separator />
 
-      <MenuItem mainAction={discard} status="danger" />
+      <MenuItem action={discard} status="danger" />
     </>
   )
 }
