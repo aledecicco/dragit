@@ -35,6 +35,7 @@ export interface DiffSummary {
 
 export interface StashInfo {
   id: StashId
+  tracker: string
   type: 'stash'
   stashNumber: string
   message: string | null

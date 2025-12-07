@@ -45,7 +45,7 @@ const StashesList = (props: StashesListProps) => {
           size="sm"
           itemSize={74}
           options={mapFn(stashesQuery.data, (stashes) => ({
-            getItemKey: (index: number) => stashes[index].id,
+            getItemKey: (index: number) => stashes[index].tracker,
           }))}
         />
       </div>

@@ -1,5 +1,6 @@
 import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
 
+import { getUniqueId } from '@/context/ids'
 import { MS_IN_SECOND } from '@/utils/time'
 
 import type { StashInfo } from '../models'
@@ -27,6 +28,7 @@ const fetchStashes = async (
 
   return res.map((resItem) => ({
     ...resItem,
+    tracker: getUniqueId(),
     type: 'stash',
     timestamp: resItem.timestamp * MS_IN_SECOND,
   }))
