@@ -64,6 +64,7 @@ const BranchSelectors = () => {
         }
         disabled={
           checkoutTracker.actionStatus === 'running' ||
+          checkoutTracker.actionStatus === 'disabled' ||
           !headInfoQuery.data ||
           !branchesQuery.data
         }
@@ -98,12 +99,15 @@ const BranchSelectors = () => {
                 value: baseReference.refName,
                 data: baseReference,
               }
-            : undefined
+            : {
+                value: '',
+                data: null,
+              }
         }
         options={baseOptions}
         setOption={(newOption) => {
           if (currentReference) {
-            changeSelectedBase(currentReference, newOption.data ?? undefined)
+            changeSelectedBase(currentReference, newOption.data)
           }
         }}
         renderOption={(option) => option.data?.refName ?? 'No base branch'}

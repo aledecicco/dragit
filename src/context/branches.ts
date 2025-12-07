@@ -21,7 +21,7 @@ interface SelectedReferences {
   /**
    * The selected base used for comparison for each reference.
    */
-  bases: Map<RefName, Reference | undefined>
+  bases: Map<RefName, Reference | null>
 }
 
 interface Setters {
@@ -33,7 +33,7 @@ interface Setters {
   /**
    * Change the selected base for a given reference.
    */
-  changeBase: (reference: Reference, base: Reference | undefined) => void
+  changeBase: (reference: Reference, base: Reference | null) => void
 }
 
 const useSelectedRefsStore = create<SelectedReferences & Setters>()(
@@ -44,14 +44,22 @@ const useSelectedRefsStore = create<SelectedReferences & Setters>()(
 
     changeCurrent: (reference: Reference | null) => {
       setState((state) => {
+        if (state.current?.refName === reference?.refName) {
+          return
+        }
+
         state.current = reference
       })
     },
 
-    changeBase: (reference: Reference, base: Reference | undefined) => {
+    changeBase: (reference: Reference, base: Reference | null) => {
       setState((state) => {
-        if (!base) {
-          state.bases.delete(reference.refName)
+        if (state.bases.get(reference.refName)?.refName === base?.refName) {
+          return
+        }
+
+        if (base === null) {
+          state.bases.set(reference.refName, null)
           return
         }
 
@@ -99,11 +107,12 @@ const useSelectedBase = (
       if (!reference) {
         return undefined
       }
+
       return state.bases.get(reference.refName)
     }),
   )
 
-  return baseReference
+  return baseReference ?? undefined
 }
 
 /**
@@ -111,7 +120,7 @@ const useSelectedBase = (
  *
  * @returns An object containing:
  * - `currentReference`: The currently checked-out reference.
- * - `baseReference`: The selected base reference for the current reference.
+ * - `baseReference`: The selected base reference for that current reference.
  */
 const useSelectedReferences = () => {
   const currentReference = useCurrentReference()
@@ -157,19 +166,24 @@ const useReferencesSync = () => {
   useEffect(() => {
     const store = useSelectedRefsStore.getState()
 
-    store.changeCurrent(headReference ?? null)
+    if (store.current?.refName !== headReference?.refName) {
+      store.changeCurrent(headReference ?? null)
+    }
 
     if (!headReference) {
       return
     }
 
-    let newBase: Reference | undefined =
+    const storedBase = store.bases.get(headReference.refName)
+
+    let newBase: Reference | null | undefined =
       // First check if there's an override set in the store.
-      store.bases.get(headReference.refName) ??
-      // Otherwise, try to use the upstream of the branch as a base.
-      (headReference.type === 'branch' && currentUpstream
-        ? getUpstreamReference(currentUpstream)
-        : undefined)
+      storedBase !== undefined
+        ? storedBase
+        : // Otherwise, try to use the upstream of the branch as a base.
+          headReference.type === 'branch' && currentUpstream
+          ? getUpstreamReference(currentUpstream)
+          : undefined
 
     if (baseReference && baseReference.refName === headReference.refName) {
       // If the new base collides with the current reference, try to fall back to the previous base.
@@ -181,7 +195,9 @@ const useReferencesSync = () => {
       }
     }
 
-    store.changeBase(headReference, newBase)
+    if (newBase !== undefined && storedBase?.refName !== newBase?.refName) {
+      store.changeBase(headReference, newBase)
+    }
   }, [headReference, prevReference, baseReference, currentUpstream])
 }
 

@@ -137,13 +137,9 @@ const GraphInner = () => {
             className={cn('w-full')}
             style={{ height: virtualizer.getTotalSize() }}
           >
-            {currentReference && (
-              <GraphCurrentBranch items={virtualizer.getVirtualItems()} />
-            )}
+            <GraphCurrentBranch items={virtualizer.getVirtualItems()} />
 
-            {baseReference && (
-              <GraphBaseBranch items={virtualizer.getVirtualItems()} />
-            )}
+            <GraphBaseBranch items={virtualizer.getVirtualItems()} />
           </SvgOverlay>
         </div>
       </Ariakit.Composite>

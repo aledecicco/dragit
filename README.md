@@ -15,7 +15,7 @@ Stash of ideas in ~planned implementation order:
 - [x] Global action tracking
 - [x] Word diffs
 - [x] Store bases and upstreams
-- [ ] Checkout of remote branches, create branch from commit
+- [x] Checkout of remote branches, create branch from commit
 - [ ] Tabs for filtering in branches widget
 - [ ] "Create" option on empty comboboxes
 - [ ] Highlight file sections in scrollbar
