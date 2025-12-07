@@ -24,7 +24,6 @@ const BranchSelectors = () => {
   const currentUpstream = useCurrentUpstream()
   const { currentReference, baseReference } = useSelectedReferences()
   const currentBranch = useBranch(currentReference)
-  const baseBranch = useBranch(baseReference)
 
   const checkout = useCheckout()
   const checkoutTracker = useActionPresenters(checkout)
@@ -85,7 +84,7 @@ const BranchSelectors = () => {
         className={cn('mx-1 col-start-2 row-start-1')}
         variant="filled"
         status="neutral"
-        disabled={!currentReference || !baseBranch}
+        disabled={!currentReference || !baseReference}
         size="md"
         round
         compact

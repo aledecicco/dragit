@@ -2,7 +2,7 @@ import { IconGitBranch, IconSwitchHorizontal } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
-import { useSelectedBranches } from '@/context/branches'
+import { useSelectedReferences } from '@/context/branches'
 
 import type { BranchInfo, RefName } from '../models'
 import {
@@ -70,7 +70,7 @@ const useCheckoutBranch = (branch: BranchInfo): Action => {
 }
 
 const useSwitchBranches = (): Action => {
-  const { baseBranch } = useSelectedBranches()
+  const { baseReference } = useSelectedReferences()
   const checkout = useRepositoryMutation(checkoutMutation)
 
   return {
@@ -80,14 +80,14 @@ const useSwitchBranches = (): Action => {
     },
     blockedBy: [{ key: 'branch_operation' }],
     run: async () => {
-      if (baseBranch) {
-        await checkout.mutateAsync({
-          reference: baseBranch.name,
-          isNew: false,
-        })
-      } else {
+      if (!baseReference) {
         throw new Error('No base branch selected')
       }
+
+      await checkout.mutateAsync({
+        reference: baseReference.refName,
+        isNew: false,
+      })
     },
     Glyph: IconSwitchHorizontal,
     label: {
