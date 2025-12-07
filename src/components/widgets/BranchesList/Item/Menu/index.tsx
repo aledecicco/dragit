@@ -11,7 +11,6 @@ import { usePullBranch } from '@/api/mutations/pullBranch'
 import { usePushBranch } from '@/api/mutations/pushBranch'
 import { useRemoveBranch } from '@/api/mutations/removeBranch'
 import { requestBranchName } from '@/common/CreateBranchDialog'
-import { runAction } from '@/context/actions'
 import { useSelectedBranches } from '@/context/branches'
 import { MenuItem } from '@/ui/Menu/Item'
 import { Separator } from '@/ui/Separator'
@@ -40,54 +39,39 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
     <>
       {branch.type === 'local' && (
         <>
-          {!isCurrentBranch && <MenuItem action={checkout} />}
+          {!isCurrentBranch && <MenuItem mainAction={checkout} />}
 
-          <MenuItem action={isCurrentBranch ? pull : fastForward} />
+          <MenuItem mainAction={isCurrentBranch ? pull : fastForward} />
 
-          {isCurrentBranch && <MenuItem action={push} />}
+          {isCurrentBranch && <MenuItem mainAction={push} />}
 
           <Separator />
 
           <MenuItem
-            action={createBranch}
-            trackOnly
-            onClick={() => {
-              requestBranchName(branch.name).then((newBranchName) => {
-                runAction(createBranch, newBranchName)
-              })
-            }}
+            mainAction={createBranch}
+            argsRequester={() => requestBranchName(branch.name)}
           />
 
           <MenuItem
-            action={branchOff}
-            trackOnly
-            onClick={() => {
-              requestBranchName(branch.name).then((newBranchName) => {
-                runAction(branchOff, newBranchName)
-              })
-            }}
+            mainAction={branchOff}
+            argsRequester={() => requestBranchName(branch.name)}
           />
 
-          {!isCurrentBranch && <MenuItem action={merge} />}
+          {!isCurrentBranch && <MenuItem mainAction={merge} />}
         </>
       )}
 
       {branch.type === 'remote' && (
         <MenuItem
-          action={track}
-          trackOnly
-          onClick={() => {
-            requestBranchName(branch.name, branch.name.split('/').at(-1)).then(
-              (newBranchName) => {
-                runAction(branchOff, newBranchName)
-              },
-            )
-          }}
+          mainAction={track}
+          argsRequester={() =>
+            requestBranchName(branch.name, branch.name.split('/').at(-1))
+          }
         />
       )}
 
       <Separator />
-      <MenuItem action={remove} status="danger" />
+      <MenuItem mainAction={remove} status="danger" />
     </>
   )
 }

@@ -31,7 +31,7 @@ const UnstagedFileContextMenu = (props: UnstagedFileContextMenuProps) => {
       {file.status === 'unmerged' ? (
         <UnmergedFileMenuItems file={file} />
       ) : (
-        <MenuItem action={stage} />
+        <MenuItem mainAction={stage} />
       )}
       <MenuItem
         label="View Changes"
@@ -62,22 +62,22 @@ const UnmergedFileMenuItems = (props: UnmergedFileMenuItemsProps) => {
       {match(file.changes)
         .with(P.union('bothAdded', 'bothModified'), () => (
           <>
-            <MenuItem action={acceptAsIs} />
-            <MenuItem action={acceptOurs} />
-            <MenuItem action={acceptTheirs} />
+            <MenuItem mainAction={acceptAsIs} />
+            <MenuItem mainAction={acceptOurs} />
+            <MenuItem mainAction={acceptTheirs} />
           </>
         ))
         .with(P.union('addedByUs', 'addedByThem'), () => (
           <>
-            <MenuItem action={acceptNewFile} />
-            <MenuItem action={ignoreNewFile} />
+            <MenuItem mainAction={acceptNewFile} />
+            <MenuItem mainAction={ignoreNewFile} />
           </>
         ))
-        .with('bothDeleted', () => <MenuItem action={acceptDeletion} />)
+        .with('bothDeleted', () => <MenuItem mainAction={acceptDeletion} />)
         .with(P.union('deletedByUs', 'deletedByThem'), () => (
           <>
-            <MenuItem action={acceptDeletion} />
-            <MenuItem action={ignoreDeletion} />
+            <MenuItem mainAction={acceptDeletion} />
+            <MenuItem mainAction={ignoreDeletion} />
           </>
         ))
         .exhaustive()}

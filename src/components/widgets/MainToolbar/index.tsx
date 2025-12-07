@@ -1,13 +1,14 @@
-import type { WorktreeFileType } from '@/api/models'
 import { useStageFiles } from '@/api/mutations/addToIndex'
 import { useCommitIndex } from '@/api/mutations/commitIndex'
 import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
 import { useSaveStash } from '@/api/mutations/saveStash'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { requestFilePath } from '@/common/FileSelectorDialog'
-import { runAction } from '@/context/actions'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
+
+import { STAGED_FILE_TYPES } from '../WorktreeChanges/Staged'
+import { UNSTAGED_FILE_TYPES } from '../WorktreeChanges/Unstaged'
 
 interface MainToolbarProps extends Partial<ToolbarProps> {}
 
@@ -31,18 +32,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         fixed
         tool={{
           mainAction: stageFiles,
-          trackOnly: true,
-          onClick: () => {
-            const types: WorktreeFileType[] = [
-              'unstaged',
-              'unmerged',
-              'untracked',
-            ]
-
-            requestFilePath(types).then((path) => {
-              runAction(stageFiles, [path])
-            })
-          },
+          argsRequester: () => requestFilePath(UNSTAGED_FILE_TYPES),
         }}
       />
 
@@ -53,14 +43,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         fixed
         tool={{
           mainAction: unstageFiles,
-          trackOnly: true,
-          onClick: () => {
-            const types: WorktreeFileType[] = ['staged']
-
-            requestFilePath(types).then((path) => {
-              runAction(unstageFiles, [path])
-            })
-          },
+          argsRequester: () => requestFilePath(STAGED_FILE_TYPES),
         }}
       />
 
@@ -71,18 +54,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         fixed
         tool={{
           mainAction: saveStash,
-          trackOnly: true,
-          onClick: () => {
-            const types: WorktreeFileType[] = [
-              'unstaged',
-              'unmerged',
-              'untracked',
-            ]
-
-            requestFilePath(types).then((path) => {
-              runAction(saveStash, [path])
-            })
-          },
+          argsRequester: () => requestFilePath(UNSTAGED_FILE_TYPES),
         }}
       />
 
@@ -93,12 +65,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         fixed
         tool={{
           mainAction: commit,
-          trackOnly: true,
-          onClick: () => {
-            requestCommitParams().then((commitParams) => {
-              runAction(commit, commitParams)
-            })
-          },
+          argsRequester: requestCommitParams,
         }}
       />
     </Toolbar>

@@ -50,9 +50,31 @@ type RunnerActionButtonProps = BaseActionButtonProps & {
   trackOnly?: false
 }
 
-type ActionButtonProps<T> =
-  | TrackOnlyActionButtonProps<T>
-  | RunnerActionButtonProps
+type ActionButtonProps<T> = BaseActionButtonProps &
+  (
+    | {
+        /**
+         * The action that is triggered when the button is clicked.
+         */
+        mainAction: Action<T>
+
+        /**
+         * Callback that requests the arguments to run the action.
+         */
+        argsRequester: () => Promise<T>
+      }
+    | {
+        /**
+         * The action that is triggered when the button is clicked.
+         */
+        mainAction: Action
+
+        /**
+         * Callback that requests the arguments to run the action.
+         */
+        argsRequester?: never
+      }
+  )
 
 /**
  * A {@link Button} that triggers and tracks an action, reflecting its state during its lifecycle.
@@ -63,9 +85,10 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   const {
     status,
     mainAction,
+    argsRequester,
     alternatives,
     menuButtonProps,
-    trackOnly,
+
     ...buttonProps
   } = props
 
@@ -92,10 +115,16 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
       buttonProps.iconProps,
       actionStatus === 'running' ? 'animate-spin' : undefined,
     ),
-    onClick: (e: MouseEvent<HTMLButtonElement>) => {
+    onClick: async (e: MouseEvent<HTMLButtonElement>) => {
       buttonProps.onClick?.(e)
-      if (!trackOnly && actionStatus !== 'running') {
-        runAction(mainAction)
+
+      if (actionStatus !== 'running') {
+        if (argsRequester) {
+          const args = await argsRequester()
+          runAction(mainAction, args)
+        } else {
+          runAction(mainAction)
+        }
       }
     },
   }

@@ -18,7 +18,7 @@ const StagedFileContextMenu = (props: StagedFileContextMenuProps) => {
 
   return (
     <>
-      <MenuItem action={unstage} />
+      <MenuItem mainAction={unstage} />
       <MenuItem
         label="View changes"
         Glyph={IconEye}

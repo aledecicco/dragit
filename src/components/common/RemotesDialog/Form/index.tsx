@@ -3,7 +3,6 @@ import { IconX } from '@tabler/icons-react'
 import { useAddRemote } from '@/api/mutations/addRemote'
 import { useQueryRemotes } from '@/api/queries/remotes'
 import { runAction, useActionStatuses } from '@/context/actions'
-import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { Form, type FormProps } from '@/ui/Form'
 import { InputField } from '@/ui/Form/InputField'
@@ -65,12 +64,12 @@ const RemoteForm = (props: RemoteFormProps) => {
         compact
       />
 
-      <ActionButton
+      <DecoratedButton
         type="submit"
         className={cn('w-max')}
-        mainAction={addRemote}
+        label={addRemote.label.idle}
+        Glyph={addRemote.Glyph}
         status="primary"
-        trackOnly
         compact
       />
 

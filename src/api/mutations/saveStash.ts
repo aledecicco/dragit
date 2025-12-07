@@ -30,14 +30,14 @@ const saveStashMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useSaveStash = (): Action<string[]> => {
+const useSaveStash = (): Action<string[] | string> => {
   const saveStash = useRepositoryMutation(saveStashMutation)
   return {
     id: { key: 'files_operation', operation: 'save_stash' },
     blockedBy: [{ key: 'files_operation' }],
     run: async (files) => {
       await saveStash.mutateAsync({
-        files,
+        files: Array.isArray(files) ? files : [files],
         message: null, // TODO: allow messages
         includeUntracked: true,
       })

@@ -48,7 +48,7 @@ const useUnstageFile = (file: WorktreeFileInfo): Action => {
   }
 }
 
-const useUnstageFiles = (): Action<string[]> => {
+const useUnstageFiles = (): Action<string[] | string> => {
   const removeFromIndex = useRepositoryMutation(removeFromIndexMutation)
 
   return {
@@ -56,7 +56,7 @@ const useUnstageFiles = (): Action<string[]> => {
     blockedBy: [{ key: 'file_operation' }],
     run: async (files) => {
       await removeFromIndex.mutateAsync({
-        files,
+        files: Array.isArray(files) ? files : [files],
       })
     },
     label: {

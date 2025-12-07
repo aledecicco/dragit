@@ -2,7 +2,6 @@ import type { CommitId } from '@/api/models'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
 import { useMergeCommit } from '@/api/mutations/merge'
 import { requestBranchName } from '@/common/CreateBranchDialog'
-import { runAction } from '@/context/actions'
 import { MenuItem } from '@/ui/Menu/Item'
 
 interface CommitContextMenuProps {
@@ -19,26 +18,16 @@ const CommitContextMenu = (props: CommitContextMenuProps) => {
   return (
     <>
       <MenuItem
-        action={createBranch}
-        trackOnly
-        onClick={() => {
-          requestBranchName(commitId).then((newBranchName) => {
-            runAction(createBranch, newBranchName)
-          })
-        }}
+        mainAction={createBranch}
+        argsRequester={() => requestBranchName(commitId)}
       />
 
       <MenuItem
-        action={branchOff}
-        trackOnly
-        onClick={() => {
-          requestBranchName(commitId).then((newBranchName) => {
-            runAction(branchOff, newBranchName)
-          })
-        }}
+        mainAction={branchOff}
+        argsRequester={() => requestBranchName(commitId)}
       />
 
-      <MenuItem action={merge} />
+      <MenuItem mainAction={merge} />
     </>
   )
 }

@@ -1,8 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
-import type { Action } from '@/context/actions'
-import { ActionButton } from '@/lib/ActionButton'
+import { ActionButton, type ActionButtonProps } from '@/lib/ActionButton'
 import {
   DecoratedButton,
   type DecoratedButtonProps,
@@ -25,29 +24,21 @@ interface BaseToolbarItemProps extends Ariakit.ToolbarItemProps {
   status?: ButtonStatus
 }
 
-type ToolbarItemProps = CommonMenuItemProps | ActionToolbarItemProps
+type ToolbarItemProps<T = void> =
+  | CommonMenuItemProps
+  | ActionToolbarItemProps<T>
 
 type CommonMenuItemProps = BaseToolbarItemProps & DecoratedButtonProps
 
-type ActionToolbarItemProps = BaseToolbarItemProps &
+type ActionToolbarItemProps<T = void> = BaseToolbarItemProps &
   Partial<DecoratedButtonProps> & {
-    tool: {
-      alternatives?: Action[]
-    } & (
-      | {
-          // biome-ignore lint/suspicious/noExplicitAny: Toolbars need to accept actions with different parameter types.
-          mainAction: Action<any>
-          trackOnly: true
-          onClick: () => void
-        }
-      | { mainAction: Action<void>; trackOnly?: false }
-    )
+    tool: ActionButtonProps<T>
   }
 
 /**
  * A single item inside a {@link Toolbar}.
  */
-const ToolbarItem = (props: ToolbarItemProps) => {
+const ToolbarItem = <T = void>(props: ToolbarItemProps<T>) => {
   if ('tool' in props) {
     return <ActionToolbarItem {...props} />
   }
@@ -61,7 +52,7 @@ const ToolbarItem = (props: ToolbarItemProps) => {
   )
 }
 
-const ActionToolbarItem = (props: ActionToolbarItemProps) => {
+const ActionToolbarItem = <T = void>(props: ActionToolbarItemProps<T>) => {
   const { fixed, tool, ...itemProps } = props
   return (
     <BaseToolbarItem
@@ -77,6 +68,7 @@ const ActionToolbarItem = (props: ActionToolbarItemProps) => {
     />
   )
 }
+
 const BaseToolbarItem = (props: BaseToolbarItemProps) => {
   const { fixed = false, status = 'neutral', ...itemProps } = props
 

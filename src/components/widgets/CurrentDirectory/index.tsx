@@ -2,7 +2,6 @@ import { open } from '@tauri-apps/plugin-dialog'
 
 import { useOpenFolder } from '@/api/mutations/openFolder'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
-import { runAction } from '@/context/actions'
 import { ActionButton } from '@/lib/ActionButton'
 import type { ButtonProps } from '@/ui/Button'
 import { propsWithCn } from '@/utils/styles'
@@ -21,7 +20,18 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
   return (
     <ActionButton
       mainAction={openFolder}
-      trackOnly
+      argsRequester={async () => {
+        const path = await open({
+          multiple: false,
+          directory: true,
+        })
+
+        if (!path) {
+          throw new Error('No folder selected')
+        }
+
+        return path
+      }}
       variant="plain"
       status="primary"
       size="md"
@@ -31,18 +41,6 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
         'font-medium',
         !currentDirQuery.data && 'italic',
       )}
-      onClick={(e) => {
-        buttonProps.onClick?.(e)
-
-        open({
-          multiple: false,
-          directory: true,
-        }).then((path) => {
-          if (path) {
-            runAction(openFolder, path)
-          }
-        })
-      }}
       disabled={currentDirQuery.isFetching || buttonProps.disabled}
     />
   )

@@ -1,7 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 
-import type { Action } from '@/context/actions'
-import { ActionButton } from '@/lib/ActionButton'
+import { ActionButton, type ActionButtonProps } from '@/lib/ActionButton'
 import {
   DecoratedButton,
   type DecoratedButtonProps,
@@ -12,27 +11,17 @@ import { Menu } from '..'
 
 interface BaseMenuItemProps extends Ariakit.MenuItemProps {}
 
-type MenuItemProps = CommonMenuItemProps | ActionMenuItemProps
+type MenuItemProps<T = void> = CommonMenuItemProps | ActionMenuItemProps<T>
 
 type CommonMenuItemProps = BaseMenuItemProps & DecoratedButtonProps
 
-type ActionMenuItemProps = BaseMenuItemProps &
-  Partial<DecoratedButtonProps> &
-  (
-    | {
-        // biome-ignore lint/suspicious/noExplicitAny: Menu items need to accept actions with different parameter types.
-        action: Action<any>
-        trackOnly: true
-        onClick: () => void
-      }
-    | { action: Action<void>; trackOnly?: false }
-  )
+type ActionMenuItemProps<T = void> = BaseMenuItemProps & ActionButtonProps<T>
 
 /**
  * A single menu item inside a {@link Menu}.
  */
-const MenuItem = (props: MenuItemProps) => {
-  if ('action' in props) {
+const MenuItem = <T = void>(props: MenuItemProps<T>) => {
+  if ('mainAction' in props) {
     return <ActionMenuItem {...props} />
   }
 
@@ -43,23 +32,10 @@ const MenuItem = (props: MenuItemProps) => {
   )
 }
 
-const ActionMenuItem = (props: ActionMenuItemProps) => {
-  const { action, trackOnly, ...itemProps } = props
-
-  const actionProps = trackOnly
-    ? { onClick: props.onClick, mainAction: action, trackOnly }
-    : { mainAction: action, trackOnly }
-
+const ActionMenuItem = <T = void>(props: ActionMenuItemProps<T>) => {
   return (
     <BaseMenuItem
-      render={
-        <ActionButton
-          variant="plain"
-          size="sm"
-          {...actionProps}
-          {...itemProps}
-        />
-      }
+      render={<ActionButton variant="plain" size="sm" {...props} />}
     />
   )
 }
