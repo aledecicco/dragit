@@ -18,7 +18,8 @@
       "identifier": "opener:allow-open-path",
       "allow": [
         {
-          "path": "**"
+          "path": "**/*",
+          "app":true
         }
       ]
     },
@@ -29,7 +30,6 @@
           "url": "https://api.github.com/search/users"
         }
       ]
-    },
-    "opener:default"
+    }
   ]
 }

@@ -5,15 +5,18 @@ import {
   useEffect,
   useRef,
 } from 'react'
+import * as Ariakit from '@ariakit/react'
 import { IconFile } from '@tabler/icons-react'
 import type { UseQueryResult } from '@tanstack/react-query'
 
+import { useCurrentPath } from '@/api/utils'
 import { QueryLoader } from '@/lib/Loader/Query'
 import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { Separator } from '@/ui/Separator'
 import { Skeleton } from '@/ui/Skeleton'
 import { range } from '@/utils/array'
+import { openFile } from '@/utils/interaction'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface FileViewerContainerProps<T>
@@ -47,6 +50,7 @@ interface FileViewerContainerProps<T>
 const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
   const { query, filepath, annotation, children, ...divProps } = props
 
+  const repoPath = useCurrentPath()
   const viewerRef = useRef<HTMLDivElement>(null)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset scroll when a different file is selected
@@ -66,12 +70,23 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
     >
       <div className={cn('flex flex-row items-center gap-x-2 p-2 pr-9')}>
         <Icon Glyph={IconFile} size="lg" />
-        <Marquee className={cn('text-md text-light-500')}>
-          {filepath}
-          <span className={cn('text-light-900 text-sm italic ml-2')}>
-            {annotation}
-          </span>
-        </Marquee>
+        <button
+          type="button"
+          className={cn(
+            'text-md text-light-500',
+            'cursor-pointer hover:underline focus:underline',
+          )}
+          onClick={() => {
+            openFile(`${repoPath}/${filepath}`)
+          }}
+        >
+          <Marquee>
+            {filepath}
+            <span className={cn('text-light-900 text-sm italic ml-2')}>
+              {annotation}
+            </span>
+          </Marquee>
+        </button>
       </div>
 
       <Separator />

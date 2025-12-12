@@ -16,7 +16,7 @@ Stash of ideas in ~planned implementation order:
 - [x] Word diffs
 - [x] Store bases and upstreams
 - [x] Checkout of remote branches, create branch from commit
-- [ ] Tabs for filtering in branches widget
+- [x] Tabs for filtering in branches widget
 - [ ] "Create" option on empty comboboxes
 - [ ] Highlight file sections in scrollbar
 - [x] Merge continuation

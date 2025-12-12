@@ -77,13 +77,13 @@ const Autosuggest = (props: AutosuggestProps) => {
           portal
           sameWidth
           gutter={4}
-          className={cn('rounded-lg shadow-md', 'bg-dark-300 p-2')}
+          className={cn('rounded-lg shadow-md', 'bg-dark-300 p')}
         >
           <Ariakit.ComboboxList className={cn('max-h-80 overflow-y-auto')}>
             {mapOr(
               <div
                 className={cn(
-                  'text-center p-1',
+                  'text-center p-2',
                   'text-sm italic text-light-950',
                 )}
               >

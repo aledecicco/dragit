@@ -1,13 +1,15 @@
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { openPath } from '@tauri-apps/plugin-opener'
 
+const DEFAULT_APP = 'code'
+
 /**
  * Opens the given file using the specified application, or the default for its type.
  *
  * @param path - The path to the file to open.
  * @returns A promise that resolves when the file is opened.
  */
-export const openFile = (path: string, openWith?: string) => {
+export const openFile = (path: string, openWith: string = DEFAULT_APP) => {
   return openPath(path, openWith)
 }
 
