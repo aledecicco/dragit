@@ -3,7 +3,7 @@ import { match, P } from 'ts-pattern'
 
 import { MS_IN_SECOND } from '@/utils/time'
 
-import type { BranchInfo, RemoteRef } from '../models'
+import type { BranchInfo, BranchType, RemoteRef } from '../models'
 import { BRANCHES_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 
@@ -44,12 +44,15 @@ const fetchBranches = async (
   )
 }
 
-const branchesQuery = (repoPath: string) =>
+const branchesQuery = (repoPath: string, type?: BranchType) =>
   queryOptions({
     queryKey: [branchesQueryKeys.all(repoPath)],
     queryFn: (context) => fetchBranches(repoPath, context),
+    select: (branches) =>
+      type ? branches.filter((branch) => branch.type === type) : branches,
   })
 
-const useQueryBranches = () => useRepositoryQuery(branchesQuery)
+const useQueryBranches = (type?: BranchType) =>
+  useRepositoryQuery(branchesQuery, type)
 
 export { branchesQueryKeys, useQueryBranches }

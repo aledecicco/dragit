@@ -1,8 +1,11 @@
 import type { ComponentProps } from 'react'
+import { match } from 'ts-pattern'
 
 import { useQueryBranches } from '@/api/queries/branches'
 import { QueryList } from '@/lib/QueryList'
 import { Chip } from '@/ui/Chip'
+import { Tabs, useTabsHandler } from '@/ui/Tabs'
+import { Tab } from '@/ui/Tabs/Item'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
@@ -15,22 +18,36 @@ interface BranchesListProps extends ComponentProps<'div'> {}
  */
 const BranchesList = (props: BranchesListProps) => {
   const { ...divProps } = props
-  const branchesQuery = useQueryBranches()
+
+  const allBranchesQuery = useQueryBranches()
+  const localBranchesQuery = useQueryBranches('local')
+  const remoteBranchesQuery = useQueryBranches('remote')
+
+  const { store, selectedTab } = useTabsHandler('local')
+
+  const branchesQuery = match(selectedTab)
+    .with('local', () => localBranchesQuery)
+    .with('remote', () => remoteBranchesQuery)
+    .otherwise(() => allBranchesQuery)
 
   return (
     <div {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}>
-      <div className={cn('flex flex-row items-center justify-between')}>
-        <div
-          className={cn(
-            'text-sm text-light-600 text-start',
-            'py-2 flex flex-row gap-x-2 items-center',
-          )}
-        >
-          <p>All Branches</p>
+      <Tabs store={store}>
+        <Tab id="local">
+          Local
+          <Chip size="sm">{localBranchesQuery.data?.length ?? '...'}</Chip>
+        </Tab>
 
-          <Chip size="sm">{branchesQuery.data?.length ?? '...'}</Chip>
-        </div>
-      </div>
+        <Tab id="remote">
+          Remote
+          <Chip size="sm">{remoteBranchesQuery.data?.length ?? '...'}</Chip>
+        </Tab>
+
+        <Tab id="all">
+          All
+          <Chip size="sm">{allBranchesQuery.data?.length ?? '...'}</Chip>
+        </Tab>
+      </Tabs>
 
       <div
         className={cn(

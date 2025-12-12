@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useComboboxStore, useStoreState } from '@ariakit/react'
+import * as Ariakit from '@ariakit/react'
 
 import { Autosuggest, type AutosuggestProps } from '@/ui/Autosuggest'
 import { Button, type ButtonProps } from '@/ui/Button'
@@ -29,8 +29,7 @@ const EditableText = (props: EditableTextProps) => {
   const { buttonProps, label, ...inputProps } = props
   const [editing, setEditing] = useState(false)
 
-  const store = useComboboxStore()
-  const isOpen = useStoreState(store, 'open')
+  const { store, isOpen } = useEditableTextHandler()
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -80,4 +79,11 @@ const EditableText = (props: EditableTextProps) => {
   )
 }
 
-export { EditableText, type EditableTextProps }
+const useEditableTextHandler = () => {
+  const store = Ariakit.useComboboxStore()
+  const isOpen = Ariakit.useStoreState(store, 'open')
+
+  return { store, isOpen }
+}
+
+export { EditableText, useEditableTextHandler, type EditableTextProps }

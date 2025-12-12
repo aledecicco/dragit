@@ -16,7 +16,7 @@ type ToggleGroupItemProps = DecoratedButtonProps & {
 }
 
 /**
- * A single item in a {@link ToggleGroup} component.
+ * A single item in a {@link ToggleGroup}.
  */
 const ToggleGroupItem = (props: ToggleGroupItemProps) => {
   const { value, ...buttonProps } = props

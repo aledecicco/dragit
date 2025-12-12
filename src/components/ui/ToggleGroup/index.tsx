@@ -19,4 +19,19 @@ const ToggleGroup = (props: ToggleGroupProps) => {
   )
 }
 
-export { ToggleGroup, type ToggleGroupProps }
+const useToggleHandler = <T extends string>(
+  toggles: readonly T[],
+  defaultValue?: T,
+) => {
+  const store = Ariakit.useRadioStore({
+    defaultValue,
+  })
+
+  const value = Ariakit.useStoreState(store, (state) =>
+    toggles.find((item) => item === state.value),
+  )
+
+  return { store, value }
+}
+
+export { ToggleGroup, useToggleHandler, type ToggleGroupProps }

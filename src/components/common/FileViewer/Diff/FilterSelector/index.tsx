@@ -4,9 +4,12 @@ import {
   IconColumns3Filled,
 } from '@tabler/icons-react'
 
-import { ToggleGroup, type ToggleGroupProps } from '@/ui/ToggleGroup'
+import {
+  ToggleGroup,
+  type ToggleGroupProps,
+  useToggleHandler,
+} from '@/ui/ToggleGroup'
 import { ToggleGroupItem } from '@/ui/ToggleGroup/Item'
-import { useToggleHandler } from '@/ui/ToggleGroup/utils'
 import { cn } from '@/utils/styles'
 
 import { DIFF_FILTERS } from '../utils'

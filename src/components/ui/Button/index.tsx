@@ -89,6 +89,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-primary-600',
             'aria-expanded:bg-primary-600',
             'aria-checked:bg-primary-600',
+            'aria-selected:bg-primary-600',
             'focus:bg-primary-600 data-focus:bg-primary-600',
             'aria-disabled:bg-primary-500/40 aria-disabled:text-light-800',
           ])
@@ -97,6 +98,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-primary-300/4',
             'aria-expanded:bg-primary-300/4',
             'aria-checked:bg-primary-300/4',
+            'aria-selected:bg-primary-300/4',
             'focus:bg-primary-300/4 data-focus:bg-primary-300/4',
             'aria-disabled:text-primary-400/40',
           ])
@@ -105,6 +107,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-accent-500',
             'aria-expanded:bg-accent-500',
             'aria-checked:bg-accent-500',
+            'aria-selected:bg-accent-500',
             'focus:bg-accent-500 data-focus:bg-accent-500',
             'aria-disabled:bg-accent-600/40 aria-disabled:text-light-700',
           ])
@@ -113,6 +116,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-accent-600/4',
             'aria-expanded:bg-accent-600/4',
             'aria-checked:bg-accent-600/4',
+            'aria-selected:bg-accent-600/4',
             'focus:bg-accent-600/4 data-focus:bg-accent-600/4',
             'aria-disabled:text-accent-500/40',
           ])
@@ -121,6 +125,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-dark-100',
             'aria-expanded:bg-dark-100',
             'aria-checked:bg-dark-100',
+            'aria-selected:bg-dark-100',
             'focus:bg-dark-100 data-focus:bg-dark-100',
             'aria-disabled:bg-dark-400 aria-disabled:text-light-950/50',
           ])
@@ -129,6 +134,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-light-50/4',
             'aria-expanded:bg-light-50/4',
             'aria-checked:bg-light-50/4',
+            'aria-selected:bg-light-50/4',
             'focus:bg-light-50/4 data-focus:bg-light-50/4',
             'aria-disabled:text-light-800',
           ])
@@ -137,6 +143,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-success-600',
             'aria-expanded:bg-success-600',
             'aria-checked:bg-success-600',
+            'aria-selected:bg-success-600',
             'focus:bg-success-600 data-focus:bg-success-600',
             'aria-disabled:bg-success-300/30 aria-disabled:text-light-900',
           ])
@@ -145,6 +152,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-success-300/4',
             'aria-expanded:bg-success-300/4',
             'aria-checked:bg-success-300/4',
+            'aria-selected:bg-success-300/4',
             'focus:bg-success-300/4 data-focus:bg-success-300/4',
             'aria-disabled:text-success-200/30',
           ])
@@ -153,6 +161,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-warning-500',
             'aria-expanded:bg-warning-500',
             'aria-checked:bg-warning-500',
+            'aria-selected:bg-warning-500',
             'focus:bg-warning-500 data-focus:bg-warning-500',
             'aria-disabled:bg-warning-600/40 aria-disabled:text-light-700',
           ])
@@ -161,6 +170,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-warning-200/4',
             'aria-expanded:bg-warning-200/4',
             'aria-checked:bg-warning-200/4',
+            'aria-selected:bg-warning-200/4',
             'focus:bg-warning-200/4 data-focus:bg-warning-200/4',
             'aria-disabled:text-warning-300/40',
           ])
@@ -169,6 +179,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-danger-700',
             'aria-expanded:bg-danger-700',
             'aria-checked:bg-danger-700',
+            'aria-selected:bg-danger-700',
             'focus:bg-danger-700 data-focus:bg-danger-700',
             'aria-disabled:bg-danger-300/30 aria-disabled:text-light-800',
           ])
@@ -177,6 +188,7 @@ const Button = (props: ButtonProps) => {
             'hover:bg-danger-300/4',
             'aria-expanded:bg-danger-300/4',
             'aria-checked:bg-danger-300/4',
+            'aria-selected:bg-danger-300/4',
             'focus:bg-danger-300/4 data-focus:bg-danger-300/4',
             'aria-disabled:text-danger-300/50',
           ])

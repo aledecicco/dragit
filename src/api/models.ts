@@ -175,6 +175,7 @@ export interface RemoteBranch {
   type: 'remote'
 }
 export type BranchInfo = LocalBranch | RemoteBranch
+export type BranchType = BranchInfo['type']
 
 export type Reference =
   | {
