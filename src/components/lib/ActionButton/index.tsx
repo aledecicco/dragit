@@ -1,16 +1,19 @@
 import type { MouseEvent } from 'react'
-import { match } from 'ts-pattern'
 
-import { type Action, hashId, runAction } from '@/context/actions'
-import { Button, type ButtonStatus } from '@/ui/Button'
+import {
+  type Action,
+  hashId,
+  runAction,
+  useActionStatuses,
+} from '@/context/actions'
+import { Button } from '@/ui/Button'
 import { MenuItem } from '@/ui/Menu/Item'
 import { SplitButton } from '@/ui/SplitButton'
-import { propsWithCn } from '@/utils/styles'
 
 import { DecoratedButton, type DecoratedButtonProps } from '../DecoratedButton'
-import { useActionButtonTracker } from './utils'
+import { useActionButtonAction } from './utils'
 
-interface BaseActionButtonProps extends Partial<DecoratedButtonProps> {
+type BaseActionButtonProps = Partial<DecoratedButtonProps> & {
   /**
    * Additional props used for the dropdown menu if alternatives are provided.
    */
@@ -38,14 +41,8 @@ type ActionProps<T> =
       argsRequester: () => Promise<T>
     }
   | {
-      /**
-       * The action that is triggered when the button is clicked.
-       */
       action: Action
 
-      /**
-       * Callback that requests the arguments to run the action.
-       */
       argsRequester?: never
     }
 
@@ -58,38 +55,22 @@ type ActionButtonProps<T> = BaseActionButtonProps & ActionProps<T>
  */
 const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   const {
-    status,
     action,
     argsRequester,
     alternatives,
     menuButtonProps,
-
     ...buttonProps
   } = props
 
-  const { Glyph, label, actionStatus } = useActionButtonTracker(
+  const activeAction = useActionButtonAction(
     action,
     alternatives?.map((alt) => alt.action),
   )
-  const buttonStatus = match(actionStatus)
-    .returnType<ButtonStatus>()
-    .with('idle', () => status ?? 'neutral')
-    .with('running', () => status ?? 'neutral')
-    .with('success', () => 'success')
-    .with('error', () => 'danger')
-    .with('disabled', () => status ?? 'neutral')
-    .exhaustive()
+  const actionStatus = useActionStatuses(activeAction)
 
   const commonProps = {
     ...buttonProps,
-    label: label,
-    Glyph: Glyph,
-    status: buttonStatus,
-    disabled: buttonProps.disabled || actionStatus === 'disabled',
-    iconProps: propsWithCn(
-      buttonProps.iconProps,
-      actionStatus === 'running' ? 'animate-spin' : undefined,
-    ),
+
     onClick: async (e: MouseEvent<HTMLButtonElement>) => {
       buttonProps.onClick?.(e)
 
@@ -107,6 +88,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   return alternatives ? (
     <SplitButton
       {...commonProps}
+      track={activeAction}
       items={alternatives.map((alternative) => (
         <MenuItem key={hashId(alternative.action.id)} {...alternative} />
       ))}
@@ -121,7 +103,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
       }}
     />
   ) : (
-    <DecoratedButton {...commonProps} />
+    <DecoratedButton {...commonProps} track={activeAction} />
   )
 }
 

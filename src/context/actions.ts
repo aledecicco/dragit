@@ -315,4 +315,4 @@ function useActionPresenters(actions: AnyAction | AnyAction[]) {
 }
 
 export { useActionStatuses, runAction, useActionPresenters, hashId }
-export type { Action, ActionId, ActionStatus, ActionPresenter }
+export type { Action, AnyAction, ActionId, ActionStatus, ActionPresenter }

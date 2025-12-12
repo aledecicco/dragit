@@ -67,8 +67,7 @@ const RemoteForm = (props: RemoteFormProps) => {
       <DecoratedButton
         type="submit"
         className={cn('w-max')}
-        label={addRemote.label.idle}
-        Glyph={addRemote.Glyph}
+        track={addRemote}
         status="primary"
         compact
       />

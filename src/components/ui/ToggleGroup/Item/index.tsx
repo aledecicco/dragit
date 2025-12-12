@@ -8,7 +8,7 @@ import { propsWithCn } from '@/utils/styles'
 
 import { ToggleGroup } from '..'
 
-interface ToggleGroupItemProps extends DecoratedButtonProps {
+type ToggleGroupItemProps = DecoratedButtonProps & {
   /**
    * The value and identifier of the toggle item.
    */

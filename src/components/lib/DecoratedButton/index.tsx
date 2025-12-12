@@ -1,8 +1,12 @@
-import { Button, type ButtonProps } from '@/ui/Button'
+import { match } from 'ts-pattern'
+
+import { type AnyAction, useActionPresenters } from '@/context/actions'
+import { Button, type ButtonProps, type ButtonStatus } from '@/ui/Button'
 import { type Glyph, Icon, type IconProps } from '@/ui/Icon'
 import { Tooltip } from '@/ui/Tooltip'
+import { propsWithCn } from '@/utils/styles'
 
-interface DecoratedButtonProps extends ButtonProps {
+interface BaseDecoratedButtonProps extends ButtonProps {
   /**
    * The label of the button.
    */
@@ -25,10 +29,60 @@ interface DecoratedButtonProps extends ButtonProps {
   iconProps?: Partial<IconProps>
 }
 
+type DecoratedButtonProps =
+  | CommonDecoratedButtonProps
+  | TrackerDecoratedButtonProps
+
+interface CommonDecoratedButtonProps extends BaseDecoratedButtonProps {}
+
+interface TrackerDecoratedButtonProps
+  extends Omit<BaseDecoratedButtonProps, 'label' | 'Glyph'> {
+  /**
+   * An action to get the label and icon from.
+   */
+  track: AnyAction
+}
+
 /**
  * A {@link Button} with an icon and a label, which can be displayed in a compact form with a tooltip.
  */
 const DecoratedButton = (props: DecoratedButtonProps) => {
+  if ('track' in props) {
+    return <TrackerDecoratedButton {...props} />
+  }
+
+  return <BaseDecoratedButton {...props} />
+}
+
+const TrackerDecoratedButton = (props: TrackerDecoratedButtonProps) => {
+  const { track, ...buttonProps } = props
+
+  const { label, Glyph, actionStatus } = useActionPresenters(track)
+  const buttonStatus = match(actionStatus)
+    .returnType<ButtonStatus>()
+    .with('idle', () => buttonProps.status ?? 'neutral')
+    .with('running', () => buttonProps.status ?? 'neutral')
+    .with('success', () => 'success')
+    .with('error', () => 'danger')
+    .with('disabled', () => buttonProps.status ?? 'neutral')
+    .exhaustive()
+
+  return (
+    <BaseDecoratedButton
+      {...buttonProps}
+      label={label}
+      Glyph={Glyph}
+      status={buttonStatus}
+      disabled={buttonProps.disabled || actionStatus === 'disabled'}
+      iconProps={propsWithCn(
+        buttonProps.iconProps,
+        actionStatus === 'running' ? 'animate-spin' : undefined,
+      )}
+    />
+  )
+}
+
+const BaseDecoratedButton = (props: BaseDecoratedButtonProps) => {
   const { label, Glyph, compact, iconProps, ...buttonProps } = props
 
   const button = (

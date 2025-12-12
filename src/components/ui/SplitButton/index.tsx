@@ -9,7 +9,7 @@ import {
 import { Dropdown } from '@/ui/Dropdown'
 import { cn, propsWithCn } from '@/utils/styles'
 
-interface SplitButtonProps extends Omit<DecoratedButtonProps, 'round'> {
+type SplitButtonProps = DecoratedButtonProps & {
   /**
    * The list of items to display in the dropdown menu.
    */
