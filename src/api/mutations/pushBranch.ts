@@ -47,7 +47,7 @@ const usePushBranch = (branch: BranchInfo): Action => {
     blockedBy: [
       { key: 'modify_branch', branch: branch.name },
       ...(currentBranch?.name === branch.name
-        ? [{ key: 'modify_branch', type: 'current' }]
+        ? [{ key: 'modify_branch', type: 'current' }, { key: 'file_operation' }]
         : []),
     ],
     run: async () => {

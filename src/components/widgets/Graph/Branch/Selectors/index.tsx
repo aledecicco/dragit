@@ -6,7 +6,7 @@ import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { runAction, useActionPresenters } from '@/context/actions'
 import { changeSelectedBase, useSelectedReferences } from '@/context/branches'
-import { getUpstreamReference, useCurrentUpstream } from '@/context/upstream'
+import { getUpstreamReference, useSelectedUpstream } from '@/context/upstream'
 import { ActionButton } from '@/lib/ActionButton'
 import { Combobox } from '@/ui/Combobox'
 import { useBranch } from '@/utils/repository'
@@ -21,9 +21,9 @@ const BranchSelectors = () => {
   const headInfoQuery = useQueryHeadInfo()
   const branchesQuery = useQueryBranches()
 
-  const currentUpstream = useCurrentUpstream()
   const { currentReference, baseReference } = useSelectedReferences()
   const currentBranch = useBranch(currentReference)
+  const currentUpstream = useSelectedUpstream(currentBranch)
 
   const checkout = useCheckout()
   const checkoutTracker = useActionPresenters(checkout)

@@ -34,7 +34,10 @@ const useStageFile = (file: WorktreeFileInfo): Action => {
 
   return {
     id: { key: 'file_operation', operation: 'add_file', file: file.path },
-    blockedBy: [{ key: 'file_operation', file: file.path }],
+    blockedBy: [
+      { key: 'file_operation', file: file.path },
+      { key: 'modify_branch', type: 'current' },
+    ],
     run: async () => {
       await addToIndex.mutateAsync({ files: [file.path] })
     },
@@ -53,7 +56,10 @@ const useStageFiles = (): Action<string[] | string> => {
 
   return {
     id: { key: 'file_operation', operation: 'add_files' },
-    blockedBy: [{ key: 'file_operation' }],
+    blockedBy: [
+      { key: 'file_operation' },
+      { key: 'modify_branch', type: 'current' },
+    ],
     run: async (files) => {
       await addToIndex.mutateAsync({
         files: Array.isArray(files) ? files : [files],

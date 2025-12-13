@@ -38,7 +38,10 @@ const useMerge = (): Action<MergeArgs> => {
       operation: 'merge',
       type: 'current',
     },
-    blockedBy: [{ key: 'modify_branch', type: 'current' }],
+    blockedBy: [
+      { key: 'modify_branch', type: 'current' },
+      { key: 'file_operation' },
+    ],
     run: async (args) => {
       await merge.mutateAsync(args)
     },
@@ -61,7 +64,10 @@ const useMergeBranch = (branch: BranchInfo): Action => {
       operation: 'merge',
       type: 'current',
     },
-    blockedBy: [{ key: 'modify_branch', type: 'current' }],
+    blockedBy: [
+      { key: 'modify_branch', type: 'current' },
+      { key: 'file_operation' },
+    ],
     run: async () => {
       await merge.mutateAsync({ reference: branch.name })
     },

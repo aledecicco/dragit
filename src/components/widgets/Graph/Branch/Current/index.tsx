@@ -4,7 +4,7 @@ import { useQueryBranchDivergence } from '@/api/queries/branchDivergence'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { getPaginatedLength } from '@/api/utils'
 import { useSelectedReferences } from '@/context/branches'
-import { useSelectedUpstream } from '@/context/upstream'
+import { getUpstreamReference, useSelectedUpstream } from '@/context/upstream'
 import { useBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
@@ -43,7 +43,7 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
   const upstream = useSelectedUpstream(currentBranch)
   const mainDivergenceQuery = useQueryBranchDivergence(
     currentBranch?.type === 'local' ? currentBranch.name : undefined,
-    upstream ? `${upstream.remote}/${upstream.remoteBranch}` : undefined,
+    upstream ? getUpstreamReference(upstream).refName : undefined,
   )
 
   const commonAncestor = useCurrentCommonAncestor()

@@ -29,7 +29,11 @@ const useContinueMerge = (): Action => {
 
   return {
     id: { key: 'merge_operation', operation: 'continue_merge' },
-    blockedBy: [{ key: 'merge_operation' }],
+    blockedBy: [
+      { key: 'merge_operation' },
+      { key: 'modify_branch', type: 'current' },
+      { key: 'file_operation' },
+    ],
     run: async () => {
       await continueMerge.mutateAsync()
     },

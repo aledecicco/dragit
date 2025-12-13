@@ -29,7 +29,11 @@ const useContinueRebase = (): Action => {
 
   return {
     id: { key: 'merge_operation', operation: 'continue_rebase' },
-    blockedBy: [{ key: 'merge_operation' }],
+    blockedBy: [
+      { key: 'merge_operation' },
+      { key: 'modify_branch', type: 'current' },
+      { key: 'file_operation' },
+    ],
     run: async () => {
       await continueRebase.mutateAsync()
     },

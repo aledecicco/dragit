@@ -34,7 +34,10 @@ const useUnstageFile = (file: WorktreeFileInfo): Action => {
 
   return {
     id: { key: 'file_operation', operation: 'unstage_file', file: file.path },
-    blockedBy: [{ key: 'file_operation' }],
+    blockedBy: [
+      { key: 'file_operation', file: file.path },
+      { key: 'modify_branch', type: 'current' },
+    ],
     run: async () => {
       await unstage.mutateAsync({ files: [file.path] })
     },
@@ -53,7 +56,10 @@ const useUnstageFiles = (): Action<string[] | string> => {
 
   return {
     id: { key: 'file_operation', operation: 'unstage_files' },
-    blockedBy: [{ key: 'file_operation' }],
+    blockedBy: [
+      { key: 'file_operation' },
+      { key: 'modify_branch', type: 'current' },
+    ],
     run: async (files) => {
       await removeFromIndex.mutateAsync({
         files: Array.isArray(files) ? files : [files],

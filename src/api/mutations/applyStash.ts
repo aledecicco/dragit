@@ -38,7 +38,11 @@ const useApplyStash = (stash: StashInfo): Action => {
       operation: 'apply_stash',
       stash: stash.tracker,
     },
-    blockedBy: [{ key: 'file_operation' }, { stash: stash.tracker }],
+    blockedBy: [
+      { key: 'file_operation' },
+      { stash: stash.tracker },
+      { key: 'modify_branch', type: 'current' },
+    ],
     run: async () => {
       await applyStash.mutateAsync({ stashId: stash.id })
     },

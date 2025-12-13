@@ -50,7 +50,10 @@ const useAcceptOurs = (file: UnmergedFileInfo): Action => {
       file: file.path,
       resolution: 'ours',
     },
-    blockedBy: [{ key: 'file_operation', file: file.path }],
+    blockedBy: [
+      { key: 'file_operation', file: file.path },
+      { key: 'modify_branch', type: 'current' },
+    ],
     run: async () => {
       await solveFileConflict.mutateAsync({
         filepath: file.path,
@@ -79,7 +82,10 @@ const useAcceptTheirs = (file: UnmergedFileInfo): Action => {
       file: file.path,
       resolution: 'theirs',
     },
-    blockedBy: [{ key: 'file_operation', file: file.path }],
+    blockedBy: [
+      { key: 'file_operation', file: file.path },
+      { key: 'modify_branch', type: 'current' },
+    ],
     run: async () => {
       await solveFileConflict.mutateAsync({
         filepath: file.path,
@@ -107,7 +113,10 @@ const useAcceptAsIs = (file: UnmergedFileInfo): Action => {
       file: file.path,
       resolution: 'manual',
     },
-    blockedBy: [{ key: 'file_operation', file: file.path }],
+    blockedBy: [
+      { key: 'file_operation', file: file.path },
+      { key: 'modify_branch', type: 'current' },
+    ],
     run: async () => {
       await addToIndex.mutateAsync({ files: [file.path] })
     },

@@ -94,7 +94,7 @@ const chooseUpstream = (
 /**
  * Hook that facilitates tracking the selected upstream for a branch.
  */
-const useSelectedUpstream = (
+const useStoredUpstream = (
   branch: BranchInfo | undefined,
 ): Upstream | undefined => {
   const upstream = useSelectedUpstreamsStore(
@@ -111,11 +111,24 @@ const useSelectedUpstream = (
 }
 
 /**
- * Hook that facilitates tracking the selected upstream for the current branch.
+ * Hook that facilitates tracking the selected upstream for a branch.
  */
-const useCurrentUpstream = (): Upstream | undefined => {
-  const { currentBranch } = useSelectedBranches()
-  return useSelectedUpstream(currentBranch)
+const useSelectedUpstream = (
+  branch: BranchInfo | undefined,
+): Upstream | undefined => {
+  const storedUpstream = useStoredUpstream(branch)
+  const remotesQuery = useQueryRemotes()
+
+  if (storedUpstream) {
+    return storedUpstream
+  }
+
+  const upstream =
+    branch?.type === 'local'
+      ? chooseUpstream(branch, remotesQuery.data ?? [])
+      : undefined
+
+  return upstream
 }
 
 const getUpstreamReference = (upstream: Upstream): Reference => ({
@@ -139,7 +152,7 @@ const useUpstreamSync = () => {
   const remotesQuery = useQueryRemotes()
 
   useEffect(() => {
-    if (!remotesQuery.data || currentBranch?.type !== 'local') {
+    if (currentBranch?.type !== 'local') {
       return
     }
 
@@ -147,14 +160,13 @@ const useUpstreamSync = () => {
 
     store.changeUpstream(
       currentBranch.name,
-      chooseUpstream(currentBranch, remotesQuery.data),
+      chooseUpstream(currentBranch, remotesQuery.data ?? []),
     )
   }, [currentBranch, remotesQuery.data])
 }
 
 export {
   useSelectedUpstream,
-  useCurrentUpstream,
   getUpstreamReference,
   changeSelectedUpstream,
   useUpstreamSync,

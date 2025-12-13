@@ -38,7 +38,10 @@ const useCommitIndex = (): Action<CommitIndexArgs> => {
       operation: 'commit',
       type: 'current',
     },
-    blockedBy: [{ key: 'modify_branch', type: 'current' }],
+    blockedBy: [
+      { key: 'modify_branch', type: 'current' },
+      { key: 'file_operation' },
+    ],
     run: async (args) => {
       await commitIndex.mutateAsync(args)
     },

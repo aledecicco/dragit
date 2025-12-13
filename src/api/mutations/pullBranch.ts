@@ -2,6 +2,7 @@ import { IconDownload } from '@tabler/icons-react'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
+import { useSelectedUpstream } from '@/context/upstream'
 
 import type { BranchInfo, BranchName, RemoteName } from '../models'
 import {
@@ -34,6 +35,7 @@ const pullBranchMutation = (repoPath: string) =>
 
 const usePullBranch = (branch: BranchInfo): Action => {
   const pullBranch = useRepositoryMutation(pullBranchMutation)
+  const upstream = useSelectedUpstream(branch)
 
   return {
     id: {
@@ -44,17 +46,21 @@ const usePullBranch = (branch: BranchInfo): Action => {
     blockedBy: [
       { key: 'modify_branch', branch: branch.name },
       { key: 'modify_branch', type: 'current' },
+      { key: 'file_operation' },
     ],
     run: async () => {
       if (branch.type !== 'local') {
         throw new Error('Branch is not local')
       }
 
-      // TODO: check if this should use the global remote set.
+      if (!upstream) {
+        throw new Error('No upstream set for branch')
+      }
+
       await pullBranch.mutateAsync({
         branch: branch.name,
-        remote: branch.upstream?.remote ?? 'origin',
-        remoteBranch: branch.upstream?.remoteBranch ?? branch.name,
+        remote: upstream.remote,
+        remoteBranch: upstream.remoteBranch,
         isRebase: false,
       })
     },

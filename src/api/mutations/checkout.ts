@@ -40,7 +40,10 @@ const useCheckout = (): Action<CheckoutArgs> => {
       key: 'branch_operation',
       operation: 'checkout',
     },
-    blockedBy: [{ key: 'branch_operation' }],
+    blockedBy: [
+      { key: 'branch_operation' },
+      { key: 'modify_branch', type: 'current' },
+    ],
     run: async (args) => {
       await checkout.mutateAsync(args)
     },
