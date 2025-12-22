@@ -1,3 +1,5 @@
+import * as Path from '@tauri-apps/api/path'
+
 /**
  * Given a word and a count, returns the pluralized form of the word if gramatically correct.
  *
@@ -19,4 +21,27 @@ export const pluralize = (
   }
 
   return suffix
+}
+
+/**
+ * Splits a file path into its segments using the appropriate separator.
+ *
+ * @param filepath - The file path to split.
+ */
+export const splitPath = (filepath: string): string[] => {
+  return filepath.split(Path.sep())
+}
+
+/**
+ * Gets the directory and filename of a file path.
+ *
+ * @param filepath - The file path to get the location of.
+ */
+export const getPathLocation = (filepath: string): [string, string] => {
+  const segments = splitPath(filepath)
+
+  const filename = segments.pop()
+  const filedir = `./${segments.join(Path.sep())}`
+
+  return [filedir, filename ?? filepath]
 }

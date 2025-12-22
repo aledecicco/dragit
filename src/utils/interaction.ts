@@ -1,6 +1,7 @@
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { openPath } from '@tauri-apps/plugin-opener'
 
+// TODO: make app configurable
 const DEFAULT_APP = 'code'
 
 /**

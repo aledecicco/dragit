@@ -13,6 +13,7 @@ import type { VersionedFileInfo } from '@/api/models'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
+import { getPathLocation, splitPath } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface SnapshotDetailsDialogItemProps extends ListItemProps {
@@ -25,10 +26,11 @@ interface SnapshotDetailsDialogItemProps extends ListItemProps {
 /**
  * The list item for files in the snapshot details dialog.
  *
- * Displays as a checkbox to allow selecting/unselecting files.
+ * Displays as a radio item to allow selecting files.
  */
 const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
   const { file, ...itemProps } = props
+
   const Glyph = match(file.changes)
     .with('added', () => IconFilePlus)
     .with('deleted', () => IconFileMinus)
@@ -38,14 +40,7 @@ const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
     .with('renamed', () => IconFileArrowRight)
     .exhaustive()
 
-  const statusMessage = match(file.changes)
-    .with('added', () => 'New')
-    .with('deleted', () => 'Deleted')
-    .with('modified', () => 'Edited')
-    .with('typeChanged', () => 'Converted')
-    .with('copied', () => 'Copied')
-    .with('renamed', () => 'Renamed')
-    .exhaustive()
+  const [filedir, filename] = getPathLocation(file.path)
 
   return (
     <Ariakit.Radio
@@ -55,44 +50,43 @@ const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
           interactive
           {...propsWithCn(
             itemProps,
-            'flex flex-row text-start items-start justify-between gap-x-8',
             'border border-solid border-transparent',
             'aria-checked:border-accent-300',
           )}
         >
-          <div className={cn('min-w-0 w-full')}>
-            <div
-              className={cn(
-                'flex flex-row gap-x-1 items-center',
-                match(file.changes)
-                  .with('added', () => 'text-success-200/90')
-                  .with('deleted', () => 'text-danger-200/90')
-                  .with('modified', () => 'text-success-200/90')
-                  .with('typeChanged', () => 'text-light-400')
-                  .with('copied', () => 'text-light-400')
-                  .with('renamed', () => 'text-light-400')
-                  .exhaustive(),
-              )}
-            >
-              <Icon Glyph={Glyph} size="md" />
-              <Marquee className={cn('text-sm')}>{file.path}</Marquee>
+          <div className={cn('w-full flex flex-col items-start')}>
+            <div className={cn('flex flex-row gap-x-1 items-center min-w-0')}>
+              <Icon
+                Glyph={Glyph}
+                size="md"
+                className={cn(
+                  match(file.changes)
+                    .with('added', () => 'text-success-200/90')
+                    .with('deleted', () => 'text-danger-200/90')
+                    .with('modified', () => 'text-success-200/90')
+                    .with('typeChanged', () => 'text-light-400')
+                    .with('copied', () => 'text-light-400')
+                    .with('renamed', () => 'text-light-400')
+                    .exhaustive(),
+                )}
+              />
+
+              <Marquee className={cn('text-sm text-light-500')}>
+                {filename}
+              </Marquee>
             </div>
 
-            <p
-              className={cn(
-                'text-xs',
-                match(file.changes)
-                  .with('added', () => 'text-success-300/70')
-                  .with('deleted', () => 'text-danger-300/70')
-                  .with('modified', () => 'text-success-300/70')
-                  .with('typeChanged', () => 'text-light-600')
-                  .with('copied', () => 'text-light-600')
-                  .with('renamed', () => 'text-light-600')
-                  .exhaustive(),
-              )}
-            >
-              {statusMessage}
-            </p>
+            <Marquee className={cn('text-xs text-light-900/80')}>
+              {splitPath(filedir).map((segment, i, all) => (
+                <span key={`${i + 1}`}>
+                  {segment}
+
+                  {i < all.length - 1 && (
+                    <span className={cn('text-light-700 mx-px')}>/</span>
+                  )}
+                </span>
+              ))}
+            </Marquee>
           </div>
         </ListItem>
       }

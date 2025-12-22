@@ -101,7 +101,7 @@ const CommandMenu = (props: CommandMenuProps) => {
 
         <Separator className={cn('border-dark-700')} />
 
-        <div className={cn('pt-1 grid max-h-70')}>
+        <div className={cn('pt-1 grid max-h-100')}>
           <Ariakit.ComboboxList className={cn('h-full')} render={children} />
         </div>
       </Ariakit.ComboboxProvider>

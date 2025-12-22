@@ -19,14 +19,13 @@ const CommandMenuItem = (props: CommandMenuItemProps) => {
       focusOnHover
       {...propsWithCn(
         itemProps,
-        'text-xs text-light-500',
+        'text-sm text-light-800',
         'px-2 py-3 rounded-none cursor-pointer',
         'data-active-item:bg-dark-100',
       )}
     >
       <Ariakit.ComboboxItemValue
         className={cn(
-          'tracking-wider',
           '*:data-autocomplete-value:font-thin *:data-autocomplete-value:text-light-300',
           '*:data-user-value:font-bold *:data-user-value:text-light-50',
         )}

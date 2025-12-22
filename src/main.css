@@ -133,7 +133,7 @@
   font-family: "Inter", sans-serif;
   @apply bg-dark-600 text-light-50;
   @apply scheme-dark;
-  @apply font-normal;
+  @apply font-normal tracking-wide;
 }
 
 #root {
