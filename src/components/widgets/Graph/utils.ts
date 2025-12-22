@@ -19,7 +19,6 @@ import { HISTORY_PAGE_SIZE } from '@/api/queries/commitHistory'
 import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { getPaginatedItem, getPaginatedLength } from '@/api/utils'
 import { useSelectedReferences } from '@/context/branches'
-import type { ComboboxOption } from '@/ui/Combobox'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<Page<HistoryItem>>>
 
@@ -139,18 +138,8 @@ const getGraphCommitData = (
  *
  * @returns An array of combobox options.
  */
-const getCurrentBranchOptions = (
-  branches: BranchInfo[],
-): ComboboxOption<BranchInfo>[] => {
-  return (
-    branches?.map((branch) => {
-      const option = {
-        value: branch.name,
-        data: branch,
-      }
-      return option
-    }) ?? []
-  )
+const getCurrentBranchOptions = (branches: BranchInfo[]): BranchInfo[] => {
+  return branches
 }
 
 /**
@@ -166,31 +155,20 @@ const getBaseBranchOptions = (
   branches: BranchInfo[],
   exclude?: RefName,
   include?: Reference,
-): ComboboxOption<Reference | null>[] => {
-  let options =
-    branches?.map((branch) => {
-      const option = {
-        value: branch.name,
-        data: { type: 'branch', refName: branch.name } as Reference | null,
-      }
-      return option
-    }) ?? []
-
-  options.unshift({ value: '', data: null })
+): Reference[] => {
+  let options: Reference[] =
+    branches?.map((branch) => ({ type: 'branch', refName: branch.name })) ?? []
 
   if (exclude) {
-    options = options.filter((option) => option.value !== exclude)
+    options = options.filter((option) => option?.refName !== exclude)
   }
 
   if (include) {
     const isIncluded = options.some(
-      (option) => option.value === include.refName,
+      (option) => option?.refName === include.refName,
     )
     if (!isIncluded) {
-      options.unshift({
-        value: include.refName,
-        data: include,
-      })
+      options.unshift(include)
     }
   }
 

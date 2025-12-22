@@ -5,7 +5,6 @@ import {
   useEffect,
   useRef,
 } from 'react'
-import * as Ariakit from '@ariakit/react'
 import { IconFile } from '@tabler/icons-react'
 import type { UseQueryResult } from '@tanstack/react-query'
 

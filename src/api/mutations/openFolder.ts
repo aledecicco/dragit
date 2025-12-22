@@ -1,11 +1,10 @@
 import { IconFolderOpen } from '@tabler/icons-react'
-import { useMutation } from '@tanstack/react-query'
+import { mutationOptions, useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
 import { useQueryCurrentDir } from '../queries/currentDir'
-import { mutationOptions } from '../utils'
 
 interface OpenFolderArgs {
   newPath: string

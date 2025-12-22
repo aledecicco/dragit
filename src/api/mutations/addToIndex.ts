@@ -1,14 +1,11 @@
 import { IconPlaylistAdd, IconPlus } from '@tabler/icons-react'
+import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
 import type { WorktreeFileInfo } from '../models'
-import {
-  mutationOptions,
-  pathMutationKey,
-  useRepositoryMutation,
-} from '../utils'
+import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface AddToIndexArgs {
   files: string[]

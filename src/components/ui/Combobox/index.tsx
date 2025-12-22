@@ -12,22 +12,35 @@ import { cn, propsWithCn } from '@/utils/styles'
 import { type Glyph, Icon, type IconProps } from '../Icon'
 import { ComboboxItem } from './Item'
 
-type ComboboxOption<T> = {
-  value: string
-  // TODO: don't require data
-  data: T
-}
-
-interface ComboboxProps<T> extends Partial<ButtonProps> {
+interface BaseComboboxProps<T> extends Partial<ButtonProps> {
   /**
    * The currently selected option.
    */
-  option: ComboboxOption<T> | undefined
+  option: T | undefined
 
   /**
    * The list of all available options.
    */
-  options: ComboboxOption<T>[]
+  options: T[]
+
+  /**
+   * Function that gets the string value of an option.
+   *
+   * @param option - The option to get the value for.
+   */
+  getValue?: (option: T) => string
+
+  /**
+   * Function that renders an option.
+   *
+   * @param option - The option to render.
+   */
+  renderOption?: (option: T) => string
+
+  /**
+   * Placeholder text to display when no option is selected.
+   */
+  placeholder?: string
 
   /**
    * A decorator for the input.
@@ -38,63 +51,95 @@ interface ComboboxProps<T> extends Partial<ButtonProps> {
    * Additional props to pass to the decorator icon.
    */
   iconProps?: Partial<IconProps>
+}
 
-  /**
-   * Function that renders an option.
-   *
-   * @param option - The option to render.
-   */
-  renderOption: (option: ComboboxOption<T>) => ReactNode
-
+interface WithEmptyComboboxProps<T> extends BaseComboboxProps<T> {
   /**
    * Callback that updates the selected option.
    *
    * @param option - The new option to set.
    */
-  setOption: (option: ComboboxOption<T>) => void
+  setOption: (option: T | undefined) => void
 
   /**
-   * Placeholder text to display when no option is selected.
+   * Text for an optional empty option.
    */
-  placeholder?: string
+  emptyOption: string
 }
+
+interface WithoutEmptyComboboxProps<T> extends BaseComboboxProps<T> {
+  /**
+   * Callback that updates the selected option.
+   *
+   * @param option - The new option to set.
+   */
+  setOption: (option: T) => void
+
+  /**
+   * Text for an optional empty option.
+   */
+  emptyOption?: never
+}
+
+type ComboboxProps<T> = WithEmptyComboboxProps<T> | WithoutEmptyComboboxProps<T>
 
 /**
  * A select field that allows searching through a list of options.
  *
  * Automatically filters options based on the current input value.
  */
-const Combobox = <T,>(props: ComboboxProps<T>) => {
+function Combobox(props: ComboboxProps<string>): ReactNode
+
+function Combobox<T>(
+  props: ComboboxProps<T> & { getValue: (option: T) => string },
+): ReactNode
+
+function Combobox<T>(props: ComboboxProps<T>) {
   const {
     option,
     options,
+    getValue,
+    setOption,
+    renderOption,
+    emptyOption,
+    placeholder = 'Select...',
     Glyph,
     iconProps,
-    renderOption,
-    setOption,
-    placeholder = 'Select...',
     ...buttonProps
   } = props
 
-  const [search, setSearch] = useState('')
+  const getOptionValue = (option: T): string =>
+    getValue ? getValue(option) : (option as string)
 
-  const matchingOptions = matchSorter(options, search, { keys: ['value'] })
+  const [search, setSearch] = useState('')
+  const value = option ? getOptionValue(option) : ''
+
+  const matchingOptions = matchSorter(options, search, {
+    keys: [getOptionValue],
+  })
 
   return (
     <Ariakit.ComboboxProvider
       resetValueOnHide
       includesBaseElement={false}
-      setValue={(value) => {
-        startTransition(() => setSearch(value))
+      setValue={(newValue) => {
+        startTransition(() => setSearch(newValue))
       }}
     >
       <Ariakit.SelectProvider
-        value={option?.value ?? ''}
-        setValue={(value) => {
-          const option = options.find((option) => value === option.value)
+        value={value}
+        setValue={(newValue) => {
+          if (newValue === '' && emptyOption) {
+            setOption(undefined)
+            return
+          }
 
-          if (option) {
-            setOption(option)
+          const newOption = options.find(
+            (_option) => newValue === getOptionValue(_option),
+          )
+
+          if (newOption) {
+            setOption(newOption)
           }
         }}
         defaultValue=""
@@ -108,7 +153,7 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
               {...propsWithCn(
                 buttonProps,
                 'min-w-0 group/combobox gap-2 text-sm',
-                option === undefined && 'font-thin text-light-300',
+                !option && 'font-thin text-light-300',
               )}
             />
           }
@@ -117,7 +162,9 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
             <Icon Glyph={Glyph} size={buttonProps.size} {...iconProps} />
           )}
           <Marquee reverse={false}>
-            {option === undefined ? placeholder : renderOption(option)}
+            {option
+              ? (renderOption?.(option) ?? getOptionValue(option))
+              : placeholder}
           </Marquee>
           <Icon
             Glyph={IconChevronDown}
@@ -140,6 +187,10 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
           <Separator className={cn('my-2')} />
 
           <Ariakit.ComboboxList className={cn('max-h-80 overflow-y-auto')}>
+            {search === '' && emptyOption && (
+              <ComboboxItem value="">{emptyOption}</ComboboxItem>
+            )}
+
             {mapOr(
               <div
                 className={cn(
@@ -150,11 +201,14 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
                 No matches found
               </div>,
               matchingOptions,
-              (option) => (
-                <ComboboxItem key={option.value} item={option}>
-                  {renderOption(option)}
-                </ComboboxItem>
-              ),
+              (_option) => {
+                const _value = getOptionValue(_option)
+                return (
+                  <ComboboxItem key={_value} value={_value}>
+                    {renderOption ? renderOption(_option) : _value}
+                  </ComboboxItem>
+                )
+              },
             )}
           </Ariakit.ComboboxList>
         </Ariakit.SelectPopover>
@@ -163,4 +217,4 @@ const Combobox = <T,>(props: ComboboxProps<T>) => {
   )
 }
 
-export { Combobox, type ComboboxProps, type ComboboxOption }
+export { Combobox, type ComboboxProps }

@@ -1,15 +1,12 @@
 import { IconUpload } from '@tabler/icons-react'
+import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 import { useSelectedBranches } from '@/context/branches'
 
 import type { BranchInfo, BranchName, RemoteName } from '../models'
-import {
-  mutationOptions,
-  pathMutationKey,
-  useRepositoryMutation,
-} from '../utils'
+import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface PushBranchArgs {
   branch: BranchName

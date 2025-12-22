@@ -1,15 +1,12 @@
 import { IconGitBranch, IconSwitchHorizontal } from '@tabler/icons-react'
+import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 import { useSelectedReferences } from '@/context/branches'
 
 import type { BranchInfo, RefName } from '../models'
-import {
-  mutationOptions,
-  pathMutationKey,
-  useRepositoryMutation,
-} from '../utils'
+import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface CheckoutArgs {
   reference: RefName

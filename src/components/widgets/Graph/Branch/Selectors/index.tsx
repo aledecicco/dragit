@@ -43,19 +43,12 @@ const BranchSelectors = () => {
     <>
       <Combobox
         className={cn('w-65 col-start-1 row-start-1')}
-        option={
-          currentBranch
-            ? {
-                value: currentBranch.name,
-                data: currentBranch,
-              }
-            : undefined
-        }
+        option={currentBranch}
         options={checkoutOptions}
-        setOption={(newOption) => {
-          runAction(checkout, { reference: newOption.data.name, isNew: false })
+        getValue={(branch) => branch.name}
+        setOption={(newBranch) => {
+          runAction(checkout, { reference: newBranch.name, isNew: false })
         }}
-        renderOption={(option) => option.data.name}
         placeholder={
           currentReference?.type === 'commit'
             ? `Detached at #${currentReference.refName}`
@@ -92,24 +85,15 @@ const BranchSelectors = () => {
 
       <Combobox
         className={cn('w-65 col-start-3 row-start-1')}
-        option={
-          baseReference
-            ? {
-                value: baseReference.refName,
-                data: baseReference,
-              }
-            : {
-                value: '',
-                data: null,
-              }
-        }
+        option={baseReference}
         options={baseOptions}
-        setOption={(newOption) => {
+        getValue={(ref) => ref.refName}
+        setOption={(newRef) => {
           if (currentReference) {
-            changeSelectedBase(currentReference, newOption.data)
+            changeSelectedBase(currentReference, newRef ?? null)
           }
         }}
-        renderOption={(option) => option.data?.refName ?? 'No base branch'}
+        emptyOption="No base branch"
         placeholder={
           baseReference?.type === 'commit'
             ? `#${baseReference.refName}`

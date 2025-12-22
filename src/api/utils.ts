@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import {
   type DefaultError,
   type InfiniteData,
@@ -25,20 +24,6 @@ import type {
   WorktreeFileType,
 } from './models'
 import { useQueryCurrentDir } from './queries/currentDir'
-
-/**
- * An implementation of `queryOptions` for mutations.
- */
-export function mutationOptions<
-  TData = unknown,
-  TError = DefaultError,
-  TVariables = void,
-  TContext = unknown,
->(
-  options: UseMutationOptions<TData, TError, TVariables, TContext>,
-): UseMutationOptions<TData, TError, TVariables, TContext> {
-  return options
-}
 
 /**
  * Retrieves an item at a specific index in a paginated data structure.
@@ -244,25 +229,6 @@ export const getFileTypeFilter = (
   }
 
   return filter
-}
-
-/**
- * Hook that clears the current page of an arbitrary query if it has no data.
- *
- * @param query - The query to check for data.
- * @param page - The page that the query was fetched for.
- * @param clearPage - A callback to clear the page if the query has no data.
- */
-export const useHandlePageSync = (
-  query: UseQueryResult<Page<unknown>>,
-  page: number,
-  clearPage: () => void,
-) => {
-  useEffect(() => {
-    if (page && !query.isLoading && !query.data?.items.length) {
-      clearPage()
-    }
-  }, [clearPage, query.data, query.isLoading, page])
 }
 
 /**

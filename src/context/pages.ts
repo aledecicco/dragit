@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 
 import type { FileTypeFilter, WorktreeFileType } from '@/api/models'
 import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
-import { getFileTypeFilter, useHandlePageSync } from '@/api/utils'
+import { getFileTypeFilter } from '@/api/utils'
 
 interface FilePages {
   /**
@@ -100,16 +100,17 @@ const useHandleFilesPageSync = (
 ) => {
   const filesQuery = useQueryWorktreeFiles(types, pathspec)
   const page = useWorktreeFilesPage(types)
-  const clear = () => {
-    clearPage(types)
-  }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: clear page when search changes
   useEffect(() => {
     clearPage(types)
-  }, [types, pathspec, clearPage])
+  }, [types, pathspec])
 
-  useHandlePageSync(filesQuery, page, clear)
+  useEffect(() => {
+    if (page && !filesQuery.isLoading && !filesQuery.data?.items.length) {
+      clearPage(types)
+    }
+  }, [filesQuery.data, filesQuery.isLoading, page, types])
 }
 
 export {

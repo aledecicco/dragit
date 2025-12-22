@@ -6,7 +6,7 @@ import {
   IconWorldQuestion,
 } from '@tabler/icons-react'
 
-import type { RemoteName, Upstream } from '@/api/models'
+import type { BranchName, RemoteName, Upstream } from '@/api/models'
 import { useFetchRemote } from '@/api/mutations/fetchRemote'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryRemotes } from '@/api/queries/remotes'
@@ -15,7 +15,7 @@ import { useSelectedBranches } from '@/context/branches'
 import { changeSelectedUpstream, useSelectedUpstream } from '@/context/upstream'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
-import { Combobox, type ComboboxOption } from '@/ui/Combobox'
+import { Combobox } from '@/ui/Combobox'
 import { EditableText } from '@/ui/EditableText'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -33,16 +33,10 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
   const remotesQuery = useQueryRemotes()
   const branchesQuery = useQueryBranches()
 
-  const remoteOptions: ComboboxOption<RemoteName>[] =
-    remotesQuery.data?.map((remote) => {
-      const option = {
-        value: remote.name,
-        data: remote.name,
-      }
-      return option
-    }) ?? []
+  const remoteOptions: RemoteName[] =
+    remotesQuery.data?.map((remote) => remote.name) ?? []
 
-  const remoteBranchOptions = !upstream
+  const remoteBranchOptions: BranchName[] = !upstream
     ? []
     : (branchesQuery.data
         ?.filter((branch) => branch.type === 'remote')
@@ -55,21 +49,16 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
       {...propsWithCn(divProps, 'w-full flex flex-row items-center min-w-0')}
     >
       <Combobox
-        option={
-          upstream
-            ? { value: upstream.remote, data: upstream.remote }
-            : undefined
-        }
+        option={upstream?.remote}
         options={remoteOptions}
-        setOption={(newOption) => {
+        setOption={(newRemote) => {
           if (currentBranch?.type === 'local' && upstream) {
             changeSelectedUpstream(currentBranch.name, {
-              remote: newOption.value,
+              remote: newRemote,
               remoteBranch: upstream.remoteBranch,
             })
           }
         }}
-        renderOption={(option) => option.value}
         placeholder={currentBranch?.type === 'local' ? 'Remote...' : '-'}
         disabled={!remoteOptions || currentBranch?.type !== 'local'}
         Glyph={
@@ -98,11 +87,11 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         value={upstream?.remoteBranch ?? ''}
         label="Remote branch"
         suggestions={remoteBranchOptions}
-        setValue={(newValue) => {
-          if (currentBranch?.type === 'local' && upstream && newValue) {
+        setValue={(newBranch) => {
+          if (currentBranch?.type === 'local' && upstream && newBranch) {
             changeSelectedUpstream(currentBranch.name, {
               remote: upstream.remote,
-              remoteBranch: newValue,
+              remoteBranch: newBranch,
             })
           }
         }}

@@ -39,7 +39,7 @@ function QueryList<T, I>(
 ): ReactNode
 
 function QueryList<I>(
-  props: QueryListProps<I[], I> & { getItems?: undefined },
+  props: QueryListProps<I[], I> & { getItems?: never },
 ): ReactNode
 
 function QueryList<T, I>(props: QueryListProps<T, I>) {

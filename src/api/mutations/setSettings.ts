@@ -1,11 +1,10 @@
 import { IconDeviceFloppy } from '@tabler/icons-react'
-import { useMutation } from '@tanstack/react-query'
+import { mutationOptions, useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
 import type { Settings } from '../models'
-import { mutationOptions } from '../utils'
 
 interface SetSettingsArgs {
   settings: Settings
