@@ -36,12 +36,16 @@ export const splitPath = (filepath: string): string[] => {
  * Gets the directory and filename of a file path.
  *
  * @param filepath - The file path to get the location of.
+ *
+ * @returns An object containing:
+ * - `filedir`: The directory that contains the file.
+ * - `filename`: The name of the file.
  */
-export const getPathLocation = (filepath: string): [string, string] => {
+export const getPathLocation = (filepath: string) => {
   const segments = splitPath(filepath)
 
-  const filename = segments.pop()
+  const filename = segments.pop() ?? filepath
   const filedir = `./${segments.join(Path.sep())}`
 
-  return [filedir, filename ?? filepath]
+  return { filedir, filename }
 }

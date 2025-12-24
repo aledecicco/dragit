@@ -1,11 +1,12 @@
+import * as Ariakit from '@ariakit/react'
+
 import { useCurrentPath } from '@/api/utils'
-import { Button, type ButtonProps } from '@/ui/Button'
+import { FilePath } from '@/common/FilePath'
 import { Marquee } from '@/ui/Marquee'
 import { openFile } from '@/utils/interaction'
-import { splitPath } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 
-interface FileViewerTitleProps extends ButtonProps {
+interface FileViewerTitleProps extends Ariakit.ButtonProps {
   /**
    * The path of the file being displayed.
    */
@@ -21,14 +22,13 @@ const FileViewerTitle = (props: FileViewerTitleProps) => {
   const { filepath, annotation, ...buttonProps } = props
 
   const repoPath = useCurrentPath()
-  const segments = splitPath(`./${filepath}`)
 
   return (
-    <Button
+    <Ariakit.Button
       {...propsWithCn(
         buttonProps,
         'font-medium',
-        'hover:underline focus:underline bg-transparent!',
+        'hover:underline focus:underline',
         'px-0 py-0.5',
       )}
       onClick={(e) => {
@@ -36,22 +36,18 @@ const FileViewerTitle = (props: FileViewerTitleProps) => {
         openFile(`${repoPath}/${filepath}`)
       }}
     >
-      <Marquee className={cn('text-light-700')}>
-        {segments.map((segment, i, all) => (
-          <span key={`${i + 1}`}>
-            {segment}
-
-            {i < all.length - 1 && (
-              <span className={cn('text-light-300 mx-px')}>/</span>
-            )}
-          </span>
-        ))}
+      <Marquee>
+        <FilePath
+          filepath={`./${filepath}`}
+          className={cn('text-light-700')}
+          separatorProps={{ className: cn('text-light-300') }}
+        />
 
         <span className={cn('text-light-900 text-sm italic ml-2')}>
           {annotation}
         </span>
       </Marquee>
-    </Button>
+    </Ariakit.Button>
   )
 }
 

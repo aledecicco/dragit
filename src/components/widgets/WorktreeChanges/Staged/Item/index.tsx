@@ -9,12 +9,13 @@ import {
 import { match } from 'ts-pattern'
 
 import type { FileOfType } from '@/api/models'
+import { FilePath } from '@/common/FilePath'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
 import { ContextMenu } from '@/lib/ContextMenu'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
-import { getPathLocation, splitPath } from '@/utils/string'
+import { getPathLocation } from '@/utils/string'
 import { cn } from '@/utils/styles'
 
 import type { STAGED_FILE_TYPES } from '..'
@@ -46,7 +47,7 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
     )
     .exhaustive()
 
-  const [filedir, filename] = getPathLocation(file.path)
+  const { filedir, filename } = getPathLocation(file.path)
 
   return (
     <ContextMenu items={<StagedFileContextMenu file={file} />}>
@@ -85,15 +86,10 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
           </div>
 
           <Marquee className={cn('text-xs text-light-900/80')}>
-            {splitPath(filedir).map((segment, i, all) => (
-              <span key={`${i + 1}`}>
-                {segment}
-
-                {i < all.length - 1 && (
-                  <span className={cn('text-light-700 mx-px')}>/</span>
-                )}
-              </span>
-            ))}
+            <FilePath
+              filepath={filedir}
+              separatorProps={{ className: cn('text-light-700') }}
+            />
           </Marquee>
         </div>
       </ListItem>
