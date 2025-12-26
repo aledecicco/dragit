@@ -70,5 +70,51 @@ const usePullBranch = (branch: BranchInfo): Action => {
     Glyph: IconDownload,
   }
 }
+const useRebaseBranch = (branch: BranchInfo): Action => {
+  const pullBranch = useRepositoryMutation(pullBranchMutation)
+  const upstream = useSelectedUpstream(branch)
 
-export { usePullBranch, pullBranchKey, pullBranchMutation, type PullBranchArgs }
+  return {
+    id: {
+      key: 'modify_branch',
+      operation: 'rebase',
+      type: 'current',
+    },
+    blockedBy: [
+      { key: 'modify_branch', branch: branch.name },
+      { key: 'modify_branch', type: 'current' },
+      { key: 'file_operation' },
+    ],
+    run: async () => {
+      if (branch.type !== 'local') {
+        throw new Error('Branch is not local')
+      }
+
+      if (!upstream) {
+        throw new Error('No upstream set for branch')
+      }
+
+      await pullBranch.mutateAsync({
+        branch: branch.name,
+        remote: upstream.remote,
+        remoteBranch: upstream.remoteBranch,
+        isRebase: true,
+      })
+    },
+    label: {
+      idle: 'Rebase',
+      running: 'Rebasing',
+      success: 'Rebased',
+      error: 'Failed to rebase',
+    },
+    Glyph: IconDownload,
+  }
+}
+
+export {
+  usePullBranch,
+  useRebaseBranch,
+  pullBranchKey,
+  pullBranchMutation,
+  type PullBranchArgs,
+}

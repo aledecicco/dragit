@@ -7,8 +7,8 @@ import {
 } from '@/api/mutations/createBranch'
 import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { useMergeBranch } from '@/api/mutations/merge'
-import { usePullBranch } from '@/api/mutations/pullBranch'
-import { usePushBranch } from '@/api/mutations/pushBranch'
+import { usePullBranch, useRebaseBranch } from '@/api/mutations/pullBranch'
+import { useForcePushBranch, usePushBranch } from '@/api/mutations/pushBranch'
 import { useRemoveBranch } from '@/api/mutations/removeBranch'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { useSelectedBranches } from '@/context/branches'
@@ -34,7 +34,9 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
   const checkout = useCheckoutBranch(branch)
   const fastForward = useFastForwardBranch(branch)
   const pull = usePullBranch(branch)
+  const rebase = useRebaseBranch(branch)
   const push = usePushBranch(branch)
+  const forcePush = useForcePushBranch(branch)
   const remove = useRemoveBranch(branch)
   const createBranch = useCreateBranchAt(branch.name)
   const branchOff = useBranchOff(branch.name)
@@ -48,8 +50,14 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
           {!isCurrentBranch && <MenuItem action={checkout} />}
 
           <MenuItem action={isCurrentBranch ? pull : fastForward} />
+          {isCurrentBranch && <MenuItem action={rebase} />}
 
-          {isCurrentBranch && <MenuItem action={push} />}
+          {isCurrentBranch && (
+            <>
+              <MenuItem action={push} />
+              <MenuItem action={forcePush} />
+            </>
+          )}
 
           <Separator />
 
