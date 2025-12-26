@@ -46,7 +46,10 @@ const FormField = (props: FormFieldProps) => {
       )}
     >
       {!compact && (
-        <Ariakit.FormLabel name={name} className={cn('text-sm text-light-400')}>
+        <Ariakit.FormLabel
+          name={name}
+          className={cn('text-sm text-light-400 capitalize')}
+        >
           {label}
           {inputProps.required && ' *'}
         </Ariakit.FormLabel>

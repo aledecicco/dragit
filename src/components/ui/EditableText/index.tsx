@@ -54,9 +54,10 @@ const EditableText = (props: EditableTextProps) => {
       aria-label={`${label}. Press Enter to save. Press Escape to cancel.`}
       store={store}
       {...propsWithCn(inputProps, 'font-medium')}
+      placeholder={inputProps.placeholder ?? `Enter a ${label}...`}
       setValue={(value) => {
-        setEditing(false)
         inputProps.setValue(value)
+        setEditing(false)
       }}
       onBlur={(e) => {
         inputProps.onBlur?.(e)

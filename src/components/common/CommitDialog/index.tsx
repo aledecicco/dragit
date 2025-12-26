@@ -29,7 +29,7 @@ const CommitDialog = (props: CommitDialogProps) => {
 
   return (
     <ValueRequesterDialog heading="Commit Changes" {...dialogProps}>
-      <TextField label="Commit Message" name="message" autoFocus required />
+      <TextField label="commit message" name="message" autoFocus required />
 
       <DecoratedButton
         type="submit"

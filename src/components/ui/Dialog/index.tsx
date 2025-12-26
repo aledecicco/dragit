@@ -60,7 +60,7 @@ const Dialog = (props: DialogProps) => {
           dialogProps,
           'fixed top-half left-half -translate-half',
           'max-w-[70%] max-h-[70%] rounded-lg overflow-hidden',
-          'border-2 border-solid border-dark-900',
+          'border-2 border-dark-900',
           'grid grid-rows-1',
           sideContent
             ? 'w-full h-full grid-cols-[430px_1fr]'

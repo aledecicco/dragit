@@ -51,7 +51,7 @@ const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
           interactive
           {...propsWithCn(
             itemProps,
-            'border border-solid border-transparent',
+            'border border-transparent',
             'aria-checked:border-accent-300',
           )}
         >

@@ -85,7 +85,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
 
       <EditableText
         value={upstream?.remoteBranch ?? ''}
-        label="Remote Branch"
+        label="remote branch"
         suggestions={remoteBranchOptions}
         setValue={(newBranch) => {
           if (currentBranch?.type === 'local' && upstream && newBranch) {
@@ -95,7 +95,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
             })
           }
         }}
-        placeholder={currentBranch?.type === 'local' ? 'Branch...' : '-'}
+        placeholder={currentBranch?.type === 'local' ? undefined : '-'}
         className={cn('pl-5 rounded-l-none flex-1')}
         style={{
           clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%)',

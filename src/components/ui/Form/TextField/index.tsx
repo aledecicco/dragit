@@ -28,7 +28,9 @@ const TextField = (props: TextFieldProps) => {
         fieldProps.onKeyDown?.(e)
 
         if (e.key === 'Enter' && e.ctrlKey) {
+          e.stopPropagation()
           e.preventDefault()
+
           form?.submit()
         }
       }}

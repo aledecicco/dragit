@@ -50,7 +50,7 @@ const CreateBranchDialog = (props: CreateBranchDialogProps) => {
         },
       }}
     >
-      <InputField label="Branch Name" name="name" autoFocus required />
+      <InputField label="branch name" name="name" autoFocus required />
 
       <DecoratedButton
         type="submit"

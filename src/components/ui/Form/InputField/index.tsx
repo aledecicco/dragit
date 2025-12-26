@@ -12,7 +12,7 @@ const InputField = (props: InputFieldProps) => {
 
   return (
     <FormField
-      placeholder={`Enter a ${fieldProps.label}`}
+      placeholder={`Enter a ${fieldProps.label}...`}
       {...propsWithCn(
         fieldProps,
         'p-3 text-sm bg-dark-800 rounded-sm text-light-800',

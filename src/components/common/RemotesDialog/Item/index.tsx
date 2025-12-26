@@ -40,7 +40,7 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
             runAction(renameRemote, newName)
           }
         }}
-        label="Remote Name"
+        label="remote name"
         buttonProps={{
           className: cn('rounded-l-sm rounded-r-none'),
         }}
@@ -54,15 +54,13 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
             runAction(changeRemoteUrl, newUrl)
           }
         }}
-        label="Remote URL"
+        label="remote URL"
         buttonProps={{
           className: cn(
-            'justify-start flex-1 rounded-none border-x border-x-dark-600 border-solid',
+            'justify-start flex-1 rounded-none border-x border-x-dark-600',
           ),
         }}
-        className={cn(
-          'flex-1 rounded-none border-x border-x-dark-600 border-solid',
-        )}
+        className={cn('flex-1 rounded-none border-x border-x-dark-600')}
       />
 
       <ActionButton

@@ -59,7 +59,7 @@ const Autosuggest = (props: AutosuggestProps) => {
         placeholder={placeholder}
         {...propsWithCn(
           comboboxProps,
-          'p-2 bg-dark-800 rounded-sm text-sm text-light-800',
+          'px-2.5 py-1.75 bg-dark-800 rounded-sm text-sm text-light-800',
           'min-w-0 text-sm',
           value === undefined && 'font-thin text-light-300',
         )}

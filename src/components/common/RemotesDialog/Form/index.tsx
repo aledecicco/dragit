@@ -54,11 +54,11 @@ const RemoteForm = (props: RemoteFormProps) => {
         }
       }}
     >
-      <InputField name="name" label="Remote name" required autoFocus compact />
+      <InputField name="name" label="remote name" required autoFocus compact />
 
       <InputField
         name="url"
-        label="Remote URL"
+        label="remote URL"
         containerProps={{ className: cn('flex-1') }}
         required
         compact

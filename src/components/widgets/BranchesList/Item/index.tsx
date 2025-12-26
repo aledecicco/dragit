@@ -37,7 +37,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
         aria-selected={isCurrentBranch}
         {...propsWithCn(
           itemProps,
-          'border border-solid border-transparent',
+          'border border-transparent',
           isCurrentBranch && 'bg-dark-500 border-accent-300',
         )}
       >

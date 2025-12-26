@@ -25,7 +25,7 @@ Stash of ideas in ~planned implementation order:
 - [x] Paginate pathspec searches
 - [ ] "Init", "empty dir", and "not a repository" screens
 - [ ] Highlight matches during pathspec search
-- [ ] More complete commit dialog with "amend" option
+- [x] More complete commit dialog with "amend" option
 - [ ] Animations pass
 - [ ] Drag and drop shortcuts
 - [ ] Global keyboard shortcuts
