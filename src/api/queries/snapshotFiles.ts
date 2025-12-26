@@ -65,7 +65,7 @@ const fetchSnapshotFilesPage = async (
       .returnType<VersionedFileInfo>()
       .with({ status: { Changed: P.select() } }, (status) => ({
         path: file.path,
-        status: 'staged',
+        status: 'versioned',
         changes: match(status.changes)
           .returnType<ChangeStatus>()
           .with({ Added: P.any }, () => 'added')
@@ -76,7 +76,7 @@ const fetchSnapshotFilesPage = async (
       }))
       .with({ status: { Moved: P.select() } }, (status) => ({
         path: file.path,
-        status: 'staged',
+        status: 'versioned',
         oldPath: status.oldPath,
         changes: match(status.changes)
           .returnType<MovedStatus>()

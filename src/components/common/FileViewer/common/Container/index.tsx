@@ -5,11 +5,9 @@ import {
   useEffect,
   useRef,
 } from 'react'
-import { IconFile } from '@tabler/icons-react'
 import type { UseQueryResult } from '@tanstack/react-query'
 
 import { QueryLoader } from '@/lib/Loader/Query'
-import { Icon } from '@/ui/Icon'
 import { Separator } from '@/ui/Separator'
 import { Skeleton } from '@/ui/Skeleton'
 import { range } from '@/utils/array'
@@ -30,9 +28,14 @@ interface FileViewerContainerProps<T>
   filepath: string
 
   /**
+   * The icon to display alongside the file path.
+   */
+  decoration?: ReactNode
+
+  /**
    * An optional annotation to display alongside the file path.
    */
-  annotation?: string
+  annotation?: ReactNode
 
   /**
    * Function that accepts the query's result and returns the children to render.
@@ -46,7 +49,8 @@ interface FileViewerContainerProps<T>
  * Displays the contents of a file, showing changes made to it on each line.
  */
 const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
-  const { query, filepath, annotation, children, ...divProps } = props
+  const { query, filepath, decoration, annotation, children, ...divProps } =
+    props
 
   const viewerRef = useRef<HTMLDivElement>(null)
 
@@ -54,8 +58,6 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
   useEffect(() => {
     viewerRef.current?.scrollTo({ top: 0, left: 0 })
   }, [filepath])
-
-  // TODO: show old path on moved files
 
   return (
     <div
@@ -66,7 +68,7 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
       )}
     >
       <div className={cn('flex flex-row items-center gap-x-2 p-2 pr-9')}>
-        <Icon Glyph={IconFile} size="lg" />
+        {decoration}
 
         <FileViewerTitle filepath={filepath} annotation={annotation} />
       </div>
@@ -86,7 +88,7 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
             <Fragment key={i}>
               <div
                 className={cn(
-                  'h-7 flex flex-row items-center font-mono',
+                  'h-6.5 flex flex-row items-center font-mono',
                   'text-xs w-19 px-1 overflow-hidden',
                   'bg-dark-600 text-light-950/30',
                 )}

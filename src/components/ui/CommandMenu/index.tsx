@@ -95,27 +95,25 @@ const CommandMenu = (props: CommandMenuProps) => {
       >
         <Ariakit.Combobox
           placeholder="Search..."
-          className={cn('w-full px-2 py-3 rounded-none', 'text-sm bg-dark-500')}
+          className={cn('w-full p-3 rounded-none', 'text-sm bg-dark-500')}
           autoSelect
         />
 
         <Separator className={cn('border-dark-700')} />
 
-        <div className={cn('pt-1 grid max-h-100')}>
+        <div className={cn('grid max-h-100')}>
           <Ariakit.ComboboxList className={cn('h-full')} render={children} />
         </div>
       </Ariakit.ComboboxProvider>
 
-      <Separator
-        className={cn('w-[95%] border-light-950/10 mb-1 self-center')}
-      />
+      <Separator className={cn('w-[95%] border-dark-50 mb-1 self-center')} />
 
       {footer}
 
       {!!shortcuts.length && (
         <ShortcutCheatsheet
           shortcuts={shortcuts}
-          className={cn('p-1 self-center')}
+          className={cn('p-2 self-center')}
         />
       )}
     </ValueRequesterDialog>

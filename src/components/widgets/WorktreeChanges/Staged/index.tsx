@@ -11,6 +11,9 @@ export const STAGED_FILE_TYPES = [
 
 interface StagedWorktreeChangesProps extends ComponentProps<'div'> {}
 
+/**
+ * Main app widget displaying the staged changes in the worktree.
+ */
 const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
   const { ...divProps } = props
 

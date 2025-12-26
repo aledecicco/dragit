@@ -1,7 +1,8 @@
+import type { ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 
 import { useCurrentPath } from '@/api/utils'
-import { FilePath } from '@/common/FilePath'
+import { FilePath } from '@/common/File/Path'
 import { Marquee } from '@/ui/Marquee'
 import { openFile } from '@/utils/interaction'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -15,39 +16,44 @@ interface FileViewerTitleProps extends Ariakit.ButtonProps {
   /**
    * An optional annotation to display alongside the file path.
    */
-  annotation?: string
+  annotation?: ReactNode
 }
 
+/**
+ * The title section of the file viewer, displaying the file path.
+ */
 const FileViewerTitle = (props: FileViewerTitleProps) => {
   const { filepath, annotation, ...buttonProps } = props
 
   const repoPath = useCurrentPath()
 
   return (
-    <Ariakit.Button
-      {...propsWithCn(
-        buttonProps,
-        'font-medium',
-        'hover:underline focus:underline',
-        'px-0 py-0.5',
-      )}
-      onClick={(e) => {
-        buttonProps.onClick?.(e)
-        openFile(`${repoPath}/${filepath}`)
-      }}
-    >
-      <Marquee>
-        <FilePath
-          filepath={`./${filepath}`}
-          className={cn('text-light-700')}
-          separatorProps={{ className: cn('text-light-300') }}
-        />
+    <div className={cn('flex flex-col items-start w-full')}>
+      <Ariakit.Button
+        {...propsWithCn(
+          buttonProps,
+          'font-medium',
+          'hover:underline focus:underline',
+          'px-0 pt-0.5 pb-0',
+          'text-light-300',
+        )}
+        onClick={(e) => {
+          buttonProps.onClick?.(e)
+          openFile(`${repoPath}/${filepath}`)
+        }}
+      >
+        <Marquee>
+          <FilePath
+            filepath={`./${filepath}`}
+            separatorProps={{ className: cn('text-light-50') }}
+          />
+        </Marquee>
+      </Ariakit.Button>
 
-        <span className={cn('text-light-900 text-sm italic ml-2')}>
-          {annotation}
-        </span>
+      <Marquee className={cn('text-light-900 text-xs italic')}>
+        {annotation}
       </Marquee>
-    </Ariakit.Button>
+    </div>
   )
 }
 

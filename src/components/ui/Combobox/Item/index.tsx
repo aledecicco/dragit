@@ -2,10 +2,15 @@ import * as Ariakit from '@ariakit/react'
 
 import { cn } from '@/utils/styles'
 
+import { Combobox } from '..'
+
 interface ComboboxItemProps extends Ariakit.SelectItemProps {
   value: string
 }
 
+/**
+ * A single menu item inside a {@link Combobox}.
+ */
 const ComboboxItem = (props: ComboboxItemProps) => {
   const { value, ...itemProps } = props
 

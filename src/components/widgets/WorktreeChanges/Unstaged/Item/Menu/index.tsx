@@ -18,9 +18,15 @@ import { MenuItem } from '@/ui/Menu/Item'
 import type { UNSTAGED_FILE_TYPES } from '../..'
 
 interface UnstagedFileContextMenuProps {
+  /**
+   * The file to use for context menu actions.
+   */
   file: FileOfType<(typeof UNSTAGED_FILE_TYPES)[number]>
 }
 
+/**
+ * The context menu for unstaged files.
+ */
 const UnstagedFileContextMenu = (props: UnstagedFileContextMenuProps) => {
   const { file } = props
 

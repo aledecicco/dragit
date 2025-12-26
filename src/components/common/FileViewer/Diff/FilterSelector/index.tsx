@@ -16,6 +16,9 @@ import { DIFF_FILTERS } from '../utils'
 
 interface DiffFilterSelectorProps extends ToggleGroupProps {}
 
+/**
+ * A selector for filtering diff views.
+ */
 const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
   const { ...toggleGroupProps } = props
 

@@ -24,7 +24,10 @@ const Tab = (props: TabProps) => {
       render={
         <Button
           variant="plain"
-          {...propsWithCn(buttonProps, 'relative rounded-xl rounded-b-none')}
+          {...propsWithCn(
+            buttonProps,
+            'relative rounded-xl rounded-b-none font-medium',
+          )}
         >
           <div
             className={cn('absolute -left-2 bottom-0 bg-inherit w-2 h-2.5')}

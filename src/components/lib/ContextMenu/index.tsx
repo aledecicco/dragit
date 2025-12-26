@@ -13,6 +13,9 @@ interface ContextMenuProps extends Omit<MenuProps, 'children'> {
   items: ReactNode
 }
 
+/**
+ * A context menu that appears on right-click.
+ */
 const ContextMenu = (props: ContextMenuProps) => {
   const { children, items, ...menuProps } = props
 

@@ -2,11 +2,15 @@ import type { ComponentProps } from 'react'
 
 import { useQueryStashes } from '@/api/queries/stashes'
 import { QueryList } from '@/lib/QueryList'
+import { Accordion } from '@/ui/Accordion'
+import { AccordionSection } from '@/ui/Accordion/Section'
 import { Chip } from '@/ui/Chip'
-import { cn, propsWithCn } from '@/utils/styles'
+import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
 import { StashesListItem } from './Item'
+
+const STASHES_DEFAULT_OPEN = true // TODO: make configurable
 
 interface StashesListProps extends ComponentProps<'div'> {}
 
@@ -18,25 +22,12 @@ const StashesList = (props: StashesListProps) => {
   const stashesQuery = useQueryStashes()
 
   return (
-    <div {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}>
-      <div className={cn('flex flex-row items-center justify-between')}>
-        <div
-          className={cn(
-            'text-sm text-light-600 text-start',
-            'py-2 flex flex-row gap-x-2 items-center',
-          )}
-        >
-          <p>Stashes</p>
-
-          <Chip size="sm">{stashesQuery.data?.length ?? '...'}</Chip>
-        </div>
-      </div>
-
-      <div
-        className={cn(
-          'overflow-y-hidden grow',
-          'w-full bg-dark-800 rounded-sm',
-        )}
+    <Accordion {...divProps}>
+      <AccordionSection
+        label="Stashes"
+        extraInfo={<Chip size="sm">{stashesQuery.data?.length ?? '...'}</Chip>}
+        defaultOpen={STASHES_DEFAULT_OPEN}
+        className={cn('mb-2')}
       >
         <QueryList
           name="stashes"
@@ -48,8 +39,8 @@ const StashesList = (props: StashesListProps) => {
             getItemKey: (index: number) => stashes[index].tracker,
           }))}
         />
-      </div>
-    </div>
+      </AccordionSection>
+    </Accordion>
   )
 }
 

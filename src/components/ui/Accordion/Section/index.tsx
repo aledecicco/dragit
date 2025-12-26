@@ -33,11 +33,7 @@ const AccordionSection = (props: AccordionSectionProps) => {
   return (
     <Ariakit.DisclosureProvider defaultOpen={defaultOpen}>
       <Ariakit.CompositeRow
-        render={
-          <div
-            className={cn('flex flex-row items-center justify-between', 'px-2')}
-          />
-        }
+        render={<div className={cn('flex flex-row items-center gap-x-2')} />}
       >
         <Ariakit.CompositeItem
           tabbable
@@ -47,10 +43,10 @@ const AccordionSection = (props: AccordionSectionProps) => {
                 'capitalize',
                 'cursor-pointer w-full group/accordion',
                 'text-sm text-light-600 text-start',
-                'p-2 flex flex-row gap-x-2 items-center',
-                'hover:text-light-700 hover:underline',
-                'focus:text-light-700 focus:underline',
-                'data-focus:text-light-700 data-focus:underline',
+                'py-2 flex flex-row gap-x-2 items-center w-max',
+                'hover:underline',
+                'focus:underline',
+                'data-focus:underline',
                 'aria-disabled:text-light-950',
               )}
             />

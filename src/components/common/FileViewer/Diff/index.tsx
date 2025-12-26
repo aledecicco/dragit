@@ -3,6 +3,8 @@ import { match, P } from 'ts-pattern'
 
 import type { DiffScope, FileDiff } from '@/api/models'
 import { useQueryFileDiff } from '@/api/queries/fileDiff'
+import { FileIcon } from '@/common/File/Icon'
+import { FileStatus } from '@/common/File/Status'
 import { cn } from '@/utils/styles'
 
 import { FileViewerContainer } from '../common/Container'
@@ -33,20 +35,43 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
   const fileStageAnnotation =
     diffScope.type === 'unmerged'
       ? match(diffScope.stage)
-          .with('ours', () => ' (ours)')
-          .with('theirs', () => ' (theirs)')
+          .with('ours', () => (
+            <span className={cn('text-primary-500')}>Ours</span>
+          ))
+          .with('theirs', () => (
+            <span className={cn('text-warning-500')}>Theirs</span>
+          ))
           .exhaustive()
       : match(filter)
-          .with('ours', () => ' (after changes)')
-          .with('theirs', () => ' (before changes)')
-          .with('both', () => undefined)
+          .with('ours', () => 'After changes')
+          .with('theirs', () => 'Before changes')
+          .with('both', () =>
+            'changes' in diffScope.file &&
+            diffScope.file.changes === 'renamed' ? (
+              `Moved from ./${diffScope.file.oldPath}`
+            ) : (
+              <FileStatus file={diffScope.file} />
+            ),
+          )
           .exhaustive()
+
+  const filepath =
+    diffScope.type === 'unmerged'
+      ? diffScope.file.path
+      : match(filter)
+          .with('theirs', () =>
+            'changes' in diffScope.file && diffScope.file.changes === 'renamed'
+              ? diffScope.file.oldPath
+              : diffScope.file.path,
+          )
+          .otherwise(() => diffScope.file.path)
 
   return (
     <FileViewerContainer
       {...divProps}
       query={fileDiffQuery}
-      filepath={diffScope.file.path}
+      decoration={<FileIcon file={diffScope.file} size="lg" />}
+      filepath={filepath}
       annotation={fileStageAnnotation}
     >
       {(fileDiff) => (
@@ -60,7 +85,7 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
           </div>
 
           <FileViewerContent className={cn('col-start-3')}>
-            {highlightDiff(fileDiff, diffScope.file.path, filter)}
+            {highlightDiff(fileDiff, filepath, filter)}
           </FileViewerContent>
         </>
       )}

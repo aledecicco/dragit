@@ -138,8 +138,10 @@ export type FileOfType<T extends WorktreeFileType> = WorktreeFileTypes[T]
 export type FileTypeFilter = {
   [T in WorktreeFileType]?: boolean
 }
-export type VersionedFileInfo = FileInfo &
-  ({ changes: ChangeStatus } | { changes: MovedStatus; oldPath: string })
+export type VersionedFileInfo = FileInfo & { status: 'versioned' } & (
+    | { changes: ChangeStatus }
+    | { changes: MovedStatus; oldPath: string }
+  )
 
 export interface RemoteInfo {
   name: RemoteName

@@ -1,18 +1,8 @@
-import {
-  IconFileAlert,
-  IconFileCode2,
-  IconFileMinus,
-  IconFilePencil,
-  IconFilePlus,
-  IconFileUnknown,
-} from '@tabler/icons-react'
-import { match } from 'ts-pattern'
-
 import type { FileOfType } from '@/api/models'
-import { FilePath } from '@/common/FilePath'
+import { FileIcon } from '@/common/File/Icon'
+import { FilePath } from '@/common/File/Path'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
 import { ContextMenu } from '@/lib/ContextMenu'
-import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { getPathLocation } from '@/utils/string'
@@ -34,19 +24,6 @@ interface UnstagedChangesItemProps extends ListItemProps {
 const UnstagedChangesItem = (props: UnstagedChangesItemProps) => {
   const { file, ...itemProps } = props
 
-  const Glyph = match(file)
-    .with({ status: 'unstaged' }, (file) =>
-      match(file.changes)
-        .with('added', () => IconFilePlus)
-        .with('deleted', () => IconFileMinus)
-        .with('modified', () => IconFilePencil)
-        .with('typeChanged', () => IconFileCode2)
-        .exhaustive(),
-    )
-    .with({ status: 'untracked' }, () => IconFileUnknown)
-    .with({ status: 'unmerged' }, () => IconFileAlert)
-    .exhaustive()
-
   const { filedir, filename } = getPathLocation(file.path)
 
   return (
@@ -61,24 +38,7 @@ const UnstagedChangesItem = (props: UnstagedChangesItemProps) => {
       >
         <div className={cn('w-full flex flex-col items-start')}>
           <div className={cn('flex flex-row gap-x-1 items-center min-w-0')}>
-            <Icon
-              Glyph={Glyph}
-              size="md"
-              className={cn(
-                match(file)
-                  .with({ status: 'unstaged' }, (file) =>
-                    match(file.changes)
-                      .with('added', () => 'text-success-200/90')
-                      .with('deleted', () => 'text-danger-200/90')
-                      .with('modified', () => 'text-success-200/90')
-                      .with('typeChanged', () => 'text-light-400')
-                      .exhaustive(),
-                  )
-                  .with({ status: 'untracked' }, () => 'text-light-600')
-                  .with({ status: 'unmerged' }, () => 'text-warning-100/90')
-                  .exhaustive(),
-              )}
-            />
+            <FileIcon file={file} />
 
             <Marquee className={cn('text-sm text-light-500')}>
               {filename}

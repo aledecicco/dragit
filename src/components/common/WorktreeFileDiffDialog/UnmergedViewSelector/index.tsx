@@ -12,6 +12,9 @@ interface UnmergedViewSelectorProps extends ToggleGroupProps {}
 
 const DIFF_VIEW_MODES = ['inline', 'side_by_side'] as const
 
+/**
+ * A selector to choose a view mode for unmerged files.
+ */
 const UnmergedViewSelector = (props: UnmergedViewSelectorProps) => {
   const { ...toggleGroupProps } = props
 

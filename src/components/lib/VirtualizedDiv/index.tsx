@@ -8,9 +8,9 @@ import {
   ScrollShadowDiv,
   type ScrollShadowDivProps,
 } from '@/lib/ScrollShadowDiv'
-import { cn } from '@/utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 
-import { VirtualizedDivItem } from './Item'
+import { VirtualizedDivItem, type VirtualizedDivItemProps } from './Item'
 
 interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
   /**
@@ -22,6 +22,11 @@ interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
    * Render function for each item.
    */
   renderItem: (item: T) => ReactNode
+
+  /**
+   * Additional props for all item containers.
+   */
+  itemProps?: Partial<VirtualizedDivItemProps>
 
   /**
    * The fixed height of each item.
@@ -47,7 +52,15 @@ interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
  * Displays shadows to signal scrollable content.
  */
 const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
-  const { items, itemSize, renderItem, options, fallback, ...divProps } = props
+  const {
+    items,
+    renderItem,
+    itemProps,
+    itemSize,
+    options,
+    fallback,
+    ...divProps
+  } = props
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const virtualizer = useVirtualizer({
@@ -76,11 +89,11 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
         virtualizer.scrollOffset <
           virtualizer.getTotalSize() - scrollContainerRef.current?.clientHeight
       }
-      {...divProps}
+      {...propsWithCn(divProps, 'px-2')}
     >
       <div
         ref={scrollContainerRef}
-        className={cn('overflow-y-auto w-full max-h-full px-2 scroll-smooth')}
+        className={cn('overflow-y-auto w-full max-h-full scroll-smooth')}
       >
         <div
           className={cn('w-full relative')}
@@ -91,6 +104,7 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
               key={virtualRow.key}
               itemSize={itemSize}
               position={virtualRow.start}
+              {...itemProps}
             >
               {renderItem(items[virtualRow.index])}
             </VirtualizedDivItem>

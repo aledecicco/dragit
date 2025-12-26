@@ -5,9 +5,15 @@ import { requestBranchName } from '@/common/CreateBranchDialog'
 import { MenuItem } from '@/ui/Menu/Item'
 
 interface CommitContextMenuProps {
+  /**
+   * The commit to use for context menu actions.
+   */
   commitId: CommitId
 }
 
+/**
+ * The context menu for commits.
+ */
 const CommitContextMenu = (props: CommitContextMenuProps) => {
   const { commitId } = props
 

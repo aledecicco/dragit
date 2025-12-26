@@ -14,6 +14,9 @@ import { cn, propsWithCn } from '@/utils/styles'
 
 interface PendingActionsProps extends ComponentProps<'div'> {}
 
+/**
+ * A floating widget that displays pending actions that need to be taken care of.
+ */
 const PendingActions = (props: PendingActionsProps) => {
   const { ...divProps } = props
 

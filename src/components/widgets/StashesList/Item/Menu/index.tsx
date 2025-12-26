@@ -8,9 +8,15 @@ import { MenuItem } from '@/ui/Menu/Item'
 import { Separator } from '@/ui/Separator'
 
 interface StashContextMenuProps {
+  /**
+   * The stash to use for context menu actions.
+   */
   stash: StashInfo
 }
 
+/**
+ * The context menu for stashes.
+ */
 const StashContextMenu = (props: StashContextMenuProps) => {
   const { stash } = props
 

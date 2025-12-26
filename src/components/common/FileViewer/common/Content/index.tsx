@@ -20,7 +20,7 @@ const FileViewerContent = (props: FileViewerContentProps) => {
       <div
         className={cn(
           'w-max min-w-full pl-2',
-          'whitespace-pre font-mono leading-7',
+          'whitespace-pre font-mono leading-6.5',
         )}
       >
         {children}

@@ -10,7 +10,7 @@ import {
 import { match } from 'ts-pattern'
 
 import type { VersionedFileInfo } from '@/api/models'
-import { FilePath } from '@/common/FilePath'
+import { FilePath } from '@/common/File/Path'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'

@@ -34,7 +34,7 @@ const LineNumber = (props: LineNumberProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'h-7 flex flex-row font-mono',
+        'h-6.5 flex flex-row font-mono',
         'text-xs w-15 px-1 py-1.75 overflow-hidden',
         match(type)
           .with('added', () => [

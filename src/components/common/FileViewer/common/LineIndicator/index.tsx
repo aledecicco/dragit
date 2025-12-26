@@ -27,7 +27,7 @@ const LineIndicator = (props: LineIndicatorProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'h-7 flex flex-row justify-center font-mono',
+        'h-6.5 flex flex-row justify-center font-mono',
         'w-4 py-1.25 font-bold',
         match(type)
           .with('added', () => 'bg-success-500/30 text-success-500')

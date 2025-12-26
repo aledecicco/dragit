@@ -35,7 +35,7 @@ interface BaseComboboxProps<T> extends Partial<ButtonProps> {
    *
    * @param option - The option to render.
    */
-  renderOption?: (option: T) => string
+  renderOption?: (option: T) => ReactNode
 
   /**
    * Placeholder text to display when no option is selected.

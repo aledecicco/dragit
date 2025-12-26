@@ -13,6 +13,9 @@ export const UNSTAGED_FILE_TYPES = [
 
 interface UnstagedWorktreeChangesProps extends ComponentProps<'div'> {}
 
+/**
+ * Main app widget displaying the unstaged changes in the worktree.
+ */
 const UnstagedWorktreeChanges = (props: UnstagedWorktreeChangesProps) => {
   const { ...divProps } = props
 

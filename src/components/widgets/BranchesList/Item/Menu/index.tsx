@@ -16,9 +16,15 @@ import { MenuItem } from '@/ui/Menu/Item'
 import { Separator } from '@/ui/Separator'
 
 interface BranchContextMenuProps {
+  /**
+   * The branch to use for context menu actions.
+   */
   branch: BranchInfo
 }
 
+/**
+ * The context menu for branches.
+ */
 const BranchContextMenu = (props: BranchContextMenuProps) => {
   const { branch } = props
 
