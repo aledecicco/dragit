@@ -1,4 +1,4 @@
-import { IconMessageCheck } from '@tabler/icons-react'
+import { IconMessageCheck, IconMessageCog } from '@tabler/icons-react'
 import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
@@ -26,7 +26,7 @@ const commitIndexMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useCommitIndex = (): Action<CommitIndexArgs> => {
+const useCommitIndex = (): Action<Omit<CommitIndexArgs, 'isAmend'>> => {
   const commitIndex = useRepositoryMutation(commitIndexMutation)
 
   return {
@@ -40,7 +40,7 @@ const useCommitIndex = (): Action<CommitIndexArgs> => {
       { key: 'file_operation' },
     ],
     run: async (args) => {
-      await commitIndex.mutateAsync(args)
+      await commitIndex.mutateAsync({ ...args, isAmend: false })
     },
     label: {
       idle: 'Commit',
@@ -52,8 +52,35 @@ const useCommitIndex = (): Action<CommitIndexArgs> => {
   }
 }
 
+const useAmend = (): Action<Omit<CommitIndexArgs, 'isAmend'>> => {
+  const commitIndex = useRepositoryMutation(commitIndexMutation)
+
+  return {
+    id: {
+      key: 'modify_branch',
+      operation: 'amend',
+      type: 'current',
+    },
+    blockedBy: [
+      { key: 'modify_branch', type: 'current' },
+      { key: 'file_operation' },
+    ],
+    run: async (args) => {
+      await commitIndex.mutateAsync({ ...args, isAmend: true })
+    },
+    label: {
+      idle: 'Amend',
+      running: 'Amending',
+      success: 'Amended',
+      error: 'Failed to amend',
+    },
+    Glyph: IconMessageCog,
+  }
+}
+
 export {
   useCommitIndex,
+  useAmend,
   commitIndexKey,
   commitIndexMutation,
   type CommitIndexArgs,

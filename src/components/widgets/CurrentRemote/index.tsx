@@ -85,7 +85,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
 
       <EditableText
         value={upstream?.remoteBranch ?? ''}
-        label="Remote branch"
+        label="Remote Branch"
         suggestions={remoteBranchOptions}
         setValue={(newBranch) => {
           if (currentBranch?.type === 'local' && upstream && newBranch) {

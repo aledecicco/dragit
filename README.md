@@ -17,11 +17,11 @@ Stash of ideas in ~planned implementation order:
 - [x] Store bases and upstreams
 - [x] Checkout of remote branches, create branch from commit
 - [x] Tabs for filtering in branches widget
-- [ ] "Create" option on empty comboboxes
+- [x] "Create" option on empty comboboxes
 - [ ] Highlight file sections in scrollbar
 - [x] Merge continuation
-- [ ] Open files on click
-- [ ] Display old paths in file viewers for moved files
+- [x] Open files on click
+- [x] Display old paths in file viewers for moved files
 - [x] Paginate pathspec searches
 - [ ] "Init", "empty dir", and "not a repository" screens
 - [ ] Highlight matches during pathspec search

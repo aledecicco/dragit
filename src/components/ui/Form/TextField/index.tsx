@@ -1,3 +1,5 @@
+import * as Ariakit from '@ariakit/react'
+
 import { propsWithCn } from '@/utils/styles'
 
 import { FormField, type FormFieldProps } from '../Field'
@@ -10,6 +12,8 @@ interface TextFieldProps extends FormFieldProps {}
 const TextField = (props: TextFieldProps) => {
   const { ...fieldProps } = props
 
+  const form = Ariakit.useFormContext()
+
   return (
     <FormField
       render={<textarea rows={5} />}
@@ -20,6 +24,14 @@ const TextField = (props: TextFieldProps) => {
         'border border-transparent',
         'aria-invalid:border-danger-300',
       )}
+      onKeyDown={(e) => {
+        fieldProps.onKeyDown?.(e)
+
+        if (e.key === 'Enter' && e.ctrlKey) {
+          e.preventDefault()
+          form?.submit()
+        }
+      }}
     />
   )
 }

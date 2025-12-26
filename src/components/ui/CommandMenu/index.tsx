@@ -41,6 +41,11 @@ interface CommandMenuProps
    * @param value - The new search value.
    */
   onSearchChange?: (value: string) => void
+
+  /**
+   * Extra props for the search field.
+   */
+  fieldProps?: Partial<Ariakit.ComboboxProps>
 }
 
 export const DEFAULT_SHORTCUTS: Shortcut[] = [
@@ -68,6 +73,7 @@ const CommandMenu = (props: CommandMenuProps) => {
     shortcuts = DEFAULT_SHORTCUTS,
     footer,
     onSearchChange,
+    fieldProps,
     ...dialogProps
   } = props
 
@@ -97,6 +103,7 @@ const CommandMenu = (props: CommandMenuProps) => {
           placeholder="Search..."
           className={cn('w-full p-3 rounded-none', 'text-sm bg-dark-500')}
           autoSelect
+          {...fieldProps}
         />
 
         <Separator className={cn('border-dark-700')} />

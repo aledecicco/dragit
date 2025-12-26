@@ -105,6 +105,10 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
         }
       }}
       {...commandMenuProps}
+      fieldProps={{
+        placeholder: 'Enter a pathspec...',
+        ...commandMenuProps.fieldProps,
+      }}
       onSearchChange={(newSearch) => {
         commandMenuProps.onSearchChange?.(newSearch)
         setSearch(newSearch)

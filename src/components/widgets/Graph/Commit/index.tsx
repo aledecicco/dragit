@@ -37,6 +37,11 @@ interface GraphCommitProps extends ComponentProps<'div'> {
    * The distance to this commit from the branch's tip.
    */
   distance: number
+
+  /**
+   * Whether this commit is the current one can be amended.
+   */
+  allowAmend?: boolean
 }
 
 /**
@@ -51,11 +56,15 @@ const GraphCommit = makeTracked<
   HTMLDivElement,
   ParentCommitType
 >((props) => {
-  const { commitId, commitType, distance, trackRef, ...divProps } = props
+  const { commitId, commitType, distance, trackRef, allowAmend, ...divProps } =
+    props
+
   const commitInfoQuery = useQueryCommitInfo(commitId)
 
   return (
-    <ContextMenu items={<CommitContextMenu commitId={commitId} />}>
+    <ContextMenu
+      items={<CommitContextMenu commitId={commitId} allowAmend={allowAmend} />}
+    >
       <div
         {...propsWithCn(divProps, 'relative')}
         ref={mergeRefs([trackRef, divProps.ref])}

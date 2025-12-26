@@ -18,6 +18,7 @@ interface GraphCommitCardProps extends Ariakit.ButtonProps {
  */
 const GraphCommitCard = (props: GraphCommitCardProps) => {
   const { commitInfo, ...buttonProps } = props
+
   const timeAgo = useDateDifference(commitInfo.timestamp)
 
   return (

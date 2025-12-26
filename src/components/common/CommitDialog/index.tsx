@@ -1,4 +1,4 @@
-import { useCommitIndex } from '@/api/mutations/commitIndex'
+import { useAmend, useCommitIndex } from '@/api/mutations/commitIndex'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import {
   requestValueFromDialog,
@@ -23,7 +23,9 @@ interface CommitFormValues {
  */
 const CommitDialog = (props: CommitDialogProps) => {
   const { ...dialogProps } = props
+
   const commit = useCommitIndex()
+  const amend = useAmend()
 
   return (
     <ValueRequesterDialog heading="Commit Changes" {...dialogProps}>
@@ -31,8 +33,7 @@ const CommitDialog = (props: CommitDialogProps) => {
 
       <DecoratedButton
         type="submit"
-        label={commit.label.idle}
-        Glyph={commit.Glyph}
+        track={dialogProps.formOptions.defaultValues.isAmend ? amend : commit}
         className={cn('w-full')}
         status="primary"
       />
@@ -40,9 +41,14 @@ const CommitDialog = (props: CommitDialogProps) => {
   )
 }
 
-const requestCommitParams = () =>
+const requestCommitParams = (defaultMessage?: string, isAmend?: boolean) =>
   requestValueFromDialog(CommitDialog, {
-    formOptions: { defaultValues: { message: '', isAmend: false } },
+    formOptions: {
+      defaultValues: {
+        message: defaultMessage ?? '',
+        isAmend: isAmend ?? false,
+      },
+    },
   })
 
 export { CommitDialog, requestCommitParams, type CommitDialogProps }
