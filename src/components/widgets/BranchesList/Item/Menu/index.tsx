@@ -76,8 +76,12 @@ const BranchContextMenu = (props: BranchContextMenuProps) => {
         />
       )}
 
-      <Separator />
-      <MenuItem action={remove} status="danger" />
+      {!isCurrentBranch && (
+        <>
+          <Separator />
+          <MenuItem action={remove} status="danger" />{' '}
+        </>
+      )}
     </>
   )
 }

@@ -9,6 +9,7 @@ import { changeSelectedBase, useSelectedReferences } from '@/context/branches'
 import { getUpstreamReference, useSelectedUpstream } from '@/context/upstream'
 import { ActionButton } from '@/lib/ActionButton'
 import { Combobox } from '@/ui/Combobox'
+import { ComboboxItem } from '@/ui/Combobox/Item'
 import { useBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 
@@ -70,6 +71,16 @@ const BranchSelectors = () => {
               .otherwise(() => undefined),
           ),
         }}
+        noMatches={(search) => (
+          <ComboboxItem
+            value={search}
+            onClick={() => {
+              runAction(checkout, { reference: search, isNew: true })
+            }}
+          >
+            Create <b>{search}</b> from current commit
+          </ComboboxItem>
+        )}
       />
 
       <ActionButton

@@ -5,7 +5,7 @@ import { Menu, type MenuProps } from '@/ui/Menu'
 import { propsWithCn } from '@/utils/styles'
 
 interface ContextMenuProps extends Omit<MenuProps, 'children'> {
-  children: Ariakit.MenuButtonProps['render']
+  children: Ariakit.RoleProps['render']
 
   /**
    * The contents to be displayed in the context menu.
@@ -24,7 +24,7 @@ const ContextMenu = (props: ContextMenuProps) => {
 
   return (
     <>
-      <Ariakit.Button
+      <Ariakit.Role
         render={children}
         onContextMenu={(e: React.MouseEvent) => {
           setAnchorRect({ x: e.clientX + 5, y: e.clientY - 5 })

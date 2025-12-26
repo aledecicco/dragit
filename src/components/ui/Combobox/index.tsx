@@ -51,6 +51,13 @@ interface BaseComboboxProps<T> extends Partial<ButtonProps> {
    * Additional props to pass to the decorator icon.
    */
   iconProps?: Partial<IconProps>
+
+  /**
+   * Callback that renders when there are no matching options.
+   *
+   * @param search - The current search string.
+   */
+  noMatches?: (search: string) => ReactNode
 }
 
 interface WithEmptyComboboxProps<T> extends BaseComboboxProps<T> {
@@ -105,6 +112,7 @@ function Combobox<T>(props: ComboboxProps<T>) {
     placeholder = 'Select...',
     Glyph,
     iconProps,
+    noMatches,
     ...buttonProps
   } = props
 
@@ -192,14 +200,18 @@ function Combobox<T>(props: ComboboxProps<T>) {
             )}
 
             {mapOr(
-              <div
-                className={cn(
-                  'text-center p-2',
-                  'text-sm italic text-light-950',
-                )}
-              >
-                No matches found
-              </div>,
+              noMatches ? (
+                noMatches(search)
+              ) : (
+                <div
+                  className={cn(
+                    'text-center p-2',
+                    'text-sm italic text-light-950',
+                  )}
+                >
+                  No matches found
+                </div>
+              ),
               matchingOptions,
               (_option) => {
                 const _value = getOptionValue(_option)
