@@ -90,7 +90,7 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
         commitId={commitData.hash}
         commitType={isUnconfirmed ? 'unconfirmed' : 'confirmed'}
         elementId={COMMIT_ELEMENT_ID(commitData.hash, currentReference.refName)}
-        allowAmend={virtualRow.index === 0}
+        isCurrent={virtualRow.index === 0}
         parent={mapFn(commitData.parent, (parentCommit) => ({
           id: COMMIT_ELEMENT_ID(
             parentCommit,

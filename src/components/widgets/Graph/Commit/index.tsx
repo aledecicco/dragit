@@ -4,14 +4,12 @@ import { mergeRefs } from 'react-merge-refs'
 
 import type { CommitId } from '@/api/models'
 import { useQueryCommitInfo } from '@/api/queries/commitInfo'
-import { ContextMenu } from '@/lib/ContextMenu'
 import { QueryLoader } from '@/lib/Loader/Query'
 import { makeTracked } from '@/lib/SvgOverlay'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { ParentCommitType } from '../Edges'
 import { GraphCommitCard } from './Card'
-import { CommitContextMenu } from './Menu'
 import { GraphCommitNode } from './Node'
 
 export type CommitType = 'confirmed' | 'unconfirmed'
@@ -39,9 +37,9 @@ interface GraphCommitProps extends ComponentProps<'div'> {
   distance: number
 
   /**
-   * Whether this commit is the current one can be amended.
+   * Whether this commit is the current one.
    */
-  allowAmend?: boolean
+  isCurrent?: boolean
 }
 
 /**
@@ -56,42 +54,43 @@ const GraphCommit = makeTracked<
   HTMLDivElement,
   ParentCommitType
 >((props) => {
-  const { commitId, commitType, distance, trackRef, allowAmend, ...divProps } =
+  const { commitId, commitType, distance, trackRef, isCurrent, ...divProps } =
     props
 
   const commitInfoQuery = useQueryCommitInfo(commitId)
 
   return (
-    <ContextMenu
-      items={<CommitContextMenu commitId={commitId} allowAmend={allowAmend} />}
+    <div
+      {...propsWithCn(divProps, 'relative')}
+      ref={mergeRefs([trackRef, divProps.ref])}
     >
-      <div
-        {...propsWithCn(divProps, 'relative')}
-        ref={mergeRefs([trackRef, divProps.ref])}
-      >
-        <GraphCommitNode commitType={commitType} />
+      <GraphCommitNode commitType={commitType} />
 
-        <div
-          className={cn(
-            'absolute left-full top-half translate-x-2 -translate-y-half',
-            'border-4 border-dark-600 rounded-lg shadow-md',
+      <div
+        className={cn(
+          'absolute left-full top-half translate-x-2 -translate-y-half',
+          'border-4 border-dark-600 rounded-lg shadow-md',
+        )}
+        style={{
+          width: COMMIT_WIDTH,
+          height: COMMIT_HEIGHT,
+        }}
+      >
+        <QueryLoader query={commitInfoQuery}>
+          {(commitInfo) => (
+            <Ariakit.CompositeItem
+              rowId={`${distance}`}
+              render={
+                <GraphCommitCard
+                  commitInfo={commitInfo}
+                  isCurrent={isCurrent}
+                />
+              }
+            />
           )}
-          style={{
-            width: COMMIT_WIDTH,
-            height: COMMIT_HEIGHT,
-          }}
-        >
-          <QueryLoader query={commitInfoQuery}>
-            {(commitInfo) => (
-              <Ariakit.CompositeItem
-                rowId={`${distance}`}
-                render={<GraphCommitCard commitInfo={commitInfo} />}
-              />
-            )}
-          </QueryLoader>
-        </div>
+        </QueryLoader>
       </div>
-    </ContextMenu>
+    </div>
   )
 })
 

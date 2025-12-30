@@ -2,6 +2,7 @@ import type { BranchInfo } from '@/api/models'
 import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { usePullBranch, useRebaseBranch } from '@/api/mutations/pullBranch'
 import { useForcePushBranch, usePushBranch } from '@/api/mutations/pushBranch'
+import { interaction } from '@/lib/ActionButton/utils'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 
@@ -35,14 +36,18 @@ const BranchToolbar = (props: BranchToolbarProps) => {
         compact
         fixed
         action={isBase ? fastForward : pull}
-        alternatives={[{ action: rebase }]}
+        alternatives={[
+          interaction({
+            action: rebase,
+          }),
+        ]}
         disabled={toolbarProps.disabled || !branch || branch.type !== 'local'}
       />
       <ToolbarItem
         compact
         fixed
         action={push}
-        alternatives={[{ action: forcePush }]}
+        alternatives={[interaction({ action: forcePush })]}
         disabled={toolbarProps.disabled || !branch || branch.type !== 'local'}
       />
     </Toolbar>

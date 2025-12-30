@@ -13,22 +13,10 @@ import { SplitButton } from '@/ui/SplitButton'
 import { DecoratedButton, type DecoratedButtonProps } from '../DecoratedButton'
 import { useActionButtonAction } from './utils'
 
-type BaseActionButtonProps = Partial<DecoratedButtonProps> & {
-  /**
-   * Additional props used for the dropdown menu if alternatives are provided.
-   */
-  menuButtonProps?: Partial<DecoratedButtonProps>
-
-  /**
-   * A list of alternative actions that can be selected from a dropdown menu.
-   *
-   * When selected, they are run and tracked like the main action.
-   */
-  // biome-ignore lint/suspicious/noExplicitAny: We don't care about the shape of the actions.
-  alternatives?: ActionProps<any>[]
-}
-
-type ActionProps<T> =
+/**
+ * Flows that will be triggered with a click, and that result in an action being run.
+ */
+type Interaction<T> =
   | {
       /**
        * The action that is triggered when the button is clicked.
@@ -46,7 +34,23 @@ type ActionProps<T> =
       argsRequester?: never
     }
 
-type ActionButtonProps<T> = BaseActionButtonProps & ActionProps<T>
+type AnyInteraction = Interaction<never>
+
+type BaseActionButtonProps = Partial<DecoratedButtonProps> & {
+  /**
+   * Additional props used for the dropdown menu if alternatives are provided.
+   */
+  menuButtonProps?: Partial<DecoratedButtonProps>
+
+  /**
+   * A list of alternative actions that can be selected from a dropdown menu.
+   *
+   * When selected, they are run and tracked like the main action.
+   */
+  alternatives?: AnyInteraction[]
+}
+
+type ActionButtonProps<T> = BaseActionButtonProps & Interaction<T>
 
 /**
  * A {@link Button} that triggers and tracks an action, reflecting its state during its lifecycle.
@@ -107,4 +111,9 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   )
 }
 
-export { ActionButton, type ActionButtonProps }
+export {
+  ActionButton,
+  type ActionButtonProps,
+  type Interaction,
+  type AnyInteraction,
+}

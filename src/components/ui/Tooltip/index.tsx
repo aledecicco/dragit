@@ -19,16 +19,30 @@ interface TooltipProps extends Ariakit.TooltipProps {
    * Defaults to 'top'.
    */
   placement?: Ariakit.TooltipProviderProps['placement']
+
+  /**
+   * Whether the tooltip should appear instantly without delay.
+   */
+  instant?: boolean
 }
 
 /**
  * Tooltip component with default styles that is triggered when hovering over an anchor.
  */
 const Tooltip = (props: TooltipProps) => {
-  const { anchor, description, placement = 'top', ...tooltipProps } = props
+  const {
+    anchor,
+    description,
+    placement = 'top',
+    instant,
+    ...tooltipProps
+  } = props
 
   return (
-    <Ariakit.TooltipProvider placement={placement}>
+    <Ariakit.TooltipProvider
+      placement={placement}
+      timeout={instant ? 0 : undefined}
+    >
       <Ariakit.TooltipAnchor render={anchor} />
       <Ariakit.Tooltip
         unmountOnHide

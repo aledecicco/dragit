@@ -11,7 +11,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
-import type { ResolutionStrategy, UnmergedFileInfo } from '../models'
+import type { ResolutionStrategy, WorktreeFileInfo } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 import { addToIndexMutation } from './addToIndex'
 import { removeFromTreeMutation } from './removeFromTree'
@@ -36,7 +36,7 @@ const solveFileConflictMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useAcceptOurs = (file: UnmergedFileInfo): Action => {
+const useAcceptOurs = (file: WorktreeFileInfo): Action => {
   const solveFileConflict = useRepositoryMutation(solveFileConflictMutation)
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
@@ -68,7 +68,7 @@ const useAcceptOurs = (file: UnmergedFileInfo): Action => {
   }
 }
 
-const useAcceptTheirs = (file: UnmergedFileInfo): Action => {
+const useAcceptTheirs = (file: WorktreeFileInfo): Action => {
   const solveFileConflict = useRepositoryMutation(solveFileConflictMutation)
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
@@ -100,7 +100,7 @@ const useAcceptTheirs = (file: UnmergedFileInfo): Action => {
   }
 }
 
-const useAcceptAsIs = (file: UnmergedFileInfo): Action => {
+const useAcceptAsIs = (file: WorktreeFileInfo): Action => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
@@ -127,7 +127,7 @@ const useAcceptAsIs = (file: UnmergedFileInfo): Action => {
   }
 }
 
-const useAcceptDeletion = (file: UnmergedFileInfo): Action => {
+const useAcceptDeletion = (file: WorktreeFileInfo): Action => {
   const removeFromTree = useRepositoryMutation(removeFromTreeMutation)
 
   return {
@@ -151,7 +151,7 @@ const useAcceptDeletion = (file: UnmergedFileInfo): Action => {
   }
 }
 
-const useIgnoreDeletion = (file: UnmergedFileInfo): Action => {
+const useIgnoreDeletion = (file: WorktreeFileInfo): Action => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
@@ -175,7 +175,7 @@ const useIgnoreDeletion = (file: UnmergedFileInfo): Action => {
   }
 }
 
-const useAcceptFile = (file: UnmergedFileInfo): Action => {
+const useAcceptFile = (file: WorktreeFileInfo): Action => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
@@ -199,7 +199,7 @@ const useAcceptFile = (file: UnmergedFileInfo): Action => {
   }
 }
 
-const useIgnoreFile = (file: UnmergedFileInfo): Action => {
+const useIgnoreFile = (file: WorktreeFileInfo): Action => {
   const removeFromTree = useRepositoryMutation(removeFromTreeMutation)
 
   return {

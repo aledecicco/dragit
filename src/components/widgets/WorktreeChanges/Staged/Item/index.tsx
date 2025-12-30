@@ -1,15 +1,16 @@
 import type { FileOfType } from '@/api/models'
+import { useUnstageFile } from '@/api/mutations/removeFromIndex'
 import { FileIcon } from '@/common/File/Icon'
 import { FilePath } from '@/common/File/Path'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
-import { ContextMenu } from '@/lib/ContextMenu'
+import { interaction } from '@/lib/ActionButton/utils'
+import { InteractionHandler } from '@/lib/InteractionHandler'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { getPathLocation } from '@/utils/string'
 import { cn } from '@/utils/styles'
 
 import type { STAGED_FILE_TYPES } from '..'
-import { StagedFileContextMenu } from './Menu'
 
 interface StagedChangesItemProps extends ListItemProps {
   /**
@@ -25,36 +26,46 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
   const { file, ...itemProps } = props
 
   const { filedir, filename } = getPathLocation(file.path)
+  const interactions = useInteractions(file)
 
   return (
-    <ContextMenu items={<StagedFileContextMenu file={file} />}>
-      <ListItem
-        interactive
-        {...itemProps}
-        onClick={(e) => {
-          itemProps.onClick?.(e)
-          showWorktreeFileDiffDialog(file)
-        }}
-      >
-        <div className={cn('w-full flex flex-col items-start')}>
-          <div className={cn('flex flex-row gap-x-1 items-center min-w-0')}>
-            <FileIcon file={file} />
+    <InteractionHandler
+      interactions={interactions}
+      render={
+        <ListItem
+          interactive
+          {...itemProps}
+          onClick={(e) => {
+            itemProps.onClick?.(e)
+            showWorktreeFileDiffDialog(file)
+          }}
+        />
+      }
+    >
+      <div className={cn('w-full flex flex-col items-start')}>
+        <div className={cn('flex flex-row gap-x-1 items-center min-w-0')}>
+          <FileIcon file={file} />
 
-            <Marquee className={cn('text-sm text-light-500')}>
-              {filename}
-            </Marquee>
-          </div>
-
-          <Marquee className={cn('text-xs text-light-900/80')}>
-            <FilePath
-              filepath={filedir}
-              separatorProps={{ className: cn('text-light-700') }}
-            />
-          </Marquee>
+          <Marquee className={cn('text-sm text-light-500')}>{filename}</Marquee>
         </div>
-      </ListItem>
-    </ContextMenu>
+
+        <Marquee className={cn('text-xs text-light-900/80')}>
+          <FilePath
+            filepath={filedir}
+            separatorProps={{ className: cn('text-light-700') }}
+          />
+        </Marquee>
+      </div>
+    </InteractionHandler>
   )
+}
+
+const useInteractions = (
+  file: FileOfType<(typeof STAGED_FILE_TYPES)[number]>,
+) => {
+  const unstage = useUnstageFile(file)
+
+  return [interaction({ action: unstage })]
 }
 
 export { StagedChangesItem, type StagedChangesItemProps }

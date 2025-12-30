@@ -1,6 +1,6 @@
 import {
-  IconAlertTriangleFilled,
-  IconCircleCheckFilled,
+  IconAlertHexagonFilled,
+  IconCheck,
   IconLoader2,
 } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
@@ -255,8 +255,7 @@ async function runAction<T>(action: Action<T>, args?: T): Promise<void> {
   }
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: We don't care about the shape of the actions.
-type AnyAction = Action<any>
+type AnyAction = Action<never>
 
 /**
  * Utility function to get the icon to display for an action based on its status.
@@ -266,8 +265,8 @@ const getActionGlyph = (action: AnyAction, status: ActionStatus): Glyph => {
     .returnType<Glyph>()
     .with('idle', () => action.Glyph)
     .with('running', () => IconLoader2)
-    .with('success', () => IconCircleCheckFilled)
-    .with('error', () => IconAlertTriangleFilled)
+    .with('success', () => IconCheck)
+    .with('error', () => IconAlertHexagonFilled)
     .with('disabled', () => action.Glyph)
     .exhaustive()
 }
@@ -314,5 +313,27 @@ function useActionPresenters(actions: AnyAction | AnyAction[]) {
   })
 }
 
-export { useActionStatuses, runAction, useActionPresenters, hashId }
+/**
+ * A hook that chooses the most relevant action from a list.
+ *
+ * @param actions - A list of actions to track.
+ */
+const useActiveAction = (actions: AnyAction[]): AnyAction | undefined => {
+  const statuses = useActionStatuses(actions)
+
+  const activeAction =
+    actions.find((_, index) => statuses[index] === 'running') ??
+    actions.find((_, index) => statuses[index] === 'error') ??
+    actions.find((_, index) => statuses[index] === 'success')
+
+  return activeAction
+}
+
+export {
+  useActionStatuses,
+  runAction,
+  useActionPresenters,
+  useActiveAction,
+  hashId,
+}
 export type { Action, AnyAction, ActionId, ActionStatus, ActionPresenter }

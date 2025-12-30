@@ -9,14 +9,14 @@ import { cn } from '@/utils/styles'
 
 import { Menu } from '..'
 
-type MenuItemProps<T = void> =
+type MenuItemProps<T> =
   | Omit<ActionButtonProps<T>, 'alternatives'>
   | DecoratedButtonProps
 
 /**
  * A single menu item inside a {@link Menu}.
  */
-const MenuItem = <T = void>(props: MenuItemProps<T>) => {
+const MenuItem = <T,>(props: MenuItemProps<T>) => {
   const { ...buttonProps } = props
 
   return (

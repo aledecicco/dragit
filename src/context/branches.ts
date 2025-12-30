@@ -186,7 +186,7 @@ const useReferencesSync = () => {
           : undefined
 
     if (baseReference && baseReference.refName === headReference.refName) {
-      // If the new base collides with the current reference, try to fall back to the previous base.
+      // If the new reference collides with the current base, try to fall back to the previous reference.
       if (prevReference && prevReference.refName !== headReference.refName) {
         newBase = prevReference
       } else {

@@ -1,9 +1,6 @@
-import {
-  type Action,
-  type ActionPresenter,
-  useActionPresenters,
-  useActionStatuses,
-} from '@/context/actions'
+import { type AnyAction, useActiveAction } from '@/context/actions'
+
+import type { AnyInteraction, Interaction } from '.'
 
 /**
  * A hook that facilitates choosing which action to track for an action button.
@@ -11,39 +8,23 @@ import {
  * @param action - The main action to use as default.
  * @param alternatives - A list of alternative actions to track.
  */
-const useActionButtonAction = <T>(
-  action: Action<T> | Action<void>,
-  alternatives: Action[] | undefined,
-): Action<T> | Action<void> => {
+const useActionButtonAction = (
+  action: AnyAction,
+  alternatives: AnyAction[] | undefined,
+): AnyAction => {
   const actions = [action, ...(alternatives ?? [])]
-  const statuses = useActionStatuses(actions)
+  const activeAction = useActiveAction(actions)
 
-  const activeAction =
-    actions.find((_, index) => statuses[index] === 'running') ??
-    actions.find((_, index) => statuses[index] === 'error') ??
-    actions.find((_, index) => statuses[index] === 'success') ??
-    action
-
-  return activeAction
+  return activeAction ?? action
 }
 
 /**
- * A hook that facilitates tracking the state of an action button.
+ * Utility to safely type an interaction.
  *
- * Manages the icon and label of the button, allowing to track one of the alternative actions,
- * and reverting back to the main one once done.
- *
- * @param action - The main action to use as default.
- * @param alternatives - A list of alternative actions to track.
- * @param defaultStatus - The default status of the button while all actions are idle (used during running state also).
+ * @param interaction - The interaction to type.
  */
-const useActionButtonTracker = <T>(
-  action: Action<T> | Action<void>,
-  alternatives: Action[] | undefined,
-): ActionPresenter => {
-  const activeAction = useActionButtonAction(action, alternatives)
-
-  return useActionPresenters(activeAction)
+const interaction = <T>(interaction: Interaction<T>): AnyInteraction => {
+  return interaction as Interaction<never>
 }
 
-export { useActionButtonAction, useActionButtonTracker }
+export { useActionButtonAction, interaction }
