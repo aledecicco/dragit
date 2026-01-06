@@ -25,7 +25,6 @@ const GraphCommitNode = (props: GraphCommitNodeProps) => {
       {...propsWithCn(
         divProps,
         'rounded-full shadow-sm p-0.5',
-        'flex items-center justify-center',
         match(commitType)
           .with('confirmed', () => 'bg-primary-600')
           .with('unconfirmed', () => 'bg-accent-400')

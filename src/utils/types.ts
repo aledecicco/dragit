@@ -1,15 +1,6 @@
-type ReactSetter<T> = React.Dispatch<React.SetStateAction<T>>
-Object
-type LiteralUnion<LiteralType extends string> =
-  | LiteralType
-  | (string & Record<never, never>)
+export type ReactSetter<T> = React.Dispatch<React.SetStateAction<T>>
 
-type Size = 'xs' | 'sm' | 'md' | 'lg'
-
-/**
- * The identity function.
- */
-const idFn = <T>(v: T) => v
+export type Size = 'xs' | 'sm' | 'md' | 'lg'
 
 /**
  * Functor map function. Applies a function to a value if defined, and returns `undefined` otherwise.
@@ -17,7 +8,7 @@ const idFn = <T>(v: T) => v
  * @param v - The value to map.
  * @param f - The function to apply.
  */
-const mapFn = <T, R>(
+export const mapFn = <T, R>(
   v: T | undefined | null,
   f: (v: T) => R,
 ): R | undefined => {
@@ -28,21 +19,12 @@ const mapFn = <T, R>(
   return f(v)
 }
 
-type AnyObject = Record<never, never>
+export type AnyObject = Record<never, never>
 
 /**
  * Makes the keys of a type `T` optional, except for the ones specified in `K`.
  */
-type RequireOnly<T, K extends keyof T> = Partial<T> & Pick<T, K>
+export type RequireOnly<T, K extends keyof T> = Partial<T> & Pick<T, K>
 
-type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
-
-export type {
-  ReactSetter,
-  LiteralUnion,
-  Size,
-  AnyObject,
-  RequireOnly,
-  MakeOptional,
-}
-export { idFn, mapFn }
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
+  Partial<Pick<T, K>>

@@ -3,7 +3,7 @@ import type { IconProps as TablerIconProps } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import { propsWithCn } from '@/utils/styles'
-import type { LiteralUnion, Size } from '@/utils/types'
+import type { Size } from '@/utils/types'
 
 type Glyph = ComponentType<TablerIconProps>
 
@@ -14,9 +14,9 @@ interface IconProps extends TablerIconProps {
   Glyph: ComponentType<TablerIconProps>
 
   /**
-   * The size of the icon. Can be an arbitrary class or a predefined {@link Size}.
+   * The size of the icon.
    */
-  size?: LiteralUnion<Size>
+  size?: Size
 }
 
 /**
@@ -35,7 +35,7 @@ const Icon = (props: IconProps) => {
           .with('sm', () => 'stroke-1.5 size-3.5')
           .with('md', () => 'stroke-1.5 size-4')
           .with('lg', () => 'stroke-2 size-5')
-          .otherwise(() => size),
+          .exhaustive(),
       )}
     />
   )

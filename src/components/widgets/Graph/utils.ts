@@ -17,8 +17,12 @@ import type {
 } from '@/api/models'
 import { HISTORY_PAGE_SIZE } from '@/api/queries/commitHistory'
 import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
+import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { getPaginatedItem, getPaginatedLength } from '@/api/utils'
 import { useSelectedReferences } from '@/context/branches'
+
+import { STAGED_FILE_TYPES } from '../WorktreeChanges/Staged'
+import { UNSTAGED_FILE_TYPES } from '../WorktreeChanges/Unstaged'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<Page<HistoryItem>>>
 
@@ -175,6 +179,16 @@ const getBaseBranchOptions = (
   return options
 }
 
+/**
+ * Hook that determines whether there are uncommitted changes in the worktree.
+ */
+const useHasUncommittedChanges = (): boolean => {
+  const stagedFiles = useQueryWorktreeFiles(STAGED_FILE_TYPES)
+  const unstagedFiles = useQueryWorktreeFiles(UNSTAGED_FILE_TYPES)
+
+  return !!stagedFiles.data?.items.length || !!unstagedFiles.data?.items.length
+}
+
 export {
   ancestorNotInRange,
   ancestorIsDivergent,
@@ -183,4 +197,5 @@ export {
   getGraphCommitData,
   getCurrentBranchOptions,
   getBaseBranchOptions,
+  useHasUncommittedChanges,
 }
