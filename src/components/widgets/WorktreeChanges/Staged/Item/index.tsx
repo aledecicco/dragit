@@ -1,5 +1,6 @@
 import type { FileOfType } from '@/api/models'
 import { useUnstageFile } from '@/api/mutations/removeFromIndex'
+import { useStashFile } from '@/api/mutations/saveStash'
 import { FileIcon } from '@/common/File/Icon'
 import { FilePath } from '@/common/File/Path'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
@@ -64,8 +65,9 @@ const useInteractions = (
   file: FileOfType<(typeof STAGED_FILE_TYPES)[number]>,
 ) => {
   const unstage = useUnstageFile(file)
+  const stash = useStashFile(file)
 
-  return [interaction({ action: unstage })]
+  return [[interaction({ action: unstage }), interaction({ action: stash })]]
 }
 
 export { StagedChangesItem, type StagedChangesItemProps }

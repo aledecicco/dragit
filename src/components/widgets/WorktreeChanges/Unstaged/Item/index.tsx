@@ -2,6 +2,7 @@ import { match, P } from 'ts-pattern'
 
 import type { FileOfType } from '@/api/models'
 import { useStageFile } from '@/api/mutations/addToIndex'
+import { useStashFile } from '@/api/mutations/saveStash'
 import {
   useAcceptAsIs,
   useAcceptDeletion,
@@ -74,6 +75,7 @@ const useInteractions = (
   file: FileOfType<(typeof UNSTAGED_FILE_TYPES)[number]>,
 ) => {
   const stage = useStageFile(file)
+  const stash = useStashFile(file)
 
   const acceptAsIs = useAcceptAsIs(file)
   const acceptOurs = useAcceptOurs(file)
@@ -84,7 +86,7 @@ const useInteractions = (
   const ignoreNewFile = useIgnoreFile(file)
 
   return [
-    ...(file.status === 'unmerged'
+    file.status === 'unmerged'
       ? match(file.changes)
           .with(P.union('bothAdded', 'bothModified'), () => [
             interaction({ action: acceptAsIs }),
@@ -101,7 +103,7 @@ const useInteractions = (
             interaction({ action: ignoreDeletion }),
           ])
           .exhaustive()
-      : [{ action: stage }]),
+      : [interaction({ action: stage }), interaction({ action: stash })],
   ]
 }
 

@@ -4,6 +4,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/context/actions'
 
+import type { WorktreeFileInfo } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface SaveStashArgs {
@@ -27,8 +28,35 @@ const saveStashMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
+const useStashFile = (file: WorktreeFileInfo): Action => {
+  const saveStash = useRepositoryMutation(saveStashMutation)
+
+  return {
+    id: { key: 'file_operation', operation: 'save_stash', file: file.path },
+    blockedBy: [
+      { key: 'file_operation', file: file.path },
+      { key: 'modify_branch', type: 'current' },
+    ],
+    run: async () => {
+      await saveStash.mutateAsync({
+        files: [file.path],
+        message: null, // TODO: allow messages
+        includeUntracked: true,
+      })
+    },
+    label: {
+      idle: 'Stash',
+      running: 'Stashing',
+      success: 'Stashed',
+      error: 'Failed',
+    },
+    Glyph: IconPackage,
+  }
+}
+
 const useSaveStash = (): Action<string[] | string> => {
   const saveStash = useRepositoryMutation(saveStashMutation)
+
   return {
     id: { key: 'file_operation', operation: 'save_stash' },
     blockedBy: [
@@ -52,4 +80,10 @@ const useSaveStash = (): Action<string[] | string> => {
   }
 }
 
-export { useSaveStash, saveStashKey, saveStashMutation, type SaveStashArgs }
+export {
+  useStashFile,
+  useSaveStash,
+  saveStashKey,
+  saveStashMutation,
+  type SaveStashArgs,
+}
