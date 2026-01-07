@@ -6,19 +6,20 @@ import {
   useVirtualizer,
 } from '@tanstack/react-virtual'
 
+import { SvgOverlay } from '@/widgets/Graph/SvgOverlay'
+
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { getPaginatedLength } from '@/api/utils'
 import { BranchToolbar } from '@/common/BranchToolbar'
 import { useSelectedBranches, useSelectedReferences } from '@/context/branches'
 import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
-import { SvgOverlay } from '@/lib/SvgOverlay'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { GraphBaseBranch } from './Branch/Base'
 import { GraphCurrentBranch } from './Branch/Current'
 import { BranchSelectors } from './Branch/Selectors'
 import { NODE_SIZE } from './Commit/Node'
-import { CURVE_SIZE, EDGE_LENGTH, EDGE_OFFSET, Edges } from './Edges'
+import { CURVE_SIZE, EDGE_LENGTH, EDGE_OFFSET } from './Edges/utils'
 import { useCurrentCommonAncestor } from './utils'
 
 interface GraphProps extends ComponentProps<'div'> {}
@@ -133,7 +134,6 @@ const GraphInner = () => {
           )}
         >
           <SvgOverlay
-            RenderOverlay={Edges}
             className={cn('w-full')}
             style={{ height: virtualizer.getTotalSize() }}
           >

@@ -1,4 +1,4 @@
-import { type ComponentType, type Ref, useEffect, useRef } from 'react'
+import { type ComponentType, type RefObject, useEffect, useRef } from 'react'
 
 import {
   type ThrottleOptions,
@@ -9,19 +9,20 @@ import { MS_IN_SECOND } from '@/utils/time'
 import type { AnyObject } from '@/utils/types'
 
 import {
-  type Element,
   type ElementId,
-  type ParentRel,
-  useSvgOverlay,
+  type ParentElement,
+  registerElement,
+  type TrackedElement,
+  unregisterElement,
 } from './context'
 
-interface TrackedComponentProps<R extends string> {
+interface TrackedComponentProps {
   elementId: ElementId
-  parent: ParentRel<R> | undefined
+  parent: ParentElement | undefined
 }
 
 interface TrackRefProps<T extends HTMLElement> {
-  trackRef: Ref<T>
+  trackRef: RefObject<T | null>
 }
 
 /**
@@ -29,30 +30,27 @@ interface TrackRefProps<T extends HTMLElement> {
  *
  * Also provides a ref that should be attached by the inner component to the element that's going to be tracked.
  */
-const makeTracked = <
-  P extends AnyObject,
-  T extends HTMLElement,
-  R extends string = string,
->(
+const makeTracked = <P extends AnyObject, T extends HTMLElement>(
   WrappedComponent: ComponentType<
-    Omit<P, keyof TrackedComponentProps<R>> & TrackRefProps<T>
+    Omit<P, keyof TrackedComponentProps> & TrackRefProps<T>
   >,
 ) => {
-  const TrackedComponent = (props: P & TrackedComponentProps<R>) => {
+  const TrackedComponent = (props: P & TrackedComponentProps) => {
     const { elementId, parent, ...componentProps } = props
-    const svgOverlay = useSvgOverlay()
 
     const ref = useRef<T>(null)
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: manually handle item registration
     useEffect(() => {
-      svgOverlay.registerElement(elementId, {
-        ref,
-        parent,
-      })
+      if (ref.current) {
+        registerElement(elementId, {
+          ref: ref as RefObject<T>,
+          parent,
+        })
+      }
 
       return () => {
-        svgOverlay.unregisterElement(elementId)
+        unregisterElement(elementId)
       }
     }, [elementId, parent?.id, parent?.type])
 
@@ -74,22 +72,20 @@ interface Position {
  *
  * @param elem - The element to get the position of.
  */
-const getPosition = (elem: Element): Position => {
+const getPosition = (elem: TrackedElement): Position => {
   const pos = { x: 0, y: 0 }
 
-  if (elem.ref.current) {
-    pos.x += elem.ref.current.offsetLeft
-    pos.y += elem.ref.current.offsetTop
+  pos.x += elem.ref.current.offsetLeft
+  pos.y += elem.ref.current.offsetTop
 
-    const transform = window.getComputedStyle(elem.ref.current).transform
+  const transform = window.getComputedStyle(elem.ref.current).transform
 
-    if (transform !== 'none') {
-      const matrix = transform.match(/matrix.*\((.+)\)/)
-      if (matrix?.[1]) {
-        const values = matrix[1].split(', ')
-        pos.x += Number.parseFloat(values[4])
-        pos.y += Number.parseFloat(values[5])
-      }
+  if (transform !== 'none') {
+    const matrix = transform.match(/matrix.*\((.+)\)/)
+    if (matrix?.[1]) {
+      const values = matrix[1].split(', ')
+      pos.x += Number.parseFloat(values[4])
+      pos.y += Number.parseFloat(values[5])
     }
   }
 
@@ -115,5 +111,35 @@ const useRefreshCanvas = () => {
   return { refreshTrigger: rerenderTrigger, refresh }
 }
 
-export { makeTracked, type TrackRefProps, getPosition, type Position }
-export { useRefreshCanvas }
+/**
+ * Hook that refreshes the SVG overlay when needed.
+ *
+ * @param ref - A ref to the container element of the SVG overlay.
+ */
+const useSyncCanvas = (ref: RefObject<HTMLDivElement>) => {
+  const { refresh } = useRefreshCanvas()
+  const observer = useRef(new ResizeObserver(refresh))
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only want to run on mount/unmount
+  useEffect(() => {
+    const element = ref.current
+
+    if (element) {
+      observer.current.observe(element)
+    }
+
+    return () => {
+      if (element) {
+        observer.current.disconnect()
+      }
+    }
+  }, [])
+}
+
+export {
+  makeTracked,
+  getPosition,
+  useSyncCanvas,
+  type TrackRefProps,
+  type Position,
+}

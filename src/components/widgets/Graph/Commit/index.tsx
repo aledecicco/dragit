@@ -5,10 +5,9 @@ import { mergeRefs } from 'react-merge-refs'
 import type { CommitId } from '@/api/models'
 import { useQueryCommitInfo } from '@/api/queries/commitInfo'
 import { QueryLoader } from '@/lib/Loader/Query'
-import { makeTracked } from '@/lib/SvgOverlay'
 import { cn, propsWithCn } from '@/utils/styles'
 
-import type { ParentCommitType } from '../Edges'
+import { makeTracked } from '../SvgOverlay/utils'
 import { GraphCommitCard } from './Card'
 import { GraphCommitNode } from './Node'
 
@@ -49,11 +48,7 @@ interface GraphCommitProps extends ComponentProps<'div'> {
  *
  * Registers/unregisters itself in the SVG overlay when mounted/unmounted.
  */
-const GraphCommit = makeTracked<
-  GraphCommitProps,
-  HTMLDivElement,
-  ParentCommitType
->((props) => {
+const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
   const { commitId, commitType, distance, trackRef, isCurrent, ...divProps } =
     props
 
