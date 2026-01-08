@@ -61,6 +61,7 @@ pub fn run() {
             api::get_commit_info,
             api::add_to_index,
             api::remove_from_index,
+            api::remove_from_tree,
             api::commit_index,
             api::get_common_ancestor,
             api::get_branch_divergence,

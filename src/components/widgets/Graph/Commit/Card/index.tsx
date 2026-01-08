@@ -63,7 +63,7 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
       >
         {commitInfo.message ?? 'No message.'}
       </p>
-      <div className={cn('flex flex-row items-center justify-between gap-x-1')}>
+      <div className={cn('flex flex-row items-center justify-between gap-x-2')}>
         <Marquee className={cn('text-xs text-light-950')} reverse={false}>
           {commitInfo.authorName}, {timeAgo}
         </Marquee>

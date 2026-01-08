@@ -1,3 +1,6 @@
+import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
+import { UnstagedWorktreeChanges } from '@/widgets/WorktreeChanges/Unstaged'
+
 import type { WorktreeFileInfo } from '@/api/models'
 import { showDialog } from '@/context/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
@@ -14,8 +17,7 @@ import {
   useViewModeSelector,
 } from './UnmergedViewSelector'
 
-export const WORKTREE_FILE_DIFF_DIALOG = (file: WorktreeFileInfo) =>
-  `snapshot_details_dialog__${file.status}_${file.path}`
+export const WORKTREE_FILE_DIFF_DIALOG_KEY = 'worktree_file_diff_dialog'
 
 interface WorktreeFileDiffDialogProps extends Omit<DialogProps, 'dialogKey'> {
   /**
@@ -37,52 +39,72 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
 
   return (
     <Dialog
-      dialogKey={WORKTREE_FILE_DIFF_DIALOG(file)}
+      dialogKey={WORKTREE_FILE_DIFF_DIALOG_KEY}
       heading={undefined}
       {...propsWithCn(
         dialogProps,
-        'max-w-[70%] max-h-[85%] grid-cols-[1fr] w-full overflow-visible',
-        isSideBySide && 'grid-cols-[1fr_1fr] max-w-[90%]',
+        'max-w-[90%] max-h-[85%]',
+        file.status === 'unmerged' &&
+          isSideBySide &&
+          'max-w-[92%] grid-cols-[300px_1fr]',
       )}
-      contentProps={propsWithCn(dialogProps.contentProps, 'p-0 bg-dark-900')}
+      contentProps={propsWithCn(dialogProps.contentProps, 'p-3')}
       sideContent={
-        isSideBySide && (
-          <FileDiffViewer
-            filter="both"
-            className={cn('border-l border-dark-700')}
-            diffScope={{ type: 'unmerged', stage: 'theirs', file }}
-          />
-        )
+        <div
+          className={cn(
+            'w-full h-full relative',
+            isSideBySide && 'grid grid-cols-2',
+          )}
+        >
+          {file.status === 'unmerged' && !isSideBySide ? (
+            <FileConflictViewer file={file} />
+          ) : (
+            <FileDiffViewer
+              filter={
+                file.status === 'unmerged' ? 'both' : filterSelector.value
+              }
+              diffScope={
+                file.status === 'unmerged'
+                  ? {
+                      type: 'unmerged',
+                      stage: 'ours',
+                      file,
+                    }
+                  : { type: 'worktree', file }
+              }
+            />
+          )}
+
+          {isSideBySide && (
+            <FileDiffViewer
+              filter="both"
+              className={cn('border-l border-dark-700')}
+              diffScope={{ type: 'unmerged', stage: 'theirs', file }}
+            />
+          )}
+        </div>
       }
     >
-      {file.status === 'unmerged' && !isSideBySide ? (
-        <FileConflictViewer file={file} />
-      ) : (
-        <FileDiffViewer
-          filter={file.status === 'unmerged' ? 'both' : filterSelector.value}
-          diffScope={
-            file.status === 'unmerged'
-              ? {
-                  type: 'unmerged',
-                  stage: 'ours',
-                  file,
-                }
-              : { type: 'worktree', file }
-          }
-        />
-      )}
+      <div
+        className={cn(
+          'grid grid-rows-[auto_auto_max-content] gap-4 w-full h-full',
+        )}
+      >
+        <UnstagedWorktreeChanges className={cn('h-full min-h-50')} />
+        <StagedWorktreeChanges className={cn('h-full min-h-50')} />
 
-      {file.status === 'unmerged' ? (
-        <UnmergedViewSelector
-          className={cn('absolute -bottom-3 left-half -translate-x-half')}
-          store={viewModeSelector.store}
-        />
-      ) : (
-        <DiffFilterSelector
-          className={cn('absolute -bottom-3 left-half -translate-x-half')}
-          store={filterSelector.store}
-        />
-      )}
+        {file.status === 'unmerged' ? (
+          <UnmergedViewSelector
+            className={cn('mt-6 w-full')}
+            store={viewModeSelector.store}
+          />
+        ) : (
+          <DiffFilterSelector
+            className={cn('mt-6 w-full')}
+            store={filterSelector.store}
+          />
+        )}
+      </div>
     </Dialog>
   )
 }
@@ -91,7 +113,7 @@ const showWorktreeFileDiffDialog = (
   file: WorktreeFileInfo,
   props?: Partial<WorktreeFileDiffDialogProps>,
 ) => {
-  showDialog(WORKTREE_FILE_DIFF_DIALOG(file), WorktreeFileDiffDialog, {
+  showDialog(WORKTREE_FILE_DIFF_DIALOG_KEY, WorktreeFileDiffDialog, {
     file,
     ...props,
   })

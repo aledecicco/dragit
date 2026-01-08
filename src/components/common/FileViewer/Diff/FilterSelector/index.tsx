@@ -23,34 +23,38 @@ const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
   const { ...toggleGroupProps } = props
 
   return (
-    <ToggleGroup {...toggleGroupProps}>
+    <ToggleGroup fixed {...toggleGroupProps}>
       <ToggleGroupItem
+        fixed
+        size="sm"
         value="theirs"
-        label="View before changes"
+        label="Before changes"
         Glyph={IconBracketsContainStart}
-        compact
       />
 
       <ToggleGroupItem
+        fixed
+        size="sm"
         value="both"
-        label="View changes inline"
+        label="Inline changes"
         Glyph={IconColumns3Filled}
         iconProps={{
           className: cn('-rotate-90'),
         }}
-        compact
       />
 
       <ToggleGroupItem
+        fixed
+        size="sm"
         value="ours"
-        label="View after changes"
+        label="After changes"
         Glyph={IconBracketsContainEnd}
-        compact
       />
     </ToggleGroup>
   )
 }
 
+// TODO: persist toggle selection
 const useDiffFilterSelector = () => useToggleHandler(DIFF_FILTERS, 'both')
 
 export {

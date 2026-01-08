@@ -60,6 +60,7 @@ const useMergeBranch = (branch: BranchInfo): Action => {
       key: 'modify_branch',
       operation: 'merge',
       type: 'current',
+      branch: branch.name,
     },
     blockedBy: [
       { key: 'modify_branch', type: 'current' },
@@ -86,6 +87,7 @@ const useMergeCommit = (commit: CommitId): Action => {
       key: 'modify_branch',
       operation: 'merge',
       type: 'current',
+      commit,
     },
     blockedBy: [{ key: 'modify_branch', type: 'current' }],
     run: async () => {

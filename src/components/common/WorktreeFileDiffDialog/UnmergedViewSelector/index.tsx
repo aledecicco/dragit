@@ -19,25 +19,28 @@ const UnmergedViewSelector = (props: UnmergedViewSelectorProps) => {
   const { ...toggleGroupProps } = props
 
   return (
-    <ToggleGroup {...toggleGroupProps}>
+    <ToggleGroup fixed {...toggleGroupProps}>
       <ToggleGroupItem
+        fixed
+        size="sm"
         value="side_by_side"
-        label="View side by side"
+        label="Side by side"
         Glyph={IconColumns3Filled}
-        compact
       />
 
       <ToggleGroupItem
+        fixed
+        size="sm"
         value="inline"
-        label="View conflicted version"
+        label="Inline conflicts"
         Glyph={IconColumns3Filled}
         iconProps={{ className: cn('rotate-90') }}
-        compact
       />
     </ToggleGroup>
   )
 }
 
+// TODO: persist toggle selection
 const useViewModeSelector = () => useToggleHandler(DIFF_VIEW_MODES, 'inline')
 
 export {
