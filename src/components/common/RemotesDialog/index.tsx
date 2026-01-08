@@ -50,6 +50,7 @@ const RemotesDialog = (props: RemotesDialogProps) => {
 
       {adding ? (
         <RemoteForm
+          className={cn('-mb-1 mx-px')}
           defaultValues={{ name: '', url: '' }}
           onCancel={() => {
             setAdding(false)
