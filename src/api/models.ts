@@ -18,6 +18,7 @@ export interface CurrentDirInfo {
 
 export type CommitId = string
 export type StashId = string
+export type TagName = string
 export type SnapshotId = CommitId | StashId
 export type BranchName = string
 export type RemoteName = string
@@ -42,6 +43,16 @@ export interface StashInfo {
   timestamp: number
   createdOn: CommitId | BranchName
   changes: DiffSummary | null
+}
+
+export interface TagInfo {
+  name: TagName
+  type: 'tag'
+  reference: string
+  timestamp: number
+  message: string | null
+  authorName: string | null
+  authorEmail: string | null
 }
 
 export interface CommitInfo {
@@ -238,3 +249,4 @@ export type AppEvent =
   | { type: 'configUpdated'; repoPath: string }
   | { type: 'indexUpdated'; repoPath: string }
   | { type: 'stashesUpdated'; repoPath: string }
+  | { type: 'tagsUpdated'; repoPath: string }

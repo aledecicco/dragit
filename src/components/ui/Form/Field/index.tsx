@@ -5,11 +5,6 @@ import { cn, propsWithCn } from '@/utils/styles'
 
 interface FormFieldProps extends Ariakit.FormInputProps {
   /**
-   * The field's name, which is used to identify it in the form state.
-   */
-  name: Ariakit.FormInputProps['name']
-
-  /**
    * The field's label.
    */
   label: string
@@ -35,7 +30,7 @@ interface FormFieldProps extends Ariakit.FormInputProps {
  * when it appears or disappears.
  */
 const FormField = (props: FormFieldProps) => {
-  const { name, label, compact = false, containerProps, ...inputProps } = props
+  const { label, compact = false, containerProps, ...inputProps } = props
 
   return (
     <div
@@ -47,7 +42,7 @@ const FormField = (props: FormFieldProps) => {
     >
       {!compact && (
         <Ariakit.FormLabel
-          name={name}
+          name={inputProps.name}
           className={cn('text-sm text-light-400 capitalize')}
         >
           {label}
@@ -55,10 +50,10 @@ const FormField = (props: FormFieldProps) => {
         </Ariakit.FormLabel>
       )}
 
-      <Ariakit.FormInput name={name} {...inputProps} />
+      <Ariakit.FormInput {...inputProps} />
 
       <Ariakit.FormError
-        name={name}
+        name={inputProps.name}
         className={cn(
           'text-xs text-danger-300',
           'absolute top-full translate-y-1.5',

@@ -1,5 +1,6 @@
+import { IconPlus } from '@tabler/icons-react'
+
 import type { BranchName, RefName } from '@/api/models'
-import { useCreateBranchAt } from '@/api/mutations/createBranch'
 import { useQueryBranches } from '@/api/queries/branches'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import {
@@ -30,8 +31,6 @@ const CreateBranchDialog = (props: CreateBranchDialogProps) => {
 
   const branches = useQueryBranches()
 
-  const createBranch = useCreateBranchAt(fromReference)
-
   return (
     <ValueRequesterDialog
       heading={`Branch from ${fromReference}`}
@@ -54,8 +53,8 @@ const CreateBranchDialog = (props: CreateBranchDialogProps) => {
 
       <DecoratedButton
         type="submit"
-        label={createBranch.label.idle}
-        Glyph={createBranch.Glyph}
+        label="Create branch"
+        Glyph={IconPlus}
         className={cn('w-full')}
         status="primary"
       />
@@ -66,7 +65,7 @@ const CreateBranchDialog = (props: CreateBranchDialogProps) => {
 const requestBranchName = (
   fromReference: RefName,
   defaultName: BranchName = '',
-): Promise<BranchName> => {
+) => {
   return requestValueFromDialog(CreateBranchDialog, {
     fromReference,
     formOptions: {

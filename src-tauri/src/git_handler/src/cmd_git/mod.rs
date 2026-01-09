@@ -761,6 +761,58 @@ impl GitHandler for CmdGit {
             }))
     }
 
+    fn get_tags(
+        &self,
+        channel: &Channel<AppMessage>,
+        repo_path: &str,
+    ) -> Result<Vec<models::TagInfo>, GitError> {
+        let process = self.spawn_and_notify(
+            channel,
+            repo_path,
+            ["for-each-ref", "refs/tags", TAG_INFO_FORMAT],
+        )?;
+
+        let output = self.get_all_output(process)?;
+        let segments = output.split('\0');
+
+        segments
+            .collect::<Vec<&str>>()
+            .chunks_exact(7)
+            .map(|chunk| {
+                parse_tag_info(&chunk.iter().skip(1).map(|&s| s.to_string()).collect())
+                    .ok_or(GitError::GetTagsFailed {})
+            })
+            .collect()
+    }
+
+    fn tag(
+        &self,
+        repo_path: &str,
+        tag_name: &str,
+        reference: &str,
+        message: Option<&str>,
+    ) -> Result<(), GitError> {
+        let mut args = vec!["tag", tag_name, reference];
+
+        if let Some(message) = message {
+            args.push("-m");
+            args.push(message);
+        }
+
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::TagFailed {
+                name: tag_name.to_string(),
+                reference: reference.to_string(),
+            }))
+    }
+
+    fn delete_tag(&self, repo_path: &str, tag_name: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["tag", "-d", tag_name])
+            .or(Err(GitError::DeleteTagFailed {
+                name: tag_name.to_string(),
+            }))
+    }
+
     fn get_file_contents(
         &self,
         channel: &Channel<AppMessage>,

@@ -3,9 +3,11 @@ import * as Ariakit from '@ariakit/react'
 import type { CommitInfo } from '@/api/models'
 import { useAmend } from '@/api/mutations/commitIndex'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
+import { useTagCommit } from '@/api/mutations/createTag'
 import { useMergeCommit } from '@/api/mutations/merge'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { requestBranchName } from '@/common/CreateBranchDialog'
+import { requestTagParams } from '@/common/CreateTagDialog'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
@@ -81,18 +83,21 @@ const useInteractions = (commit: CommitInfo, isCurrent: boolean) => {
   const branchOff = useBranchOff(commit.id)
   const merge = useMergeCommit(commit.id)
   const amend = useAmend()
+  const tag = useTagCommit(commit)
 
   return [
-    [
-      ...(isCurrent
-        ? [
+    ...(isCurrent
+      ? [
+          [
             interaction({
               action: amend,
               argsRequester: () =>
                 requestCommitParams(commit.message ?? '', true),
             }),
-          ]
-        : []),
+          ],
+        ]
+      : []),
+    [
       interaction({
         action: createBranch,
         argsRequester: () => requestBranchName(commit.id),
@@ -103,6 +108,16 @@ const useInteractions = (commit: CommitInfo, isCurrent: boolean) => {
       }),
       interaction({
         action: merge,
+      }),
+    ],
+    [
+      interaction({
+        action: tag,
+        argsRequester: () =>
+          requestTagParams(commit.shortHash).then(({ name, message }) => ({
+            tagName: name,
+            message,
+          })),
       }),
     ],
   ]

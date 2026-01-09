@@ -22,8 +22,6 @@ interface StashesListItemProps extends ListItemProps {
 
 /**
  * The list item for stashes in the stashes widget.
- *
- * Includes a toolbar to apply or delete the stash.
  */
 const StashesListItem = (props: StashesListItemProps) => {
   const { stash, ...itemProps } = props

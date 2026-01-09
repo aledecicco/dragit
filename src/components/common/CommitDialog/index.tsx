@@ -1,4 +1,5 @@
-import { useAmend, useCommitIndex } from '@/api/mutations/commitIndex'
+import { IconMessageCheck, IconMessageCog } from '@tabler/icons-react'
+
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import {
   requestValueFromDialog,
@@ -24,8 +25,7 @@ interface CommitFormValues {
 const CommitDialog = (props: CommitDialogProps) => {
   const { ...dialogProps } = props
 
-  const commit = useCommitIndex()
-  const amend = useAmend()
+  const isAmend = dialogProps.formOptions?.defaultValues.isAmend ?? false
 
   return (
     <ValueRequesterDialog heading="Commit Changes" {...dialogProps}>
@@ -33,7 +33,8 @@ const CommitDialog = (props: CommitDialogProps) => {
 
       <DecoratedButton
         type="submit"
-        track={dialogProps.formOptions.defaultValues.isAmend ? amend : commit}
+        label={isAmend ? 'Amend Commit' : 'Commit'}
+        Glyph={isAmend ? IconMessageCog : IconMessageCheck}
         className={cn('w-full')}
         status="primary"
       />

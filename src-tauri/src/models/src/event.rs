@@ -36,6 +36,9 @@ pub enum AppEvent {
 
     /// The stashes were updated.
     StashesUpdated { repo_path: String },
+
+    /// The tags were updated.
+    TagsUpdated { repo_path: String },
 }
 
 #[derive(Debug, Clone, serde::Serialize)]

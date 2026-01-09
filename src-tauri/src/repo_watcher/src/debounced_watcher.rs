@@ -14,7 +14,7 @@ use tauri::{AppHandle, Emitter};
 use crate::{
     get_branches_folder, get_config_folder, get_git_folder, get_head_file, get_index_file,
     get_objects_folder, get_remotes_folder, get_stashes_file,
-    utils::{get_merge_file, get_rebase_folder},
+    utils::{get_merge_file, get_rebase_folder, get_tags_folder},
 };
 use models::{AppEvent, RepoWatcher, RepoWatcherError, EVENT_ID};
 
@@ -47,6 +47,7 @@ impl DebouncedWatcher {
         let objects_folder = get_objects_folder(&repo_path);
         let index_file = get_index_file(&repo_path);
         let stashes_file = get_stashes_file(&repo_path);
+        let tags_folder = get_tags_folder(&repo_path);
         let rebase_folder = get_rebase_folder(&repo_path);
         let merge_file = get_merge_file(&repo_path);
 
@@ -60,6 +61,7 @@ impl DebouncedWatcher {
                     let mut config_updated = false;
                     let mut index_updated = false;
                     let mut stashes_updated = false;
+                    let mut tags_updated = false;
                     let mut branches_list_updated = false;
 
                     events.iter().for_each(|event| {
@@ -100,6 +102,10 @@ impl DebouncedWatcher {
                         }
 
                         event.paths.iter().for_each(|path| {
+                            if path.starts_with(&tags_folder) {
+                                tags_updated = true;
+                            }
+
                             if path.starts_with(&branches_folder) && path.is_file() {
                                 if let Ok(Some(branch_name)) = path
                                     .strip_prefix(&branches_folder)
@@ -230,6 +236,15 @@ impl DebouncedWatcher {
                         let _ = app_handle.emit(
                             EVENT_ID,
                             AppEvent::StashesUpdated {
+                                repo_path: pathname.to_string(),
+                            },
+                        );
+                    }
+
+                    if tags_updated {
+                        let _ = app_handle.emit(
+                            EVENT_ID,
+                            AppEvent::TagsUpdated {
                                 repo_path: pathname.to_string(),
                             },
                         );

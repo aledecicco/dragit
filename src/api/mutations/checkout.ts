@@ -5,7 +5,7 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Action } from '@/context/actions'
 import { useSelectedReferences } from '@/context/branches'
 
-import type { BranchInfo, RefName } from '../models'
+import type { BranchInfo, RefName, TagInfo } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface CheckoutArgs {
@@ -69,6 +69,21 @@ const useCheckoutBranch = (branch: BranchInfo): Action => {
   }
 }
 
+const useCheckoutTag = (tag: TagInfo): Action => {
+  const checkout = useCheckout()
+
+  return {
+    ...checkout,
+    id: {
+      key: 'branch_operation',
+      operation: 'checkout',
+      tag: tag.name,
+    },
+    blockedBy: [{ key: 'branch_operation' }],
+    run: () => checkout.run({ reference: tag.name, isNew: false }),
+  }
+}
+
 const useSwitchBranches = (): Action => {
   const { baseReference } = useSelectedReferences()
   const checkout = useRepositoryMutation(checkoutMutation)
@@ -103,6 +118,7 @@ export {
   useCheckout,
   useCheckoutBranch,
   useSwitchBranches,
+  useCheckoutTag,
   checkoutKey,
   checkoutMutation,
   type CheckoutArgs,

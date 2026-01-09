@@ -32,7 +32,7 @@ const InteractionHandler = (props: InteractionHandlerProps) => {
     <ContextMenu
       items={interactions.map((section, i) => (
         <Fragment key={`${i + 1}`}>
-          {i > 0 && <Separator />}
+          {i > 0 && <Separator className={cn('my-0.5')} />}
           {Array.isArray(section) ? (
             section.map((interaction, j) => (
               <MenuItem key={`${i + 1}-${j + 1}`} {...interaction} />

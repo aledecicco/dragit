@@ -9,6 +9,7 @@ static REFS_FOLDER_NAME: &str = "refs";
 static HEADS_FOLDER_NAME: &str = "heads";
 static REMOTES_FOLDER_NAME: &str = "remotes";
 static STASHES_FILE_NAME: &str = "stash";
+static TAGS_FOLDER_NAME: &str = "tags";
 static REBASE_FOLDER_NAME: &str = "rebase-merge";
 static MERGE_FILE_NAME: &str = "MERGE_HEAD";
 
@@ -36,6 +37,12 @@ pub(crate) fn get_stashes_file(repo_path: &Path) -> PathBuf {
     get_git_folder(repo_path)
         .join(REFS_FOLDER_NAME)
         .join(STASHES_FILE_NAME)
+}
+
+pub(crate) fn get_tags_folder(repo_path: &Path) -> PathBuf {
+    get_git_folder(repo_path)
+        .join(REFS_FOLDER_NAME)
+        .join(TAGS_FOLDER_NAME)
 }
 
 pub(crate) fn get_branches_folder(repo_path: &Path) -> PathBuf {

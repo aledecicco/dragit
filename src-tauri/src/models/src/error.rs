@@ -124,6 +124,15 @@ pub enum GitError {
     #[error("Failed to drop stash #{stash_id}")]
     DiscardStashFailed { stash_id: String },
 
+    #[error("Failed to retrieve tags")]
+    GetTagsFailed {},
+
+    #[error("Failed to tag \"{reference}\" as \"{name}\"")]
+    TagFailed { name: String, reference: String },
+
+    #[error("Failed to tag \"{name}\"")]
+    DeleteTagFailed { name: String },
+
     #[error("Failed to get contents of file \"#{filepath}\" on \"#{reference}\"")]
     GetFileContentsFailed { reference: String, filepath: String },
 

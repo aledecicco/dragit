@@ -182,6 +182,16 @@ export const STASH_INFO_SCHEMA = BorshSchema.Struct({
 })
 export const STASHES_SCHEMA = BorshSchema.Vec(STASH_INFO_SCHEMA)
 
+export const TAG_INFO_SCHEMA = BorshSchema.Struct({
+  name: BorshSchema.String,
+  reference: BorshSchema.String,
+  timestamp: BorshSchema.u32,
+  message: BorshSchema.Option(BorshSchema.String),
+  authorName: BorshSchema.Option(BorshSchema.String),
+  authorEmail: BorshSchema.Option(BorshSchema.String),
+})
+export const TAGS_SCHEMA = BorshSchema.Vec(TAG_INFO_SCHEMA)
+
 export const FILE_DIFF_SCHEMA = BorshSchema.Vec(
   BorshSchema.Enum({
     Added: BorshSchema.Vec(BorshSchema.String),

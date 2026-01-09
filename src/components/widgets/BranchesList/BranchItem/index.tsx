@@ -8,12 +8,14 @@ import {
   useCreateBranchAt,
   useTrackBranch,
 } from '@/api/mutations/createBranch'
+import { useTagBranch } from '@/api/mutations/createTag'
 import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { useMergeBranch } from '@/api/mutations/merge'
 import { usePullBranch, useRebaseBranch } from '@/api/mutations/pullBranch'
 import { useForcePushBranch, usePushBranch } from '@/api/mutations/pushBranch'
 import { useRemoveBranch } from '@/api/mutations/removeBranch'
 import { requestBranchName } from '@/common/CreateBranchDialog'
+import { requestTagParams } from '@/common/CreateTagDialog'
 import { useSelectedBranches } from '@/context/branches'
 import { useSelectedUpstream } from '@/context/upstream'
 import { interaction } from '@/lib/ActionButton/utils'
@@ -74,7 +76,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
         )}
       </div>
 
-      <p
+      <div
         className={cn(
           'text-xs text-light-950',
           'text-nowrap overflow-hidden text-ellipsis',
@@ -93,7 +95,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
             </Marquee>
           </>
         )}
-      </p>
+      </div>
       <p
         className={cn(
           'text-xs text-light-950/60 mt-2',
@@ -121,6 +123,7 @@ const useInteractions = (branch: BranchInfo) => {
   const branchOff = useBranchOff(branch.name)
   const merge = useMergeBranch(branch)
   const track = useTrackBranch(branch)
+  const tag = useTagBranch(branch)
 
   const localPrimary = [
     ...(!isCurrentBranch ? [interaction({ action: checkout })] : []),
@@ -132,6 +135,10 @@ const useInteractions = (branch: BranchInfo) => {
           interaction({ action: forcePush }),
         ]
       : []),
+    interaction({
+      action: tag,
+      argsRequester: () => requestTagParams(branch.name),
+    }),
   ]
 
   const localSecondary = [
@@ -149,11 +156,17 @@ const useInteractions = (branch: BranchInfo) => {
   const localInteractions = [localPrimary, localSecondary]
 
   const remoteInteractions = [
-    interaction({
-      action: track,
-      argsRequester: () =>
-        requestBranchName(branch.name, branch.name.split('/').at(-1)),
-    }),
+    [
+      interaction({
+        action: track,
+        argsRequester: () =>
+          requestBranchName(branch.name, branch.name.split('/').at(-1)),
+      }),
+      interaction({
+        action: tag,
+        argsRequester: () => requestTagParams(branch.name),
+      }),
+    ],
   ]
 
   return [

@@ -2,7 +2,8 @@ use tauri::ipc::Channel;
 
 use crate::{
     AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError, HeadInfo,
-    HistoryItem, Page, RemoteInfo, SnapshotInfo, StashInfo, VersionedFileInfo, WorktreeFileInfo,
+    HistoryItem, Page, RemoteInfo, SnapshotInfo, StashInfo, TagInfo, VersionedFileInfo,
+    WorktreeFileInfo,
 };
 
 /// Abstraction for common operations that a git implementation needs to support.
@@ -200,6 +201,25 @@ pub trait GitHandler {
 
     /// Discards the given stash.
     fn discard_stash(&self, repo_path: &str, stash_id: &str) -> Result<(), GitError>;
+
+    /// Returns the list of tags.
+    fn get_tags(
+        &self,
+        channel: &Channel<AppMessage>,
+        repo_path: &str,
+    ) -> Result<Vec<TagInfo>, GitError>;
+
+    /// Tags the given reference with a name and an optional message.
+    fn tag(
+        &self,
+        repo_path: &str,
+        tag_name: &str,
+        reference: &str,
+        message: Option<&str>,
+    ) -> Result<(), GitError>;
+
+    /// Deletes the given tag.
+    fn delete_tag(&self, repo_path: &str, tag_name: &str) -> Result<(), GitError>;
 
     /// Returns the contents of a file at a given point.
     fn get_file_contents(

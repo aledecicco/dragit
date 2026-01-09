@@ -460,6 +460,38 @@ pub async fn discard_stash(
     with_handler(&state, &|h| h.discard_stash(repo_path, stash_id))
 }
 
+/// Returns the current list of tags.
+#[tauri::command]
+pub async fn get_tags(
+    state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
+    repo_path: &str,
+) -> Result<Response, AppError> {
+    with_handler(&state, &|h| h.get_tags(&channel, repo_path)).and_then(serialize_response)
+}
+
+/// Creates a new tag at the given reference.
+#[tauri::command]
+pub async fn tag(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    tag_name: &str,
+    reference: &str,
+    message: Option<&str>,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.tag(repo_path, tag_name, reference, message))
+}
+
+/// Removes a tag.
+#[tauri::command]
+pub async fn delete_tag(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    tag_name: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.delete_tag(repo_path, tag_name))
+}
+
 /// Returns the diff of a file between two sources.
 #[tauri::command]
 pub async fn get_file_diff(

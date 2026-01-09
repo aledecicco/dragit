@@ -2,6 +2,7 @@ import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
 import { useQueryBranches } from '@/api/queries/branches'
+import { useQueryTags } from '@/api/queries/tags'
 import { QueryList } from '@/lib/QueryList'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
@@ -9,7 +10,8 @@ import { Tab } from '@/ui/Tabs/Item'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-import { BranchesListItem } from './Item'
+import { BranchesListItem } from './BranchItem'
+import { TagsListItem } from './TagItem'
 
 interface BranchesListProps extends ComponentProps<'div'> {}
 
@@ -22,6 +24,7 @@ const BranchesList = (props: BranchesListProps) => {
   const allBranchesQuery = useQueryBranches()
   const localBranchesQuery = useQueryBranches('local')
   const remoteBranchesQuery = useQueryBranches('remote')
+  const tagsQuery = useQueryTags()
 
   const { store, selectedTab } = useTabsHandler('local')
 
@@ -47,6 +50,11 @@ const BranchesList = (props: BranchesListProps) => {
           All
           <Chip size="sm">{allBranchesQuery.data?.length ?? '...'}</Chip>
         </Tab>
+
+        <Tab id="tags" className={cn('ml-auto')}>
+          Tags
+          <Chip size="sm">{tagsQuery.data?.length ?? '...'}</Chip>
+        </Tab>
       </Tabs>
 
       <div
@@ -55,16 +63,29 @@ const BranchesList = (props: BranchesListProps) => {
           'w-full bg-dark-800 rounded-sm',
         )}
       >
-        <QueryList
-          name="branches"
-          query={branchesQuery}
-          renderItem={(branch) => <BranchesListItem branch={branch} />}
-          size="sm"
-          itemSize={74}
-          options={mapFn(branchesQuery.data, (branches) => ({
-            getItemKey: (index: number) => branches[index].name,
-          }))}
-        />
+        {selectedTab === 'tags' ? (
+          <QueryList
+            name="tags"
+            query={tagsQuery}
+            renderItem={(tag) => <TagsListItem tag={tag} />}
+            size="sm"
+            itemSize={74}
+            options={mapFn(tagsQuery.data, (tags) => ({
+              getItemKey: (index: number) => tags[index].name,
+            }))}
+          />
+        ) : (
+          <QueryList
+            name="branches"
+            query={branchesQuery}
+            renderItem={(branch) => <BranchesListItem branch={branch} />}
+            size="sm"
+            itemSize={74}
+            options={mapFn(branchesQuery.data, (branches) => ({
+              getItemKey: (index: number) => branches[index].name,
+            }))}
+          />
+        )}
       </div>
     </div>
   )

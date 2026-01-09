@@ -42,6 +42,17 @@ pub struct StashInfo {
     pub changes: Option<DiffSummary>,
 }
 
+#[derive(borsh::BorshSerialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct TagInfo {
+    pub name: String,
+    pub reference: String,
+    pub timestamp: u32,
+    pub message: Option<String>,
+    pub author_name: Option<String>,
+    pub author_email: Option<String>,
+}
+
 #[derive(serde::Deserialize, Debug)]
 #[serde(rename_all = "camelCase", tag = "type")]
 pub enum SnapshotInfo {

@@ -15,6 +15,7 @@ import { fileDiffQueryKeys } from './queries/fileDiff'
 import { headInfoQueryKeys } from './queries/headInfo'
 import { remotesQueryKeys } from './queries/remotes'
 import { stashesQueryKeys } from './queries/stashes'
+import { tagsQueryKeys } from './queries/tags'
 import { worktreeFilesQueryKeys } from './queries/worktreeFiles'
 import { pathQueryKey } from './utils'
 
@@ -143,6 +144,11 @@ const useEventsHandler = () => {
             })
           },
         )
+        .with({ type: 'tagsUpdated', repoPath: P.string }, ({ repoPath }) => {
+          client.invalidateQueries({
+            queryKey: [tagsQueryKeys.all(repoPath)],
+          })
+        })
         .exhaustive()
     })
 
