@@ -1,4 +1,5 @@
 import { IconTag } from '@tabler/icons-react'
+import { message } from '@tauri-apps/plugin-dialog'
 
 import type { RefName } from '@/api/models'
 import { useQueryTags } from '@/api/queries/tags'
@@ -79,7 +80,7 @@ const requestTagParams = (reference: RefName) => {
         message: '',
       },
     },
-  })
+  }).then(({ name, message }) => ({ tagName: name, message }))
 }
 
 export {

@@ -4,7 +4,7 @@ import { useStashFile } from '@/api/mutations/saveStash'
 import { FileIcon } from '@/common/File/Icon'
 import { FilePath } from '@/common/File/Path'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
-import { interaction } from '@/lib/ActionButton/utils'
+import { group, interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
@@ -67,7 +67,9 @@ const useInteractions = (
   const unstage = useUnstageFile(file)
   const stash = useStashFile(file)
 
-  return [[interaction({ action: unstage }), interaction({ action: stash })]]
+  return [
+    group(interaction({ action: unstage }), interaction({ action: stash })),
+  ]
 }
 
 export { StagedChangesItem, type StagedChangesItemProps }

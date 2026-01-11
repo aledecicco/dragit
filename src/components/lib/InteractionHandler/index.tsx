@@ -13,7 +13,7 @@ interface InteractionHandlerProps extends Ariakit.RoleProps {
   /**
    * The list of ways to interact with this item.
    */
-  interactions: (AnyInteraction | AnyInteraction[])[]
+  interactions: AnyInteraction[][]
 }
 
 /**
@@ -23,25 +23,21 @@ const InteractionHandler = (props: InteractionHandlerProps) => {
   const { interactions, children, ...itemProps } = props
 
   const actions = interactions.flatMap((section) =>
-    Array.isArray(section)
-      ? section.map((interaction) => interaction.action)
-      : [section.action],
+    section.map((interaction) => interaction.action),
   )
 
   return (
     <ContextMenu
-      items={interactions.map((section, i) => (
-        <Fragment key={`${i + 1}`}>
-          {i > 0 && <Separator className={cn('my-0.5')} />}
-          {Array.isArray(section) ? (
-            section.map((interaction, j) => (
+      items={interactions
+        .filter((section) => section.length > 0)
+        .map((section, i) => (
+          <Fragment key={`${i + 1}`}>
+            {i > 0 && <Separator className={cn('my-0.5')} />}
+            {section.map((interaction, j) => (
               <MenuItem key={`${i + 1}-${j + 1}`} {...interaction} />
-            ))
-          ) : (
-            <MenuItem key={`${i + 1}`} {...section} />
-          )}
-        </Fragment>
-      ))}
+            ))}
+          </Fragment>
+        ))}
     >
       <Ariakit.Role {...propsWithCn(itemProps, 'relative')}>
         {children}

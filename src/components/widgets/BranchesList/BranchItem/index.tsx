@@ -18,7 +18,7 @@ import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
 import { useSelectedBranches } from '@/context/branches'
 import { useSelectedUpstream } from '@/context/upstream'
-import { interaction } from '@/lib/ActionButton/utils'
+import { group, interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
@@ -125,23 +125,21 @@ const useInteractions = (branch: BranchInfo) => {
   const track = useTrackBranch(branch)
   const tag = useTagBranch(branch)
 
-  const localPrimary = [
-    ...(!isCurrentBranch ? [interaction({ action: checkout })] : []),
+  const forLocal1 = group(
+    !isCurrentBranch && interaction({ action: checkout }),
     interaction({ action: isCurrentBranch ? pull : fastForward }),
-    ...(isCurrentBranch
-      ? [
-          interaction({ action: rebase }),
-          interaction({ action: push }),
-          interaction({ action: forcePush }),
-        ]
-      : []),
+    isCurrentBranch && [
+      interaction({ action: rebase }),
+      interaction({ action: push }),
+      interaction({ action: forcePush }),
+    ],
     interaction({
       action: tag,
       argsRequester: () => requestTagParams(branch.name),
     }),
-  ]
+  )
 
-  const localSecondary = [
+  const forLocal2 = group(
     interaction({
       action: createBranch,
       argsRequester: () => requestBranchName(branch.name),
@@ -150,32 +148,32 @@ const useInteractions = (branch: BranchInfo) => {
       action: branchOff,
       argsRequester: () => requestBranchName(branch.name),
     }),
-    ...(!isCurrentBranch ? [interaction({ action: merge })] : []),
-  ]
+    !isCurrentBranch && interaction({ action: merge }),
+  )
 
-  const localInteractions = [localPrimary, localSecondary]
+  const forRemote = group(
+    interaction({
+      action: track,
+      argsRequester: () =>
+        requestBranchName(branch.name, branch.name.split('/').at(-1)),
+    }),
+    interaction({
+      action: tag,
+      argsRequester: () => requestTagParams(branch.name),
+    }),
+  )
 
-  const remoteInteractions = [
-    [
+  const forRemove = group(
+    !isCurrentBranch &&
       interaction({
-        action: track,
-        argsRequester: () =>
-          requestBranchName(branch.name, branch.name.split('/').at(-1)),
+        action: remove,
       }),
-      interaction({
-        action: tag,
-        argsRequester: () => requestTagParams(branch.name),
-      }),
-    ],
-  ]
+  )
 
-  return [
-    ...match(branch.type)
-      .with('local', () => localInteractions)
-      .with('remote', () => remoteInteractions)
-      .exhaustive(),
-    ...(!isCurrentBranch ? [interaction({ action: remove })] : []),
-  ]
+  return match(branch.type)
+    .with('local', () => [forLocal1, forLocal2, forRemove])
+    .with('remote', () => [forRemote, forRemove])
+    .exhaustive()
 }
 
 export { BranchesListItem, type BranchesListItemProps }

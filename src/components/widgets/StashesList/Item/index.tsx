@@ -5,7 +5,7 @@ import { useApplyStash } from '@/api/mutations/applyStash'
 import { useDiscardStash } from '@/api/mutations/discardStash'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
-import { interaction } from '@/lib/ActionButton/utils'
+import { group, interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
@@ -105,7 +105,10 @@ const useInteractions = (stash: StashInfo) => {
   const apply = useApplyStash(stash)
   const discard = useDiscardStash(stash)
 
-  return [[interaction({ action: apply })], [interaction({ action: discard })]]
+  return [
+    group(interaction({ action: apply })),
+    group(interaction({ action: discard })),
+  ]
 }
 
 export { StashesListItem, type StashesListItemProps }

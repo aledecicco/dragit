@@ -15,7 +15,7 @@ import {
 import { FileIcon } from '@/common/File/Icon'
 import { FilePath } from '@/common/File/Path'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
-import { interaction } from '@/lib/ActionButton/utils'
+import { group, interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
@@ -85,26 +85,32 @@ const useInteractions = (
   const acceptNewFile = useAcceptFile(file)
   const ignoreNewFile = useIgnoreFile(file)
 
-  return [
-    file.status === 'unmerged'
-      ? match(file.changes)
-          .with(P.union('bothAdded', 'bothModified'), () => [
+  return file.status === 'unmerged'
+    ? match(file.changes)
+        .with(P.union('bothAdded', 'bothModified'), () => [
+          group(
             interaction({ action: acceptAsIs }),
             interaction({ action: acceptOurs }),
             interaction({ action: acceptTheirs }),
-          ])
-          .with(P.union('addedByUs', 'addedByThem'), () => [
+          ),
+        ])
+        .with(P.union('addedByUs', 'addedByThem'), () => [
+          group(
             interaction({ action: acceptNewFile }),
             interaction({ action: ignoreNewFile }),
-          ])
-          .with('bothDeleted', () => [interaction({ action: acceptDeletion })])
-          .with(P.union('deletedByUs', 'deletedByThem'), () => [
+          ),
+        ])
+        .with('bothDeleted', () => [
+          group(interaction({ action: acceptDeletion })),
+        ])
+        .with(P.union('deletedByUs', 'deletedByThem'), () => [
+          group(
             interaction({ action: acceptDeletion }),
             interaction({ action: ignoreDeletion }),
-          ])
-          .exhaustive()
-      : [interaction({ action: stage }), interaction({ action: stash })],
-  ]
+          ),
+        ])
+        .exhaustive()
+    : [group(interaction({ action: stage }), interaction({ action: stash }))]
 }
 
 export { UnstagedChangesItem, type UnstagedChangesItemProps }

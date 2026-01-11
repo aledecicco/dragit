@@ -27,4 +27,25 @@ const interaction = <T>(interaction: Interaction<T>): AnyInteraction => {
   return interaction as Interaction<never>
 }
 
-export { useActionButtonAction, interaction }
+/**
+ * Utility to group interactions together.
+ *
+ * @param interactions - The interactions to group.
+ */
+const group = (
+  ...interactions: (AnyInteraction | AnyInteraction[] | undefined | false)[]
+): AnyInteraction[] => {
+  return interactions.flatMap((interaction) => {
+    if (Array.isArray(interaction)) {
+      return interaction
+    }
+
+    if (interaction) {
+      return [interaction]
+    }
+
+    return []
+  })
+}
+
+export { useActionButtonAction, interaction, group }

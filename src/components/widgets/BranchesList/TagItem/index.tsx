@@ -5,7 +5,7 @@ import { useCheckoutTag } from '@/api/mutations/checkout'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
 import { useDeleteTag } from '@/api/mutations/deleteTag'
 import { requestBranchName } from '@/common/CreateBranchDialog'
-import { interaction } from '@/lib/ActionButton/utils'
+import { group, interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
 import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
@@ -86,7 +86,7 @@ const useInteractions = (tag: TagInfo) => {
   const deleteTag = useDeleteTag(tag)
 
   return [
-    [
+    group(
       interaction({ action: checkout }),
       interaction({
         action: createBranch,
@@ -96,8 +96,8 @@ const useInteractions = (tag: TagInfo) => {
         action: branchOff,
         argsRequester: () => requestBranchName(tag.reference),
       }),
-    ],
-    [interaction({ action: deleteTag })],
+    ),
+    group(interaction({ action: deleteTag })),
   ]
 }
 

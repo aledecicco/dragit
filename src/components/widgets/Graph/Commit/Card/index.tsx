@@ -9,7 +9,7 @@ import { requestCommitParams } from '@/common/CommitDialog'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
-import { interaction } from '@/lib/ActionButton/utils'
+import { group, interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -86,18 +86,14 @@ const useInteractions = (commit: CommitInfo, isCurrent: boolean) => {
   const tag = useTagCommit(commit)
 
   return [
-    ...(isCurrent
-      ? [
-          [
-            interaction({
-              action: amend,
-              argsRequester: () =>
-                requestCommitParams(commit.message ?? '', true),
-            }),
-          ],
-        ]
-      : []),
-    [
+    group(
+      isCurrent &&
+        interaction({
+          action: amend,
+          argsRequester: () => requestCommitParams(commit.message ?? '', true),
+        }),
+    ),
+    group(
       interaction({
         action: createBranch,
         argsRequester: () => requestBranchName(commit.id),
@@ -109,17 +105,13 @@ const useInteractions = (commit: CommitInfo, isCurrent: boolean) => {
       interaction({
         action: merge,
       }),
-    ],
-    [
+    ),
+    group(
       interaction({
         action: tag,
-        argsRequester: () =>
-          requestTagParams(commit.shortHash).then(({ name, message }) => ({
-            tagName: name,
-            message,
-          })),
+        argsRequester: () => requestTagParams(commit.shortHash),
       }),
-    ],
+    ),
   ]
 }
 
