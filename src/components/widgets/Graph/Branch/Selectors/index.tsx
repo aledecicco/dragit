@@ -1,4 +1,4 @@
-import { IconGitBranch } from '@tabler/icons-react'
+import { IconGitBranch, IconGitCommit, IconTag } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import { useCheckout, useSwitchBranches } from '@/api/mutations/checkout'
@@ -115,7 +115,10 @@ const BranchSelectors = () => {
             : 'Choose a base branch...'
         }
         disabled={!headInfoQuery.data || !branchesQuery.data}
-        Glyph={IconGitBranch}
+        Glyph={match(baseReference?.type)
+          .with('commit', () => IconGitCommit)
+          .with('tag', () => IconTag)
+          .otherwise(() => IconGitBranch)}
       >
         <ComboboxSection
           name="branches"
@@ -142,7 +145,7 @@ const BranchSelectors = () => {
           onSelect={(value) => {
             if (currentReference) {
               changeSelectedBase(currentReference, {
-                type: 'commit',
+                type: 'tag',
                 refName: value,
               })
             }

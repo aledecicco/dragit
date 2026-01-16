@@ -199,6 +199,10 @@ export type Reference =
       type: 'branch'
       refName: BranchName
     }
+  | {
+      type: 'tag'
+      refName: TagName
+    }
 export type RefName = Reference['refName']
 
 export type DiffType = 'added' | 'removed' | 'unchanged'

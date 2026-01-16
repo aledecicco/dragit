@@ -5,7 +5,7 @@ import {
   useEffect,
   useRef,
 } from 'react'
-import { Focusable, Role } from '@ariakit/react'
+import { Focusable } from '@ariakit/react'
 import type { UseQueryResult } from '@tanstack/react-query'
 
 import { QueryLoader } from '@/lib/Loader/Query'
