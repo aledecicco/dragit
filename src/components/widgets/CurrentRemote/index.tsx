@@ -11,11 +11,12 @@ import { useFetchRemote } from '@/api/mutations/fetchRemote'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryRemotes } from '@/api/queries/remotes'
 import { showRemotesDialog } from '@/common/RemotesDialog'
-import { useSelectedBranches } from '@/context/branches'
-import { changeSelectedUpstream, useSelectedUpstream } from '@/context/upstream'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
+import { useSelectedBranches } from '@/state/branches'
+import { changeSelectedUpstream, useSelectedUpstream } from '@/state/upstream'
 import { Combobox } from '@/ui/Combobox'
+import { ComboboxSection } from '@/ui/Combobox/Section'
 import { EditableText } from '@/ui/EditableText'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -49,16 +50,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
       {...propsWithCn(divProps, 'w-full flex flex-row items-center min-w-0')}
     >
       <Combobox
-        option={upstream?.remote}
-        options={remoteOptions}
-        setOption={(newRemote) => {
-          if (currentBranch?.type === 'local' && upstream) {
-            changeSelectedUpstream(currentBranch.name, {
-              remote: newRemote,
-              remoteBranch: upstream.remoteBranch,
-            })
-          }
-        }}
+        value={upstream?.remote}
         placeholder={currentBranch?.type === 'local' ? 'Remote...' : '-'}
         disabled={!remoteOptions || currentBranch?.type !== 'local'}
         Glyph={
@@ -79,7 +71,20 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         style={{
           clipPath: 'polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
         }}
-      />
+      >
+        <ComboboxSection
+          name="remotes"
+          options={remoteOptions}
+          onSelect={(value) => {
+            if (currentBranch?.type === 'local' && upstream) {
+              changeSelectedUpstream(currentBranch.name, {
+                remote: value,
+                remoteBranch: upstream.remoteBranch,
+              })
+            }
+          }}
+        />
+      </Combobox>
 
       <p className={cn('text-2xl -mx-2 text-light-950/50')}>/</p>
 

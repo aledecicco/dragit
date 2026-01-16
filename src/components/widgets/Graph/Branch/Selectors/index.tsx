@@ -4,16 +4,17 @@ import { match } from 'ts-pattern'
 import { useCheckout, useSwitchBranches } from '@/api/mutations/checkout'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
-import { runAction, useActionPresenters } from '@/context/actions'
-import { changeSelectedBase, useSelectedReferences } from '@/context/branches'
-import { getUpstreamReference, useSelectedUpstream } from '@/context/upstream'
+import { useQueryTags } from '@/api/queries/tags'
 import { ActionButton } from '@/lib/ActionButton'
+import { runAction, useActionPresenters } from '@/state/actions'
+import { changeSelectedBase, useSelectedReferences } from '@/state/branches'
+import { useSelectedUpstream } from '@/state/upstream'
 import { Combobox } from '@/ui/Combobox'
 import { ComboboxItem } from '@/ui/Combobox/Item'
+import { ComboboxSection } from '@/ui/Combobox/Section'
+import { ensurePresent } from '@/utils/array'
 import { useBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
-
-import { getBaseBranchOptions, getCurrentBranchOptions } from '../../utils'
 
 /**
  * Controls to select the main branch and the base branch.
@@ -21,6 +22,7 @@ import { getBaseBranchOptions, getCurrentBranchOptions } from '../../utils'
 const BranchSelectors = () => {
   const headInfoQuery = useQueryHeadInfo()
   const branchesQuery = useQueryBranches()
+  const tagsQuery = useQueryTags()
 
   const { currentReference, baseReference } = useSelectedReferences()
   const currentBranch = useBranch(currentReference)
@@ -30,26 +32,14 @@ const BranchSelectors = () => {
   const checkoutTracker = useActionPresenters(checkout)
   const switchBranches = useSwitchBranches()
 
-  const checkoutOptions = getCurrentBranchOptions(branchesQuery.data ?? [])
-
-  const baseOptions = getBaseBranchOptions(
-    branchesQuery.data ?? [],
-    currentBranch?.name,
-    currentBranch && currentUpstream
-      ? getUpstreamReference(currentUpstream)
-      : undefined,
-  )
+  const branchOptions = branchesQuery.data?.map((branch) => branch.name) ?? []
+  const tagOptions = tagsQuery.data?.map((tag) => tag.name) ?? []
 
   return (
     <>
       <Combobox
         className={cn('w-65 col-start-1 row-start-1')}
-        option={currentBranch}
-        options={checkoutOptions}
-        getValue={(branch) => branch.name}
-        setOption={(newBranch) => {
-          runAction(checkout, { reference: newBranch.name, isNew: false })
-        }}
+        value={currentReference?.refName}
         placeholder={
           currentReference?.type === 'commit'
             ? `Detached at #${currentReference.refName}`
@@ -71,17 +61,39 @@ const BranchSelectors = () => {
               .otherwise(() => undefined),
           ),
         }}
-        noMatches={(search) => (
-          <ComboboxItem
-            value={search}
-            onClick={() => {
-              runAction(checkout, { reference: search, isNew: true })
-            }}
-          >
-            Create <b>{search}</b> from current commit
-          </ComboboxItem>
-        )}
-      />
+      >
+        <ComboboxSection
+          name="branches"
+          onSelect={(value) => {
+            runAction(checkout, {
+              reference: value,
+              isNew: false,
+            })
+          }}
+          options={branchOptions}
+          noMatches={(search) => (
+            <ComboboxItem
+              value={search}
+              onClick={() => {
+                runAction(checkout, { reference: search, isNew: true })
+              }}
+            >
+              Create branch <b>{search}</b> from current commit
+            </ComboboxItem>
+          )}
+        />
+
+        <ComboboxSection
+          name="tags"
+          onSelect={(value) => {
+            runAction(checkout, {
+              reference: value,
+              isNew: false,
+            })
+          }}
+          options={tagOptions}
+        />
+      </Combobox>
 
       <ActionButton
         action={switchBranches}
@@ -96,15 +108,7 @@ const BranchSelectors = () => {
 
       <Combobox
         className={cn('w-65 col-start-3 row-start-1')}
-        option={baseReference}
-        options={baseOptions}
-        getValue={(ref) => ref.refName}
-        setOption={(newRef) => {
-          if (currentReference) {
-            changeSelectedBase(currentReference, newRef ?? null)
-          }
-        }}
-        emptyOption="No base branch"
+        value={baseReference?.refName}
         placeholder={
           baseReference?.type === 'commit'
             ? `#${baseReference.refName}`
@@ -112,7 +116,40 @@ const BranchSelectors = () => {
         }
         disabled={!headInfoQuery.data || !branchesQuery.data}
         Glyph={IconGitBranch}
-      />
+      >
+        <ComboboxSection
+          name="branches"
+          onSelect={(value) => {
+            if (currentReference) {
+              changeSelectedBase(currentReference, {
+                type: 'branch',
+                refName: value,
+              })
+            }
+          }}
+          options={
+            currentUpstream
+              ? ensurePresent(
+                  branchOptions,
+                  `${currentUpstream.remote}/${currentUpstream.remoteBranch}`,
+                )
+              : branchOptions
+          }
+        />
+
+        <ComboboxSection
+          name="tags"
+          onSelect={(value) => {
+            if (currentReference) {
+              changeSelectedBase(currentReference, {
+                type: 'commit',
+                refName: value,
+              })
+            }
+          }}
+          options={tagOptions}
+        />
+      </Combobox>
     </>
   )
 }

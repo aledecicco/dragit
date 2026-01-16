@@ -3,7 +3,7 @@ import { match } from 'ts-pattern'
 import {
   ParentType,
   useTrackedElements,
-} from '@/widgets/Graph/SvgOverlay/context'
+} from '@/widgets/Graph/SvgOverlay/store'
 import { getPosition } from '@/widgets/Graph/SvgOverlay/utils'
 
 import { cn } from '@/utils/styles'

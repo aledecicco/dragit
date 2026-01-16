@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 import { useQueryRemotes } from '@/api/queries/remotes'
-import { showDialog } from '@/context/dialogs'
 import { QueryList } from '@/lib/QueryList'
+import { showDialog } from '@/state/dialogs'
 import { Button } from '@/ui/Button'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { cn, propsWithCn } from '@/utils/styles'

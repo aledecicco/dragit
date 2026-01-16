@@ -2,7 +2,7 @@ import type { VirtualItem } from '@tanstack/react-virtual'
 
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { getPaginatedLength } from '@/api/utils'
-import { useSelectedReferences } from '@/context/branches'
+import { useSelectedReferences } from '@/state/branches'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 

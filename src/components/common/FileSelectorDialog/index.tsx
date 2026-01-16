@@ -6,16 +6,16 @@ import {
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
+import { Pagination } from '@/lib/Pagination'
+import type { Shortcut } from '@/lib/ShortcutsCheatsheet'
+import { requestValueFromDialog } from '@/lib/ValueRequester/Dialog'
+import { VirtualizedDiv } from '@/lib/VirtualizedDiv'
 import {
   setNextPage,
   setPrevPage,
   useHandleFilesPageSync,
   useWorktreeFilesPage,
-} from '@/context/pages'
-import { Pagination } from '@/lib/Pagination'
-import type { Shortcut } from '@/lib/ShortcutsCheatsheet'
-import { requestValueFromDialog } from '@/lib/ValueRequester/Dialog'
-import { VirtualizedDiv } from '@/lib/VirtualizedDiv'
+} from '@/state/pages'
 import { CommandMenu, type CommandMenuProps } from '@/ui/CommandMenu'
 import { CommandMenuItem } from '@/ui/CommandMenu/Item'
 import { Marquee } from '@/ui/Marquee'

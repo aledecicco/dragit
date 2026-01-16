@@ -14,12 +14,13 @@ import type {
   Page,
   Reference,
   RefName,
+  TagInfo,
 } from '@/api/models'
 import { HISTORY_PAGE_SIZE } from '@/api/queries/commitHistory'
 import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { getPaginatedItem, getPaginatedLength } from '@/api/utils'
-import { useSelectedReferences } from '@/context/branches'
+import { useSelectedReferences } from '@/state/branches'
 
 import { STAGED_FILE_TYPES } from '../WorktreeChanges/Staged'
 import { UNSTAGED_FILE_TYPES } from '../WorktreeChanges/Unstaged'
@@ -138,45 +139,69 @@ const getGraphCommitData = (
 /**
  * Generates the appropriate options for the current branch selector.
  *
- * @param branches The list of all available branches.
+ * @param branches - The list of all available branches.
+ * @param tags - The list of all available tags.
  *
  * @returns An array of combobox options.
  */
-const getCurrentBranchOptions = (branches: BranchInfo[]): BranchInfo[] => {
-  return branches
+const getCurrentBranchOptions = (branches: BranchInfo[], tags: TagInfo[]) => {
+  const branchOptions: Reference[] =
+    branches?.map((branch) => ({ type: 'branch', refName: branch.name })) ?? []
+
+  const tagOptions: Reference[] = tags.map((tag) => ({
+    type: 'commit',
+    refName: tag.name,
+  }))
+
+  return [
+    { id: 'branches' as const, label: 'Branches', items: branchOptions },
+    { id: 'tags' as const, label: 'Tags', items: tagOptions },
+  ]
 }
 
 /**
  * Generates the appropriate options for the base branch selector based on the provided config.
  *
- * @param branches The list of all available branches.
- * @param exclude An optional name to exclude from the options.
- * @param include An optional reference to always include in the options.
+ * @param branches - The list of all available branches.
+ * @param tags - The list of all available tags.
+ * @param exclude - An optional name to exclude from the options.
+ * @param include - An optional reference to always include in the options.
  *
  * @returns An array of combobox options.
  */
 const getBaseBranchOptions = (
   branches: BranchInfo[],
+  tags: TagInfo[],
   exclude?: RefName,
   include?: Reference,
-): Reference[] => {
-  let options: Reference[] =
+) => {
+  let branchOptions: Reference[] =
     branches?.map((branch) => ({ type: 'branch', refName: branch.name })) ?? []
 
+  const tagOptions: Reference[] = tags.map((tag) => ({
+    type: 'commit',
+    refName: tag.name,
+  }))
+
   if (exclude) {
-    options = options.filter((option) => option?.refName !== exclude)
+    branchOptions = branchOptions.filter(
+      (option) => option?.refName !== exclude,
+    )
   }
 
   if (include) {
-    const isIncluded = options.some(
+    const isIncluded = branchOptions.some(
       (option) => option?.refName === include.refName,
     )
     if (!isIncluded) {
-      options.unshift(include)
+      branchOptions.unshift(include)
     }
   }
 
-  return options
+  return [
+    { id: 'branches', label: 'Branches', items: branchOptions },
+    { id: 'tags', label: 'Tags', items: tagOptions },
+  ]
 }
 
 /**

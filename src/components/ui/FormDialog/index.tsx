@@ -1,4 +1,4 @@
-import { hideDialog } from '@/context/dialogs'
+import { hideDialog } from '@/state/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { Form, type FormProps } from '@/ui/Form'
 import type { AnyObject, RequireOnly } from '@/utils/types'

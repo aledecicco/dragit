@@ -12,10 +12,10 @@ import { UnstagedWorktreeChanges } from '@/widgets/WorktreeChanges/Unstaged'
 
 import { useEventsHandler } from '@/api/events'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
-import { useReferencesSync } from '@/context/branches'
-import { useDialog } from '@/context/dialogs'
-import { useUpstreamSync } from '@/context/upstream'
 import { useContextMenuHandler } from '@/lib/ContextMenu/utils'
+import { useReferencesSync } from '@/state/branches'
+import { useDialog } from '@/state/dialogs'
+import { useUpstreamSync } from '@/state/upstream'
 import { cn } from '@/utils/styles'
 
 enableMapSet()

@@ -8,8 +8,8 @@ import {
 } from '@/api/queries/snapshotFiles'
 import { useNeedsPagination } from '@/api/utils'
 import { ChangesSummary } from '@/common/DiffSummary'
-import { showDialog } from '@/context/dialogs'
 import { Pagination } from '@/lib/Pagination'
+import { showDialog } from '@/state/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { cn, propsWithCn } from '@/utils/styles'
 

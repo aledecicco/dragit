@@ -14,7 +14,7 @@ import {
   registerElement,
   type TrackedElement,
   unregisterElement,
-} from './context'
+} from './store'
 
 interface TrackedComponentProps {
   elementId: ElementId

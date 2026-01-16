@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react'
 
-import { hideDialog, showDialog } from '@/context/dialogs'
-import { getUniqueId } from '@/context/ids'
+import { hideDialog, showDialog } from '@/state/dialogs'
+import { getUniqueId } from '@/state/ids'
 import { FormDialog, type FormDialogProps } from '@/ui/FormDialog'
 import type { AnyObject, RequireOnly } from '@/utils/types'
 

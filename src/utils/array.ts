@@ -76,3 +76,18 @@ export const splitWhen = <T>(
 export const splitBy = <T>(arr: T[], delimiter: T): T[][] => {
   return splitWhen(arr, (item) => item === delimiter)
 }
+
+/**
+ * Ensures that an item is present in an array. If the item is already present, the original array is returned.
+ * Otherwise, a new array with the item prepended is returned.
+ *
+ * @param arr - The array to check.
+ * @param item - The item to ensure is present.
+ */
+export const ensurePresent = <T>(arr: T[], item: T): T[] => {
+  if (arr.includes(item)) {
+    return arr
+  }
+
+  return [item, ...arr]
+}

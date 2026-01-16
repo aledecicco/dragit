@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
 import { match, P } from 'ts-pattern'
 
-import { useSelectedReferences } from '@/context/branches'
+import { useSelectedReferences } from '@/state/branches'
 
 import type { AppEvent } from './models'
 import { branchDivergenceQueryKeys } from './queries/branchDivergence'

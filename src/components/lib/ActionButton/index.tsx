@@ -5,7 +5,7 @@ import {
   hashId,
   runAction,
   useActionStatuses,
-} from '@/context/actions'
+} from '@/state/actions'
 import { Button } from '@/ui/Button'
 import { MenuItem } from '@/ui/Menu/Item'
 import { SplitButton } from '@/ui/SplitButton'

@@ -6,7 +6,7 @@ import {
 import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { Action } from '@/context/actions'
+import type { Action } from '@/state/actions'
 
 import type { BranchInfo, BranchName, RemoteRef } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'

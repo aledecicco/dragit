@@ -2,8 +2,8 @@ import type { ComponentProps, ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { IconX } from '@tabler/icons-react'
 
-import { type DialogKey, hideDialog } from '@/context/dialogs'
 import { DecoratedButton } from '@/lib/DecoratedButton'
+import { type DialogKey, hideDialog } from '@/state/dialogs'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface DialogProps extends Ariakit.DialogProps {

@@ -2,7 +2,7 @@ import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
 import { UnstagedWorktreeChanges } from '@/widgets/WorktreeChanges/Unstaged'
 
 import type { WorktreeFileInfo } from '@/api/models'
-import { showDialog } from '@/context/dialogs'
+import { showDialog } from '@/state/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { cn, propsWithCn } from '@/utils/styles'
 

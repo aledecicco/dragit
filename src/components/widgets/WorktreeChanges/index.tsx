@@ -6,14 +6,14 @@ import {
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
+import { Pagination } from '@/lib/Pagination'
+import { QueryList } from '@/lib/QueryList'
 import {
   setNextPage,
   setPrevPage,
   useHandleFilesPageSync,
   useWorktreeFilesPage,
-} from '@/context/pages'
-import { Pagination } from '@/lib/Pagination'
-import { QueryList } from '@/lib/QueryList'
+} from '@/state/pages'
 import { Chip } from '@/ui/Chip'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'

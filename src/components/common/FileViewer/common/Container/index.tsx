@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef,
 } from 'react'
+import { Focusable, Role } from '@ariakit/react'
 import type { UseQueryResult } from '@tanstack/react-query'
 
 import { QueryLoader } from '@/lib/Loader/Query'
@@ -75,8 +76,9 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
 
       <Separator />
 
-      <div
+      <Focusable
         ref={viewerRef}
+        render={<div />}
         className={cn(
           'pl-1 py-1 text-sm overflow-y-auto',
           'grid grid-cols-[max-content_max-content_1fr] grid-rows-[1fr]',
@@ -104,7 +106,7 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
         >
           {children}
         </QueryLoader>
-      </div>
+      </Focusable>
     </div>
   )
 }

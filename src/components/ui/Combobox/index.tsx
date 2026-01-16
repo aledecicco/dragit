@@ -1,41 +1,26 @@
-import { type ReactNode, startTransition, useState } from 'react'
+import { type ReactNode, startTransition } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { IconChevronDown } from '@tabler/icons-react'
-import { matchSorter } from 'match-sorter'
 
 import { Button, type ButtonProps } from '@/ui/Button'
 import { Marquee } from '@/ui/Marquee'
 import { Separator } from '@/ui/Separator'
-import { mapOr } from '@/utils/array'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { type Glyph, Icon, type IconProps } from '../Icon'
-import { ComboboxItem } from './Item'
+import { Tabs, useTabsHandler } from '../Tabs'
+import { Tab } from '../Tabs/Item'
+import {
+  ComboboxContextProvider,
+  useComboboxUpdater,
+  useComboboxValue,
+} from './context'
 
-interface BaseComboboxProps<T> extends Partial<ButtonProps> {
+interface ComboboxProps extends Partial<ButtonProps> {
   /**
-   * The currently selected option.
+   * The currently selected value.
    */
-  option: T | undefined
-
-  /**
-   * The list of all available options.
-   */
-  options: T[]
-
-  /**
-   * Function that gets the string value of an option.
-   *
-   * @param option - The option to get the value for.
-   */
-  getValue?: (option: T) => string
-
-  /**
-   * Function that renders an option.
-   *
-   * @param option - The option to render.
-   */
-  renderOption?: (option: T) => ReactNode
+  value: string | undefined
 
   /**
    * Placeholder text to display when no option is selected.
@@ -51,106 +36,60 @@ interface BaseComboboxProps<T> extends Partial<ButtonProps> {
    * Additional props to pass to the decorator icon.
    */
   iconProps?: Partial<IconProps>
-
-  /**
-   * Callback that renders when there are no matching options.
-   *
-   * @param search - The current search string.
-   */
-  noMatches?: (search: string) => ReactNode
 }
-
-interface WithEmptyComboboxProps<T> extends BaseComboboxProps<T> {
-  /**
-   * Callback that updates the selected option.
-   *
-   * @param option - The new option to set.
-   */
-  setOption: (option: T | undefined) => void
-
-  /**
-   * Text for an optional empty option.
-   */
-  emptyOption: string
-}
-
-interface WithoutEmptyComboboxProps<T> extends BaseComboboxProps<T> {
-  /**
-   * Callback that updates the selected option.
-   *
-   * @param option - The new option to set.
-   */
-  setOption: (option: T) => void
-
-  /**
-   * Text for an optional empty option.
-   */
-  emptyOption?: never
-}
-
-type ComboboxProps<T> = WithEmptyComboboxProps<T> | WithoutEmptyComboboxProps<T>
 
 /**
  * A select field that allows searching through a list of options.
  *
  * Automatically filters options based on the current input value.
  */
-function Combobox(props: ComboboxProps<string>): ReactNode
+const Combobox = (props: ComboboxProps): ReactNode => {
+  return (
+    <ComboboxContextProvider>
+      <ComboboxInner {...props} />
+    </ComboboxContextProvider>
+  )
+}
 
-function Combobox<T>(
-  props: ComboboxProps<T> & { getValue: (option: T) => string },
-): ReactNode
-
-function Combobox<T>(props: ComboboxProps<T>) {
+const ComboboxInner = (props: ComboboxProps) => {
   const {
-    option,
-    options,
-    getValue,
-    setOption,
-    renderOption,
-    emptyOption,
+    children,
+    value,
     placeholder = 'Select...',
     Glyph,
     iconProps,
-    noMatches,
     ...buttonProps
   } = props
 
-  const getOptionValue = (option: T): string =>
-    getValue ? getValue(option) : (option as string)
+  const combobox = Ariakit.useComboboxStore({
+    resetValueOnHide: true,
+    setValue: (newValue) => {
+      startTransition(() => setSearch(newValue))
+    },
+  })
 
-  const [search, setSearch] = useState('')
-  const value = option ? getOptionValue(option) : ''
+  const { group, groups } = useComboboxValue()
+  const { setSearch, setCurrentGroup } = useComboboxUpdater()
 
-  const matchingOptions = matchSorter(options, search, {
-    keys: [getOptionValue],
+  const tabsHandler = useTabsHandler('branches', {
+    selectedId: group?.name,
+    setSelectedId: (id) => {
+      const selectedGroup = groups.find((g) => g.name === id)
+      setCurrentGroup(selectedGroup?.name)
+    },
+    selectOnMove: true,
+    combobox,
   })
 
   return (
-    <Ariakit.ComboboxProvider
-      resetValueOnHide
-      includesBaseElement={false}
-      setValue={(newValue) => {
-        startTransition(() => setSearch(newValue))
-      }}
-    >
+    <Ariakit.ComboboxProvider store={combobox}>
       <Ariakit.SelectProvider
-        value={value}
+        includesBaseElement={false}
+        value={value ?? ''}
         setValue={(newValue) => {
-          if (newValue === '' && emptyOption) {
-            setOption(undefined)
-            return
-          }
-
-          const newOption = options.find(
-            (_option) => newValue === getOptionValue(_option),
-          )
-
-          if (newOption) {
-            setOption(newOption)
-          }
+          group?.onSelect(newValue)
         }}
-        defaultValue=""
+        combobox={combobox}
       >
         <Ariakit.Select
           render={
@@ -161,7 +100,7 @@ function Combobox<T>(props: ComboboxProps<T>) {
               {...propsWithCn(
                 buttonProps,
                 'min-w-0 group/combobox gap-2 text-sm',
-                !option && 'font-thin text-light-300',
+                !value && 'font-thin text-light-300',
               )}
             />
           }
@@ -169,11 +108,7 @@ function Combobox<T>(props: ComboboxProps<T>) {
           {Glyph && (
             <Icon Glyph={Glyph} size={buttonProps.size} {...iconProps} />
           )}
-          <Marquee reverse={false}>
-            {option
-              ? (renderOption?.(option) ?? getOptionValue(option))
-              : placeholder}
-          </Marquee>
+          <Marquee reverse={false}>{value ? value : placeholder}</Marquee>
           <Icon
             Glyph={IconChevronDown}
             size={buttonProps.size}
@@ -186,43 +121,31 @@ function Combobox<T>(props: ComboboxProps<T>) {
           gutter={4}
           className={cn('rounded-lg shadow-md', 'bg-dark-300 p-2')}
         >
-          <Ariakit.Combobox
-            placeholder="Search..."
-            className={cn('w-full p-2 rounded-sm', 'text-sm bg-dark-500')}
-            autoSelect
-          />
-
-          <Separator className={cn('my-2')} />
-
-          <Ariakit.ComboboxList className={cn('max-h-80 overflow-y-auto')}>
-            {search === '' && emptyOption && (
-              <ComboboxItem value="">{emptyOption}</ComboboxItem>
-            )}
-
-            {mapOr(
-              noMatches ? (
-                noMatches(search)
-              ) : (
-                <div
-                  className={cn(
-                    'text-center p-2',
-                    'text-sm italic text-light-950',
-                  )}
+          <Tabs
+            store={tabsHandler.store}
+            list={
+              groups.length > 1 &&
+              groups.map((group) => (
+                <Tab
+                  key={group.name}
+                  id={group.name}
+                  className={cn('capitalize')}
                 >
-                  No matches found
-                </div>
-              ),
-              matchingOptions,
-              (_option) => {
-                const _value = getOptionValue(_option)
-                return (
-                  <ComboboxItem key={_value} value={_value}>
-                    {renderOption ? renderOption(_option) : _value}
-                  </ComboboxItem>
-                )
-              },
-            )}
-          </Ariakit.ComboboxList>
+                  {group.name}
+                </Tab>
+              ))
+            }
+          >
+            <Ariakit.Combobox
+              placeholder={group ? `Search ${group.name}...` : 'Search...'}
+              autoSelect="always"
+              className={cn('w-full p-2 rounded-sm', 'text-sm bg-dark-500')}
+            />
+
+            <Separator className={cn('my-2')} />
+
+            {children}
+          </Tabs>
         </Ariakit.SelectPopover>
       </Ariakit.SelectProvider>
     </Ariakit.ComboboxProvider>

@@ -1,24 +1,36 @@
+import type { ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 
-import { propsWithCn } from '@/utils/styles'
+import { cn } from '@/utils/styles'
 
-interface TabsProps extends Ariakit.TabListProps {}
+interface TabsProps extends Ariakit.TabProviderProps {
+  list: ReactNode
+}
 
 /**
  * List of grouped tabs that can be used to switch views.
  */
 const Tabs = (props: TabsProps) => {
-  const { store, ...listProps } = props
+  const { children, list, ...tabsProps } = props
+
   return (
-    <Ariakit.TabProvider selectOnMove={false} store={store}>
-      <Ariakit.TabList {...propsWithCn(listProps, 'flex flex-row px-2')} />
+    <Ariakit.TabProvider {...tabsProps}>
+      <Ariakit.TabList className={cn('flex flex-row px-2')} focusable={false}>
+        {list}
+      </Ariakit.TabList>
+
+      {children}
     </Ariakit.TabProvider>
   )
 }
 
-const useTabsHandler = (defaultTab?: string) => {
+const useTabsHandler = (
+  defaultTab?: string,
+  storeProps?: Partial<Ariakit.TabStoreProps>,
+) => {
   const store = Ariakit.useTabStore({
     defaultSelectedId: defaultTab,
+    ...storeProps,
   })
   const selectedTab = Ariakit.useStoreState(store, 'selectedId')
 

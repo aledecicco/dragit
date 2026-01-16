@@ -1,4 +1,4 @@
-import { type AnyAction, useActiveAction } from '@/context/actions'
+import { type AnyAction, useActiveAction } from '@/state/actions'
 
 import type { AnyInteraction, Interaction } from '.'
 

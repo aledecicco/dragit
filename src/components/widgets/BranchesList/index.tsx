@@ -26,7 +26,9 @@ const BranchesList = (props: BranchesListProps) => {
   const remoteBranchesQuery = useQueryBranches('remote')
   const tagsQuery = useQueryTags()
 
-  const { store, selectedTab } = useTabsHandler('local')
+  const { store, selectedTab } = useTabsHandler('local', {
+    selectOnMove: false,
+  })
 
   const branchesQuery = match(selectedTab)
     .with('local', () => localBranchesQuery)
@@ -35,27 +37,32 @@ const BranchesList = (props: BranchesListProps) => {
 
   return (
     <div {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}>
-      <Tabs store={store}>
-        <Tab id="local">
-          Local
-          <Chip size="sm">{localBranchesQuery.data?.length ?? '...'}</Chip>
-        </Tab>
+      <Tabs
+        store={store}
+        list={
+          <>
+            <Tab id="local">
+              Local
+              <Chip size="sm">{localBranchesQuery.data?.length ?? '...'}</Chip>
+            </Tab>
 
-        <Tab id="remote">
-          Remote
-          <Chip size="sm">{remoteBranchesQuery.data?.length ?? '...'}</Chip>
-        </Tab>
+            <Tab id="remote">
+              Remote
+              <Chip size="sm">{remoteBranchesQuery.data?.length ?? '...'}</Chip>
+            </Tab>
 
-        <Tab id="all">
-          All
-          <Chip size="sm">{allBranchesQuery.data?.length ?? '...'}</Chip>
-        </Tab>
+            <Tab id="all">
+              All
+              <Chip size="sm">{allBranchesQuery.data?.length ?? '...'}</Chip>
+            </Tab>
 
-        <Tab id="tags" className={cn('ml-auto')}>
-          Tags
-          <Chip size="sm">{tagsQuery.data?.length ?? '...'}</Chip>
-        </Tab>
-      </Tabs>
+            <Tab id="tags" className={cn('ml-auto')}>
+              Tags
+              <Chip size="sm">{tagsQuery.data?.length ?? '...'}</Chip>
+            </Tab>
+          </>
+        }
+      />
 
       <div
         className={cn(
