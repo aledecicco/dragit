@@ -43,14 +43,14 @@ const CreateTagDialog = (props: CreateTagDialogProps) => {
           dialogProps.formOptions?.validateForm?.(formState, form)
 
           if (formState.values.name.includes(' ')) {
-            form.setError('tagName', 'Tag name cannot contain spaces')
+            form.setError('name', 'Tag name cannot contain spaces')
           }
 
           const exists = tags.data?.some(
             (tag) => tag.name === formState.values.name,
           )
           if (exists) {
-            form.setError('tagName', 'A tag with this name already exists')
+            form.setError('name', 'A tag with this name already exists')
           }
         },
       }}

@@ -131,10 +131,7 @@ const useComboboxValue = () => {
     useShallow((state) => ({
       search: state.search,
       group: state.groups.find((group) => group.name === state.currentGroup),
-      groups: (() => {
-        console.log(state.groups)
-        return state.groups
-      })(),
+      groups: state.groups,
     })),
   )
 }
