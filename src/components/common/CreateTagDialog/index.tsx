@@ -79,7 +79,10 @@ const requestTagParams = (reference: RefName) => {
         message: '',
       },
     },
-  }).then(({ name, message }) => ({ tagName: name, message }))
+  }).then(({ name, message }) => ({
+    tagName: name,
+    message: message ? message : null,
+  }))
 }
 
 export {

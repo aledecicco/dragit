@@ -43,7 +43,7 @@ pub(crate) const STASH_INFO_DETACHED: &str = "(no branch)";
 pub(crate) const STASH_INFO_QUICK: &str = "WIP";
 /// Format used to get the needed information about a tag.
 pub(crate) const TAG_INFO_FORMAT: &str =
-    "--format=%00%(refname:short)%00%(objectname:short)%00%(creatordate:unix)%00%(taggername)%00%(taggeremail:trim)%00%(contents)%00";
+    "--format=%00%(refname:short)%00%(*objectname:short)%00%(objectname:short)%00%(creatordate:unix)%00%(taggername)%00%(taggeremail:trim)%00%(contents)%00";
 /// The suffix that denotes that a string contains the number of insertions in a revision.
 pub(crate) const DIFF_INSERTIONS: &str = "(+)";
 /// The suffix that denotes that a string contains the number of deletions in a revision.
@@ -353,18 +353,31 @@ pub(crate) fn parse_stash_info(lines: &Vec<String>) -> Option<StashInfo> {
 pub(crate) fn parse_tag_info(segments: &Vec<String>) -> Option<TagInfo> {
     let mut segments = segments.iter();
 
+    let name = segments.next()?.to_string();
+    let reference_1 = segments.next()?.to_string();
+    let reference_2 = segments.next()?.to_string();
+    let reference = if !reference_1.is_empty() {
+        reference_1
+    } else {
+        reference_2
+    };
+    let timestamp = u32::from_str(segments.next()?).ok()?;
+    let author_name = segments
+        .next()
+        .and_then(|s| (!s.is_empty()).then_some(s.to_string()));
+    let author_email = segments
+        .next()
+        .and_then(|s| (!s.is_empty()).then_some(s.to_string()));
+    let message = segments
+        .next()
+        .and_then(|s| (!s.is_empty()).then_some(s.to_string()));
+
     Some(TagInfo {
-        name: segments.next()?.to_string(),
-        reference: segments.next()?.to_string(),
-        timestamp: u32::from_str(segments.next()?).ok()?,
-        author_name: segments
-            .next()
-            .and_then(|s| (!s.is_empty()).then_some(s.to_string())),
-        author_email: segments
-            .next()
-            .and_then(|s| (!s.is_empty()).then_some(s.to_string())),
-        message: segments
-            .next()
-            .and_then(|s| (!s.is_empty()).then_some(s.to_string())),
+        name,
+        reference,
+        timestamp,
+        author_name,
+        author_email,
+        message,
     })
 }

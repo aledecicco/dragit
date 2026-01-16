@@ -777,7 +777,7 @@ impl GitHandler for CmdGit {
 
         segments
             .collect::<Vec<&str>>()
-            .chunks_exact(7)
+            .chunks_exact(8)
             .map(|chunk| {
                 parse_tag_info(&chunk.iter().skip(1).map(|&s| s.to_string()).collect())
                     .ok_or(GitError::GetTagsFailed {})
