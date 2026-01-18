@@ -15,7 +15,7 @@ import { Icon } from '@/ui/Icon'
 import { ListItem, type ListItemProps } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { getPathLocation } from '@/utils/string'
-import { cn, propsWithCn } from '@/utils/styles'
+import { cn } from '@/utils/styles'
 
 interface SnapshotDetailsDialogItemProps extends ListItemProps {
   /**
@@ -47,14 +47,7 @@ const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
     <Ariakit.Radio
       value={file.path}
       render={
-        <ListItem
-          interactive
-          {...propsWithCn(
-            itemProps,
-            'border border-transparent',
-            'aria-checked:border-accent-300',
-          )}
-        >
+        <ListItem interactive {...itemProps}>
           <div className={cn('w-full flex flex-col items-start')}>
             <div className={cn('flex flex-row gap-x-1 items-center min-w-0')}>
               <Icon

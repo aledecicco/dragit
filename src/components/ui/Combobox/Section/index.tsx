@@ -5,7 +5,7 @@ import { matchSorter } from 'match-sorter'
 import { TabPanel } from '@/ui/Tabs/Panel'
 import { cn, propsWithCn } from '@/utils/styles'
 
-import { useComboboxGroupHandler, useComboboxValue } from '../context'
+import { useComboboxGroupHandler, useComboboxState } from '../context'
 import { ComboboxItem } from '../Item'
 
 interface ComboboxSectionProps
@@ -56,7 +56,7 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
     }
   }, [name, onSelect, registerGroup, unregisterGroup])
 
-  const { search, group } = useComboboxValue()
+  const { search, group } = useComboboxState()
 
   if (group?.name !== name) {
     return undefined

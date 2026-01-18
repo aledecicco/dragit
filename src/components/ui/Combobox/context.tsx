@@ -109,6 +109,7 @@ const ComboboxContextProvider = (props: PropsWithChildren) => {
  */
 const useComboboxContext = () => {
   const context = useContext(ComboboxContext)
+
   if (!context) {
     throw new Error('No combobox provider found')
   }
@@ -124,8 +125,9 @@ const useComboboxContext = () => {
  * - `group`: The currently selected group.
  * - `groups`: The list of all available groups.
  */
-const useComboboxValue = () => {
+const useComboboxState = () => {
   const store = useComboboxContext()
+
   return useStore(
     store,
     useShallow((state) => ({
@@ -145,6 +147,7 @@ const useComboboxValue = () => {
  */
 const useComboboxUpdater = () => {
   const store = useComboboxContext()
+
   return useStore(
     store,
     useShallow((state) => ({
@@ -166,6 +169,7 @@ const useComboboxGroupHandler = () => {
 
   const registerGroup = (newGroup: ComboboxGroup) => {
     const state = store.getState()
+
     let newGroups: ComboboxGroup[] = []
     const index = state.groups.findIndex(
       (group) => group.name === newGroup.name,
@@ -202,7 +206,7 @@ const useComboboxGroupHandler = () => {
 
 export {
   ComboboxContextProvider,
-  useComboboxValue,
+  useComboboxState,
   useComboboxUpdater,
   useComboboxGroupHandler,
 }

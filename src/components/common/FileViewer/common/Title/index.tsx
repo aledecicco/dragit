@@ -50,9 +50,13 @@ const FileViewerTitle = (props: FileViewerTitleProps) => {
         </Marquee>
       </Ariakit.Button>
 
-      <Marquee className={cn('text-light-900 text-xs italic')}>
-        {annotation}
-      </Marquee>
+      {typeof annotation === 'string' ? (
+        <Marquee className={cn('text-light-900 text-xs italic')}>
+          {annotation}
+        </Marquee>
+      ) : (
+        annotation
+      )}
     </div>
   )
 }

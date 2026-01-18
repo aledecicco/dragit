@@ -34,12 +34,8 @@ const TagsListItem = (props: TagsListItemProps) => {
       interactions={interactions}
       render={
         <ListItem
-          interactive={false}
-          {...propsWithCn(
-            itemProps,
-            'flex flex-col justify-between',
-            'border border-transparent',
-          )}
+          interactive
+          {...propsWithCn(itemProps, 'flex flex-col justify-between')}
         />
       }
     >

@@ -35,11 +35,7 @@ const StashesListItem = (props: StashesListItemProps) => {
       render={
         <ListItem
           interactive
-          {...propsWithCn(
-            itemProps,
-            'flex flex-col justify-between',
-            'border border-transparent',
-          )}
+          {...propsWithCn(itemProps, 'flex flex-col justify-between')}
           onClick={(e) => {
             itemProps.onClick?.(e)
             showSnapshotDetailsDialog(stash)

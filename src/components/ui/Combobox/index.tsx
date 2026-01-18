@@ -12,8 +12,8 @@ import { Tabs, useTabsHandler } from '../Tabs'
 import { Tab } from '../Tabs/Item'
 import {
   ComboboxContextProvider,
+  useComboboxState,
   useComboboxUpdater,
-  useComboboxValue,
 } from './context'
 
 interface ComboboxProps extends Partial<ButtonProps> {
@@ -68,7 +68,7 @@ const ComboboxInner = (props: ComboboxProps) => {
     },
   })
 
-  const { group, groups } = useComboboxValue()
+  const { group, groups } = useComboboxState()
   const { setSearch, setCurrentGroup } = useComboboxUpdater()
 
   const tabsHandler = useTabsHandler('branches', {
