@@ -1,5 +1,4 @@
 import type { ComponentProps } from 'react'
-import { useCallback } from 'react'
 
 import type { WorktreeFileType } from '@/api/models'
 
@@ -18,18 +17,13 @@ interface StagedWorktreeChangesProps extends ComponentProps<'div'> {}
 const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
   const { ...divProps } = props
 
-  const renderFile = useCallback(
-    (file: typeof STAGED_FILE_TYPES) => <StagedChangesItem file={file} />,
-    [],
-  )
-
   return (
     <WorktreeChanges
       {...divProps}
       label="staged changes"
       extraInfo={undefined}
       fileTypes={STAGED_FILE_TYPES}
-      renderFile={renderFile}
+      renderFile={(file) => <StagedChangesItem file={file} />}
     />
   )
 }

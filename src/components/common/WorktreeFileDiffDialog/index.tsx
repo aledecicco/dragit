@@ -87,7 +87,7 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
     >
       <div
         className={cn(
-          'grid grid-rows-[auto_auto_max-content] gap-4 w-full h-full',
+          'grid grid-rows-[auto_auto_max-content] gap-y-4 w-full h-full',
         )}
       >
         <UnstagedWorktreeChanges className={cn('h-full min-h-50')} />

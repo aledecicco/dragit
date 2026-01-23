@@ -1,5 +1,4 @@
 import type { ComponentProps } from 'react'
-import { useCallback } from 'react'
 
 import type { WorktreeFileType } from '@/api/models'
 
@@ -20,18 +19,13 @@ interface UnstagedWorktreeChangesProps extends ComponentProps<'div'> {}
 const UnstagedWorktreeChanges = (props: UnstagedWorktreeChangesProps) => {
   const { ...divProps } = props
 
-  const renderFile = useCallback(
-    (file: typeof UNSTAGED_FILE_TYPES) => <UnstagedChangesItem file={file} />,
-    [],
-  )
-
   return (
     <WorktreeChanges
       {...divProps}
       label="unstaged changes"
       extraInfo={undefined}
       fileTypes={UNSTAGED_FILE_TYPES}
-      renderFile={renderFile}
+      renderFile={(file) => <UnstagedChangesItem file={file} />}
     />
   )
 }

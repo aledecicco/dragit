@@ -10,6 +10,7 @@ import { useNeedsPagination } from '@/api/utils'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { Pagination } from '@/lib/Pagination'
 import { showDialog } from '@/state/dialogs'
+import { Chip } from '@/ui/Chip'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -84,36 +85,50 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
 
       <div
         className={cn(
-          'grid gap-y-6 overflow-y-hidden grid-rows-[max-content_1fr]',
+          'grid gap-y-4 overflow-y-hidden',
+          fileSelector.selectedFile
+            ? 'grid-rows-[max-content_1fr_max-content]'
+            : 'grid-rows-[max-content_1fr]',
         )}
       >
         <SnapshotDialogDescription snapshotInfo={snapshotInfo} />
 
-        <SnapshotDialogFileList
-          store={fileSelector.store}
-          filesQuery={filesQuery}
-          className={cn('grid gap-y-2 overflow-y-hidden')}
-        />
-      </div>
+        <div className={cn('flex flex-col gap-y-1 overflow-hidden')}>
+          <div
+            className={cn(
+              'text-sm text-light-600 text-start',
+              'py-2 flex flex-row gap-x-2 items-center',
+            )}
+          >
+            <p>Files</p>
 
-      {showPagination && (
-        <Pagination
-          className={cn('mt-6 -mb-2')}
-          page={page}
-          pageSize={SNAPSHOT_FILES_PAGE_SIZE}
-          hasNext={!!filesQuery.data?.hasNext}
-          setPrevPage={() => {
-            setPage((_page) => _page - 1)
-          }}
-          setNextPage={() => {
-            setPage((_page) => _page + 1)
-          }}
-        />
-      )}
+            {showPagination ? (
+              <Pagination
+                page={page}
+                pageSize={SNAPSHOT_FILES_PAGE_SIZE}
+                hasNext={!!filesQuery.data?.hasNext}
+                setPrevPage={() => {
+                  setPage((_page) => _page - 1)
+                }}
+                setNextPage={() => {
+                  setPage((_page) => _page + 1)
+                }}
+              />
+            ) : (
+              <Chip size="sm">{filesQuery.data?.items.length ?? '...'}</Chip>
+            )}
+          </div>
+
+          <SnapshotDialogFileList
+            filesQuery={filesQuery}
+            store={fileSelector.store}
+          />
+        </div>
+      </div>
 
       {fileSelector.selectedFile && (
         <DiffFilterSelector
-          className="absolute -bottom-3 left-[calc(50%+215px)] -translate-x-half z-1"
+          className={cn('mt-6 w-full')}
           store={filterSelector.store}
         />
       )}
