@@ -1,3 +1,5 @@
+import { startTransition } from 'react'
+
 import type { FileOfType } from '@/api/models'
 import { useUnstageFile } from '@/api/mutations/removeFromIndex'
 import { useStashFile } from '@/api/mutations/saveStash'
@@ -38,7 +40,9 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
           {...itemProps}
           onClick={(e) => {
             itemProps.onClick?.(e)
-            showWorktreeFileDiffDialog(file)
+            startTransition(() => {
+              showWorktreeFileDiffDialog(file)
+            })
           }}
         />
       }

@@ -23,10 +23,10 @@ const ListItem = (props: ListItemProps) => {
       {...propsWithCn(
         itemProps,
         'w-full p-1.5 bg-dark-600 rounded-xs shadow-md',
-        'hover:bg-dark-500 focus:bg-dark-500 data-focus:bg-dark-500 aria-checked:bg-dark-500',
-        'hover:aria-checked:bg-dark-400 focus:aria-checked:bg-dark-400 data-focus:aria-checked:bg-dark-400',
+        'hover:bg-dark-500 aria-selected:bg-dark-400',
+        'hover:aria-selected:bg-dark-300',
         'border border-transparent',
-        'aria-selected:bg-dark-500 aria-selected:border-accent-300',
+        'aria-current:border-accent-300',
         interactive && 'cursor-pointer',
       )}
     />

@@ -9,9 +9,7 @@ import { cn } from '@/utils/styles'
 
 import { Menu } from '..'
 
-type MenuItemProps<T> =
-  | Omit<ActionButtonProps<T>, 'alternatives'>
-  | DecoratedButtonProps
+type MenuItemProps<T> = ActionButtonProps<T> | DecoratedButtonProps
 
 /**
  * A single menu item inside a {@link Menu}.

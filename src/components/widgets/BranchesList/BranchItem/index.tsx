@@ -52,7 +52,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
       render={
         <ListItem
           interactive
-          aria-selected={isCurrentBranch}
+          aria-current={isCurrentBranch}
           {...propsWithCn(itemProps, 'text-start')}
         />
       }

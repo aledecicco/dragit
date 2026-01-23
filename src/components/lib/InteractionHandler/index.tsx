@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 import * as Ariakit from '@ariakit/react'
 
 import { ActionIndicator } from '@/common/ActionIndicator'
@@ -22,13 +22,17 @@ interface InteractionHandlerProps extends Ariakit.RoleProps {
 const InteractionHandler = (props: InteractionHandlerProps) => {
   const { interactions, children, ...itemProps } = props
 
-  const actions = interactions.flatMap((section) =>
-    section.map((interaction) => interaction.action),
+  const actions = useMemo(
+    () =>
+      interactions.flatMap((section) =>
+        section.map((interaction) => interaction.action),
+      ),
+    [interactions],
   )
 
-  return (
-    <ContextMenu
-      items={interactions
+  const menuItems = useMemo(
+    () =>
+      interactions
         .filter((section) => section.length > 0)
         .map((section, i) => (
           <Fragment key={`${i + 1}`}>
@@ -37,8 +41,12 @@ const InteractionHandler = (props: InteractionHandlerProps) => {
               <MenuItem key={`${i + 1}-${j + 1}`} {...interaction} />
             ))}
           </Fragment>
-        ))}
-    >
+        )),
+    [interactions],
+  )
+
+  return (
+    <ContextMenu items={menuItems}>
       <Ariakit.Role {...propsWithCn(itemProps, 'relative')}>
         {children}
 

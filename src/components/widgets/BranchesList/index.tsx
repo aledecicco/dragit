@@ -3,6 +3,9 @@ import { match } from 'ts-pattern'
 
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
+import { MultiInteraction } from '@/lib/MultiInteraction'
+import { MultiSelect } from '@/lib/MultiSelect'
+import { MultiSelectItem } from '@/lib/MultiSelect/Item'
 import { QueryList } from '@/lib/QueryList'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
@@ -71,16 +74,30 @@ const BranchesList = (props: BranchesListProps) => {
         )}
       >
         {selectedTab === 'tags' ? (
-          <QueryList
-            name="tags"
-            query={tagsQuery}
-            renderItem={(tag) => <TagsListItem tag={tag} />}
-            size="sm"
-            itemSize={74}
-            options={mapFn(tagsQuery.data, (tags) => ({
-              getItemKey: (index: number) => tags[index].name,
-            }))}
-          />
+          <MultiInteraction items={tagsQuery.data ?? []} actions={[]}>
+            <QueryList
+              name="tags"
+              query={tagsQuery}
+              renderItem={(tag) => (
+                <TagsListItem
+                  tag={tag}
+                  render={
+                    <MultiSelectItem
+                      itemIndex={
+                        tagsQuery.data?.findIndex((t) => t.name === tag.name) ??
+                        0
+                      }
+                    />
+                  }
+                />
+              )}
+              size="sm"
+              itemSize={74}
+              options={mapFn(tagsQuery.data, (tags) => ({
+                getItemKey: (index: number) => tags[index].name,
+              }))}
+            />
+          </MultiInteraction>
         ) : (
           <QueryList
             name="branches"

@@ -60,6 +60,10 @@ pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
                 VersionedFileStatus::Changed {
                     changes: ChangeStatus::Deleted,
                 } => DiffSource::Empty,
+                // TODO: not working for untracked files added to stashes
+                // VersionedFileStatus::Changed {
+                //     changes: ChangeStatus::Added,
+                // } => DiffSource::GitReference(format!("{snapshot_id}^3"), file.path.to_string()),
                 _ => DiffSource::GitReference(snapshot_id.to_string(), file.path.to_string()),
             },
         ),

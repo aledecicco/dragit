@@ -69,10 +69,10 @@ const useDialogsStore = create<Dialogs & Setters>()(
 const useDialog = (): DialogEntry<AnyObject> | undefined => {
   const dialogs = useDialogsStore((state) => state.mounted)
 
-  let entry: [DialogKey, DialogEntry<AnyObject>] | undefined
-  for (entry of dialogs);
+  const lastKey = Array.from(dialogs.keys()).pop()
+  if (!lastKey) return undefined
 
-  return entry?.[1]
+  return dialogs.get(lastKey)
 }
 
 /**

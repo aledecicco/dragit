@@ -52,8 +52,7 @@ const Dialog = (props: DialogProps) => {
   return (
     <Ariakit.DialogProvider defaultOpen>
       <Ariakit.Dialog
-        modal
-        portal
+        modal={false}
         unmountOnHide
         backdrop={<div className={cn('bg-black/50', 'backdrop-blur-md')} />}
         {...propsWithCn(

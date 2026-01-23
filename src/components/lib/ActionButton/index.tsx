@@ -26,7 +26,7 @@ type Interaction<T> =
       /**
        * Callback that requests the arguments to run the action.
        */
-      argsRequester: () => Promise<T>
+      argsRequester: (() => Promise<T>) | (() => T)
     }
   | {
       action: Action
