@@ -482,14 +482,14 @@ pub async fn tag(
     with_handler(&state, &|h| h.tag(repo_path, tag_name, reference, message))
 }
 
-/// Removes a tag.
+/// Removes a list of tags.
 #[tauri::command]
-pub async fn delete_tag(
+pub async fn delete_tags(
     state: State<'_, AppState>,
     repo_path: &str,
-    tag_name: &str,
+    tag_names: Vec<&str>,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.delete_tag(repo_path, tag_name))
+    with_handler(&state, &|h| h.delete_tags(repo_path, &tag_names))
 }
 
 /// Returns the diff of a file between two sources.

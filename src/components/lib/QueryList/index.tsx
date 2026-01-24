@@ -80,22 +80,22 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
       {(data) => {
         const items = getItems ? getItems(data) : (data as I[])
 
-        const list = (
-          <VirtualizedDiv
-            size="sm"
-            items={items}
-            fallback={
-              <p className={cn('text-sm text-light-950/50 italic p-3')}>
-                No {name} found.
-              </p>
-            }
-            {...propsWithCn(virtualizedDivProps, 'h-full')}
-          />
-        )
-
         return (
           <Ariakit.CompositeProvider focusLoop={false}>
-            <Ariakit.Composite render={list} />
+            <Ariakit.Composite
+              render={
+                <VirtualizedDiv
+                  size="sm"
+                  items={items}
+                  fallback={
+                    <p className={cn('text-sm text-light-950/50 italic p-3')}>
+                      No {name} found.
+                    </p>
+                  }
+                  {...propsWithCn(virtualizedDivProps, 'h-full')}
+                />
+              }
+            />
           </Ariakit.CompositeProvider>
         )
       }}

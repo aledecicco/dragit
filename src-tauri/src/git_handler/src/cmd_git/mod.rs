@@ -806,11 +806,10 @@ impl GitHandler for CmdGit {
             }))
     }
 
-    fn delete_tag(&self, repo_path: &str, tag_name: &str) -> Result<(), GitError> {
-        self.spawn_and_await(repo_path, ["tag", "-d", tag_name])
-            .or(Err(GitError::DeleteTagFailed {
-                name: tag_name.to_string(),
-            }))
+    fn delete_tags(&self, repo_path: &str, tag_names: &Vec<&str>) -> Result<(), GitError> {
+        let args = [vec!["tag", "-d"], tag_names.clone()].concat();
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::DeleteTagsFailed {}))
     }
 
     fn get_file_contents(

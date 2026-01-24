@@ -1,6 +1,7 @@
 import * as Ariakit from '@ariakit/react'
 
-import { useIsSelected, useSelectionUpdater } from '../context'
+import { MultiSelect } from '..'
+import { useSelectedItems, useSelectionUpdater } from '../context'
 
 interface MultiSelectItemProps extends Ariakit.CompositeItemProps {
   /**
@@ -9,10 +10,14 @@ interface MultiSelectItemProps extends Ariakit.CompositeItemProps {
   itemIndex: number
 }
 
+/**
+ * A single item inside a {@link MultiSelect}.
+ */
 const MultiSelectItem = (props: MultiSelectItemProps) => {
   const { itemIndex, ...itemProps } = props
 
-  const isSelected = useIsSelected(itemIndex)
+  const selectedItems = useSelectedItems()
+  const isSelected = selectedItems.has(itemIndex)
 
   const { toggle, extendSelection, setSelection } = useSelectionUpdater()
 
@@ -29,7 +34,11 @@ const MultiSelectItem = (props: MultiSelectItemProps) => {
         } else if (e.metaKey || e.ctrlKey) {
           toggle(itemIndex)
         } else {
-          setSelection(itemIndex)
+          if (isSelected && selectedItems.size === 1) {
+            setSelection([])
+          } else {
+            setSelection(itemIndex)
+          }
         }
       }}
     />

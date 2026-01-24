@@ -1,0 +1,73 @@
+import { IconTrash } from '@tabler/icons-react'
+import { mutationOptions } from '@tanstack/react-query'
+import { invoke } from '@tauri-apps/api/core'
+
+import type { Action } from '@/state/actions'
+
+import type { TagInfo, TagName } from '../models'
+import { pathMutationKey, useRepositoryMutation } from '../utils'
+
+interface DeleteTagsArgs {
+  tagNames: TagName[]
+}
+
+const deleteTagsKey = (repoPath: string) =>
+  ({
+    ...pathMutationKey(repoPath),
+    key: 'delete_tags',
+  }) as const
+
+const deleteTagsMutation = (repoPath: string) =>
+  mutationOptions({
+    mutationKey: [deleteTagsKey(repoPath)],
+    mutationFn: (args: DeleteTagsArgs) => {
+      return invoke('delete_tags', { repoPath, ...args })
+    },
+    networkMode: 'always',
+  })
+
+const useDeleteTag = (tag: TagInfo): Action => {
+  const deleteTags = useRepositoryMutation(deleteTagsMutation)
+
+  return {
+    id: { key: 'tag_operation', operation: 'delete_tag', tag: tag.name },
+    blockedBy: [{ tag: tag.name }],
+    run: async () => {
+      await deleteTags.mutateAsync({ tagNames: [tag.name] })
+    },
+    label: {
+      idle: 'Delete',
+      running: 'Deleting',
+      success: 'Deleted',
+      error: 'Failed',
+    },
+    Glyph: IconTrash,
+  }
+}
+
+const useDeleteTags = (): Action<TagInfo[]> => {
+  const deleteTags = useRepositoryMutation(deleteTagsMutation)
+
+  return {
+    id: { key: 'tag_operation', operation: 'delete_tags' },
+    blockedBy: [{ key: 'tag_operation' }],
+    run: async (tags) => {
+      await deleteTags.mutateAsync({ tagNames: tags.map((tag) => tag.name) })
+    },
+    label: {
+      idle: 'Delete',
+      running: 'Deleting',
+      success: 'Deleted',
+      error: 'Failed',
+    },
+    Glyph: IconTrash,
+  }
+}
+
+export {
+  useDeleteTag,
+  useDeleteTags,
+  deleteTagsKey,
+  deleteTagsMutation,
+  type DeleteTagsArgs,
+}

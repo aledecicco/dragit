@@ -118,10 +118,10 @@ const useRefreshCanvas = () => {
  */
 const useSyncCanvas = (ref: RefObject<HTMLDivElement>) => {
   const { refresh } = useRefreshCanvas()
-  const observer = useRef(new ResizeObserver(refresh))
+  const observer = useRef<ResizeObserver | null>(null)
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only want to run on mount/unmount
   useEffect(() => {
+    observer.current = new ResizeObserver(refresh)
     const element = ref.current
 
     if (element) {
@@ -130,10 +130,10 @@ const useSyncCanvas = (ref: RefObject<HTMLDivElement>) => {
 
     return () => {
       if (element) {
-        observer.current.disconnect()
+        observer.current?.disconnect()
       }
     }
-  }, [])
+  }, [refresh, ref])
 }
 
 export {

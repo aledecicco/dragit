@@ -3,17 +3,21 @@ import { IconGitCommit, IconTag } from '@tabler/icons-react'
 import type { TagInfo } from '@/api/models'
 import { useCheckoutTag } from '@/api/mutations/checkout'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
-import { useDeleteTag } from '@/api/mutations/deleteTag'
+import { useDeleteTag } from '@/api/mutations/deleteTags'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
+import {
+  MultiSelectItem,
+  type MultiSelectItemProps,
+} from '@/lib/MultiSelect/Item'
 import { Icon } from '@/ui/Icon'
-import { ListItem, type ListItemProps } from '@/ui/ListItem'
+import { ListItem } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
-import { cn, propsWithCn } from '@/utils/styles'
+import { cn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
-interface TagsListItemProps extends ListItemProps {
+interface TagsListItemProps extends MultiSelectItemProps {
   /**
    * The tag that this list item should display.
    */
@@ -33,9 +37,14 @@ const TagsListItem = (props: TagsListItemProps) => {
     <InteractionHandler
       interactions={interactions}
       render={
-        <ListItem
-          interactive
-          {...propsWithCn(itemProps, 'flex flex-col justify-between')}
+        <MultiSelectItem
+          render={
+            <ListItem
+              interactive
+              className={cn('flex flex-col justify-between')}
+            />
+          }
+          {...itemProps}
         />
       }
     >

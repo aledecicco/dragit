@@ -50,72 +50,71 @@ const Dialog = (props: DialogProps) => {
   } = props
 
   return (
-    <Ariakit.DialogProvider defaultOpen>
-      <Ariakit.Dialog
-        modal={false}
-        unmountOnHide
-        backdrop={<div className={cn('bg-black/50', 'backdrop-blur-md')} />}
+    <Ariakit.Dialog
+      open
+      modal={false}
+      portal={false}
+      backdrop={<div className={cn('bg-black/50', 'backdrop-blur-md')} />}
+      {...propsWithCn(
+        dialogProps,
+        'fixed top-half left-half -translate-half',
+        'max-w-[70%] max-h-[70%] rounded-lg overflow-hidden',
+        'border-2 border-dark-900',
+        'grid grid-rows-1',
+        sideContent
+          ? 'w-full h-full grid-cols-[430px_1fr]'
+          : 'grid-cols-[530px]',
+      )}
+      onClose={(e) => {
+        dialogProps.onClose?.(e)
+        hideDialog(dialogKey)
+      }}
+    >
+      <div
         {...propsWithCn(
-          dialogProps,
-          'fixed top-half left-half -translate-half',
-          'max-w-[70%] max-h-[70%] rounded-lg overflow-hidden',
-          'border-2 border-dark-900',
-          'grid grid-rows-1',
-          sideContent
-            ? 'w-full h-full grid-cols-[430px_1fr]'
-            : 'grid-cols-[530px]',
+          contentProps,
+          'py-8 px-6 bg-dark-600',
+          'overflow-hidden',
+          heading && 'pb-6',
         )}
-        onClose={(e) => {
-          dialogProps.onClose?.(e)
-          hideDialog(dialogKey)
-        }}
       >
-        <div
-          {...propsWithCn(
-            contentProps,
-            'py-8 px-6 bg-dark-600',
-            'overflow-hidden',
-            heading && 'pb-6',
-          )}
-        >
-          {showClose && (
-            <Ariakit.DialogDismiss
-              render={
-                <DecoratedButton
-                  round
-                  compact
-                  variant="plain"
-                  status="neutral"
-                  size="md"
-                  className={cn(
-                    'text-lg text-light-950',
-                    'absolute top-1.5 right-1.5',
-                  )}
-                  label="Close dialog"
-                  Glyph={IconX}
-                />
-              }
-            />
-          )}
-
-          {heading && (
-            <Ariakit.DialogHeading
-              className={cn('text-xl font-semibold text-center -mt-2 mb-6')}
-            >
-              {heading}
-            </Ariakit.DialogHeading>
-          )}
-
-          {children}
-        </div>
-
-        {!!sideContent && (
-          <div className={cn('w-full h-full bg-dark-900 overflow-hidden')}>
-            {sideContent}
-          </div>
+        {showClose && (
+          <Ariakit.DialogDismiss
+            render={
+              <DecoratedButton
+                round
+                compact
+                variant="plain"
+                status="neutral"
+                size="md"
+                className={cn(
+                  'text-lg text-light-950',
+                  'absolute top-1.5 right-1.5',
+                )}
+                label="Close dialog"
+                Glyph={IconX}
+              />
+            }
+          />
         )}
-      </Ariakit.Dialog>
-    </Ariakit.DialogProvider>
+
+        {heading && (
+          <Ariakit.DialogHeading
+            className={cn('text-xl font-semibold text-center -mt-2 mb-6')}
+          >
+            {heading}
+          </Ariakit.DialogHeading>
+        )}
+
+        {children}
+      </div>
+
+      {!!sideContent && (
+        <div className={cn('w-full h-full bg-dark-900 overflow-hidden')}>
+          {sideContent}
+        </div>
+      )}
+    </Ariakit.Dialog>
   )
 }
 

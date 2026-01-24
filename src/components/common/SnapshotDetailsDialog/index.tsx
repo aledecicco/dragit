@@ -61,7 +61,7 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
       dialogKey={SNAPSHOT_DETAILS_DIALOG_KEY(snapshotInfo.id)}
       heading={snapshotName}
       contentProps={{
-        className: cn('grid grid-rows-[max-content_max-content]'),
+        className: cn('grid grid-rows-[max-content_max-content_1fr]'),
       }}
       sideContent={
         fileSelector.selectedFile && (
@@ -93,7 +93,12 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
       >
         <SnapshotDialogDescription snapshotInfo={snapshotInfo} />
 
-        <div className={cn('flex flex-col gap-y-1 overflow-hidden')}>
+        <div
+          className={cn(
+            'flex flex-col gap-y-1 overflow-hidden',
+            'h-full min-h-50',
+          )}
+        >
           <div
             className={cn(
               'text-sm text-light-600 text-start',
@@ -124,14 +129,14 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
             store={fileSelector.store}
           />
         </div>
-      </div>
 
-      {fileSelector.selectedFile && (
-        <DiffFilterSelector
-          className={cn('mt-6 w-full')}
-          store={filterSelector.store}
-        />
-      )}
+        {fileSelector.selectedFile && (
+          <DiffFilterSelector
+            className={cn('mt-6 w-full')}
+            store={filterSelector.store}
+          />
+        )}
+      </div>
     </Dialog>
   )
 }

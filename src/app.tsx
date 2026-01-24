@@ -38,6 +38,7 @@ const App = () => {
           currentDirQuery.data.isRepository &&
           currentDirQuery.data.exists && <InRepository />}
       </div>
+
       <Dialogs />
     </>
   )

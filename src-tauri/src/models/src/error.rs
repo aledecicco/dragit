@@ -130,8 +130,8 @@ pub enum GitError {
     #[error("Failed to tag \"{reference}\" as \"{name}\"")]
     TagFailed { name: String, reference: String },
 
-    #[error("Failed to tag \"{name}\"")]
-    DeleteTagFailed { name: String },
+    #[error("Failed to delete tags")]
+    DeleteTagsFailed {},
 
     #[error("Failed to get contents of file \"#{filepath}\" on \"#{reference}\"")]
     GetFileContentsFailed { reference: String, filepath: String },

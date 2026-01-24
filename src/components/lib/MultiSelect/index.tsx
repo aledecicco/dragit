@@ -31,7 +31,6 @@ const MultiSelectInner = (props: MultiSelectProps) => {
   const ref = useRef(null)
 
   useClickAway(ref, () => {
-    console.log('A')
     setSelection([])
   })
 
@@ -42,7 +41,7 @@ const MultiSelectInner = (props: MultiSelectProps) => {
         aria-multiselectable
         {...compositeProps}
         render={children}
-        ref={mergeRefs([compositeProps.ref, ref])}
+        ref={mergeRefs([ref, compositeProps.ref])}
       />
     </Ariakit.CompositeProvider>
   )

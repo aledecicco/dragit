@@ -15,8 +15,6 @@ const Menu = (props: MenuProps) => {
   return (
     <Ariakit.Menu
       gutter={4}
-      portal
-      unmountOnHide
       {...propsWithCn(
         menuProps,
         'rounded-md shadow-md p-1',

@@ -1,12 +1,13 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
+import type { TagInfo } from '@/api/models'
+import { useDeleteTags } from '@/api/mutations/deleteTags'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
 import { MultiInteraction } from '@/lib/MultiInteraction'
-import { MultiSelect } from '@/lib/MultiSelect'
-import { MultiSelectItem } from '@/lib/MultiSelect/Item'
 import { QueryList } from '@/lib/QueryList'
+import type { Action } from '@/state/actions'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
 import { Tab } from '@/ui/Tabs/Item'
@@ -37,6 +38,8 @@ const BranchesList = (props: BranchesListProps) => {
     .with('local', () => localBranchesQuery)
     .with('remote', () => remoteBranchesQuery)
     .otherwise(() => allBranchesQuery)
+
+  const tabListActions = useTabListActions()
 
   return (
     <div {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}>
@@ -74,22 +77,15 @@ const BranchesList = (props: BranchesListProps) => {
         )}
       >
         {selectedTab === 'tags' ? (
-          <MultiInteraction items={tagsQuery.data ?? []} actions={[]}>
+          <MultiInteraction
+            items={tagsQuery.data ?? []}
+            actions={tabListActions}
+          >
             <QueryList
               name="tags"
               query={tagsQuery}
-              renderItem={(tag) => (
-                <TagsListItem
-                  tag={tag}
-                  render={
-                    <MultiSelectItem
-                      itemIndex={
-                        tagsQuery.data?.findIndex((t) => t.name === tag.name) ??
-                        0
-                      }
-                    />
-                  }
-                />
+              renderItem={(tag, position) => (
+                <TagsListItem tag={tag} itemIndex={position} />
               )}
               size="sm"
               itemSize={74}
@@ -113,6 +109,12 @@ const BranchesList = (props: BranchesListProps) => {
       </div>
     </div>
   )
+}
+
+const useTabListActions = (): Action<TagInfo[]>[][] => {
+  const deleteTags = useDeleteTags()
+
+  return [[deleteTags]]
 }
 
 export { BranchesList, type BranchesListProps }

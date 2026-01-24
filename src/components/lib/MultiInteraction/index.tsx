@@ -20,7 +20,9 @@ interface MultiInteractionProps<T> extends MultiSelectProps {
    */
   items: T[]
 }
-
+/**
+ * A component that allows selecting arbitrary child items and performing actions on all of them.
+ */
 const MultiInteraction = <T,>(props: MultiInteractionProps<T>) => {
   const { actions, items, children, ...multiSelectProps } = props
 
@@ -34,7 +36,7 @@ const MultiInteraction = <T,>(props: MultiInteractionProps<T>) => {
 }
 
 const MultiInteractionInner = <T,>(props: MultiInteractionProps<T>) => {
-  const { actions, items, children } = props
+  const { actions, items, ...contentProps } = props
 
   const itemIndexes = useSelectedItems()
   const { setSelection } = useSelectionUpdater()
@@ -46,6 +48,13 @@ const MultiInteractionInner = <T,>(props: MultiInteractionProps<T>) => {
 
   return (
     <ContextMenu
+      {...contentProps}
+      onContextMenuCapture={(e) => {
+        if (itemIndexes.size > 1) {
+          e.preventDefault()
+        }
+      }}
+      isOuter
       items={actions
         .filter((section) => section.length > 0)
         .map((section, i) => (
@@ -58,13 +67,14 @@ const MultiInteractionInner = <T,>(props: MultiInteractionProps<T>) => {
                 argsRequester={() =>
                   items.filter((_, index) => itemIndexes.has(index))
                 }
-              />
+              >
+                {' '}
+                ({items.filter((_, index) => itemIndexes.has(index)).length})
+              </MenuItem>
             ))}
           </Fragment>
         ))}
-    >
-      {children}
-    </ContextMenu>
+    />
   )
 }
 

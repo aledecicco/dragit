@@ -89,6 +89,7 @@ const BaseDecoratedButton = (props: BaseDecoratedButtonProps) => {
     <Button {...buttonProps}>
       <Icon size={buttonProps.size} Glyph={Glyph} {...iconProps} />
       {!compact && label}
+      {buttonProps.children}
     </Button>
   )
 

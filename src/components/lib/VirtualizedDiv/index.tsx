@@ -21,7 +21,7 @@ interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
   /**
    * Render function for each item.
    */
-  renderItem: (item: T) => ReactNode
+  renderItem: (item: T, position: number) => ReactNode
 
   /**
    * Additional props for all item containers.
@@ -106,7 +106,7 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
               position={virtualRow.start}
               {...itemProps}
             >
-              {renderItem(items[virtualRow.index])}
+              {renderItem(items[virtualRow.index], virtualRow.index)}
             </VirtualizedDivItem>
           ))}
         </div>

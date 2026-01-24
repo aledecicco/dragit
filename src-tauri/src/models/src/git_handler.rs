@@ -218,8 +218,8 @@ pub trait GitHandler {
         message: Option<&str>,
     ) -> Result<(), GitError>;
 
-    /// Deletes the given tag.
-    fn delete_tag(&self, repo_path: &str, tag_name: &str) -> Result<(), GitError>;
+    /// Deletes the given tags.
+    fn delete_tags(&self, repo_path: &str, tag_names: &Vec<&str>) -> Result<(), GitError>;
 
     /// Returns the contents of a file at a given point.
     fn get_file_contents(
