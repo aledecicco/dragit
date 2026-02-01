@@ -21,6 +21,7 @@ const FileStatus = (props: FileStatusProps) => {
     <span
       {...propsWithCn(
         spanProps,
+        'text-xs',
         match(file)
           .with({ status: P.union('staged', 'versioned') }, (file) =>
             match(file.changes)

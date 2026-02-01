@@ -7,8 +7,8 @@ import { Graph } from '@/widgets/Graph'
 import { MainToolbar } from '@/widgets/MainToolbar'
 import { PendingActions } from '@/widgets/PendingActions'
 import { StashesList } from '@/widgets/StashesList'
+import { NotStagedWorktreeChanges } from '@/widgets/WorktreeChanges/NotStaged'
 import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
-import { UnstagedWorktreeChanges } from '@/widgets/WorktreeChanges/Unstaged'
 
 import { useBackendEventshandler } from '@/api/events'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
@@ -65,7 +65,7 @@ const InRepository = () => {
         <StashesList className={cn('max-h-45')} />
 
         <div className={cn('grid grid-rows-[auto_auto] gap-4 mb-2')}>
-          <UnstagedWorktreeChanges className={cn('h-full min-h-50')} />
+          <NotStagedWorktreeChanges className={cn('h-full min-h-50')} />
           <StagedWorktreeChanges className={cn('h-full min-h-50')} />
         </div>
 

@@ -8,8 +8,8 @@ import { requestFilePath } from '@/common/FileSelectorDialog'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 
+import { NOT_STAGED_FILE_TYPES } from '../WorktreeChanges/NotStaged'
 import { STAGED_FILE_TYPES } from '../WorktreeChanges/Staged'
-import { UNSTAGED_FILE_TYPES } from '../WorktreeChanges/Unstaged'
 
 interface MainToolbarProps extends Partial<ToolbarProps> {}
 
@@ -20,7 +20,7 @@ const MainToolbar = (props: MainToolbarProps) => {
   const { ...toolbarProps } = props
 
   const stagedFilesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
-  const unstagedFilesQuery = useQueryWorktreeFiles(UNSTAGED_FILE_TYPES)
+  const unstagedFilesQuery = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
 
   const stageFiles = useStageFiles()
   const unstageFiles = useUnstageFiles()
@@ -36,7 +36,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         fixed
         action={stageFiles}
         argsRequester={async () => {
-          const filepath = await requestFilePath(UNSTAGED_FILE_TYPES)
+          const filepath = await requestFilePath(NOT_STAGED_FILE_TYPES)
 
           if (filepath === '.') {
             return unstagedFilesQuery.data?.items || []
@@ -86,7 +86,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         fixed
         action={stashFiles}
         argsRequester={async () => {
-          const filepath = await requestFilePath(UNSTAGED_FILE_TYPES)
+          const filepath = await requestFilePath(NOT_STAGED_FILE_TYPES)
 
           if (filepath === '.') {
             return unstagedFilesQuery.data?.items || []

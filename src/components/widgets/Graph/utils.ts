@@ -18,8 +18,8 @@ import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { getPaginatedItem, getPaginatedLength } from '@/api/utils'
 import { useSelectedReferences } from '@/state/branches'
 
+import { NOT_STAGED_FILE_TYPES } from '../WorktreeChanges/NotStaged'
 import { STAGED_FILE_TYPES } from '../WorktreeChanges/Staged'
-import { UNSTAGED_FILE_TYPES } from '../WorktreeChanges/Unstaged'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<Page<HistoryItem>>>
 
@@ -137,7 +137,7 @@ const getGraphCommitData = (
  */
 const useHasUncommittedChanges = (): boolean => {
   const stagedFiles = useQueryWorktreeFiles(STAGED_FILE_TYPES)
-  const unstagedFiles = useQueryWorktreeFiles(UNSTAGED_FILE_TYPES)
+  const unstagedFiles = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
 
   return !!stagedFiles.data?.items.length || !!unstagedFiles.data?.items.length
 }

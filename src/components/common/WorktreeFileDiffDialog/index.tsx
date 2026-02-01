@@ -1,5 +1,5 @@
+import { NotStagedWorktreeChanges } from '@/widgets/WorktreeChanges/NotStaged'
 import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
-import { UnstagedWorktreeChanges } from '@/widgets/WorktreeChanges/Unstaged'
 
 import type { WorktreeFileInfo } from '@/api/models'
 import { showDialog } from '@/state/dialogs'
@@ -90,7 +90,7 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
           'grid grid-rows-[auto_auto_max-content] gap-y-4 w-full h-full',
         )}
       >
-        <UnstagedWorktreeChanges className={cn('h-full min-h-50')} />
+        <NotStagedWorktreeChanges className={cn('h-full min-h-50')} />
         <StagedWorktreeChanges className={cn('h-full min-h-50')} />
 
         {file.status === 'unmerged' ? (

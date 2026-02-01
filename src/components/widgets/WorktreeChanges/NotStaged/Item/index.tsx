@@ -26,19 +26,19 @@ import { Marquee } from '@/ui/Marquee'
 import { getPathLocation } from '@/utils/string'
 import { cn } from '@/utils/styles'
 
-import type { UNSTAGED_FILE_TYPES } from '..'
+import type { NOT_STAGED_FILE_TYPES } from '..'
 
-interface UnstagedChangesItemProps extends MultiSelectItemProps {
+interface NotStagedChangesItemProps extends MultiSelectItemProps {
   /**
    * Information about the unstaged file to display.
    */
-  file: FileOfType<(typeof UNSTAGED_FILE_TYPES)[number]>
+  file: FileOfType<(typeof NOT_STAGED_FILE_TYPES)[number]>
 }
 
 /**
  * The list item for files in the 'unstaged' file statuses widget section.
  */
-const UnstagedChangesItem = (props: UnstagedChangesItemProps) => {
+const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
   const { file, ...itemProps } = props
 
   const { filedir, filename } = getPathLocation(file.path)
@@ -77,7 +77,7 @@ const UnstagedChangesItem = (props: UnstagedChangesItemProps) => {
 }
 
 const useInteractions = (
-  file: FileOfType<(typeof UNSTAGED_FILE_TYPES)[number]>,
+  file: FileOfType<(typeof NOT_STAGED_FILE_TYPES)[number]>,
 ) => {
   const stage = useStageFile(file)
   const stash = useStashFile(file)
@@ -118,4 +118,4 @@ const useInteractions = (
     : [group(interaction({ action: stage }), interaction({ action: stash }))]
 }
 
-export { UnstagedChangesItem, type UnstagedChangesItemProps }
+export { NotStagedChangesItem, type NotStagedChangesItemProps }
