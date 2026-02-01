@@ -48,7 +48,7 @@ const useStageFile = (file: WorktreeFileInfo): Action => {
   }
 }
 
-const useStageFiles = (): Action<string[] | string> => {
+const useStageFiles = (): Action<WorktreeFileInfo[]> => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
   return {
@@ -59,14 +59,14 @@ const useStageFiles = (): Action<string[] | string> => {
     ],
     run: async (files) => {
       await addToIndex.mutateAsync({
-        files: Array.isArray(files) ? files : [files],
+        files: files.map((file) => file.path),
       })
     },
     label: {
-      idle: 'Stage Files',
-      running: 'Staging',
-      success: 'Staged',
-      error: 'Staging failed',
+      idle: 'Stage files',
+      running: 'Staging files',
+      success: 'Staged files',
+      error: 'Failed to stage',
     },
     Glyph: IconPlaylistAdd,
   }

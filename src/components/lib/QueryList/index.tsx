@@ -88,7 +88,12 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
                   size="sm"
                   items={items}
                   fallback={
-                    <p className={cn('text-sm text-light-950/50 italic p-3')}>
+                    <p
+                      className={cn(
+                        'text-sm text-light-950/50 italic',
+                        'p-3 bg-dark-800 rounded-md h-full',
+                      )}
+                    >
                       No {name} found.
                     </p>
                   }

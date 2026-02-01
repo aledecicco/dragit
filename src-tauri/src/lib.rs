@@ -84,7 +84,7 @@ pub fn run() {
             api::delete_tags,
             api::get_file_diff,
             api::get_file_conflicts,
-            api::solve_file_conflict,
+            api::solve_file_conflicts,
             api::abort_merge,
             api::continue_merge,
             api::abort_rebase,

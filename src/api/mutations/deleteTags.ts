@@ -31,7 +31,7 @@ const useDeleteTag = (tag: TagInfo): Action => {
 
   return {
     id: { key: 'tag_operation', operation: 'delete_tag', tag: tag.name },
-    blockedBy: [{ tag: tag.name }],
+    blockedBy: [{ key: 'tag_operation', tag: tag.name }],
     run: async () => {
       await deleteTags.mutateAsync({ tagNames: [tag.name] })
     },

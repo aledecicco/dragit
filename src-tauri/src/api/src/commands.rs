@@ -578,16 +578,16 @@ pub async fn get_file_conflicts(
     serialize_response(conflicts)
 }
 
-/// Solves the conflicts of a file using the given startegy.
+/// Solves file conflicts using the given strategy.
 #[tauri::command]
-pub async fn solve_file_conflict(
+pub async fn solve_file_conflicts(
     state: State<'_, AppState>,
     repo_path: &str,
-    filepath: &str,
+    files: Vec<&str>,
     strategy: ResolutionStrategy,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| {
-        h.solve_file_conflict(repo_path, filepath, &strategy)
+        h.solve_file_conflicts(repo_path, &files, &strategy)
     })
 }
 

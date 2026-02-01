@@ -78,7 +78,11 @@ const ContextMenu = (props: ContextMenuProps) => {
         getAnchorRect={() => anchorRect.current}
         className={cn('min-w-30 border border-dark-50')}
       >
-        {items}
+        {items ? (
+          items
+        ) : (
+          <p className={cn('italic text-light-950')}>No options</p>
+        )}
       </Menu>
     </>
   )

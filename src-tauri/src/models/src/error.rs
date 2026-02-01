@@ -136,8 +136,8 @@ pub enum GitError {
     #[error("Failed to get contents of file \"#{filepath}\" on \"#{reference}\"")]
     GetFileContentsFailed { reference: String, filepath: String },
 
-    #[error("Failed to solve file conflict for \"{filepath}\"")]
-    SolveFileConflictFailed { filepath: String },
+    #[error("Failed to solve file conflicts")]
+    SolveFileConflictsFailed {},
 
     #[error("Failed to abort merge in progress")]
     AbortMergeFailed {},

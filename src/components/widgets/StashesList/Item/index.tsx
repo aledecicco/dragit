@@ -2,7 +2,7 @@ import { IconArchive, IconGitBranch } from '@tabler/icons-react'
 
 import type { StashInfo } from '@/api/models'
 import { useApplyStash } from '@/api/mutations/applyStash'
-import { useDiscardStash } from '@/api/mutations/discardStash'
+import { useDiscardStash } from '@/api/mutations/discardStashes'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'

@@ -11,7 +11,7 @@ import {
   useAcceptTheirs,
   useIgnoreDeletion,
   useIgnoreFile,
-} from '@/api/mutations/solveFileConflict'
+} from '@/api/mutations/solveFileConflicts'
 import { FileIcon } from '@/common/File/Icon'
 import { FilePath } from '@/common/File/Path'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'

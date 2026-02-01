@@ -36,7 +36,7 @@ interface FileSelectorDialogProps<T extends WorktreeFileType>
 const SHORTCUTS: Shortcut[] = [
   {
     keys: [
-      { symbol: 'Ctrl', keyName: 'Control' },
+      { symbol: 'Ctrl', keyName: 'Control' }, // TODO: Mac key symbol
       { symbol: '↵', keyName: 'Enter' },
     ],
     combined: true,
@@ -47,7 +47,7 @@ const SHORTCUTS: Shortcut[] = [
 const PAGINATION_SHORTCUTS: Shortcut[] = [
   {
     keys: [
-      { symbol: 'Ctrl', keyName: 'Control' },
+      { symbol: 'Ctrl', keyName: 'Control' }, // TODO: Mac key symbol
       { symbol: 'Q', keyName: 'q' },
     ],
     combined: true,
@@ -55,7 +55,7 @@ const PAGINATION_SHORTCUTS: Shortcut[] = [
   },
   {
     keys: [
-      { symbol: 'Ctrl', keyName: 'Control' },
+      { symbol: 'Ctrl', keyName: 'Control' }, // TODO: Mac key symbol
       { symbol: 'E', keyName: 'e' },
     ],
     combined: true,

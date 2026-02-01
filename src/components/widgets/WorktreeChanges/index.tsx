@@ -1,6 +1,18 @@
 import type { ComponentProps, ReactNode } from 'react'
 
 import type { FileOfType, WorktreeFileType } from '@/api/models'
+import { useStageFiles } from '@/api/mutations/addToIndex'
+import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
+import { useStashFiles } from '@/api/mutations/saveStash'
+import {
+  useAcceptManyAsIs,
+  useAcceptManyDeletions,
+  useAcceptManyFiles,
+  useAcceptManyOurs,
+  useAcceptManyTheirs,
+  useIgnoreManyDeletions,
+  useIgnoreManyFiles,
+} from '@/api/mutations/solveFileConflicts'
 import {
   useQueryWorktreeFiles,
   WORKTREE_FILES_PAGE_SIZE,
@@ -56,6 +68,8 @@ const WorktreeChanges = <T extends WorktreeFileType[]>(
 
   const showPagination = useNeedsPagination(filesQuery, page)
 
+  const getFilesListActions = useGetFilesListActions()
+
   return (
     <div {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}>
       <div className={cn('flex flex-row items-center justify-between')}>
@@ -95,7 +109,7 @@ const WorktreeChanges = <T extends WorktreeFileType[]>(
       >
         <MultiInteraction
           items={filesQuery.data?.items ?? []}
-          getActions={() => []}
+          getActions={getFilesListActions}
         >
           <QueryList
             name={`files with ${label}`}
@@ -112,6 +126,77 @@ const WorktreeChanges = <T extends WorktreeFileType[]>(
       </div>
     </div>
   )
+}
+
+const useGetFilesListActions = <T extends WorktreeFileType[]>() => {
+  const unstage = useUnstageFiles()
+  const stage = useStageFiles()
+  const stash = useStashFiles()
+
+  const acceptAsIs = useAcceptManyAsIs()
+  const acceptOurs = useAcceptManyOurs()
+  const acceptTheirs = useAcceptManyTheirs()
+  const acceptDeletions = useAcceptManyDeletions()
+  const ignoreDeletions = useIgnoreManyDeletions()
+  const acceptNewFiles = useAcceptManyFiles()
+  const ignoreNewFiles = useIgnoreManyFiles()
+
+  return (files: FileOfType<T[number]>[]) => {
+    const allStaged = files.every((file) => file.status === 'staged')
+    if (allStaged) {
+      return [[unstage, stash]]
+    }
+
+    const allBothAddedOrModified = files.every(
+      (file) =>
+        file.status === 'unmerged' &&
+        (file.changes === 'bothAdded' || file.changes === 'bothModified'),
+    )
+    if (allBothAddedOrModified) {
+      return [[acceptAsIs, acceptOurs, acceptTheirs]]
+    }
+
+    const allAddedByUsOrThem = files.every(
+      (file) =>
+        file.status === 'unmerged' &&
+        (file.changes === 'addedByUs' || file.changes === 'addedByThem'),
+    )
+    if (allAddedByUsOrThem) {
+      return [[acceptNewFiles, ignoreNewFiles]]
+    }
+
+    const allDeletedByUsOrThem = files.every(
+      (file) =>
+        file.status === 'unmerged' &&
+        (file.changes === 'deletedByUs' || file.changes === 'deletedByThem'),
+    )
+    if (allDeletedByUsOrThem) {
+      return [[acceptDeletions, ignoreDeletions]]
+    }
+
+    const allDeleted = files.every(
+      (file) =>
+        file.status === 'unmerged' &&
+        (file.changes === 'bothDeleted' ||
+          file.changes === 'deletedByUs' ||
+          file.changes === 'deletedByThem'),
+    )
+    if (allDeleted) {
+      return [[acceptDeletions]]
+    }
+
+    const anyUnmerged = files.some((file) => file.status === 'unmerged')
+    if (anyUnmerged) {
+      return [[stage]]
+    }
+
+    const allNotStaged = files.every((file) => file.status !== 'staged')
+    if (allNotStaged) {
+      return [[stage, stash]]
+    }
+
+    return [[]]
+  }
 }
 
 export { WorktreeChanges, type WorktreeChangesProps }

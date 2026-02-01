@@ -225,11 +225,11 @@ pub trait GitHandler {
         filepath: &str,
     ) -> Result<String, GitError>;
 
-    /// Solves a file conflict using the given strategy.
-    fn solve_file_conflict(
+    /// Solves file conflicts using the given strategy.
+    fn solve_file_conflicts(
         &self,
         repo_path: &str,
-        filepath: &str,
+        files: &Vec<&str>,
         strategy: &ResolutionStrategy,
     ) -> Result<(), GitError>;
 

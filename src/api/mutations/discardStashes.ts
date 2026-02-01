@@ -45,8 +45,35 @@ const useDiscardStash = (stash: StashInfo): Action => {
   }
 }
 
+const useDiscardStashes = (): Action<StashInfo[]> => {
+  const discardStash = useRepositoryMutation(discardStashMutation)
+
+  return {
+    id: { key: 'stash_operation', operation: 'discard_many' },
+    blockedBy: [{ key: 'stash_operation' }],
+    run: async (stashes) => {
+      // Order stashes by descending ID to avoid issues with shifting indices
+      const ordered = [...stashes].sort((stashA, stashB) =>
+        stashB.id.localeCompare(stashA.id),
+      )
+
+      for (const stash of ordered) {
+        await discardStash.mutateAsync({ stashId: stash.id })
+      }
+    },
+    label: {
+      idle: 'Discard stashes',
+      running: 'Discarding stashes',
+      success: 'Stashes discarded',
+      error: 'Failed to discard',
+    },
+    Glyph: IconTrash,
+  }
+}
+
 export {
   useDiscardStash,
+  useDiscardStashes,
   discardStashKey,
   discardStashMutation,
   type DiscardStashArgs,

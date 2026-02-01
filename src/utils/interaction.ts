@@ -37,18 +37,10 @@ export const useDefaultEventPrevention = () => {
       e.stopPropagation()
     }
 
-    const preventSelectAll = (e: KeyboardEvent) => {
-      if ((e.key === 'a' || e.key === 'A') && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-      }
-    }
-
     window.addEventListener('contextmenu', preventContextMenu)
-    window.addEventListener('keydown', preventSelectAll)
 
     return () => {
       window.removeEventListener('contextmenu', preventContextMenu)
-      window.removeEventListener('keydown', preventSelectAll)
     }
   })
 }

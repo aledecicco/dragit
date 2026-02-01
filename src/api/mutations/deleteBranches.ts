@@ -35,7 +35,7 @@ const useDeleteBranch = (branch: BranchInfo): Action => {
       operation: 'delete_branch',
       branch: branch.name,
     },
-    blockedBy: [{ branch: branch.name }],
+    blockedBy: [{ key: 'branch_operation', branch: branch.name }],
     run: async () => {
       await deleteBranches.mutateAsync({
         branchNames: [branch.name],

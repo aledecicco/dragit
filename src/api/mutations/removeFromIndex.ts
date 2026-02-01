@@ -48,7 +48,7 @@ const useUnstageFile = (file: WorktreeFileInfo): Action => {
   }
 }
 
-const useUnstageFiles = (): Action<string[] | string> => {
+const useUnstageFiles = (): Action<WorktreeFileInfo[]> => {
   const removeFromIndex = useRepositoryMutation(removeFromIndexMutation)
 
   return {
@@ -59,14 +59,14 @@ const useUnstageFiles = (): Action<string[] | string> => {
     ],
     run: async (files) => {
       await removeFromIndex.mutateAsync({
-        files: Array.isArray(files) ? files : [files],
+        files: files.map((file) => file.path),
       })
     },
     label: {
-      idle: 'Unstage Files',
-      running: 'Unstaging',
-      success: 'Unstaged',
-      error: 'Unstaging failed',
+      idle: 'Unstage files',
+      running: 'Unstaging files',
+      success: 'Unstaged files',
+      error: 'Failed to unstage',
     },
     Glyph: IconPlaylistX,
   }

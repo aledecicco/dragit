@@ -118,6 +118,7 @@ const ComboboxInner = (props: ComboboxProps) => {
         <Ariakit.SelectPopover
           portal
           sameWidth
+          unmountOnHide
           gutter={4}
           className={cn('rounded-lg shadow-md min-w-max', 'bg-dark-300 p-2')}
         >

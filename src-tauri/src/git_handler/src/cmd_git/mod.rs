@@ -171,7 +171,8 @@ impl GitHandler for CmdGit {
     }
 
     fn delete_branches(&self, repo_path: &str, branch_names: &Vec<&str>) -> Result<(), GitError> {
-        let args = [vec!["branch", "-D"], branch_names.clone()].concat();
+        let mut args = vec!["branch", "-D"];
+        args.extend(branch_names);
 
         self.spawn_and_await(repo_path, args)
             .or(Err(GitError::DeleteBranchesFailed {}))
@@ -397,19 +398,25 @@ impl GitHandler for CmdGit {
     }
 
     fn add_to_index(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
-        let args = [vec!["add"], files.clone()].concat();
+        let mut args = vec!["add"];
+        args.extend(files);
+
         self.spawn_and_await(repo_path, args)
             .or(Err(GitError::AddToIndexFailed {}))
     }
 
     fn remove_from_index(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
-        let args = [vec!["reset", "--"], files.clone()].concat();
+        let mut args = vec!["reset", "--"];
+        args.extend(files);
+
         self.spawn_and_await(repo_path, args)
             .or(Err(GitError::RemoveFromIndexFailed {}))
     }
 
     fn remove_from_tree(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
-        let args = [vec!["rm"], files.clone()].concat();
+        let mut args = vec!["rm"];
+        args.extend(files);
+
         self.spawn_and_await(repo_path, args)
             .or(Err(GitError::RemoveFromTreeFailed {}))
     }
@@ -797,7 +804,9 @@ impl GitHandler for CmdGit {
     }
 
     fn delete_tags(&self, repo_path: &str, tag_names: &Vec<&str>) -> Result<(), GitError> {
-        let args = [vec!["tag", "-d"], tag_names.clone()].concat();
+        let mut args = vec!["tag", "-d"];
+        args.extend(tag_names);
+
         self.spawn_and_await(repo_path, args)
             .or(Err(GitError::DeleteTagsFailed {}))
     }
@@ -823,25 +832,22 @@ impl GitHandler for CmdGit {
             }))?)
     }
 
-    fn solve_file_conflict(
+    fn solve_file_conflicts(
         &self,
         repo_path: &str,
-        filepath: &str,
+        files: &Vec<&str>,
         strategy: &ResolutionStrategy,
     ) -> Result<(), GitError> {
-        let args = [
-            "checkout",
-            filepath,
-            match strategy {
-                ResolutionStrategy::Ours => "--ours",
-                ResolutionStrategy::Theirs => "--theirs",
-            },
-        ];
+        let mut args = vec!["checkout"];
+        args.extend(files);
+
+        match strategy {
+            ResolutionStrategy::Ours => args.push("--ours"),
+            ResolutionStrategy::Theirs => args.push("--theirs"),
+        }
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::SolveFileConflictFailed {
-                filepath: filepath.to_string(),
-            }))
+            .or(Err(GitError::SolveFileConflictsFailed {}))
     }
 
     fn abort_merge(&self, repo_path: &str) -> Result<(), GitError> {

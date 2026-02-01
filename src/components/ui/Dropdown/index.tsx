@@ -20,7 +20,7 @@ const Dropdown = (props: DropdownProps) => {
     <Ariakit.MenuProvider>
       <Ariakit.MenuButton render={anchor} className={cn('group/menu')} />
 
-      <Menu {...menuProps} />
+      <Menu unmountOnHide {...menuProps} />
     </Ariakit.MenuProvider>
   )
 }

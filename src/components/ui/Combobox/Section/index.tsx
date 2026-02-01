@@ -62,7 +62,7 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
     return undefined
   }
 
-  const matchingOptions = matchSorter(options, search)
+  const matchingOptions = matchSorter(options, search.trim())
 
   return (
     <TabPanel tabId={name}>

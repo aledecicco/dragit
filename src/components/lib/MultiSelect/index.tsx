@@ -45,6 +45,7 @@ const MultiSelectInner = (props: MultiSelectProps) => {
   return (
     <Ariakit.CompositeProvider>
       <Ariakit.Composite
+        focusable
         onClick={(e) => {
           if (!(e.target instanceof Element)) {
             return
@@ -63,6 +64,10 @@ const MultiSelectInner = (props: MultiSelectProps) => {
 
           if ((e.key === 'a' || e.key === 'A') && (e.metaKey || e.ctrlKey)) {
             setSelection([...Array(itemsCount).keys()])
+
+            e.preventDefault()
+            e.stopPropagation()
+
             return
           }
         }}

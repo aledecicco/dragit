@@ -1,7 +1,8 @@
 import { useStageFiles } from '@/api/mutations/addToIndex'
 import { useCommitIndex } from '@/api/mutations/commitIndex'
 import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
-import { useSaveStash } from '@/api/mutations/saveStash'
+import { useStashFiles } from '@/api/mutations/saveStash'
+import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { requestFilePath } from '@/common/FileSelectorDialog'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
@@ -18,9 +19,12 @@ interface MainToolbarProps extends Partial<ToolbarProps> {}
 const MainToolbar = (props: MainToolbarProps) => {
   const { ...toolbarProps } = props
 
+  const stagedFilesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
+  const unstagedFilesQuery = useQueryWorktreeFiles(UNSTAGED_FILE_TYPES)
+
   const stageFiles = useStageFiles()
   const unstageFiles = useUnstageFiles()
-  const saveStash = useSaveStash()
+  const stashFiles = useStashFiles()
   const commit = useCommitIndex()
 
   return (
@@ -31,7 +35,23 @@ const MainToolbar = (props: MainToolbarProps) => {
         compact={false}
         fixed
         action={stageFiles}
-        argsRequester={() => requestFilePath(UNSTAGED_FILE_TYPES)}
+        argsRequester={async () => {
+          const filepath = await requestFilePath(UNSTAGED_FILE_TYPES)
+
+          if (filepath === '.') {
+            return unstagedFilesQuery.data?.items || []
+          }
+
+          const file = unstagedFilesQuery.data?.items.find(
+            (file) => file.path === filepath,
+          )
+
+          if (!file) {
+            throw new Error('File not found')
+          }
+
+          return [file]
+        }}
       />
 
       <ToolbarItem
@@ -40,7 +60,23 @@ const MainToolbar = (props: MainToolbarProps) => {
         compact={false}
         fixed
         action={unstageFiles}
-        argsRequester={() => requestFilePath(STAGED_FILE_TYPES)}
+        argsRequester={async () => {
+          const filepath = await requestFilePath(STAGED_FILE_TYPES)
+
+          if (filepath === '.') {
+            return stagedFilesQuery.data?.items || []
+          }
+
+          const file = stagedFilesQuery.data?.items.find(
+            (file) => file.path === filepath,
+          )
+
+          if (!file) {
+            throw new Error('File not found')
+          }
+
+          return [file]
+        }}
       />
 
       <ToolbarItem
@@ -48,8 +84,24 @@ const MainToolbar = (props: MainToolbarProps) => {
         size="md"
         compact={false}
         fixed
-        action={saveStash}
-        argsRequester={() => requestFilePath(UNSTAGED_FILE_TYPES)}
+        action={stashFiles}
+        argsRequester={async () => {
+          const filepath = await requestFilePath(UNSTAGED_FILE_TYPES)
+
+          if (filepath === '.') {
+            return unstagedFilesQuery.data?.items || []
+          }
+
+          const file = unstagedFilesQuery.data?.items.find(
+            (file) => file.path === filepath,
+          )
+
+          if (!file) {
+            throw new Error('File not found')
+          }
+
+          return [file]
+        }}
       />
 
       <ToolbarItem

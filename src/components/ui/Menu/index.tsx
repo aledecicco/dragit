@@ -2,6 +2,8 @@ import * as Ariakit from '@ariakit/react'
 
 import { propsWithCn } from '@/utils/styles'
 
+import { MenuItem } from './Item'
+
 interface MenuProps extends Ariakit.MenuProps {}
 
 /**

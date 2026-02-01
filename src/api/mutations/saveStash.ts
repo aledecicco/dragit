@@ -48,13 +48,13 @@ const useStashFile = (file: WorktreeFileInfo): Action => {
       idle: 'Stash',
       running: 'Stashing',
       success: 'Stashed',
-      error: 'Failed',
+      error: 'Failed to stash',
     },
     Glyph: IconPackage,
   }
 }
 
-const useSaveStash = (): Action<string[] | string> => {
+const useStashFiles = (): Action<WorktreeFileInfo[]> => {
   const saveStash = useRepositoryMutation(saveStashMutation)
 
   return {
@@ -65,16 +65,16 @@ const useSaveStash = (): Action<string[] | string> => {
     ],
     run: async (files) => {
       await saveStash.mutateAsync({
-        files: Array.isArray(files) ? files : [files],
+        files: files.map((file) => file.path),
         message: null, // TODO: allow messages
         includeUntracked: true,
       })
     },
     label: {
-      idle: 'Stash',
-      running: 'Stashing',
-      success: 'Stashed',
-      error: 'Failed',
+      idle: 'Stash files',
+      running: 'Stashing files',
+      success: 'Stashed files',
+      error: 'Failed to stash',
     },
     Glyph: IconPackage,
   }
@@ -82,7 +82,7 @@ const useSaveStash = (): Action<string[] | string> => {
 
 export {
   useStashFile,
-  useSaveStash,
+  useStashFiles,
   saveStashKey,
   saveStashMutation,
   type SaveStashArgs,

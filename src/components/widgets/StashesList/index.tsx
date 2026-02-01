@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react'
 
+import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { useQueryStashes } from '@/api/queries/stashes'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
@@ -20,7 +21,9 @@ interface StashesListProps extends ComponentProps<'div'> {}
  */
 const StashesList = (props: StashesListProps) => {
   const { ...divProps } = props
+
   const stashesQuery = useQueryStashes()
+  const getStashesListActions = useGetStashesListActions()
 
   return (
     <Accordion {...divProps}>
@@ -30,7 +33,10 @@ const StashesList = (props: StashesListProps) => {
         defaultOpen={STASHES_DEFAULT_OPEN}
         className={cn('mb-2')}
       >
-        <MultiInteraction items={stashesQuery.data ?? []} getActions={() => []}>
+        <MultiInteraction
+          items={stashesQuery.data ?? []}
+          getActions={getStashesListActions}
+        >
           <QueryList
             name="stashes"
             query={stashesQuery}
@@ -47,6 +53,12 @@ const StashesList = (props: StashesListProps) => {
       </AccordionSection>
     </Accordion>
   )
+}
+
+const useGetStashesListActions = () => {
+  const discard = useDiscardStashes()
+
+  return () => [[discard]]
 }
 
 export { StashesList, type StashesListProps }
