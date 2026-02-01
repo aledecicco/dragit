@@ -56,7 +56,6 @@ const SplitButton = (props: SplitButtonProps) => {
     >
       <DecoratedButton
         {...buttonProps}
-        round={false}
         className={cn(
           'rounded-l-[inherit] rounded-r-none grow',
           'border-r',
@@ -75,6 +74,7 @@ const SplitButton = (props: SplitButtonProps) => {
             .with('lg', () => 'pr-2')
             .exhaustive(),
         )}
+        round={false}
         size={size}
       />
 
@@ -85,7 +85,7 @@ const SplitButton = (props: SplitButtonProps) => {
             Glyph={IconChevronDown}
             compact
             {...propsWithCn(
-              menuButtonProps,
+              {},
               'h-full',
               'rounded-l-none rounded-r-[inherit]',
               match(menuSize)

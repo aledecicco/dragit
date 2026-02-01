@@ -106,7 +106,6 @@ const MultiSelectContextProvider = (props: PropsWithChildren) => {
 
         setSelection: (items: number | number[]) =>
           setState((state) => {
-            console.log('setSelection', items)
             state.selected.clear()
             state.lastExtension = undefined
 

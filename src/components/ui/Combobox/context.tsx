@@ -197,7 +197,7 @@ const useComboboxGroupHandler = () => {
 
     // If the current group is being unregistered, reset it
     if (state.currentGroup === name) {
-      state.setCurrentGroup(state.groups.at(0)?.name)
+      state.setCurrentGroup(newGroups.at(0)?.name)
     }
   }
 

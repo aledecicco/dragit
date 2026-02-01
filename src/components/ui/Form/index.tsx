@@ -52,9 +52,10 @@ const Form = <T extends AnyObject>(props: FormProps<T>) => {
   })
 
   return (
-    <Ariakit.FormProvider store={form}>
-      <Ariakit.Form {...propsWithCn(formProps, 'flex flex-col gap-8')} />
-    </Ariakit.FormProvider>
+    <Ariakit.Form
+      store={form}
+      {...propsWithCn(formProps, 'flex flex-col gap-8')}
+    />
   )
 }
 

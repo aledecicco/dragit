@@ -1,8 +1,16 @@
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 
-import { Menu, type MenuProps } from '@/ui/Menu'
-import { propsWithCn } from '@/utils/styles'
+import { Menu } from '@/ui/Menu'
+import { cn } from '@/utils/styles'
+
+export const CONTEXT_MENU_HANDLER_KEY = Symbol.for(
+  'dragit/CONTEXT_MENU_HANDLER',
+)
+
+interface ContextMenuEvent extends MouseEvent {
+  [CONTEXT_MENU_HANDLER_KEY]?: string
+}
 
 interface ContextMenuProps extends Omit<Ariakit.RoleProps, 'children'> {
   children: Ariakit.RoleProps['render']
@@ -15,55 +23,64 @@ interface ContextMenuProps extends Omit<Ariakit.RoleProps, 'children'> {
   /**
    * Additional props to pass to the menu.
    */
-  menuProps?: MenuProps
+  menuProps?: Ariakit.MenuStoreProps
 
   /**
-   * Whether this context menu is an outer menu that has priority over children.
+   * An optional id for ownership tracking of events.
    */
-  isOuter?: boolean
+  menuId?: string
 }
 
 /**
  * A context menu that appears on right-click.
  */
 const ContextMenu = (props: ContextMenuProps) => {
-  const { children, items, menuProps, isOuter, ...anchorProps } = props
+  const { children, items, menuProps, menuId, ...anchorProps } = props
 
-  const menu = Ariakit.useMenuStore({ focusLoop: true })
-  const [anchorRect, setAnchorRect] = useState({ x: 0, y: 0 })
+  const menu = Ariakit.useMenuStore({ focusLoop: true, ...menuProps })
+  const anchorRect = useRef({ x: 0, y: 0 })
 
   return (
     <>
       <Ariakit.Role
         render={children}
+        {...anchorProps}
         onContextMenu={(e) => {
+          const nativeEvent: ContextMenuEvent = e.nativeEvent
+
+          if (
+            nativeEvent[CONTEXT_MENU_HANDLER_KEY] &&
+            nativeEvent[CONTEXT_MENU_HANDLER_KEY] !== menuId
+          ) {
+            return
+          }
+
           anchorProps.onContextMenu?.(e)
 
-          if (e.defaultPrevented && !isOuter) {
+          if (e.defaultPrevented) {
             return
           }
 
           e.preventDefault()
           e.stopPropagation()
-          setAnchorRect({ x: e.clientX + 5, y: e.clientY - 5 })
+
+          anchorRect.current = { x: e.clientX + 5, y: e.clientY - 5 }
           menu.show()
         }}
-        {...anchorProps}
       />
 
-      <Ariakit.MenuProvider store={menu}>
-        <Menu
-          modal={true}
-          unmountOnHide
-          autoFocusOnShow
-          getAnchorRect={() => anchorRect}
-          {...propsWithCn(menuProps, 'min-w-30 border border-dark-50')}
-        >
-          {items}
-        </Menu>
-      </Ariakit.MenuProvider>
+      <Menu
+        store={menu}
+        modal
+        unmountOnHide
+        autoFocus
+        getAnchorRect={() => anchorRect.current}
+        className={cn('min-w-30 border border-dark-50')}
+      >
+        {items}
+      </Menu>
     </>
   )
 }
 
-export { ContextMenu, type ContextMenuProps }
+export { ContextMenu, type ContextMenuProps, type ContextMenuEvent }

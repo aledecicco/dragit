@@ -8,6 +8,11 @@ import { MultiSelectItem } from './Item'
 
 interface MultiSelectProps extends Omit<Ariakit.CompositeProps, 'children'> {
   children: Ariakit.CompositeProps['render']
+
+  /**
+   * The total number of items in the multiselect list.
+   */
+  itemsCount: number
 }
 
 /**
@@ -25,18 +30,42 @@ const MultiSelect = (props: MultiSelectProps) => {
 }
 
 const MultiSelectInner = (props: MultiSelectProps) => {
-  const { children, ...compositeProps } = props
+  const { children, itemsCount, ...compositeProps } = props
 
   const { setSelection } = useSelectionUpdater()
-  const ref = useRef(null)
+  const ref = useRef<HTMLDivElement>(null)
 
   useClickAway(ref, () => {
-    setSelection([])
+    if (!document.querySelector('[role="menu"], [role="dialog"]')) {
+      setSelection([])
+    }
   })
 
   return (
     <Ariakit.CompositeProvider>
       <Ariakit.Composite
+        focusable
+        onClick={(e) => {
+          if (!(e.target instanceof Element)) {
+            return
+          }
+
+          const item = e.target.closest('[role="option"]')
+          if (!item) {
+            setSelection([])
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            setSelection([])
+            return
+          }
+
+          if (e.key === 'a' && (e.metaKey || e.ctrlKey)) {
+            setSelection([...Array(itemsCount).keys()])
+            return
+          }
+        }}
         role="listbox"
         aria-multiselectable
         {...compositeProps}

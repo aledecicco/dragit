@@ -24,7 +24,7 @@ const EVENT_ID = 'app-event'
 /**
  * Subscribes the app to events coming from the backend, and invalidates queries accordingly.
  */
-const useEventsHandler = () => {
+const useBackendEventshandler = () => {
   const client = useQueryClient()
   const { currentReference } = useSelectedReferences()
 
@@ -158,4 +158,4 @@ const useEventsHandler = () => {
   }, [client.resetQueries, client.invalidateQueries, currentReference])
 }
 
-export { useEventsHandler }
+export { useBackendEventshandler }

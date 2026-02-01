@@ -8,13 +8,9 @@ import type { VirtualItem } from '@tanstack/react-virtual'
 import type {
   AncestorInfo,
   BranchDivergence,
-  BranchInfo,
   CommonAncestorInfo,
   HistoryItem,
   Page,
-  Reference,
-  RefName,
-  TagInfo,
 } from '@/api/models'
 import { HISTORY_PAGE_SIZE } from '@/api/queries/commitHistory'
 import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
@@ -137,74 +133,6 @@ const getGraphCommitData = (
 }
 
 /**
- * Generates the appropriate options for the current branch selector.
- *
- * @param branches - The list of all available branches.
- * @param tags - The list of all available tags.
- *
- * @returns An array of combobox options.
- */
-const getCurrentBranchOptions = (branches: BranchInfo[], tags: TagInfo[]) => {
-  const branchOptions: Reference[] =
-    branches?.map((branch) => ({ type: 'branch', refName: branch.name })) ?? []
-
-  const tagOptions: Reference[] = tags.map((tag) => ({
-    type: 'commit',
-    refName: tag.name,
-  }))
-
-  return [
-    { id: 'branches' as const, label: 'Branches', items: branchOptions },
-    { id: 'tags' as const, label: 'Tags', items: tagOptions },
-  ]
-}
-
-/**
- * Generates the appropriate options for the base branch selector based on the provided config.
- *
- * @param branches - The list of all available branches.
- * @param tags - The list of all available tags.
- * @param exclude - An optional name to exclude from the options.
- * @param include - An optional reference to always include in the options.
- *
- * @returns An array of combobox options.
- */
-const getBaseBranchOptions = (
-  branches: BranchInfo[],
-  tags: TagInfo[],
-  exclude?: RefName,
-  include?: Reference,
-) => {
-  let branchOptions: Reference[] =
-    branches?.map((branch) => ({ type: 'branch', refName: branch.name })) ?? []
-
-  const tagOptions: Reference[] = tags.map((tag) => ({
-    type: 'commit',
-    refName: tag.name,
-  }))
-
-  if (exclude) {
-    branchOptions = branchOptions.filter(
-      (option) => option?.refName !== exclude,
-    )
-  }
-
-  if (include) {
-    const isIncluded = branchOptions.some(
-      (option) => option?.refName === include.refName,
-    )
-    if (!isIncluded) {
-      branchOptions.unshift(include)
-    }
-  }
-
-  return [
-    { id: 'branches', label: 'Branches', items: branchOptions },
-    { id: 'tags', label: 'Tags', items: tagOptions },
-  ]
-}
-
-/**
  * Hook that determines whether there are uncommitted changes in the worktree.
  */
 const useHasUncommittedChanges = (): boolean => {
@@ -220,7 +148,5 @@ export {
   useInfiniteScroll,
   useCurrentCommonAncestor,
   getGraphCommitData,
-  getCurrentBranchOptions,
-  getBaseBranchOptions,
   useHasUncommittedChanges,
 }

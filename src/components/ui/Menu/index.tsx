@@ -17,6 +17,7 @@ const Menu = (props: MenuProps) => {
       gutter={4}
       {...propsWithCn(
         menuProps,
+        'z-1',
         'rounded-md shadow-md p-1',
         'bg-dark-300 min-w-max',
       )}

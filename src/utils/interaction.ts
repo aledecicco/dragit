@@ -1,5 +1,6 @@
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { openPath } from '@tauri-apps/plugin-opener'
+import { useEffectOnce } from 'react-use'
 
 // TODO: make app configurable
 const DEFAULT_APP = 'code'
@@ -24,4 +25,30 @@ export const openFile = (path: string, openWith: string = DEFAULT_APP) => {
  */
 export const copyToClipboard = (text: string, label?: string) => {
   return writeText(text, { label })
+}
+
+/**
+ * A hook that prevents default browser behaviors for some events.
+ */
+export const useDefaultEventPrevention = () => {
+  useEffectOnce(() => {
+    const preventContextMenu = (e: PointerEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    const preventSelectAll = (e: KeyboardEvent) => {
+      if (e.key === 'a' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+      }
+    }
+
+    window.addEventListener('contextmenu', preventContextMenu)
+    window.addEventListener('keydown', preventSelectAll)
+
+    return () => {
+      window.removeEventListener('contextmenu', preventContextMenu)
+      window.removeEventListener('keydown', preventSelectAll)
+    }
+  })
 }

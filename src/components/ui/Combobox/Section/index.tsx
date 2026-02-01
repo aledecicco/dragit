@@ -86,7 +86,7 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
         ) : (
           matchingOptions.map((option) => (
             <ComboboxItem key={option} value={option}>
-              {renderOption ? renderOption(option) : option}
+              {renderOption ? renderOption(option) : option ? option : 'Empty'}
             </ComboboxItem>
           ))
         )}

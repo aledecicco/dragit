@@ -10,19 +10,20 @@ import { StashesList } from '@/widgets/StashesList'
 import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
 import { UnstagedWorktreeChanges } from '@/widgets/WorktreeChanges/Unstaged'
 
-import { useEventsHandler } from '@/api/events'
+import { useBackendEventshandler } from '@/api/events'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
-import { useContextMenuHandler } from '@/lib/ContextMenu/utils'
 import { useReferencesSync } from '@/state/branches'
 import { useDialog } from '@/state/dialogs'
 import { useUpstreamSync } from '@/state/upstream'
 import { cn } from '@/utils/styles'
 
+import { useDefaultEventPrevention } from './utils/interaction'
+
 enableMapSet()
 
 const App = () => {
-  useEventsHandler()
-  useContextMenuHandler()
+  useBackendEventshandler()
+  useDefaultEventPrevention()
 
   const currentDirQuery = useQueryCurrentDir()
 

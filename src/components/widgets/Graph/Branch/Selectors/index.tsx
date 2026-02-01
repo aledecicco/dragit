@@ -33,6 +33,17 @@ const BranchSelectors = () => {
   const switchBranches = useSwitchBranches()
 
   const branchOptions = branchesQuery.data?.map((branch) => branch.name) ?? []
+  const baseBranchOptions = [
+    '',
+    ...(currentUpstream
+      ? ensurePresent(
+          branchOptions,
+          `${currentUpstream.remote}/${currentUpstream.remoteBranch}`,
+          true,
+        )
+      : branchOptions
+    ).filter((branch) => branch !== currentReference?.refName),
+  ]
   const tagOptions = tagsQuery.data?.map((tag) => tag.name) ?? []
 
   return (
@@ -124,20 +135,18 @@ const BranchSelectors = () => {
           name="branches"
           onSelect={(value) => {
             if (currentReference) {
-              changeSelectedBase(currentReference, {
-                type: 'branch',
-                refName: value,
-              })
+              changeSelectedBase(
+                currentReference,
+                value
+                  ? {
+                      type: 'branch',
+                      refName: value,
+                    }
+                  : null,
+              )
             }
           }}
-          options={
-            currentUpstream
-              ? ensurePresent(
-                  branchOptions,
-                  `${currentUpstream.remote}/${currentUpstream.remoteBranch}`,
-                )
-              : branchOptions
-          }
+          options={baseBranchOptions}
         />
 
         <ComboboxSection

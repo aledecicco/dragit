@@ -20,7 +20,7 @@ const BranchMessage = (props: BranchMessageProps) => {
         pProps,
         'text-center text-light-950 italic',
         'absolute top-9 w-max p-1 overflow-visible',
-        isBase ? 'left-[68%]' : 'left-[12%]',
+        isBase ? 'left-[66%]' : 'left-[13.5%]',
       )}
     />
   )

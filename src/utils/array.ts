@@ -79,15 +79,21 @@ export const splitBy = <T>(arr: T[], delimiter: T): T[][] => {
 
 /**
  * Ensures that an item is present in an array. If the item is already present, the original array is returned.
- * Otherwise, a new array with the item prepended is returned.
+ * Otherwise, a new array that with the item is returned.
  *
  * @param arr - The array to check.
  * @param item - The item to ensure is present.
+ * @param sorted - Whether the item should be inserted in sorted order.
  */
-export const ensurePresent = <T>(arr: T[], item: T): T[] => {
+export const ensurePresent = <T>(arr: T[], item: T, sorted?: boolean): T[] => {
   if (arr.includes(item)) {
     return arr
   }
 
-  return [item, ...arr]
+  const newArr = [item, ...arr]
+  if (sorted) {
+    newArr.sort()
+  }
+
+  return newArr
 }

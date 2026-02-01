@@ -2,7 +2,6 @@ import { useDeferredValue, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
 
-import { mapOr } from '@/utils/array'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { AutosuggestItem } from './Item'
@@ -25,11 +24,6 @@ interface AutosuggestProps extends Ariakit.ComboboxProps {
    * @param value - The new value to set. If `undefined`, the input will be cleared.
    */
   setValue: (value: string | undefined) => void
-
-  /**
-   * Placeholder text for the input when no value is set.
-   */
-  placeholder?: string
 }
 
 /**
@@ -38,14 +32,7 @@ interface AutosuggestProps extends Ariakit.ComboboxProps {
  * Automatically filters suggestions based on the current input value.
  */
 const Autosuggest = (props: AutosuggestProps) => {
-  const {
-    value,
-    suggestions = [],
-    setValue,
-    placeholder = 'Select...',
-    store,
-    ...comboboxProps
-  } = props
+  const { value, suggestions = [], setValue, store, ...comboboxProps } = props
 
   const [search, setSearch] = useState(value ?? '')
   const deferredSearch = useDeferredValue(search)
@@ -56,7 +43,7 @@ const Autosuggest = (props: AutosuggestProps) => {
     <Ariakit.ComboboxProvider store={store} value={search} setValue={setSearch}>
       <Ariakit.Combobox
         autoComplete="both"
-        placeholder={placeholder}
+        placeholder={comboboxProps.placeholder ?? 'Select...'}
         {...propsWithCn(
           comboboxProps,
           'px-2.5 py-1.75 bg-dark-800 rounded-sm text-sm text-light-800',
@@ -80,7 +67,16 @@ const Autosuggest = (props: AutosuggestProps) => {
           className={cn('rounded-lg shadow-md', 'bg-dark-300 p')}
         >
           <Ariakit.ComboboxList className={cn('max-h-80 overflow-y-auto')}>
-            {mapOr(
+            {suggestions.length === 0 ? (
+              <div
+                className={cn(
+                  'text-center p-2',
+                  'text-sm italic text-light-950',
+                )}
+              >
+                No options found
+              </div>
+            ) : matchingSuggestions.length === 0 ? (
               <div
                 className={cn(
                   'text-center p-2',
@@ -88,9 +84,9 @@ const Autosuggest = (props: AutosuggestProps) => {
                 )}
               >
                 No matches found
-              </div>,
-              matchingSuggestions,
-              (suggestion) => (
+              </div>
+            ) : (
+              matchingSuggestions.map((suggestion) => (
                 <AutosuggestItem
                   key={suggestion}
                   value={suggestion}
@@ -98,7 +94,7 @@ const Autosuggest = (props: AutosuggestProps) => {
                     setValue(suggestion)
                   }}
                 />
-              ),
+              ))
             )}
           </Ariakit.ComboboxList>
         </Ariakit.ComboboxPopover>

@@ -1,10 +1,7 @@
 import * as Ariakit from '@ariakit/react'
-import { IconChevronDown } from '@tabler/icons-react'
 
 import { Menu, type MenuProps } from '@/ui/Menu'
 import { cn } from '@/utils/styles'
-
-import { Icon } from '../Icon'
 
 interface DropdownProps extends MenuProps {
   /**
@@ -21,12 +18,7 @@ const Dropdown = (props: DropdownProps) => {
 
   return (
     <Ariakit.MenuProvider>
-      <Ariakit.MenuButton render={anchor} className={cn('group/menu')}>
-        <Icon
-          Glyph={IconChevronDown}
-          className={cn('group-aria-expanded/menu:rotate-180')}
-        />
-      </Ariakit.MenuButton>
+      <Ariakit.MenuButton render={anchor} className={cn('group/menu')} />
 
       <Menu {...menuProps} />
     </Ariakit.MenuProvider>

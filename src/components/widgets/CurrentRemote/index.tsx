@@ -18,6 +18,7 @@ import { changeSelectedUpstream, useSelectedUpstream } from '@/state/upstream'
 import { Combobox } from '@/ui/Combobox'
 import { ComboboxSection } from '@/ui/Combobox/Section'
 import { EditableText } from '@/ui/EditableText'
+import { ensurePresent } from '@/utils/array'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface CurrentRemoteProps extends ComponentProps<'div'> {}
@@ -34,16 +35,22 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
   const remotesQuery = useQueryRemotes()
   const branchesQuery = useQueryBranches()
 
-  const remoteOptions: RemoteName[] =
-    remotesQuery.data?.map((remote) => remote.name) ?? []
+  const allRemotes = remotesQuery.data?.map((remote) => remote.name) ?? []
+  const remoteOptions: RemoteName[] = upstream?.remote
+    ? ensurePresent(allRemotes, upstream.remote, true)
+    : allRemotes
 
   const remoteBranchOptions: BranchName[] = !upstream
     ? []
-    : (branchesQuery.data
-        ?.filter((branch) => branch.type === 'remote')
-        .filter((branch) => branch.name.startsWith(`${upstream.remote}/`))
-        .map((branch) => branch.name.substring(upstream.remote.length + 1)) ??
-      [])
+    : ensurePresent(
+        branchesQuery.data
+          ?.filter((branch) => branch.type === 'remote')
+          .filter((branch) => branch.name.startsWith(`${upstream.remote}/`))
+          .map((branch) => branch.name.substring(upstream.remote.length + 1)) ??
+          [],
+        upstream.remoteBranch,
+        true,
+      )
 
   return (
     <div

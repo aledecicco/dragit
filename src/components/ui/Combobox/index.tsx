@@ -71,7 +71,7 @@ const ComboboxInner = (props: ComboboxProps) => {
   const { group, groups } = useComboboxState()
   const { setSearch, setCurrentGroup } = useComboboxUpdater()
 
-  const tabsHandler = useTabsHandler('branches', {
+  const tabsHandler = useTabsHandler(group?.name, {
     selectedId: group?.name,
     setSelectedId: (id) => {
       const selectedGroup = groups.find((g) => g.name === id)
@@ -119,7 +119,7 @@ const ComboboxInner = (props: ComboboxProps) => {
           portal
           sameWidth
           gutter={4}
-          className={cn('rounded-lg shadow-md', 'bg-dark-300 p-2')}
+          className={cn('rounded-lg shadow-md min-w-max', 'bg-dark-300 p-2')}
         >
           <Tabs
             store={tabsHandler.store}
