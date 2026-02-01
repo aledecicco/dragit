@@ -12,7 +12,8 @@ interface ContextMenuEvent extends MouseEvent {
   [CONTEXT_MENU_HANDLER_KEY]?: string
 }
 
-interface ContextMenuProps extends Omit<Ariakit.RoleProps, 'children'> {
+interface ContextMenuProps
+  extends Omit<Ariakit.RoleProps, 'children' | 'render'> {
   children: Ariakit.RoleProps['render']
 
   /**

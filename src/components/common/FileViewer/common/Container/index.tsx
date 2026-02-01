@@ -17,7 +17,7 @@ import { cn, propsWithCn } from '@/utils/styles'
 import { FileViewerTitle } from '../Title'
 
 interface FileViewerContainerProps<T>
-  extends Omit<ComponentProps<'div'>, 'children'> {
+  extends Omit<ComponentProps<'div'>, 'children' | 'render'> {
   /**
    * The query result to wait for.
    */

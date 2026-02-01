@@ -27,7 +27,7 @@ const TextField = (props: TextFieldProps) => {
       onKeyDown={(e) => {
         fieldProps.onKeyDown?.(e)
 
-        if (e.key === 'Enter' && e.ctrlKey) {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
           e.stopPropagation()
           e.preventDefault()
 

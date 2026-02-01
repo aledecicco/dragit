@@ -6,7 +6,8 @@ import { useClickAway } from 'react-use'
 import { MultiSelectContextProvider, useSelectionUpdater } from './context'
 import { MultiSelectItem } from './Item'
 
-interface MultiSelectProps extends Omit<Ariakit.CompositeProps, 'children'> {
+interface MultiSelectProps
+  extends Omit<Ariakit.CompositeProps, 'children' | 'render'> {
   children: Ariakit.CompositeProps['render']
 
   /**
@@ -44,7 +45,6 @@ const MultiSelectInner = (props: MultiSelectProps) => {
   return (
     <Ariakit.CompositeProvider>
       <Ariakit.Composite
-        focusable
         onClick={(e) => {
           if (!(e.target instanceof Element)) {
             return
@@ -61,7 +61,7 @@ const MultiSelectInner = (props: MultiSelectProps) => {
             return
           }
 
-          if (e.key === 'a' && (e.metaKey || e.ctrlKey)) {
+          if ((e.key === 'a' || e.key === 'A') && (e.metaKey || e.ctrlKey)) {
             setSelection([...Array(itemsCount).keys()])
             return
           }

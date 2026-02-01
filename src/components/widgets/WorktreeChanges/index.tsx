@@ -93,7 +93,10 @@ const WorktreeChanges = <T extends WorktreeFileType[]>(
           'w-full bg-dark-800 rounded-sm',
         )}
       >
-        <MultiInteraction items={filesQuery.data?.items ?? []} actions={[]}>
+        <MultiInteraction
+          items={filesQuery.data?.items ?? []}
+          getActions={() => []}
+        >
           <QueryList
             name={`files with ${label}`}
             query={filesQuery}

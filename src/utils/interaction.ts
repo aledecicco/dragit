@@ -38,7 +38,7 @@ export const useDefaultEventPrevention = () => {
     }
 
     const preventSelectAll = (e: KeyboardEvent) => {
-      if (e.key === 'a' && (e.metaKey || e.ctrlKey)) {
+      if ((e.key === 'a' || e.key === 'A') && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
       }
     }

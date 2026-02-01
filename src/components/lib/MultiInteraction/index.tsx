@@ -17,9 +17,9 @@ import { useSelectedItems, useSelectionUpdater } from '../MultiSelect/context'
 interface MultiInteractionProps<T>
   extends Omit<MultiSelectProps, 'itemsCount'> {
   /**
-   * The list of ways to interact with the items.
+   * Callback that returns the list of ways to interact with the selected items.
    */
-  actions: Action<T[]>[][]
+  getActions: (items: T[]) => Action<T[]>[][]
 
   /**
    * The items being interacted with.
@@ -30,11 +30,11 @@ interface MultiInteractionProps<T>
  * A component that allows selecting arbitrary child items and performing actions on all of them.
  */
 const MultiInteraction = <T,>(props: MultiInteractionProps<T>) => {
-  const { actions, items, children, ...multiSelectProps } = props
+  const { getActions, items, children, ...multiSelectProps } = props
 
   return (
     <MultiSelect itemsCount={items.length} {...multiSelectProps}>
-      <MultiInteractionInner actions={actions} items={items}>
+      <MultiInteractionInner getActions={getActions} items={items}>
         {children}
       </MultiInteractionInner>
     </MultiSelect>
@@ -42,7 +42,7 @@ const MultiInteraction = <T,>(props: MultiInteractionProps<T>) => {
 }
 
 const MultiInteractionInner = <T,>(props: MultiInteractionProps<T>) => {
-  const { actions, items, ...contentProps } = props
+  const { getActions, items, ...contentProps } = props
 
   const itemIndexes = useSelectedItems()
   const { setSelection } = useSelectionUpdater()
@@ -53,6 +53,9 @@ const MultiInteractionInner = <T,>(props: MultiInteractionProps<T>) => {
   }, [items])
 
   const menuId = useUniqueId()
+
+  const selectedItems = items.filter((_, index) => itemIndexes.has(index))
+  const actions = getActions(selectedItems)
 
   return (
     <ContextMenu
@@ -74,22 +77,16 @@ const MultiInteractionInner = <T,>(props: MultiInteractionProps<T>) => {
         .map((section, i) => (
           <Fragment key={`${i + 1}`}>
             {i > 0 && <Separator className={cn('my-0.5')} />}
-            {section.map((action, j) => {
-              const selectedItems = items.filter((_, index) =>
-                itemIndexes.has(index),
-              )
-
-              return (
-                <MenuItem
-                  key={`${i + 1}-${j + 1}`}
-                  action={action}
-                  argsRequester={() => selectedItems}
-                >
-                  {' '}
-                  ({selectedItems.length})
-                </MenuItem>
-              )
-            })}
+            {section.map((action, j) => (
+              <MenuItem
+                key={`${i + 1}-${j + 1}`}
+                action={action}
+                argsRequester={() => selectedItems}
+              >
+                {' '}
+                ({selectedItems.length})
+              </MenuItem>
+            ))}
           </Fragment>
         ))}
     />

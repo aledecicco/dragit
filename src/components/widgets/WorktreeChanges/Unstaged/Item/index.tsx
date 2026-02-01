@@ -51,8 +51,8 @@ const UnstagedChangesItem = (props: UnstagedChangesItemProps) => {
         <MultiSelectItem
           render={<ListItem interactive />}
           {...itemProps}
-          onClick={(e) => {
-            itemProps.onClick?.(e)
+          onDoubleClick={(e) => {
+            itemProps.onDoubleClick?.(e)
             showWorktreeFileDiffDialog(file)
           }}
         />

@@ -86,7 +86,7 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
     <CommandMenu
       shortcuts={shortcuts}
       onKeyDown={(e) => {
-        if (e.ctrlKey && e.key === 'Enter') {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
           e.preventDefault()
           e.stopPropagation()
           commandMenuProps.submitValue({
@@ -94,11 +94,11 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
           })
         }
 
-        if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
+        if ((e.key === 'q' || e.key === 'Q') && (e.ctrlKey || e.metaKey)) {
           setPrevPage(types)
         }
 
-        if (e.ctrlKey && (e.key === 'e' || e.key === 'E')) {
+        if ((e.key === 'e' || e.key === 'E') && (e.ctrlKey || e.metaKey)) {
           if (filesQuery.data?.hasNext) {
             setNextPage(types)
           }

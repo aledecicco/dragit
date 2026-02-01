@@ -30,7 +30,7 @@ const StashesList = (props: StashesListProps) => {
         defaultOpen={STASHES_DEFAULT_OPEN}
         className={cn('mb-2')}
       >
-        <MultiInteraction items={stashesQuery.data ?? []} actions={[]}>
+        <MultiInteraction items={stashesQuery.data ?? []} getActions={() => []}>
           <QueryList
             name="stashes"
             query={stashesQuery}

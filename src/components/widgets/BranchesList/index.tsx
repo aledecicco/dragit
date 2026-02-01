@@ -1,14 +1,12 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import type { BranchInfo, TagInfo } from '@/api/models'
 import { useDeleteBranches } from '@/api/mutations/deleteBranches'
 import { useDeleteTags } from '@/api/mutations/deleteTags'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
-import type { Action } from '@/state/actions'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
 import { Tab } from '@/ui/Tabs/Item'
@@ -40,8 +38,8 @@ const BranchesList = (props: BranchesListProps) => {
     .with('remote', () => remoteBranchesQuery)
     .otherwise(() => allBranchesQuery)
 
-  const branchListActions = useBranchListActions()
-  const tabListActions = useTabListActions()
+  const getBranchesListActions = useGetBranchesListActions()
+  const getTagsListActions = useGetTagsListActions()
 
   return (
     <div {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}>
@@ -81,7 +79,7 @@ const BranchesList = (props: BranchesListProps) => {
         {selectedTab === 'tags' ? (
           <MultiInteraction
             items={tagsQuery.data ?? []}
-            actions={tabListActions}
+            getActions={getTagsListActions}
           >
             <QueryList
               name="tags"
@@ -99,7 +97,7 @@ const BranchesList = (props: BranchesListProps) => {
         ) : (
           <MultiInteraction
             items={branchesQuery.data ?? []}
-            actions={branchListActions}
+            getActions={getBranchesListActions}
           >
             <QueryList
               name="branches"
@@ -120,16 +118,16 @@ const BranchesList = (props: BranchesListProps) => {
   )
 }
 
-const useBranchListActions = (): Action<BranchInfo[]>[][] => {
+const useGetBranchesListActions = () => {
   const deleteBranches = useDeleteBranches()
 
-  return [[deleteBranches]]
+  return () => [[deleteBranches]]
 }
 
-const useTabListActions = (): Action<TagInfo[]>[][] => {
+const useGetTagsListActions = () => {
   const deleteTags = useDeleteTags()
 
-  return [[deleteTags]]
+  return () => [[deleteTags]]
 }
 
 export { BranchesList, type BranchesListProps }
