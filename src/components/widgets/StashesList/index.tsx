@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react'
 
 import { useQueryStashes } from '@/api/queries/stashes'
+import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
 import { Accordion } from '@/ui/Accordion'
 import { AccordionSection } from '@/ui/Accordion/Section'
@@ -29,16 +30,20 @@ const StashesList = (props: StashesListProps) => {
         defaultOpen={STASHES_DEFAULT_OPEN}
         className={cn('mb-2')}
       >
-        <QueryList
-          name="stashes"
-          query={stashesQuery}
-          renderItem={(stash) => <StashesListItem stash={stash} />}
-          size="sm"
-          itemSize={74}
-          options={mapFn(stashesQuery.data, (stashes) => ({
-            getItemKey: (index: number) => stashes[index].tracker,
-          }))}
-        />
+        <MultiInteraction items={stashesQuery.data ?? []} actions={[]}>
+          <QueryList
+            name="stashes"
+            query={stashesQuery}
+            renderItem={(stash, position) => (
+              <StashesListItem stash={stash} itemIndex={position} />
+            )}
+            size="sm"
+            itemSize={74}
+            options={mapFn(stashesQuery.data, (stashes) => ({
+              getItemKey: (index: number) => stashes[index].tracker,
+            }))}
+          />
+        </MultiInteraction>
       </AccordionSection>
     </Accordion>
   )

@@ -31,12 +31,12 @@ const useCommitIndex = (): Action<Omit<CommitIndexArgs, 'isAmend'>> => {
 
   return {
     id: {
-      key: 'modify_branch',
+      key: 'branch_operation',
       operation: 'commit',
       type: 'current',
     },
     blockedBy: [
-      { key: 'modify_branch', type: 'current' },
+      { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
     run: async (args) => {
@@ -57,12 +57,12 @@ const useAmend = (): Action<Omit<CommitIndexArgs, 'isAmend'>> => {
 
   return {
     id: {
-      key: 'modify_branch',
+      key: 'branch_operation',
       operation: 'amend',
       type: 'current',
     },
     blockedBy: [
-      { key: 'modify_branch', type: 'current' },
+      { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
     run: async (args) => {

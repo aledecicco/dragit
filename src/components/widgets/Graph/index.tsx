@@ -1,10 +1,6 @@
 import { type ComponentProps, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
-import {
-  defaultRangeExtractor,
-  type Range,
-  useVirtualizer,
-} from '@tanstack/react-virtual'
+import { defaultRangeExtractor, type Range } from '@tanstack/react-virtual'
 
 import { SvgOverlay } from '@/widgets/Graph/SvgOverlay'
 
@@ -13,6 +9,7 @@ import { getPaginatedLength } from '@/api/utils'
 import { BranchToolbar } from '@/common/BranchToolbar'
 import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
 import { useSelectedBranches, useSelectedReferences } from '@/state/branches'
+import { useVirtualizer } from '@/utils/performance'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { GraphBaseBranch } from './Branch/Base'
@@ -116,10 +113,9 @@ const GraphInner = () => {
             }
             hasScrollLeft={
               virtualizer.scrollOffset !== null &&
-              scrollContainerRef.current !== null &&
+              virtualizer.scrollElement !== null &&
               virtualizer.scrollOffset <
-                virtualizer.getTotalSize() -
-                  scrollContainerRef.current?.clientHeight
+                virtualizer.totalSize - virtualizer.scrollElement.clientHeight
             }
             className={cn('w-full h-full col-span-3 col-start-1 row-start-3')}
             size="md"
@@ -135,11 +131,11 @@ const GraphInner = () => {
         >
           <SvgOverlay
             className={cn('w-full')}
-            style={{ height: virtualizer.getTotalSize() }}
+            style={{ height: virtualizer.totalSize }}
           >
-            <GraphCurrentBranch items={virtualizer.getVirtualItems()} />
+            <GraphCurrentBranch items={virtualizer.virtualItems} />
 
-            <GraphBaseBranch items={virtualizer.getVirtualItems()} />
+            <GraphBaseBranch items={virtualizer.virtualItems} />
           </SvgOverlay>
         </div>
       </Ariakit.Composite>

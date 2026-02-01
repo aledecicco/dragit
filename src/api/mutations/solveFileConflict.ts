@@ -49,7 +49,7 @@ const useAcceptOurs = (file: WorktreeFileInfo): Action => {
     },
     blockedBy: [
       { key: 'file_operation', file: file.path },
-      { key: 'modify_branch', type: 'current' },
+      { key: 'branch_operation', type: 'current' },
     ],
     run: async () => {
       await solveFileConflict.mutateAsync({
@@ -81,7 +81,7 @@ const useAcceptTheirs = (file: WorktreeFileInfo): Action => {
     },
     blockedBy: [
       { key: 'file_operation', file: file.path },
-      { key: 'modify_branch', type: 'current' },
+      { key: 'branch_operation', type: 'current' },
     ],
     run: async () => {
       await solveFileConflict.mutateAsync({
@@ -112,7 +112,7 @@ const useAcceptAsIs = (file: WorktreeFileInfo): Action => {
     },
     blockedBy: [
       { key: 'file_operation', file: file.path },
-      { key: 'modify_branch', type: 'current' },
+      { key: 'branch_operation', type: 'current' },
     ],
     run: async () => {
       await addToIndex.mutateAsync({ files: [file.path] })

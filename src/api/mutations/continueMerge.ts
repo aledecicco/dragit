@@ -28,7 +28,7 @@ const useContinueMerge = (): Action => {
     id: { key: 'merge_operation', operation: 'continue_merge' },
     blockedBy: [
       { key: 'merge_operation' },
-      { key: 'modify_branch', type: 'current' },
+      { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
     run: async () => {

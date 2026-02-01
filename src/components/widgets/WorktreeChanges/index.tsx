@@ -6,6 +6,7 @@ import {
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
+import { MultiInteraction } from '@/lib/MultiInteraction'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
 import {
@@ -38,9 +39,12 @@ interface WorktreeChangesProps<T extends WorktreeFileType[]>
   /**
    * Callback to render each file item.
    */
-  renderFile: (file: FileOfType<T[number]>) => ReactNode
+  renderFile: (file: FileOfType<T[number]>, position: number) => ReactNode
 }
 
+/**
+ * Main app widget that displays the list of worktree changes of specific types.
+ */
 const WorktreeChanges = <T extends WorktreeFileType[]>(
   props: WorktreeChangesProps<T>,
 ) => {
@@ -89,17 +93,19 @@ const WorktreeChanges = <T extends WorktreeFileType[]>(
           'w-full bg-dark-800 rounded-sm',
         )}
       >
-        <QueryList
-          name={`files with ${label}`}
-          query={filesQuery}
-          getItems={(d) => d.items}
-          renderItem={renderFile}
-          size="sm"
-          itemSize={48}
-          options={mapFn(filesQuery.data, (files) => ({
-            getItemKey: (index: number) => files.items[index].path,
-          }))}
-        />
+        <MultiInteraction items={filesQuery.data?.items ?? []} actions={[]}>
+          <QueryList
+            name={`files with ${label}`}
+            query={filesQuery}
+            getItems={(d) => d.items}
+            renderItem={renderFile}
+            size="sm"
+            itemSize={48}
+            options={mapFn(filesQuery.data, (files) => ({
+              getItemKey: (index: number) => files.items[index].path,
+            }))}
+          />
+        </MultiInteraction>
       </div>
     </div>
   )

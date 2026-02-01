@@ -36,13 +36,13 @@ const usePullBranch = (branch: BranchInfo): Action => {
 
   return {
     id: {
-      key: 'modify_branch',
+      key: 'branch_operation',
       operation: 'pull',
       type: 'current',
     },
     blockedBy: [
-      { key: 'modify_branch', branch: branch.name },
-      { key: 'modify_branch', type: 'current' },
+      { key: 'branch_operation', branch: branch.name },
+      { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
     run: async () => {
@@ -76,13 +76,13 @@ const useRebaseBranch = (branch: BranchInfo): Action => {
 
   return {
     id: {
-      key: 'modify_branch',
+      key: 'branch_operation',
       operation: 'rebase',
       type: 'current',
     },
     blockedBy: [
-      { key: 'modify_branch', branch: branch.name },
-      { key: 'modify_branch', type: 'current' },
+      { key: 'branch_operation', branch: branch.name },
+      { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
     run: async () => {

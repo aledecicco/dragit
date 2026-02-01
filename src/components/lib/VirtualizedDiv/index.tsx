@@ -1,13 +1,11 @@
 import { type ReactNode, useRef } from 'react'
-import {
-  useVirtualizer,
-  type VirtualizerOptions,
-} from '@tanstack/react-virtual'
+import type { VirtualizerOptions } from '@tanstack/react-virtual'
 
 import {
   ScrollShadowDiv,
   type ScrollShadowDivProps,
 } from '@/lib/ScrollShadowDiv'
+import { useVirtualizer } from '@/utils/performance'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { VirtualizedDivItem, type VirtualizedDivItemProps } from './Item'
@@ -45,8 +43,6 @@ interface VirtualizedDivProps<T> extends Partial<ScrollShadowDivProps> {
 }
 
 /**
- * TODO: is this being optimized by the compiler?
- *
  * A div that automatically initializes a virtualized list.
  *
  * Displays shadows to signal scrollable content.
@@ -85,9 +81,9 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
       }
       hasScrollLeft={
         virtualizer.scrollOffset !== null &&
-        scrollContainerRef.current !== null &&
+        virtualizer.scrollElement !== null &&
         virtualizer.scrollOffset <
-          virtualizer.getTotalSize() - scrollContainerRef.current?.clientHeight
+          virtualizer.totalSize - virtualizer.scrollElement.clientHeight
       }
       {...propsWithCn(divProps, 'px-2')}
     >
@@ -97,9 +93,9 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
       >
         <div
           className={cn('w-full relative')}
-          style={{ height: virtualizer.getTotalSize() }}
+          style={{ height: virtualizer.totalSize }}
         >
-          {virtualizer.getVirtualItems().map((virtualRow) => (
+          {virtualizer.virtualItems.map((virtualRow) => (
             <VirtualizedDivItem
               key={virtualRow.key}
               itemSize={itemSize}

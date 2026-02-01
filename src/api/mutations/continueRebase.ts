@@ -28,7 +28,7 @@ const useContinueRebase = (): Action => {
     id: { key: 'merge_operation', operation: 'continue_rebase' },
     blockedBy: [
       { key: 'merge_operation' },
-      { key: 'modify_branch', type: 'current' },
+      { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
     run: async () => {

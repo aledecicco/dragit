@@ -1,7 +1,8 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import type { TagInfo } from '@/api/models'
+import type { BranchInfo, TagInfo } from '@/api/models'
+import { useDeleteBranches } from '@/api/mutations/deleteBranches'
 import { useDeleteTags } from '@/api/mutations/deleteTags'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
@@ -39,6 +40,7 @@ const BranchesList = (props: BranchesListProps) => {
     .with('remote', () => remoteBranchesQuery)
     .otherwise(() => allBranchesQuery)
 
+  const branchListActions = useBranchListActions()
   const tabListActions = useTabListActions()
 
   return (
@@ -95,20 +97,33 @@ const BranchesList = (props: BranchesListProps) => {
             />
           </MultiInteraction>
         ) : (
-          <QueryList
-            name="branches"
-            query={branchesQuery}
-            renderItem={(branch) => <BranchesListItem branch={branch} />}
-            size="sm"
-            itemSize={74}
-            options={mapFn(branchesQuery.data, (branches) => ({
-              getItemKey: (index: number) => branches[index].name,
-            }))}
-          />
+          <MultiInteraction
+            items={branchesQuery.data ?? []}
+            actions={branchListActions}
+          >
+            <QueryList
+              name="branches"
+              query={branchesQuery}
+              renderItem={(branch, position) => (
+                <BranchesListItem branch={branch} itemIndex={position} />
+              )}
+              size="sm"
+              itemSize={74}
+              options={mapFn(branchesQuery.data, (branches) => ({
+                getItemKey: (index: number) => branches[index].name,
+              }))}
+            />
+          </MultiInteraction>
         )}
       </div>
     </div>
   )
+}
+
+const useBranchListActions = (): Action<BranchInfo[]>[][] => {
+  const deleteBranches = useDeleteBranches()
+
+  return [[deleteBranches]]
 }
 
 const useTabListActions = (): Action<TagInfo[]>[][] => {

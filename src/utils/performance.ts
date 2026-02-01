@@ -1,4 +1,5 @@
 import { useReducer, useRef } from 'react'
+import { useVirtualizer as useTanstackVirtualizer } from '@tanstack/react-virtual'
 
 import { MS_IN_SECOND } from './time'
 
@@ -135,5 +136,44 @@ const useRerender = () => {
   return { rerenderTrigger, rerender }
 }
 
-export { useDebouncedCallback, useThrottledCallback, useRerender }
+type VirtualizerOptions<T extends Element, I extends Element> = Parameters<
+  typeof useTanstackVirtualizer<T, I>
+>[0]
+
+/**
+ * Hook that handles virtualization of a list of items.
+ *
+ * @param options - The options for the virtualizer.
+ *
+ * @returns An object containing:
+ * - `scrollOffset`: The current scroll offset.
+ * - `scrollElement`: The scrollable element.
+ * - `totalSize`: The total size of the virtualized content.
+ * - `virtualItems`: The list of virtual items.
+ */
+const useVirtualizer = <T extends Element, I extends Element>(
+  options: VirtualizerOptions<T, I>,
+) => {
+  'use no memo'
+
+  // TODO: https://github.com/TanStack/virtual/issues/736
+  // TODO: https://github.com/TanStack/virtual/issues/743
+
+  const { scrollOffset, scrollElement, getTotalSize, getVirtualItems } =
+    useTanstackVirtualizer(options)
+
+  return {
+    scrollOffset,
+    scrollElement,
+    totalSize: getTotalSize(),
+    virtualItems: getVirtualItems(),
+  }
+}
+
+export {
+  useDebouncedCallback,
+  useThrottledCallback,
+  useRerender,
+  useVirtualizer,
+}
 export type { DebounceOptions, ThrottleOptions }

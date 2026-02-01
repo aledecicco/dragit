@@ -14,7 +14,7 @@ import {
 import { Icon } from '@/ui/Icon'
 import { ListItem } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
-import { cn } from '@/utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
 interface TagsListItemProps extends MultiSelectItemProps {
@@ -38,13 +38,8 @@ const TagsListItem = (props: TagsListItemProps) => {
       interactions={interactions}
       render={
         <MultiSelectItem
-          render={
-            <ListItem
-              interactive
-              className={cn('flex flex-col justify-between')}
-            />
-          }
-          {...itemProps}
+          render={<ListItem interactive />}
+          {...propsWithCn(itemProps, 'flex flex-col justify-between')}
         />
       }
     >

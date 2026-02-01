@@ -7,13 +7,17 @@ import { ChangesSummary } from '@/common/DiffSummary'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
+import {
+  MultiSelectItem,
+  type MultiSelectItemProps,
+} from '@/lib/MultiSelect/Item'
 import { Icon } from '@/ui/Icon'
-import { ListItem, type ListItemProps } from '@/ui/ListItem'
+import { ListItem } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
-interface StashesListItemProps extends ListItemProps {
+interface StashesListItemProps extends MultiSelectItemProps {
   /**
    * The stash that this list item should display.
    */
@@ -33,11 +37,11 @@ const StashesListItem = (props: StashesListItemProps) => {
     <InteractionHandler
       interactions={interactions}
       render={
-        <ListItem
-          interactive
+        <MultiSelectItem
+          render={<ListItem interactive />}
           {...propsWithCn(itemProps, 'flex flex-col justify-between')}
-          onClick={(e) => {
-            itemProps.onClick?.(e)
+          onDoubleClick={(e) => {
+            itemProps.onDoubleClick?.(e)
             showSnapshotDetailsDialog(stash)
           }}
         />

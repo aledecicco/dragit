@@ -23,7 +23,9 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
       label="staged changes"
       extraInfo={undefined}
       fileTypes={STAGED_FILE_TYPES}
-      renderFile={(file) => <StagedChangesItem file={file} />}
+      renderFile={(file, position) => (
+        <StagedChangesItem file={file} itemIndex={position} />
+      )}
     />
   )
 }

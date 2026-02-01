@@ -35,11 +35,11 @@ const useFastForwardBranch = (branch: BranchInfo): Action => {
 
   return {
     id: {
-      key: 'modify_branch',
+      key: 'branch_operation',
       operation: 'fast_forward',
       branch: branch.name,
     },
-    blockedBy: [{ key: 'modify_branch', branch: branch.name }],
+    blockedBy: [{ key: 'branch_operation', branch: branch.name }],
     run: async () => {
       if (branch.type !== 'local') {
         throw new Error('Branch is not local')

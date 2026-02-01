@@ -9,24 +9,28 @@ import {
   useTrackBranch,
 } from '@/api/mutations/createBranch'
 import { useTagBranch } from '@/api/mutations/createTag'
+import { useDeleteBranch } from '@/api/mutations/deleteBranches'
 import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { useMergeBranch } from '@/api/mutations/merge'
 import { usePullBranch, useRebaseBranch } from '@/api/mutations/pullBranch'
 import { useForcePushBranch, usePushBranch } from '@/api/mutations/pushBranch'
-import { useRemoveBranch } from '@/api/mutations/removeBranch'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
+import {
+  MultiSelectItem,
+  type MultiSelectItemProps,
+} from '@/lib/MultiSelect/Item'
 import { useSelectedBranches } from '@/state/branches'
 import { useSelectedUpstream } from '@/state/upstream'
 import { Icon } from '@/ui/Icon'
-import { ListItem, type ListItemProps } from '@/ui/ListItem'
+import { ListItem } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
-interface BranchesListItemProps extends ListItemProps {
+interface BranchesListItemProps extends MultiSelectItemProps {
   branch: BranchInfo
 }
 
@@ -50,8 +54,8 @@ const BranchesListItem = (props: BranchesListItemProps) => {
     <InteractionHandler
       interactions={interactions}
       render={
-        <ListItem
-          interactive
+        <MultiSelectItem
+          render={<ListItem interactive />}
           aria-current={isCurrentBranch}
           {...propsWithCn(itemProps, 'text-start')}
         />
@@ -113,7 +117,7 @@ const useInteractions = (branch: BranchInfo) => {
   const rebase = useRebaseBranch(branch)
   const push = usePushBranch(branch)
   const forcePush = useForcePushBranch(branch)
-  const remove = useRemoveBranch(branch)
+  const deleteBranch = useDeleteBranch(branch)
   const createBranch = useCreateBranchAt(branch.name)
   const branchOff = useBranchOff(branch.name)
   const merge = useMergeBranch(branch)
@@ -158,16 +162,16 @@ const useInteractions = (branch: BranchInfo) => {
     }),
   )
 
-  const forRemove = group(
+  const forDelete = group(
     !isCurrentBranch &&
       interaction({
-        action: remove,
+        action: deleteBranch,
       }),
   )
 
   return match(branch.type)
-    .with('local', () => [forLocal1, forLocal2, forRemove])
-    .with('remote', () => [forRemote, forRemove])
+    .with('local', () => [forLocal1, forLocal2, forDelete])
+    .with('remote', () => [forRemote, forDelete])
     .exhaustive()
 }
 

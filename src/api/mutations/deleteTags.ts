@@ -36,10 +36,10 @@ const useDeleteTag = (tag: TagInfo): Action => {
       await deleteTags.mutateAsync({ tagNames: [tag.name] })
     },
     label: {
-      idle: 'Delete',
-      running: 'Deleting',
-      success: 'Deleted',
-      error: 'Failed',
+      idle: 'Delete tag',
+      running: 'Deleting tag',
+      success: 'Tag deleted',
+      error: 'Failed to delete',
     },
     Glyph: IconTrash,
   }
@@ -55,10 +55,10 @@ const useDeleteTags = (): Action<TagInfo[]> => {
       await deleteTags.mutateAsync({ tagNames: tags.map((tag) => tag.name) })
     },
     label: {
-      idle: 'Delete',
-      running: 'Deleting',
-      success: 'Deleted',
-      error: 'Failed',
+      idle: 'Delete tags',
+      running: 'Deleting tags',
+      success: 'Tags deleted',
+      error: 'Failed to delete',
     },
     Glyph: IconTrash,
   }

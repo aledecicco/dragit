@@ -170,21 +170,11 @@ impl GitHandler for CmdGit {
             }))
     }
 
-    fn remove_branch(
-        &self,
-        repo_path: &str,
-        branch_name: &str,
-        is_remote: bool,
-    ) -> Result<(), GitError> {
-        let mut args = vec!["branch", "-D", branch_name];
-        if is_remote {
-            args.push("--remote");
-        }
+    fn delete_branches(&self, repo_path: &str, branch_names: &Vec<&str>) -> Result<(), GitError> {
+        let args = [vec!["branch", "-D"], branch_names.clone()].concat();
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::DeleteBranchFailed {
-                branch_name: branch_name.to_string(),
-            }))
+            .or(Err(GitError::DeleteBranchesFailed {}))
     }
 
     fn get_commit_history_page(

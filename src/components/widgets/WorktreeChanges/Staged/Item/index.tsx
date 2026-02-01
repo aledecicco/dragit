@@ -1,5 +1,3 @@
-import { startTransition } from 'react'
-
 import type { FileOfType } from '@/api/models'
 import { useUnstageFile } from '@/api/mutations/removeFromIndex'
 import { useStashFile } from '@/api/mutations/saveStash'
@@ -8,14 +6,18 @@ import { FilePath } from '@/common/File/Path'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
-import { ListItem, type ListItemProps } from '@/ui/ListItem'
+import {
+  MultiSelectItem,
+  type MultiSelectItemProps,
+} from '@/lib/MultiSelect/Item'
+import { ListItem } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { getPathLocation } from '@/utils/string'
 import { cn } from '@/utils/styles'
 
 import type { STAGED_FILE_TYPES } from '..'
 
-interface StagedChangesItemProps extends ListItemProps {
+interface StagedChangesItemProps extends MultiSelectItemProps {
   /**
    * Information about the staged file to display.
    */
@@ -35,14 +37,12 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
     <InteractionHandler
       interactions={interactions}
       render={
-        <ListItem
-          interactive
+        <MultiSelectItem
+          render={<ListItem interactive />}
           {...itemProps}
           onClick={(e) => {
             itemProps.onClick?.(e)
-            startTransition(() => {
-              showWorktreeFileDiffDialog(file)
-            })
+            showWorktreeFileDiffDialog(file)
           }}
         />
       }

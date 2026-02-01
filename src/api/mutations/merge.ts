@@ -31,12 +31,12 @@ const useMerge = (): Action<MergeArgs> => {
 
   return {
     id: {
-      key: 'modify_branch',
+      key: 'branch_operation',
       operation: 'merge',
       type: 'current',
     },
     blockedBy: [
-      { key: 'modify_branch', type: 'current' },
+      { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
     run: async (args) => {
@@ -57,13 +57,13 @@ const useMergeBranch = (branch: BranchInfo): Action => {
 
   return {
     id: {
-      key: 'modify_branch',
+      key: 'branch_operation',
       operation: 'merge',
       type: 'current',
       branch: branch.name,
     },
     blockedBy: [
-      { key: 'modify_branch', type: 'current' },
+      { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
     run: async () => {
@@ -84,12 +84,12 @@ const useMergeCommit = (commit: CommitId): Action => {
 
   return {
     id: {
-      key: 'modify_branch',
+      key: 'branch_operation',
       operation: 'merge',
       type: 'current',
       commit,
     },
-    blockedBy: [{ key: 'modify_branch', type: 'current' }],
+    blockedBy: [{ key: 'branch_operation', type: 'current' }],
     run: async () => {
       await merge.mutateAsync({ reference: commit })
     },

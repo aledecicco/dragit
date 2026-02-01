@@ -131,17 +131,14 @@ pub async fn create_branch(
     })
 }
 
-/// Deletes the given branch.
+/// Deletes the given branches.
 #[tauri::command]
-pub async fn remove_branch(
+pub async fn delete_branches(
     state: State<'_, AppState>,
     repo_path: &str,
-    branch_name: &str,
-    is_remote: bool,
+    branch_names: Vec<&str>,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| {
-        h.remove_branch(repo_path, branch_name, is_remote)
-    })
+    with_handler(&state, &|h| h.delete_branches(repo_path, &branch_names))
 }
 
 /// Returns a paginated list of commits leading up to the given reference.

@@ -17,14 +17,18 @@ import { FilePath } from '@/common/File/Path'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { InteractionHandler } from '@/lib/InteractionHandler'
-import { ListItem, type ListItemProps } from '@/ui/ListItem'
+import {
+  MultiSelectItem,
+  type MultiSelectItemProps,
+} from '@/lib/MultiSelect/Item'
+import { ListItem } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
 import { getPathLocation } from '@/utils/string'
 import { cn } from '@/utils/styles'
 
 import type { UNSTAGED_FILE_TYPES } from '..'
 
-interface UnstagedChangesItemProps extends ListItemProps {
+interface UnstagedChangesItemProps extends MultiSelectItemProps {
   /**
    * Information about the unstaged file to display.
    */
@@ -44,7 +48,8 @@ const UnstagedChangesItem = (props: UnstagedChangesItemProps) => {
     <InteractionHandler
       interactions={interactions}
       render={
-        <ListItem
+        <MultiSelectItem
+          render={<ListItem interactive />}
           {...itemProps}
           onClick={(e) => {
             itemProps.onClick?.(e)

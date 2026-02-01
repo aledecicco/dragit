@@ -28,8 +28,8 @@ pub enum GitError {
     #[error("Failed to create branch \"{branch_name}\"")]
     CreateBranchFailed { branch_name: String },
 
-    #[error("Failed to delete branch \"{branch_name}\"")]
-    DeleteBranchFailed { branch_name: String },
+    #[error("Failed to delete branches")]
+    DeleteBranchesFailed {},
 
     #[error("Failed to get commit history of \"{reference}\"")]
     GetReferenceHistoryFailed { reference: String },

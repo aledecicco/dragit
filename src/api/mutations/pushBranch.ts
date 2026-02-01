@@ -37,14 +37,17 @@ const usePushBranch = (branch: BranchInfo): Action => {
 
   return {
     id: {
-      key: 'modify_branch',
+      key: 'branch_operation',
       operation: 'push',
       branch: branch.name,
     },
     blockedBy: [
-      { key: 'modify_branch', branch: branch.name },
+      { key: 'branch_operation', branch: branch.name },
       ...(currentBranch?.name === branch.name
-        ? [{ key: 'modify_branch', type: 'current' }, { key: 'file_operation' }]
+        ? [
+            { key: 'branch_operation', type: 'current' },
+            { key: 'file_operation' },
+          ]
         : []),
     ],
     run: async () => {
@@ -75,11 +78,11 @@ const useForcePushBranch = (branch: BranchInfo): Action => {
 
   return {
     id: {
-      key: 'modify_branch',
+      key: 'branch_operation',
       operation: 'force_push',
       branch: branch.name,
     },
-    blockedBy: [{ key: 'modify_branch', branch: branch.name }],
+    blockedBy: [{ key: 'branch_operation', branch: branch.name }],
     run: async () => {
       if (branch.type !== 'local') {
         throw new Error('Branch is not local')
