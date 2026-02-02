@@ -45,7 +45,6 @@ const MultiSelectInner = (props: MultiSelectProps) => {
   return (
     <Ariakit.CompositeProvider>
       <Ariakit.Composite
-        focusable
         onClick={(e) => {
           if (!(e.target instanceof Element)) {
             return

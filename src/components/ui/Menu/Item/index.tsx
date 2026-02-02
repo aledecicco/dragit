@@ -19,7 +19,6 @@ const MenuItem = <T,>(props: MenuItemProps<T>) => {
 
   return (
     <Ariakit.MenuItem
-      focusable
       className={cn(
         'shrink-0 gap-x-2 justify-start text-nowrap min-w-max w-full',
         'font-medium',

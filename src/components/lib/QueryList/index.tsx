@@ -83,6 +83,7 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
         return (
           <Ariakit.CompositeProvider focusLoop={false}>
             <Ariakit.Composite
+              focusable
               render={
                 <VirtualizedDiv
                   size="sm"
