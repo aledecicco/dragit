@@ -250,7 +250,11 @@ impl DebouncedWatcher {
                         );
                     }
                 }
-                Err(_) => {} // TODO: warn frontend about possible unsync
+                Err(errs) => {
+                    errs.iter()
+                        .for_each(|err| eprintln!("Watcher error: {err:?}"));
+                    // TODO: warn frontend about possible unsync
+                }
             };
         }
     }

@@ -163,11 +163,12 @@ export const fetchAndDeserialize = async <T>(
   schema: BorshSchema<T>,
   context: QueryFunctionContext,
 ): Promise<T> => {
-  let shouldStop = false
   const processIds: number[] = []
 
   const abortSignal = context.signal
-  abortSignal.onabort = () => {
+  let shouldStop = abortSignal.aborted
+
+  const abortHandler = () => {
     // When the query is aborted, we set a flag to kill processes later.
     shouldStop = true
     // And we kill any processes we already have the pid for.
@@ -175,6 +176,7 @@ export const fetchAndDeserialize = async <T>(
       new Child(pid).kill()
     })
   }
+  abortSignal.addEventListener('abort', abortHandler, { once: true })
 
   const channel = new Channel<AppMessage>()
   channel.onmessage = (event) => {

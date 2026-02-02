@@ -23,7 +23,6 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
     <WorktreeChanges
       {...divProps}
       label="unstaged changes"
-      extraInfo={undefined}
       fileTypes={NOT_STAGED_FILE_TYPES}
       renderFile={(file, position) => (
         <NotStagedChangesItem file={file} itemIndex={position} />

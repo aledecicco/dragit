@@ -59,7 +59,11 @@ const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
       }
     >
       <div className={cn('w-full flex flex-col items-start')}>
-        <div className={cn('flex flex-row gap-x-1 items-center min-w-0')}>
+        <div
+          className={cn(
+            'grid grid-cols-[max-content_1fr] gap-x-1 items-center min-w-0',
+          )}
+        >
           <FileIcon file={file} />
 
           <Marquee className={cn('text-sm text-light-500')}>{filename}</Marquee>

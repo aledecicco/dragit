@@ -1,5 +1,8 @@
-import { NotStagedWorktreeChanges } from '@/widgets/WorktreeChanges/NotStaged'
-import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
+import { WorktreeChanges } from '@/widgets/WorktreeChanges'
+import { NOT_STAGED_FILE_TYPES } from '@/widgets/WorktreeChanges/NotStaged'
+import { NotStagedChangesItem } from '@/widgets/WorktreeChanges/NotStaged/Item'
+import { STAGED_FILE_TYPES } from '@/widgets/WorktreeChanges/Staged'
+import { StagedChangesItem } from '@/widgets/WorktreeChanges/Staged/Item'
 
 import type { WorktreeFileInfo } from '@/api/models'
 import { showDialog } from '@/state/dialogs'
@@ -23,20 +26,20 @@ interface WorktreeFileDiffDialogProps extends Omit<DialogProps, 'dialogKey'> {
   /**
    * The file that should be displayed.
    */
-  file: WorktreeFileInfo
+  openFile: WorktreeFileInfo
 }
 
 /**
  * Dialog that displays a file diff for a file in the worktree.
  */
 const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
-  const { file, ...dialogProps } = props
+  const { openFile, ...dialogProps } = props
 
   const viewModeSelector = useViewModeSelector()
   const isSideBySide =
-    viewModeSelector.value === 'side_by_side' && file.status === 'unmerged'
+    viewModeSelector.value === 'side_by_side' && openFile.status === 'unmerged'
   const filterSelector = useDiffFilterSelector()
-
+  //
   return (
     <Dialog
       dialogKey={WORKTREE_FILE_DIFF_DIALOG_KEY}
@@ -44,7 +47,7 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
       {...propsWithCn(
         dialogProps,
         'max-w-[90%] max-h-[85%]',
-        file.status === 'unmerged' &&
+        openFile.status === 'unmerged' &&
           isSideBySide &&
           'max-w-[92%] grid-cols-[300px_1fr]',
       )}
@@ -56,21 +59,21 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
             isSideBySide && 'grid grid-cols-2',
           )}
         >
-          {file.status === 'unmerged' && !isSideBySide ? (
-            <FileConflictViewer file={file} />
+          {openFile.status === 'unmerged' && !isSideBySide ? (
+            <FileConflictViewer file={openFile} />
           ) : (
             <FileDiffViewer
               filter={
-                file.status === 'unmerged' ? 'both' : filterSelector.value
+                openFile.status === 'unmerged' ? 'both' : filterSelector.value
               }
               diffScope={
-                file.status === 'unmerged'
+                openFile.status === 'unmerged'
                   ? {
                       type: 'unmerged',
                       stage: 'ours',
-                      file,
+                      file: openFile,
                     }
-                  : { type: 'worktree', file }
+                  : { type: 'worktree', file: openFile }
               }
             />
           )}
@@ -79,7 +82,7 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
             <FileDiffViewer
               filter="both"
               className={cn('border-l border-dark-700')}
-              diffScope={{ type: 'unmerged', stage: 'theirs', file }}
+              diffScope={{ type: 'unmerged', stage: 'theirs', file: openFile }}
             />
           )}
         </div>
@@ -90,10 +93,37 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
           'grid grid-rows-[auto_auto_max-content] gap-y-4 w-full h-full',
         )}
       >
-        <NotStagedWorktreeChanges className={cn('h-full min-h-50')} />
-        <StagedWorktreeChanges className={cn('h-full min-h-50')} />
+        <WorktreeChanges
+          className={cn('h-full min-h-50')}
+          label="unstaged changes"
+          fileTypes={NOT_STAGED_FILE_TYPES}
+          renderFile={(file, position) => (
+            <NotStagedChangesItem
+              file={file}
+              itemIndex={position}
+              aria-current={
+                file.path === openFile.path && file.status === openFile.status
+              }
+            />
+          )}
+        />
 
-        {file.status === 'unmerged' ? (
+        <WorktreeChanges
+          className={cn('h-full min-h-50')}
+          label="staged changes"
+          fileTypes={STAGED_FILE_TYPES}
+          renderFile={(file, position) => (
+            <StagedChangesItem
+              file={file}
+              itemIndex={position}
+              aria-current={
+                file.path === openFile.path && file.status === openFile.status
+              }
+            />
+          )}
+        />
+
+        {openFile.status === 'unmerged' ? (
           <UnmergedViewSelector
             className={cn('mt-6 w-full')}
             store={viewModeSelector.store}
@@ -114,7 +144,7 @@ const showWorktreeFileDiffDialog = (
   props?: Partial<WorktreeFileDiffDialogProps>,
 ) => {
   showDialog(WORKTREE_FILE_DIFF_DIALOG_KEY, WorktreeFileDiffDialog, {
-    file,
+    openFile: file,
     ...props,
   })
 }
