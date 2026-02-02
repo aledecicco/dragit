@@ -54,7 +54,7 @@ const useStashFile = (file: WorktreeFileInfo): Action => {
   }
 }
 
-const useStashFiles = (): Action<WorktreeFileInfo[]> => {
+const useStashFiles = (): Action<WorktreeFileInfo[] | string[]> => {
   const saveStash = useRepositoryMutation(saveStashMutation)
 
   return {
@@ -65,7 +65,9 @@ const useStashFiles = (): Action<WorktreeFileInfo[]> => {
     ],
     run: async (files) => {
       await saveStash.mutateAsync({
-        files: files.map((file) => file.path),
+        files: files.map((file) =>
+          typeof file === 'string' ? file : file.path,
+        ),
         message: null, // TODO: allow messages
         includeUntracked: true,
       })

@@ -194,7 +194,7 @@ const computeActionStatus = (
     return 'disabled'
   }
 
-  return 'idle'
+  return store.actions.get(hashId(action.id)) ?? 'idle'
 }
 
 /**
@@ -220,6 +220,33 @@ function useActionStatuses(actions: AnyAction | AnyAction[]) {
       return statuses
     }),
   )
+}
+
+/**
+ * Disables an action while it is initialized so it's not run twice.
+ *
+ * @param action - The action to begin preparing.
+ */
+const getActionArgs = async <T>(
+  action: Action<T>,
+  argsRequester: (() => Promise<T>) | (() => T),
+): Promise<T> => {
+  const store = useActionsStore.getState()
+  const status = store.getActionStatus(action.id) ?? 'idle'
+
+  if (status !== 'idle') {
+    throw new Error('Action is not ready')
+  }
+
+  store.setActionStatus(action.id, 'disabled')
+
+  try {
+    const args = await argsRequester()
+    return args
+  } catch (e) {
+    store.setActionStatus(action.id, 'idle')
+    throw e
+  }
 }
 
 /**
@@ -331,6 +358,7 @@ const useActiveAction = (actions: AnyAction[]): AnyAction | undefined => {
 
 export {
   useActionStatuses,
+  getActionArgs,
   runAction,
   useActionPresenters,
   useActiveAction,

@@ -83,13 +83,13 @@ const TrackerDecoratedButton = (props: TrackerDecoratedButtonProps) => {
 }
 
 const BaseDecoratedButton = (props: BaseDecoratedButtonProps) => {
-  const { label, Glyph, compact, iconProps, ...buttonProps } = props
+  const { label, Glyph, compact, iconProps, children, ...buttonProps } = props
 
   const button = (
-    <Button {...buttonProps}>
+    <Button aria-label={label} {...buttonProps}>
       <Icon size={buttonProps.size} Glyph={Glyph} {...iconProps} />
       {!compact && label}
-      {buttonProps.children}
+      {children}
     </Button>
   )
 

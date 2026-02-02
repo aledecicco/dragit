@@ -2,6 +2,7 @@ import type { MouseEvent } from 'react'
 
 import {
   type Action,
+  getActionArgs,
   hashId,
   runAction,
   useActionStatuses,
@@ -78,9 +79,10 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     onClick: async (e: MouseEvent<HTMLButtonElement>) => {
       buttonProps.onClick?.(e)
 
-      if (actionStatus !== 'running') {
+      if (actionStatus === 'idle') {
         if (argsRequester) {
-          const args = await argsRequester()
+          const args = await getActionArgs(action, argsRequester)
+          console.log('args', args)
           runAction(action, args)
         } else {
           runAction(action)
@@ -94,7 +96,11 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
       {...commonProps}
       track={activeAction}
       items={alternatives.map((alternative) => (
-        <MenuItem key={hashId(alternative.action.id)} {...alternative} />
+        <MenuItem
+          key={hashId(alternative.action.id)}
+          {...alternative}
+          disabled={actionStatus !== 'idle'}
+        />
       ))}
       menuButtonProps={{
         label: 'View alternatives',

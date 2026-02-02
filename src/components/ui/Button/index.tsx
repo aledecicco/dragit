@@ -206,10 +206,6 @@ const Button = (props: ButtonProps) => {
           ])
           .exhaustive(),
       )}
-      onClick={(e) => {
-        e.stopPropagation()
-        buttonProps.onClick?.(e)
-      }}
     />
   )
 }

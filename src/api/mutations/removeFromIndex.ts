@@ -48,7 +48,7 @@ const useUnstageFile = (file: WorktreeFileInfo): Action => {
   }
 }
 
-const useUnstageFiles = (): Action<WorktreeFileInfo[]> => {
+const useUnstageFiles = (): Action<WorktreeFileInfo[] | string[]> => {
   const removeFromIndex = useRepositoryMutation(removeFromIndexMutation)
 
   return {
@@ -59,7 +59,9 @@ const useUnstageFiles = (): Action<WorktreeFileInfo[]> => {
     ],
     run: async (files) => {
       await removeFromIndex.mutateAsync({
-        files: files.map((file) => file.path),
+        files: files.map((file) =>
+          typeof file === 'string' ? file : file.path,
+        ),
       })
     },
     label: {
