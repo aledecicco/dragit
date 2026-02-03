@@ -78,7 +78,7 @@ pub fn run() {
             api::get_stashes,
             api::stash,
             api::apply_stash,
-            api::discard_stash,
+            api::discard_stashes,
             api::get_tags,
             api::tag,
             api::delete_tags,

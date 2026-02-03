@@ -39,7 +39,7 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
   const isSideBySide =
     viewModeSelector.value === 'side_by_side' && openFile.status === 'unmerged'
   const filterSelector = useDiffFilterSelector()
-  //
+
   return (
     <Dialog
       dialogKey={WORKTREE_FILE_DIFF_DIALOG_KEY}

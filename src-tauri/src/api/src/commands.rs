@@ -447,14 +447,14 @@ pub async fn apply_stash(
     with_handler(&state, &|h| h.apply_stash(repo_path, stash_id))
 }
 
-/// Discards a stash entry.
+/// Discards the given stash entries.
 #[tauri::command]
-pub async fn discard_stash(
+pub async fn discard_stashes(
     state: State<'_, AppState>,
     repo_path: &str,
-    stash_id: &str,
+    stash_ids: Vec<&str>,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.discard_stash(repo_path, stash_id))
+    with_handler(&state, &|h| h.discard_stashes(repo_path, &stash_ids))
 }
 
 /// Returns the current list of tags.

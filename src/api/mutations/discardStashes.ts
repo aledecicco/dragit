@@ -8,20 +8,20 @@ import type { StashId, StashInfo } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface DiscardStashArgs {
-  stashId: StashId
+  stashIds: StashId[]
 }
 
 const discardStashKey = (repoPath: string) =>
   ({
     ...pathMutationKey(repoPath),
-    key: 'discard_stash',
+    key: 'discard_stashes',
   }) as const
 
 const discardStashMutation = (repoPath: string) =>
   mutationOptions({
     mutationKey: [discardStashKey(repoPath)],
     mutationFn: (args: DiscardStashArgs) => {
-      return invoke('discard_stash', { repoPath, ...args })
+      return invoke('discard_stashes', { repoPath, ...args })
     },
     networkMode: 'always',
   })
@@ -33,7 +33,7 @@ const useDiscardStash = (stash: StashInfo): Action => {
     id: { key: 'stash_operation', operation: 'discard', stash: stash.tracker },
     blockedBy: [{ stash: stash.tracker }],
     run: async () => {
-      await discardStash.mutateAsync({ stashId: stash.id })
+      await discardStash.mutateAsync({ stashIds: [stash.id] })
     },
     label: {
       idle: 'Discard',
@@ -52,14 +52,9 @@ const useDiscardStashes = (): Action<StashInfo[]> => {
     id: { key: 'stash_operation', operation: 'discard_many' },
     blockedBy: [{ key: 'stash_operation' }],
     run: async (stashes) => {
-      // Order stashes by descending ID to avoid issues with shifting indices
-      const ordered = [...stashes].sort((stashA, stashB) =>
-        stashB.id.localeCompare(stashA.id),
-      )
-
-      for (const stash of ordered) {
-        await discardStash.mutateAsync({ stashId: stash.id })
-      }
+      await discardStash.mutateAsync({
+        stashIds: stashes.map((stash) => stash.id),
+      })
     },
     label: {
       idle: 'Discard stashes',

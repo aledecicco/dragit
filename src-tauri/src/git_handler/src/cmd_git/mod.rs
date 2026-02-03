@@ -751,11 +751,19 @@ impl GitHandler for CmdGit {
             }))
     }
 
-    fn discard_stash(&self, repo_path: &str, stash_id: &str) -> Result<(), GitError> {
-        self.spawn_and_await(repo_path, ["stash", "drop", &stash_id])
-            .or(Err(GitError::DiscardStashFailed {
-                stash_id: stash_id.to_string(),
-            }))
+    fn discard_stashes(&self, repo_path: &str, stash_ids: &Vec<&str>) -> Result<(), GitError> {
+        // Discard stashes in descending order to avoid index shifting issues.
+        let mut sorted_ids = stash_ids.iter().cloned().collect::<Vec<&str>>();
+        sorted_ids.sort_by(|a, b| b.cmp(a));
+
+        for stash_id in sorted_ids {
+            self.spawn_and_await(repo_path, ["stash", "drop", stash_id])
+                .or(Err(GitError::DiscardStashFailed {
+                    stash_id: stash_id.to_string(),
+                }))?;
+        }
+
+        Ok(())
     }
 
     fn get_tags(

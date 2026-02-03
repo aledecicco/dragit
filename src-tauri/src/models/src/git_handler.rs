@@ -194,8 +194,8 @@ pub trait GitHandler {
     /// Applies the given stash to the current working directory.
     fn apply_stash(&self, repo_path: &str, stash_id: &str) -> Result<(), GitError>;
 
-    /// Discards the given stash.
-    fn discard_stash(&self, repo_path: &str, stash_id: &str) -> Result<(), GitError>;
+    /// Discards the given stashes.
+    fn discard_stashes(&self, repo_path: &str, stash_ids: &Vec<&str>) -> Result<(), GitError>;
 
     /// Returns the list of tags.
     fn get_tags(
