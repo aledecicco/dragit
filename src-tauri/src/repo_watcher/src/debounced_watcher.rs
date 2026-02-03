@@ -1,9 +1,9 @@
 use notify::{
-    event::{CreateKind, RemoveKind},
-    RecommendedWatcher, Watcher,
+    event::{CreateKind, EventKindMask, RemoveKind},
+    RecommendedWatcher,
 };
 use notify_debouncer_full::{
-    new_debouncer, DebounceEventHandler, DebouncedEvent, Debouncer, FileIdMap,
+    new_debouncer, DebounceEventHandler, DebouncedEvent, Debouncer, RecommendedCache,
 };
 use std::{
     path::{Path, PathBuf},
@@ -21,7 +21,7 @@ use models::{AppEvent, RepoWatcher, RepoWatcherError, EVENT_ID};
 /// Implementation of [`RepoWatcher`] that uses a debouncer to group events.
 pub struct DebouncedWatcher {
     app_handle: AppHandle,
-    debouncer: Option<Debouncer<RecommendedWatcher, FileIdMap>>,
+    debouncer: Option<Debouncer<RecommendedWatcher, RecommendedCache>>,
     path: Option<String>,
 }
 
@@ -64,115 +64,120 @@ impl DebouncedWatcher {
                     let mut tags_updated = false;
                     let mut branches_list_updated = false;
 
-                    events.iter().for_each(|event| {
-                        println!("{:?}", event.kind);
-                        event.paths.iter().for_each(|path| println!("{:?}", path));
+                    events
+                        .iter()
+                        .filter(|event| EventKindMask::CORE.matches(&event.kind))
+                        .for_each(|event| {
+                            println!("{:?}", event.kind);
+                            event.paths.iter().for_each(|path| println!("{:?}", path));
 
-                        if event.paths.iter().any(|path| path.eq(&repo_path)) {
-                            folder_modified = true;
-                        }
-
-                        if event
-                            .paths
-                            .iter()
-                            .any(|path| !path.starts_with(&git_folder))
-                        {
-                            files_modified = true;
-                        }
-
-                        if event.paths.contains(&config_folder) {
-                            config_updated = true;
-                        }
-
-                        if event.paths.contains(&objects_folder) {
-                            index_updated = true;
-                        }
-
-                        if event.paths.contains(&index_file) {
-                            index_updated = true;
-                        }
-
-                        if event.paths.contains(&stashes_file) {
-                            stashes_updated = true;
-                        }
-
-                        if event.paths.contains(&rebase_folder) || event.paths.contains(&merge_file)
-                        {
-                            head_changed = true;
-                        }
-
-                        event.paths.iter().for_each(|path| {
-                            if path.starts_with(&tags_folder) {
-                                tags_updated = true;
+                            if event.paths.iter().any(|path| path.eq(&repo_path)) {
+                                folder_modified = true;
                             }
 
-                            if path.starts_with(&branches_folder) && path.is_file() {
-                                if let Ok(Some(branch_name)) = path
-                                    .strip_prefix(&branches_folder)
-                                    .map(|path| path.to_str())
-                                {
-                                    let _ = app_handle.emit(
-                                        EVENT_ID,
-                                        AppEvent::BranchUpdated {
-                                            name: branch_name.to_string(),
-                                            repo_path: pathname.to_string(),
-                                        },
-                                    );
-                                    //println!("branch updated {}", branch_name);
-                                }
+                            if event
+                                .paths
+                                .iter()
+                                .any(|path| !path.starts_with(&git_folder))
+                            {
+                                files_modified = true;
                             }
 
-                            if path.starts_with(&remotes_folder) && path.is_file() {
-                                if let Ok(Some(branch_name)) =
-                                    path.strip_prefix(&remotes_folder).map(|path| path.to_str())
-                                {
-                                    let _ = app_handle.emit(
-                                        EVENT_ID,
-                                        AppEvent::BranchUpdated {
-                                            name: branch_name.to_string(),
-                                            repo_path: pathname.to_string(),
-                                        },
-                                    );
-                                    //println!("remote branch updated {}", branch_name);
+                            if event.paths.contains(&config_folder) {
+                                config_updated = true;
+                            }
+
+                            if event.paths.contains(&objects_folder) {
+                                index_updated = true;
+                            }
+
+                            if event.paths.contains(&index_file) {
+                                index_updated = true;
+                            }
+
+                            if event.paths.contains(&stashes_file) {
+                                stashes_updated = true;
+                            }
+
+                            if event.paths.contains(&rebase_folder)
+                                || event.paths.contains(&merge_file)
+                            {
+                                head_changed = true;
+                            }
+
+                            event.paths.iter().for_each(|path| {
+                                if path.starts_with(&tags_folder) {
+                                    tags_updated = true;
                                 }
+
+                                if path.starts_with(&branches_folder) && path.is_file() {
+                                    if let Ok(Some(branch_name)) = path
+                                        .strip_prefix(&branches_folder)
+                                        .map(|path| path.to_str())
+                                    {
+                                        let _ = app_handle.emit(
+                                            EVENT_ID,
+                                            AppEvent::BranchUpdated {
+                                                name: branch_name.to_string(),
+                                                repo_path: pathname.to_string(),
+                                            },
+                                        );
+                                        //println!("branch updated {}", branch_name);
+                                    }
+                                }
+
+                                if path.starts_with(&remotes_folder) && path.is_file() {
+                                    if let Ok(Some(branch_name)) =
+                                        path.strip_prefix(&remotes_folder).map(|path| path.to_str())
+                                    {
+                                        let _ = app_handle.emit(
+                                            EVENT_ID,
+                                            AppEvent::BranchUpdated {
+                                                name: branch_name.to_string(),
+                                                repo_path: pathname.to_string(),
+                                            },
+                                        );
+                                        //println!("remote branch updated {}", branch_name);
+                                    }
+                                }
+                            });
+
+                            match event.kind {
+                                notify::EventKind::Create(CreateKind::Folder) => {
+                                    if event.paths.contains(&git_folder) {
+                                        git_folder_modified = true;
+                                    }
+                                }
+                                notify::EventKind::Create(CreateKind::File) => {
+                                    if event.paths.contains(&head_file) {
+                                        head_changed = true
+                                    }
+
+                                    if event.paths.iter().any(|path| {
+                                        path.starts_with(&branches_folder)
+                                            || path.starts_with(&remotes_folder)
+                                    }) {
+                                        branches_list_updated = true;
+                                    }
+                                }
+                                notify::EventKind::Remove(RemoveKind::Folder) => {
+                                    if event.paths.contains(&git_folder) {
+                                        git_folder_modified = true;
+                                    }
+                                }
+                                notify::EventKind::Remove(RemoveKind::File) => {
+                                    if event
+                                        .paths
+                                        .iter()
+                                        .any(|path| path.starts_with(&branches_folder))
+                                    {
+                                        branches_list_updated = true;
+                                    }
+                                }
+                                _ => {}
                             }
                         });
 
-                        match event.kind {
-                            notify::EventKind::Create(CreateKind::Folder) => {
-                                if event.paths.contains(&git_folder) {
-                                    git_folder_modified = true;
-                                }
-                            }
-                            notify::EventKind::Create(CreateKind::File) => {
-                                if event.paths.contains(&head_file) {
-                                    head_changed = true
-                                }
-
-                                if event.paths.iter().any(|path| {
-                                    path.starts_with(&branches_folder)
-                                        || path.starts_with(&remotes_folder)
-                                }) {
-                                    branches_list_updated = true;
-                                }
-                            }
-                            notify::EventKind::Remove(RemoveKind::Folder) => {
-                                if event.paths.contains(&git_folder) {
-                                    git_folder_modified = true;
-                                }
-                            }
-                            notify::EventKind::Remove(RemoveKind::File) => {
-                                if event
-                                    .paths
-                                    .iter()
-                                    .any(|path| path.starts_with(&branches_folder))
-                                {
-                                    branches_list_updated = true;
-                                }
-                            }
-                            _ => {}
-                        }
-                    });
                     println!("");
                     if folder_modified {
                         let _ = app_handle.emit(EVENT_ID, AppEvent::DirChanged);
@@ -277,7 +282,6 @@ impl RepoWatcher for DebouncedWatcher {
                 .or(Err(RepoWatcherError::SetupFailed {}))?;
 
             debouncer
-                .watcher()
                 .watch(&PathBuf::from(repo_path), notify::RecursiveMode::Recursive)
                 .or(Err(RepoWatcherError::WatchFolderFailed {
                     path: repo_path.to_string(),

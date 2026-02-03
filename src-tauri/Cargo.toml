@@ -51,7 +51,7 @@ members = [
 
 
 [workspace.dependencies]
-tauri = { version = "2.4.0", features = [] }
+tauri = { version = "2.10.1", features = [] }
 serde = { version = "1", features = ["derive"] }
 borsh = { version = "1.5.7", features = ["derive"] }
 tauri-plugin-store = { version = "2" }
