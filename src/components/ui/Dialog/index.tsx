@@ -52,7 +52,6 @@ const Dialog = (props: DialogProps) => {
   return (
     <Ariakit.Dialog
       open
-      modal={false}
       portal={false}
       backdrop={<div className={cn('bg-black/50', 'backdrop-blur-md')} />}
       {...propsWithCn(

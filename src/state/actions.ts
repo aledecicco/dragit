@@ -227,7 +227,7 @@ function useActionStatuses(actions: AnyAction | AnyAction[]) {
  *
  * @param action - The action to begin preparing.
  */
-const getActionArgs = async <T>(
+const prepareActionArgs = async <T>(
   action: Action<T>,
   argsRequester: (() => Promise<T>) | (() => T),
 ): Promise<T> => {
@@ -358,7 +358,7 @@ const useActiveAction = (actions: AnyAction[]): AnyAction | undefined => {
 
 export {
   useActionStatuses,
-  getActionArgs,
+  prepareActionArgs,
   runAction,
   useActionPresenters,
   useActiveAction,

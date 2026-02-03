@@ -55,6 +55,9 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
       : undefined,
   )
 
+  const store = Ariakit.useCompositeContext()
+  const composite = Ariakit.useComboboxStore({ store })
+
   return (
     <QueryLoader
       query={query}
@@ -82,6 +85,7 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
 
         return (
           <Ariakit.Composite
+            store={composite}
             focusable
             render={
               <VirtualizedDiv

@@ -19,25 +19,29 @@ interface SnapshotDialogFileListProps extends Ariakit.RadioGroupProps {
  * Displays a list of files that can be selected.
  */
 const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
-  const { filesQuery, ...radioProps } = props
+  const { filesQuery, store, ...radioProps } = props
+
+  const radio = Ariakit.useRadioStore({ store })
 
   return (
-    <Ariakit.RadioGroup
-      render={
-        <QueryList
-          name="modified files"
-          query={filesQuery}
-          getItems={(d) => d.items}
-          renderItem={(file) => <SnapshotDetailsDialogItem file={file} />}
-          itemSize={48}
-          size="md"
-          options={mapFn(filesQuery.data, (page) => ({
-            getItemKey: (index: number) => page.items[index].path,
-          }))}
-        />
-      }
-      {...propsWithCn(radioProps, 'bg-dark-800 rounded-md')}
-    />
+    <Ariakit.RadioProvider store={radio}>
+      <Ariakit.RadioGroup
+        render={
+          <QueryList
+            name="modified files"
+            query={filesQuery}
+            getItems={(d) => d.items}
+            renderItem={(file) => <SnapshotDetailsDialogItem file={file} />}
+            itemSize={48}
+            size="md"
+            options={mapFn(filesQuery.data, (page) => ({
+              getItemKey: (index: number) => page.items[index].path,
+            }))}
+          />
+        }
+        {...propsWithCn(radioProps, 'bg-dark-800 rounded-md')}
+      />
+    </Ariakit.RadioProvider>
   )
 }
 

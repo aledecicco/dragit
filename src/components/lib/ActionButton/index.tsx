@@ -2,8 +2,8 @@ import type { MouseEvent } from 'react'
 
 import {
   type Action,
-  getActionArgs,
   hashId,
+  prepareActionArgs,
   runAction,
   useActionStatuses,
 } from '@/state/actions'
@@ -81,8 +81,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
 
       if (actionStatus === 'idle') {
         if (argsRequester) {
-          const args = await getActionArgs(action, argsRequester)
-          console.log('args', args)
+          const args = await prepareActionArgs(action, argsRequester)
           runAction(action, args)
         } else {
           runAction(action)

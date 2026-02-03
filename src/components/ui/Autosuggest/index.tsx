@@ -39,8 +39,14 @@ const Autosuggest = (props: AutosuggestProps) => {
 
   const matchingSuggestions = matchSorter(suggestions, deferredSearch)
 
+  const combobox = Ariakit.useComboboxStore({ store })
+
   return (
-    <Ariakit.ComboboxProvider store={store} value={search} setValue={setSearch}>
+    <Ariakit.ComboboxProvider
+      store={combobox}
+      value={search}
+      setValue={setSearch}
+    >
       <Ariakit.Combobox
         autoComplete="both"
         placeholder={comboboxProps.placeholder ?? 'Select...'}
