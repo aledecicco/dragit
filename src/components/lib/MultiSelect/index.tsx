@@ -31,7 +31,7 @@ const MultiSelect = (props: MultiSelectProps) => {
 }
 
 const MultiSelectInner = (props: MultiSelectProps) => {
-  const { children, itemsCount, ...compositeProps } = props
+  const { children, itemsCount, store, ...compositeProps } = props
 
   const { setSelection } = useSelectionUpdater()
   const ref = useRef<HTMLDivElement>(null)
@@ -42,41 +42,60 @@ const MultiSelectInner = (props: MultiSelectProps) => {
     }
   })
 
+  const composite = Ariakit.useCompositeStore({ store })
+
   return (
-    <Ariakit.CompositeProvider>
-      <Ariakit.Composite
-        onClick={(e) => {
-          if (!(e.target instanceof Element)) {
-            return
+    <Ariakit.Composite
+      store={composite}
+      onClick={(e) => {
+        const target = e.target
+
+        if (!(target instanceof HTMLElement)) {
+          return
+        }
+
+        const containsAnyItem = composite
+          .getState()
+          .renderedItems.some((item) => item.element?.contains(target))
+
+        if (!containsAnyItem) {
+          setSelection([])
+        }
+      }}
+      onKeyDown={(e) => {
+        if (!(e.target instanceof Element)) {
+          return
+        }
+
+        if (e.key === 'Escape') {
+          setSelection([])
+          return
+        }
+
+        if ((e.key === 'a' || e.key === 'A') && (e.metaKey || e.ctrlKey)) {
+          setSelection([...Array(itemsCount).keys()])
+
+          if (!composite.getState().activeId) {
+            const lastItem = composite.getState().items.at(-1)?.id
+
+            if (lastItem) {
+              composite.move(lastItem)
+            }
           }
 
-          const item = e.target.closest('[role="option"]')
-          if (!item) {
-            setSelection([])
-          }
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Escape') {
-            setSelection([])
-            return
-          }
+          e.preventDefault()
+          e.stopPropagation()
 
-          if ((e.key === 'a' || e.key === 'A') && (e.metaKey || e.ctrlKey)) {
-            setSelection([...Array(itemsCount).keys()])
-
-            e.preventDefault()
-            e.stopPropagation()
-
-            return
-          }
-        }}
-        role="listbox"
-        aria-multiselectable
-        {...compositeProps}
-        render={children}
-        ref={mergeRefs([ref, compositeProps.ref])}
-      />
-    </Ariakit.CompositeProvider>
+          return
+        }
+      }}
+      role="listbox"
+      aria-multiselectable
+      {...compositeProps}
+      render={children}
+      ref={mergeRefs([ref, compositeProps.ref])}
+      focusable
+    />
   )
 }
 
