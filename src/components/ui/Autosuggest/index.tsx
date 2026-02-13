@@ -1,4 +1,4 @@
-import { useDeferredValue, useState } from 'react'
+import { useDeferredValue } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
 
@@ -34,19 +34,16 @@ interface AutosuggestProps extends Ariakit.ComboboxProps {
 const Autosuggest = (props: AutosuggestProps) => {
   const { value, suggestions = [], setValue, store, ...comboboxProps } = props
 
-  const [search, setSearch] = useState(value ?? '')
-  const deferredSearch = useDeferredValue(search)
-
-  const matchingSuggestions = matchSorter(suggestions, deferredSearch)
-
   const combobox = Ariakit.useComboboxStore({ store })
 
+  const search = Ariakit.useStoreState(combobox, 'value')
+  const deferredSearch = useDeferredValue(search)
+  const matchingSuggestions = useDeferredValue(
+    matchSorter(suggestions, deferredSearch),
+  )
+
   return (
-    <Ariakit.ComboboxProvider
-      store={combobox}
-      value={search}
-      setValue={setSearch}
-    >
+    <Ariakit.ComboboxProvider store={combobox}>
       <Ariakit.Combobox
         autoComplete="both"
         placeholder={comboboxProps.placeholder ?? 'Select...'}
@@ -60,7 +57,7 @@ const Autosuggest = (props: AutosuggestProps) => {
           comboboxProps.onKeyDown?.(e)
 
           if (e.key === 'Enter') {
-            setValue(search === '' ? undefined : search)
+            setValue(deferredSearch === '' ? undefined : deferredSearch)
           }
         }}
       />

@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect } from 'react'
+import { type ReactNode, useDeferredValue, useEffect } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
 
@@ -57,12 +57,13 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
   }, [name, onSelect, registerGroup, unregisterGroup])
 
   const { search, group } = useComboboxState()
+  const deferredSearch = useDeferredValue(search)
 
   if (group?.name !== name) {
     return undefined
   }
 
-  const matchingOptions = matchSorter(options, search.trim())
+  const matchingOptions = matchSorter(options, deferredSearch.trim())
 
   return (
     <TabPanel tabId={name}>
@@ -76,7 +77,7 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
             No {name} found
           </div>
         ) : matchingOptions.length === 0 ? (
-          (noMatches?.(search) ?? (
+          (noMatches?.(deferredSearch) ?? (
             <div
               className={cn('text-center p-2', 'text-sm italic text-light-950')}
             >
@@ -86,7 +87,11 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
         ) : (
           matchingOptions.map((option) => (
             <ComboboxItem key={option} value={option}>
-              {renderOption ? renderOption(option) : option ? option : 'Empty'}
+              {renderOption
+                ? renderOption(option)
+                : option
+                  ? undefined
+                  : 'Empty'}
             </ComboboxItem>
           ))
         )}

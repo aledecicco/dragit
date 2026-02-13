@@ -61,15 +61,17 @@ const ComboboxInner = (props: ComboboxProps) => {
     ...buttonProps
   } = props
 
+  const { group, groups } = useComboboxState()
+  const { setSearch, setCurrentGroup } = useComboboxUpdater()
+
   const combobox = Ariakit.useComboboxStore({
     resetValueOnHide: true,
     setValue: (newValue) => {
-      startTransition(() => setSearch(newValue))
+      startTransition(() => {
+        setSearch(newValue)
+      })
     },
   })
-
-  const { group, groups } = useComboboxState()
-  const { setSearch, setCurrentGroup } = useComboboxUpdater()
 
   const tabsHandler = useTabsHandler(group?.name, {
     selectedId: group?.name,
@@ -120,7 +122,7 @@ const ComboboxInner = (props: ComboboxProps) => {
           sameWidth
           unmountOnHide
           gutter={4}
-          className={cn('rounded-lg shadow-md min-w-max', 'bg-dark-300 p-2')}
+          className={cn('rounded-lg shadow-md min-w-50', 'bg-dark-300 p-2')}
         >
           <Tabs
             store={tabsHandler.store}

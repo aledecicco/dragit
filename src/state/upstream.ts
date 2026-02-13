@@ -82,9 +82,6 @@ const chooseUpstream = (
     // Otherwise, fall back to using the current branch name.
     branch.name
 
-  // TODO: validate that the chosen remote and remote branch actually exist?
-  // Otherwise the branch selector UI gets confused.
-
   return {
     remote: newRemote,
     remoteBranch: newRemoteBranch,

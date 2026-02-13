@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react'
+import { type ComponentProps, startTransition } from 'react'
 import * as Ariakit from '@ariakit/react'
 
 import { cn, propsWithCn } from '@/utils/styles'
@@ -32,6 +32,9 @@ interface FormFieldProps extends Ariakit.FormInputProps {
 const FormField = (props: FormFieldProps) => {
   const { label, compact = false, containerProps, ...inputProps } = props
 
+  const form = Ariakit.useFormContext()
+  const store = inputProps.store ?? form
+
   return (
     <div
       {...propsWithCn(
@@ -50,7 +53,15 @@ const FormField = (props: FormFieldProps) => {
         </Ariakit.FormLabel>
       )}
 
-      <Ariakit.FormInput {...inputProps} />
+      <Ariakit.FormInput
+        {...inputProps}
+        onChange={(e) => {
+          startTransition(() => {
+            inputProps.onChange?.(e)
+            store?.setValue(inputProps.name, e.currentTarget.value)
+          })
+        }}
+      />
 
       <Ariakit.FormError
         name={inputProps.name}

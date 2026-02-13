@@ -17,7 +17,7 @@ const AutosuggestItem = (props: AutosuggestItemProps) => {
       focusOnHover
       {...propsWithCn(
         itemProps,
-        'text-sm text-center text-light-50',
+        'text-sm text-center text-light-200 tracking-wider',
         'p-2 rounded-sm cursor-pointer',
         'wrap-anywhere',
         itemProps.value === '' && 'italic',
@@ -25,7 +25,9 @@ const AutosuggestItem = (props: AutosuggestItemProps) => {
       )}
     >
       <Ariakit.ComboboxItemValue
-        className={cn('*:data-user-value:text-accent-300')}
+        className={cn(
+          '*:data-user-value:font-bold *:data-user-value:text-light-50',
+        )}
       />
     </Ariakit.ComboboxItem>
   )
