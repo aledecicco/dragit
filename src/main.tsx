@@ -6,6 +6,7 @@ import '@fontsource/inter'
 import './main.css'
 
 import { ClientProvider } from '@/api/client'
+import { DragAndDropHandler } from '@/lib/DragAndDrop/Handler'
 
 import { App } from './app'
 
@@ -16,7 +17,9 @@ scan({
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ClientProvider>
-      <App />
+      <DragAndDropHandler>
+        <App />
+      </DragAndDropHandler>
     </ClientProvider>
   </React.StrictMode>,
 )

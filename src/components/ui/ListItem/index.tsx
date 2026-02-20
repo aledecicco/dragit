@@ -2,20 +2,13 @@ import * as Ariakit from '@ariakit/react'
 
 import { propsWithCn } from '@/utils/styles'
 
-interface ListItemProps extends Ariakit.CompositeItemProps {
-  /**
-   * Whether the list item should be interactive.
-   *
-   * If `true`, it will render as a button.
-   */
-  interactive?: boolean
-}
+interface ListItemProps extends Ariakit.CompositeItemProps {}
 
 /**
- * Base list item component with default styles, that can be set as interactive or not.
+ * Base list item component with default style.
  */
 const ListItem = (props: ListItemProps) => {
-  const { interactive = false, ...itemProps } = props
+  const { ...itemProps } = props
 
   return (
     <Ariakit.CompositeItem
@@ -27,9 +20,8 @@ const ListItem = (props: ListItemProps) => {
         'hover:aria-selected:bg-dark-300 focus:aria-selected:bg-dark-300 data-focus:aria-selected:bg-dark-300',
         'border border-transparent',
         'aria-current:border-accent-300 aria-checked:border-accent-300',
-        interactive && 'cursor-pointer',
+        'cursor-pointer',
       )}
-      render={itemProps.render ?? (interactive ? undefined : <div />)}
     />
   )
 }

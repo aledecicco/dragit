@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react'
+import { IconArchive } from '@tabler/icons-react'
 
 import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { useQueryStashes } from '@/api/queries/stashes'
@@ -36,6 +37,12 @@ const StashesList = (props: StashesListProps) => {
         <MultiInteraction
           items={stashesQuery.data ?? []}
           getActions={getStashesListActions}
+          getDragPayload={(_, stash) => ({
+            type: 'stash',
+            dragged: stash,
+            label: `Stash #${stash.stashNumber}`,
+            Glyph: IconArchive,
+          })}
         >
           <QueryList
             name="stashes"

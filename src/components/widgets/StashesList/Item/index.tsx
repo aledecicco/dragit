@@ -6,15 +6,15 @@ import { useDiscardStash } from '@/api/mutations/discardStashes'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
+import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractionHandler } from '@/lib/InteractionHandler'
 import {
   MultiSelectItem,
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
 import { Icon } from '@/ui/Icon'
-import { ListItem } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
-import { cn, propsWithCn } from '@/utils/styles'
+import { cn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
 interface StashesListItemProps extends MultiSelectItemProps {
@@ -34,70 +34,88 @@ const StashesListItem = (props: StashesListItemProps) => {
   const interactions = useInteractions(stash)
 
   return (
-    <InteractionHandler
-      interactions={interactions}
-      render={
-        <MultiSelectItem
-          render={<ListItem interactive />}
-          {...propsWithCn(itemProps, 'flex flex-col justify-between')}
-          onDoubleClick={(e) => {
-            itemProps.onDoubleClick?.(e)
-            showSnapshotDetailsDialog(stash)
-          }}
-        />
-      }
+    <Draggable
+      id={`stash-${stash.stashNumber}`}
+      dragPayload={{
+        type: 'stash',
+        dragged: stash,
+        label: `Stash #${stash.stashNumber}`,
+        Glyph: IconArchive,
+      }}
     >
-      <div className={cn('min-w-0 w-full overflow-hidden')}>
-        <div
-          className={cn('flex flex-row gap-x-1 items-center text-light-600')}
-        >
-          <Icon Glyph={IconArchive} size="md" />
-
-          <Marquee className={cn('text-sm')} reverse={false}>
-            #{stash.stashNumber} -{' '}
-            <span className={cn('text-light-950')}>
-              <Icon
-                Glyph={IconGitBranch}
-                size="sm"
-                className={cn('inline-block')}
-              />{' '}
-              {stash.createdOn}
-            </span>
-          </Marquee>
-        </div>
-
-        <Marquee
-          className={cn('text-xs text-light-950', !stash.message && 'italic')}
-          reverse={false}
-        >
-          {stash.message ?? 'No description'}
-        </Marquee>
-      </div>
-
-      <div
-        className={cn(
-          'min-w-0 w-full mt-2',
-          'flex flex-row justify-between items-end gap-x-2',
-        )}
+      <InteractionHandler
+        interactions={interactions}
+        render={
+          <MultiSelectItem
+            {...itemProps}
+            onDoubleClick={(e) => {
+              itemProps.onDoubleClick?.(e)
+              showSnapshotDetailsDialog(stash)
+            }}
+          />
+        }
       >
-        <p
-          className={cn(
-            'text-xs text-light-950/60',
-            'text-nowrap overflow-hidden text-ellipsis',
-          )}
+        <div
+          className={cn('flex flex-col justify-between pointer-events-none')}
         >
-          Stashed {stashedTime}
-        </p>
+          <div className={cn('min-w-0 w-full overflow-hidden')}>
+            <div
+              className={cn(
+                'flex flex-row gap-x-1 items-center text-light-600',
+              )}
+            >
+              <Icon Glyph={IconArchive} size="md" />
 
-        <Marquee className={cn('text-xs')} reverse={false}>
-          {stash.changes ? (
-            <ChangesSummary diff={stash.changes} />
-          ) : (
-            <span className={cn('text-light-950')}>Untracked changes</span>
-          )}
-        </Marquee>
-      </div>
-    </InteractionHandler>
+              <Marquee className={cn('text-sm')} reverse={false}>
+                #{stash.stashNumber} -{' '}
+                <span className={cn('text-light-950')}>
+                  <Icon
+                    Glyph={IconGitBranch}
+                    size="sm"
+                    className={cn('inline-block')}
+                  />{' '}
+                  {stash.createdOn}
+                </span>
+              </Marquee>
+            </div>
+
+            <Marquee
+              className={cn(
+                'text-xs text-light-950',
+                !stash.message && 'italic',
+              )}
+              reverse={false}
+            >
+              {stash.message ?? 'No description'}
+            </Marquee>
+          </div>
+
+          <div
+            className={cn(
+              'min-w-0 w-full mt-2',
+              'flex flex-row justify-between items-end gap-x-2',
+            )}
+          >
+            <p
+              className={cn(
+                'text-xs text-light-950/60',
+                'text-nowrap overflow-hidden text-ellipsis',
+              )}
+            >
+              Stashed {stashedTime}
+            </p>
+
+            <Marquee className={cn('text-xs')} reverse={false}>
+              {stash.changes ? (
+                <ChangesSummary diff={stash.changes} />
+              ) : (
+                <span className={cn('text-light-950')}>Untracked changes</span>
+              )}
+            </Marquee>
+          </div>
+        </div>
+      </InteractionHandler>
+    </Draggable>
   )
 }
 

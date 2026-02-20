@@ -1,4 +1,5 @@
 import { Fragment, useEffect } from 'react'
+import { useCompositeContext } from '@ariakit/react'
 
 import type { Action } from '@/state/actions'
 import { useUniqueId } from '@/state/ids'
@@ -11,6 +12,7 @@ import {
   ContextMenu,
   type ContextMenuEvent,
 } from '../ContextMenu'
+import { type DragType, useBeforeDrag } from '../DragAndDrop/utils'
 import { MultiSelect, type MultiSelectProps } from '../MultiSelect'
 import { useSelectedItems, useSelectionUpdater } from '../MultiSelect/context'
 
@@ -25,24 +27,39 @@ interface MultiInteractionProps<T>
    * The items being interacted with.
    */
   items: T[]
+
+  /**
+   * Callback that returns the payload to be used when dragging the selected items.
+   */
+  getDragPayload: (items: T[], dragged: T) => DragType
 }
 /**
  * A component that allows selecting arbitrary child items and performing actions on all of them.
  */
 const MultiInteraction = <T,>(props: MultiInteractionProps<T>) => {
-  const { getActions, items, children, ...multiSelectProps } = props
+  const { getActions, items, getDragPayload, children, ...multiSelectProps } =
+    props
 
   return (
     <MultiSelect itemsCount={items.length} {...multiSelectProps}>
-      <MultiInteractionInner getActions={getActions} items={items}>
+      <MultiInteractionInner
+        getActions={getActions}
+        items={items}
+        getDragPayload={getDragPayload}
+      >
         {children}
       </MultiInteractionInner>
     </MultiSelect>
   )
 }
 
-const MultiInteractionInner = <T,>(props: MultiInteractionProps<T>) => {
-  const { getActions, items, ...contentProps } = props
+type MultiInteractionInnerProps<T> = Pick<
+  MultiInteractionProps<T>,
+  'getActions' | 'items' | 'getDragPayload' | 'children'
+>
+
+const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
+  const { getActions, items, getDragPayload, children, ...contentProps } = props
 
   const itemIndexes = useSelectedItems()
   const { setSelection } = useSelectionUpdater()
@@ -56,6 +73,28 @@ const MultiInteractionInner = <T,>(props: MultiInteractionProps<T>) => {
 
   const selectedItems = items.filter((_, index) => itemIndexes.has(index))
   const actions = getActions(selectedItems)
+
+  const composite = useCompositeContext()
+
+  useBeforeDrag(({ element, source }) => {
+    const compositeItem = composite
+      ?.getState()
+      .renderedItems.find((item) => item.element?.contains(element))
+
+    if (compositeItem) {
+      const itemId = Number(compositeItem.id)
+      const draggedItem = items.at(itemId)
+
+      if (draggedItem) {
+        if (itemIndexes.has(itemId)) {
+          source.data = getDragPayload(selectedItems, draggedItem)
+        } else {
+          setSelection(itemId)
+          source.data = getDragPayload([draggedItem], draggedItem)
+        }
+      }
+    }
+  })
 
   return (
     <ContextMenu
@@ -89,7 +128,9 @@ const MultiInteractionInner = <T,>(props: MultiInteractionProps<T>) => {
             ))}
           </Fragment>
         ))}
-    />
+    >
+      {children}
+    </ContextMenu>
   )
 }
 

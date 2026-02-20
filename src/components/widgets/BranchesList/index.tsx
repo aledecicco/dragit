@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react'
+import { IconGitBranch, IconTag } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import { useDeleteBranches } from '@/api/mutations/deleteBranches'
@@ -80,6 +81,12 @@ const BranchesList = (props: BranchesListProps) => {
           <MultiInteraction
             items={tagsQuery.data ?? []}
             getActions={getTagsListActions}
+            getDragPayload={(_, tag) => ({
+              type: 'tag',
+              dragged: tag,
+              label: tag.name,
+              Glyph: IconTag,
+            })}
           >
             <QueryList
               name="tags"
@@ -98,6 +105,12 @@ const BranchesList = (props: BranchesListProps) => {
           <MultiInteraction
             items={branchesQuery.data ?? []}
             getActions={getBranchesListActions}
+            getDragPayload={(_, branch) => ({
+              type: 'branch',
+              dragged: branch,
+              label: branch.name,
+              Glyph: IconGitBranch,
+            })}
           >
             <QueryList
               name="branches"

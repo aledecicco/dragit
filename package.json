@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "@ariakit/react": "^0.4.21",
+    "@dnd-kit/abstract": "^0.3.2",
+    "@dnd-kit/dom": "^0.3.2",
+    "@dnd-kit/react": "^0.3.2",
     "@fontsource/inter": "^5.2.8",
     "@tabler/icons-react": "^3.35.0",
     "@tailwindcss/vite": "4.1.16",

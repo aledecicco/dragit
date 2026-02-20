@@ -17,6 +17,7 @@ import { useForcePushBranch, usePushBranch } from '@/api/mutations/pushBranch'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
+import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractionHandler } from '@/lib/InteractionHandler'
 import {
   MultiSelectItem,
@@ -25,9 +26,8 @@ import {
 import { useSelectedBranches } from '@/state/branches'
 import { useSelectedUpstream } from '@/state/upstream'
 import { Icon } from '@/ui/Icon'
-import { ListItem } from '@/ui/ListItem'
 import { Marquee } from '@/ui/Marquee'
-import { cn, propsWithCn } from '@/utils/styles'
+import { cn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
 interface BranchesListItemProps extends MultiSelectItemProps {
@@ -51,59 +51,71 @@ const BranchesListItem = (props: BranchesListItemProps) => {
   const interactions = useInteractions(branch)
 
   return (
-    <InteractionHandler
-      interactions={interactions}
-      render={
-        <MultiSelectItem
-          render={<ListItem interactive />}
-          aria-current={isCurrentBranch}
-          {...propsWithCn(itemProps, 'text-start')}
-        />
-      }
+    <Draggable
+      id={`branch-${branch.name}`}
+      dragPayload={{
+        type: 'branch',
+        dragged: branch,
+        label: branch.name,
+        Glyph: IconGitBranch,
+      }}
     >
-      <div className={cn('flex flex-row gap-x-1 items-center text-light-600')}>
-        <Icon Glyph={IconGitBranch} size="md" />
-
-        <Marquee className={cn('text-sm')}>{branch.name}</Marquee>
-
-        {isCurrentBranch && (
-          <Icon
-            Glyph={IconLocationFilled}
-            size="sm"
-            className={cn('text-accent-400/90')}
-          />
-        )}
-      </div>
-
-      <div
-        className={cn(
-          'text-xs text-light-950',
-          'text-nowrap overflow-hidden text-ellipsis',
-          'flex flex-row gap-1',
-        )}
+      <InteractionHandler
+        interactions={interactions}
+        render={
+          <MultiSelectItem aria-current={isCurrentBranch} {...itemProps} />
+        }
       >
-        {match(branch.type)
-          .with('local', () => 'Local branch')
-          .with('remote', () => 'Remote branch')
-          .exhaustive()}
-        {remoteCounterpart && (
-          <>
-            , tracking{' '}
-            <Marquee className={cn('text-light-400')} reverse={false}>
-              {remoteCounterpart.remote}/{remoteCounterpart.remoteBranch}
-            </Marquee>
-          </>
-        )}
-      </div>
-      <p
-        className={cn(
-          'text-xs text-light-950/60 mt-2',
-          'text-nowrap overflow-hidden text-ellipsis',
-        )}
-      >
-        Last modified {lastModified}
-      </p>
-    </InteractionHandler>
+        <div className={cn('w-full text-start pointer-events-none')}>
+          <div
+            className={cn(
+              'flex flex-row gap-x-1 items-center text-light-600 pointer-events-none',
+            )}
+          >
+            <Icon Glyph={IconGitBranch} size="md" />
+
+            <Marquee className={cn('text-sm')}>{branch.name}</Marquee>
+
+            {isCurrentBranch && (
+              <Icon
+                Glyph={IconLocationFilled}
+                size="sm"
+                className={cn('text-accent-400/90')}
+              />
+            )}
+          </div>
+
+          <div
+            className={cn(
+              'text-xs text-light-950',
+              'text-nowrap overflow-hidden text-ellipsis',
+              'flex flex-row gap-1',
+            )}
+          >
+            {match(branch.type)
+              .with('local', () => 'Local branch')
+              .with('remote', () => 'Remote branch')
+              .exhaustive()}
+            {remoteCounterpart && (
+              <>
+                , tracking{' '}
+                <Marquee className={cn('text-light-400')} reverse={false}>
+                  {remoteCounterpart.remote}/{remoteCounterpart.remoteBranch}
+                </Marquee>
+              </>
+            )}
+          </div>
+          <p
+            className={cn(
+              'text-xs text-light-950/60 mt-2',
+              'text-nowrap overflow-hidden text-ellipsis',
+            )}
+          >
+            Last modified {lastModified}
+          </p>
+        </div>
+      </InteractionHandler>
+    </Draggable>
   )
 }
 

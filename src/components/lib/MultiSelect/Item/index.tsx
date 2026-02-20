@@ -1,9 +1,9 @@
-import * as Ariakit from '@ariakit/react'
+import { ListItem, type ListItemProps } from '@/ui/ListItem'
 
 import { MultiSelect } from '..'
 import { useSelectedItems, useSelectionUpdater } from '../context'
 
-interface MultiSelectItemProps extends Ariakit.CompositeItemProps {
+interface MultiSelectItemProps extends ListItemProps {
   /**
    * The unique numeric index of this item in the multiselect list.
    */
@@ -22,7 +22,8 @@ const MultiSelectItem = (props: MultiSelectItemProps) => {
   const { toggle, extendSelection, setSelection } = useSelectionUpdater()
 
   return (
-    <Ariakit.CompositeItem
+    <ListItem
+      id={`${itemIndex}`}
       role="option"
       aria-selected={isSelected}
       {...itemProps}

@@ -146,6 +146,9 @@ export type WorktreeFileType = keyof WorktreeFileTypes
 
 export type FileOfType<T extends WorktreeFileType> = WorktreeFileTypes[T]
 
+export type StagedFile = FileOfType<'staged'>
+export type NotStagedFile = FileOfType<'unstaged' | 'unmerged' | 'untracked'>
+
 export type FileTypeFilter = {
   [T in WorktreeFileType]?: boolean
 }

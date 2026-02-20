@@ -1,8 +1,5 @@
-import { WorktreeChanges } from '@/widgets/WorktreeChanges'
-import { NOT_STAGED_FILE_TYPES } from '@/widgets/WorktreeChanges/NotStaged'
-import { NotStagedChangesItem } from '@/widgets/WorktreeChanges/NotStaged/Item'
-import { STAGED_FILE_TYPES } from '@/widgets/WorktreeChanges/Staged'
-import { StagedChangesItem } from '@/widgets/WorktreeChanges/Staged/Item'
+import { NotStagedWorktreeChanges } from '@/widgets/WorktreeChanges/NotStaged'
+import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
 
 import type { WorktreeFileInfo } from '@/api/models'
 import { showDialog } from '@/state/dialogs'
@@ -93,35 +90,9 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
           'grid grid-rows-[auto_auto_max-content] gap-y-4 w-full h-full',
         )}
       >
-        <WorktreeChanges
-          className={cn('h-full min-h-50')}
-          label="unstaged changes"
-          fileTypes={NOT_STAGED_FILE_TYPES}
-          renderFile={(file, position) => (
-            <NotStagedChangesItem
-              file={file}
-              itemIndex={position}
-              aria-current={
-                file.path === openFile.path && file.status === openFile.status
-              }
-            />
-          )}
-        />
+        <NotStagedWorktreeChanges className={cn('h-full min-h-50')} />
 
-        <WorktreeChanges
-          className={cn('h-full min-h-50')}
-          label="staged changes"
-          fileTypes={STAGED_FILE_TYPES}
-          renderFile={(file, position) => (
-            <StagedChangesItem
-              file={file}
-              itemIndex={position}
-              aria-current={
-                file.path === openFile.path && file.status === openFile.status
-              }
-            />
-          )}
-        />
+        <StagedWorktreeChanges className={cn('h-full min-h-50')} />
 
         {openFile.status === 'unmerged' ? (
           <UnmergedViewSelector

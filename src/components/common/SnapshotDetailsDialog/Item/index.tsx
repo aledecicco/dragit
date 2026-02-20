@@ -47,7 +47,7 @@ const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
     <Ariakit.Radio
       value={file.path}
       render={
-        <ListItem interactive {...itemProps}>
+        <ListItem {...itemProps}>
           <div className={cn('w-full flex flex-col items-start')}>
             <div className={cn('flex flex-row gap-x-1 items-center min-w-0')}>
               <Icon
