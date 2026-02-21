@@ -12,11 +12,14 @@ import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
 
 import { useBackendEventshandler } from '@/api/events'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
+import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { useReferencesSync } from '@/state/branches'
 import { useDialog } from '@/state/dialogs'
 import { useUpstreamSync } from '@/state/upstream'
 import { cn } from '@/utils/styles'
 
+import { useMakeApplyStash } from './api/mutations/applyStash'
+import { runAction } from './state/actions'
 import { useDefaultEventPrevention } from './utils/interaction'
 
 enableMapSet()
@@ -55,6 +58,8 @@ const InRepository = () => {
   useReferencesSync()
   useUpstreamSync()
 
+  const makeApplyStash = useMakeApplyStash()
+
   return (
     <>
       <div
@@ -64,10 +69,19 @@ const InRepository = () => {
       >
         <StashesList className={cn('max-h-45')} />
 
-        <div className={cn('grid grid-rows-[auto_auto] gap-4 mb-2')}>
+        <DropArea
+          acceptedTypes={['stash']}
+          label={{
+            stash: 'apply stash changes',
+          }}
+          handleDrop={(payload) => {
+            runAction(makeApplyStash(payload.dragged))
+          }}
+          className={cn('grid grid-rows-[auto_auto] gap-4 mb-2')}
+        >
           <NotStagedWorktreeChanges className={cn('h-full min-h-50')} />
           <StagedWorktreeChanges className={cn('h-full min-h-50')} />
-        </div>
+        </DropArea>
 
         <MainToolbar />
       </div>

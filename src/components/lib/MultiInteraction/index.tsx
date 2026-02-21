@@ -12,7 +12,7 @@ import {
   ContextMenu,
   type ContextMenuEvent,
 } from '../ContextMenu'
-import { type DragType, useBeforeDrag } from '../DragAndDrop/utils'
+import { type DragPayload, useBeforeDrag } from '../DragAndDrop/utils'
 import { MultiSelect, type MultiSelectProps } from '../MultiSelect'
 import { useSelectedItems, useSelectionUpdater } from '../MultiSelect/context'
 
@@ -31,7 +31,7 @@ interface MultiInteractionProps<T>
   /**
    * Callback that returns the payload to be used when dragging the selected items.
    */
-  getDragPayload: (items: T[], dragged: T) => DragType
+  getDragPayload: (items: T[], dragged: T) => DragPayload
 }
 /**
  * A component that allows selecting arbitrary child items and performing actions on all of them.

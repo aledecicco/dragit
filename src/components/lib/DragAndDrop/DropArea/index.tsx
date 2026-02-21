@@ -1,15 +1,21 @@
-import * as Ariakit from '@ariakit/react'
+import type { ComponentProps } from 'react'
+import { IconDragDrop } from '@tabler/icons-react'
 import { mergeRefs } from 'react-merge-refs'
 
 import { useUniqueId } from '@/state/ids'
-import { propsWithCn } from '@/utils/styles'
+import { Icon } from '@/ui/Icon'
+import { cn, propsWithCn } from '@/utils/styles'
 
-import { type DragType, useDroppable, useOnDrop } from '../utils'
+import {
+  type DragType,
+  type MatchingPayload,
+  useCanDrop,
+  useCurrentDrag,
+  useDroppable,
+  useOnDrop,
+} from '../utils'
 
-interface DropAreaProps<T extends DragType['type']>
-  extends Omit<Ariakit.RoleProps, 'children' | 'render'> {
-  children: Ariakit.RoleProps['render']
-
+interface DropAreaProps<T extends DragType> extends ComponentProps<'div'> {
   /**
    * The type of draggable items that this area can accept.
    */
@@ -18,38 +24,55 @@ interface DropAreaProps<T extends DragType['type']>
   /**
    * A callback function that is called when a draggable item of an accepted type is dropped on this area.
    */
-  handleDrop: (payload: Extract<DragType, { type: T }>) => void
+  handleDrop: (payload: MatchingPayload<T>) => void
+
+  /**
+   * The label to display when a drag operation of an accepted type is in progress.
+   */
+  label: {
+    [K in T]: string
+  }
 }
 
 /**
  * An abstract component that makes its child able to receive dropped items of a given type.
  */
-const DropArea = <T extends DragType['type']>(props: DropAreaProps<T>) => {
-  const { acceptedTypes, handleDrop, children, ref, ...roleProps } = props
+const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
+  const { acceptedTypes, handleDrop, label, children, ref, ...divProps } = props
 
   const id = useUniqueId()
 
-  const { isDropTarget, ref: dropRef } = useDroppable({
+  const { ref: dropRef, isDropTarget } = useDroppable({
     id,
     accept: acceptedTypes,
   })
 
-  useOnDrop(({ source, target }) => {
-    if (target.id === id) {
-      handleDrop(source.data as Extract<DragType, { type: T }>)
-    }
+  useOnDrop(id, acceptedTypes, ({ source }) => {
+    handleDrop(source.data)
   })
 
+  const canDrop = useCanDrop(acceptedTypes)
+  const currentDrag = useCurrentDrag()
+
   return (
-    <Ariakit.Role
-      {...propsWithCn(
-        roleProps,
-        'border-2 border-transparent',
-        isDropTarget && 'border-dashed border-accent-400',
+    <div {...propsWithCn(divProps, 'relative')} ref={mergeRefs([dropRef, ref])}>
+      {children}
+
+      {canDrop && currentDrag.source && (
+        <div
+          className={cn(
+            'absolute top-0 left-0 w-full h-full overflow-hidden',
+            'flex flex-col items-center justify-center gap-2 p-4',
+            'rounded-md border border-dashed border-primary-500 bg-dark-400',
+            'text-md text-light-950/50 text-center',
+            isDropTarget && 'border-accent-400 bg-dark-300 text-light-950/80',
+          )}
+        >
+          <Icon size="lg" Glyph={IconDragDrop} className={cn('size-7')} />
+          Drop here to {label[currentDrag.source.type as T]}
+        </div>
       )}
-      ref={mergeRefs([dropRef, ref])}
-      render={children}
-    />
+    </div>
   )
 }
 

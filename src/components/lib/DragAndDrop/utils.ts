@@ -16,7 +16,7 @@ type Coordinates = {
   y: number
 }
 
-class SnapCenterToCursor extends DndTypes.Modifier {
+class SnapToCursor extends DndTypes.Modifier {
   public apply(operation: DndTypes.DragOperation): Coordinates {
     if (
       operation.activatorEvent instanceof MouseEvent &&
@@ -42,20 +42,38 @@ interface DragDef<T extends string, D> {
   dragged: D
 }
 
-type DragType =
+type DragPayload =
   | DragDef<'not-staged-files', NotStagedFile[]>
   | DragDef<'staged-files', StagedFile[]>
   | DragDef<'branch', BranchInfo>
   | DragDef<'tag', TagInfo>
   | DragDef<'stash', StashInfo>
 
-const useDraggable = Dnd.useDraggable<DragType>
+type DragType = DragPayload['type']
 
-const useDroppable = Dnd.useDroppable<DragType>
+type MatchingPayload<T extends DragType> = Extract<DragPayload, { type: T }>
 
-type Draggable = DndSettings.Draggable<DragType> & { data: DragType }
-type Droppable = DndSettings.Droppable<DragType>
+const useDraggable = <T extends DragType>(
+  args: Dnd.UseDraggableInput<MatchingPayload<T>>,
+) => Dnd.useDraggable<MatchingPayload<T>>(args)
 
+const useDroppable = <T extends DragType>(
+  args: Dnd.UseDroppableInput<MatchingPayload<T>>,
+) => Dnd.useDroppable<MatchingPayload<T>>(args)
+
+type Draggable<T extends DragType = DragType> = DndSettings.Draggable<
+  MatchingPayload<T>
+> & { data: MatchingPayload<T> }
+
+type Droppable<T extends DragType = DragType> = DndSettings.Droppable<
+  MatchingPayload<T>
+>
+
+/**
+ * Hook that registers a callback to be triggered globally before every drag operation starts.
+ *
+ * @param callback - The callback to register. It can modify the drag operation.
+ */
 const useBeforeDrag = (
   callback: (args: { element: HTMLElement; source: Draggable }) => void,
 ) => {
@@ -74,8 +92,17 @@ const useBeforeDrag = (
   })
 }
 
-const useOnDrop = (
-  callback: (args: { source: Draggable; target: Droppable }) => void,
+/**
+ * Hook that registers a callback to be triggered when a valid drop operation occurs.
+ *
+ * @param areaId - The ID of the drop area.
+ * @param types - The types of draggable items that the drop area can accept.
+ * @param callback - The callback that handles the drop operations of the given types.
+ */
+const useOnDrop = <T extends DragType>(
+  areaId: string,
+  types: T[],
+  callback: (args: { source: Draggable<T>; target: Droppable<T> }) => void,
 ) => {
   Dnd.useDragDropMonitor({
     onDragEnd: (event) => {
@@ -86,14 +113,42 @@ const useOnDrop = (
       const source = event.operation.source as Draggable | null
       const target = event.operation.target as Droppable | null
 
-      if (source && target) {
+      if (
+        source &&
+        target &&
+        types.includes(source.data.type as T) &&
+        areaId === target.id
+      ) {
         callback({
-          source,
-          target,
+          source: source as Draggable<T>,
+          target: target as Droppable<T>,
         })
       }
     },
   })
+}
+
+/**
+ * Hook that tracks the current drag operation if any.
+ */
+const useCurrentDrag = () => {
+  const { source, target } = Dnd.useDragOperation<DragPayload>()
+
+  return {
+    source: source as Draggable | undefined | null,
+    target: target as Droppable | undefined | null,
+  }
+}
+
+/**
+ * Hook that tracks whether the current drag operation can be dropped on a drop area that accepts the given types.
+ *
+ * @param types - The types of draggable items that the drop area can accept.
+ */
+const useCanDrop = <T extends DragType>(types: T[]): boolean => {
+  const { source } = useCurrentDrag()
+
+  return !!source && types.includes(source.data.type as T)
 }
 
 export {
@@ -101,7 +156,12 @@ export {
   useDroppable,
   useBeforeDrag,
   useOnDrop,
-  SnapCenterToCursor,
+  useCurrentDrag,
+  useCanDrop,
+  SnapToCursor,
+  type DragPayload,
   type DragType,
+  type MatchingPayload,
   type Draggable,
+  type Droppable,
 }

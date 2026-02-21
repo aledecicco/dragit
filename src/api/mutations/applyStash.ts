@@ -27,9 +27,13 @@ const applyStashMutation = (repoPath: string) =>
   })
 
 const useApplyStash = (stash: StashInfo): Action => {
+  return useMakeApplyStash()(stash)
+}
+
+const useMakeApplyStash = (): ((stash: StashInfo) => Action) => {
   const applyStash = useRepositoryMutation(applyStashMutation)
 
-  return {
+  return (stash: StashInfo): Action => ({
     id: {
       key: 'file_operation',
       operation: 'apply_stash',
@@ -50,7 +54,13 @@ const useApplyStash = (stash: StashInfo): Action => {
       error: 'Failed',
     },
     Glyph: IconPackageExport,
-  }
+  })
 }
 
-export { useApplyStash, applyStashKey, applyStashMutation, type ApplyStashArgs }
+export {
+  useApplyStash,
+  useMakeApplyStash,
+  applyStashKey,
+  applyStashMutation,
+  type ApplyStashArgs,
+}

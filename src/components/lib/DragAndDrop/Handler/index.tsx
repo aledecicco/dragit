@@ -3,7 +3,7 @@ import * as DndSettings from '@dnd-kit/dom'
 import * as Dnd from '@dnd-kit/react'
 
 import { DragAndDropIndicator } from '../Indicator'
-import { type Draggable, SnapCenterToCursor } from '../utils'
+import { type Draggable, SnapToCursor } from '../utils'
 
 type DragAndDropHandlerProps = PropsWithChildren
 
@@ -15,7 +15,7 @@ const DragAndDropHandler = (props: DragAndDropHandlerProps) => {
 
   return (
     <Dnd.DragDropProvider
-      modifiers={[SnapCenterToCursor.configure({})]}
+      modifiers={[SnapToCursor.configure({})]}
       plugins={[
         DndSettings.Accessibility,
         DndSettings.Cursor,

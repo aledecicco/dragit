@@ -3,9 +3,9 @@ import { mergeRefs } from 'react-merge-refs'
 
 import { propsWithCn } from '@/utils/styles'
 
-import { type DragType, useDraggable } from '../utils'
+import { type DragType, type MatchingPayload, useDraggable } from '../utils'
 
-interface DraggableProps
+interface DraggableProps<T extends DragType>
   extends Omit<Ariakit.RoleProps, 'children' | 'render'> {
   children: Ariakit.RoleProps['render']
 
@@ -17,13 +17,13 @@ interface DraggableProps
   /**
    * Extra data carried by the item.
    */
-  dragPayload: DragType
+  dragPayload: MatchingPayload<T>
 }
 
 /**
  * An abstract component that makes its child draggable.
  */
-const Draggable = (props: DraggableProps) => {
+const Draggable = <T extends DragType>(props: DraggableProps<T>) => {
   const { id, dragPayload, children, ref, ...roleProps } = props
 
   const { ref: dragRef, isDragging } = useDraggable({

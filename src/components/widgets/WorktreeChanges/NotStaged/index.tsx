@@ -1,8 +1,10 @@
 import type { ComponentProps } from 'react'
 import { IconFile, IconFiles } from '@tabler/icons-react'
+import { match } from 'ts-pattern'
 
 import type { NotStagedFile, WorktreeFileType } from '@/api/models'
 import { useStageFiles } from '@/api/mutations/addToIndex'
+import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
 import { useStashFiles } from '@/api/mutations/saveStash'
 import {
   useAcceptManyAsIs,
@@ -18,9 +20,11 @@ import {
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
+import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
+import { runAction } from '@/state/actions'
 import {
   setNextPage,
   setPrevPage,
@@ -54,9 +58,23 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
   const showPagination = useNeedsPagination(filesQuery, page)
 
   const getActions = useGetActions()
+  const unstage = useUnstageFiles()
 
   return (
-    <div {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}>
+    <DropArea
+      {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}
+      acceptedTypes={['staged-files']}
+      label={{
+        'staged-files': 'unstage changes',
+      }}
+      handleDrop={(payload) => {
+        match(payload)
+          .with({ type: 'staged-files' }, ({ dragged }) => {
+            runAction(unstage, dragged)
+          })
+          .exhaustive()
+      }}
+    >
       <div
         className={cn(
           'text-sm text-light-600 text-start',
@@ -113,7 +131,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
           />
         </MultiInteraction>
       </div>
-    </div>
+    </DropArea>
   )
 }
 
