@@ -56,6 +56,12 @@ const useDiscardStashes = (): Action<StashInfo[]> => {
         stashIds: stashes.map((stash) => stash.id),
       })
     },
+    derivedIds: (stashes) =>
+      stashes.map((stash) => ({
+        key: 'stash_operation',
+        operation: 'discard',
+        stash: stash.tracker,
+      })),
     label: {
       idle: 'Discard stashes',
       running: 'Discarding stashes',

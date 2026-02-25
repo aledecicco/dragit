@@ -62,6 +62,12 @@ const useDeleteBranches = (): Action<BranchInfo[]> => {
         branchNames: branches.map((branch) => branch.name),
       })
     },
+    derivedIds: (branches) =>
+      branches.map((branch) => ({
+        key: 'branch_operation',
+        operation: 'delete_branch',
+        branch: branch.name,
+      })),
     Glyph: IconTrash,
     label: {
       idle: 'Delete branches',

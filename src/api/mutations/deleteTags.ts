@@ -54,6 +54,12 @@ const useDeleteTags = (): Action<TagInfo[]> => {
     run: async (tags) => {
       await deleteTags.mutateAsync({ tagNames: tags.map((tag) => tag.name) })
     },
+    derivedIds: (tags) =>
+      tags.map((tag) => ({
+        key: 'tag_operation',
+        operation: 'delete_tag',
+        tag: tag.name,
+      })),
     label: {
       idle: 'Delete tags',
       running: 'Deleting tags',

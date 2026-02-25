@@ -64,6 +64,12 @@ const useStageFiles = (): Action<WorktreeFileInfo[] | string[]> => {
         ),
       })
     },
+    derivedIds: (files) =>
+      files.map((file) => ({
+        key: 'file_operation',
+        operation: 'add_file',
+        file: typeof file === 'string' ? file : file.path,
+      })),
     label: {
       idle: 'Stage files',
       running: 'Staging files',

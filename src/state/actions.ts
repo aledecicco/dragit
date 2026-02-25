@@ -46,6 +46,11 @@ interface Action<T = void> {
    * Async function that performs the action.
    */
   run: (args: T) => Promise<void>
+
+  /**
+   * Optional function that derives additional action IDs that mirror the main action's status.
+   */
+  derivedIds?: (args: T) => ActionId[]
 }
 
 interface ActionsTracker {
@@ -262,22 +267,40 @@ async function runAction<T>(action: Action<T>, args?: T): Promise<void> {
   const status = store.getActionStatus(action.id) ?? 'idle'
 
   if (status !== 'running') {
-    store.setActionStatus(action.id, 'running')
-    store.setActionTimer(action.id, undefined)
+    const derived = action.derivedIds?.(args as T) ?? []
+
+    const setAll = (status: ActionStatus | undefined) => {
+      store.setActionStatus(action.id, status)
+      for (const id of derived) {
+        store.setActionStatus(id, status)
+      }
+    }
+
+    const setAllTimers = (timeout: number | undefined) => {
+      store.setActionTimer(action.id, timeout)
+      for (const id of derived) {
+        store.setActionTimer(id, timeout)
+      }
+    }
+
+    setAll('running')
+    setAllTimers(undefined)
 
     return action
       .run(args as T)
       .then(() => {
-        store.setActionStatus(action.id, 'success')
+        setAll('success')
       })
       .catch(() => {
-        store.setActionStatus(action.id, 'error')
+        setAll('error')
       })
       .finally(() => {
         const timeoutId = setTimeout(() => {
-          store.setActionStatus(action.id, undefined)
+          setAll(undefined)
+          setAllTimers(undefined)
         }, MS_IN_SECOND * 2)
-        store.setActionTimer(action.id, timeoutId)
+
+        setAllTimers(timeoutId)
       })
   }
 }

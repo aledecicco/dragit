@@ -89,6 +89,13 @@ const useAcceptManyOurs = (): Action<WorktreeFileInfo[]> => {
       })
       await addToIndex.mutateAsync({ files: files.map((file) => file.path) })
     },
+    derivedIds: (files) =>
+      files.map((file) => ({
+        key: 'file_operation',
+        operation: 'solve_conflict',
+        file: file.path,
+        resolution: 'ours',
+      })),
     label: {
       idle: 'Accept ours',
       running: 'Accepting ours',
@@ -152,6 +159,13 @@ const useAcceptManyTheirs = (): Action<WorktreeFileInfo[]> => {
       })
       await addToIndex.mutateAsync({ files: files.map((file) => file.path) })
     },
+    derivedIds: (files) =>
+      files.map((file) => ({
+        key: 'file_operation',
+        operation: 'solve_conflict',
+        file: file.path,
+        resolution: 'theirs',
+      })),
     label: {
       idle: 'Accept theirs',
       running: 'Accepting theirs',
@@ -205,6 +219,13 @@ const useAcceptManyAsIs = (): Action<WorktreeFileInfo[]> => {
     run: async (files) => {
       await addToIndex.mutateAsync({ files: files.map((file) => file.path) })
     },
+    derivedIds: (files) =>
+      files.map((file) => ({
+        key: 'file_operation',
+        operation: 'solve_conflict',
+        file: file.path,
+        resolution: 'manual',
+      })),
     label: {
       idle: 'Accept as they are',
       running: 'Accepting as they are',
@@ -260,6 +281,13 @@ const useAcceptManyDeletions = (): Action<WorktreeFileInfo[]> => {
         files: files.map((file) => file.path),
       })
     },
+    derivedIds: (files) =>
+      files.map((file) => ({
+        key: 'file_operation',
+        operation: 'solve_conflict',
+        file: file.path,
+        resolution: 'delete',
+      })),
     label: {
       idle: 'Accept deletions',
       running: 'Accepting deletions',
@@ -313,6 +341,13 @@ const useIgnoreManyDeletions = (): Action<WorktreeFileInfo[]> => {
     run: async (files) => {
       await addToIndex.mutateAsync({ files: files.map((file) => file.path) })
     },
+    derivedIds: (files) =>
+      files.map((file) => ({
+        key: 'file_operation',
+        operation: 'solve_conflict',
+        file: file.path,
+        resolution: 'dont_delete',
+      })),
     label: {
       idle: 'Ignore deletions',
       running: 'Ignoring deletions',
@@ -366,6 +401,13 @@ const useAcceptManyFiles = (): Action<WorktreeFileInfo[]> => {
     run: async (files) => {
       await addToIndex.mutateAsync({ files: files.map((file) => file.path) })
     },
+    derivedIds: (files) =>
+      files.map((file) => ({
+        key: 'file_operation',
+        operation: 'solve_conflict',
+        file: file.path,
+        resolution: 'accept',
+      })),
     label: {
       idle: 'Accept new files',
       running: 'Accepting new files',
@@ -421,6 +463,13 @@ const useIgnoreManyFiles = (): Action<WorktreeFileInfo[]> => {
         files: files.map((file) => file.path),
       })
     },
+    derivedIds: (files) =>
+      files.map((file) => ({
+        key: 'file_operation',
+        operation: 'solve_conflict',
+        file: file.path,
+        resolution: 'ignore',
+      })),
     label: {
       idle: 'Ignore new files',
       running: 'Ignoring new files',

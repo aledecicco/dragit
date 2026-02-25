@@ -72,6 +72,12 @@ const useStashFiles = (): Action<WorktreeFileInfo[] | string[]> => {
         includeUntracked: true,
       })
     },
+    derivedIds: (files) =>
+      files.map((file) => ({
+        key: 'file_operation',
+        operation: 'save_stash',
+        file: typeof file === 'string' ? file : file.path,
+      })),
     label: {
       idle: 'Stash files',
       running: 'Stashing files',

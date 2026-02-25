@@ -1,5 +1,5 @@
 import { Fragment, useEffect } from 'react'
-import { useCompositeContext } from '@ariakit/react'
+import * as Ariakit from '@ariakit/react'
 
 import type { Action } from '@/state/actions'
 import { useUniqueId } from '@/state/ids'
@@ -30,6 +30,9 @@ interface MultiInteractionProps<T>
 
   /**
    * Callback that returns the payload to be used when dragging the selected items.
+   *
+   * @param items - The currently selected items.
+   * @param dragged - The item that triggered the drag.
    */
   getDragPayload: (items: T[], dragged: T) => DragPayload
 }
@@ -56,7 +59,8 @@ const MultiInteraction = <T,>(props: MultiInteractionProps<T>) => {
 type MultiInteractionInnerProps<T> = Pick<
   MultiInteractionProps<T>,
   'getActions' | 'items' | 'getDragPayload' | 'children'
->
+> &
+  Omit<Ariakit.RoleProps, 'children'>
 
 const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
   const { getActions, items, getDragPayload, children, ...contentProps } = props
@@ -74,7 +78,7 @@ const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
   const selectedItems = items.filter((_, index) => itemIndexes.has(index))
   const actions = getActions(selectedItems)
 
-  const composite = useCompositeContext()
+  const composite = Ariakit.useCompositeContext()
 
   useBeforeDrag(({ element, source }) => {
     const compositeItem = composite
@@ -106,7 +110,24 @@ const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
         }
       }}
       onContextMenuCapture={(e) => {
-        if (itemIndexes.size > 1) {
+        const target = e.target
+
+        if (!(target instanceof HTMLElement)) {
+          return
+        }
+
+        const itemIndex =
+          composite
+            ?.getState()
+            .renderedItems.findIndex((item) =>
+              item.element?.contains(target),
+            ) ?? -1
+
+        if (
+          itemIndexes.size > 1 &&
+          itemIndex >= 0 &&
+          itemIndexes.has(itemIndex)
+        ) {
           const nativeEvent: ContextMenuEvent = e.nativeEvent
           nativeEvent[CONTEXT_MENU_HANDLER_KEY] = menuId
         }

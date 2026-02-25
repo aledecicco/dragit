@@ -64,6 +64,12 @@ const useUnstageFiles = (): Action<WorktreeFileInfo[] | string[]> => {
         ),
       })
     },
+    derivedIds: (files) =>
+      files.map((file) => ({
+        key: 'file_operation',
+        operation: 'unstage_file',
+        file: typeof file === 'string' ? file : file.path,
+      })),
     label: {
       idle: 'Unstage files',
       running: 'Unstaging files',
