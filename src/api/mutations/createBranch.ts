@@ -11,7 +11,7 @@ import type { Action } from '@/state/actions'
 
 import type { BranchInfo, BranchName, RefName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
-import { useCheckout } from './checkout'
+import { checkoutMutation } from './checkout'
 
 interface CreateBranchArgs {
   branchName: BranchName
@@ -54,7 +54,7 @@ const useCreateBranch = (): Action<CreateBranchArgs> => {
 }
 
 const useCreateBranchAt = (reference: RefName): Action<BranchName> => {
-  const createBranch = useCreateBranch()
+  const createBranch = useRepositoryMutation(createBranchMutation)
 
   return {
     id: {
@@ -68,16 +68,17 @@ const useCreateBranchAt = (reference: RefName): Action<BranchName> => {
       error: 'Failed to create branch',
     },
     Glyph: IconPlus,
-    run: (name) =>
-      createBranch.run({
+    run: async (name) => {
+      await createBranch.mutateAsync({
         branchName: name,
         fromReference: reference,
-      }),
+      })
+    },
   }
 }
 
 const useTrackBranch = (branch: BranchInfo): Action<BranchName> => {
-  const createBranch = useCreateBranch()
+  const createBranch = useRepositoryMutation(createBranchMutation)
 
   return {
     id: {
@@ -93,16 +94,17 @@ const useTrackBranch = (branch: BranchInfo): Action<BranchName> => {
       error: 'Failed to create branch',
     },
     Glyph: IconCloudDown,
-    run: (name) =>
-      createBranch.run({
+    run: async (name) => {
+      await createBranch.mutateAsync({
         branchName: name,
         fromReference: branch.name,
-      }),
+      })
+    },
   }
 }
 
 const useBranchOff = (reference: RefName): Action<BranchName> => {
-  const checkout = useCheckout()
+  const checkout = useRepositoryMutation(checkoutMutation)
 
   return {
     id: {
@@ -118,12 +120,13 @@ const useBranchOff = (reference: RefName): Action<BranchName> => {
       error: 'Failed to create branch',
     },
     Glyph: IconRouteAltLeft,
-    run: (name) =>
-      checkout.run({
+    run: async (name) => {
+      checkout.mutateAsync({
         reference: name,
         isNew: true,
         fromReference: reference,
-      }),
+      })
+    },
   }
 }
 

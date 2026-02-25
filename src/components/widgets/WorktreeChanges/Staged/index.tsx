@@ -1,6 +1,5 @@
 import type { ComponentProps } from 'react'
 import { IconFile, IconFiles } from '@tabler/icons-react'
-import { match } from 'ts-pattern'
 
 import type { WorktreeFileType } from '@/api/models'
 import { useStageFiles } from '@/api/mutations/addToIndex'
@@ -57,11 +56,7 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
         'not-staged-files': 'stage changes',
       }}
       handleDrop={(payload) => {
-        match(payload)
-          .with({ type: 'not-staged-files' }, ({ dragged }) => {
-            runAction(stage, dragged)
-          })
-          .exhaustive()
+        runAction(stage, payload.dragged)
       }}
     >
       <div

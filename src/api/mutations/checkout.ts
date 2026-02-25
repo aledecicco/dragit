@@ -44,6 +44,13 @@ const useCheckout = (): Action<CheckoutArgs> => {
     run: async (args) => {
       await checkout.mutateAsync(args)
     },
+    derivedIds: (args) => [
+      {
+        key: 'branch_operation',
+        operation: 'checkout',
+        reference: args.reference,
+      },
+    ],
     Glyph: IconGitBranch,
     label: {
       idle: 'Checkout',
@@ -55,32 +62,48 @@ const useCheckout = (): Action<CheckoutArgs> => {
 }
 
 const useCheckoutBranch = (branch: BranchInfo): Action => {
-  const checkout = useCheckout()
+  const checkout = useRepositoryMutation(checkoutMutation)
 
   return {
-    ...checkout,
     id: {
       key: 'branch_operation',
       operation: 'checkout',
-      branch: branch.name,
+      reference: branch.name,
     },
     blockedBy: [{ key: 'branch_operation' }],
-    run: () => checkout.run({ reference: branch.name, isNew: false }),
+    run: async () => {
+      await checkout.mutateAsync({ reference: branch.name, isNew: false })
+    },
+    Glyph: IconGitBranch,
+    label: {
+      idle: 'Checkout',
+      running: 'Checking out',
+      success: 'Checked out',
+      error: 'Checkout failed',
+    },
   }
 }
 
 const useCheckoutTag = (tag: TagInfo): Action => {
-  const checkout = useCheckout()
+  const checkout = useRepositoryMutation(checkoutMutation)
 
   return {
-    ...checkout,
     id: {
       key: 'branch_operation',
       operation: 'checkout',
-      tag: tag.name,
+      reference: tag.name,
     },
     blockedBy: [{ key: 'branch_operation' }],
-    run: () => checkout.run({ reference: tag.name, isNew: false }),
+    run: async () => {
+      await checkout.mutateAsync({ reference: tag.name, isNew: false })
+    },
+    Glyph: IconGitBranch,
+    label: {
+      idle: 'Checkout',
+      running: 'Checking out',
+      success: 'Checked out',
+      error: 'Checkout failed',
+    },
   }
 }
 
@@ -104,6 +127,15 @@ const useSwitchBranches = (): Action => {
         isNew: false,
       })
     },
+    derivedIds: baseReference
+      ? () => [
+          {
+            key: 'branch_operation',
+            operation: 'checkout',
+            reference: baseReference?.refName,
+          },
+        ]
+      : undefined,
     Glyph: IconSwitchHorizontal,
     label: {
       idle: 'Switch branch and base branch',

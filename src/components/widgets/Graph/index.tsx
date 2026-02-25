@@ -1,14 +1,22 @@
 import { type ComponentProps, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { defaultRangeExtractor, type Range } from '@tanstack/react-virtual'
+import { match } from 'ts-pattern'
 
 import { SvgOverlay } from '@/widgets/Graph/SvgOverlay'
 
+import { useCheckout } from '@/api/mutations/checkout'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { getPaginatedLength } from '@/api/utils'
 import { BranchToolbar } from '@/common/BranchToolbar'
+import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
-import { useSelectedBranches, useSelectedReferences } from '@/state/branches'
+import { runAction } from '@/state/actions'
+import {
+  changeSelectedBase,
+  useSelectedBranches,
+  useSelectedReferences,
+} from '@/state/branches'
 import { useVirtualizer } from '@/utils/performance'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -59,7 +67,13 @@ const Graph = (props: GraphProps) => {
           />
         )}
 
-        <GraphInner />
+        <div
+          className={cn(
+            'col-span-3 row-start-3 overflow-hidden w-full h-full relative',
+          )}
+        >
+          <GraphInner />
+        </div>
       </div>
     </div>
   )
@@ -103,6 +117,8 @@ const GraphInner = () => {
     overscan: 3,
   })
 
+  const checkout = useCheckout()
+
   return (
     <Ariakit.CompositeProvider focusLoop="horizontal" focusShift>
       <Ariakit.Composite
@@ -139,6 +155,59 @@ const GraphInner = () => {
           </SvgOverlay>
         </div>
       </Ariakit.Composite>
+
+      <DropArea
+        interactiveOutsideDrag={false}
+        className={cn('absolute top-0 bottom-0 left-0 w-half row-start-3')}
+        overlayProps={{
+          className: 'rounded-r-none rounded-l-sm',
+        }}
+        acceptedTypes={['branch', 'tag']}
+        label={{
+          branch: 'checkout branch',
+          tag: 'checkout tag',
+        }}
+        handleDrop={(payload) => {
+          runAction(checkout, {
+            reference: payload.dragged.name,
+            isNew: false,
+          })
+        }}
+      />
+
+      <DropArea
+        interactiveOutsideDrag={false}
+        extraValidation={(payload) =>
+          payload.dragged.name !== currentReference?.refName
+        }
+        className={cn('absolute top-0 bottom-0 right-0 w-half row-start-3')}
+        overlayProps={{
+          className: 'rounded-l-none rounded-r-sm',
+        }}
+        acceptedTypes={['branch', 'tag']}
+        label={{
+          branch: 'use branch as base',
+          tag: 'use tag as base',
+        }}
+        handleDrop={(payload) => {
+          if (currentReference) {
+            match(payload)
+              .with({ type: 'branch' }, ({ dragged }) => {
+                changeSelectedBase(currentReference, {
+                  type: 'branch',
+                  refName: dragged.name,
+                })
+              })
+              .with({ type: 'tag' }, ({ dragged }) => {
+                changeSelectedBase(currentReference, {
+                  type: 'tag',
+                  refName: dragged.name,
+                })
+              })
+              .exhaustive()
+          }
+        }}
+      />
     </Ariakit.CompositeProvider>
   )
 }

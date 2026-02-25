@@ -94,7 +94,16 @@ const useCurrentReference = (): Reference | undefined => {
 /**
  * Change the selected base for a given reference.
  */
-const changeSelectedBase = useSelectedRefsStore.getState().changeBase
+const changeSelectedBase = (
+  reference: Reference,
+  newBase: Reference | null,
+) => {
+  const state = useSelectedRefsStore.getState()
+
+  if (reference.refName !== newBase?.refName) {
+    state.changeBase(reference, newBase)
+  }
+}
 
 /**
  * Hook that facilitates tracking the selected base for a reference.
