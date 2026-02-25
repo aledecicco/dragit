@@ -43,7 +43,7 @@ const StashesList = (props: StashesListProps) => {
       }}
       {...divProps}
     >
-      <Accordion>
+      <Accordion className={cn('max-h-full overflow-hidden')}>
         <AccordionSection
           label="Stashes"
           extraInfo={

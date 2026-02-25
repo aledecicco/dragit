@@ -18,7 +18,14 @@ const Accordion = (props: AccordionProps) => {
   return (
     <Ariakit.CompositeProvider focusLoop focusShift>
       <Ariakit.Composite
-        render={<div {...propsWithCn(divProps, 'flex flex-col bg-dark-600')} />}
+        render={
+          <div
+            {...propsWithCn(
+              divProps,
+              'grid grid-rows-[max-content_1fr] bg-dark-600',
+            )}
+          />
+        }
       />
     </Ariakit.CompositeProvider>
   )

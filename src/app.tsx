@@ -67,7 +67,7 @@ const InRepository = () => {
           'grid grid-rows-[min-content_minmax(0,5fr)_max-content] gap-2',
         )}
       >
-        <StashesList className={cn('max-h-45')} />
+        <StashesList className={cn('max-h-45 overflow-hidden')} />
 
         <DropArea
           acceptedTypes={['stash']}
@@ -77,7 +77,9 @@ const InRepository = () => {
           handleDrop={(payload) => {
             runAction(makeApplyStash(payload.dragged))
           }}
-          className={cn('grid grid-rows-[auto_auto] gap-4 mb-2')}
+          className={cn(
+            'grid grid-rows-[auto_auto] gap-4 mb-2 overflow-hidden',
+          )}
         >
           <NotStagedWorktreeChanges className={cn('h-full min-h-50')} />
           <StagedWorktreeChanges className={cn('h-full min-h-50')} />
@@ -86,7 +88,9 @@ const InRepository = () => {
         <MainToolbar />
       </div>
 
-      <div className={cn('grid grid-rows-[max-content_1fr] gap-4')}>
+      <div
+        className={cn('grid grid-rows-[max-content_1fr] gap-4 overflow-hidden')}
+      >
         <CurrentDirectory className={cn('justify-self-center')} />
 
         <div className={cn('h-full w-full min-h-0', 'relative')}>
@@ -97,7 +101,9 @@ const InRepository = () => {
         </div>
       </div>
 
-      <div className={cn('grid grid-rows-[max-content_1fr] gap-4')}>
+      <div
+        className={cn('grid grid-rows-[max-content_1fr] gap-4 overflow-hidden')}
+      >
         <CurrentRemote />
         <BranchesList />
       </div>

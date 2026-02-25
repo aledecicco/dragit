@@ -63,7 +63,9 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
       query={query}
       loadingFallback={
         <div
-          className={cn('flex flex-col px-2')}
+          className={cn(
+            'flex flex-col px-2 relative overflow-hidden max-h-full',
+          )}
           style={{
             paddingTop: virtualizedDivProps.options?.paddingStart ?? 8,
             paddingBottom: virtualizedDivProps.options?.paddingEnd ?? 8,
@@ -73,10 +75,18 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
           {range(placeholdersCount ?? prevCount ?? 30).map((i) => (
             <Skeleton
               key={i}
-              style={{ height: virtualizedDivProps.itemSize }}
+              style={{ minHeight: virtualizedDivProps.itemSize }}
               variant="fill"
             />
           ))}
+
+          <div
+            className={cn(
+              'w-full h-2.5 absolute -bottom-1 left-0',
+              'bg-linear-to-t from-dark-950/70 to-transparent from-30% rounded-t-full',
+              'pointer-events-none',
+            )}
+          />
         </div>
       }
     >

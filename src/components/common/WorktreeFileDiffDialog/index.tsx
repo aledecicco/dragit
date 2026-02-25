@@ -1,6 +1,3 @@
-import { NotStagedWorktreeChanges } from '@/widgets/WorktreeChanges/NotStaged'
-import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
-
 import type { WorktreeFileInfo } from '@/api/models'
 import { showDialog } from '@/state/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
@@ -43,12 +40,8 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
       heading={undefined}
       {...propsWithCn(
         dialogProps,
-        'max-w-[90%] max-h-[85%]',
-        openFile.status === 'unmerged' &&
-          isSideBySide &&
-          'max-w-[92%] grid-cols-[300px_1fr]',
+        'max-w-[80%] max-h-[85%] grid-cols-1 grid-rows-1',
       )}
-      contentProps={propsWithCn(dialogProps.contentProps, 'p-3')}
       sideContent={
         <div
           className={cn(
@@ -82,31 +75,21 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
               diffScope={{ type: 'unmerged', stage: 'theirs', file: openFile }}
             />
           )}
+
+          {openFile.status === 'unmerged' ? (
+            <UnmergedViewSelector
+              className={cn('absolute bottom-0 left-half -translate-x-half')}
+              store={viewModeSelector.store}
+            />
+          ) : (
+            <DiffFilterSelector
+              className={cn('absolute bottom-0 left-half -translate-x-half')}
+              store={filterSelector.store}
+            />
+          )}
         </div>
       }
-    >
-      <div
-        className={cn(
-          'grid grid-rows-[auto_auto_max-content] gap-y-4 w-full h-full',
-        )}
-      >
-        <NotStagedWorktreeChanges className={cn('h-full min-h-50')} />
-
-        <StagedWorktreeChanges className={cn('h-full min-h-50')} />
-
-        {openFile.status === 'unmerged' ? (
-          <UnmergedViewSelector
-            className={cn('mt-6 w-full')}
-            store={viewModeSelector.store}
-          />
-        ) : (
-          <DiffFilterSelector
-            className={cn('mt-6 w-full')}
-            store={filterSelector.store}
-          />
-        )}
-      </div>
-    </Dialog>
+    />
   )
 }
 

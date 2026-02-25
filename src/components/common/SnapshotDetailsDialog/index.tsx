@@ -60,22 +60,32 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
     <Dialog
       dialogKey={SNAPSHOT_DETAILS_DIALOG_KEY(snapshotInfo.id)}
       heading={snapshotName}
-      contentProps={{
-        className: cn('grid grid-rows-[max-content_max-content_1fr]'),
-      }}
       sideContent={
         fileSelector.selectedFile && (
-          <FileDiffViewer
-            diffScope={{
-              type: 'snapshot',
-              snapshotId: snapshotInfo.id,
-              file: fileSelector.selectedFile,
-            }}
-            filter={filterSelector.value}
-          />
+          <div className={cn('w-full h-full relative')}>
+            <FileDiffViewer
+              diffScope={{
+                type: 'snapshot',
+                snapshotId: snapshotInfo.id,
+                file: fileSelector.selectedFile,
+              }}
+              filter={filterSelector.value}
+            />
+
+            {fileSelector.selectedFile && (
+              <DiffFilterSelector
+                className={cn('absolute bottom-0 left-half -translate-x-half')}
+                store={filterSelector.store}
+              />
+            )}
+          </div>
         )
       }
-      {...propsWithCn(dialogProps, 'max-w-[90%] max-h-[85%] overflow-visible')}
+      {...propsWithCn(dialogProps, 'max-w-[90%] max-h-[85%]')}
+      contentProps={propsWithCn(
+        dialogProps.contentProps,
+        'grid grid-rows-[max-content_max-content_1fr]',
+      )}
     >
       <ChangesSummary
         diff={snapshotInfo.changes}
@@ -85,10 +95,7 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
 
       <div
         className={cn(
-          'grid gap-y-4 overflow-y-hidden',
-          fileSelector.selectedFile
-            ? 'grid-rows-[max-content_1fr_max-content]'
-            : 'grid-rows-[max-content_1fr]',
+          'grid grid-rows-[max-content_1fr] gap-y-4 overflow-y-hidden',
         )}
       >
         <SnapshotDialogDescription snapshotInfo={snapshotInfo} />
@@ -127,15 +134,9 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
           <SnapshotDialogFileList
             filesQuery={filesQuery}
             store={fileSelector.store}
+            className={cn('h-full overflow-hidden')}
           />
         </div>
-
-        {fileSelector.selectedFile && (
-          <DiffFilterSelector
-            className={cn('mt-6 w-full')}
-            store={filterSelector.store}
-          />
-        )}
       </div>
     </Dialog>
   )

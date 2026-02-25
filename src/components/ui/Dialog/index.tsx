@@ -30,7 +30,7 @@ interface DialogProps extends Ariakit.DialogProps {
   /**
    * Optional content to be displayed to one side of the dialog.
    */
-  sideContent?: ReactNode
+  sideContent?: Ariakit.RoleProps['render']
 }
 
 /**
@@ -69,45 +69,46 @@ const Dialog = (props: DialogProps) => {
         hideDialog(dialogKey)
       }}
     >
-      <div
-        {...propsWithCn(
-          contentProps,
-          'py-8 px-6 bg-dark-600',
-          'overflow-hidden',
-          heading && 'pb-6',
-        )}
-      >
-        {showClose && (
-          <DecoratedButton
-            round
-            compact
-            variant="plain"
-            status="neutral"
-            size="md"
-            className={cn(
-              'text-lg text-light-950',
-              'absolute top-1.5 right-1.5',
-            )}
-            label="Close dialog"
-            Glyph={IconX}
-          />
-        )}
+      {(!!children || !!heading) && (
+        <div
+          {...propsWithCn(
+            contentProps,
+            'py-8 px-6 bg-dark-600',
+            'overflow-hidden',
+            heading && 'pb-6',
+          )}
+        >
+          {heading && (
+            <Ariakit.DialogHeading
+              className={cn('text-xl font-semibold text-center -mt-2 mb-6')}
+            >
+              {heading}
+            </Ariakit.DialogHeading>
+          )}
 
-        {heading && (
-          <Ariakit.DialogHeading
-            className={cn('text-xl font-semibold text-center -mt-2 mb-6')}
-          >
-            {heading}
-          </Ariakit.DialogHeading>
-        )}
-
-        {children}
-      </div>
+          {children}
+        </div>
+      )}
 
       {!!sideContent && (
-        <div className={cn('w-full h-full bg-dark-900 overflow-hidden')}>
-          {sideContent}
-        </div>
+        <Ariakit.Role
+          className={cn('w-full h-full bg-dark-900')}
+          render={sideContent}
+        />
+      )}
+
+      {showClose && (
+        <DecoratedButton
+          render={<Ariakit.DialogDismiss />}
+          round
+          compact
+          variant="plain"
+          status="neutral"
+          size="md"
+          className={cn('text-lg text-light-950', 'absolute top-1.5 right-1.5')}
+          label="Close dialog"
+          Glyph={IconX}
+        />
       )}
     </Ariakit.Dialog>
   )

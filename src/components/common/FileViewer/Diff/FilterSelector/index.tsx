@@ -30,7 +30,15 @@ const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
         value="theirs"
         label="Before changes"
         Glyph={IconBracketsContainStart}
-      />
+        className={cn('relative rounded-bl-none')}
+      >
+        <div
+          className={cn('absolute -left-2 bottom-0 bg-inherit w-2 h-2.5')}
+          style={{
+            clipPath: 'path("M 0 10 C 6 7.5 6 7.5 8 0 L 8 10 Z")',
+          }}
+        />
+      </ToggleGroupItem>
 
       <ToggleGroupItem
         fixed
@@ -49,7 +57,15 @@ const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
         value="ours"
         label="After changes"
         Glyph={IconBracketsContainEnd}
-      />
+        className={cn('relative rounded-br-none')}
+      >
+        <div
+          className={cn('absolute -right-2 bottom-0 bg-inherit w-2 h-2.5')}
+          style={{
+            clipPath: 'path("M 8 10 C 2 7.5 2 7.5 0 0 L 0 10 Z")',
+          }}
+        />
+      </ToggleGroupItem>
     </ToggleGroup>
   )
 }

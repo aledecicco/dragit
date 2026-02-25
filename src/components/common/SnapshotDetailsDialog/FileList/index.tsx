@@ -26,21 +26,20 @@ const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
   return (
     <Ariakit.RadioProvider store={radio}>
       <Ariakit.RadioGroup
-        render={
-          <QueryList
-            name="modified files"
-            query={filesQuery}
-            getItems={(d) => d.items}
-            renderItem={(file) => <SnapshotDetailsDialogItem file={file} />}
-            itemSize={48}
-            size="md"
-            options={mapFn(filesQuery.data, (page) => ({
-              getItemKey: (index: number) => page.items[index].path,
-            }))}
-          />
-        }
         {...propsWithCn(radioProps, 'bg-dark-800 rounded-md')}
-      />
+      >
+        <QueryList
+          name="modified files"
+          query={filesQuery}
+          getItems={(d) => d.items}
+          renderItem={(file) => <SnapshotDetailsDialogItem file={file} />}
+          itemSize={48}
+          size="md"
+          options={mapFn(filesQuery.data, (page) => ({
+            getItemKey: (index: number) => page.items[index].path,
+          }))}
+        />
+      </Ariakit.RadioGroup>
     </Ariakit.RadioProvider>
   )
 }
