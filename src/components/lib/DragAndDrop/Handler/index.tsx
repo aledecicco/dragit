@@ -25,7 +25,12 @@ const DragAndDropHandler = (props: DragAndDropHandlerProps) => {
     >
       {children}
 
-      <Dnd.DragOverlay>
+      <Dnd.DragOverlay
+        style={{
+          width: 'fit-content',
+          height: 'fit-content',
+        }}
+      >
         {(dragging: Draggable) => (
           <DragAndDropIndicator
             Glyph={dragging.data.Glyph}

@@ -53,13 +53,52 @@ type DragType = DragPayload['type']
 
 type MatchingPayload<T extends DragType> = Extract<DragPayload, { type: T }>
 
+/**
+ * A collision detector that uses the center of the drag overlay shape instead
+ * of the raw pointer position.
+ *
+ * Using the shape center ensures collision detection aligns with where the
+ * indicator visually appears on screen for both input methods.
+ */
+const shapeCenterCollision: DndTypes.CollisionDetector = ({
+  dragOperation,
+  droppable,
+}) => {
+  const point =
+    dragOperation.shape?.current.center ?? dragOperation.position.current
+
+  if (!point || !droppable.shape) {
+    return null
+  }
+
+  if (droppable.shape.containsPoint(point)) {
+    const center = droppable.shape.center
+    const distance = Math.sqrt(
+      (center.x - point.x) ** 2 + (center.y - point.y) ** 2,
+    )
+
+    return {
+      id: droppable.id,
+      value: distance === 0 ? Number.POSITIVE_INFINITY : 1 / distance,
+      type: DndTypes.CollisionType.PointerIntersection,
+      priority: DndTypes.CollisionPriority.Normal,
+    }
+  }
+
+  return null
+}
+
 const useDraggable = <T extends DragType>(
   args: Dnd.UseDraggableInput<MatchingPayload<T>>,
 ) => Dnd.useDraggable<MatchingPayload<T>>(args)
 
 const useDroppable = <T extends DragType>(
   args: Dnd.UseDroppableInput<MatchingPayload<T>>,
-) => Dnd.useDroppable<MatchingPayload<T>>(args)
+) =>
+  Dnd.useDroppable<MatchingPayload<T>>({
+    collisionDetector: shapeCenterCollision,
+    ...args,
+  })
 
 type Draggable<T extends DragType = DragType> = DndSettings.Draggable<
   MatchingPayload<T>

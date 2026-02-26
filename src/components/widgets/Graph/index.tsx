@@ -1,7 +1,6 @@
 import { type ComponentProps, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { defaultRangeExtractor, type Range } from '@tanstack/react-virtual'
-import { match } from 'ts-pattern'
 
 import { SvgOverlay } from '@/widgets/Graph/SvgOverlay'
 
@@ -120,45 +119,48 @@ const GraphInner = () => {
   const checkout = useCheckout()
 
   return (
-    <Ariakit.CompositeProvider focusLoop="horizontal" focusShift>
-      <Ariakit.Composite
-        render={
-          <ScrollShadowDiv
-            isScrolled={
-              virtualizer.scrollOffset !== null && virtualizer.scrollOffset > 0
-            }
-            hasScrollLeft={
-              virtualizer.scrollOffset !== null &&
-              virtualizer.scrollElement !== null &&
-              virtualizer.scrollOffset <
-                virtualizer.totalSize - virtualizer.scrollElement.clientHeight
-            }
-            className={cn('w-full h-full col-span-3 col-start-1 row-start-3')}
-            size="md"
-          />
-        }
-      >
-        <div
-          ref={scrollContainerRef}
-          className={cn(
-            'overflow-auto scroll-smooth w-full h-full bg-dark-800/80',
-            'will-change-transform',
-          )}
+    <>
+      <Ariakit.CompositeProvider focusLoop="horizontal" focusShift>
+        <Ariakit.Composite
+          render={
+            <ScrollShadowDiv
+              isScrolled={
+                virtualizer.scrollOffset !== null &&
+                virtualizer.scrollOffset > 0
+              }
+              hasScrollLeft={
+                virtualizer.scrollOffset !== null &&
+                virtualizer.scrollElement !== null &&
+                virtualizer.scrollOffset <
+                  virtualizer.totalSize - virtualizer.scrollElement.clientHeight
+              }
+              className={cn('w-full h-full col-span-3 col-start-1 row-start-3')}
+              size="md"
+            />
+          }
         >
-          <SvgOverlay
-            className={cn('w-full')}
-            style={{ height: virtualizer.totalSize }}
+          <div
+            ref={scrollContainerRef}
+            className={cn(
+              'overflow-auto scroll-smooth w-full h-full bg-dark-800/80',
+              'will-change-transform',
+            )}
           >
-            <GraphCurrentBranch items={virtualizer.virtualItems} />
+            <SvgOverlay
+              className={cn('w-full')}
+              style={{ height: virtualizer.totalSize }}
+            >
+              <GraphCurrentBranch items={virtualizer.virtualItems} />
 
-            <GraphBaseBranch items={virtualizer.virtualItems} />
-          </SvgOverlay>
-        </div>
-      </Ariakit.Composite>
+              <GraphBaseBranch items={virtualizer.virtualItems} />
+            </SvgOverlay>
+          </div>
+        </Ariakit.Composite>
+      </Ariakit.CompositeProvider>
 
       <DropArea
         interactiveOutsideDrag={false}
-        className={cn('absolute top-0 bottom-0 left-0 w-half row-start-3')}
+        className={cn('absolute top-0 bottom-0 left-0 w-half')}
         overlayProps={{
           className: 'rounded-r-none rounded-l-sm',
         }}
@@ -180,7 +182,7 @@ const GraphInner = () => {
         extraValidation={(payload) =>
           payload.dragged.name !== currentReference?.refName
         }
-        className={cn('absolute top-0 bottom-0 right-0 w-half row-start-3')}
+        className={cn('absolute top-0 bottom-0 right-0 w-half')}
         overlayProps={{
           className: 'rounded-l-none rounded-r-sm',
         }}
@@ -191,24 +193,14 @@ const GraphInner = () => {
         }}
         handleDrop={(payload) => {
           if (currentReference) {
-            match(payload)
-              .with({ type: 'branch' }, ({ dragged }) => {
-                changeSelectedBase(currentReference, {
-                  type: 'branch',
-                  refName: dragged.name,
-                })
-              })
-              .with({ type: 'tag' }, ({ dragged }) => {
-                changeSelectedBase(currentReference, {
-                  type: 'tag',
-                  refName: dragged.name,
-                })
-              })
-              .exhaustive()
+            changeSelectedBase(currentReference, {
+              type: payload.type,
+              refName: payload.dragged.name,
+            })
           }
         }}
       />
-    </Ariakit.CompositeProvider>
+    </>
   )
 }
 
