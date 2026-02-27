@@ -2,12 +2,18 @@ import type { ComponentProps } from 'react'
 import { IconGitBranch, IconTag } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
+import { useMakeCreateBranchAt } from '@/api/mutations/createBranch'
+import { useMakeTagCommit } from '@/api/mutations/createTag'
 import { useDeleteBranches } from '@/api/mutations/deleteBranches'
 import { useDeleteTags } from '@/api/mutations/deleteTags'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
+import { requestBranchName } from '@/common/CreateBranchDialog'
+import { requestTagParams } from '@/common/CreateTagDialog'
+import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
+import { prepareActionArgs, runAction } from '@/state/actions'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
 import { Tab } from '@/ui/Tabs/Item'
@@ -42,8 +48,38 @@ const BranchesList = (props: BranchesListProps) => {
   const getBranchesListActions = useGetBranchesListActions()
   const getTagsListActions = useGetTagsListActions()
 
+  const makeTagCommit = useMakeTagCommit()
+  const makeCreateBranchAt = useMakeCreateBranchAt()
+
   return (
-    <div {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}>
+    <DropArea
+      {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}
+      acceptedTypes={['commit']}
+      label={
+        selectedTab === 'tags'
+          ? {
+              commit: 'tag this commit',
+            }
+          : {
+              commit: 'track this commit',
+            }
+      }
+      handleDrop={async (payload) => {
+        if (selectedTab === 'tags') {
+          const tagCommit = makeTagCommit(payload.dragged)
+          const args = await prepareActionArgs(tagCommit, () =>
+            requestTagParams(`#${payload.dragged.shortHash}`),
+          )
+          runAction(tagCommit, args)
+        } else {
+          const createBranchAt = makeCreateBranchAt(payload.dragged.id)
+          const args = await prepareActionArgs(createBranchAt, () =>
+            requestBranchName(`#${payload.dragged.shortHash}`),
+          )
+          runAction(createBranchAt, args)
+        }
+      }}
+    >
       <Tabs
         store={store}
         list={
@@ -127,7 +163,7 @@ const BranchesList = (props: BranchesListProps) => {
           </MultiInteraction>
         )}
       </div>
-    </div>
+    </DropArea>
   )
 }
 

@@ -3,7 +3,7 @@ import * as DndSettings from '@dnd-kit/dom'
 import * as Dnd from '@dnd-kit/react'
 
 import { DragAndDropIndicator } from '../Indicator'
-import { type Draggable, SnapToCursor } from '../utils'
+import { RestrictMovement, SnapToCursor } from '../utils'
 
 type DragAndDropHandlerProps = PropsWithChildren
 
@@ -15,7 +15,20 @@ const DragAndDropHandler = (props: DragAndDropHandlerProps) => {
 
   return (
     <Dnd.DragDropProvider
-      modifiers={[SnapToCursor.configure({})]}
+      sensors={[
+        DndSettings.PointerSensor.configure({
+          activationConstraints: [
+            new DndSettings.PointerActivationConstraints.Distance({ value: 5 }),
+          ],
+        }),
+        DndSettings.KeyboardSensor.configure({
+          offset: 20,
+          preventActivation: (event) => {
+            return !event.altKey
+          },
+        }),
+      ]}
+      modifiers={[SnapToCursor, RestrictMovement]}
       plugins={[
         DndSettings.Accessibility,
         DndSettings.Cursor,
@@ -31,7 +44,7 @@ const DragAndDropHandler = (props: DragAndDropHandlerProps) => {
           height: 'fit-content',
         }}
       >
-        {(dragging: Draggable) => (
+        {(dragging) => (
           <DragAndDropIndicator
             Glyph={dragging.data.Glyph}
             label={dragging.data.label}

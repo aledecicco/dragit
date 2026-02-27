@@ -9,7 +9,6 @@ import { cn, propsWithCn } from '@/utils/styles'
 import {
   type DragType,
   type MatchingPayload,
-  useCanDrop,
   useCurrentDrag,
   useDroppable,
   useOnDrop,
@@ -73,14 +72,10 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
     accept: acceptedTypes,
   })
 
-  const canDrop = useCanDrop(acceptedTypes)
-  const currentDrag = useCurrentDrag()
+  const currentDrag = useCurrentDrag(acceptedTypes)
 
   const disabledByValidation =
-    canDrop &&
-    extraValidation &&
-    currentDrag.source &&
-    !extraValidation(currentDrag.source.data as MatchingPayload<T>)
+    currentDrag && extraValidation && !extraValidation(currentDrag.source.data)
 
   useOnDrop(id, acceptedTypes, ({ source }) => {
     if (!disabledByValidation) {
@@ -93,19 +88,19 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
       {...propsWithCn(
         divProps,
         'relative',
-        !interactiveOutsideDrag && !currentDrag.source && 'pointer-events-none',
+        !interactiveOutsideDrag && !currentDrag && 'pointer-events-none',
       )}
       ref={mergeRefs([dropRef, ref])}
     >
       {children}
 
-      {canDrop && currentDrag.source && (
+      {currentDrag && (
         <div
           {...propsWithCn(
             overlayProps,
             'absolute top-0 left-0 w-full h-full overflow-hidden',
             'flex flex-col items-center justify-center gap-2 p-4',
-            'rounded-md border border-dashed border-primary-500 bg-dark-400',
+            'rounded-md border border-dashed border-primary-400 bg-dark-400',
             'text-md text-light-950/50 text-center',
             isDropTarget && 'border-accent-400 bg-dark-300 text-light-950/80',
             disabledByValidation &&

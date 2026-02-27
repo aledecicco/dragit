@@ -37,7 +37,7 @@ const Draggable = <T extends DragType>(props: DraggableProps<T>) => {
       {...propsWithCn(
         roleProps,
         'touch-manipulation',
-        isDragging && 'opacity-80',
+        isDragging && 'border border-neutral-600',
       )}
       ref={mergeRefs([dragRef, ref])}
       render={children}

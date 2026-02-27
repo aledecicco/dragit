@@ -1,4 +1,5 @@
 import * as Ariakit from '@ariakit/react'
+import { IconGitCommit } from '@tabler/icons-react'
 
 import type { CommitInfo } from '@/api/models'
 import { useAmend } from '@/api/mutations/commitIndex'
@@ -10,6 +11,7 @@ import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
+import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractionHandler } from '@/lib/InteractionHandler'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -37,44 +39,64 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
   const interactions = useInteractions(commitInfo, !!isCurrent)
 
   return (
-    <InteractionHandler
-      interactions={interactions}
-      render={
-        <Ariakit.Button
-          {...propsWithCn(
-            buttonProps,
-            'p-2 border border-dark-100 rounded-sm',
-            'cursor-pointer',
-            'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
-            'hover:dithered-bg-dark-500 data-active-item:dithered-bg-dark-500',
+    <Draggable
+      id={`commit-${commitInfo.id}`}
+      dragPayload={{
+        type: 'commit',
+        dragged: commitInfo,
+        label: `#${commitInfo.shortHash}`,
+        Glyph: IconGitCommit,
+      }}
+    >
+      <InteractionHandler
+        interactions={interactions}
+        render={
+          <Ariakit.Button
+            {...propsWithCn(
+              buttonProps,
+              'p-2 border border-dark-100 rounded-sm',
+              'cursor-pointer',
+              'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
+              'hover:dithered-bg-dark-500 data-active-item:dithered-bg-dark-500',
+              'w-full h-full',
+            )}
+            onDoubleClick={(e) => {
+              buttonProps.onDoubleClick?.(e)
+              showSnapshotDetailsDialog(commitInfo)
+            }}
+          />
+        }
+      >
+        <div
+          className={cn(
             'w-full h-full overflow-hidden',
             'flex flex-col gap-y-1 items-stretch',
+            'pointer-events-none',
           )}
-          onClick={(e) => {
-            buttonProps.onClick?.(e)
-            showSnapshotDetailsDialog(commitInfo)
-          }}
-        />
-      }
-    >
-      <p
-        className={cn(
-          'text-start text-sm text-ellipsis text-nowrap overflow-hidden',
-          !commitInfo.message && 'italic text-light-800',
-        )}
-      >
-        {commitInfo.message ?? 'No message.'}
-      </p>
-      <div className={cn('flex flex-row items-center justify-between gap-x-2')}>
-        <Marquee className={cn('text-xs text-light-950')} reverse={false}>
-          {commitInfo.authorName}, {timeAgo}
-        </Marquee>
+        >
+          <p
+            className={cn(
+              'text-start text-sm text-ellipsis text-nowrap overflow-hidden',
+              !commitInfo.message && 'italic text-light-800',
+            )}
+          >
+            {commitInfo.message ?? 'No message.'}
+          </p>
 
-        <p className={cn('text-xs text-light-600 min-w-max')}>
-          #{commitInfo.shortHash}
-        </p>
-      </div>
-    </InteractionHandler>
+          <div
+            className={cn('flex flex-row items-center justify-between gap-x-2')}
+          >
+            <Marquee className={cn('text-xs text-light-950')} reverse={false}>
+              {commitInfo.authorName}, {timeAgo}
+            </Marquee>
+
+            <p className={cn('text-xs text-light-600 min-w-max')}>
+              #{commitInfo.shortHash}
+            </p>
+          </div>
+        </div>
+      </InteractionHandler>
+    </Draggable>
   )
 }
 
@@ -96,11 +118,11 @@ const useInteractions = (commit: CommitInfo, isCurrent: boolean) => {
     group(
       interaction({
         action: createBranch,
-        argsRequester: () => requestBranchName(commit.id),
+        argsRequester: () => requestBranchName(`#${commit.shortHash}`),
       }),
       interaction({
         action: branchOff,
-        argsRequester: () => requestBranchName(commit.id),
+        argsRequester: () => requestBranchName(`#${commit.shortHash}`),
       }),
       interaction({
         action: merge,
@@ -109,7 +131,7 @@ const useInteractions = (commit: CommitInfo, isCurrent: boolean) => {
     group(
       interaction({
         action: tag,
-        argsRequester: () => requestTagParams(commit.shortHash),
+        argsRequester: () => requestTagParams(`#${commit.shortHash}`),
       }),
     ),
   ]

@@ -26,10 +26,6 @@ const applyStashMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useApplyStash = (stash: StashInfo): Action => {
-  return useMakeApplyStash()(stash)
-}
-
 const useMakeApplyStash = (): ((stash: StashInfo) => Action) => {
   const applyStash = useRepositoryMutation(applyStashMutation)
 
@@ -57,9 +53,13 @@ const useMakeApplyStash = (): ((stash: StashInfo) => Action) => {
   })
 }
 
+const useApplyStash = (stash: StashInfo): Action => {
+  return useMakeApplyStash()(stash)
+}
+
 export {
-  useApplyStash,
   useMakeApplyStash,
+  useApplyStash,
   applyStashKey,
   applyStashMutation,
   type ApplyStashArgs,

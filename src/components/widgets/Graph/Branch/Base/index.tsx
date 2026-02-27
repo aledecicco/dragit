@@ -18,17 +18,16 @@ interface GraphBaseBranchProps {
   /**
    * The virtual items representing the commits currently being displayed.
    */
-  items: VirtualItem[]
+  items: (VirtualItem | undefined)[]
 }
 
 /**
  * Loads commits for the base branch from the given virtual items,
  * and displays them as a graph correctly setting their styles, positions, and parents.
- *
- * TODO: The compiler's memoization might cause issues here: https://github.com/TanStack/virtual/issues/736
  */
 const GraphBaseBranch = (props: GraphBaseBranchProps) => {
-  const { items } = props
+  const { items: itemsArg } = props
+  const items = itemsArg.filter((item) => !!item)
 
   const { baseReference } = useSelectedReferences()
 

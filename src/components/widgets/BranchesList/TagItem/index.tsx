@@ -104,11 +104,11 @@ const useInteractions = (tag: TagInfo) => {
       interaction({ action: checkout }),
       interaction({
         action: createBranch,
-        argsRequester: () => requestBranchName(tag.reference),
+        argsRequester: () => requestBranchName(`#${tag.reference}`),
       }),
       interaction({
         action: branchOff,
-        argsRequester: () => requestBranchName(tag.reference),
+        argsRequester: () => requestBranchName(`#${tag.reference}`),
       }),
     ),
     group(interaction({ action: deleteTag })),

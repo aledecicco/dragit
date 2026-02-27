@@ -53,10 +53,12 @@ const useCreateBranch = (): Action<CreateBranchArgs> => {
   }
 }
 
-const useCreateBranchAt = (reference: RefName): Action<BranchName> => {
+const useMakeCreateBranchAt = (): ((
+  reference: RefName,
+) => Action<BranchName>) => {
   const createBranch = useRepositoryMutation(createBranchMutation)
 
-  return {
+  return (reference: RefName): Action<BranchName> => ({
     id: {
       key: 'create_branch_at',
       at: reference,
@@ -74,7 +76,11 @@ const useCreateBranchAt = (reference: RefName): Action<BranchName> => {
         fromReference: reference,
       })
     },
-  }
+  })
+}
+
+const useCreateBranchAt = (reference: RefName): Action<BranchName> => {
+  return useMakeCreateBranchAt()(reference)
 }
 
 const useTrackBranch = (branch: BranchInfo): Action<BranchName> => {
@@ -132,6 +138,7 @@ const useBranchOff = (reference: RefName): Action<BranchName> => {
 
 export {
   useCreateBranch,
+  useMakeCreateBranchAt,
   useCreateBranchAt,
   useTrackBranch,
   useBranchOff,

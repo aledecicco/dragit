@@ -1,21 +1,27 @@
 import * as DndTypes from '@dnd-kit/abstract'
+import * as DndCollision from '@dnd-kit/collision'
 import type * as DndSettings from '@dnd-kit/dom'
 import * as Dnd from '@dnd-kit/react'
 
 import type {
   BranchInfo,
+  CommitInfo,
   NotStagedFile,
   StagedFile,
   StashInfo,
   TagInfo,
 } from '@/api/models'
 import type { Glyph } from '@/ui/Icon'
+import { clamp } from '@/utils/number'
 
 type Coordinates = {
   x: number
   y: number
 }
 
+/**
+ * A modifier that snaps the drag overlay to the cursor position.
+ */
 class SnapToCursor extends DndTypes.Modifier {
   public apply(operation: DndTypes.DragOperation): Coordinates {
     if (
@@ -48,44 +54,73 @@ type DragPayload =
   | DragDef<'branch', BranchInfo>
   | DragDef<'tag', TagInfo>
   | DragDef<'stash', StashInfo>
+  | DragDef<'commit', CommitInfo>
 
 type DragType = DragPayload['type']
 
 type MatchingPayload<T extends DragType> = Extract<DragPayload, { type: T }>
 
+const collisionDetector = DndCollision.shapeIntersection
+
 /**
- * A collision detector that uses the center of the drag overlay shape instead
- * of the raw pointer position.
- *
- * Using the shape center ensures collision detection aligns with where the
- * indicator visually appears on screen for both input methods.
+ * A modifier that restricts the drag overlay to within the window.
  */
-const shapeCenterCollision: DndTypes.CollisionDetector = ({
-  dragOperation,
-  droppable,
-}) => {
-  const point =
-    dragOperation.shape?.current.center ?? dragOperation.position.current
+class RestrictMovement extends DndTypes.Modifier {
+  private lastInput: Coordinates | null = null
+  private lastOutput: Coordinates | null = null
 
-  if (!point || !droppable.shape) {
-    return null
-  }
-
-  if (droppable.shape.containsPoint(point)) {
-    const center = droppable.shape.center
-    const distance = Math.sqrt(
-      (center.x - point.x) ** 2 + (center.y - point.y) ** 2,
-    )
-
-    return {
-      id: droppable.id,
-      value: distance === 0 ? Number.POSITIVE_INFINITY : 1 / distance,
-      type: DndTypes.CollisionType.PointerIntersection,
-      priority: DndTypes.CollisionPriority.Normal,
+  apply(operation: DndTypes.DragOperation): Coordinates {
+    if (!operation.shape) {
+      this.lastInput = null
+      this.lastOutput = null
+      return operation.transform
     }
-  }
 
-  return null
+    const { initial, current } = operation.shape
+
+    const width = current.boundingRectangle.width
+    const height = current.boundingRectangle.height
+
+    const { left, top } = initial.boundingRectangle
+
+    // Account for the SnapToCursor offset so bounds are relative to
+    // where the overlay actually appears, not the source element.
+    const offsetX =
+      operation.activatorEvent instanceof MouseEvent
+        ? operation.activatorEvent.offsetX
+        : 0
+    const offsetY =
+      operation.activatorEvent instanceof MouseEvent
+        ? operation.activatorEvent.offsetY
+        : 0
+
+    const minX = -left + offsetX
+    const maxX = window.innerWidth - left - width + offsetX
+    const minY = -top + offsetY
+    const maxY = window.innerHeight - top - height + offsetY
+
+    // For keyboard, build on the previous clamped output so excess movement
+    // doesn't accumulate. For pointer, build on the previous raw input
+    // so the indicator stays anchored to the cursor.
+    const base =
+      operation.activatorEvent instanceof KeyboardEvent
+        ? this.lastOutput
+        : this.lastInput
+
+    const deltaX = operation.transform.x - (this.lastInput?.x ?? 0)
+    const deltaY = operation.transform.y - (this.lastInput?.y ?? 0)
+
+    const outputX = (base?.x ?? operation.transform.x) + (base ? deltaX : 0)
+    const outputY = (base?.y ?? operation.transform.y) + (base ? deltaY : 0)
+
+    const clampedX = clamp(outputX, minX, maxX)
+    const clampedY = clamp(outputY, minY, maxY)
+
+    this.lastInput = { x: operation.transform.x, y: operation.transform.y }
+    this.lastOutput = { x: clampedX, y: clampedY }
+
+    return { x: clampedX, y: clampedY }
+  }
 }
 
 const useDraggable = <T extends DragType>(
@@ -96,7 +131,7 @@ const useDroppable = <T extends DragType>(
   args: Dnd.UseDroppableInput<MatchingPayload<T>>,
 ) =>
   Dnd.useDroppable<MatchingPayload<T>>({
-    collisionDetector: shapeCenterCollision,
+    collisionDetector,
     ...args,
   })
 
@@ -170,24 +205,20 @@ const useOnDrop = <T extends DragType>(
 /**
  * Hook that tracks the current drag operation if any.
  */
-const useCurrentDrag = () => {
-  const { source, target } = Dnd.useDragOperation<DragPayload>()
+const useCurrentDrag = <T extends DragType>(types: T[]) => {
+  const operation = Dnd.useDragOperation<DragPayload>()
 
-  return {
-    source: source as Draggable | undefined | null,
-    target: target as Droppable | undefined | null,
+  const source = operation.source as Draggable | null
+  const target = operation.target as Droppable | null
+
+  if (source && types.includes(source.data.type as T)) {
+    return {
+      source: source as Draggable<T>,
+      target: target as Droppable<T>,
+    }
   }
-}
 
-/**
- * Hook that tracks whether the current drag operation can be dropped on a drop area that accepts the given types.
- *
- * @param types - The types of draggable items that the drop area can accept.
- */
-const useCanDrop = <T extends DragType>(types: T[]): boolean => {
-  const { source } = useCurrentDrag()
-
-  return !!source && types.includes(source.data.type as T)
+  return undefined
 }
 
 export {
@@ -196,8 +227,8 @@ export {
   useBeforeDrag,
   useOnDrop,
   useCurrentDrag,
-  useCanDrop,
   SnapToCursor,
+  RestrictMovement,
   type DragPayload,
   type DragType,
   type MatchingPayload,

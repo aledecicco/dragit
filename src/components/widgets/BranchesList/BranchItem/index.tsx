@@ -2,7 +2,7 @@ import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@/api/models'
-import { useCheckoutBranch } from '@/api/mutations/checkout'
+import { useCheckout, useCheckoutBranch } from '@/api/mutations/checkout'
 import {
   useBranchOff,
   useCreateBranchAt,
@@ -23,6 +23,7 @@ import {
   MultiSelectItem,
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
+import { runAction } from '@/state/actions'
 import { useSelectedBranches } from '@/state/branches'
 import { useSelectedUpstream } from '@/state/upstream'
 import { Icon } from '@/ui/Icon'
@@ -50,6 +51,8 @@ const BranchesListItem = (props: BranchesListItemProps) => {
 
   const interactions = useInteractions(branch)
 
+  const checkout = useCheckoutBranch(branch)
+
   return (
     <Draggable
       id={`branch-${branch.name}`}
@@ -63,14 +66,21 @@ const BranchesListItem = (props: BranchesListItemProps) => {
       <InteractionHandler
         interactions={interactions}
         render={
-          <MultiSelectItem aria-current={isCurrentBranch} {...itemProps} />
+          <MultiSelectItem
+            aria-current={isCurrentBranch}
+            {...itemProps}
+            onDoubleClick={(e) => {
+              itemProps.onDoubleClick?.(e)
+              if (!isCurrentBranch) {
+                runAction(checkout)
+              }
+            }}
+          />
         }
       >
         <div className={cn('w-full text-start pointer-events-none')}>
           <div
-            className={cn(
-              'flex flex-row gap-x-1 items-center text-light-600 pointer-events-none',
-            )}
+            className={cn('flex flex-row gap-x-1 items-center text-light-600')}
           >
             <Icon Glyph={IconGitBranch} size="md" />
 

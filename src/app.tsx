@@ -77,12 +77,10 @@ const InRepository = () => {
           handleDrop={(payload) => {
             runAction(makeApplyStash(payload.dragged))
           }}
-          className={cn(
-            'grid grid-rows-[auto_auto] gap-4 mb-2 overflow-hidden',
-          )}
+          className={cn('grid grid-rows-2 gap-4 mb-2 overflow-hidden')}
         >
-          <NotStagedWorktreeChanges className={cn('h-full min-h-50')} />
-          <StagedWorktreeChanges className={cn('h-full min-h-50')} />
+          <NotStagedWorktreeChanges className={cn('h-full')} />
+          <StagedWorktreeChanges className={cn('h-full')} />
         </DropArea>
 
         <MainToolbar />

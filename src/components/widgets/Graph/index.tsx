@@ -166,8 +166,8 @@ const GraphInner = () => {
         }}
         acceptedTypes={['branch', 'tag']}
         label={{
-          branch: 'checkout branch',
-          tag: 'checkout tag',
+          branch: 'checkout this branch',
+          tag: 'checkout this tag',
         }}
         handleDrop={(payload) => {
           runAction(checkout, {
@@ -188,8 +188,8 @@ const GraphInner = () => {
         }}
         acceptedTypes={['branch', 'tag']}
         label={{
-          branch: 'use branch as base',
-          tag: 'use tag as base',
+          branch: 'use this branch as base',
+          tag: 'use this tag as base',
         }}
         handleDrop={(payload) => {
           if (currentReference) {

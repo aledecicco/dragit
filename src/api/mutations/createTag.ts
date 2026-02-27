@@ -28,9 +28,9 @@ const createTagMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useTagBranch = (
-  branch: BranchInfo,
-): Action<Omit<CreateTagArgs, 'reference'>> => {
+type TagAction = Action<Omit<CreateTagArgs, 'reference'>>
+
+const useTagBranch = (branch: BranchInfo): TagAction => {
   const createTag = useRepositoryMutation(createTagMutation)
 
   return {
@@ -53,12 +53,10 @@ const useTagBranch = (
   }
 }
 
-const useTagCommit = (
-  commit: CommitInfo,
-): Action<Omit<CreateTagArgs, 'reference'>> => {
+const useMakeTagCommit = (): ((commit: CommitInfo) => TagAction) => {
   const createTag = useRepositoryMutation(createTagMutation)
 
-  return {
+  return (commit: CommitInfo): TagAction => ({
     id: { key: 'tag_operation', operation: 'create_tag', commit: commit.id },
     blockedBy: [{ key: 'tag_operation', commit: commit.id }],
     run: async (args) => {
@@ -75,11 +73,16 @@ const useTagCommit = (
       error: 'Failed',
     },
     Glyph: IconTag,
-  }
+  })
+}
+
+const useTagCommit = (commit: CommitInfo): TagAction => {
+  return useMakeTagCommit()(commit)
 }
 
 export {
   useTagBranch,
+  useMakeTagCommit,
   useTagCommit,
   createTagKey,
   createTagMutation,
