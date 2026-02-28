@@ -53,7 +53,7 @@ const Dialog = (props: DialogProps) => {
     <Ariakit.Dialog
       open
       portal={false}
-      backdrop={<div className={cn('bg-black/50', 'backdrop-blur-md')} />}
+      backdrop={<div className={cn('bg-black/50')} />}
       {...propsWithCn(
         dialogProps,
         'fixed top-half left-half -translate-half',

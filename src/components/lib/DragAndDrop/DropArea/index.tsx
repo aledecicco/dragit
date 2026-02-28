@@ -75,7 +75,7 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
   const currentDrag = useCurrentDrag(acceptedTypes)
 
   const disabledByValidation =
-    currentDrag && extraValidation && !extraValidation(currentDrag.source.data)
+    currentDrag && extraValidation && !extraValidation(currentDrag.data)
 
   useOnDrop(id, acceptedTypes, ({ source }) => {
     if (!disabledByValidation) {
@@ -98,6 +98,7 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
         <div
           {...propsWithCn(
             overlayProps,
+            'z-2',
             'absolute top-0 left-0 w-full h-full overflow-hidden',
             'flex flex-col items-center justify-center gap-2 p-4',
             'rounded-md border border-dashed border-primary-400 bg-dark-400',
@@ -113,7 +114,7 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
             className={cn('size-7')}
           />
           {disabledByValidation ? "Can't" : 'Drop here to'}{' '}
-          {label[currentDrag.source.type as T]}
+          {label[currentDrag.type]}
         </div>
       )}
     </div>

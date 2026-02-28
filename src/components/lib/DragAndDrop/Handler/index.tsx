@@ -2,6 +2,7 @@ import type { PropsWithChildren } from 'react'
 import * as DndSettings from '@dnd-kit/dom'
 import * as Dnd from '@dnd-kit/react'
 
+import { DragAndDropBackdrop } from '../Backdrop'
 import { DragAndDropIndicator } from '../Indicator'
 import { RestrictMovement, SnapToCursor } from '../utils'
 
@@ -37,6 +38,8 @@ const DragAndDropHandler = (props: DragAndDropHandlerProps) => {
       ]}
     >
       {children}
+
+      <DragAndDropBackdrop />
 
       <Dnd.DragOverlay
         style={{

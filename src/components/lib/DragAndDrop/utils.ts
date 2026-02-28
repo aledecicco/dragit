@@ -83,43 +83,48 @@ class RestrictMovement extends DndTypes.Modifier {
 
     const { left, top } = initial.boundingRectangle
 
-    // Account for the SnapToCursor offset so bounds are relative to
-    // where the overlay actually appears, not the source element.
-    const offsetX =
-      operation.activatorEvent instanceof MouseEvent
-        ? operation.activatorEvent.offsetX
-        : 0
-    const offsetY =
-      operation.activatorEvent instanceof MouseEvent
-        ? operation.activatorEvent.offsetY
-        : 0
+    if (operation.activatorEvent instanceof MouseEvent) {
+      const offsetX = operation.activatorEvent.offsetX
+      const offsetY = operation.activatorEvent.offsetY
 
-    const minX = -left + offsetX
-    const maxX = window.innerWidth - left - width + offsetX
-    const minY = -top + offsetY
-    const maxY = window.innerHeight - top - height + offsetY
+      const minX = -left + offsetX
+      const maxX = window.innerWidth - left - width + offsetX
+      const minY = -top + offsetY
+      const maxY = window.innerHeight - top - height + offsetY
 
-    // For keyboard, build on the previous clamped output so excess movement
-    // doesn't accumulate. For pointer, build on the previous raw input
-    // so the indicator stays anchored to the cursor.
-    const base =
-      operation.activatorEvent instanceof KeyboardEvent
-        ? this.lastOutput
-        : this.lastInput
+      return {
+        x: clamp(operation.transform.x, minX, maxX),
+        y: clamp(operation.transform.y, minY, maxY),
+      }
+    }
 
-    const deltaX = operation.transform.x - (this.lastInput?.x ?? 0)
-    const deltaY = operation.transform.y - (this.lastInput?.y ?? 0)
+    if (operation.activatorEvent instanceof KeyboardEvent) {
+      const minX = -left
+      const maxX = window.innerWidth - left - width
+      const minY = -top
+      const maxY = window.innerHeight - top - height
 
-    const outputX = (base?.x ?? operation.transform.x) + (base ? deltaX : 0)
-    const outputY = (base?.y ?? operation.transform.y) + (base ? deltaY : 0)
+      // Build on the previous clamped output so excess movement doesn't accumulate.
+      const deltaX = operation.transform.x - (this.lastInput?.x ?? 0)
+      const deltaY = operation.transform.y - (this.lastInput?.y ?? 0)
 
-    const clampedX = clamp(outputX, minX, maxX)
-    const clampedY = clamp(outputY, minY, maxY)
+      const outputX = this.lastOutput
+        ? this.lastOutput.x + deltaX
+        : operation.transform.x
+      const outputY = this.lastOutput
+        ? this.lastOutput.y + deltaY
+        : operation.transform.y
 
-    this.lastInput = { x: operation.transform.x, y: operation.transform.y }
-    this.lastOutput = { x: clampedX, y: clampedY }
+      const clampedX = clamp(outputX, minX, maxX)
+      const clampedY = clamp(outputY, minY, maxY)
 
-    return { x: clampedX, y: clampedY }
+      this.lastInput = { x: operation.transform.x, y: operation.transform.y }
+      this.lastOutput = { x: clampedX, y: clampedY }
+
+      return { x: clampedX, y: clampedY }
+    }
+
+    return operation.transform
   }
 }
 
@@ -137,7 +142,7 @@ const useDroppable = <T extends DragType>(
 
 type Draggable<T extends DragType = DragType> = DndSettings.Draggable<
   MatchingPayload<T>
-> & { data: MatchingPayload<T> }
+> & { data: MatchingPayload<T>; type: T }
 
 type Droppable<T extends DragType = DragType> = DndSettings.Droppable<
   MatchingPayload<T>
@@ -205,17 +210,21 @@ const useOnDrop = <T extends DragType>(
 /**
  * Hook that tracks the current drag operation if any.
  */
-const useCurrentDrag = <T extends DragType>(types: T[]) => {
+function useCurrentDrag(): Draggable | undefined
+function useCurrentDrag<T extends DragType>(
+  types: T[],
+): Draggable<T> | undefined
+function useCurrentDrag<T extends DragType>(types?: T[]) {
   const operation = Dnd.useDragOperation<DragPayload>()
 
   const source = operation.source as Draggable | null
-  const target = operation.target as Droppable | null
 
-  if (source && types.includes(source.data.type as T)) {
-    return {
-      source: source as Draggable<T>,
-      target: target as Droppable<T>,
-    }
+  if (source && types && (types as string[]).includes(source.data.type)) {
+    return source as Draggable<T>
+  }
+
+  if (source && !types) {
+    return source
   }
 
   return undefined
