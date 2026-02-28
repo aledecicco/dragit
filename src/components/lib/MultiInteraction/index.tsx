@@ -64,33 +64,34 @@ type MultiInteractionInnerProps<T> = Pick<
 const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
   const { getActions, items, getDragPayload, children, ...contentProps } = props
 
-  const selectedItemIndexes = useSelectedItems()
+  const composite = Ariakit.useCompositeContext()
   const { setSelection } = useSelectionUpdater()
+  const selectedItemIndexes = useSelectedItems()
+  const selectedItems = items.filter((_, index) =>
+    selectedItemIndexes.has(index),
+  )
+
+  const menuId = useUniqueId()
+  const actions = getActions(selectedItems)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset selection when items change
   useEffect(() => {
     setSelection([])
   }, [items])
 
-  const menuId = useUniqueId()
-
-  const selectedItems = items.filter((_, index) =>
-    selectedItemIndexes.has(index),
-  )
-  const actions = getActions(selectedItems)
-
-  const composite = Ariakit.useCompositeContext()
-
   useBeforeDrag(({ element, source, manager }) => {
     const compositeItem = composite
       ?.getState()
       .renderedItems.find((item) => item.element?.contains(element))
 
+    // If drag was within this component.
     if (compositeItem) {
       const itemId = Number(compositeItem.id)
       const draggedItem = items.at(itemId)
 
       if (draggedItem) {
+        // If more than one item is selected upon dragging, and the dragged item is among the selected ones,
+        // set the drag payload to include all selected items.
         if (selectedItemIndexes.size > 1 && selectedItemIndexes.has(itemId)) {
           const originalData = source.data
           const originalType = source.type

@@ -6,6 +6,7 @@ import {
   ValueRequesterDialog,
   type ValueRequesterDialogProps,
 } from '@/lib/ValueRequester/Dialog'
+import { DialogContent } from '@/ui/Dialog/Content'
 import { TextField } from '@/ui/Form/TextField'
 import { cn } from '@/utils/styles'
 
@@ -28,16 +29,18 @@ const CommitDialog = (props: CommitDialogProps) => {
   const isAmend = dialogProps.formOptions?.defaultValues.isAmend ?? false
 
   return (
-    <ValueRequesterDialog heading="Commit Changes" {...dialogProps}>
-      <TextField label="commit message" name="message" autoFocus required />
+    <ValueRequesterDialog {...dialogProps}>
+      <DialogContent heading="Commit Changes">
+        <TextField label="commit message" name="message" autoFocus required />
 
-      <DecoratedButton
-        type="submit"
-        label={isAmend ? 'Amend Commit' : 'Commit'}
-        Glyph={isAmend ? IconMessageCog : IconMessageCheck}
-        className={cn('w-full')}
-        status="primary"
-      />
+        <DecoratedButton
+          type="submit"
+          label={isAmend ? 'Amend Commit' : 'Commit'}
+          Glyph={isAmend ? IconMessageCog : IconMessageCheck}
+          className={cn('w-full')}
+          status="primary"
+        />
+      </DialogContent>
     </ValueRequesterDialog>
   )
 }

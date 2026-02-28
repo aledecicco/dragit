@@ -79,14 +79,12 @@ const CommandMenu = (props: CommandMenuProps) => {
 
   return (
     <ValueRequesterDialog
-      {...propsWithCn(dialogProps, 'rounded-md')}
+      {...propsWithCn(dialogProps, 'rounded-md bg-dark-300')}
       formOptions={{
         defaultValues: { value: '' },
         className: cn('gap-0'),
       }}
       showClose={false}
-      heading={undefined}
-      contentProps={propsWithCn(dialogProps.contentProps, 'p-0 bg-dark-300')}
     >
       <Ariakit.ComboboxProvider
         open

@@ -1,4 +1,3 @@
-import type { ComponentProps, ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { IconX } from '@tabler/icons-react'
 
@@ -13,41 +12,16 @@ interface DialogProps extends Ariakit.DialogProps {
   dialogKey: DialogKey
 
   /**
-   * An optional title to be used as heading.
-   */
-  heading?: string
-
-  /**
    * Whether to display a close button.
    */
   showClose?: boolean
-
-  /**
-   * Additional props for the div that wraps the content.
-   */
-  contentProps?: ComponentProps<'div'>
-
-  /**
-   * Optional content to be displayed to one side of the dialog.
-   */
-  sideContent?: Ariakit.RoleProps['render']
 }
 
 /**
  * A dialog component that can be used to display content in an overlay.
- *
- * It supports a heading, close button, and side content.
  */
 const Dialog = (props: DialogProps) => {
-  const {
-    dialogKey,
-    heading,
-    showClose = true,
-    contentProps,
-    sideContent,
-    children,
-    ...dialogProps
-  } = props
+  const { dialogKey, showClose = true, children, ...dialogProps } = props
 
   return (
     <Ariakit.Dialog
@@ -58,44 +32,15 @@ const Dialog = (props: DialogProps) => {
         dialogProps,
         'fixed top-half left-half -translate-half',
         'max-w-[70%] max-h-[70%] rounded-lg overflow-hidden',
-        'border-2 border-dark-900',
-        'grid grid-rows-1',
-        sideContent
-          ? 'w-full h-full grid-cols-[430px_1fr]'
-          : 'grid-cols-[530px]',
+        'border-2 border-dark-900 bg-dark-900',
+        'grid grid-rows-1 grid-cols-[530px]',
       )}
       onClose={(e) => {
         dialogProps.onClose?.(e)
         hideDialog(dialogKey)
       }}
     >
-      {(!!children || !!heading) && (
-        <div
-          {...propsWithCn(
-            contentProps,
-            'py-8 px-6 bg-dark-600',
-            'overflow-hidden',
-            heading && 'pb-6',
-          )}
-        >
-          {heading && (
-            <Ariakit.DialogHeading
-              className={cn('text-xl font-semibold text-center -mt-2 mb-6')}
-            >
-              {heading}
-            </Ariakit.DialogHeading>
-          )}
-
-          {children}
-        </div>
-      )}
-
-      {!!sideContent && (
-        <Ariakit.Role
-          className={cn('w-full h-full bg-dark-900')}
-          render={sideContent}
-        />
-      )}
+      {children}
 
       {showClose && (
         <DecoratedButton

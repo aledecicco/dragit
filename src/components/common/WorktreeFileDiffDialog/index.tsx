@@ -37,59 +37,51 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
   return (
     <Dialog
       dialogKey={WORKTREE_FILE_DIFF_DIALOG_KEY}
-      heading={undefined}
       {...propsWithCn(
         dialogProps,
-        'max-w-[80%] max-h-[85%] grid-cols-1 grid-rows-1',
+        'max-w-[80%] max-h-[85%] w-full h-full grid-cols-1',
+        isSideBySide && 'grid-cols-2',
       )}
-      sideContent={
-        <div
-          className={cn(
-            'w-full h-full relative',
-            isSideBySide && 'grid grid-cols-2',
-          )}
-        >
-          {openFile.status === 'unmerged' && !isSideBySide ? (
-            <FileConflictViewer file={openFile} />
-          ) : (
-            <FileDiffViewer
-              filter={
-                openFile.status === 'unmerged' ? 'both' : filterSelector.value
-              }
-              diffScope={
-                openFile.status === 'unmerged'
-                  ? {
-                      type: 'unmerged',
-                      stage: 'ours',
-                      file: openFile,
-                    }
-                  : { type: 'worktree', file: openFile }
-              }
-            />
-          )}
+    >
+      {openFile.status === 'unmerged' && !isSideBySide ? (
+        <FileConflictViewer file={openFile} />
+      ) : (
+        <FileDiffViewer
+          filter={
+            openFile.status === 'unmerged' ? 'both' : filterSelector.value
+          }
+          diffScope={
+            openFile.status === 'unmerged'
+              ? {
+                  type: 'unmerged',
+                  stage: 'ours',
+                  file: openFile,
+                }
+              : { type: 'worktree', file: openFile }
+          }
+        />
+      )}
 
-          {isSideBySide && (
-            <FileDiffViewer
-              filter="both"
-              className={cn('border-l border-dark-700')}
-              diffScope={{ type: 'unmerged', stage: 'theirs', file: openFile }}
-            />
-          )}
+      {isSideBySide && (
+        <FileDiffViewer
+          filter="both"
+          className={cn('border-l border-dark-700')}
+          diffScope={{ type: 'unmerged', stage: 'theirs', file: openFile }}
+        />
+      )}
 
-          {openFile.status === 'unmerged' ? (
-            <UnmergedViewSelector
-              className={cn('absolute bottom-0 left-half -translate-x-half')}
-              store={viewModeSelector.store}
-            />
-          ) : (
-            <DiffFilterSelector
-              className={cn('absolute bottom-0 left-half -translate-x-half')}
-              store={filterSelector.store}
-            />
-          )}
-        </div>
-      }
-    />
+      {openFile.status === 'unmerged' ? (
+        <UnmergedViewSelector
+          className={cn('absolute bottom-0 left-half -translate-x-half')}
+          store={viewModeSelector.store}
+        />
+      ) : (
+        <DiffFilterSelector
+          className={cn('absolute bottom-0 left-half -translate-x-half')}
+          store={filterSelector.store}
+        />
+      )}
+    </Dialog>
   )
 }
 

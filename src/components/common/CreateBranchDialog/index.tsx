@@ -8,6 +8,7 @@ import {
   ValueRequesterDialog,
   type ValueRequesterDialogProps,
 } from '@/lib/ValueRequester/Dialog'
+import { DialogContent } from '@/ui/Dialog/Content'
 import { InputField } from '@/ui/Form/InputField'
 import { cn } from '@/utils/styles'
 
@@ -33,7 +34,6 @@ const CreateBranchDialog = (props: CreateBranchDialogProps) => {
 
   return (
     <ValueRequesterDialog
-      heading={`Branch from ${fromReference}`}
       {...dialogProps}
       formOptions={{
         ...dialogProps.formOptions,
@@ -49,15 +49,17 @@ const CreateBranchDialog = (props: CreateBranchDialogProps) => {
         },
       }}
     >
-      <InputField label="branch name" name="name" autoFocus required />
+      <DialogContent heading={`Branch from ${fromReference}`}>
+        <InputField label="branch name" name="name" autoFocus required />
 
-      <DecoratedButton
-        type="submit"
-        label="Create branch"
-        Glyph={IconPlus}
-        className={cn('w-full')}
-        status="primary"
-      />
+        <DecoratedButton
+          type="submit"
+          label="Create branch"
+          Glyph={IconPlus}
+          className={cn('w-full')}
+          status="primary"
+        />
+      </DialogContent>
     </ValueRequesterDialog>
   )
 }

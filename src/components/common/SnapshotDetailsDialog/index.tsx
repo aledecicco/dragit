@@ -12,6 +12,7 @@ import { Pagination } from '@/lib/Pagination'
 import { showDialog } from '@/state/dialogs'
 import { Chip } from '@/ui/Chip'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
+import { DialogContent } from '@/ui/Dialog/Content'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { FileDiffViewer } from '../FileViewer/Diff'
@@ -59,85 +60,88 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
   return (
     <Dialog
       dialogKey={SNAPSHOT_DETAILS_DIALOG_KEY(snapshotInfo.id)}
-      heading={snapshotName}
-      sideContent={
-        fileSelector.selectedFile && (
-          <div className={cn('w-full h-full relative')}>
-            <FileDiffViewer
-              diffScope={{
-                type: 'snapshot',
-                snapshotId: snapshotInfo.id,
-                file: fileSelector.selectedFile,
-              }}
-              filter={filterSelector.value}
-            />
-
-            {fileSelector.selectedFile && (
-              <DiffFilterSelector
-                className={cn('absolute bottom-0 left-half -translate-x-half')}
-                store={filterSelector.store}
-              />
-            )}
-          </div>
-        )
-      }
-      {...propsWithCn(dialogProps, 'max-w-[90%] max-h-[85%]')}
-      contentProps={propsWithCn(
-        dialogProps.contentProps,
-        'grid grid-rows-[max-content_max-content_1fr]',
+      {...propsWithCn(
+        dialogProps,
+        'max-w-[90%] max-h-[85%]',
+        fileSelector.selectedFile && 'w-full h-full grid-cols-[430px_1fr]',
       )}
     >
-      <ChangesSummary
-        diff={snapshotInfo.changes}
-        compact={false}
-        className={cn('text-sm justify-self-center -mt-6 mb-6')}
-      />
-
-      <div
-        className={cn(
-          'grid grid-rows-[max-content_1fr] gap-y-4 overflow-y-hidden',
-        )}
+      <DialogContent
+        heading={snapshotName}
+        className={cn('grid grid-rows-[max-content_max-content_1fr]')}
       >
-        <SnapshotDialogDescription snapshotInfo={snapshotInfo} />
+        <ChangesSummary
+          diff={snapshotInfo.changes}
+          compact={false}
+          className={cn('text-sm justify-self-center -mt-6 mb-6')}
+        />
 
         <div
           className={cn(
-            'flex flex-col gap-y-1 overflow-hidden',
-            'h-full min-h-50',
+            'grid grid-rows-[max-content_1fr] gap-y-4 overflow-y-hidden',
           )}
         >
+          <SnapshotDialogDescription snapshotInfo={snapshotInfo} />
+
           <div
             className={cn(
-              'text-sm text-light-600 text-start',
-              'py-2 flex flex-row gap-x-2 items-center',
+              'flex flex-col gap-y-1 overflow-hidden',
+              'h-full min-h-50',
             )}
           >
-            <p>Files</p>
+            <div
+              className={cn(
+                'text-sm text-light-600 text-start',
+                'py-2 flex flex-row gap-x-2 items-center',
+              )}
+            >
+              <p>Files</p>
 
-            {showPagination ? (
-              <Pagination
-                page={page}
-                pageSize={SNAPSHOT_FILES_PAGE_SIZE}
-                hasNext={!!filesQuery.data?.hasNext}
-                setPrevPage={() => {
-                  setPage((_page) => _page - 1)
-                }}
-                setNextPage={() => {
-                  setPage((_page) => _page + 1)
-                }}
-              />
-            ) : (
-              <Chip size="sm">{filesQuery.data?.items.length ?? '...'}</Chip>
-            )}
+              {showPagination ? (
+                <Pagination
+                  page={page}
+                  pageSize={SNAPSHOT_FILES_PAGE_SIZE}
+                  hasNext={!!filesQuery.data?.hasNext}
+                  setPrevPage={() => {
+                    setPage((_page) => _page - 1)
+                  }}
+                  setNextPage={() => {
+                    setPage((_page) => _page + 1)
+                  }}
+                />
+              ) : (
+                <Chip size="sm">{filesQuery.data?.items.length ?? '...'}</Chip>
+              )}
+            </div>
+
+            <SnapshotDialogFileList
+              filesQuery={filesQuery}
+              store={fileSelector.store}
+              className={cn('h-full overflow-hidden')}
+            />
           </div>
-
-          <SnapshotDialogFileList
-            filesQuery={filesQuery}
-            store={fileSelector.store}
-            className={cn('h-full overflow-hidden')}
-          />
         </div>
-      </div>
+      </DialogContent>
+
+      {fileSelector.selectedFile && (
+        <div className={cn('w-full h-full relative')}>
+          <FileDiffViewer
+            diffScope={{
+              type: 'snapshot',
+              snapshotId: snapshotInfo.id,
+              file: fileSelector.selectedFile,
+            }}
+            filter={filterSelector.value}
+          />
+
+          {fileSelector.selectedFile && (
+            <DiffFilterSelector
+              className={cn('absolute bottom-0 left-half -translate-x-half')}
+              store={filterSelector.store}
+            />
+          )}
+        </div>
+      )}
     </Dialog>
   )
 }

@@ -5,6 +5,7 @@ import { QueryList } from '@/lib/QueryList'
 import { showDialog } from '@/state/dialogs'
 import { Button } from '@/ui/Button'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
+import { DialogContent } from '@/ui/Dialog/Content'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
@@ -27,46 +28,47 @@ const RemotesDialog = (props: RemotesDialogProps) => {
   return (
     <Dialog
       dialogKey={REMOTES_DIALOG_KEY}
-      heading="Remotes"
       {...propsWithCn(dialogProps, 'grid-cols-[560px]')}
     >
-      <div
-        className={cn(
-          'grid max-h-60 overflow-y-hidden mb-4',
-          'bg-dark-700 border border-dark-300 rounded-lg',
-        )}
-      >
-        <QueryList
-          name="remotes"
-          query={remotesQuery}
-          renderItem={(remote) => <RemotesDialogItem remote={remote} />}
-          itemSize={34}
-          size="md"
-          options={mapFn(remotesQuery.data, (remotes) => ({
-            getItemKey: (index: number) => remotes[index].name,
-          }))}
-        />
-      </div>
-
-      {adding ? (
-        <RemoteForm
-          className={cn('-mb-1 mx-px')}
-          defaultValues={{ name: '', url: '' }}
-          onCancel={() => {
-            setAdding(false)
-          }}
-        />
-      ) : (
-        <Button
-          status="primary"
-          className={cn('w-full')}
-          onClick={() => {
-            setAdding(true)
-          }}
+      <DialogContent heading="Remotes">
+        <div
+          className={cn(
+            'grid max-h-60 overflow-y-hidden mb-4',
+            'bg-dark-700 border border-dark-300 rounded-lg',
+          )}
         >
-          Create
-        </Button>
-      )}
+          <QueryList
+            name="remotes"
+            query={remotesQuery}
+            renderItem={(remote) => <RemotesDialogItem remote={remote} />}
+            itemSize={34}
+            size="md"
+            options={mapFn(remotesQuery.data, (remotes) => ({
+              getItemKey: (index: number) => remotes[index].name,
+            }))}
+          />
+        </div>
+
+        {adding ? (
+          <RemoteForm
+            className={cn('-mb-1 mx-px')}
+            defaultValues={{ name: '', url: '' }}
+            onCancel={() => {
+              setAdding(false)
+            }}
+          />
+        ) : (
+          <Button
+            status="primary"
+            className={cn('w-full')}
+            onClick={() => {
+              setAdding(true)
+            }}
+          >
+            Create
+          </Button>
+        )}
+      </DialogContent>
     </Dialog>
   )
 }

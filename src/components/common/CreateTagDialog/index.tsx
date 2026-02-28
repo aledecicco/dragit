@@ -8,6 +8,7 @@ import {
   ValueRequesterDialog,
   type ValueRequesterDialogProps,
 } from '@/lib/ValueRequester/Dialog'
+import { DialogContent } from '@/ui/Dialog/Content'
 import { InputField } from '@/ui/Form/InputField'
 import { TextField } from '@/ui/Form/TextField'
 import { cn } from '@/utils/styles'
@@ -35,7 +36,6 @@ const CreateTagDialog = (props: CreateTagDialogProps) => {
 
   return (
     <ValueRequesterDialog
-      heading={`Tag ${reference}`}
       {...dialogProps}
       formOptions={{
         ...dialogProps.formOptions,
@@ -55,17 +55,19 @@ const CreateTagDialog = (props: CreateTagDialogProps) => {
         },
       }}
     >
-      <InputField label="tag name" name="name" autoFocus required />
+      <DialogContent heading={`Tag ${reference}`}>
+        <InputField label="tag name" name="name" autoFocus required />
 
-      <TextField label="tag description" name="message" />
+        <TextField label="tag description" name="message" />
 
-      <DecoratedButton
-        type="submit"
-        label="Create tag"
-        Glyph={IconTag}
-        className={cn('w-full')}
-        status="primary"
-      />
+        <DecoratedButton
+          type="submit"
+          label="Create tag"
+          Glyph={IconTag}
+          className={cn('w-full')}
+          status="primary"
+        />
+      </DialogContent>
     </ValueRequesterDialog>
   )
 }
