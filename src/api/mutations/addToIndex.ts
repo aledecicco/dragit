@@ -26,10 +26,10 @@ const addToIndexMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useStageFile = (file: WorktreeFileInfo): Action => {
+const useMakeStageFile = (): ((file: WorktreeFileInfo) => Action) => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
-  return {
+  return (file: WorktreeFileInfo): Action => ({
     id: { key: 'file_operation', operation: 'add_file', file: file.path },
     blockedBy: [
       { key: 'file_operation', file: file.path },
@@ -45,7 +45,11 @@ const useStageFile = (file: WorktreeFileInfo): Action => {
       error: 'Failed to stage',
     },
     Glyph: IconPlus,
-  }
+  })
+}
+
+const useStageFile = (file: WorktreeFileInfo): Action => {
+  return useMakeStageFile()(file)
 }
 
 const useStageFiles = (): Action<WorktreeFileInfo[] | string[]> => {
@@ -81,6 +85,7 @@ const useStageFiles = (): Action<WorktreeFileInfo[] | string[]> => {
 }
 
 export {
+  useMakeStageFile,
   useStageFile,
   useStageFiles,
   addToIndexKey,

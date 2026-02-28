@@ -28,10 +28,10 @@ const saveStashMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useStashFile = (file: WorktreeFileInfo): Action => {
+const useMakeStashFile = (): ((file: WorktreeFileInfo) => Action) => {
   const saveStash = useRepositoryMutation(saveStashMutation)
 
-  return {
+  return (file: WorktreeFileInfo): Action => ({
     id: { key: 'file_operation', operation: 'save_stash', file: file.path },
     blockedBy: [
       { key: 'file_operation', file: file.path },
@@ -51,7 +51,11 @@ const useStashFile = (file: WorktreeFileInfo): Action => {
       error: 'Failed to stash',
     },
     Glyph: IconPackage,
-  }
+  })
+}
+
+const useStashFile = (file: WorktreeFileInfo): Action => {
+  return useMakeStashFile()(file)
 }
 
 const useStashFiles = (): Action<WorktreeFileInfo[] | string[]> => {
@@ -89,6 +93,7 @@ const useStashFiles = (): Action<WorktreeFileInfo[] | string[]> => {
 }
 
 export {
+  useMakeStashFile,
   useStashFile,
   useStashFiles,
   saveStashKey,

@@ -26,10 +26,10 @@ const removeRemoteMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useRemoveRemote = (name: RemoteName): Action => {
+const useMakeRemoveRemote = (): ((name: RemoteName) => Action) => {
   const removeRemote = useRepositoryMutation(removeRemoteMutation)
 
-  return {
+  return (name: RemoteName): Action => ({
     id: {
       key: 'remote_operation',
       operation: 'remove',
@@ -46,10 +46,15 @@ const useRemoveRemote = (name: RemoteName): Action => {
       success: 'Remote removed',
       error: 'Failed to remove',
     },
-  }
+  })
+}
+
+const useRemoveRemote = (name: RemoteName): Action => {
+  return useMakeRemoveRemote()(name)
 }
 
 export {
+  useMakeRemoveRemote,
   useRemoveRemote,
   removeRemoteKey,
   removeRemoteMutation,

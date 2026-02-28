@@ -70,6 +70,7 @@ const usePullBranch = (branch: BranchInfo): Action => {
     Glyph: IconDownload,
   }
 }
+
 const useRebaseBranch = (branch: BranchInfo): Action => {
   const pullBranch = useRepositoryMutation(pullBranchMutation)
   const upstream = useSelectedUpstream(branch)

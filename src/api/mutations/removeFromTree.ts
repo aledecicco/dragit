@@ -26,10 +26,10 @@ const removeFromTreeMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useMarkAsRemoved = (file: WorktreeFileInfo): Action => {
+const useMakeMarkAsRemoved = (): ((file: WorktreeFileInfo) => Action) => {
   const remove = useRepositoryMutation(removeFromTreeMutation)
 
-  return {
+  return (file: WorktreeFileInfo): Action => ({
     id: { key: 'file_operation', operation: 'remove_file', file: file.path },
     blockedBy: [
       { key: 'file_operation', file: file.path },
@@ -45,7 +45,16 @@ const useMarkAsRemoved = (file: WorktreeFileInfo): Action => {
       error: 'Failed to delete',
     },
     Glyph: IconTrash,
-  }
+  })
 }
 
-export { useMarkAsRemoved, removeFromTreeKey, removeFromTreeMutation }
+const useMarkAsRemoved = (file: WorktreeFileInfo): Action => {
+  return useMakeMarkAsRemoved()(file)
+}
+
+export {
+  useMakeMarkAsRemoved,
+  useMarkAsRemoved,
+  removeFromTreeKey,
+  removeFromTreeMutation,
+}

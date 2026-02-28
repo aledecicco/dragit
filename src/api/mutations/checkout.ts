@@ -61,10 +61,10 @@ const useCheckout = (): Action<CheckoutArgs> => {
   }
 }
 
-const useCheckoutBranch = (branch: BranchInfo): Action => {
+const useMakeCheckoutBranch = (): ((branch: BranchInfo) => Action) => {
   const checkout = useRepositoryMutation(checkoutMutation)
 
-  return {
+  return (branch: BranchInfo): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'checkout',
@@ -81,13 +81,17 @@ const useCheckoutBranch = (branch: BranchInfo): Action => {
       success: 'Checked out',
       error: 'Checkout failed',
     },
-  }
+  })
 }
 
-const useCheckoutTag = (tag: TagInfo): Action => {
+const useCheckoutBranch = (branch: BranchInfo): Action => {
+  return useMakeCheckoutBranch()(branch)
+}
+
+const useMakeCheckoutTag = (): ((tag: TagInfo) => Action) => {
   const checkout = useRepositoryMutation(checkoutMutation)
 
-  return {
+  return (tag: TagInfo): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'checkout',
@@ -104,7 +108,11 @@ const useCheckoutTag = (tag: TagInfo): Action => {
       success: 'Checked out',
       error: 'Checkout failed',
     },
-  }
+  })
+}
+
+const useCheckoutTag = (tag: TagInfo): Action => {
+  return useMakeCheckoutTag()(tag)
 }
 
 const useSwitchBranches = (): Action => {
@@ -148,8 +156,10 @@ const useSwitchBranches = (): Action => {
 
 export {
   useCheckout,
+  useMakeCheckoutBranch,
   useCheckoutBranch,
   useSwitchBranches,
+  useMakeCheckoutTag,
   useCheckoutTag,
   checkoutKey,
   checkoutMutation,

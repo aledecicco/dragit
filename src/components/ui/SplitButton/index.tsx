@@ -85,7 +85,7 @@ const SplitButton = (props: SplitButtonProps) => {
             Glyph={IconChevronDown}
             compact
             {...propsWithCn(
-              {},
+              menuButtonProps,
               'h-full',
               'rounded-l-none rounded-r-[inherit]',
               match(menuSize)

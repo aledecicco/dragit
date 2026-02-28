@@ -27,10 +27,10 @@ const changeRemoteUrlMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useChangeRemoteUrl = (name: RemoteName): Action<string> => {
+const useMakeChangeRemoteUrl = (): ((name: RemoteName) => Action<string>) => {
   const changeRemoteUrl = useRepositoryMutation(changeRemoteUrlMutation)
 
-  return {
+  return (name: RemoteName): Action<string> => ({
     id: {
       key: 'remote_operation',
       operation: 'change_url',
@@ -47,10 +47,15 @@ const useChangeRemoteUrl = (name: RemoteName): Action<string> => {
       success: 'URL Changed',
       error: 'Failed to change URL',
     },
-  }
+  })
+}
+
+const useChangeRemoteUrl = (name: RemoteName): Action<string> => {
+  return useMakeChangeRemoteUrl()(name)
 }
 
 export {
+  useMakeChangeRemoteUrl,
   useChangeRemoteUrl,
   changeRemoteUrlKey,
   changeRemoteUrlMutation,

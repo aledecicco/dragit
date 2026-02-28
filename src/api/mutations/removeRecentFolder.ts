@@ -18,10 +18,10 @@ const removeRecentFolderMutation = mutationOptions({
   networkMode: 'always',
 })
 
-const useRemoveRecentFolder = (recentPath: string): Action => {
+const useMakeRemoveRecentFolder = (): ((recentPath: string) => Action) => {
   const remove = useMutation(removeRecentFolderMutation)
 
-  return {
+  return (recentPath: string): Action => ({
     id: { key: 'remove_recent_folder', path: recentPath },
     run: async () => {
       await remove.mutateAsync({ recentPath })
@@ -33,10 +33,15 @@ const useRemoveRecentFolder = (recentPath: string): Action => {
       error: 'Failed to remove',
     },
     Glyph: IconTrash,
-  }
+  })
+}
+
+const useRemoveRecentFolder = (recentPath: string): Action => {
+  return useMakeRemoveRecentFolder()(recentPath)
 }
 
 export {
+  useMakeRemoveRecentFolder,
   useRemoveRecentFolder,
   removeRecentFolderKey,
   removeRecentFolderMutation,

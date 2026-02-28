@@ -31,10 +31,10 @@ const setUpstreamMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useSetUpstream = (branch: BranchInfo): Action<RemoteRef> => {
+const useMakeSetUpstream = (): ((branch: BranchInfo) => Action<RemoteRef>) => {
   const setUpstream = useRepositoryMutation(setUpstreamMutation)
 
-  return {
+  return (branch: BranchInfo): Action<RemoteRef> => ({
     id: {
       key: 'branch_operation',
       operation: 'set_upstream',
@@ -60,10 +60,15 @@ const useSetUpstream = (branch: BranchInfo): Action<RemoteRef> => {
           ? IconWorldQuestion
           : IconWorld
         : IconWorldCancel,
-  }
+  })
+}
+
+const useSetUpstream = (branch: BranchInfo): Action<RemoteRef> => {
+  return useMakeSetUpstream()(branch)
 }
 
 export {
+  useMakeSetUpstream,
   useSetUpstream,
   setUpstreamKey,
   setUpstreamMutation,

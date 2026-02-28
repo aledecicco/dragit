@@ -159,7 +159,6 @@ const GraphInner = () => {
       </Ariakit.CompositeProvider>
 
       <DropArea
-        interactiveOutsideDrag={false}
         className={cn('absolute top-0 bottom-0 left-0 w-half')}
         overlayProps={{
           className: 'rounded-r-none rounded-l-sm',
@@ -178,7 +177,6 @@ const GraphInner = () => {
       />
 
       <DropArea
-        interactiveOutsideDrag={false}
         extraValidation={(payload) =>
           payload.dragged.name !== currentReference?.refName
         }

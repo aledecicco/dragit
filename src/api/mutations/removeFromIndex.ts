@@ -26,10 +26,10 @@ const removeFromIndexMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useUnstageFile = (file: WorktreeFileInfo): Action => {
+const useMakeUnstageFile = (): ((file: WorktreeFileInfo) => Action) => {
   const unstage = useRepositoryMutation(removeFromIndexMutation)
 
-  return {
+  return (file: WorktreeFileInfo): Action => ({
     id: { key: 'file_operation', operation: 'unstage_file', file: file.path },
     blockedBy: [
       { key: 'file_operation', file: file.path },
@@ -45,7 +45,11 @@ const useUnstageFile = (file: WorktreeFileInfo): Action => {
       error: 'Failed to unstage',
     },
     Glyph: IconMinus,
-  }
+  })
+}
+
+const useUnstageFile = (file: WorktreeFileInfo): Action => {
+  return useMakeUnstageFile()(file)
 }
 
 const useUnstageFiles = (): Action<WorktreeFileInfo[] | string[]> => {
@@ -81,6 +85,7 @@ const useUnstageFiles = (): Action<WorktreeFileInfo[] | string[]> => {
 }
 
 export {
+  useMakeUnstageFile,
   useUnstageFile,
   useUnstageFiles,
   removeFromIndexKey,

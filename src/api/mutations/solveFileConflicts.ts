@@ -36,11 +36,11 @@ const solveFileConflictsMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useAcceptOurs = (file: WorktreeFileInfo): Action => {
+const useMakeAcceptOurs = (): ((file: WorktreeFileInfo) => Action) => {
   const solveFileConflicts = useRepositoryMutation(solveFileConflictsMutation)
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
-  return {
+  return (file: WorktreeFileInfo): Action => ({
     id: {
       key: 'file_operation',
       operation: 'solve_conflict',
@@ -65,7 +65,11 @@ const useAcceptOurs = (file: WorktreeFileInfo): Action => {
       error: 'Failed to accept ours',
     },
     Glyph: IconChevronLeft,
-  }
+  })
+}
+
+const useAcceptOurs = (file: WorktreeFileInfo): Action => {
+  return useMakeAcceptOurs()(file)
 }
 
 const useAcceptManyOurs = (): Action<WorktreeFileInfo[]> => {
@@ -106,11 +110,11 @@ const useAcceptManyOurs = (): Action<WorktreeFileInfo[]> => {
   }
 }
 
-const useAcceptTheirs = (file: WorktreeFileInfo): Action => {
+const useMakeAcceptTheirs = (): ((file: WorktreeFileInfo) => Action) => {
   const solveFileConflicts = useRepositoryMutation(solveFileConflictsMutation)
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
-  return {
+  return (file: WorktreeFileInfo): Action => ({
     id: {
       key: 'file_operation',
       operation: 'solve_conflict',
@@ -135,7 +139,11 @@ const useAcceptTheirs = (file: WorktreeFileInfo): Action => {
       error: 'Failed to accept theirs',
     },
     Glyph: IconChevronRight,
-  }
+  })
+}
+
+const useAcceptTheirs = (file: WorktreeFileInfo): Action => {
+  return useMakeAcceptTheirs()(file)
 }
 
 const useAcceptManyTheirs = (): Action<WorktreeFileInfo[]> => {
@@ -176,10 +184,10 @@ const useAcceptManyTheirs = (): Action<WorktreeFileInfo[]> => {
   }
 }
 
-const useAcceptAsIs = (file: WorktreeFileInfo): Action => {
+const useMakeAcceptAsIs = (): ((file: WorktreeFileInfo) => Action) => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
-  return {
+  return (file: WorktreeFileInfo): Action => ({
     id: {
       key: 'file_operation',
       operation: 'solve_conflict',
@@ -200,7 +208,11 @@ const useAcceptAsIs = (file: WorktreeFileInfo): Action => {
       error: 'Failed to accept as is',
     },
     Glyph: IconCheck,
-  }
+  })
+}
+
+const useAcceptAsIs = (file: WorktreeFileInfo): Action => {
+  return useMakeAcceptAsIs()(file)
 }
 
 const useAcceptManyAsIs = (): Action<WorktreeFileInfo[]> => {
@@ -236,10 +248,10 @@ const useAcceptManyAsIs = (): Action<WorktreeFileInfo[]> => {
   }
 }
 
-const useAcceptDeletion = (file: WorktreeFileInfo): Action => {
+const useMakeAcceptDeletion = (): ((file: WorktreeFileInfo) => Action) => {
   const removeFromTree = useRepositoryMutation(removeFromTreeMutation)
 
-  return {
+  return (file: WorktreeFileInfo): Action => ({
     id: {
       key: 'file_operation',
       operation: 'solve_conflict',
@@ -260,7 +272,11 @@ const useAcceptDeletion = (file: WorktreeFileInfo): Action => {
       error: 'Failed to accept deletion',
     },
     Glyph: IconTrash,
-  }
+  })
+}
+
+const useAcceptDeletion = (file: WorktreeFileInfo): Action => {
+  return useMakeAcceptDeletion()(file)
 }
 
 const useAcceptManyDeletions = (): Action<WorktreeFileInfo[]> => {
@@ -298,10 +314,10 @@ const useAcceptManyDeletions = (): Action<WorktreeFileInfo[]> => {
   }
 }
 
-const useIgnoreDeletion = (file: WorktreeFileInfo): Action => {
+const useMakeIgnoreDeletion = (): ((file: WorktreeFileInfo) => Action) => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
-  return {
+  return (file: WorktreeFileInfo): Action => ({
     id: {
       key: 'file_operation',
       operation: 'solve_conflict',
@@ -322,7 +338,11 @@ const useIgnoreDeletion = (file: WorktreeFileInfo): Action => {
       error: 'Failed to ignore deletion',
     },
     Glyph: IconTrashOff,
-  }
+  })
+}
+
+const useIgnoreDeletion = (file: WorktreeFileInfo): Action => {
+  return useMakeIgnoreDeletion()(file)
 }
 
 const useIgnoreManyDeletions = (): Action<WorktreeFileInfo[]> => {
@@ -358,10 +378,10 @@ const useIgnoreManyDeletions = (): Action<WorktreeFileInfo[]> => {
   }
 }
 
-const useAcceptFile = (file: WorktreeFileInfo): Action => {
+const useMakeAcceptFile = (): ((file: WorktreeFileInfo) => Action) => {
   const addToIndex = useRepositoryMutation(addToIndexMutation)
 
-  return {
+  return (file: WorktreeFileInfo): Action => ({
     id: {
       key: 'file_operation',
       operation: 'solve_conflict',
@@ -382,7 +402,11 @@ const useAcceptFile = (file: WorktreeFileInfo): Action => {
       error: 'Failed to accept new file',
     },
     Glyph: IconCheck,
-  }
+  })
+}
+
+const useAcceptFile = (file: WorktreeFileInfo): Action => {
+  return useMakeAcceptFile()(file)
 }
 
 const useAcceptManyFiles = (): Action<WorktreeFileInfo[]> => {
@@ -418,10 +442,10 @@ const useAcceptManyFiles = (): Action<WorktreeFileInfo[]> => {
   }
 }
 
-const useIgnoreFile = (file: WorktreeFileInfo): Action => {
+const useMakeIgnoreFile = (): ((file: WorktreeFileInfo) => Action) => {
   const removeFromTree = useRepositoryMutation(removeFromTreeMutation)
 
-  return {
+  return (file: WorktreeFileInfo): Action => ({
     id: {
       key: 'file_operation',
       operation: 'solve_conflict',
@@ -442,7 +466,11 @@ const useIgnoreFile = (file: WorktreeFileInfo): Action => {
       error: 'Failed to ignore new file',
     },
     Glyph: IconCancel,
-  }
+  })
+}
+
+const useIgnoreFile = (file: WorktreeFileInfo): Action => {
+  return useMakeIgnoreFile()(file)
 }
 
 const useIgnoreManyFiles = (): Action<WorktreeFileInfo[]> => {
@@ -481,18 +509,25 @@ const useIgnoreManyFiles = (): Action<WorktreeFileInfo[]> => {
 }
 
 export {
+  useMakeAcceptOurs,
   useAcceptOurs,
   useAcceptManyOurs,
+  useMakeAcceptTheirs,
   useAcceptTheirs,
   useAcceptManyTheirs,
+  useMakeAcceptAsIs,
   useAcceptAsIs,
   useAcceptManyAsIs,
+  useMakeAcceptDeletion,
   useAcceptDeletion,
   useAcceptManyDeletions,
+  useMakeIgnoreDeletion,
   useIgnoreDeletion,
   useIgnoreManyDeletions,
+  useMakeAcceptFile,
   useAcceptFile,
   useAcceptManyFiles,
+  useMakeIgnoreFile,
   useIgnoreFile,
   useIgnoreManyFiles,
   solveFileConflictsKey,

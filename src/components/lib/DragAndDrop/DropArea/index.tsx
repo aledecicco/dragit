@@ -41,12 +41,6 @@ interface DropAreaProps<T extends DragType> extends ComponentProps<'div'> {
    * Additional props to pass to the overlay displayed during drag operations.
    */
   overlayProps?: ComponentProps<'div'>
-
-  /**
-   * Whether the drop area should be interactive (able to receive pointer events) when
-   * not during a drag operation.
-   */
-  interactiveOutsideDrag?: boolean
 }
 
 /**
@@ -59,7 +53,6 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
     extraValidation,
     label,
     overlayProps,
-    interactiveOutsideDrag = true,
     children,
     ref,
     ...divProps
@@ -88,7 +81,7 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
       {...propsWithCn(
         divProps,
         'relative',
-        !interactiveOutsideDrag && !currentDrag && 'pointer-events-none',
+        !children && !currentDrag && 'pointer-events-none',
       )}
       ref={mergeRefs([dropRef, ref])}
     >
@@ -98,7 +91,7 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
         <div
           {...propsWithCn(
             overlayProps,
-            'z-2',
+            'z-3',
             'absolute top-0 left-0 w-full h-full overflow-hidden',
             'flex flex-col items-center justify-center gap-2 p-4',
             'rounded-md border border-dashed border-primary-400 bg-dark-400',

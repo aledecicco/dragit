@@ -26,10 +26,10 @@ const fetchRemoteMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const useFetchRemote = (name: RemoteName): Action => {
+const useMakeFetchRemote = (): ((name: RemoteName) => Action) => {
   const fetchRemote = useRepositoryMutation(fetchRemoteMutation)
 
-  return {
+  return (name: RemoteName): Action => ({
     id: {
       key: 'remote_operation',
       operation: 'fetch',
@@ -48,10 +48,15 @@ const useFetchRemote = (name: RemoteName): Action => {
       error: 'Failed',
     },
     Glyph: IconRefresh,
-  }
+  })
+}
+
+const useFetchRemote = (name: RemoteName): Action => {
+  return useMakeFetchRemote()(name)
 }
 
 export {
+  useMakeFetchRemote,
   useFetchRemote,
   fetchRemoteKey,
   fetchRemoteMutation,

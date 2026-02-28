@@ -26,10 +26,10 @@ const deleteTagsMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useDeleteTag = (tag: TagInfo): Action => {
+const useMakeDeleteTag = (): ((tag: TagInfo) => Action) => {
   const deleteTags = useRepositoryMutation(deleteTagsMutation)
 
-  return {
+  return (tag: TagInfo): Action => ({
     id: { key: 'tag_operation', operation: 'delete_tag', tag: tag.name },
     blockedBy: [{ key: 'tag_operation', tag: tag.name }],
     run: async () => {
@@ -42,7 +42,11 @@ const useDeleteTag = (tag: TagInfo): Action => {
       error: 'Failed to delete',
     },
     Glyph: IconTrash,
-  }
+  })
+}
+
+const useDeleteTag = (tag: TagInfo): Action => {
+  return useMakeDeleteTag()(tag)
 }
 
 const useDeleteTags = (): Action<TagInfo[]> => {
@@ -71,6 +75,7 @@ const useDeleteTags = (): Action<TagInfo[]> => {
 }
 
 export {
+  useMakeDeleteTag,
   useDeleteTag,
   useDeleteTags,
   deleteTagsKey,

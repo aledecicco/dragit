@@ -52,10 +52,10 @@ const useMerge = (): Action<MergeArgs> => {
   }
 }
 
-const useMergeBranch = (branch: BranchInfo): Action => {
+const useMakeMergeBranch = (): ((branch: BranchInfo) => Action) => {
   const merge = useRepositoryMutation(mergeMutation)
 
-  return {
+  return (branch: BranchInfo): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'merge',
@@ -76,13 +76,17 @@ const useMergeBranch = (branch: BranchInfo): Action => {
       success: 'Merged',
       error: 'Merge failed',
     },
-  }
+  })
 }
 
-const useMergeCommit = (commit: CommitId): Action => {
+const useMergeBranch = (branch: BranchInfo): Action => {
+  return useMakeMergeBranch()(branch)
+}
+
+const useMakeMergeCommit = (): ((commit: CommitId) => Action) => {
   const merge = useRepositoryMutation(mergeMutation)
 
-  return {
+  return (commit: CommitId): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'merge',
@@ -100,12 +104,18 @@ const useMergeCommit = (commit: CommitId): Action => {
       success: 'Merged',
       error: 'Merge failed',
     },
-  }
+  })
+}
+
+const useMergeCommit = (commit: CommitId): Action => {
+  return useMakeMergeCommit()(commit)
 }
 
 export {
   useMerge,
+  useMakeMergeBranch,
   useMergeBranch,
+  useMakeMergeCommit,
   useMergeCommit,
   mergeKey,
   mergeMutation,

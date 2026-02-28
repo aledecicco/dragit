@@ -26,10 +26,10 @@ const discardStashMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useDiscardStash = (stash: StashInfo): Action => {
+const useMakeDiscardStash = (): ((stash: StashInfo) => Action) => {
   const discardStash = useRepositoryMutation(discardStashMutation)
 
-  return {
+  return (stash: StashInfo): Action => ({
     id: { key: 'stash_operation', operation: 'discard', stash: stash.tracker },
     blockedBy: [{ stash: stash.tracker }],
     run: async () => {
@@ -42,7 +42,11 @@ const useDiscardStash = (stash: StashInfo): Action => {
       error: 'Failed',
     },
     Glyph: IconTrash,
-  }
+  })
+}
+
+const useDiscardStash = (stash: StashInfo): Action => {
+  return useMakeDiscardStash()(stash)
 }
 
 const useDiscardStashes = (): Action<StashInfo[]> => {
@@ -73,6 +77,7 @@ const useDiscardStashes = (): Action<StashInfo[]> => {
 }
 
 export {
+  useMakeDiscardStash,
   useDiscardStash,
   useDiscardStashes,
   discardStashKey,

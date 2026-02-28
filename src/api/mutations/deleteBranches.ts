@@ -26,10 +26,10 @@ const deleteBranchesMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useDeleteBranch = (branch: BranchInfo): Action => {
+const useMakeDeleteBranch = (): ((branch: BranchInfo) => Action) => {
   const deleteBranches = useRepositoryMutation(deleteBranchesMutation)
 
-  return {
+  return (branch: BranchInfo): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'delete_branch',
@@ -48,7 +48,11 @@ const useDeleteBranch = (branch: BranchInfo): Action => {
       success: 'Branch deleted',
       error: 'Failed to delete',
     },
-  }
+  })
+}
+
+const useDeleteBranch = (branch: BranchInfo): Action => {
+  return useMakeDeleteBranch()(branch)
 }
 
 const useDeleteBranches = (): Action<BranchInfo[]> => {
@@ -79,6 +83,7 @@ const useDeleteBranches = (): Action<BranchInfo[]> => {
 }
 
 export {
+  useMakeDeleteBranch,
   useDeleteBranch,
   useDeleteBranches,
   deleteBranchesKey,

@@ -27,10 +27,10 @@ const renameRemoteMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useRenameRemote = (name: RemoteName): Action<RemoteName> => {
+const useMakeRenameRemote = (): ((name: RemoteName) => Action<RemoteName>) => {
   const renameRemote = useRepositoryMutation(renameRemoteMutation)
 
-  return {
+  return (name: RemoteName): Action<RemoteName> => ({
     id: {
       key: 'remote_operation',
       operation: 'rename',
@@ -47,10 +47,15 @@ const useRenameRemote = (name: RemoteName): Action<RemoteName> => {
       success: 'Remote renamed',
       error: 'Failed to rename',
     },
-  }
+  })
+}
+
+const useRenameRemote = (name: RemoteName): Action<RemoteName> => {
+  return useMakeRenameRemote()(name)
 }
 
 export {
+  useMakeRenameRemote,
   useRenameRemote,
   renameRemoteKey,
   renameRemoteMutation,
