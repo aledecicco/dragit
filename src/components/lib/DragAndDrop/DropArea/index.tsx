@@ -3,7 +3,7 @@ import { IconDragDrop, IconForbid2 } from '@tabler/icons-react'
 import { mergeRefs } from 'react-merge-refs'
 
 import { useUniqueId } from '@/state/ids'
-import { Icon } from '@/ui/Icon'
+import { type Glyph, Icon } from '@/ui/Icon'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import {
@@ -38,9 +38,19 @@ interface DropAreaProps<T extends DragType> extends ComponentProps<'div'> {
   }
 
   /**
+   * Icon override for the overlay displayed during drag operations.
+   */
+  Glyph?: Glyph
+
+  /**
    * Additional props to pass to the overlay displayed during drag operations.
    */
   overlayProps?: ComponentProps<'div'>
+
+  /**
+   * Whether to indicate that dropping an item here is a dangerous action.
+   */
+  dangerous?: boolean
 }
 
 /**
@@ -52,7 +62,9 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
     handleDrop,
     extraValidation,
     label,
+    Glyph,
     overlayProps,
+    dangerous = false,
     children,
     ref,
     ...divProps
@@ -97,17 +109,18 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
             'rounded-md border border-dashed border-primary-400 bg-dark-400',
             'text-md text-light-950/50 text-center',
             isDropTarget && 'border-accent-400 bg-dark-300 text-light-950/80',
+            dangerous && 'text-danger-400/90 border-danger-400',
             disabledByValidation &&
               'border-dark-50 bg-dark-500 text-light-950/30',
           )}
         >
           <Icon
             size="lg"
-            Glyph={disabledByValidation ? IconForbid2 : IconDragDrop}
+            Glyph={disabledByValidation ? IconForbid2 : (Glyph ?? IconDragDrop)}
             className={cn('size-7')}
           />
           {disabledByValidation ? "Can't" : 'Drop here to'}{' '}
-          {label[currentDrag.type]}
+          {label[currentDrag.data.type]}
         </div>
       )}
     </div>

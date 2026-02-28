@@ -157,10 +157,14 @@ type Droppable<T extends DragType = DragType> = DndSettings.Droppable<
  * @param callback - The callback to register. It can modify the drag operation.
  */
 const useBeforeDrag = (
-  callback: (args: { element: HTMLElement; source: Draggable }) => void,
+  callback: (args: {
+    element: HTMLElement
+    source: Draggable
+    manager: Dnd.DragDropManager
+  }) => void,
 ) => {
   Dnd.useDragDropMonitor({
-    onBeforeDragStart: (event) => {
+    onBeforeDragStart: (event, manager) => {
       const element = event.operation.source?.element
       const source = event.operation.source as Draggable | null
 
@@ -168,6 +172,7 @@ const useBeforeDrag = (
         callback({
           element,
           source,
+          manager,
         })
       }
     },

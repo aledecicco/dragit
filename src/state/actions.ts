@@ -239,7 +239,7 @@ const prepareActionArgs = async <T>(
   const store = useActionsStore.getState()
   const status = store.getActionStatus(action.id) ?? 'idle'
 
-  if (status !== 'idle') {
+  if (status === 'running' || status === 'disabled') {
     throw new Error('Action is not ready')
   }
 

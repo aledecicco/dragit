@@ -6,6 +6,7 @@ import { CurrentRemote } from '@/widgets/CurrentRemote'
 import { Graph } from '@/widgets/Graph'
 import { MainToolbar } from '@/widgets/MainToolbar'
 import { PendingActions } from '@/widgets/PendingActions'
+import { RecyclingBin } from '@/widgets/RecyclingBin'
 import { StashesList } from '@/widgets/StashesList'
 import { NotStagedWorktreeChanges } from '@/widgets/WorktreeChanges/NotStaged'
 import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
@@ -100,10 +101,15 @@ const InRepository = () => {
       </div>
 
       <div
-        className={cn('grid grid-rows-[max-content_1fr] gap-4 overflow-hidden')}
+        className={cn(
+          'grid grid-rows-[max-content_1fr] gap-4 overflow-hidden',
+          'relative',
+        )}
       >
         <CurrentRemote />
         <BranchesList />
+
+        <RecyclingBin className={cn('absolute bottom-0 left-0 w-full h-50')} />
       </div>
     </>
   )

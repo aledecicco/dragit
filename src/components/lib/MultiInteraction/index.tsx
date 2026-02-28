@@ -64,7 +64,7 @@ type MultiInteractionInnerProps<T> = Pick<
 const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
   const { getActions, items, getDragPayload, children, ...contentProps } = props
 
-  const itemIndexes = useSelectedItems()
+  const selectedItemIndexes = useSelectedItems()
   const { setSelection } = useSelectionUpdater()
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset selection when items change
@@ -74,12 +74,14 @@ const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
 
   const menuId = useUniqueId()
 
-  const selectedItems = items.filter((_, index) => itemIndexes.has(index))
+  const selectedItems = items.filter((_, index) =>
+    selectedItemIndexes.has(index),
+  )
   const actions = getActions(selectedItems)
 
   const composite = Ariakit.useCompositeContext()
 
-  useBeforeDrag(({ element, source }) => {
+  useBeforeDrag(({ element, source, manager }) => {
     const compositeItem = composite
       ?.getState()
       .renderedItems.find((item) => item.element?.contains(element))
@@ -89,8 +91,21 @@ const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
       const draggedItem = items.at(itemId)
 
       if (draggedItem) {
-        if (itemIndexes.size > 1 && itemIndexes.has(itemId)) {
+        if (selectedItemIndexes.size > 1 && selectedItemIndexes.has(itemId)) {
+          const originalData = source.data
+          const originalType = source.type
+
           source.data = getDragPayload(selectedItems)
+          source.type = source.data.type
+
+          const unsubscribe = manager.monitor.addEventListener(
+            'dragend',
+            () => {
+              source.data = originalData
+              source.type = originalType
+              unsubscribe()
+            },
+          )
         } else {
           setSelection(itemId)
         }
@@ -103,7 +118,7 @@ const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
       {...contentProps}
       menuId={menuId}
       onContextMenu={(e) => {
-        if (itemIndexes.size <= 1) {
+        if (selectedItemIndexes.size <= 1) {
           e.preventDefault()
         }
       }}
@@ -122,9 +137,9 @@ const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
             ) ?? -1
 
         if (
-          itemIndexes.size > 1 &&
+          selectedItemIndexes.size > 1 &&
           itemIndex >= 0 &&
-          itemIndexes.has(itemIndex)
+          selectedItemIndexes.has(itemIndex)
         ) {
           const nativeEvent: ContextMenuEvent = e.nativeEvent
           nativeEvent[CONTEXT_MENU_HANDLER_KEY] = menuId
