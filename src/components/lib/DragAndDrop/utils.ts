@@ -52,8 +52,11 @@ type DragPayload =
   | DragDef<'not-staged-files', NotStagedFile[]>
   | DragDef<'staged-files', StagedFile[]>
   | DragDef<'branch', BranchInfo>
+  | DragDef<'branches', BranchInfo[]>
   | DragDef<'tag', TagInfo>
+  | DragDef<'tags', TagInfo[]>
   | DragDef<'stash', StashInfo>
+  | DragDef<'stashes', StashInfo[]>
   | DragDef<'commit', CommitInfo>
 
 type DragType = DragPayload['type']

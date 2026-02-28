@@ -32,9 +32,8 @@ interface MultiInteractionProps<T>
    * Callback that returns the payload to be used when dragging the selected items.
    *
    * @param items - The currently selected items.
-   * @param dragged - The item that triggered the drag.
    */
-  getDragPayload: (items: T[], dragged: T) => DragPayload
+  getDragPayload: (items: T[]) => DragPayload
 }
 /**
  * A component that allows selecting arbitrary child items and performing actions on all of them.
@@ -90,11 +89,10 @@ const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
       const draggedItem = items.at(itemId)
 
       if (draggedItem) {
-        if (itemIndexes.has(itemId)) {
-          source.data = getDragPayload(selectedItems, draggedItem)
+        if (itemIndexes.size > 1 && itemIndexes.has(itemId)) {
+          source.data = getDragPayload(selectedItems)
         } else {
           setSelection(itemId)
-          source.data = getDragPayload([draggedItem], draggedItem)
         }
       }
     }

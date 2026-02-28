@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { IconGitBranch, IconTag } from '@tabler/icons-react'
+import { IconGitBranch, IconTags } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import { useMakeCreateBranchAt } from '@/api/mutations/createBranch'
@@ -117,11 +117,11 @@ const BranchesList = (props: BranchesListProps) => {
           <MultiInteraction
             items={tagsQuery.data ?? []}
             getActions={getTagsListActions}
-            getDragPayload={(_, tag) => ({
-              type: 'tag',
-              dragged: tag,
-              label: tag.name,
-              Glyph: IconTag,
+            getDragPayload={(tags) => ({
+              type: 'tags',
+              dragged: tags,
+              label: `${tags.length} tags`,
+              Glyph: IconTags,
             })}
           >
             <QueryList
@@ -141,10 +141,10 @@ const BranchesList = (props: BranchesListProps) => {
           <MultiInteraction
             items={branchesQuery.data ?? []}
             getActions={getBranchesListActions}
-            getDragPayload={(_, branch) => ({
-              type: 'branch',
-              dragged: branch,
-              label: branch.name,
+            getDragPayload={(branches) => ({
+              type: 'branches',
+              dragged: branches,
+              label: `${branches.length} branches`,
               Glyph: IconGitBranch,
             })}
           >

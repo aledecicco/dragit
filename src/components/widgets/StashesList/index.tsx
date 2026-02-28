@@ -55,10 +55,10 @@ const StashesList = (props: StashesListProps) => {
           <MultiInteraction
             items={stashesQuery.data ?? []}
             getActions={getStashesListActions}
-            getDragPayload={(_, stash) => ({
-              type: 'stash',
-              dragged: stash,
-              label: `Stash #${stash.stashNumber}`,
+            getDragPayload={(stashes) => ({
+              type: 'stashes',
+              dragged: stashes,
+              label: `${stashes.length} stashes`,
               Glyph: IconArchive,
             })}
           >
