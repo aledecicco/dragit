@@ -10,6 +10,7 @@ import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
+import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
@@ -84,25 +85,81 @@ const BranchesList = (props: BranchesListProps) => {
         store={store}
         list={
           <>
-            <Tab id="local">
-              Local
-              <Chip size="sm">{localBranchesQuery.data?.length ?? '...'}</Chip>
-            </Tab>
+            <Draggable
+              className={cn('border-none')}
+              dragPayload={{
+                type: 'branches',
+                dragged: localBranchesQuery.data ?? [],
+                label: `${(localBranchesQuery.data ?? []).length} branches`,
+                Glyph: IconGitBranch,
+              }}
+              onBeforeDrag={() => {
+                store.setSelectedId('local')
+              }}
+            >
+              <Tab id="local">
+                Local
+                <Chip size="sm">
+                  {localBranchesQuery.data?.length ?? '...'}
+                </Chip>
+              </Tab>
+            </Draggable>
 
-            <Tab id="remote">
-              Remote
-              <Chip size="sm">{remoteBranchesQuery.data?.length ?? '...'}</Chip>
-            </Tab>
+            <Draggable
+              className={cn('border-none')}
+              dragPayload={{
+                type: 'branches',
+                dragged: remoteBranchesQuery.data ?? [],
+                label: `${(remoteBranchesQuery.data ?? []).length} branches`,
+                Glyph: IconGitBranch,
+              }}
+              onBeforeDrag={() => {
+                store.setSelectedId('remote')
+              }}
+            >
+              <Tab id="remote">
+                Remote
+                <Chip size="sm">
+                  {remoteBranchesQuery.data?.length ?? '...'}
+                </Chip>
+              </Tab>
+            </Draggable>
 
-            <Tab id="all">
-              All
-              <Chip size="sm">{allBranchesQuery.data?.length ?? '...'}</Chip>
-            </Tab>
+            <Draggable
+              className={cn('border-none')}
+              dragPayload={{
+                type: 'branches',
+                dragged: allBranchesQuery.data ?? [],
+                label: `${(allBranchesQuery.data ?? []).length} branches`,
+                Glyph: IconGitBranch,
+              }}
+              onBeforeDrag={() => {
+                store.setSelectedId('all')
+              }}
+            >
+              <Tab id="all">
+                All
+                <Chip size="sm">{allBranchesQuery.data?.length ?? '...'}</Chip>
+              </Tab>
+            </Draggable>
 
-            <Tab id="tags" className={cn('ml-auto')}>
-              Tags
-              <Chip size="sm">{tagsQuery.data?.length ?? '...'}</Chip>
-            </Tab>
+            <Draggable
+              className={cn('border-none')}
+              dragPayload={{
+                type: 'tags',
+                dragged: tagsQuery.data ?? [],
+                label: `${(tagsQuery.data ?? []).length} tags`,
+                Glyph: IconTags,
+              }}
+              onBeforeDrag={() => {
+                store.setSelectedId('tags')
+              }}
+            >
+              <Tab id="tags" className={cn('ml-auto')}>
+                Tags
+                <Chip size="sm">{tagsQuery.data?.length ?? '...'}</Chip>
+              </Tab>
+            </Draggable>
           </>
         }
       />

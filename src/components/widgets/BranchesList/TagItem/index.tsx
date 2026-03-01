@@ -35,7 +35,6 @@ const TagsListItem = (props: TagsListItemProps) => {
 
   return (
     <Draggable
-      id={`tag-${tag.name}`}
       dragPayload={{
         type: 'tag',
         dragged: tag,

@@ -35,7 +35,6 @@ const StashesListItem = (props: StashesListItemProps) => {
 
   return (
     <Draggable
-      id={`stash-${stash.stashNumber}`}
       dragPayload={{
         type: 'stash',
         dragged: stash,

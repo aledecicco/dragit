@@ -45,7 +45,6 @@ const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
 
   return (
     <Draggable
-      id={`not-staged-file-${file.path}`}
       dragPayload={{
         type: 'not-staged-files',
         dragged: [file],

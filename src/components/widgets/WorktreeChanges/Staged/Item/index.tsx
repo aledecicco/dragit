@@ -35,7 +35,6 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
 
   return (
     <Draggable
-      id={`staged-file-${file.path}`}
       dragPayload={{
         type: 'staged-files',
         dragged: [file],

@@ -4,6 +4,7 @@ import { IconArchive } from '@tabler/icons-react'
 import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { useStashFiles } from '@/api/mutations/saveStash'
 import { useQueryStashes } from '@/api/queries/stashes'
+import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
@@ -32,52 +33,62 @@ const StashesList = (props: StashesListProps) => {
   const stash = useStashFiles()
 
   return (
-    <DropArea
-      acceptedTypes={['staged-files', 'not-staged-files']}
-      label={{
-        'staged-files': 'stash changes',
-        'not-staged-files': 'stash changes',
+    <Draggable
+      className={cn('border-none')}
+      dragPayload={{
+        type: 'stashes',
+        dragged: stashesQuery.data ?? [],
+        label: `${(stashesQuery.data ?? []).length} stashes`,
+        Glyph: IconArchive,
       }}
-      handleDrop={(payload) => {
-        runAction(stash, payload.dragged)
-      }}
-      {...divProps}
     >
-      <Accordion className={cn('max-h-full overflow-hidden')}>
-        <AccordionSection
-          label="Stashes"
-          extraInfo={
-            <Chip size="sm">{stashesQuery.data?.length ?? '...'}</Chip>
-          }
-          defaultOpen={STASHES_DEFAULT_OPEN}
-          className={cn('mb-2')}
-        >
-          <MultiInteraction
-            items={stashesQuery.data ?? []}
-            getActions={getStashesListActions}
-            getDragPayload={(stashes) => ({
-              type: 'stashes',
-              dragged: stashes,
-              label: `${stashes.length} stashes`,
-              Glyph: IconArchive,
-            })}
+      <DropArea
+        acceptedTypes={['staged-files', 'not-staged-files']}
+        label={{
+          'staged-files': 'stash changes',
+          'not-staged-files': 'stash changes',
+        }}
+        handleDrop={(payload) => {
+          runAction(stash, payload.dragged)
+        }}
+        {...divProps}
+      >
+        <Accordion className={cn('max-h-full overflow-hidden')}>
+          <AccordionSection
+            label="Stashes"
+            extraInfo={
+              <Chip size="sm">{stashesQuery.data?.length ?? '...'}</Chip>
+            }
+            defaultOpen={STASHES_DEFAULT_OPEN}
+            className={cn('mb-2')}
           >
-            <QueryList
-              name="stashes"
-              query={stashesQuery}
-              renderItem={(stash, position) => (
-                <StashesListItem stash={stash} itemIndex={position} />
-              )}
-              size="sm"
-              itemSize={74}
-              options={mapFn(stashesQuery.data, (stashes) => ({
-                getItemKey: (index: number) => stashes[index].tracker,
-              }))}
-            />
-          </MultiInteraction>
-        </AccordionSection>
-      </Accordion>
-    </DropArea>
+            <MultiInteraction
+              items={stashesQuery.data ?? []}
+              getActions={getStashesListActions}
+              getDragPayload={(stashes) => ({
+                type: 'stashes',
+                dragged: stashes,
+                label: `${stashes.length} stashes`,
+                Glyph: IconArchive,
+              })}
+            >
+              <QueryList
+                name="stashes"
+                query={stashesQuery}
+                renderItem={(stash, position) => (
+                  <StashesListItem stash={stash} itemIndex={position} />
+                )}
+                size="sm"
+                itemSize={74}
+                options={mapFn(stashesQuery.data, (stashes) => ({
+                  getItemKey: (index: number) => stashes[index].tracker,
+                }))}
+              />
+            </MultiInteraction>
+          </AccordionSection>
+        </Accordion>
+      </DropArea>
+    </Draggable>
   )
 }
 

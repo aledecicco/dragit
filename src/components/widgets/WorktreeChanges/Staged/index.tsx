@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { IconFile, IconFiles } from '@tabler/icons-react'
+import { IconFiles } from '@tabler/icons-react'
 
 import type { WorktreeFileType } from '@/api/models'
 import { useStageFiles } from '@/api/mutations/addToIndex'
@@ -10,6 +10,7 @@ import {
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
+import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { Pagination } from '@/lib/Pagination'
@@ -49,73 +50,83 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
   const stage = useStageFiles()
 
   return (
-    <DropArea
-      {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}
-      acceptedTypes={['not-staged-files']}
-      label={{
-        'not-staged-files': 'stage changes',
-      }}
-      handleDrop={(payload) => {
-        runAction(stage, payload.dragged)
+    <Draggable
+      className={cn('border-none')}
+      dragPayload={{
+        type: 'staged-files',
+        dragged: filesQuery.data?.items ?? [],
+        label: `${(filesQuery.data?.items ?? []).length} files`,
+        Glyph: IconFiles,
       }}
     >
-      <div
-        className={cn(
-          'text-sm text-light-600 text-start',
-          'py-2 flex flex-row gap-x-2 items-center',
-        )}
+      <DropArea
+        {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}
+        acceptedTypes={['not-staged-files']}
+        label={{
+          'not-staged-files': 'stage changes',
+        }}
+        handleDrop={(payload) => {
+          runAction(stage, payload.dragged)
+        }}
       >
-        <p>Staged Changes</p>
-
-        {showPagination ? (
-          <Pagination
-            page={page}
-            pageSize={WORKTREE_FILES_PAGE_SIZE}
-            hasNext={!!filesQuery.data?.hasNext}
-            setPrevPage={() => {
-              setPrevPage(STAGED_FILE_TYPES)
-            }}
-            setNextPage={() => {
-              setNextPage(STAGED_FILE_TYPES)
-            }}
-          />
-        ) : (
-          <Chip size="sm">{filesQuery.data?.items.length ?? '...'}</Chip>
-        )}
-      </div>
-
-      <div
-        className={cn(
-          'overflow-y-hidden grow',
-          'w-full bg-dark-800 rounded-sm',
-        )}
-      >
-        <MultiInteraction
-          items={filesQuery.data?.items ?? []}
-          getActions={getActions}
-          getDragPayload={(files) => ({
-            type: 'staged-files',
-            dragged: files,
-            label: files.length > 1 ? `${files.length} files` : files[0].path,
-            Glyph: files.length > 1 ? IconFiles : IconFile,
-          })}
+        <div
+          className={cn(
+            'text-sm text-light-600 text-start',
+            'py-2 flex flex-row gap-x-2 items-center',
+          )}
         >
-          <QueryList
-            name="files with staged changes"
-            query={filesQuery}
-            getItems={(d) => d.items}
-            renderItem={(file, position) => (
-              <StagedChangesItem file={file} itemIndex={position} />
-            )}
-            size="sm"
-            itemSize={48}
-            options={mapFn(filesQuery.data, (files) => ({
-              getItemKey: (index: number) => files.items[index].path,
-            }))}
-          />
-        </MultiInteraction>
-      </div>
-    </DropArea>
+          <p>Staged Changes</p>
+
+          {showPagination ? (
+            <Pagination
+              page={page}
+              pageSize={WORKTREE_FILES_PAGE_SIZE}
+              hasNext={!!filesQuery.data?.hasNext}
+              setPrevPage={() => {
+                setPrevPage(STAGED_FILE_TYPES)
+              }}
+              setNextPage={() => {
+                setNextPage(STAGED_FILE_TYPES)
+              }}
+            />
+          ) : (
+            <Chip size="sm">{filesQuery.data?.items.length ?? '...'}</Chip>
+          )}
+        </div>
+
+        <div
+          className={cn(
+            'overflow-y-hidden grow',
+            'w-full bg-dark-800 rounded-sm',
+          )}
+        >
+          <MultiInteraction
+            items={filesQuery.data?.items ?? []}
+            getActions={getActions}
+            getDragPayload={(files) => ({
+              type: 'staged-files',
+              dragged: files,
+              label: `${files.length} files`,
+              Glyph: IconFiles,
+            })}
+          >
+            <QueryList
+              name="files with staged changes"
+              query={filesQuery}
+              getItems={(d) => d.items}
+              renderItem={(file, position) => (
+                <StagedChangesItem file={file} itemIndex={position} />
+              )}
+              size="sm"
+              itemSize={48}
+              options={mapFn(filesQuery.data, (files) => ({
+                getItemKey: (index: number) => files.items[index].path,
+              }))}
+            />
+          </MultiInteraction>
+        </div>
+      </DropArea>
+    </Draggable>
   )
 }
 

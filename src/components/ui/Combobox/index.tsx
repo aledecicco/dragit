@@ -80,7 +80,6 @@ const ComboboxInner = (props: ComboboxProps) => {
       setCurrentGroup(selectedGroup?.name)
     },
     selectOnMove: true,
-    combobox,
   })
 
   return (
@@ -91,7 +90,6 @@ const ComboboxInner = (props: ComboboxProps) => {
         setValue={(newValue) => {
           group?.onSelect(newValue)
         }}
-        combobox={combobox}
       >
         <Ariakit.Select
           render={
@@ -143,6 +141,27 @@ const ComboboxInner = (props: ComboboxProps) => {
               placeholder={group ? `Search ${group.name}...` : 'Search...'}
               autoSelect="always"
               className={cn('w-full p-2 rounded-sm', 'text-sm bg-dark-500')}
+              onKeyDownCapture={(e) => {
+                if (e.key === 'ArrowLeft') {
+                  if (
+                    e.currentTarget.selectionStart === 0 &&
+                    e.currentTarget.selectionEnd === 0
+                  ) {
+                    e.stopPropagation()
+                  }
+                }
+
+                if (e.key === 'ArrowRight') {
+                  const length = e.currentTarget.value.length
+
+                  if (
+                    e.currentTarget.selectionStart === length &&
+                    e.currentTarget.selectionEnd === length
+                  ) {
+                    e.stopPropagation()
+                  }
+                }
+              }}
             />
 
             <Separator className={cn('my-2')} />

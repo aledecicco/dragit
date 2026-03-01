@@ -40,7 +40,6 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
 
   return (
     <Draggable
-      id={`commit-${commitInfo.id}`}
       dragPayload={{
         type: 'commit',
         dragged: commitInfo,

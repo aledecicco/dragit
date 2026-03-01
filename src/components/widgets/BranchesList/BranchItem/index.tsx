@@ -2,7 +2,7 @@ import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@/api/models'
-import { useCheckout, useCheckoutBranch } from '@/api/mutations/checkout'
+import { useCheckoutBranch } from '@/api/mutations/checkout'
 import {
   useBranchOff,
   useCreateBranchAt,
@@ -55,7 +55,6 @@ const BranchesListItem = (props: BranchesListItemProps) => {
 
   return (
     <Draggable
-      id={`branch-${branch.name}`}
       dragPayload={{
         type: 'branch',
         dragged: branch,

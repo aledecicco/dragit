@@ -238,12 +238,39 @@ function useCurrentDrag<T extends DragType>(types?: T[]) {
   return undefined
 }
 
+/**
+ * Utility function to temporarily override the drag payload of a draggable source for the duration of a drag operation.
+ * The original payload is restored after the operation ends.
+ *
+ * @param getPayload - A function that returns the new payload to use during the drag operation.
+ * @param source - The draggable source whose payload should be overridden.
+ * @param manager - The drag and drop manager that handles the drag operation.
+ */
+const overridePayload = <T extends DragType>(
+  getPayload: () => MatchingPayload<T>,
+  source: Draggable,
+  manager: DndSettings.DragDropManager,
+) => {
+  const originalData = source.data
+  const originalType = source.type
+
+  source.data = getPayload()
+  source.type = source.data.type
+
+  const unsubscribe = manager.monitor.addEventListener('dragend', () => {
+    source.data = originalData
+    source.type = originalType
+    unsubscribe()
+  })
+}
+
 export {
   useDraggable,
   useDroppable,
   useBeforeDrag,
   useOnDrop,
   useCurrentDrag,
+  overridePayload,
   SnapToCursor,
   RestrictMovement,
   type DragPayload,
