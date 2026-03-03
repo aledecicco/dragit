@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react'
 import { IconFiles } from '@tabler/icons-react'
 
-import type { WorktreeFileType } from '@/api/models'
+import type { StagedFile, WorktreeFileType } from '@/api/models'
 import { useStageFiles } from '@/api/mutations/addToIndex'
 import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
 import { useStashFiles } from '@/api/mutations/saveStash'
@@ -12,6 +12,7 @@ import {
 import { useNeedsPagination } from '@/api/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
+import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
@@ -23,6 +24,7 @@ import {
   useWorktreeFilesPage,
 } from '@/state/pages'
 import { Chip } from '@/ui/Chip'
+import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
@@ -52,12 +54,7 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
   return (
     <Draggable
       className={cn('border-none')}
-      dragPayload={{
-        type: 'staged-files',
-        dragged: filesQuery.data?.items ?? [],
-        label: `${(filesQuery.data?.items ?? []).length} files`,
-        Glyph: IconFiles,
-      }}
+      dragPayload={getDragPayload(filesQuery.data?.items)}
     >
       <DropArea
         {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}
@@ -103,12 +100,7 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
           <MultiInteraction
             items={filesQuery.data?.items ?? []}
             getActions={getActions}
-            getDragPayload={(files) => ({
-              type: 'staged-files',
-              dragged: files,
-              label: `${files.length} files`,
-              Glyph: IconFiles,
-            })}
+            getDragPayload={getDragPayload}
           >
             <QueryList
               name="files with staged changes"
@@ -129,6 +121,13 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
     </Draggable>
   )
 }
+
+const getDragPayload = (files: StagedFile[] | undefined): DragPayload => ({
+  type: 'staged-files',
+  dragged: files ?? [],
+  label: pluralize('file', files?.length ?? 0, true),
+  Glyph: IconFiles,
+})
 
 const useGetActions = () => {
   const unstage = useUnstageFiles()

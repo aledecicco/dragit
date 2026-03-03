@@ -37,8 +37,6 @@ interface BranchesListItemProps extends MultiSelectItemProps {
 
 /**
  * The list item for branches in the branches widget.
- *
- * Uses {@link Marquee}s to display long branch names.
  */
 const BranchesListItem = (props: BranchesListItemProps) => {
   const { branch, ...itemProps } = props

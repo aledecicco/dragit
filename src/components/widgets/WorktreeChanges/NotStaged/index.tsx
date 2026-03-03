@@ -21,6 +21,7 @@ import {
 import { useNeedsPagination } from '@/api/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
+import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
@@ -32,6 +33,7 @@ import {
   useWorktreeFilesPage,
 } from '@/state/pages'
 import { Chip } from '@/ui/Chip'
+import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
@@ -63,12 +65,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
   return (
     <Draggable
       className={cn('border-none')}
-      dragPayload={{
-        type: 'not-staged-files',
-        dragged: filesQuery.data?.items ?? [],
-        label: `${(filesQuery.data?.items ?? []).length} files`,
-        Glyph: IconFiles,
-      }}
+      dragPayload={getDragPayload(filesQuery.data?.items)}
     >
       <DropArea
         {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}
@@ -114,12 +111,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
           <MultiInteraction
             items={filesQuery.data?.items ?? []}
             getActions={getActions}
-            getDragPayload={(files) => ({
-              type: 'not-staged-files',
-              dragged: files,
-              label: `${files.length} files`,
-              Glyph: IconFiles,
-            })}
+            getDragPayload={getDragPayload}
           >
             <QueryList
               name="files with unstaged changes"
@@ -140,6 +132,13 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
     </Draggable>
   )
 }
+
+const getDragPayload = (files: NotStagedFile[] | undefined): DragPayload => ({
+  type: 'not-staged-files',
+  dragged: files ?? [],
+  label: pluralize('file', files?.length ?? 0, true),
+  Glyph: IconFiles,
+})
 
 const useGetActions = () => {
   const stage = useStageFiles()

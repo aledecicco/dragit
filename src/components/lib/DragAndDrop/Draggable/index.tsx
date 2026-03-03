@@ -9,6 +9,7 @@ import { propsWithCn } from '@/utils/styles'
 import {
   type Draggable as DraggableSource,
   type DragType,
+  isEmptyDragPayload,
   type MatchingPayload,
   useBeforeDrag,
   useDraggable,
@@ -46,6 +47,7 @@ const Draggable = <T extends DragType>(props: DraggableProps<T>) => {
     id,
     type: dragPayload.type,
     data: dragPayload,
+    disabled: isEmptyDragPayload(dragPayload),
   })
 
   useBeforeDrag(({ element, source, manager }) => {

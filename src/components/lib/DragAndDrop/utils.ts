@@ -264,6 +264,12 @@ const overridePayload = <T extends DragType>(
   })
 }
 
+/**
+ * Whether the given drag payload has no items being dragged.
+ */
+const isEmptyDragPayload = (payload: DragPayload): boolean =>
+  Array.isArray(payload.dragged) && payload.dragged.length === 0
+
 export {
   useDraggable,
   useDroppable,
@@ -271,6 +277,7 @@ export {
   useOnDrop,
   useCurrentDrag,
   overridePayload,
+  isEmptyDragPayload,
   SnapToCursor,
   RestrictMovement,
   type DragPayload,

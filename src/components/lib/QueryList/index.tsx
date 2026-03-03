@@ -104,7 +104,7 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
                 fallback={
                   <p
                     className={cn(
-                      'text-sm text-light-950/50 italic',
+                      'text-sm text-light-950/50 italic select-none',
                       'p-3 bg-dark-800 rounded-md h-full',
                     )}
                   >

@@ -8,6 +8,7 @@ import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { runAction } from '@/state/actions'
 import { useSelectedBranches } from '@/state/branches'
+import { cn } from '@/utils/styles'
 
 interface RecyclingBinProps extends ComponentProps<'div'> {}
 
@@ -26,7 +27,9 @@ const RecyclingBin = (props: RecyclingBinProps) => {
   return (
     <DropArea
       {...divProps}
-      dangerous
+      overlayProps={{
+        className: cn('border-danger-400'),
+      }}
       acceptedTypes={['branch', 'branches', 'stash', 'stashes', 'tag', 'tags']}
       label={{
         branch: 'delete this branch',

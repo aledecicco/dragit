@@ -2,6 +2,7 @@ import type { ComponentProps } from 'react'
 import { IconGitBranch, IconTags } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
+import type { BranchInfo, TagInfo } from '@/api/models'
 import { useMakeCreateBranchAt } from '@/api/mutations/createBranch'
 import { useMakeTagCommit } from '@/api/mutations/createTag'
 import { useDeleteBranches } from '@/api/mutations/deleteBranches'
@@ -12,12 +13,14 @@ import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
+import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
 import { prepareActionArgs, runAction } from '@/state/actions'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
 import { Tab } from '@/ui/Tabs/Item'
+import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
@@ -41,7 +44,7 @@ const BranchesList = (props: BranchesListProps) => {
     selectOnMove: false,
   })
 
-  const branchesQuery = match(selectedTab)
+  const currentBranchesQuery = match(selectedTab)
     .with('local', () => localBranchesQuery)
     .with('remote', () => remoteBranchesQuery)
     .otherwise(() => allBranchesQuery)
@@ -87,12 +90,7 @@ const BranchesList = (props: BranchesListProps) => {
           <>
             <Draggable
               className={cn('border-none')}
-              dragPayload={{
-                type: 'branches',
-                dragged: localBranchesQuery.data ?? [],
-                label: `${(localBranchesQuery.data ?? []).length} branches`,
-                Glyph: IconGitBranch,
-              }}
+              dragPayload={getBranchesDragPayload(localBranchesQuery.data)}
               onBeforeDrag={() => {
                 store.setSelectedId('local')
               }}
@@ -107,12 +105,7 @@ const BranchesList = (props: BranchesListProps) => {
 
             <Draggable
               className={cn('border-none')}
-              dragPayload={{
-                type: 'branches',
-                dragged: remoteBranchesQuery.data ?? [],
-                label: `${(remoteBranchesQuery.data ?? []).length} branches`,
-                Glyph: IconGitBranch,
-              }}
+              dragPayload={getBranchesDragPayload(remoteBranchesQuery.data)}
               onBeforeDrag={() => {
                 store.setSelectedId('remote')
               }}
@@ -127,12 +120,7 @@ const BranchesList = (props: BranchesListProps) => {
 
             <Draggable
               className={cn('border-none')}
-              dragPayload={{
-                type: 'branches',
-                dragged: allBranchesQuery.data ?? [],
-                label: `${(allBranchesQuery.data ?? []).length} branches`,
-                Glyph: IconGitBranch,
-              }}
+              dragPayload={getBranchesDragPayload(allBranchesQuery.data)}
               onBeforeDrag={() => {
                 store.setSelectedId('all')
               }}
@@ -145,12 +133,7 @@ const BranchesList = (props: BranchesListProps) => {
 
             <Draggable
               className={cn('border-none')}
-              dragPayload={{
-                type: 'tags',
-                dragged: tagsQuery.data ?? [],
-                label: `${(tagsQuery.data ?? []).length} tags`,
-                Glyph: IconTags,
-              }}
+              dragPayload={getTagsDragPayload(tagsQuery.data)}
               onBeforeDrag={() => {
                 store.setSelectedId('tags')
               }}
@@ -174,12 +157,7 @@ const BranchesList = (props: BranchesListProps) => {
           <MultiInteraction
             items={tagsQuery.data ?? []}
             getActions={getTagsListActions}
-            getDragPayload={(tags) => ({
-              type: 'tags',
-              dragged: tags,
-              label: `${tags.length} tags`,
-              Glyph: IconTags,
-            })}
+            getDragPayload={getTagsDragPayload}
           >
             <QueryList
               name="tags"
@@ -196,24 +174,19 @@ const BranchesList = (props: BranchesListProps) => {
           </MultiInteraction>
         ) : (
           <MultiInteraction
-            items={branchesQuery.data ?? []}
+            items={currentBranchesQuery.data ?? []}
             getActions={getBranchesListActions}
-            getDragPayload={(branches) => ({
-              type: 'branches',
-              dragged: branches,
-              label: `${branches.length} branches`,
-              Glyph: IconGitBranch,
-            })}
+            getDragPayload={getBranchesDragPayload}
           >
             <QueryList
               name="branches"
-              query={branchesQuery}
+              query={currentBranchesQuery}
               renderItem={(branch, position) => (
                 <BranchesListItem branch={branch} itemIndex={position} />
               )}
               size="sm"
               itemSize={74}
-              options={mapFn(branchesQuery.data, (branches) => ({
+              options={mapFn(currentBranchesQuery.data, (branches) => ({
                 getItemKey: (index: number) => branches[index].name,
               }))}
             />
@@ -223,6 +196,22 @@ const BranchesList = (props: BranchesListProps) => {
     </DropArea>
   )
 }
+
+const getBranchesDragPayload = (
+  branches: BranchInfo[] | undefined,
+): DragPayload => ({
+  type: 'branches',
+  dragged: branches ?? [],
+  label: pluralize('branch', branches?.length ?? 0, true, 'branches'),
+  Glyph: IconGitBranch,
+})
+
+const getTagsDragPayload = (tags: TagInfo[] | undefined): DragPayload => ({
+  type: 'tags',
+  dragged: tags ?? [],
+  label: pluralize('tag', tags?.length ?? 0, true),
+  Glyph: IconTags,
+})
 
 const useGetBranchesListActions = () => {
   const deleteBranches = useDeleteBranches()

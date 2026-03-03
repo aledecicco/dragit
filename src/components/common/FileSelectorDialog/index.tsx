@@ -173,7 +173,10 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
         }))}
         fallback={
           <div
-            className={cn('p-3 text-center', 'text-sm italic text-light-950')}
+            className={cn(
+              'p-3 text-center',
+              'text-sm italic text-light-950 select-none',
+            )}
           >
             {filesQuery.data?.items === undefined
               ? 'Loading matches.'

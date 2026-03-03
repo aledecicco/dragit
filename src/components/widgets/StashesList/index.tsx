@@ -1,17 +1,20 @@
 import type { ComponentProps } from 'react'
 import { IconArchive } from '@tabler/icons-react'
 
+import type { StashInfo } from '@/api/models'
 import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { useStashFiles } from '@/api/mutations/saveStash'
 import { useQueryStashes } from '@/api/queries/stashes'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
+import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
 import { runAction } from '@/state/actions'
 import { Accordion } from '@/ui/Accordion'
 import { AccordionSection } from '@/ui/Accordion/Section'
 import { Chip } from '@/ui/Chip'
+import { pluralize } from '@/utils/string'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
@@ -35,12 +38,7 @@ const StashesList = (props: StashesListProps) => {
   return (
     <Draggable
       className={cn('border-none')}
-      dragPayload={{
-        type: 'stashes',
-        dragged: stashesQuery.data ?? [],
-        label: `${(stashesQuery.data ?? []).length} stashes`,
-        Glyph: IconArchive,
-      }}
+      dragPayload={getDragPayload(stashesQuery.data)}
     >
       <DropArea
         acceptedTypes={['staged-files', 'not-staged-files']}
@@ -65,12 +63,7 @@ const StashesList = (props: StashesListProps) => {
             <MultiInteraction
               items={stashesQuery.data ?? []}
               getActions={getStashesListActions}
-              getDragPayload={(stashes) => ({
-                type: 'stashes',
-                dragged: stashes,
-                label: `${stashes.length} stashes`,
-                Glyph: IconArchive,
-              })}
+              getDragPayload={getDragPayload}
             >
               <QueryList
                 name="stashes"
@@ -91,6 +84,13 @@ const StashesList = (props: StashesListProps) => {
     </Draggable>
   )
 }
+
+const getDragPayload = (stashes: StashInfo[] | undefined): DragPayload => ({
+  type: 'stashes',
+  dragged: stashes ?? [],
+  label: pluralize('stash', stashes?.length ?? 0, true, 'stashes'),
+  Glyph: IconArchive,
+})
 
 const useGetStashesListActions = () => {
   const discard = useDiscardStashes()

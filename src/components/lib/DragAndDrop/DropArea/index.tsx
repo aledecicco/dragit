@@ -46,11 +46,6 @@ interface DropAreaProps<T extends DragType> extends ComponentProps<'div'> {
    * Additional props to pass to the overlay displayed during drag operations.
    */
   overlayProps?: ComponentProps<'div'>
-
-  /**
-   * Whether to indicate that dropping an item here is a dangerous action.
-   */
-  dangerous?: boolean
 }
 
 /**
@@ -64,23 +59,23 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
     label,
     Glyph,
     overlayProps,
-    dangerous = false,
     children,
     ref,
     ...divProps
   } = props
+
+  const currentDrag = useCurrentDrag(acceptedTypes)
+
+  const disabledByValidation =
+    !!currentDrag && !!extraValidation && !extraValidation(currentDrag.data)
 
   const id = useUniqueId()
 
   const { ref: dropRef, isDropTarget } = useDroppable({
     id,
     accept: acceptedTypes,
+    disabled: disabledByValidation,
   })
-
-  const currentDrag = useCurrentDrag(acceptedTypes)
-
-  const disabledByValidation =
-    currentDrag && extraValidation && !extraValidation(currentDrag.data)
 
   useOnDrop(id, acceptedTypes, ({ source }) => {
     if (!disabledByValidation) {
@@ -107,9 +102,8 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
             'absolute top-0 left-0 w-full h-full overflow-hidden',
             'flex flex-col items-center justify-center gap-2 p-4',
             'rounded-md border border-dashed border-primary-400 bg-dark-400',
-            'text-md text-light-950/50 text-center',
+            'text-md text-light-950/50 text-center select-none',
             isDropTarget && 'border-accent-400 bg-dark-300 text-light-950/80',
-            dangerous && 'text-danger-400/90 border-danger-400',
             disabledByValidation &&
               'border-dark-50 bg-dark-500 text-light-950/30',
           )}
