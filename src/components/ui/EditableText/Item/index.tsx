@@ -2,14 +2,14 @@ import * as Ariakit from '@ariakit/react'
 
 import { cn, propsWithCn } from '@/utils/styles'
 
-import { Autosuggest } from '..'
+import { EditableText } from '..'
 
-interface AutosuggestItemProps extends Ariakit.ComboboxItemProps {}
+interface EditableTextItemProps extends Ariakit.ComboboxItemProps {}
 
 /**
- * A single item in an {@link Autosuggest} component.
+ * A single item in an {@link EditableText} component.
  */
-const AutosuggestItem = (props: AutosuggestItemProps) => {
+const EditableTextItem = (props: EditableTextItemProps) => {
   const { ...itemProps } = props
 
   return (
@@ -33,4 +33,4 @@ const AutosuggestItem = (props: AutosuggestItemProps) => {
   )
 }
 
-export { AutosuggestItem, type AutosuggestItemProps }
+export { EditableTextItem, type EditableTextItemProps }

@@ -1,16 +1,35 @@
-import { useEffect, useState } from 'react'
+import { useDeferredValue, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
+import { matchSorter } from 'match-sorter'
+import { useEffectOnce } from 'react-use'
 
-import { Autosuggest, type AutosuggestProps } from '@/ui/Autosuggest'
 import { Button, type ButtonProps } from '@/ui/Button'
 import { Marquee } from '@/ui/Marquee'
-import { propsWithCn } from '@/utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 
-interface EditableTextProps extends AutosuggestProps {
+import { EditableTextItem } from './Item'
+
+interface EditableTextProps extends Ariakit.ComboboxProps {
   /**
    * A label used for accessibility.
    */
   label: string
+
+  /**
+   * The list of all possible suggestions that could be displayed.
+   * If not provided, the suggestions dropdown won't be displayed.
+   */
+  suggestions?: string[]
+
+  /**
+   * The currently submitted value.
+   */
+  value: string
+
+  /**
+   * Callback that is called when the value is committed.
+   */
+  setValue: (value: string) => void
 
   /**
    * Props for the button that triggers the editable text.
@@ -22,45 +41,32 @@ interface EditableTextProps extends AutosuggestProps {
  * A button that turns into an editable text input when clicked.
  *
  * The changes can be committed by pressing Enter, or discarded by pressing Escape.
- *
- * Can receive suggestions from the {@link Autosuggest} component.
  */
 const EditableText = (props: EditableTextProps) => {
-  const { buttonProps, label, ...inputProps } = props
+  const {
+    label,
+    buttonProps,
+    suggestions = [],
+    value,
+    setValue,
+    ...comboboxProps
+  } = props
+
   const [editing, setEditing] = useState(false)
 
-  const { store, isOpen } = useEditableTextHandler()
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const showingSuggestions = isOpen && inputProps.suggestions?.length
-
-      if (editing && !showingSuggestions && e.key === 'Escape') {
-        setEditing(false)
-        e.stopPropagation()
-      }
-    }
-
-    window.addEventListener('keydown', handler, { capture: true })
-
-    return () => {
-      window.removeEventListener('keydown', handler, { capture: true })
-    }
-  }, [editing, isOpen, inputProps.suggestions?.length])
-
   return editing ? (
-    <Autosuggest
+    <EditableTextInner
       autoFocus
-      aria-label={`${label}. Press Enter to save. Press Escape to cancel.`}
-      store={store}
-      {...propsWithCn(inputProps, 'font-medium')}
-      placeholder={inputProps.placeholder ?? `Enter a ${label}...`}
-      setValue={(value) => {
-        inputProps.setValue(value)
+      {...propsWithCn(comboboxProps, 'font-medium')}
+      defaultValue={value}
+      placeholder={comboboxProps.placeholder ?? `Enter a ${label}...`}
+      label={label}
+      suggestions={suggestions}
+      persistValue={(value) => {
+        setValue(value)
         setEditing(false)
       }}
-      onBlur={(e) => {
-        inputProps.onBlur?.(e)
+      discardValue={() => {
         setEditing(false)
       }}
     />
@@ -74,18 +80,118 @@ const EditableText = (props: EditableTextProps) => {
         setEditing(true)
       }}
     >
-      <Marquee reverse={false}>
-        {inputProps.value ?? inputProps.placeholder}
-      </Marquee>
+      <Marquee reverse={false}>{value ?? comboboxProps.placeholder}</Marquee>
     </Button>
   )
 }
 
-const useEditableTextHandler = () => {
-  const store = Ariakit.useComboboxStore()
-  const isOpen = Ariakit.useStoreState(store, 'open')
+interface EditableTextInnerProps extends Ariakit.ComboboxProps {
+  label: string
 
-  return { store, isOpen }
+  suggestions: string[]
+
+  defaultValue: string
+
+  persistValue: (value: string) => void
+
+  discardValue: () => void
 }
 
-export { EditableText, useEditableTextHandler, type EditableTextProps }
+const EditableTextInner = (props: EditableTextInnerProps) => {
+  const {
+    label,
+    suggestions,
+    defaultValue,
+    persistValue,
+    discardValue,
+    ...comboboxProps
+  } = props
+
+  const combobox = Ariakit.useComboboxStore({
+    defaultValue,
+    setSelectedValue: (value) => {
+      if (typeof value === 'string') {
+        persistValue(value)
+      }
+    },
+  })
+  const search = Ariakit.useStoreState(combobox, 'value')
+  const deferredSearch = useDeferredValue(search)
+  const matchingSuggestions = useDeferredValue(
+    matchSorter(suggestions, deferredSearch),
+  )
+
+  useEffectOnce(() => {
+    // Listen for Escape key presses at the window level, otherwise Ariakit always beats us to it.
+    const stopEditing = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !combobox.getState().open) {
+        discardValue()
+        e.stopPropagation()
+        e.preventDefault()
+      }
+    }
+
+    window.addEventListener('keydown', stopEditing, { capture: true })
+
+    return () => {
+      window.removeEventListener('keydown', stopEditing, { capture: true })
+    }
+  })
+
+  return (
+    <Ariakit.ComboboxProvider store={combobox}>
+      <Ariakit.Combobox
+        aria-label={`${label}. Press Enter to save. Press Escape to cancel.`}
+        {...propsWithCn(
+          comboboxProps,
+          'px-2.5 py-1.75 bg-dark-800 rounded-sm text-sm text-light-800',
+          'min-w-0 text-sm',
+          search === undefined && 'font-thin text-light-300',
+        )}
+        placeholder={comboboxProps.placeholder ?? 'Select...'}
+        onBlur={(e) => {
+          comboboxProps.onBlur?.(e)
+          discardValue()
+        }}
+        onKeyDown={(e) => {
+          comboboxProps.onKeyDown?.(e)
+
+          if (e.key === 'Enter' && !combobox.getState().activeValue) {
+            persistValue(search)
+            e.stopPropagation()
+            e.preventDefault()
+          }
+        }}
+      />
+
+      <Ariakit.ComboboxPopover
+        portal
+        sameWidth
+        gutter={4}
+        className={cn('rounded-lg shadow-md', 'bg-dark-300 p')}
+      >
+        <Ariakit.ComboboxList className={cn('max-h-80 overflow-y-auto')}>
+          {suggestions.length === 0 ? (
+            <div
+              className={cn('text-center p-2', 'text-sm italic text-light-950')}
+            >
+              No {label} found
+            </div>
+          ) : matchingSuggestions.length === 0 ? (
+            <div
+              className={cn('text-center p-2', 'text-sm italic text-light-950')}
+            >
+              No matching {label} found
+            </div>
+          ) : (
+            matchingSuggestions.map((suggestion) => (
+              <EditableTextItem key={suggestion} value={suggestion} />
+            ))
+          )}
+        </Ariakit.ComboboxList>
+      </Ariakit.ComboboxPopover>
+    </Ariakit.ComboboxProvider>
+  )
+}
+
+export { EditableText, type EditableTextProps }

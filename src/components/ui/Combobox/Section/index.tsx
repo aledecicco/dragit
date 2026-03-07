@@ -46,15 +46,11 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
   const { name, options, renderOption, onSelect, noMatches, ...listProps } =
     props
 
-  const { registerGroup, unregisterGroup } = useComboboxGroupHandler()
+  const { registerGroup } = useComboboxGroupHandler()
 
   useEffect(() => {
     registerGroup({ name, onSelect })
-
-    return () => {
-      unregisterGroup(name)
-    }
-  }, [name, onSelect, registerGroup, unregisterGroup])
+  }, [name, onSelect, registerGroup])
 
   const { search, group } = useComboboxState()
   const deferredSearch = useDeferredValue(search)

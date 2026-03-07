@@ -8,7 +8,7 @@ import type { CurrentDirInfo } from '../models'
 import { CURRENT_DIR_INFO_SCHEMA } from '../schemas'
 import { fetchAndDeserialize } from '../utils'
 
-const currentDirQueryKey = ['current_dir'] as const
+const currentDirQueryKey = { key: 'current_dir' } as const
 
 const fetchCurrentDir = (
   context: QueryFunctionContext,
@@ -22,7 +22,7 @@ const fetchCurrentDir = (
 }
 
 const currentDirQuery = queryOptions({
-  queryKey: currentDirQueryKey,
+  queryKey: [currentDirQueryKey],
   queryFn: fetchCurrentDir,
 })
 

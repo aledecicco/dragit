@@ -2,11 +2,17 @@ import { IconGitBranch, IconGitCommit, IconTag } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import { useCheckout, useSwitchBranches } from '@/api/mutations/checkout'
+import { useMakeBranchOff } from '@/api/mutations/createBranch'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { useQueryTags } from '@/api/queries/tags'
+import { requestBranchName } from '@/common/CreateBranchDialog'
 import { ActionButton } from '@/lib/ActionButton'
-import { runAction, useActionPresenters } from '@/state/actions'
+import {
+  prepareActionArgs,
+  runAction,
+  useActionPresenters,
+} from '@/state/actions'
 import { changeSelectedBase, useSelectedReferences } from '@/state/branches'
 import { useSelectedUpstream } from '@/state/upstream'
 import { Combobox } from '@/ui/Combobox'
@@ -21,6 +27,7 @@ import { cn } from '@/utils/styles'
  */
 const BranchSelectors = () => {
   const headInfoQuery = useQueryHeadInfo()
+  const remoteBranchesQuery = useQueryBranches('remote')
   const branchesQuery = useQueryBranches()
   const tagsQuery = useQueryTags()
 
@@ -31,6 +38,7 @@ const BranchSelectors = () => {
   const checkout = useCheckout()
   const checkoutTracker = useActionPresenters(checkout)
   const switchBranches = useSwitchBranches()
+  const makeBranchOff = useMakeBranchOff()
 
   const branchOptions = branchesQuery.data?.map((branch) => branch.name) ?? []
   const baseBranchOptions = [
@@ -50,12 +58,12 @@ const BranchSelectors = () => {
     <>
       <Combobox
         className={cn('w-65 col-start-1 row-start-1')}
-        value={currentReference?.refName}
-        placeholder={
+        value={
           currentReference?.type === 'commit'
-            ? `Detached at #${currentReference.refName}`
-            : 'Checkout a branch...'
+            ? `#${currentReference.refName}`
+            : currentReference?.refName
         }
+        placeholder="Checkout a branch..."
         disabled={
           checkoutTracker.actionStatus === 'running' ||
           checkoutTracker.actionStatus === 'disabled' ||
@@ -75,11 +83,21 @@ const BranchSelectors = () => {
       >
         <ComboboxSection
           name="branches"
-          onSelect={(value) => {
-            runAction(checkout, {
-              reference: value,
-              isNew: false,
-            })
+          onSelect={async (value) => {
+            if (
+              remoteBranchesQuery.data?.some((branch) => branch.name === value)
+            ) {
+              const branchOff = makeBranchOff(value)
+              const args = await prepareActionArgs(branchOff, () =>
+                requestBranchName(value),
+              )
+              runAction(branchOff, args)
+            } else {
+              runAction(checkout, {
+                reference: value,
+                isNew: false,
+              })
+            }
           }}
           options={branchOptions}
           noMatches={(search) => (
@@ -119,12 +137,12 @@ const BranchSelectors = () => {
 
       <Combobox
         className={cn('w-65 col-start-3 row-start-1')}
-        value={baseReference?.refName}
-        placeholder={
+        value={
           baseReference?.type === 'commit'
             ? `#${baseReference.refName}`
-            : 'Choose a base branch...'
+            : baseReference?.refName
         }
+        placeholder="Choose a base branch..."
         disabled={!headInfoQuery.data || !branchesQuery.data}
         Glyph={match(baseReference?.type)
           .with('commit', () => IconGitCommit)

@@ -4,9 +4,9 @@ interface ValueRequesterProps<T> {
 
 /**
  * Opens a component that asks the user for a value.
- * Creates a promise that resolves when the user submits the value from the dialog.
+ * Creates a promise that resolves when the user submits the value from the component.
  *
- * @param AskDialog - The component to render, that must accept a submit callback.
+ * @param showValueRequester - A callback that shows the component that requests the value from the user.
  *
  * @returns A promise that resolves with the value provided by the user.
  */

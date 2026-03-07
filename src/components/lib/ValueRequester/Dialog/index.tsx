@@ -13,6 +13,10 @@ type ValueRequesterDialogProps<T extends AnyObject> = RequireOnly<
 > &
   ValueRequesterProps<T>
 
+/**
+ * A dialog that implements the ValueRequester interface,
+ * by rendering a {@link FormDialog} and passing the submitted form values to the submit callback.
+ */
 const ValueRequesterDialog = <T extends AnyObject>(
   props: ValueRequesterDialogProps<T>,
 ) => {

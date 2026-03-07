@@ -56,7 +56,7 @@ const CreateBranchDialog = (props: CreateBranchDialogProps) => {
           type="submit"
           label="Create branch"
           Glyph={IconPlus}
-          className={cn('w-full')}
+          className={cn('w-full mt-8')}
           status="primary"
         />
       </DialogContent>

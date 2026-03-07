@@ -28,7 +28,7 @@ const RemotesDialog = (props: RemotesDialogProps) => {
   return (
     <Dialog
       dialogKey={REMOTES_DIALOG_KEY}
-      {...propsWithCn(dialogProps, 'grid-cols-[560px]')}
+      {...propsWithCn(dialogProps, 'grid-cols-[600px]')}
     >
       <DialogContent heading="Remotes">
         <div

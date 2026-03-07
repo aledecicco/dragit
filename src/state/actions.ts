@@ -297,7 +297,6 @@ async function runAction<T>(action: Action<T>, args?: T): Promise<void> {
       .finally(() => {
         const timeoutId = setTimeout(() => {
           setAll(undefined)
-          setAllTimers(undefined)
         }, MS_IN_SECOND * 2)
 
         setAllTimers(timeoutId)

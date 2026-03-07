@@ -61,17 +61,8 @@ const ComboboxInner = (props: ComboboxProps) => {
     ...buttonProps
   } = props
 
-  const { group, groups } = useComboboxState()
+  const { search, group, groups } = useComboboxState()
   const { setSearch, setCurrentGroup } = useComboboxUpdater()
-
-  const combobox = Ariakit.useComboboxStore({
-    resetValueOnHide: true,
-    setValue: (newValue) => {
-      startTransition(() => {
-        setSearch(newValue)
-      })
-    },
-  })
 
   const tabsHandler = useTabsHandler(group?.name, {
     selectedId: group?.name,
@@ -83,10 +74,22 @@ const ComboboxInner = (props: ComboboxProps) => {
   })
 
   return (
-    <Ariakit.ComboboxProvider store={combobox}>
+    <Ariakit.ComboboxProvider
+      value={search}
+      setValue={(newValue) => {
+        startTransition(() => {
+          setSearch(newValue)
+        })
+      }}
+    >
       <Ariakit.SelectProvider
         includesBaseElement={false}
         value={value ?? ''}
+        setOpen={(open) => {
+          if (open) {
+            setSearch('')
+          }
+        }}
         setValue={(newValue) => {
           group?.onSelect(newValue)
         }}
@@ -142,22 +145,26 @@ const ComboboxInner = (props: ComboboxProps) => {
               autoSelect="always"
               className={cn('w-full p-2 rounded-sm', 'text-sm bg-dark-500')}
               onKeyDownCapture={(e) => {
-                if (e.key === 'ArrowLeft') {
-                  if (
+                // Prevent arrow keys from switching tabs when text is being navigated.
+
+                if (e.key === 'ArrowLeft' || e.key === 'Home') {
+                  const isAtStart =
                     e.currentTarget.selectionStart === 0 &&
                     e.currentTarget.selectionEnd === 0
-                  ) {
+
+                  if (!isAtStart) {
                     e.stopPropagation()
                   }
                 }
 
-                if (e.key === 'ArrowRight') {
-                  const length = e.currentTarget.value.length
+                if (e.key === 'ArrowRight' || e.key === 'End') {
+                  const isAtEnd =
+                    e.currentTarget.selectionStart ===
+                      e.currentTarget.value.length &&
+                    e.currentTarget.selectionEnd ===
+                      e.currentTarget.value.length
 
-                  if (
-                    e.currentTarget.selectionStart === length &&
-                    e.currentTarget.selectionEnd === length
-                  ) {
+                  if (!isAtEnd) {
                     e.stopPropagation()
                   }
                 }

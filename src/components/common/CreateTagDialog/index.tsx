@@ -64,7 +64,7 @@ const CreateTagDialog = (props: CreateTagDialogProps) => {
           type="submit"
           label="Create tag"
           Glyph={IconTag}
-          className={cn('w-full')}
+          className={cn('w-full mt-8')}
           status="primary"
         />
       </DialogContent>

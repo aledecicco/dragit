@@ -3,12 +3,12 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Settings } from '../models'
 
-const settingsQueryKey = ['settings'] as const
+const settingsQueryKey = { key: 'settings' } as const
 
 const fetchSettings = (): Promise<Settings> => invoke('get_setings')
 
 const settingsQuery = queryOptions({
-  queryKey: settingsQueryKey,
+  queryKey: [settingsQueryKey],
   queryFn: fetchSettings,
 })
 

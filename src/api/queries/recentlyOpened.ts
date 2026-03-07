@@ -7,7 +7,7 @@ import {
 import { RECENTLY_OPENED_SCHEMA } from '../schemas'
 import { fetchAndDeserialize } from '../utils'
 
-const recentlyOpenedQueryKey = ['recently_opened'] as const
+const recentlyOpenedQueryKey = { key: 'recently_opened' } as const
 
 const fetchRecentlyOpened = (
   context: QueryFunctionContext,
@@ -21,7 +21,7 @@ const fetchRecentlyOpened = (
 }
 
 const recentlyOpenedQuery = queryOptions({
-  queryKey: recentlyOpenedQueryKey,
+  queryKey: [recentlyOpenedQueryKey],
   queryFn: fetchRecentlyOpened,
 })
 

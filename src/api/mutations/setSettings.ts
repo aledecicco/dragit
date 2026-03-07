@@ -10,10 +10,10 @@ interface SetSettingsArgs {
   settings: Settings
 }
 
-const setSettingsKey = ['set_settings'] as const
+const setSettingsKey = { key: 'set_settings' } as const
 
 const setSettingsMutation = mutationOptions({
-  mutationKey: setSettingsKey,
+  mutationKey: [setSettingsKey],
   mutationFn: (args: SetSettingsArgs) => {
     return invoke('set_settings', { ...args })
   },

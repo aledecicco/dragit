@@ -27,7 +27,7 @@ Stash of ideas in ~planned implementation order:
 - [ ] Highlight matches during pathspec search
 - [x] More complete commit dialog with "amend" option
 - [ ] Animations pass
-- [ ] Drag and drop shortcuts
+- [x] Drag and drop shortcuts
 - [ ] Global keyboard shortcuts
 - [ ] Settings screen
 - [ ] Another pass

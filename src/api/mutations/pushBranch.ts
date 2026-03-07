@@ -4,6 +4,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
 import { useSelectedBranches } from '@/state/branches'
+import { useSelectedUpstream } from '@/state/upstream'
 
 import type { BranchInfo, BranchName, RemoteName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
@@ -32,7 +33,9 @@ const pushBranchMutation = (repoPath: string) =>
   })
 
 const usePushBranch = (branch: BranchInfo): Action => {
+  const remoteCounterpart = useSelectedUpstream(branch)
   const pushBranch = useRepositoryMutation(pushBranchMutation)
+
   const { currentBranch } = useSelectedBranches()
 
   return {
@@ -57,8 +60,8 @@ const usePushBranch = (branch: BranchInfo): Action => {
 
       await pushBranch.mutateAsync({
         branch: branch.name,
-        remote: branch.upstream?.remote ?? 'origin',
-        remoteBranch: branch.upstream?.remoteBranch ?? branch.name,
+        remote: remoteCounterpart?.remote ?? 'origin',
+        remoteBranch: remoteCounterpart?.remoteBranch ?? branch.name,
         isForce: false,
         setUpstream: true,
       })
@@ -74,7 +77,10 @@ const usePushBranch = (branch: BranchInfo): Action => {
 }
 
 const useForcePushBranch = (branch: BranchInfo): Action => {
+  const remoteCounterpart = useSelectedUpstream(branch)
   const pushBranch = useRepositoryMutation(pushBranchMutation)
+
+  const { currentBranch } = useSelectedBranches()
 
   return {
     id: {
@@ -82,7 +88,15 @@ const useForcePushBranch = (branch: BranchInfo): Action => {
       operation: 'force_push',
       branch: branch.name,
     },
-    blockedBy: [{ key: 'branch_operation', branch: branch.name }],
+    blockedBy: [
+      { key: 'branch_operation', branch: branch.name },
+      ...(currentBranch?.name === branch.name
+        ? [
+            { key: 'branch_operation', type: 'current' },
+            { key: 'file_operation' },
+          ]
+        : []),
+    ],
     run: async () => {
       if (branch.type !== 'local') {
         throw new Error('Branch is not local')
@@ -90,8 +104,8 @@ const useForcePushBranch = (branch: BranchInfo): Action => {
 
       await pushBranch.mutateAsync({
         branch: branch.name,
-        remote: branch.upstream?.remote ?? 'origin',
-        remoteBranch: branch.upstream?.remoteBranch ?? branch.name,
+        remote: remoteCounterpart?.remote ?? 'origin',
+        remoteBranch: remoteCounterpart?.remoteBranch ?? branch.name,
         isForce: true,
         setUpstream: true,
       })

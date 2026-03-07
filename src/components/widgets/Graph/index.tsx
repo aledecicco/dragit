@@ -5,12 +5,14 @@ import { defaultRangeExtractor, type Range } from '@tanstack/react-virtual'
 import { SvgOverlay } from '@/widgets/Graph/SvgOverlay'
 
 import { useCheckout } from '@/api/mutations/checkout'
+import { useMakeBranchOff } from '@/api/mutations/createBranch'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { getPaginatedLength } from '@/api/utils'
 import { BranchToolbar } from '@/common/BranchToolbar'
+import { requestBranchName } from '@/common/CreateBranchDialog'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
-import { runAction } from '@/state/actions'
+import { prepareActionArgs, runAction } from '@/state/actions'
 import {
   changeSelectedBase,
   useSelectedBranches,
@@ -117,6 +119,7 @@ const GraphInner = () => {
   })
 
   const checkout = useCheckout()
+  const makeBranchOff = useMakeBranchOff()
 
   return (
     <>
@@ -168,11 +171,19 @@ const GraphInner = () => {
           branch: 'checkout this branch',
           tag: 'checkout this tag',
         }}
-        handleDrop={(payload) => {
-          runAction(checkout, {
-            reference: payload.dragged.name,
-            isNew: false,
-          })
+        handleDrop={async (payload) => {
+          if (payload.type === 'branch' && payload.dragged.type === 'remote') {
+            const branchOff = makeBranchOff(payload.dragged.name)
+            const args = await prepareActionArgs(branchOff, () =>
+              requestBranchName(payload.dragged.name),
+            )
+            runAction(branchOff, args)
+          } else {
+            runAction(checkout, {
+              reference: payload.dragged.name,
+              isNew: false,
+            })
+          }
         }}
       />
 
