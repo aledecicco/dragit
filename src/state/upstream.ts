@@ -61,6 +61,7 @@ const useSelectedUpstreamsStore = create<SelectedUpstreams & Setters>()(
 const chooseUpstream = (
   branch: LocalBranch,
   remotes: RemoteInfo[],
+  currentBranch?: LocalBranch,
 ): Upstream => {
   const store = useSelectedUpstreamsStore.getState()
 
@@ -71,7 +72,11 @@ const chooseUpstream = (
     remotes.find((_remote) => _remote.name === branch.upstream?.remote)?.name ??
     // If not found, and there's only one remote, use that one.
     (remotes.length === 1 ? remotes.at(0) : undefined)?.name ??
-    // Otherwise fall back to the default remote name.
+    // Or if the current branch is tracking a remote branch, use that remote.
+    (currentBranch
+      ? store.upstreams.get(currentBranch.name)?.remote
+      : undefined) ??
+    // Otherwise, fall back to the default remote name.
     DEFAULT_REMOTE_NAME
 
   const newRemoteBranch: BranchName =
@@ -82,10 +87,14 @@ const chooseUpstream = (
     // Otherwise, fall back to using the current branch name.
     branch.name
 
-  return {
+  const newUpstream = {
     remote: newRemote,
     remoteBranch: newRemoteBranch,
   }
+
+  store.changeUpstream(branch.name, newUpstream)
+
+  return newUpstream
 }
 
 /**
@@ -116,13 +125,19 @@ const useSelectedUpstream = (
   const storedUpstream = useStoredUpstream(branch)
   const remotesQuery = useQueryRemotes()
 
+  const { currentBranch } = useSelectedBranches()
+
   if (storedUpstream) {
     return storedUpstream
   }
 
   const upstream =
     branch?.type === 'local'
-      ? chooseUpstream(branch, remotesQuery.data ?? [])
+      ? chooseUpstream(
+          branch,
+          remotesQuery.data ?? [],
+          currentBranch?.type === 'local' ? currentBranch : undefined,
+        )
       : undefined
 
   return upstream
@@ -153,12 +168,7 @@ const useUpstreamSync = () => {
       return
     }
 
-    const store = useSelectedUpstreamsStore.getState()
-
-    store.changeUpstream(
-      currentBranch.name,
-      chooseUpstream(currentBranch, remotesQuery.data ?? []),
-    )
+    chooseUpstream(currentBranch, remotesQuery.data ?? [])
   }, [currentBranch, remotesQuery.data])
 }
 

@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 
@@ -14,7 +14,11 @@ import {
   type ContextMenuEvent,
 } from '../ContextMenu'
 import { Draggable } from '../DragAndDrop/Draggable'
-import { type DragPayload, overridePayload } from '../DragAndDrop/utils'
+import {
+  type DragPayload,
+  overridePayload,
+  useBeforeDrag,
+} from '../DragAndDrop/utils'
 import { MultiSelect, type MultiSelectProps } from '../MultiSelect'
 import { useSelectedItems, useSelectionUpdater } from '../MultiSelect/context'
 
@@ -83,40 +87,40 @@ const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
   }, [items])
 
   const allItemsPayload = getDragPayload(items)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useBeforeDrag(({ element, source, manager }) => {
+    if (!containerRef.current?.contains(element)) {
+      return
+    }
+
+    const compositeItem = composite
+      ?.getState()
+      .renderedItems.find((item) => item.element?.contains(element))
+
+    if (compositeItem) {
+      const itemId = Number(compositeItem.id)
+      const draggedItem = items.at(itemId)
+
+      if (draggedItem) {
+        // If more than one item is selected upon dragging, and the dragged item is among the selected ones,
+        // set the drag payload to include all selected items.
+        if (selectedItemIndexes.size > 1 && selectedItemIndexes.has(itemId)) {
+          overridePayload(() => getDragPayload(selectedItems), source, manager)
+        } else {
+          setSelection(itemId)
+        }
+      }
+    } else {
+      setSelection([...Array(items.length).keys()])
+    }
+  })
 
   return (
     <Draggable
       dragPayload={allItemsPayload}
-      onBeforeDrag={({ element, source, manager }) => {
-        const compositeItem = composite
-          ?.getState()
-          .renderedItems.find((item) => item.element?.contains(element))
-
-        if (compositeItem) {
-          const itemId = Number(compositeItem.id)
-          const draggedItem = items.at(itemId)
-
-          if (draggedItem) {
-            // If more than one item is selected upon dragging, and the dragged item is among the selected ones,
-            // set the drag payload to include all selected items.
-            if (
-              selectedItemIndexes.size > 1 &&
-              selectedItemIndexes.has(itemId)
-            ) {
-              overridePayload(
-                () => getDragPayload(selectedItems),
-                source,
-                manager,
-              )
-            } else {
-              setSelection(itemId)
-            }
-          }
-        } else {
-          setSelection([...Array(items.length).keys()])
-        }
-      }}
       className={cn('border-none')}
+      ref={containerRef}
     >
       <ContextMenu
         {...contentProps}

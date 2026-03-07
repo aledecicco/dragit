@@ -122,19 +122,25 @@ const EditableTextInner = (props: EditableTextInnerProps) => {
   )
 
   useEffectOnce(() => {
-    // Listen for Escape key presses at the window level, otherwise Ariakit always beats us to it.
-    const stopEditing = (e: KeyboardEvent) => {
+    // Listen for key presses at the window level, otherwise Ariakit always beats us to it.
+    const handleEditing = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !combobox.getState().open) {
         discardValue()
         e.stopPropagation()
         e.preventDefault()
       }
+
+      if (e.key === 'Enter' && !combobox.getState().activeValue) {
+        persistValue(combobox.getState().value)
+        e.stopPropagation()
+        e.preventDefault()
+      }
     }
 
-    window.addEventListener('keydown', stopEditing, { capture: true })
+    window.addEventListener('keydown', handleEditing, { capture: true })
 
     return () => {
-      window.removeEventListener('keydown', stopEditing, { capture: true })
+      window.removeEventListener('keydown', handleEditing, { capture: true })
     }
   })
 
@@ -152,15 +158,6 @@ const EditableTextInner = (props: EditableTextInnerProps) => {
         onBlur={(e) => {
           comboboxProps.onBlur?.(e)
           discardValue()
-        }}
-        onKeyDown={(e) => {
-          comboboxProps.onKeyDown?.(e)
-
-          if (e.key === 'Enter' && !combobox.getState().activeValue) {
-            persistValue(search)
-            e.stopPropagation()
-            e.preventDefault()
-          }
         }}
       />
 
