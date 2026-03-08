@@ -98,7 +98,9 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
         <MenuItem
           key={hashId(alternative.action.id)}
           {...alternative}
-          disabled={actionStatus !== 'idle'}
+          size={commonProps.size}
+          status={commonProps.status}
+          disabled={actionStatus === 'running' || actionStatus === 'disabled'}
         />
       ))}
       menuButtonProps={{

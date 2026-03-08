@@ -1,9 +1,22 @@
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
+import { open } from '@tauri-apps/plugin-dialog'
 import { openPath } from '@tauri-apps/plugin-opener'
 import { useEffectOnce } from 'react-use'
 
 // TODO: make app configurable
 const DEFAULT_APP = 'code'
+
+/**
+ * Prompts the user to select a directory using the native file picker.
+ *
+ * @returns A promise that resolves when a directory is selected.
+ */
+export const chooseDirectory = () => {
+  return open({
+    multiple: false,
+    directory: true,
+  })
+}
 
 /**
  * Opens the given file using the specified application, or the default for its type.

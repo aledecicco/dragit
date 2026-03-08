@@ -30,6 +30,7 @@ pub fn get_recent_folders(app_handle: &AppHandle) -> Vec<String> {
         }
     }
 
+    recents.reverse();
     recents
 }
 
@@ -41,7 +42,7 @@ pub fn add_recent_folder(
     let saved_recents = app_handle.store(RECENTS_FILE_NAME)?;
 
     recents.retain(|recent| recent != path);
-    recents.push(path.to_string());
+    recents.insert(0, path.to_string());
     recents.truncate(RECENT_FILES_LIMIT);
 
     saved_recents.set(RECENTLY_OPENED_KEY, recents);

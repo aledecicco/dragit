@@ -79,6 +79,17 @@ const SplitButton = (props: SplitButtonProps) => {
       />
 
       <Dropdown
+        className={cn(
+          'border',
+          match(buttonProps.status)
+            .with('primary', () => 'border-primary-300')
+            .with('cta', () => 'border-accent-600')
+            .with('success', () => 'border-success-300')
+            .with('warning', () => 'border-warning-200')
+            .with('danger', () => 'border-danger-600')
+            .with(P.union('neutral', undefined), () => 'border-light-50')
+            .exhaustive(),
+        )}
         anchor={
           <DecoratedButton
             label="More"
@@ -90,9 +101,9 @@ const SplitButton = (props: SplitButtonProps) => {
               'rounded-l-none rounded-r-[inherit]',
               match(menuSize)
                 .with('xs', () => 'px-0.5')
-                .with('sm', () => 'px-0.5')
-                .with('md', () => 'px-0.75')
-                .with('lg', () => 'px-1')
+                .with('sm', () => 'px-0.75')
+                .with('md', () => 'px-1')
+                .with('lg', () => 'px-1.25')
                 .exhaustive(),
             )}
             iconProps={propsWithCn(

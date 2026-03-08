@@ -1,4 +1,4 @@
-import { IconFolderOpen } from '@tabler/icons-react'
+import { IconClock, IconFolderOpen } from '@tabler/icons-react'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
@@ -43,4 +43,33 @@ const useOpenFolder = (): Action<string> => {
   }
 }
 
-export { useOpenFolder, openFolderKey, openFolderMutation, type OpenFolderArgs }
+const useMakeOpenRecentFolder = (): ((folder: string) => Action) => {
+  const openFolder = useMutation(openFolderMutation)
+
+  return (folder: string) => ({
+    id: { key: 'open_folder', type: 'recent', folder },
+    run: async () => {
+      await openFolder.mutateAsync({ newPath: folder })
+    },
+    label: {
+      idle: folder,
+      running: 'Opening folder',
+      success: 'New folder opened',
+      error: 'Failed to open folder',
+    },
+    Glyph: IconClock,
+  })
+}
+
+const useOpenRecentFolder = (folder: string): Action => {
+  return useMakeOpenRecentFolder()(folder)
+}
+
+export {
+  useOpenFolder,
+  useMakeOpenRecentFolder,
+  useOpenRecentFolder,
+  openFolderKey,
+  openFolderMutation,
+  type OpenFolderArgs,
+}

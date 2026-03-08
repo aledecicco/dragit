@@ -31,11 +31,13 @@ const useBackendEventshandler = () => {
   useEffect(() => {
     const unlisten = listen<AppEvent>(EVENT_ID, (event) => {
       console.log(`Received event: ${JSON.stringify(event)}`)
+
       match(event.payload)
         .with({ type: 'dirDisappeared', repoPath: P._ }, () => {
           // TODO: show a notification that the directory is gone
         })
         .with({ type: 'dirChanged' }, () => {
+          console.log('Directory changed, resetting queries')
           client.resetQueries()
         })
         .with(

@@ -7,6 +7,7 @@ import { Graph } from '@/widgets/Graph'
 import { MainToolbar } from '@/widgets/MainToolbar'
 import { PendingActions } from '@/widgets/PendingActions'
 import { RecyclingBin } from '@/widgets/RecyclingBin'
+import { StartupScreen } from '@/widgets/StartupScreen'
 import { StashesList } from '@/widgets/StashesList'
 import { NotStagedWorktreeChanges } from '@/widgets/WorktreeChanges/NotStaged'
 import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
@@ -40,8 +41,12 @@ const App = () => {
         )}
       >
         {currentDirQuery.data?.path &&
-          currentDirQuery.data.isRepository &&
-          currentDirQuery.data.exists && <InRepository />}
+        currentDirQuery.data.isRepository &&
+        currentDirQuery.data.exists ? (
+          <InRepository />
+        ) : (
+          <StartupScreen />
+        )}
       </div>
 
       <Dialogs />

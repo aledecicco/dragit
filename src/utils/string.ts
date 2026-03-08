@@ -45,7 +45,7 @@ export const getPathLocation = (filepath: string) => {
   const segments = splitPath(filepath)
 
   const filename = segments.pop() ?? filepath
-  const filedir = `./${segments.join(Path.sep())}`
+  const filedir = segments.join(Path.sep())
 
   return { filedir, filename }
 }

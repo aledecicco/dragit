@@ -1,9 +1,12 @@
-import { open } from '@tauri-apps/plugin-dialog'
-
-import { useOpenFolder } from '@/api/mutations/openFolder'
+import {
+  useMakeOpenRecentFolder,
+  useOpenFolder,
+} from '@/api/mutations/openFolder'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
+import { useQueryRecentlyOpened } from '@/api/queries/recentlyOpened'
 import { ActionButton } from '@/lib/ActionButton'
 import type { ButtonProps } from '@/ui/Button'
+import { chooseDirectory } from '@/utils/interaction'
 import { propsWithCn } from '@/utils/styles'
 
 interface CurrentDirectoryProps extends Partial<ButtonProps> {}
@@ -16,15 +19,15 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
 
   const currentDirQuery = useQueryCurrentDir()
   const openFolder = useOpenFolder()
+  const makeOpenRecentFolder = useMakeOpenRecentFolder()
+
+  const recentFoldersQuery = useQueryRecentlyOpened()
 
   return (
     <ActionButton
       action={openFolder}
       argsRequester={async () => {
-        const path = await open({
-          multiple: false,
-          directory: true,
-        })
+        const path = await chooseDirectory()
 
         if (!path) {
           throw new Error('No folder selected')
@@ -32,6 +35,11 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
 
         return path
       }}
+      alternatives={recentFoldersQuery.data
+        ?.filter((recentFolder) => recentFolder !== currentDirQuery.data?.path)
+        .map((recentFolder) => ({
+          action: makeOpenRecentFolder(recentFolder),
+        }))}
       variant="plain"
       status="primary"
       size="md"
