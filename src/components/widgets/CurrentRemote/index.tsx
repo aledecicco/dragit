@@ -6,8 +6,8 @@ import {
   IconWorldQuestion,
 } from '@tabler/icons-react'
 
-import type { BranchName, RemoteName, Upstream } from '@/api/models'
-import { useFetchRemote } from '@/api/mutations/fetchRemote'
+import type { BranchName, RemoteName } from '@/api/models'
+import { useMakeFetchRemote } from '@/api/mutations/fetchRemote'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryRemotes } from '@/api/queries/remotes'
 import { showRemotesDialog } from '@/common/RemotesDialog'
@@ -16,6 +16,7 @@ import { DecoratedButton } from '@/lib/DecoratedButton'
 import { useSelectedBranches } from '@/state/branches'
 import { changeSelectedUpstream, useSelectedUpstream } from '@/state/upstream'
 import { Combobox } from '@/ui/Combobox'
+import { ComboboxItem } from '@/ui/Combobox/Item'
 import { ComboboxSection } from '@/ui/Combobox/Section'
 import { EditableText } from '@/ui/EditableText'
 import { ensurePresent } from '@/utils/array'
@@ -51,6 +52,8 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         upstream.remoteBranch,
         true,
       )
+
+  const makeFetchRemote = useMakeFetchRemote()
 
   return (
     <div
@@ -90,6 +93,18 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
               })
             }
           }}
+          noMatches={(search) => (
+            <ComboboxItem
+              value={search}
+              onClick={() => {
+                showRemotesDialog({
+                  defaultCreating: search,
+                })
+              }}
+            >
+              Create remote <b>{search}</b>
+            </ComboboxItem>
+          )}
         />
       </Combobox>
 
@@ -126,11 +141,19 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         }}
       />
 
-      {upstream && <FetchUpstream upstream={upstream} />}
+      {upstream && (
+        <ActionButton
+          compact
+          round
+          className={cn('ml-2')}
+          action={makeFetchRemote(upstream.remote)}
+        />
+      )}
 
       <DecoratedButton
         compact
         round
+        className={cn('ml-2')}
         label="Manage remotes"
         Glyph={IconMenuDeep}
         onClick={() => {
@@ -138,15 +161,6 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         }}
       />
     </div>
-  )
-}
-
-const FetchUpstream = (props: { upstream: Upstream }) => {
-  const { upstream } = props
-  const fetchRemote = useFetchRemote(upstream.remote)
-
-  return (
-    <ActionButton compact round className={cn('mx-2')} action={fetchRemote} />
   )
 }
 

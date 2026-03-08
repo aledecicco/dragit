@@ -10,6 +10,7 @@ import { branchDivergenceQueryKeys } from './queries/branchDivergence'
 import { branchesQueryKeys } from './queries/branches'
 import { commitHistoryQueryKeys } from './queries/commitHistory'
 import { commonAncestorQueryKeys } from './queries/commonAncestor'
+import { currentDirQueryKey } from './queries/currentDir'
 import { fileConflictsQueryKeys } from './queries/fileConflicts'
 import { fileDiffQueryKeys } from './queries/fileDiff'
 import { headInfoQueryKeys } from './queries/headInfo'
@@ -37,12 +38,15 @@ const useBackendEventshandler = () => {
           // TODO: show a notification that the directory is gone
         })
         .with({ type: 'dirChanged' }, () => {
-          console.log('Directory changed, resetting queries')
           client.resetQueries()
         })
         .with(
           { type: 'gitFolderModified', repoPath: P.string },
           ({ repoPath }) => {
+            client.invalidateQueries({
+              queryKey: [currentDirQueryKey],
+            })
+
             client.invalidateQueries({
               queryKey: [pathQueryKey(repoPath)],
             })
@@ -121,6 +125,10 @@ const useBackendEventshandler = () => {
           })
         })
         .with({ type: 'configUpdated', repoPath: P.string }, ({ repoPath }) => {
+          client.invalidateQueries({
+            queryKey: [currentDirQueryKey],
+          })
+
           client.invalidateQueries({
             queryKey: [branchesQueryKeys.all(repoPath)],
           })

@@ -75,6 +75,10 @@ impl DebouncedWatcher {
                                 folder_modified = true;
                             }
 
+                            if event.paths.contains(&git_folder) {
+                                git_folder_modified = true;
+                            }
+
                             if event
                                 .paths
                                 .iter()
@@ -143,11 +147,6 @@ impl DebouncedWatcher {
                             });
 
                             match event.kind {
-                                notify::EventKind::Create(CreateKind::Folder) => {
-                                    if event.paths.contains(&git_folder) {
-                                        git_folder_modified = true;
-                                    }
-                                }
                                 notify::EventKind::Create(CreateKind::File) => {
                                     if event.paths.contains(&head_file) {
                                         head_changed = true
@@ -158,11 +157,6 @@ impl DebouncedWatcher {
                                             || path.starts_with(&remotes_folder)
                                     }) {
                                         branches_list_updated = true;
-                                    }
-                                }
-                                notify::EventKind::Remove(RemoveKind::Folder) => {
-                                    if event.paths.contains(&git_folder) {
-                                        git_folder_modified = true;
                                     }
                                 }
                                 notify::EventKind::Remove(RemoveKind::File) => {

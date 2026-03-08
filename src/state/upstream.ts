@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { useShallow } from 'zustand/react/shallow'
 
 import type {
   BranchInfo,
@@ -31,7 +30,7 @@ interface Setters {
   /**
    * Change the selected upstream for a given branch.
    */
-  changeUpstream: (branch: BranchName, upstream: Upstream) => void
+  changeUpstream: (branch: BranchName, upstream: Upstream | undefined) => void
 }
 
 const useSelectedUpstreamsStore = create<SelectedUpstreams & Setters>()(
@@ -40,6 +39,11 @@ const useSelectedUpstreamsStore = create<SelectedUpstreams & Setters>()(
 
     changeUpstream: (branch, upstream) => {
       setState((state) => {
+        if (!upstream) {
+          state.upstreams.delete(branch)
+          return
+        }
+
         const isNew = !state.upstreams.has(branch)
         if (isNew && state.upstreams.size >= MAX_UPSTREAMS) {
           const oldest = state.upstreams.keys().next().value
@@ -62,8 +66,10 @@ const chooseUpstream = (
   branch: LocalBranch,
   remotes: RemoteInfo[],
   currentBranch?: LocalBranch,
-): Upstream => {
+): Upstream | undefined => {
   const store = useSelectedUpstreamsStore.getState()
+
+  // TODO: can't change remote through UI.
 
   const newRemote: RemoteName =
     // First check if there's an override set in the store.
@@ -87,10 +93,14 @@ const chooseUpstream = (
     // Otherwise, fall back to using the current branch name.
     branch.name
 
-  const newUpstream = {
-    remote: newRemote,
-    remoteBranch: newRemoteBranch,
-  }
+  const remoteExists = remotes.some((remote) => remote.name === newRemote)
+
+  const newUpstream = remoteExists
+    ? {
+        remote: newRemote,
+        remoteBranch: newRemoteBranch,
+      }
+    : undefined
 
   store.changeUpstream(branch.name, newUpstream)
 
@@ -100,36 +110,11 @@ const chooseUpstream = (
 /**
  * Hook that facilitates tracking the selected upstream for a branch.
  */
-const useStoredUpstream = (
-  branch: BranchInfo | undefined,
-): Upstream | undefined => {
-  const upstream = useSelectedUpstreamsStore(
-    useShallow((state) => {
-      if (branch?.type !== 'local') {
-        return
-      }
-
-      return state.upstreams.get(branch.name) ?? branch.upstream ?? undefined
-    }),
-  )
-
-  return upstream
-}
-
-/**
- * Hook that facilitates tracking the selected upstream for a branch.
- */
 const useSelectedUpstream = (
   branch: BranchInfo | undefined,
 ): Upstream | undefined => {
-  const storedUpstream = useStoredUpstream(branch)
   const remotesQuery = useQueryRemotes()
-
   const { currentBranch } = useSelectedBranches()
-
-  if (storedUpstream) {
-    return storedUpstream
-  }
 
   const upstream =
     branch?.type === 'local'

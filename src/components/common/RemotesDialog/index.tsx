@@ -14,15 +14,22 @@ import { RemotesDialogItem } from './Item'
 
 const REMOTES_DIALOG_KEY = 'remotes_dialog'
 
-interface RemotesDialogProps extends Omit<DialogProps, 'dialogKey'> {}
+interface RemotesDialogProps extends Omit<DialogProps, 'dialogKey'> {
+  /**
+   * If provided, the dialog will start in "creating" mode with the remote name pre-filled.
+   */
+  defaultCreating?: string
+}
 
 /**
  * Dialog that displays existing remotes and allows managing them.
+ *
+ * // TODO: can't scroll remotes list.
  */
 const RemotesDialog = (props: RemotesDialogProps) => {
-  const { ...dialogProps } = props
+  const { defaultCreating, ...dialogProps } = props
 
-  const [adding, setAdding] = useState(false)
+  const [adding, setAdding] = useState(defaultCreating !== undefined)
   const remotesQuery = useQueryRemotes()
 
   return (
@@ -52,7 +59,7 @@ const RemotesDialog = (props: RemotesDialogProps) => {
         {adding ? (
           <RemoteForm
             className={cn('-mb-1 mx-px')}
-            defaultValues={{ name: '', url: '' }}
+            defaultValues={{ name: defaultCreating ?? '', url: '' }}
             onCancel={() => {
               setAdding(false)
             }}

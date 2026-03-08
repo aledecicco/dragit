@@ -22,6 +22,8 @@ interface RemoteFormProps extends Partial<FormProps<RemoteFormValues>> {
 
 /**
  * Form that allows creating new remotes.
+ *
+ * // TODO: autofocus URL field if name is pre-filled.
  */
 const RemoteForm = (props: RemoteFormProps) => {
   const { onCancel, ...formProps } = props
@@ -34,16 +36,18 @@ const RemoteForm = (props: RemoteFormProps) => {
     <Form
       defaultValues={{ name: '', url: '' }}
       {...propsWithCn(formProps, 'flex flex-row gap-1')}
-      onFormSubmit={(formState) => {
+      onFormSubmit={async (formState, form) => {
+        await formProps.onFormSubmit?.(formState, form)
+
         if (formState.values.name && formState.values.url) {
-          runAction(addRemote, {
+          await runAction(addRemote, {
             name: formState.values.name,
             url: formState.values.url,
           })
         }
       }}
-      validateForm={(formState, form) => {
-        formProps.validateForm?.(formState, form)
+      validateForm={async (formState, form) => {
+        await formProps.validateForm?.(formState, form)
 
         const exists = remotesQuery.data?.find(
           (remote) => remote.name === formState.values.name,

@@ -11,7 +11,7 @@ interface IconProps extends TablerIconProps {
   /**
    * Constructor of the icon that should be displayed.
    */
-  Glyph: ComponentType<TablerIconProps>
+  Glyph: Glyph
 
   /**
    * The size of the icon.

@@ -41,6 +41,7 @@ const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
   const { file, ...itemProps } = props
 
   const { filedir, filename } = getPathLocation(file.path)
+
   const interactions = useInteractions(file)
 
   return (

@@ -179,7 +179,10 @@ const BranchesList = (props: BranchesListProps) => {
             getDragPayload={getBranchesDragPayload}
           >
             <QueryList
-              name="branches"
+              name={match(selectedTab)
+                .with('local', () => 'local branches')
+                .with('remote', () => 'remote branches')
+                .otherwise(() => 'branches')}
               query={currentBranchesQuery}
               renderItem={(branch, position) => (
                 <BranchesListItem branch={branch} itemIndex={position} />

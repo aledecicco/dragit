@@ -1,11 +1,18 @@
-import { IconFolderOpen } from '@tabler/icons-react'
+import { IconFolderOpen, IconReload } from '@tabler/icons-react'
 
+import logo from '@/assets/logo.jpg'
+
+import type { CurrentDirInfo } from '@/api/models'
+import { useInitRepository } from '@/api/mutations/initRepository'
 import { useOpenFolder } from '@/api/mutations/openFolder'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { FilePath } from '@/common/File/Path'
 import { ActionButton } from '@/lib/ActionButton'
+import { DecoratedButton } from '@/lib/DecoratedButton'
+import { QueryLoader } from '@/lib/Loader/Query'
 import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
+import { getErrorMessage } from '@/utils/error'
 import { chooseDirectory } from '@/utils/interaction'
 import { getPathLocation } from '@/utils/string'
 import { cn } from '@/utils/styles'
@@ -16,79 +23,146 @@ import { cn } from '@/utils/styles'
  */
 const StartupScreen = () => {
   const currentDirQuery = useQueryCurrentDir()
+
   const openFolder = useOpenFolder()
 
-  const location = currentDirQuery.data
-    ? getPathLocation(currentDirQuery.data.path)
-    : undefined
-
   return (
-    <>
-      {location ? (
-        <div className={cn('px-4 py-8 flex flex-col items-start')}>
-          <div
-            className={cn(
-              'text-primary-200',
-              'grid grid-cols-[max-content_1fr] gap-x-3 items-center min-w-0',
-            )}
-          >
-            <Icon Glyph={IconFolderOpen} size="lg" />
-
-            <Marquee className={cn('text-xl')}>{location.filename}</Marquee>
-          </div>
-
-          <Marquee className={cn('text-lg text-light-300')}>
-            <FilePath
-              filepath={location.filedir}
-              separatorProps={{ className: cn('text-light-950 font-bold') }}
-            />
-          </Marquee>
-
-          <ActionButton
-            action={openFolder}
-            argsRequester={async () => {
-              const path = await chooseDirectory()
-
-              if (!path) {
-                throw new Error('No folder selected')
-              }
-
-              return path
-            }}
-            className={cn('-ml-3.5')}
-            aria-label="Select and open a folder in your system"
-            size="lg"
-            variant="plain"
-            status="primary"
+    <QueryLoader
+      query={currentDirQuery}
+      loadingFallback={
+        <div className={cn('flex flex-col items-center', 'col-start-2')}>
+          <img
+            src={logo}
+            alt="DraGit logo"
+            className={cn('w-80 mt-[20%] pointer-events-none select-none')}
           />
+
+          <p className={cn('text-lg text-light-950 italic')}>Loading...</p>
         </div>
-      ) : (
-        <div className={cn('px-4 py-8 flex flex-col items-start')}>
-          <p className={cn('text-lg text-light-950')}>
-            No folder currently open.
+      }
+      errorFallback={(error) => (
+        <div className={cn('flex flex-col items-center', 'col-start-2')}>
+          <img
+            src={logo}
+            alt="DraGit logo"
+            className={cn('w-80 mt-[20%] pointer-events-none select-none')}
+          />
+
+          <p className={cn('text-lg text-danger-600 mb-2')}>
+            {getErrorMessage(error)}
           </p>
 
-          <ActionButton
-            action={openFolder}
-            argsRequester={async () => {
-              const path = await chooseDirectory()
-
-              if (!path) {
-                throw new Error('No folder selected')
-              }
-
-              return path
-            }}
-            className={cn('-ml-3.5')}
-            aria-label="Select and open a folder in your system"
+          <DecoratedButton
+            label="Retry"
+            Glyph={IconReload}
             size="lg"
             variant="plain"
-            status="primary"
+            status="danger"
+            onClick={() => currentDirQuery.refetch()}
           />
         </div>
       )}
+    >
+      {(currentDir) => {
+        if (!currentDir) {
+          return (
+            <>
+              <div className={cn('px-4 py-8')}>
+                <p className={cn('text-lg text-light-950')}>
+                  No folder currently open.
+                </p>
+              </div>
 
-      <div />
+              <div className={cn('flex flex-col gap-6 items-center')}>
+                <img
+                  src={logo}
+                  alt="DraGit logo"
+                  className={cn(
+                    'w-80 mt-[20%] pointer-events-none select-none',
+                  )}
+                />
+
+                <ActionButton
+                  action={openFolder}
+                  argsRequester={async () => {
+                    const path = await chooseDirectory()
+
+                    if (!path) {
+                      throw new Error('No folder selected')
+                    }
+
+                    return path
+                  }}
+                  aria-label="Select and open a folder in your system"
+                  size="lg"
+                  variant="plain"
+                  status="neutral"
+                />
+              </div>
+            </>
+          )
+        }
+
+        return <InFolder currentDir={currentDir} />
+      }}
+    </QueryLoader>
+  )
+}
+
+const InFolder = (props: { currentDir: CurrentDirInfo }) => {
+  const { currentDir } = props
+
+  const initRepository = useInitRepository()
+  const location = getPathLocation(currentDir.path)
+
+  return (
+    <>
+      <div className={cn('px-4 py-8 flex flex-col items-start')}>
+        <div
+          className={cn(
+            'text-primary-200',
+            'grid grid-cols-[max-content_1fr] gap-x-3 items-center min-w-0',
+          )}
+        >
+          <Icon Glyph={IconFolderOpen} size="lg" />
+
+          <Marquee className={cn('text-xl')}>{location.filename}</Marquee>
+        </div>
+
+        <Marquee className={cn('text-lg text-light-300')}>
+          <FilePath
+            filepath={location.filedir}
+            separatorProps={{
+              className: cn('text-light-950 font-bold'),
+            }}
+          />
+        </Marquee>
+      </div>
+
+      {currentDir.exists ? (
+        !currentDir.isRepository && (
+          <div
+            className={cn('flex flex-col gap-6 items-center justify-center')}
+          >
+            <p className={cn('text-lg text-light-950')}>
+              This folder is not a Git repository. Initialize it to begin.
+            </p>
+
+            <ActionButton
+              action={initRepository}
+              size="lg"
+              variant="filled"
+              status="primary"
+            />
+          </div>
+        )
+      ) : (
+        <div className={cn('flex flex-col gap-6 items-center justify-center')}>
+          <p className={cn('text-lg text-light-950')}>
+            This folder doesn't exist.
+          </p>
+        </div>
+      )}
     </>
   )
 }

@@ -66,7 +66,7 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
       <Ariakit.ComboboxList
         {...propsWithCn(listProps, 'max-h-80 overflow-y-auto')}
       >
-        {options.length === 0 ? (
+        {options.length === 0 && !deferredSearch ? (
           <div
             className={cn('text-center p-2', 'text-sm italic text-light-950')}
           >

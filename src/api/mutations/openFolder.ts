@@ -1,7 +1,8 @@
-import { IconClock, IconFolderOpen } from '@tabler/icons-react'
+import { IconClock } from '@tabler/icons-react'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
+import { LogoGlyph } from '@/common/Logo'
 import type { Action } from '@/state/actions'
 
 import { useQueryCurrentDir } from '../queries/currentDir'
@@ -39,7 +40,7 @@ const useOpenFolder = (): Action<string> => {
       success: 'New folder opened',
       error: 'Failed to open folder',
     },
-    Glyph: IconFolderOpen,
+    Glyph: LogoGlyph,
   }
 }
 

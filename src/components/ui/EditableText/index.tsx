@@ -80,7 +80,9 @@ const EditableText = (props: EditableTextProps) => {
         setEditing(true)
       }}
     >
-      <Marquee reverse={false}>{value ?? comboboxProps.placeholder}</Marquee>
+      <Marquee reverse={false}>
+        {value ? value : (comboboxProps.placeholder ?? '-')}
+      </Marquee>
     </Button>
   )
 }
