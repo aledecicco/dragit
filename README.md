@@ -26,6 +26,7 @@ Stash of ideas in ~planned implementation order:
 - [ ] "Init", "empty dir", and "not a repository" screens
 - [ ] Highlight matches during pathspec search
 - [x] More complete commit dialog with "amend" option
+- [ ] Delete remote branches and tags
 - [ ] Animations pass
 - [x] Drag and drop shortcuts
 - [ ] Global keyboard shortcuts

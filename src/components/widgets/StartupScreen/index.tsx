@@ -115,6 +115,8 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
   const initRepository = useInitRepository()
   const location = getPathLocation(currentDir.path)
 
+  const openFolder = useOpenFolder()
+
   return (
     <>
       <div className={cn('px-4 py-8 flex flex-col items-start')}>
@@ -137,30 +139,94 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
             }}
           />
         </Marquee>
+
+        <ActionButton
+          action={openFolder}
+          argsRequester={async () => {
+            const path = await chooseDirectory()
+
+            if (!path) {
+              throw new Error('No folder selected')
+            }
+
+            return path
+          }}
+          aria-label="Select and open a folder in your system"
+          size="lg"
+          variant="plain"
+          status="neutral"
+        />
       </div>
 
       {currentDir.exists ? (
         !currentDir.isRepository && (
-          <div
-            className={cn('flex flex-col gap-6 items-center justify-center')}
-          >
+          <div className={cn('flex flex-col gap-6 items-center')}>
+            <img
+              src={logo}
+              alt="DraGit logo"
+              className={cn('w-80 mt-[20%] pointer-events-none select-none')}
+            />
+
             <p className={cn('text-lg text-light-950')}>
               This folder is not a Git repository. Initialize it to begin.
             </p>
 
-            <ActionButton
-              action={initRepository}
-              size="lg"
-              variant="filled"
-              status="primary"
-            />
+            <div className={cn('flex flex-col gap-2')}>
+              <ActionButton
+                action={initRepository}
+                size="lg"
+                variant="filled"
+                status="primary"
+                className="w-full"
+              />
+
+              <ActionButton
+                action={openFolder}
+                argsRequester={async () => {
+                  const path = await chooseDirectory()
+
+                  if (!path) {
+                    throw new Error('No folder selected')
+                  }
+
+                  return path
+                }}
+                aria-label="Select and open a folder in your system"
+                size="lg"
+                variant="filled"
+                status="neutral"
+              />
+            </div>
           </div>
         )
       ) : (
-        <div className={cn('flex flex-col gap-6 items-center justify-center')}>
+        <div className={cn('flex flex-col gap-6 items-center')}>
+          <img
+            src={logo}
+            alt="DraGit logo"
+            className={cn('w-80 mt-[20%] pointer-events-none select-none')}
+          />
+
           <p className={cn('text-lg text-light-950')}>
             This folder doesn't exist.
           </p>
+
+          <ActionButton
+            action={openFolder}
+            argsRequester={async () => {
+              const path = await chooseDirectory()
+
+              if (!path) {
+                throw new Error('No folder selected')
+              }
+
+              return path
+            }}
+            aria-label="Select and open a folder in your system"
+            size="lg"
+            variant="filled"
+            status="neutral"
+          />
         </div>
       )}
     </>

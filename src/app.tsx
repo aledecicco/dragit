@@ -95,7 +95,7 @@ const InRepository = () => {
       <div
         className={cn('grid grid-rows-[max-content_1fr] gap-4 overflow-hidden')}
       >
-        <CurrentDirectory className={cn('justify-self-center')} />
+        <CurrentDirectory className={cn('justify-self-center max-w-half')} />
 
         <div className={cn('h-full w-full min-h-0', 'relative')}>
           <Graph />

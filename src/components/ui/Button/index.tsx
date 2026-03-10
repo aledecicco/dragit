@@ -52,7 +52,7 @@ const Button = (props: ButtonProps) => {
     <Ariakit.Button
       {...propsWithCn(
         buttonProps,
-        'min-w-max w-max h-max text-nowrap',
+        'h-max text-nowrap',
         'flex flex-row justify-center items-center text-center',
         'border-none font-semibold',
         'cursor-pointer active:scale-98',

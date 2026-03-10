@@ -4,7 +4,7 @@ import { type AnyAction, useActionPresenters } from '@/state/actions'
 import { Button, type ButtonProps, type ButtonStatus } from '@/ui/Button'
 import { type Glyph, Icon, type IconProps } from '@/ui/Icon'
 import { Tooltip } from '@/ui/Tooltip'
-import { propsWithCn } from '@/utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface BaseDecoratedButtonProps extends ButtonProps {
   /**
@@ -88,8 +88,10 @@ const BaseDecoratedButton = (props: BaseDecoratedButtonProps) => {
   const button = (
     <Button aria-label={label} {...buttonProps}>
       <Icon size={buttonProps.size} Glyph={Glyph} {...iconProps} />
-      {!compact && label}
-      {children}
+      <div className={cn('overflow-hidden text-ellipsis')}>
+        {!compact && label}
+        {children}
+      </div>
     </Button>
   )
 

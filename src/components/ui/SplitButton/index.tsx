@@ -44,21 +44,24 @@ const SplitButton = (props: SplitButtonProps) => {
     return {
       x: rect.x,
       y: rect.y,
-      width: rect.width * 2,
+      width: rect.width * 1.5,
       height: rect.height,
     }
   }
 
   return (
     <div
-      className={cn(className, 'flex flex-row items-stretch rounded-md')}
+      className={cn(
+        className,
+        'grid grid-cols-[1fr_max-content] items-stretch rounded-md',
+      )}
       ref={anchorRef}
     >
       <DecoratedButton
         {...buttonProps}
         className={cn(
           'rounded-l-[inherit] rounded-r-none grow',
-          'border-r',
+          'border-r overflow-hidden',
           match(buttonProps.status)
             .with('primary', () => 'border-r-primary-800')
             .with('cta', () => 'border-r-accent-700')
@@ -79,6 +82,9 @@ const SplitButton = (props: SplitButtonProps) => {
       />
 
       <Dropdown
+        portal
+        sameWidth
+        getAnchorRect={getAnchorRect}
         className={cn(
           'border',
           match(buttonProps.status)
@@ -117,7 +123,6 @@ const SplitButton = (props: SplitButtonProps) => {
             size={menuSize}
           />
         }
-        getAnchorRect={getAnchorRect}
       >
         {items}
       </Dropdown>

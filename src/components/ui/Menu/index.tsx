@@ -21,7 +21,7 @@ const Menu = (props: MenuProps) => {
         menuProps,
         'z-1',
         'rounded-md shadow-md p-1',
-        'bg-dark-300 min-w-max',
+        'bg-dark-300',
       )}
     />
   )
