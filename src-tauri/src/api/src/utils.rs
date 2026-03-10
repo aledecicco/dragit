@@ -32,3 +32,18 @@ pub(crate) fn get_disk_file_contents(repo_path: &str, filepath: &str) -> Result<
 
     Ok(contents)
 }
+
+/// Walk up from a path to find the closest ancestor directory containing a `.git` folder.
+pub(crate) fn find_git_root(path: &str) -> Option<String> {
+    let mut current = Path::new(path).to_path_buf();
+
+    loop {
+        if current.join(".git").is_dir() {
+            return Some(current.to_str()?.to_string());
+        }
+
+        if !current.pop() {
+            return None;
+        }
+    }
+}

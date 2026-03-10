@@ -4,7 +4,11 @@ use tauri::{
     AppHandle, Emitter, Manager, State,
 };
 
-use crate::{serialize_response, utils::get_disk_file_contents, with_handler};
+use crate::{
+    serialize_response,
+    utils::{find_git_root, get_disk_file_contents},
+    with_handler,
+};
 use diffs::{compute_diff, get_diff_sources};
 use models::{
     AppError, AppEvent, AppMessage, AppState, ConflictLine, ConflictMode, CurrentDirInfo,
@@ -27,16 +31,19 @@ pub async fn open_folder(app_handle: AppHandle, new_path: &str) -> Result<(), Ap
         res => res?,
     };
 
+    // If the new path is inside a git repository,use the root of that repository instead.
+    let new_path = find_git_root(new_path).unwrap_or(new_path.to_string());
+
     // Watch repository at new path
     state
         .repo_watcher
         .lock()
-        .watch_repository(new_path)
+        .watch_repository(&new_path)
         .map_err(AppError::from)?;
 
     // Not worth crashing the app if this fails
-    let _ = add_recent_folder(&app_handle, new_path);
-    let _ = set_last_opened(&app_handle, new_path);
+    let _ = add_recent_folder(&app_handle, &new_path);
+    let _ = set_last_opened(&app_handle, &new_path);
     let _ = app_handle.emit(EVENT_ID, AppEvent::DirChanged);
 
     Ok(())
