@@ -72,7 +72,6 @@ const EditableText = (props: EditableTextProps) => {
     />
   ) : (
     <Button
-      autoFocus
       aria-label={`${label}. Click to edit.`}
       {...propsWithCn(buttonProps, 'font-medium')}
       onClick={(e) => {

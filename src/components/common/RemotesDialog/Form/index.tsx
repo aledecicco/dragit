@@ -22,8 +22,6 @@ interface RemoteFormProps extends Partial<FormProps<RemoteFormValues>> {
 
 /**
  * Form that allows creating new remotes.
- *
- * // TODO: autofocus URL field if name is pre-filled.
  */
 const RemoteForm = (props: RemoteFormProps) => {
   const { onCancel, ...formProps } = props
@@ -31,6 +29,8 @@ const RemoteForm = (props: RemoteFormProps) => {
   const remotesQuery = useQueryRemotes()
   const addRemote = useAddRemote()
   const status = useActionStatuses(addRemote)
+
+  const hasDefaultName = !!formProps.defaultValues?.name
 
   return (
     <Form
@@ -58,7 +58,13 @@ const RemoteForm = (props: RemoteFormProps) => {
         }
       }}
     >
-      <InputField name="name" label="remote name" required autoFocus compact />
+      <InputField
+        name="name"
+        label="remote name"
+        required
+        compact
+        autoFocus={!hasDefaultName}
+      />
 
       <InputField
         name="url"
@@ -66,6 +72,7 @@ const RemoteForm = (props: RemoteFormProps) => {
         containerProps={{ className: cn('flex-1') }}
         required
         compact
+        autoFocus={hasDefaultName}
       />
 
       <DecoratedButton

@@ -41,10 +41,18 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
           }
         }}
         label="remote name"
-        buttonProps={{
-          className: cn('rounded-l-sm rounded-r-none'),
+        className={cn('pr-4 -mr-2.5 rounded-r-none w-half')}
+        style={{
+          clipPath: 'polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
         }}
-        className={cn('rounded-l-sm rounded-r-none')}
+        buttonProps={{
+          className: cn(
+            'pr-4 -mr-2.5 rounded-r-none max-w-half justify-start min-w-0',
+          ),
+          style: {
+            clipPath: 'polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
+          },
+        }}
       />
 
       <EditableText
@@ -55,12 +63,16 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
           }
         }}
         label="remote URL"
-        buttonProps={{
-          className: cn(
-            'justify-start flex-1 rounded-none border-x border-x-dark-600',
-          ),
+        className={cn('pl-5 rounded-none flex-1 mx-px')}
+        style={{
+          clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%)',
         }}
-        className={cn('flex-1 rounded-none border-x border-x-dark-600')}
+        buttonProps={{
+          className: cn('pl-5 rounded-none flex-1 mx-px justify-start min-w-0'),
+          style: {
+            clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%)',
+          },
+        }}
       />
 
       <ActionButton

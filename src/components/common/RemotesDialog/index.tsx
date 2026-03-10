@@ -23,8 +23,6 @@ interface RemotesDialogProps extends Omit<DialogProps, 'dialogKey'> {
 
 /**
  * Dialog that displays existing remotes and allows managing them.
- *
- * // TODO: can't scroll remotes list.
  */
 const RemotesDialog = (props: RemotesDialogProps) => {
   const { defaultCreating, ...dialogProps } = props
@@ -40,7 +38,7 @@ const RemotesDialog = (props: RemotesDialogProps) => {
       <DialogContent heading="Remotes">
         <div
           className={cn(
-            'grid max-h-60 overflow-y-hidden mb-4',
+            'grid h-full max-h-60 overflow-y-hidden mb-4',
             'bg-dark-700 border border-dark-300 rounded-lg',
           )}
         >

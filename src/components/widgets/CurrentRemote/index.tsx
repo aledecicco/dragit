@@ -14,7 +14,11 @@ import { showRemotesDialog } from '@/common/RemotesDialog'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { useSelectedBranches } from '@/state/branches'
-import { changeSelectedUpstream, useSelectedUpstream } from '@/state/upstream'
+import {
+  changeSelectedRemote,
+  changeSelectedRemoteBranch,
+  useSelectedUpstream,
+} from '@/state/upstream'
 import { Combobox } from '@/ui/Combobox'
 import { ComboboxItem } from '@/ui/Combobox/Item'
 import { ComboboxSection } from '@/ui/Combobox/Section'
@@ -86,11 +90,8 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
           name="remotes"
           options={remoteOptions}
           onSelect={(value) => {
-            if (currentBranch?.type === 'local' && upstream) {
-              changeSelectedUpstream(currentBranch.name, {
-                remote: value,
-                remoteBranch: upstream.remoteBranch,
-              })
+            if (currentBranch?.type === 'local') {
+              changeSelectedRemote(currentBranch, value)
             }
           }}
           noMatches={(search) => (
@@ -114,12 +115,13 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         value={upstream?.remoteBranch ?? ''}
         label="remote branch"
         suggestions={remoteBranchOptions}
+        disabled={currentBranch?.type !== 'local' || !upstream}
         setValue={(newBranch) => {
-          if (currentBranch?.type === 'local' && upstream && newBranch) {
-            changeSelectedUpstream(currentBranch.name, {
-              remote: upstream.remote,
-              remoteBranch: newBranch,
-            })
+          if (currentBranch?.type === 'local' && upstream) {
+            changeSelectedRemoteBranch(
+              currentBranch,
+              newBranch ? newBranch : undefined,
+            )
           }
         }}
         placeholder={currentBranch?.type === 'local' ? undefined : '-'}
@@ -128,7 +130,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
           clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%)',
         }}
         buttonProps={{
-          disabled: currentBranch?.type !== 'local',
+          disabled: currentBranch?.type !== 'local' || !upstream,
           variant: 'plain',
           className: cn(
             'text-light-700',
