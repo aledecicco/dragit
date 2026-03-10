@@ -486,6 +486,17 @@ pub async fn tag(
     with_handler(&state, &|h| h.tag(repo_path, tag_name, reference, message))
 }
 
+/// Pushes the given tag to the given remote.
+#[tauri::command]
+pub async fn push_tag(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    tag: &str,
+    remote: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.push_tag(repo_path, tag, remote))
+}
+
 /// Removes a list of tags.
 #[tauri::command]
 pub async fn delete_tags(

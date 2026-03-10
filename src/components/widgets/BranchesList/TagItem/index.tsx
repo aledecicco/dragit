@@ -4,6 +4,7 @@ import type { TagInfo } from '@/api/models'
 import { useCheckoutTag } from '@/api/mutations/checkout'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
 import { useDeleteTag } from '@/api/mutations/deleteTags'
+import { usePushTag } from '@/api/mutations/pushTag'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
@@ -93,14 +94,15 @@ const TagsListItem = (props: TagsListItemProps) => {
 
 const useInteractions = (tag: TagInfo) => {
   const checkout = useCheckoutTag(tag)
+  const push = usePushTag(tag)
 
   const createBranch = useCreateBranchAt(tag.name)
   const branchOff = useBranchOff(tag.name)
   const deleteTag = useDeleteTag(tag)
 
   return [
+    group(interaction({ action: checkout }), interaction({ action: push })),
     group(
-      interaction({ action: checkout }),
       interaction({
         action: createBranch,
         argsRequester: () => requestBranchName(`#${tag.reference}`),

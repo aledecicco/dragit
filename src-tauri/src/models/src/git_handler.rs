@@ -213,6 +213,9 @@ pub trait GitHandler {
         message: Option<&str>,
     ) -> Result<(), GitError>;
 
+    /// Pushes the given tag to the specified remote.
+    fn push_tag(&self, repo_path: &str, tag: &str, remote: &str) -> Result<(), GitError>;
+
     /// Deletes the given tags.
     fn delete_tags(&self, repo_path: &str, tag_names: &Vec<&str>) -> Result<(), GitError>;
 

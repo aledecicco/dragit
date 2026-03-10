@@ -33,12 +33,15 @@ const RemotesDialog = (props: RemotesDialogProps) => {
   return (
     <Dialog
       dialogKey={REMOTES_DIALOG_KEY}
-      {...propsWithCn(dialogProps, 'grid-cols-[600px]')}
+      {...propsWithCn(dialogProps, 'grid-cols-[600px] max-h-half')}
     >
-      <DialogContent heading="Remotes">
+      <DialogContent
+        heading="Remotes"
+        className={cn('h-full grid grid-rows-[max-content_1fr_max-content]')}
+      >
         <div
           className={cn(
-            'grid h-full max-h-60 overflow-y-hidden mb-4',
+            'overflow-y-hidden mb-4',
             'bg-dark-700 border border-dark-300 rounded-lg',
           )}
         >

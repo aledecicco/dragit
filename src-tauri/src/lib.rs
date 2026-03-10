@@ -81,6 +81,7 @@ pub fn run() {
             api::discard_stashes,
             api::get_tags,
             api::tag,
+            api::push_tag,
             api::delete_tags,
             api::get_file_diff,
             api::get_file_conflicts,

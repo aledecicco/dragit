@@ -130,6 +130,9 @@ pub enum GitError {
     #[error("Failed to tag \"{reference}\" as \"{name}\"")]
     TagFailed { name: String, reference: String },
 
+    #[error("Failed to push \"{tag}\" to remote \"{remote}\"")]
+    PushTagFailed { tag: String, remote: String },
+
     #[error("Failed to delete tags")]
     DeleteTagsFailed {},
 

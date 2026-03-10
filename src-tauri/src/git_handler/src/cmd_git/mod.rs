@@ -626,7 +626,7 @@ impl GitHandler for CmdGit {
     }
 
     fn fetch_remote(&self, repo_path: &str, name: &str) -> Result<(), GitError> {
-        self.spawn_and_await(repo_path, ["fetch", name])
+        self.spawn_and_await(repo_path, ["fetch", name, "--tags"])
             .or(Err(GitError::FetchRemoteFailed {
                 name: name.to_string(),
             }))
@@ -808,6 +808,14 @@ impl GitHandler for CmdGit {
             .or(Err(GitError::TagFailed {
                 name: tag_name.to_string(),
                 reference: reference.to_string(),
+            }))
+    }
+
+    fn push_tag(&self, repo_path: &str, tag: &str, remote: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["push", remote, tag])
+            .or(Err(GitError::PushTagFailed {
+                tag: tag.to_string(),
+                remote: remote.to_string(),
             }))
     }
 

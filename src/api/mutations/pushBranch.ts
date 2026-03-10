@@ -33,7 +33,7 @@ const pushBranchMutation = (repoPath: string) =>
   })
 
 const usePushBranch = (branch: BranchInfo): Action => {
-  const remoteCounterpart = useSelectedUpstream(branch)
+  const upstream = useSelectedUpstream(branch)
   const pushBranch = useRepositoryMutation(pushBranchMutation)
 
   const { currentBranch } = useSelectedBranches()
@@ -58,10 +58,14 @@ const usePushBranch = (branch: BranchInfo): Action => {
         throw new Error('Branch is not local')
       }
 
+      if (!upstream) {
+        throw new Error('No upstream set for branch')
+      }
+
       await pushBranch.mutateAsync({
         branch: branch.name,
-        remote: remoteCounterpart?.remote ?? 'origin',
-        remoteBranch: remoteCounterpart?.remoteBranch ?? branch.name,
+        remote: upstream.remote,
+        remoteBranch: upstream.remoteBranch,
         isForce: false,
         setUpstream: true,
       })
@@ -77,7 +81,7 @@ const usePushBranch = (branch: BranchInfo): Action => {
 }
 
 const useForcePushBranch = (branch: BranchInfo): Action => {
-  const remoteCounterpart = useSelectedUpstream(branch)
+  const upstream = useSelectedUpstream(branch)
   const pushBranch = useRepositoryMutation(pushBranchMutation)
 
   const { currentBranch } = useSelectedBranches()
@@ -102,10 +106,14 @@ const useForcePushBranch = (branch: BranchInfo): Action => {
         throw new Error('Branch is not local')
       }
 
+      if (!upstream) {
+        throw new Error('No upstream set for branch')
+      }
+
       await pushBranch.mutateAsync({
         branch: branch.name,
-        remote: remoteCounterpart?.remote ?? 'origin',
-        remoteBranch: remoteCounterpart?.remoteBranch ?? branch.name,
+        remote: upstream.remote,
+        remoteBranch: upstream.remoteBranch,
         isForce: true,
         setUpstream: true,
       })
