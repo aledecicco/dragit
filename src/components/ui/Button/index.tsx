@@ -96,12 +96,12 @@ const Button = (props: ButtonProps) => {
           ])
           .with({ variant: 'plain', status: 'primary' }, () => [
             'text-primary-300',
-            'hover:bg-primary-300/4',
-            'aria-expanded:bg-primary-300/4',
-            'aria-checked:bg-primary-300/4',
-            'aria-selected:bg-primary-300/4',
-            'data-active-item:aria-selected:bg-primary-300/6',
-            'focus:bg-primary-300/4 data-focus:bg-primary-300/4',
+            'hover:bg-primary-300/8',
+            'aria-expanded:bg-primary-300/8',
+            'aria-checked:bg-primary-300/8',
+            'aria-selected:bg-primary-300/8',
+            'data-active-item:aria-selected:bg-primary-300/10',
+            'focus:bg-primary-300/8 data-focus:bg-primary-300/8',
             'aria-disabled:text-primary-400/40',
           ])
           .with({ variant: 'filled', status: 'cta' }, () => [
@@ -115,13 +115,13 @@ const Button = (props: ButtonProps) => {
             'aria-disabled:bg-accent-600/40 aria-disabled:text-light-700',
           ])
           .with({ variant: 'plain', status: 'cta' }, () => [
-            'text-accent-600',
-            'hover:bg-accent-600/4',
-            'aria-expanded:bg-accent-600/4',
-            'aria-checked:bg-accent-600/4',
-            'aria-selected:bg-accent-600/4',
-            'data-active-item:aria-selected:bg-accent-600/6',
-            'focus:bg-accent-600/4 data-focus:bg-accent-600/4',
+            'text-accent-400',
+            'hover:bg-accent-400/8',
+            'aria-expanded:bg-accent-400/8',
+            'aria-checked:bg-accent-400/8',
+            'aria-selected:bg-accent-400/8',
+            'data-active-item:aria-selected:bg-accent-400/10',
+            'focus:bg-accent-400/8 data-focus:bg-accent-400/8',
             'aria-disabled:text-accent-500/40',
           ])
           .with({ variant: 'filled', status: 'neutral' }, () => [
@@ -156,12 +156,12 @@ const Button = (props: ButtonProps) => {
           ])
           .with({ variant: 'plain', status: 'success' }, () => [
             'text-success-300',
-            'hover:bg-success-300/4',
-            'aria-expanded:bg-success-300/4',
-            'aria-checked:bg-success-300/4',
-            'aria-selected:bg-success-300/4',
-            'data-active-item:aria-selected:bg-success-300/6',
-            'focus:bg-success-300/4 data-focus:bg-success-300/4',
+            'hover:bg-success-300/8',
+            'aria-expanded:bg-success-300/8',
+            'aria-checked:bg-success-300/8',
+            'aria-selected:bg-success-300/8',
+            'data-active-item:aria-selected:bg-success-300/10',
+            'focus:bg-success-300/8 data-focus:bg-success-300/8',
             'aria-disabled:text-success-200/30',
           ])
           .with({ variant: 'filled', status: 'warning' }, () => [
@@ -176,12 +176,12 @@ const Button = (props: ButtonProps) => {
           ])
           .with({ variant: 'plain', status: 'warning' }, () => [
             'text-warning-200/90',
-            'hover:bg-warning-200/4',
-            'aria-expanded:bg-warning-200/4',
-            'aria-checked:bg-warning-200/4',
-            'aria-selected:bg-warning-200/4',
-            'data-active-item:aria-selected:bg-warning-200/6',
-            'focus:bg-warning-200/4 data-focus:bg-warning-200/4',
+            'hover:bg-warning-200/8',
+            'aria-expanded:bg-warning-200/8',
+            'aria-checked:bg-warning-200/8',
+            'aria-selected:bg-warning-200/8',
+            'data-active-item:aria-selected:bg-warning-200/10',
+            'focus:bg-warning-200/8 data-focus:bg-warning-200/8',
             'aria-disabled:text-warning-300/40',
           ])
           .with({ variant: 'filled', status: 'danger' }, () => [
@@ -195,13 +195,13 @@ const Button = (props: ButtonProps) => {
             'aria-disabled:bg-danger-300/30 aria-disabled:text-light-800',
           ])
           .with({ variant: 'plain', status: 'danger' }, () => [
-            'text-danger-600',
-            'hover:bg-danger-300/4',
-            'aria-expanded:bg-danger-300/4',
-            'aria-checked:bg-danger-300/4',
-            'aria-selected:bg-danger-300/4',
-            'data-active-item:aria-selected:bg-danger-300/6',
-            'focus:bg-danger-300/4 data-focus:bg-danger-300/4',
+            'text-danger-300',
+            'hover:bg-danger-300/8',
+            'aria-expanded:bg-danger-300/8',
+            'aria-checked:bg-danger-300/8',
+            'aria-selected:bg-danger-300/8',
+            'data-active-item:aria-selected:bg-danger-300/10',
+            'focus:bg-danger-300/8 data-focus:bg-danger-300/8',
             'aria-disabled:text-danger-300/50',
           ])
           .exhaustive(),

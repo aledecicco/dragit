@@ -82,12 +82,12 @@ const SplitButton = (props: SplitButtonProps) => {
         className={cn(
           'border',
           match(buttonProps.status)
-            .with('primary', () => 'border-primary-300')
-            .with('cta', () => 'border-accent-600')
-            .with('success', () => 'border-success-300')
-            .with('warning', () => 'border-warning-200')
-            .with('danger', () => 'border-danger-600')
-            .with(P.union('neutral', undefined), () => 'border-light-50')
+            .with('primary', () => 'border-primary-300/20')
+            .with('cta', () => 'border-accent-600/20')
+            .with('success', () => 'border-success-300/20')
+            .with('warning', () => 'border-warning-200/20')
+            .with('danger', () => 'border-danger-600/20')
+            .with(P.union('neutral', undefined), () => 'border-light-50/20')
             .exhaustive(),
         )}
         anchor={
