@@ -1,7 +1,7 @@
 import { useDeferredValue, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { matchSorter } from 'match-sorter'
-import { useEffectOnce } from 'react-use'
+import { useEffectOnce, usePrevious } from 'react-use'
 
 import { Button, type ButtonProps } from '@/ui/Button'
 import { Marquee } from '@/ui/Marquee'
@@ -53,6 +53,7 @@ const EditableText = (props: EditableTextProps) => {
   } = props
 
   const [editing, setEditing] = useState(false)
+  const prevEditing = usePrevious(editing)
 
   return editing ? (
     <EditableTextInner
@@ -72,6 +73,7 @@ const EditableText = (props: EditableTextProps) => {
     />
   ) : (
     <Button
+      autoFocus={prevEditing}
       aria-label={`${label}. Click to edit.`}
       {...propsWithCn(buttonProps, 'font-medium')}
       onClick={(e) => {
@@ -162,32 +164,31 @@ const EditableTextInner = (props: EditableTextInnerProps) => {
         }}
       />
 
-      <Ariakit.ComboboxPopover
-        portal
-        sameWidth
-        gutter={4}
-        className={cn('rounded-lg shadow-md', 'bg-dark-300 p')}
-      >
-        <Ariakit.ComboboxList className={cn('max-h-80 overflow-y-auto')}>
-          {suggestions.length === 0 ? (
-            <div
-              className={cn('text-center p-2', 'text-sm italic text-light-950')}
-            >
-              No {label} found
-            </div>
-          ) : matchingSuggestions.length === 0 ? (
-            <div
-              className={cn('text-center p-2', 'text-sm italic text-light-950')}
-            >
-              No matching {label} found
-            </div>
-          ) : (
-            matchingSuggestions.map((suggestion) => (
-              <EditableTextItem key={suggestion} value={suggestion} />
-            ))
-          )}
-        </Ariakit.ComboboxList>
-      </Ariakit.ComboboxPopover>
+      {suggestions.length > 0 && (
+        <Ariakit.ComboboxPopover
+          portal
+          sameWidth
+          gutter={4}
+          className={cn('rounded-lg shadow-md', 'bg-dark-300 p')}
+        >
+          <Ariakit.ComboboxList className={cn('max-h-80 overflow-y-auto')}>
+            {matchingSuggestions.length === 0 ? (
+              <div
+                className={cn(
+                  'text-center p-2',
+                  'text-sm italic text-light-950',
+                )}
+              >
+                No matching {label} found
+              </div>
+            ) : (
+              matchingSuggestions.map((suggestion) => (
+                <EditableTextItem key={suggestion} value={suggestion} />
+              ))
+            )}
+          </Ariakit.ComboboxList>
+        </Ariakit.ComboboxPopover>
+      )}
     </Ariakit.ComboboxProvider>
   )
 }
