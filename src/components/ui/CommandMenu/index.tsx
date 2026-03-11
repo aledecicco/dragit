@@ -15,7 +15,7 @@ import { CommandMenuItem } from './Item'
 interface CommandMenuProps
   extends MakeOptional<
     Omit<
-      ValueRequesterDialogProps<{ value: string }>,
+      ValueRequesterDialogProps<{ selected: string }>,
       'heading' | 'showClose' | 'children'
     >,
     'formOptions'
@@ -81,7 +81,7 @@ const CommandMenu = (props: CommandMenuProps) => {
     <ValueRequesterDialog
       {...propsWithCn(dialogProps, 'rounded-md bg-dark-300')}
       formOptions={{
-        defaultValues: { value: '' },
+        defaultValues: { selected: '' },
         className: cn('gap-0'),
       }}
       showClose={false}
@@ -92,8 +92,8 @@ const CommandMenu = (props: CommandMenuProps) => {
         focusLoop={false}
         setValue={onSearchChange}
         setSelectedValue={(value) => {
-          const arg = typeof value === 'string' ? value : value.at(0)
-          dialogProps.submitValue(arg ? { value: arg } : undefined)
+          const result = typeof value === 'string' ? value : value.at(0)
+          dialogProps.submitValue(result ? { selected: result } : undefined)
         }}
         resetValueOnHide
       >

@@ -65,9 +65,7 @@ const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
           />
         }
       >
-        <div
-          className={cn('w-full flex flex-col items-start pointer-events-none')}
-        >
+        <div className={cn('w-full flex flex-col items-start')}>
           <div
             className={cn(
               'grid grid-cols-[max-content_1fr] gap-x-1 items-center min-w-0',

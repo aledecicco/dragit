@@ -55,7 +55,13 @@ const CreateTagDialog = (props: CreateTagDialogProps) => {
         },
       }}
     >
-      <DialogContent heading={`Tag ${reference}`}>
+      <DialogContent
+        heading={
+          <>
+            Tag <span className={cn('font-semibold')}>{reference}</span>
+          </>
+        }
+      >
         <InputField label="tag name" name="name" autoFocus required />
 
         <TextField label="tag description" name="message" />

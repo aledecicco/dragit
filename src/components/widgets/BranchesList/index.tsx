@@ -57,7 +57,10 @@ const BranchesList = (props: BranchesListProps) => {
 
   return (
     <DropArea
-      {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}
+      {...propsWithCn(
+        divProps,
+        'grid grid-rows-[max-content_1fr] gap-y-1 overflow-hidden',
+      )}
       acceptedTypes={['commit']}
       label={
         selectedTab === 'tags'

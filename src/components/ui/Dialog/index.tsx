@@ -49,7 +49,7 @@ const Dialog = (props: DialogProps) => {
           compact
           variant="plain"
           status="neutral"
-          size="md"
+          size="lg"
           className={cn('text-lg text-light-950', 'absolute top-1.5 right-1.5')}
           label="Close dialog"
           Glyph={IconX}

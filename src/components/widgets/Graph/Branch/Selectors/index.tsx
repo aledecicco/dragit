@@ -67,8 +67,7 @@ const BranchSelectors = () => {
         disabled={
           checkoutTracker.actionStatus === 'running' ||
           checkoutTracker.actionStatus === 'disabled' ||
-          !headInfoQuery.data ||
-          !branchesQuery.data
+          !headInfoQuery.data
         }
         Glyph={checkoutTracker.Glyph}
         iconProps={{
@@ -145,7 +144,7 @@ const BranchSelectors = () => {
             : baseReference?.refName
         }
         placeholder="Choose a base branch..."
-        disabled={!headInfoQuery.data || !branchesQuery.data}
+        disabled={!headInfoQuery.data}
         Glyph={match(baseReference?.type)
           .with('commit', () => IconGitCommit)
           .with('tag', () => IconTag)

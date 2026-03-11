@@ -75,7 +75,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
           />
         }
       >
-        <div className={cn('w-full text-start pointer-events-none')}>
+        <div className={cn('w-full text-start')}>
           <div
             className={cn('flex flex-row gap-x-1 items-center text-light-600')}
           >

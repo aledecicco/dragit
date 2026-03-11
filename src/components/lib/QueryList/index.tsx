@@ -7,7 +7,7 @@ import { QueryLoader } from '@/lib/Loader/Query'
 import { VirtualizedDiv, type VirtualizedDivProps } from '@/lib/VirtualizedDiv'
 import { Skeleton } from '@/ui/Skeleton'
 import { range } from '@/utils/array'
-import { cn, propsWithCn } from '@/utils/styles'
+import { cn } from '@/utils/styles'
 
 interface QueryListProps<T, I> extends Omit<VirtualizedDivProps<I>, 'items'> {
   /**
@@ -43,16 +43,19 @@ function QueryList<I>(
 ): ReactNode
 
 function QueryList<T, I>(props: QueryListProps<T, I>) {
-  const { query, name, getItems, placeholdersCount, ...virtualizedDivProps } =
-    props
+  const {
+    query,
+    name,
+    getItems,
+    placeholdersCount,
+    className,
+    ...virtualizedDivProps
+  } = props
 
   const prevCount = usePrevious(
     query.data
-      ? Math.min(
-          (getItems ? getItems(query.data) : (query.data as I[])).length,
-          30,
-        )
-      : undefined,
+      ? (getItems ? getItems(query.data) : (query.data as I[])).length
+      : 0,
   )
 
   const store = Ariakit.useCompositeContext()
@@ -64,7 +67,8 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
       loadingFallback={
         <div
           className={cn(
-            'flex flex-col px-2 relative overflow-hidden max-h-full',
+            'flex flex-col relative overflow-hidden max-h-full px-2',
+            className,
           )}
           style={{
             paddingTop: virtualizedDivProps.options?.paddingStart ?? 8,
@@ -72,10 +76,15 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
             gap: virtualizedDivProps.options?.gap ?? 8,
           }}
         >
-          {range(placeholdersCount ?? prevCount ?? 30).map((i) => (
+          {range(
+            placeholdersCount ?? (prevCount ? Math.min(prevCount, 30) : 30),
+          ).map((i) => (
             <Skeleton
               key={i}
-              style={{ minHeight: virtualizedDivProps.itemSize }}
+              style={{
+                minHeight: virtualizedDivProps.itemSize,
+                animationDelay: `${(i % 2) * -1}s`,
+              }}
               variant="fill"
             />
           ))}
@@ -105,13 +114,14 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
                   <p
                     className={cn(
                       'text-sm text-light-950/50 italic select-none',
-                      'p-3 bg-dark-800 rounded-md h-full',
+                      'p-3 rounded-md h-full',
                     )}
                   >
                     No {name} found.
                   </p>
                 }
-                {...propsWithCn(virtualizedDivProps, 'h-full')}
+                {...virtualizedDivProps}
+                className={cn('h-full px-2', className)}
               />
             }
           />

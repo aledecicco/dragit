@@ -1,15 +1,15 @@
 import { startTransition, useDeferredValue, useState } from 'react'
 
-import type { WorktreeFileType } from '@/api/models'
+import type { FileOfType, WorktreeFileType } from '@/api/models'
 import {
   useQueryWorktreeFiles,
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
 import { Pagination } from '@/lib/Pagination'
+import { QueryList } from '@/lib/QueryList'
 import type { Shortcut } from '@/lib/ShortcutsCheatsheet'
 import { requestValueFromDialog } from '@/lib/ValueRequester/Dialog'
-import { VirtualizedDiv } from '@/lib/VirtualizedDiv'
 import {
   setNextPage,
   setPrevPage,
@@ -17,20 +17,22 @@ import {
   useWorktreeFilesPage,
 } from '@/state/pages'
 import { CommandMenu, type CommandMenuProps } from '@/ui/CommandMenu'
-import { CommandMenuItem } from '@/ui/CommandMenu/Item'
-import { Marquee } from '@/ui/Marquee'
-import { getPathLocation } from '@/utils/string'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-import { FilePath } from '../File/Path'
+import { FileSelectorDialogItem } from './Item'
 
 interface FileSelectorDialogProps<T extends WorktreeFileType>
-  extends CommandMenuProps {
+  extends Omit<CommandMenuProps, 'submitValue'> {
   /**
    * The types of files to match.
    */
   types: T | T[]
+
+  /**
+   * Callback to submit files.
+   */
+  submitValue: (args: FileOfType<T>[] | undefined) => void
 }
 
 const SHORTCUTS: Shortcut[] = [
@@ -69,7 +71,7 @@ const PAGINATION_SHORTCUTS: Shortcut[] = [
 const FileSelectorDialog = <T extends WorktreeFileType>(
   props: FileSelectorDialogProps<T>,
 ) => {
-  const { types, ...commandMenuProps } = props
+  const { types, submitValue, ...commandMenuProps } = props
 
   const [search, setSearch] = useState('')
   const deferredSearch = useDeferredValue(search)
@@ -87,13 +89,24 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
   return (
     <CommandMenu
       shortcuts={shortcuts}
+      {...commandMenuProps}
+      submitValue={(value) => {
+        const file = filesQuery.data?.items.find(
+          (file) => file.path === value?.selected,
+        )
+
+        submitValue(file ? [file] : undefined)
+      }}
       onKeyDown={(e) => {
+        commandMenuProps.onKeyDown?.(e)
+
         if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
           e.preventDefault()
           e.stopPropagation()
-          commandMenuProps.submitValue({
-            value: deferredSearch.length ? deferredSearch : '.',
-          })
+
+          submitValue(
+            filesQuery.data?.items ? filesQuery.data.items : undefined,
+          )
         }
 
         if ((e.key === 'q' || e.key === 'Q') && (e.ctrlKey || e.metaKey)) {
@@ -106,7 +119,6 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
           }
         }
       }}
-      {...commandMenuProps}
       fieldProps={{
         placeholder: 'Enter a pathspec...',
         ...commandMenuProps.fieldProps,
@@ -136,61 +148,32 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
         )
       }
     >
-      <VirtualizedDiv
+      <QueryList
+        name="matching files"
         size="sm"
-        items={filesQuery.data?.items}
+        query={filesQuery}
+        getItems={(page) => page.items}
         itemSize={52}
-        className={cn('px-0')}
-        itemProps={{
-          className: cn('border-b border-b-dark-50 last:border-0'),
+        className={cn('px-0 bg-dark-700')}
+        renderItem={(file) => <FileSelectorDialogItem file={file} />}
+        options={{
+          paddingStart: 3,
+          paddingEnd: 3,
+          gap: 4,
+          ...mapFn(filesQuery.data?.items, (items) => ({
+            getItemKey: (index: number) => items[index].path,
+          })),
         }}
-        renderItem={(file) => {
-          const { filedir, filename } = getPathLocation(file.path)
-
-          return (
-            <CommandMenuItem
-              value={file.path}
-              className={cn('flex flex-col items-start')}
-            >
-              <Marquee className={cn('text-sm text-light-500')}>
-                {filename}
-              </Marquee>
-
-              <Marquee className={cn('text-xs text-light-900/80')}>
-                <FilePath
-                  filepath={filedir}
-                  separatorProps={{ className: cn('text-light-700') }}
-                />
-              </Marquee>
-            </CommandMenuItem>
-          )
-        }}
-        options={mapFn(filesQuery.data?.items, (items) => ({
-          getItemKey: (index: number) => items[index].path,
-          gap: 0,
-          paddingStart: 0,
-          paddingEnd: 0,
-        }))}
-        fallback={
-          <div
-            className={cn(
-              'p-3 text-center',
-              'text-sm italic text-light-950 select-none',
-            )}
-          >
-            {filesQuery.data?.items === undefined
-              ? 'Loading matches.'
-              : 'No matches found.'}
-          </div>
-        }
       />
     </CommandMenu>
   )
 }
 
-const requestFilePath = <T extends WorktreeFileType[]>(types: T) =>
-  requestValueFromDialog(FileSelectorDialog, { types }).then(
-    ({ value }) => value,
-  )
+const requestWorktreeFiles = <T extends WorktreeFileType[]>(types: T) =>
+  requestValueFromDialog(FileSelectorDialog, { types })
 
-export { FileSelectorDialog, type FileSelectorDialogProps, requestFilePath }
+export {
+  FileSelectorDialog,
+  requestWorktreeFiles,
+  type FileSelectorDialogProps,
+}

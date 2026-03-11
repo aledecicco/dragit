@@ -1,7 +1,7 @@
 import { useStageFiles } from '@/api/mutations/addToIndex'
 import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
 import { useStashFiles } from '@/api/mutations/saveStash'
-import { requestFilePath } from '@/common/FileSelectorDialog'
+import { requestWorktreeFiles } from '@/common/FileSelectorDialog'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 
@@ -29,8 +29,8 @@ const MainToolbar = (props: MainToolbarProps) => {
         compact={false}
         action={stageFiles}
         argsRequester={async () => {
-          const filepath = await requestFilePath(NOT_STAGED_FILE_TYPES)
-          return [filepath]
+          const files = await requestWorktreeFiles(NOT_STAGED_FILE_TYPES)
+          return files
         }}
       />
 
@@ -41,8 +41,8 @@ const MainToolbar = (props: MainToolbarProps) => {
         compact={false}
         action={unstageFiles}
         argsRequester={async () => {
-          const filepath = await requestFilePath(STAGED_FILE_TYPES)
-          return [filepath]
+          const files = await requestWorktreeFiles(STAGED_FILE_TYPES)
+          return files
         }}
       />
 
@@ -53,8 +53,8 @@ const MainToolbar = (props: MainToolbarProps) => {
         compact={false}
         action={stashFiles}
         argsRequester={async () => {
-          const filepath = await requestFilePath(NOT_STAGED_FILE_TYPES)
-          return [filepath]
+          const files = await requestWorktreeFiles(NOT_STAGED_FILE_TYPES)
+          return files
         }}
       />
     </Toolbar>

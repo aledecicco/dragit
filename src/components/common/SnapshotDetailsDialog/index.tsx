@@ -43,14 +43,6 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
 
   const [page, setPage] = useState(0)
 
-  const snapshotName = match(snapshotInfo)
-    .with(
-      { type: 'stash' },
-      (snapshotInfo) => `Stash #${snapshotInfo.stashNumber}`,
-    )
-    .with({ type: 'commit' }, (snapshotInfo) => `#${snapshotInfo.shortHash}`)
-    .exhaustive()
-
   const filesQuery = useQuerySnapshotFiles(snapshotInfo, page)
   const showPagination = useNeedsPagination(filesQuery, page)
   const fileSelector = useFileSelector(filesQuery.data)
@@ -67,13 +59,30 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
       )}
     >
       <DialogContent
-        heading={snapshotName}
+        heading={match(snapshotInfo)
+          .with({ type: 'stash' }, (snapshotInfo) => (
+            <>
+              Stash{' '}
+              <span className={cn('font-semibold')}>
+                #{snapshotInfo.stashNumber}
+              </span>
+            </>
+          ))
+          .with({ type: 'commit' }, (snapshotInfo) => (
+            <>
+              Commit{' '}
+              <span className={cn('font-semibold')}>
+                #{snapshotInfo.shortHash}
+              </span>
+            </>
+          ))
+          .exhaustive()}
         className={cn('grid grid-rows-[max-content_max-content_1fr]')}
       >
         <ChangesSummary
           diff={snapshotInfo.changes}
           compact={false}
-          className={cn('text-sm justify-self-center -mt-6 mb-6')}
+          className={cn('text-sm justify-self-start -mt-6 mb-6')}
         />
 
         <div

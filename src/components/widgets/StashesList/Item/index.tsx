@@ -54,9 +54,7 @@ const StashesListItem = (props: StashesListItemProps) => {
           />
         }
       >
-        <div
-          className={cn('flex flex-col justify-between pointer-events-none')}
-        >
+        <div className={cn('flex flex-col justify-between')}>
           <div className={cn('min-w-0 w-full overflow-hidden')}>
             <div
               className={cn(
