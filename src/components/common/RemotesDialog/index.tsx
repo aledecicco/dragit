@@ -41,7 +41,7 @@ const RemotesDialog = (props: RemotesDialogProps) => {
       >
         <div
           className={cn(
-            'overflow-y-hidden mb-4',
+            'overflow-y-hidden mb-6',
             'bg-dark-700 border border-dark-300 rounded-lg',
           )}
         >

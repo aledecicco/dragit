@@ -37,7 +37,7 @@ const CommitDialog = (props: CommitDialogProps) => {
           type="submit"
           label={isAmend ? 'Amend Commit' : 'Commit'}
           Glyph={isAmend ? IconMessageCog : IconMessageCheck}
-          className={cn('w-full mt-8')}
+          className={cn('w-full mt-6')}
           status="primary"
         />
       </DialogContent>

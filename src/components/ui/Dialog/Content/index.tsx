@@ -1,10 +1,13 @@
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface DialogContentProps extends ComponentProps<'div'> {
-  heading?: string
+  /**
+   * Optional heading to display at the top of the dialog.
+   */
+  heading?: ReactNode
 }
 
 /**
@@ -17,14 +20,14 @@ const DialogContent = (props: DialogContentProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'py-8 px-6 bg-dark-600',
         'overflow-hidden',
-        heading && 'pb-6',
+        'p-6 bg-dark-600',
+        !!heading && 'pt-4',
       )}
     >
       {heading && (
         <Ariakit.DialogHeading
-          className={cn('text-xl font-semibold text-center -mt-2 mb-6')}
+          className={cn('tracking-wide text-xl text-start mb-6')}
         >
           {heading}
         </Ariakit.DialogHeading>

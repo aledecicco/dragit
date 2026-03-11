@@ -49,7 +49,14 @@ const CreateBranchDialog = (props: CreateBranchDialogProps) => {
         },
       }}
     >
-      <DialogContent heading={`Branch from ${fromReference}`}>
+      <DialogContent
+        heading={
+          <>
+            Branch from{' '}
+            <span className={cn('font-semibold')}>{fromReference}</span>
+          </>
+        }
+      >
         <InputField label="branch name" name="name" autoFocus required />
 
         <DecoratedButton
