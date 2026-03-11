@@ -1,4 +1,9 @@
 interface ValueRequesterProps<T> {
+  /**
+   * Callback to submit a value.
+   *
+   * @param value - The provided value. If the component is closed without submitting a value, this will be undefined.
+   */
   submitValue: (value: T | undefined) => void
 }
 

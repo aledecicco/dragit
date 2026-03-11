@@ -33,10 +33,10 @@ interface GraphCommitCardProps extends Ariakit.ButtonProps {
  * A summary card for a commit in the commit graph.
  */
 const GraphCommitCard = (props: GraphCommitCardProps) => {
-  const { commitInfo, isCurrent, ...buttonProps } = props
+  const { commitInfo, isCurrent = false, ...buttonProps } = props
 
   const timeAgo = useDateDifference(commitInfo.timestamp)
-  const interactions = useInteractions(commitInfo, !!isCurrent)
+  const interactions = useInteractions(commitInfo, isCurrent)
 
   return (
     <Draggable

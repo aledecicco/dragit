@@ -21,6 +21,10 @@ const DragAndDropHandler = (props: DragAndDropHandlerProps) => {
           activationConstraints: [
             new DndSettings.PointerActivationConstraints.Distance({ value: 5 }),
           ],
+          preventActivation: (event, source) => {
+            const target = source.handle ?? source.element
+            return !target?.contains(event.target as Node)
+          },
         }),
         DndSettings.KeyboardSensor.configure({
           offset: 20,

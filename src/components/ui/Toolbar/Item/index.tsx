@@ -41,11 +41,13 @@ const ToolbarItem = <T = void>(props: ToolbarItemProps<T>) => {
     return <ActionToolbarItem {...props} />
   }
 
+  const { fixed, status, ...itemProps } = props
+
   return (
     <BaseToolbarItem
-      fixed={props.fixed}
-      status={props.status}
-      render={<DecoratedButton {...props} />}
+      fixed={fixed}
+      status={status}
+      render={<DecoratedButton {...itemProps} status={status} />}
     />
   )
 }

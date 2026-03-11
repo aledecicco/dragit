@@ -81,20 +81,26 @@ interface Methods {
   getActionTimer: (id: ActionId) => number | undefined
 
   /**
-   * Updates the status of an action in the tracker.
+   * Updates the statuses of a set actions in the tracker.
    *
-   * @param id - The unique identifier of the action.
-   * @param status - The new status of the action. If `undefined`, the action will be removed.
+   * @param statuses - An array of items containing:
+   * - `id`: The unique identifier of the action.
+   * - `status`: The new status of the action. If `undefined`, the action will be untracked.
    */
-  setActionStatus: (id: ActionId, status: ActionStatus | undefined) => void
+  setActionStatuses: (
+    statuses: { id: ActionId; status: ActionStatus | undefined }[],
+  ) => void
 
   /**
-   * Updates the timer for an action in the tracker.
+   * Updates the timers for set of actions in the tracker.
    *
-   * @param id - The unique identifier of the action.
-   * @param timeoutId - The ID of the new timer. If `undefined`, the timer will be cleared.
+   * @param timers - An array of items containing:
+   * - `id`: The unique identifier of the action.
+   * - `timeoutId`: The ID of the new timer. If `undefined`, the timer will be cleared.
    */
-  setActionTimer: (id: ActionId, timeoutId: number | undefined) => void
+  setActionTimers: (
+    timers: { id: ActionId; timeoutId: number | undefined }[],
+  ) => void
 }
 
 const useActionsStore = create<ActionsTracker & Methods>()(
@@ -110,28 +116,36 @@ const useActionsStore = create<ActionsTracker & Methods>()(
       return getState().timers.get(hashId(id))
     },
 
-    setActionStatus: (id: ActionId, status: ActionStatus | undefined) => {
+    setActionStatuses: (
+      statuses: { id: ActionId; status: ActionStatus | undefined }[],
+    ) => {
       setState((state) => {
-        if (status === undefined) {
-          state.actions.delete(hashId(id))
-        } else {
-          state.actions.set(hashId(id), status)
-        }
+        statuses.forEach(({ id, status }) => {
+          if (status === undefined) {
+            state.actions.delete(hashId(id))
+          } else {
+            state.actions.set(hashId(id), status)
+          }
+        })
       })
     },
 
-    setActionTimer: (id: ActionId, timeoutId: number | undefined) => {
+    setActionTimers: (
+      timers: { id: ActionId; timeoutId: number | undefined }[],
+    ) => {
       setState((state) => {
-        const timer = state.timers.get(hashId(id))
-        if (timer !== undefined) {
-          clearTimeout(timer)
-        }
+        timers.forEach(({ id, timeoutId }) => {
+          const timer = state.timers.get(hashId(id))
+          if (timer !== undefined) {
+            clearTimeout(timer)
+          }
 
-        if (timeoutId === undefined) {
-          state.timers.delete(hashId(id))
-        } else {
-          state.timers.set(hashId(id), timeoutId)
-        }
+          if (timeoutId === undefined) {
+            state.timers.delete(hashId(id))
+          } else {
+            state.timers.set(hashId(id), timeoutId)
+          }
+        })
       })
     },
   })),
@@ -243,13 +257,13 @@ const prepareActionArgs = async <T>(
     throw new Error('Action is not ready')
   }
 
-  store.setActionStatus(action.id, 'disabled')
+  store.setActionStatuses([{ id: action.id, status: 'disabled' }])
 
   try {
     const args = await argsRequester()
     return args
   } catch (e) {
-    store.setActionStatus(action.id, 'idle')
+    store.setActionStatuses([{ id: action.id, status: 'idle' }])
     throw e
   }
 }
@@ -270,17 +284,17 @@ async function runAction<T>(action: Action<T>, args?: T): Promise<void> {
     const derived = action.derivedIds?.(args as T) ?? []
 
     const setAll = (status: ActionStatus | undefined) => {
-      store.setActionStatus(action.id, status)
-      for (const id of derived) {
-        store.setActionStatus(id, status)
-      }
+      store.setActionStatuses([
+        { id: action.id, status: status },
+        ...derived.map((id) => ({ id, status })),
+      ])
     }
 
     const setAllTimers = (timeout: number | undefined) => {
-      store.setActionTimer(action.id, timeout)
-      for (const id of derived) {
-        store.setActionTimer(id, timeout)
-      }
+      store.setActionTimers([
+        { id: action.id, timeoutId: timeout },
+        ...derived.map((id) => ({ id, timeoutId: timeout })),
+      ])
     }
 
     setAll('running')

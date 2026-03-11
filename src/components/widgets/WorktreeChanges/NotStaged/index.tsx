@@ -121,7 +121,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
                 <NotStagedChangesItem file={file} itemIndex={position} />
               )}
               size="sm"
-              itemSize={48}
+              itemSize={50}
               options={mapFn(filesQuery.data, (files) => ({
                 getItemKey: (index: number) => files.items[index].path,
               }))}

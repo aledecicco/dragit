@@ -6,11 +6,13 @@ import type { FileTypeFilter, WorktreeFileType } from '@/api/models'
 import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { getFileTypeFilter } from '@/api/utils'
 
+type HashedFileTypeFilter = string
+
 interface FilePages {
   /**
    * A map from file types to page numbers.
    */
-  worktree: Map<FileTypeFilter, number>
+  worktree: Map<HashedFileTypeFilter, number>
 }
 
 interface Setters {
@@ -32,7 +34,7 @@ const useFilesPagesStore = create<FilePages & Setters>()(
 
     setPage: (types, page) => {
       setState((state) => {
-        const key = getFileTypeFilter(types)
+        const key = hashFileTypeFilter(getFileTypeFilter(types))
         if (page === undefined) {
           state.worktree.delete(key)
         } else {
@@ -44,6 +46,13 @@ const useFilesPagesStore = create<FilePages & Setters>()(
 )
 
 /**
+ * Hashes a file type filter to be used as a key.
+ */
+const hashFileTypeFilter = (filter: FileTypeFilter): HashedFileTypeFilter => {
+  return JSON.stringify(filter)
+}
+
+/**
  * Returns the page that the application is currently on for the given file types.
  * Defaults to 0.
  *
@@ -51,7 +60,7 @@ const useFilesPagesStore = create<FilePages & Setters>()(
  */
 const useWorktreeFilesPage = (types: WorktreeFileType | WorktreeFileType[]) => {
   return useFilesPagesStore((state) => {
-    const key = getFileTypeFilter(types)
+    const key = hashFileTypeFilter(getFileTypeFilter(types))
     return state.worktree.get(key) ?? 0
   })
 }
@@ -73,7 +82,7 @@ const clearPage = (types: WorktreeFileType | WorktreeFileType[]) => {
  */
 const setNextPage = (types: WorktreeFileType | WorktreeFileType[]) => {
   const store = useFilesPagesStore.getState()
-  const key = getFileTypeFilter(types)
+  const key = hashFileTypeFilter(getFileTypeFilter(types))
   store.setPage(types, (store.worktree.get(key) ?? 0) + 1)
 }
 
@@ -84,7 +93,7 @@ const setNextPage = (types: WorktreeFileType | WorktreeFileType[]) => {
  */
 const setPrevPage = (types: WorktreeFileType | WorktreeFileType[]) => {
   const store = useFilesPagesStore.getState()
-  const key = getFileTypeFilter(types)
+  const key = hashFileTypeFilter(getFileTypeFilter(types))
   store.setPage(types, Math.max(0, (store.worktree.get(key) ?? 0) - 1))
 }
 

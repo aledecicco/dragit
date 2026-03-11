@@ -16,7 +16,6 @@ import type {
   StagedFileInfo,
   WorktreeFileInfo,
   WorktreeFileType,
-  WorktreeFileTypes,
 } from '../models'
 import { WORKTREE_FILES_PAGE_SCHEMA } from '../schemas'
 import {
@@ -173,7 +172,7 @@ const worktreeFilesQuery = <T extends WorktreeFileType>(
 const useQueryWorktreeFiles = <T extends WorktreeFileType>(
   types: T | T[],
   pathspec?: string,
-): UseQueryResult<Page<WorktreeFileTypes[T]>> =>
+): UseQueryResult<Page<FileOfType<T>>> =>
   useRepositoryQuery(
     worktreeFilesQuery,
     types,
