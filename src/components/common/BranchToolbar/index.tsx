@@ -3,6 +3,7 @@ import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { usePullBranch, useRebaseBranch } from '@/api/mutations/pullBranch'
 import { useForcePushBranch, usePushBranch } from '@/api/mutations/pushBranch'
 import { interaction } from '@/lib/ActionButton/utils'
+import { useSelectedUpstream } from '@/state/upstream'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 
@@ -30,6 +31,8 @@ const BranchToolbar = (props: BranchToolbarProps) => {
   const rebase = useRebaseBranch(branch)
   const fastForward = useFastForwardBranch(branch)
 
+  const upstream = useSelectedUpstream(branch)
+
   return (
     <Toolbar {...toolbarProps} fixed>
       <ToolbarItem
@@ -45,14 +48,24 @@ const BranchToolbar = (props: BranchToolbarProps) => {
                 }),
               ]
         }
-        disabled={toolbarProps.disabled || !branch || branch.type !== 'local'}
+        disabled={
+          toolbarProps.disabled ||
+          !branch ||
+          branch.type !== 'local' ||
+          !upstream
+        }
       />
       <ToolbarItem
         compact
         fixed
         action={push}
         alternatives={[interaction({ action: forcePush })]}
-        disabled={toolbarProps.disabled || !branch || branch.type !== 'local'}
+        disabled={
+          toolbarProps.disabled ||
+          !branch ||
+          branch.type !== 'local' ||
+          !upstream
+        }
       />
     </Toolbar>
   )

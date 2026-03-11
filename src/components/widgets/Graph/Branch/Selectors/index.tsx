@@ -57,7 +57,7 @@ const BranchSelectors = () => {
   return (
     <>
       <Combobox
-        className={cn('w-65 col-start-1 row-start-1')}
+        className={cn('w-full max-w-65 col-start-1 row-start-1')}
         value={
           currentReference?.type === 'commit'
             ? `#${currentReference.refName}`
@@ -136,7 +136,7 @@ const BranchSelectors = () => {
       />
 
       <Combobox
-        className={cn('w-65 col-start-3 row-start-1')}
+        className={cn('w-full max-w-65 col-start-3 row-start-1')}
         value={
           baseReference?.type === 'commit'
             ? `#${baseReference.refName}`

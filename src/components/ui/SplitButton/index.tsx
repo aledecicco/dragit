@@ -44,7 +44,7 @@ const SplitButton = (props: SplitButtonProps) => {
     return {
       x: rect.x,
       y: rect.y,
-      width: rect.width * 1.5,
+      width: rect.width * 2,
       height: rect.height,
     }
   }
@@ -53,15 +53,21 @@ const SplitButton = (props: SplitButtonProps) => {
     <div
       className={cn(
         className,
-        'grid grid-cols-[1fr_max-content] items-stretch rounded-md',
+        'grid grid-cols-[1fr_max-content] items-stretch',
+        match(size)
+          .with('xs', () => 'rounded-sm')
+          .with('sm', () => 'rounded-sm')
+          .with('md', () => 'rounded-md')
+          .with('lg', () => 'rounded-md')
+          .exhaustive(),
       )}
       ref={anchorRef}
     >
       <DecoratedButton
         {...buttonProps}
         className={cn(
-          'rounded-l-[inherit] rounded-r-none grow',
-          'border-r overflow-hidden',
+          'rounded-l-[inherit] rounded-r-none grow overflow-hidden',
+          'border-r',
           match(buttonProps.status)
             .with('primary', () => 'border-r-primary-800')
             .with('cta', () => 'border-r-accent-700')
@@ -86,7 +92,7 @@ const SplitButton = (props: SplitButtonProps) => {
         sameWidth
         getAnchorRect={getAnchorRect}
         className={cn(
-          'border',
+          'border max-w-max',
           match(buttonProps.status)
             .with('primary', () => 'border-primary-300/20')
             .with('cta', () => 'border-accent-600/20')

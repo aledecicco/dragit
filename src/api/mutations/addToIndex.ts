@@ -76,9 +76,9 @@ const useStageFiles = (): Action<WorktreeFileInfo[] | string[]> => {
       })),
     label: {
       idle: 'Stage files',
-      running: 'Staging files',
-      success: 'Staged files',
-      error: 'Failed to stage',
+      running: 'Staging',
+      success: 'Staged',
+      error: 'Failed',
     },
     Glyph: IconPlaylistAdd,
   }

@@ -25,10 +25,10 @@ interface BaseToolbarItemProps extends Ariakit.ToolbarItemProps {
 }
 
 type ToolbarItemProps<T = void> =
-  | CommonMenuItemProps
+  | CommonToolbarItemProps
   | ActionToolbarItemProps<T>
 
-type CommonMenuItemProps = BaseToolbarItemProps & DecoratedButtonProps
+type CommonToolbarItemProps = BaseToolbarItemProps & DecoratedButtonProps
 
 type ActionToolbarItemProps<T = void> = BaseToolbarItemProps &
   ActionButtonProps<T>

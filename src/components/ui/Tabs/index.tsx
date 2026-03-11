@@ -25,7 +25,7 @@ const Tabs = (props: TabsProps) => {
   return (
     <Ariakit.TabProvider store={tabs}>
       <Ariakit.TabList
-        {...propsWithCn(tabsProps, 'flex flex-row px-2')}
+        {...propsWithCn(tabsProps, 'flex flex-row px-2 overflow-x-auto')}
         focusable={false}
       >
         {list}

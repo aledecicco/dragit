@@ -125,7 +125,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
           }
         }}
         placeholder={currentBranch?.type === 'local' ? undefined : '-'}
-        className={cn('pl-5 rounded-l-none flex-1')}
+        className={cn('pl-5 rounded-l-none flex-1 h-full')}
         style={{
           clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%)',
         }}
@@ -135,7 +135,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
           className: cn(
             'text-light-700',
             upstream === undefined && 'text-light-950',
-            'pl-5 rounded-l-none flex-1 justify-start min-w-0',
+            'pl-5 rounded-l-none flex-1 justify-start min-w-0 h-full',
           ),
           style: {
             clipPath: 'polygon(10px 0, 100% 0, 100% 100%, 0 100%)',

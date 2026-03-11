@@ -84,9 +84,9 @@ const useStashFiles = (): Action<WorktreeFileInfo[] | string[]> => {
       })),
     label: {
       idle: 'Stash files',
-      running: 'Stashing files',
-      success: 'Stashed files',
-      error: 'Failed to stash',
+      running: 'Stashing',
+      success: 'Stashed',
+      error: 'Failed',
     },
     Glyph: IconPackage,
   }

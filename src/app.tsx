@@ -7,6 +7,7 @@ import { Graph } from '@/widgets/Graph'
 import { MainToolbar } from '@/widgets/MainToolbar'
 import { PendingActions } from '@/widgets/PendingActions'
 import { RecyclingBin } from '@/widgets/RecyclingBin'
+import { SecondaryToolbar } from '@/widgets/SecondaryToolbar'
 import { StartupScreen } from '@/widgets/StartupScreen'
 import { StashesList } from '@/widgets/StashesList'
 import { NotStagedWorktreeChanges } from '@/widgets/WorktreeChanges/NotStaged'
@@ -37,7 +38,7 @@ const App = () => {
       <div
         className={cn(
           'px-8 py-4 w-full h-full max-h-full',
-          'grid grid-cols-[1fr_2fr_1fr] grid-rows-1 gap-4',
+          'grid grid-cols-[1fr_1.95fr_1fr] grid-rows-1 gap-4',
         )}
       >
         {currentDirQuery.data?.path &&
@@ -107,12 +108,13 @@ const InRepository = () => {
 
       <div
         className={cn(
-          'grid grid-rows-[max-content_1fr] gap-4 overflow-hidden',
+          'grid grid-rows-[max-content_1fr_max-content] gap-4 overflow-hidden',
           'relative',
         )}
       >
         <CurrentRemote />
         <BranchesList />
+        <SecondaryToolbar />
 
         <RecyclingBin className={cn('absolute bottom-0 left-0 w-full h-50')} />
       </div>

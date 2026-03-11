@@ -22,7 +22,6 @@ const MenuItem = <T,>(props: MenuItemProps<T>) => {
       className={cn(
         'shrink-0 gap-x-2 justify-start text-nowrap w-full',
         'font-medium',
-        'nth-[n+3]:rounded-t-none not-last-of-type:rounded-b-none',
       )}
       render={
         'action' in buttonProps ? (

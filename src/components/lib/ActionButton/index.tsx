@@ -1,4 +1,5 @@
 import type { MouseEvent } from 'react'
+import { match } from 'ts-pattern'
 
 import {
   type Action,
@@ -10,6 +11,8 @@ import {
 import { Button } from '@/ui/Button'
 import { MenuItem } from '@/ui/Menu/Item'
 import { SplitButton } from '@/ui/SplitButton'
+import { cn } from '@/utils/styles'
+import type { Size } from '@/utils/types'
 
 import { DecoratedButton, type DecoratedButtonProps } from '../DecoratedButton'
 import { useActionButtonAction } from './utils'
@@ -98,8 +101,15 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
         <MenuItem
           key={hashId(alternative.action.id)}
           {...alternative}
-          className="max-w-full overflow-hidden"
-          size={commonProps.size}
+          className={cn('max-w-full overflow-hidden')}
+          size={match(commonProps.size)
+            .returnType<Size>()
+            .with('xs', () => 'xs')
+            .with('sm', () => 'xs')
+            .with('md', () => 'sm')
+            .with('lg', () => 'md')
+            .with(undefined, () => 'sm')
+            .exhaustive()}
           status={commonProps.status}
           disabled={actionStatus === 'running' || actionStatus === 'disabled'}
         />

@@ -76,9 +76,9 @@ const useUnstageFiles = (): Action<WorktreeFileInfo[] | string[]> => {
       })),
     label: {
       idle: 'Unstage files',
-      running: 'Unstaging files',
-      success: 'Unstaged files',
-      error: 'Failed to unstage',
+      running: 'Unstaging',
+      success: 'Unstaged',
+      error: 'Failed',
     },
     Glyph: IconPlaylistX,
   }

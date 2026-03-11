@@ -1,16 +1,23 @@
 import * as Ariakit from '@ariakit/react'
+import { match } from 'ts-pattern'
 
 import { cn } from '@/utils/styles'
+import type { Size } from '@/utils/types'
 
 import { Combobox } from '..'
 
-interface ComboboxItemProps extends Ariakit.SelectItemProps {}
+interface ComboboxItemProps extends Ariakit.SelectItemProps {
+  /**
+   * The size of the item.
+   */
+  size?: Size
+}
 
 /**
  * A single menu item inside a {@link Combobox}.
  */
 const ComboboxItem = (props: ComboboxItemProps) => {
-  const { children, ...itemProps } = props
+  const { size = 'md', children, ...itemProps } = props
 
   return (
     <Ariakit.SelectItem
@@ -19,13 +26,20 @@ const ComboboxItem = (props: ComboboxItemProps) => {
         <Ariakit.ComboboxItem
           value={itemProps.value}
           className={cn(
-            'text-sm text-center text-light-200 tracking-wider',
-            'p-1.5 rounded-sm cursor-pointer',
-            'wrap-anywhere',
+            'cursor-pointer wrap-anywhere text-light-50',
+
             !itemProps.value && 'italic not-aria-selected:text-light-800',
-            'data-active-item:bg-dark-100',
-            'aria-selected:bg-accent-300/15',
-            'data-active-item:aria-selected:bg-accent-300/20',
+            'data-active-item:bg-light-50/8',
+            'aria-selected:bg-accent-400/40',
+            'data-active-item:aria-selected:bg-accent-400/50',
+            'not-first-of-type:rounded-t-none not-last-of-type:rounded-b-none',
+
+            match(size)
+              .with('xs', () => 'p-1 rounded-xs ')
+              .with('sm', () => 'p-1.25 rounded-xs')
+              .with('md', () => 'p-1.5 rounded-sm text-sm')
+              .with('lg', () => 'p-1.75 rounded-sm')
+              .exhaustive(),
           )}
         />
       }

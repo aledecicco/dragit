@@ -62,11 +62,11 @@ const Button = (props: ButtonProps) => {
         match(size)
           .with('xs', () => [
             'text-xs gap-2',
-            round ? 'p-1 rounded-full' : 'px-1.75 py-1 rounded-sm',
+            round ? 'p-1 rounded-full' : 'px-1.75 py-1.25 rounded-sm',
           ])
           .with('sm', () => [
             'text-xs gap-2',
-            round ? 'p-1.25 rounded-full' : 'px-2 py-1.25 rounded-sm',
+            round ? 'p-1.25 rounded-full' : 'px-2.5 py-1.75 rounded-sm',
           ])
           .with('md', () => [
             'text-sm gap-2',

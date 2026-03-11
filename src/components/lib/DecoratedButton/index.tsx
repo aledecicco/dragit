@@ -88,10 +88,14 @@ const BaseDecoratedButton = (props: BaseDecoratedButtonProps) => {
   const button = (
     <Button aria-label={label} {...buttonProps}>
       <Icon size={buttonProps.size} Glyph={Glyph} {...iconProps} />
-      <div className={cn('overflow-hidden text-ellipsis')}>
-        {!compact && label}
-        {children}
-      </div>
+      {compact ? (
+        children
+      ) : (
+        <div className={cn('overflow-hidden text-ellipsis')}>
+          {label}
+          {children}
+        </div>
+      )}
     </Button>
   )
 
