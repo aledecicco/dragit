@@ -104,7 +104,7 @@ const SplitButton = (props: SplitButtonProps) => {
             .with('success', () => 'border-success-300/20')
             .with('warning', () => 'border-warning-200/20')
             .with('danger', () => 'border-danger-600/20')
-            .with(P.union('neutral', undefined), () => 'border-light-50/20')
+            .with(P.union('neutral', undefined), () => 'border-light-50/5')
             .exhaustive(),
         )}
         anchor={

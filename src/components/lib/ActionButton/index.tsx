@@ -31,11 +31,18 @@ type Interaction<T> =
        * Callback that requests the arguments to run the action.
        */
       argsRequester: (() => Promise<T>) | (() => T)
+
+      /**
+       * Whether the action is considered dangerous.
+       */
+      isDangerous?: boolean
     }
   | {
       action: Action
 
       argsRequester?: never
+
+      isDangerous?: boolean
     }
 
 type AnyInteraction = Interaction<never>
@@ -65,6 +72,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   const {
     action,
     argsRequester,
+    isDangerous,
     alternatives,
     menuButtonProps,
     ...buttonProps
@@ -76,8 +84,10 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   )
   const actionStatus = useActionStatuses(activeAction)
 
-  const commonProps = {
+  const commonProps: Partial<DecoratedButtonProps> = {
     ...buttonProps,
+
+    status: isDangerous ? 'danger' : buttonProps.status,
 
     onClick: async (e: MouseEvent<HTMLButtonElement>) => {
       buttonProps.onClick?.(e)

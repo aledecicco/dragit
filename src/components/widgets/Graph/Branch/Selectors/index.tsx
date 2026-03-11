@@ -14,7 +14,7 @@ import {
   useActionPresenters,
 } from '@/state/actions'
 import { changeSelectedBase, useSelectedReferences } from '@/state/branches'
-import { useSelectedUpstream } from '@/state/upstream'
+import { getUpstreamReference, useSelectedUpstream } from '@/state/upstream'
 import { Combobox } from '@/ui/Combobox'
 import { ComboboxItem } from '@/ui/Combobox/Item'
 import { ComboboxSection } from '@/ui/Combobox/Section'
@@ -46,7 +46,7 @@ const BranchSelectors = () => {
     ...(currentUpstream
       ? ensurePresent(
           branchOptions,
-          `${currentUpstream.remote}/${currentUpstream.remoteBranch}`,
+          getUpstreamReference(currentUpstream).refName,
           true,
         )
       : branchOptions
@@ -84,9 +84,11 @@ const BranchSelectors = () => {
         <ComboboxSection
           name="branches"
           onSelect={async (value) => {
-            if (
-              remoteBranchesQuery.data?.some((branch) => branch.name === value)
-            ) {
+            const isRemoteBranch = remoteBranchesQuery.data?.some(
+              (branch) => branch.name === value,
+            )
+
+            if (isRemoteBranch) {
               const branchOff = makeBranchOff(value)
               const args = await prepareActionArgs(branchOff, () =>
                 requestBranchName(value),

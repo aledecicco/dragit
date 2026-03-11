@@ -149,12 +149,8 @@ const useInteractions = (branch: BranchInfo) => {
     isCurrentBranch && [
       interaction({ action: rebase }),
       interaction({ action: push }),
-      interaction({ action: forcePush }),
+      interaction({ action: forcePush, isDangerous: true }),
     ],
-    interaction({
-      action: tag,
-      argsRequester: () => requestTagParams(branch.name),
-    }),
   )
 
   const forLocal2 = group(
@@ -165,6 +161,10 @@ const useInteractions = (branch: BranchInfo) => {
     interaction({
       action: branchOff,
       argsRequester: () => requestBranchName(branch.name),
+    }),
+    interaction({
+      action: tag,
+      argsRequester: () => requestTagParams(branch.name),
     }),
     !isCurrentBranch && interaction({ action: merge }),
   )
@@ -185,6 +185,7 @@ const useInteractions = (branch: BranchInfo) => {
     !isCurrentBranch &&
       interaction({
         action: deleteBranch,
+        isDangerous: true,
       }),
   )
 

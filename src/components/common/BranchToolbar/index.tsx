@@ -59,7 +59,7 @@ const BranchToolbar = (props: BranchToolbarProps) => {
         compact
         fixed
         action={push}
-        alternatives={[interaction({ action: forcePush })]}
+        alternatives={[interaction({ action: forcePush, isDangerous: true })]}
         disabled={
           toolbarProps.disabled ||
           !branch ||
