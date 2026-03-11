@@ -1,6 +1,7 @@
 import { type ReactNode, startTransition } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { IconChevronDown } from '@tabler/icons-react'
+import { match } from 'ts-pattern'
 
 import { Button, type ButtonProps } from '@/ui/Button'
 import { Marquee } from '@/ui/Marquee'
@@ -58,6 +59,7 @@ const ComboboxInner = (props: ComboboxProps) => {
     placeholder = 'Select...',
     Glyph,
     iconProps,
+    size = 'md',
     ...buttonProps
   } = props
 
@@ -99,7 +101,6 @@ const ComboboxInner = (props: ComboboxProps) => {
             <Button
               variant="plain"
               status="neutral"
-              size="lg"
               {...propsWithCn(
                 buttonProps,
                 'min-w-0 group/combobox gap-2 text-sm',
@@ -108,13 +109,11 @@ const ComboboxInner = (props: ComboboxProps) => {
             />
           }
         >
-          {Glyph && (
-            <Icon Glyph={Glyph} size={buttonProps.size} {...iconProps} />
-          )}
+          {Glyph && <Icon Glyph={Glyph} size={size} {...iconProps} />}
           <Marquee reverse={false}>{value ? value : placeholder}</Marquee>
           <Icon
             Glyph={IconChevronDown}
-            size={buttonProps.size}
+            size={size}
             className={cn('group-aria-expanded/combobox:rotate-180')}
           />
         </Ariakit.Select>
@@ -123,7 +122,16 @@ const ComboboxInner = (props: ComboboxProps) => {
           sameWidth
           unmountOnHide
           gutter={4}
-          className={cn('rounded-lg shadow-md min-w-50', 'bg-dark-300 p-2')}
+          className={cn(
+            'shadow-md min-w-50 bg-dark-300',
+
+            match(size)
+              .with('xs', () => 'p-1.5 rounded-sm')
+              .with('sm', () => 'p-1.5 rounded-md')
+              .with('md', () => 'p-2 rounded-lg')
+              .with('lg', () => 'p-2.5 rounded-lg')
+              .exhaustive(),
+          )}
         >
           <Tabs
             store={tabsHandler.store}
@@ -134,6 +142,7 @@ const ComboboxInner = (props: ComboboxProps) => {
                   key={group.name}
                   id={group.name}
                   className={cn('capitalize')}
+                  size={size}
                 >
                   {group.name}
                 </Tab>
@@ -143,7 +152,16 @@ const ComboboxInner = (props: ComboboxProps) => {
             <Ariakit.Combobox
               placeholder={group ? `Search ${group.name}...` : 'Search...'}
               autoSelect="always"
-              className={cn('w-full p-2 rounded-sm', 'text-sm bg-dark-500')}
+              className={cn(
+                'w-full bg-dark-500',
+
+                match(size)
+                  .with('xs', () => 'p-1.5 rounded-xs text-xs')
+                  .with('sm', () => 'p-1.75 rounded-xs text-xs')
+                  .with('md', () => 'p-2 rounded-sm text-sm')
+                  .with('lg', () => 'p-2.5 rounded-sm text-md')
+                  .exhaustive(),
+              )}
               onKeyDownCapture={(e) => {
                 // Prevent arrow keys from switching tabs when text is being navigated.
 

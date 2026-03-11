@@ -28,10 +28,15 @@ type SplitButtonProps = DecoratedButtonProps & {
  * except for `className` which is applied to the container that wraps both buttons.
  */
 const SplitButton = (props: SplitButtonProps) => {
-  const { items, menuButtonProps, className, ...buttonProps } = props
+  const {
+    items,
+    menuButtonProps,
+    className,
+    size = 'md',
+    ...buttonProps
+  } = props
 
   const anchorRef = useRef<HTMLDivElement>(null)
-  const size = buttonProps.size ?? 'md'
   const menuSize = menuButtonProps?.size ?? size
 
   const getAnchorRect = () => {
@@ -65,6 +70,8 @@ const SplitButton = (props: SplitButtonProps) => {
     >
       <DecoratedButton
         {...buttonProps}
+        round={false}
+        size={size}
         className={cn(
           'rounded-l-[inherit] rounded-r-none grow overflow-hidden',
           'border-r',
@@ -83,8 +90,6 @@ const SplitButton = (props: SplitButtonProps) => {
             .with('lg', () => 'pr-2')
             .exhaustive(),
         )}
-        round={false}
-        size={size}
       />
 
       <Dropdown

@@ -4,6 +4,7 @@ import { matchSorter } from 'match-sorter'
 
 import { TabPanel } from '@/ui/Tabs/Panel'
 import { cn, propsWithCn } from '@/utils/styles'
+import type { Size } from '@/utils/types'
 
 import { useComboboxGroupHandler, useComboboxState } from '../context'
 import { ComboboxItem } from '../Item'
@@ -19,6 +20,11 @@ interface ComboboxSectionProps
    * All available options.
    */
   options: string[]
+
+  /**
+   * The size of the options in the list.
+   */
+  size?: Size
 
   /**
    * Callback that triggers when an option is selected.
@@ -43,8 +49,15 @@ interface ComboboxSectionProps
 }
 
 const ComboboxSection = (props: ComboboxSectionProps) => {
-  const { name, options, renderOption, onSelect, noMatches, ...listProps } =
-    props
+  const {
+    name,
+    options,
+    size = 'md',
+    renderOption,
+    onSelect,
+    noMatches,
+    ...listProps
+  } = props
 
   const { registerGroup } = useComboboxGroupHandler()
 
@@ -82,7 +95,7 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
           ))
         ) : (
           matchingOptions.map((option) => (
-            <ComboboxItem key={option} value={option}>
+            <ComboboxItem key={option} value={option} size={size}>
               {renderOption
                 ? renderOption(option)
                 : option
