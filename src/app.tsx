@@ -16,13 +16,13 @@ import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
 import { useBackendEventshandler } from '@/api/events'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
-import { useReferencesSync } from '@/state/branches'
+import { useBasesSync } from '@/state/branches'
 import { useDialog } from '@/state/dialogs'
-import { useUpstreamSync } from '@/state/upstream'
 import { cn } from '@/utils/styles'
 
 import { useMakeApplyStash } from './api/mutations/applyStash'
 import { runAction } from './state/actions'
+import { useUpstreamsSync } from './state/upstream'
 import { useDefaultEventPrevention } from './utils/interaction'
 
 enableMapSet()
@@ -62,8 +62,8 @@ const Dialogs = () => {
 }
 
 const InRepository = () => {
-  useReferencesSync()
-  useUpstreamSync()
+  useBasesSync()
+  useUpstreamsSync()
 
   const makeApplyStash = useMakeApplyStash()
 

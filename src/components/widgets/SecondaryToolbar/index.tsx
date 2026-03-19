@@ -4,9 +4,9 @@ import type { BranchInfo } from '@/api/models'
 import { useCommitIndex } from '@/api/mutations/commitIndex'
 import { usePushBranch } from '@/api/mutations/pushBranch'
 import { requestCommitParams } from '@/common/CommitDialog'
-import { useSelectedBranches } from '@/state/branches'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
+import { useCurrentBranch } from '@/utils/repository'
 
 interface SecondaryToolbarProps extends Partial<ToolbarProps> {}
 
@@ -17,7 +17,7 @@ const SecondaryToolbar = (props: SecondaryToolbarProps) => {
   const { ...toolbarProps } = props
 
   const commit = useCommitIndex()
-  const { currentBranch } = useSelectedBranches()
+  const currentBranch = useCurrentBranch()
 
   return (
     <Toolbar {...toolbarProps} fixed>

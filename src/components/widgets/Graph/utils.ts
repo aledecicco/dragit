@@ -8,15 +8,12 @@ import type { VirtualItem } from '@tanstack/react-virtual'
 import type {
   AncestorInfo,
   BranchDivergence,
-  CommonAncestorInfo,
   HistoryItem,
   Page,
 } from '@/api/models'
 import { HISTORY_PAGE_SIZE } from '@/api/queries/commitHistory'
-import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { getPaginatedItem, getPaginatedLength } from '@/api/utils'
-import { useSelectedReferences } from '@/state/branches'
 
 import { NOT_STAGED_FILE_TYPES } from '../WorktreeChanges/NotStaged'
 import { STAGED_FILE_TYPES } from '../WorktreeChanges/Staged'
@@ -85,19 +82,6 @@ const useInfiniteScroll = (
 }
 
 /**
- * Tracks the two selected refs and returns information about their common ancestor.
- */
-const useCurrentCommonAncestor = (): CommonAncestorInfo | undefined => {
-  const { currentReference, baseReference } = useSelectedReferences()
-  const commonAncestorQuery = useQueryCommonAncestor(
-    currentReference?.refName,
-    baseReference?.refName,
-  )
-
-  return commonAncestorQuery.data ?? undefined
-}
-
-/**
  * Computes and returns information useful to render a commit in the graph.
  *
  * @param row - The row representing a commit in the virtual list.
@@ -146,7 +130,6 @@ export {
   ancestorNotInRange,
   ancestorIsDivergent,
   useInfiniteScroll,
-  useCurrentCommonAncestor,
   getGraphCommitData,
   useHasUncommittedChanges,
 }

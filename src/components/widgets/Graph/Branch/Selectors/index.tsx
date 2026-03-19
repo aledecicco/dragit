@@ -4,7 +4,6 @@ import { match } from 'ts-pattern'
 import { useCheckout, useSwitchBranches } from '@/api/mutations/checkout'
 import { useMakeBranchOff } from '@/api/mutations/createBranch'
 import { useQueryBranches } from '@/api/queries/branches'
-import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { useQueryTags } from '@/api/queries/tags'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { ActionButton } from '@/lib/ActionButton'
@@ -13,27 +12,31 @@ import {
   runAction,
   useActionPresenters,
 } from '@/state/actions'
-import { changeSelectedBase, useSelectedReferences } from '@/state/branches'
-import { getUpstreamReference, useSelectedUpstream } from '@/state/upstream'
+import { changeSelectedBase, useSelectedBase } from '@/state/branches'
+import { useSelectedUpstream } from '@/state/upstream'
 import { Combobox } from '@/ui/Combobox'
 import { ComboboxItem } from '@/ui/Combobox/Item'
 import { ComboboxSection } from '@/ui/Combobox/Section'
 import { ensurePresent } from '@/utils/array'
-import { useBranch } from '@/utils/repository'
+import {
+  getUpstreamReference,
+  useBranch,
+  useHeadReference,
+} from '@/utils/repository'
 import { cn } from '@/utils/styles'
 
 /**
  * Controls to select the main branch and the base branch.
  */
 const BranchSelectors = () => {
-  const headInfoQuery = useQueryHeadInfo()
   const remoteBranchesQuery = useQueryBranches('remote')
   const branchesQuery = useQueryBranches()
   const tagsQuery = useQueryTags()
 
-  const { currentReference, baseReference } = useSelectedReferences()
+  const currentReference = useHeadReference()
   const currentBranch = useBranch(currentReference)
   const currentUpstream = useSelectedUpstream(currentBranch)
+  const baseReference = useSelectedBase(currentReference)
 
   const checkout = useCheckout()
   const checkoutTracker = useActionPresenters(checkout)
@@ -61,13 +64,13 @@ const BranchSelectors = () => {
         value={
           currentReference?.type === 'commit'
             ? `#${currentReference.refName}`
-            : currentReference?.refName
+            : (currentReference?.refName ?? '')
         }
         placeholder="Checkout a branch..."
         disabled={
           checkoutTracker.actionStatus === 'running' ||
           checkoutTracker.actionStatus === 'disabled' ||
-          !headInfoQuery.data
+          !currentReference
         }
         Glyph={checkoutTracker.Glyph}
         iconProps={{
@@ -141,10 +144,10 @@ const BranchSelectors = () => {
         value={
           baseReference?.type === 'commit'
             ? `#${baseReference.refName}`
-            : baseReference?.refName
+            : (baseReference?.refName ?? '')
         }
         placeholder="Choose a base branch..."
-        disabled={!headInfoQuery.data}
+        disabled={!currentReference}
         Glyph={match(baseReference?.type)
           .with('commit', () => IconGitCommit)
           .with('tag', () => IconTag)

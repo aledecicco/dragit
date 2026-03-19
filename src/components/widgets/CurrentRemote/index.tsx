@@ -13,7 +13,6 @@ import { useQueryRemotes } from '@/api/queries/remotes'
 import { showRemotesDialog } from '@/common/RemotesDialog'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
-import { useSelectedBranches } from '@/state/branches'
 import {
   changeSelectedRemote,
   changeSelectedRemoteBranch,
@@ -24,6 +23,7 @@ import { ComboboxItem } from '@/ui/Combobox/Item'
 import { ComboboxSection } from '@/ui/Combobox/Section'
 import { EditableText } from '@/ui/EditableText'
 import { ensurePresent } from '@/utils/array'
+import { useCurrentBranch } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface CurrentRemoteProps extends ComponentProps<'div'> {}
@@ -34,7 +34,7 @@ interface CurrentRemoteProps extends ComponentProps<'div'> {}
 const CurrentRemote = (props: CurrentRemoteProps) => {
   const { ...divProps } = props
 
-  const { currentBranch } = useSelectedBranches()
+  const currentBranch = useCurrentBranch()
   const upstream = useSelectedUpstream(currentBranch)
 
   const remotesQuery = useQueryRemotes()

@@ -7,7 +7,7 @@ import { useDeleteTags } from '@/api/mutations/deleteTags'
 import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { runAction } from '@/state/actions'
-import { useSelectedBranches } from '@/state/branches'
+import { useCurrentBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 
 interface RecyclingBinProps extends ComponentProps<'div'> {}
@@ -18,7 +18,7 @@ interface RecyclingBinProps extends ComponentProps<'div'> {}
 const RecyclingBin = (props: RecyclingBinProps) => {
   const { ...divProps } = props
 
-  const { currentBranch } = useSelectedBranches()
+  const currentBranch = useCurrentBranch()
 
   const deleteBranches = useDeleteBranches()
   const deleteTags = useDeleteTags()

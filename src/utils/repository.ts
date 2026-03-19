@@ -5,10 +5,12 @@ import type {
   Reference,
   RemoteInfo,
   RemoteName,
+  Upstream,
 } from '@/api/models'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { useQueryRemotes } from '@/api/queries/remotes'
+import { useSelectedBase } from '@/state/branches'
 
 /**
  * Finds a branch's info by name in a list of available branches.
@@ -66,6 +68,26 @@ const useHeadReference = (): Reference | undefined => {
 }
 
 /**
+ * Hook that tracks the currently checked out branch, if any.
+ */
+const useCurrentBranch = (): BranchInfo | undefined => {
+  const currentReference = useHeadReference()
+  const branch = useBranch(currentReference)
+
+  return branch
+}
+
+/**
+ * Hook that tracks the currently selected base branch, if any.
+ */
+const useCurrentBaseBranch = (): BranchInfo | undefined => {
+  const currentReference = useHeadReference()
+  const baseBranch = useBranch(useSelectedBase(currentReference))
+
+  return baseBranch
+}
+
+/**
  * Finds a remote's info by name in a list of available remotes.
  *
  * @param remoteName - The name to search for.
@@ -98,10 +120,21 @@ const useRemote = (
   return remote
 }
 
+/**
+ * Get the reference an upstream points to.
+ */
+const getUpstreamReference = (upstream: Upstream): Reference => ({
+  type: 'branch',
+  refName: `${upstream.remote}/${upstream.remoteBranch}`,
+})
+
 export {
   findBranchInfo,
   useBranch,
   useHeadReference,
-  findRemoteInfo,
-  useRemote,
+  useCurrentBranch,
+  useCurrentBaseBranch,
+  getUpstreamReference,
+  type findRemoteInfo,
+  type useRemote,
 }

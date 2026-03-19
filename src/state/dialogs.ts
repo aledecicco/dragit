@@ -41,11 +41,7 @@ const useDialogsStore = create<Dialogs & Setters>()(
   immer((setState) => ({
     mounted: new Map(),
 
-    showDialog: <T extends AnyObject>(
-      key: DialogKey,
-      DialogComponent: ComponentType<T>,
-      props: T,
-    ) => {
+    showDialog: (key, DialogComponent, props) => {
       setState((state) => {
         state.mounted.delete(key)
         state.mounted.set(key, {
@@ -55,7 +51,7 @@ const useDialogsStore = create<Dialogs & Setters>()(
       })
     },
 
-    hideDialog: (key: DialogKey) => {
+    hideDialog: (key) => {
       setState((state) => {
         state.mounted.delete(key)
       })

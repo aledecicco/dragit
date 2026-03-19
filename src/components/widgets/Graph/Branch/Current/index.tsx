@@ -2,10 +2,15 @@ import type { VirtualItem } from '@tanstack/react-virtual'
 
 import { useQueryBranchDivergence } from '@/api/queries/branchDivergence'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
+import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { getPaginatedLength } from '@/api/utils'
-import { useSelectedReferences } from '@/state/branches'
-import { getUpstreamReference, useSelectedUpstream } from '@/state/upstream'
-import { useBranch } from '@/utils/repository'
+import { useSelectedBase } from '@/state/branches'
+import { useSelectedUpstream } from '@/state/upstream'
+import {
+  getUpstreamReference,
+  useBranch,
+  useHeadReference,
+} from '@/utils/repository'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
@@ -13,7 +18,6 @@ import { COMMIT_ELEMENT_ID, GraphCommit } from '../../Commit'
 import {
   ancestorIsDivergent,
   getGraphCommitData,
-  useCurrentCommonAncestor,
   useInfiniteScroll,
 } from '../../utils'
 import { BranchMessage } from '../Message'
@@ -33,7 +37,8 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
   const { items: itemsArg } = props
   const items = itemsArg.filter((item) => !!item)
 
-  const { currentReference, baseReference } = useSelectedReferences()
+  const currentReference = useHeadReference()
+  const baseReference = useSelectedBase(currentReference)
 
   const historyQuery = useQueryCommitHistory(currentReference?.refName)
   useInfiniteScroll(historyQuery, items)
@@ -45,7 +50,10 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
     upstream ? getUpstreamReference(upstream).refName : undefined,
   )
 
-  const commonAncestor = useCurrentCommonAncestor()
+  const commonAncestor = useQueryCommonAncestor(
+    currentReference?.refName,
+    baseReference?.refName,
+  ).data
   const anchor = commonAncestor?.lastCommit
 
   if (!currentReference) {

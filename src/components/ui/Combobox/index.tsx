@@ -21,7 +21,7 @@ interface ComboboxProps extends Partial<ButtonProps> {
   /**
    * The currently selected value.
    */
-  value: string | undefined
+  value: string
 
   /**
    * Placeholder text to display when no option is selected.
@@ -86,7 +86,7 @@ const ComboboxInner = (props: ComboboxProps) => {
     >
       <Ariakit.SelectProvider
         includesBaseElement={false}
-        value={value ?? ''}
+        value={value}
         setOpen={(open) => {
           if (open) {
             setSearch('')

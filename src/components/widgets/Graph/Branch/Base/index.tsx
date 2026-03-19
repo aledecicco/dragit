@@ -1,17 +1,15 @@
 import type { VirtualItem } from '@tanstack/react-virtual'
 
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
+import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { getPaginatedLength } from '@/api/utils'
-import { useSelectedReferences } from '@/state/branches'
+import { useSelectedBase } from '@/state/branches'
+import { useHeadReference } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../../Commit'
-import {
-  getGraphCommitData,
-  useCurrentCommonAncestor,
-  useInfiniteScroll,
-} from '../../utils'
+import { getGraphCommitData, useInfiniteScroll } from '../../utils'
 import { BranchMessage } from '../Message'
 
 interface GraphBaseBranchProps {
@@ -29,12 +27,16 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
   const { items: itemsArg } = props
   const items = itemsArg.filter((item) => !!item)
 
-  const { baseReference } = useSelectedReferences()
+  const currentReference = useHeadReference()
+  const baseReference = useSelectedBase(currentReference)
 
   const historyQuery = useQueryCommitHistory(baseReference?.refName)
   useInfiniteScroll(historyQuery, items)
 
-  const commonAncestor = useCurrentCommonAncestor()
+  const commonAncestor = useQueryCommonAncestor(
+    currentReference?.refName,
+    baseReference?.refName,
+  ).data
   const anchor = commonAncestor?.commonCommit
 
   if (!baseReference) {

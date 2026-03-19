@@ -108,17 +108,15 @@ const useActionsStore = create<ActionsTracker & Methods>()(
     actions: new Map(),
     timers: new Map(),
 
-    getActionStatus: (id: ActionId) => {
+    getActionStatus: (id) => {
       return getState().actions.get(hashId(id))
     },
 
-    getActionTimer: (id: ActionId): number | undefined => {
+    getActionTimer: (id) => {
       return getState().timers.get(hashId(id))
     },
 
-    setActionStatuses: (
-      statuses: { id: ActionId; status: ActionStatus | undefined }[],
-    ) => {
+    setActionStatuses: (statuses) => {
       setState((state) => {
         statuses.forEach(({ id, status }) => {
           if (status === undefined) {
@@ -130,9 +128,7 @@ const useActionsStore = create<ActionsTracker & Methods>()(
       })
     },
 
-    setActionTimers: (
-      timers: { id: ActionId; timeoutId: number | undefined }[],
-    ) => {
+    setActionTimers: (timers) => {
       setState((state) => {
         timers.forEach(({ id, timeoutId }) => {
           const timer = state.timers.get(hashId(id))

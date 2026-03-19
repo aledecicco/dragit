@@ -3,8 +3,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
 import { match, P } from 'ts-pattern'
 
-import { useSelectedReferences } from '@/state/branches'
-
 import type { AppEvent } from './models'
 import { branchDivergenceQueryKeys } from './queries/branchDivergence'
 import { branchesQueryKeys } from './queries/branches'
@@ -27,7 +25,6 @@ const EVENT_ID = 'app-event'
  */
 const useBackendEventshandler = () => {
   const client = useQueryClient()
-  const { currentReference } = useSelectedReferences()
 
   useEffect(() => {
     const unlisten = listen<AppEvent>(EVENT_ID, (event) => {
@@ -93,18 +90,13 @@ const useBackendEventshandler = () => {
               ],
             })
 
-            if (
-              currentReference &&
-              currentReference.type === 'branch' &&
-              currentReference.refName === branchName
-            ) {
-              client.invalidateQueries({
-                queryKey: [headInfoQueryKeys.all(repoPath)],
-              })
-              client.invalidateQueries({
-                queryKey: [worktreeFilesQueryKeys.all(repoPath)],
-              })
-            }
+            client.invalidateQueries({
+              queryKey: [headInfoQueryKeys.all(repoPath)],
+            })
+
+            client.invalidateQueries({
+              queryKey: [worktreeFilesQueryKeys.all(repoPath)],
+            })
           },
         )
         .with({ type: 'headChanged', repoPath: P.string }, ({ repoPath }) => {
@@ -165,7 +157,7 @@ const useBackendEventshandler = () => {
     return () => {
       unlisten.then((f) => f())
     }
-  }, [client.resetQueries, client.invalidateQueries, currentReference])
+  }, [client.resetQueries, client.invalidateQueries])
 }
 
 export { useBackendEventshandler }

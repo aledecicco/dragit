@@ -24,14 +24,17 @@ import {
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
 import { runAction } from '@/state/actions'
-import { useSelectedBranches } from '@/state/branches'
 import { useSelectedUpstream } from '@/state/upstream'
 import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
+import { useCurrentBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
 interface BranchesListItemProps extends MultiSelectItemProps {
+  /**
+   * The branch that this list item should display.
+   */
   branch: BranchInfo
 }
 
@@ -44,8 +47,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
   const lastModified = useDateDifference(branch.timestamp)
 
   const remoteCounterpart = useSelectedUpstream(branch)
-  const { currentBranch } = useSelectedBranches()
-  const isCurrentBranch = currentBranch && branch.name === currentBranch.name
+  const isCurrentBranch = useCurrentBranch()?.name === branch.name
 
   const interactions = useInteractions(branch)
 
@@ -127,8 +129,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
 }
 
 const useInteractions = (branch: BranchInfo) => {
-  const { currentBranch } = useSelectedBranches()
-  const isCurrentBranch = currentBranch && branch.name === currentBranch.name
+  const isCurrentBranch = useCurrentBranch()?.name === branch.name
 
   const checkout = useCheckoutBranch(branch)
   const fastForward = useFastForwardBranch(branch)

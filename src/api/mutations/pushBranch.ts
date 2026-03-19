@@ -3,8 +3,8 @@ import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
-import { useSelectedBranches } from '@/state/branches'
 import { useSelectedUpstream } from '@/state/upstream'
+import { useCurrentBranch } from '@/utils/repository'
 
 import type { BranchInfo, BranchName, RemoteName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
@@ -36,7 +36,7 @@ const usePushBranch = (branch: BranchInfo): Action => {
   const upstream = useSelectedUpstream(branch)
   const pushBranch = useRepositoryMutation(pushBranchMutation)
 
-  const { currentBranch } = useSelectedBranches()
+  const currentBranch = useCurrentBranch()
 
   return {
     id: {
@@ -84,7 +84,7 @@ const useForcePushBranch = (branch: BranchInfo): Action => {
   const upstream = useSelectedUpstream(branch)
   const pushBranch = useRepositoryMutation(pushBranchMutation)
 
-  const { currentBranch } = useSelectedBranches()
+  const currentBranch = useCurrentBranch()
 
   return {
     id: {

@@ -1,4 +1,8 @@
-import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
+import {
+  type QueryFunctionContext,
+  queryOptions,
+  type UseQueryResult,
+} from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
 import { MS_IN_SECOND } from '@/utils/time'
@@ -44,15 +48,28 @@ const fetchBranches = async (
   )
 }
 
-const branchesQuery = (repoPath: string, type?: BranchType) =>
+const branchesQuery = <T extends BranchType>(repoPath: string, type?: T) =>
   queryOptions({
     queryKey: [branchesQueryKeys.all(repoPath)],
     queryFn: (context) => fetchBranches(repoPath, context),
     select: (branches) =>
-      type ? branches.filter((branch) => branch.type === type) : branches,
+      type
+        ? (branches.filter((branch) => branch.type === type) as Extract<
+            BranchInfo,
+            { type: T }
+          >[])
+        : branches,
   })
 
-const useQueryBranches = (type?: BranchType) =>
-  useRepositoryQuery(branchesQuery, type)
+function useQueryBranches(
+  type: 'local',
+): UseQueryResult<Extract<BranchInfo, { type: 'local' }>[]>
+function useQueryBranches(
+  type: 'remote',
+): UseQueryResult<Extract<BranchInfo, { type: 'remote' }>[]>
+function useQueryBranches(type?: BranchType): UseQueryResult<BranchInfo[]>
+function useQueryBranches<T extends BranchType>(type?: T) {
+  return useRepositoryQuery(branchesQuery<T>, type)
+}
 
 export { branchesQueryKeys, useQueryBranches }

@@ -1,23 +1,24 @@
 import { useEffect } from 'react'
-import { usePrevious } from 'react-use'
+import { match } from 'ts-pattern'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { useShallow } from 'zustand/react/shallow'
 
-import type { Reference, RefName } from '@/api/models'
-import { useBranch, useHeadReference } from '@/utils/repository'
+import type {
+  BranchInfo,
+  Reference,
+  RefName,
+  TagInfo,
+  Upstream,
+} from '@/api/models'
+import { useQueryBranches } from '@/api/queries/branches'
+import { useQueryTags } from '@/api/queries/tags'
+import { getUpstreamReference, useHeadReference } from '@/utils/repository'
 
-import { getUpstreamReference, useSelectedUpstream } from './upstream'
-
-const MAX_BRANCHES = 50
+import { useUpstreams } from './upstream'
 
 // TODO: store persistence.
 interface SelectedReferences {
-  /**
-   * The currently selected reference.
-   */
-  current: Reference | null
-
   /**
    * The selected base used for comparison for each reference.
    */
@@ -26,52 +27,38 @@ interface SelectedReferences {
 
 interface Setters {
   /**
-   * Change the currently selected reference.
+   * Overrides the bases store for all branches.
    */
-  changeCurrent: (reference: Reference | null) => void
+  setBases: (bases: Map<RefName, Reference | null>) => void
 
   /**
    * Change the selected base for a given reference.
    */
-  changeBase: (reference: Reference, base: Reference | null) => void
+  changeBase: (reference: Reference, base: Reference | null | undefined) => void
 }
 
 const useSelectedRefsStore = create<SelectedReferences & Setters>()(
   immer((setState) => ({
-    current: null,
-
     bases: new Map(),
 
-    changeCurrent: (reference: Reference | null) => {
+    setBases: (bases) => {
       setState((state) => {
-        if (state.current?.refName === reference?.refName) {
-          return
-        }
-
-        state.current = reference
+        state.bases = bases
       })
     },
 
-    changeBase: (reference: Reference, base: Reference | null) => {
+    changeBase: (reference, base) => {
       setState((state) => {
-        if (state.bases.get(reference.refName)?.refName === base?.refName) {
-          return
-        }
-
         if (base === null) {
           state.bases.set(reference.refName, null)
           return
         }
 
-        const isNew = !state.bases.has(reference.refName)
-        if (isNew && state.bases.size >= MAX_BRANCHES) {
-          const oldest = state.bases.keys().next().value
-          if (oldest) {
-            state.bases.delete(oldest)
-          }
+        if (base === undefined) {
+          state.bases.delete(reference.refName)
+          return
         }
 
-        state.bases.delete(reference.refName)
         state.bases.set(reference.refName, base)
       })
     },
@@ -79,16 +66,69 @@ const useSelectedRefsStore = create<SelectedReferences & Setters>()(
 )
 
 /**
- * Hook that facilitates tracking the currently checked-out reference.
+ * Figures out the default base to use for a given reference.
  */
-const useCurrentReference = (): Reference | undefined => {
-  const currentReference = useSelectedRefsStore(
-    useShallow((state) => {
-      return state.current ?? undefined
-    }),
-  )
+const getDefaultBase = (
+  reference: Reference,
+  upstream: Upstream | undefined,
+): Reference | undefined => {
+  if (reference.type === 'branch' && !!upstream) {
+    return getUpstreamReference(upstream)
+  }
 
-  return currentReference
+  return undefined
+}
+
+/**
+ * Chooses a sensible base for a given reference.
+ */
+const chooseBase = (
+  reference: Reference,
+  upstream: Upstream | undefined,
+  branches: BranchInfo[],
+  tags: TagInfo[],
+): Reference | null | undefined => {
+  const store = useSelectedRefsStore.getState()
+  const prevBase = store.bases.get(reference.refName)
+
+  if (prevBase === null) {
+    // The user explicitly chose to have no base for this reference.
+    return null
+  }
+
+  let newBase: Reference | undefined =
+    // First check if there's an override set in the store.
+    prevBase ??
+    // Otherwise find a default.
+    getDefaultBase(reference, upstream)
+
+  const baseIsValid = match(newBase)
+    .with({ type: 'commit' }, () => true)
+    .with(
+      { type: 'branch' },
+      (branchRef) =>
+        // If the reference is a branch, it must exist in order to be used as a base.
+        branches.some((branch) => branch.name === branchRef.refName) ||
+        // But allow the upstream reference to be used as a base even if it's not in the list of branches.
+        (!!upstream &&
+          getUpstreamReference(upstream).refName === branchRef.refName),
+    )
+    .with({ type: 'tag' }, (tagRef) =>
+      // If the reference is a tag, it must exist in order to be used as a base.
+      tags.some((tag) => tag.name === tagRef.refName),
+    )
+    .with(undefined, () => true)
+    .exhaustive()
+
+  if (!baseIsValid) {
+    newBase = undefined
+  }
+
+  if (newBase?.refName === prevBase?.refName) {
+    return prevBase
+  }
+
+  return newBase
 }
 
 /**
@@ -99,10 +139,7 @@ const changeSelectedBase = (
   newBase: Reference | null,
 ) => {
   const state = useSelectedRefsStore.getState()
-
-  if (reference.refName !== newBase?.refName) {
-    state.changeBase(reference, newBase)
-  }
+  state.changeBase(reference, newBase)
 }
 
 /**
@@ -111,108 +148,56 @@ const changeSelectedBase = (
 const useSelectedBase = (
   reference: Reference | undefined,
 ): Reference | undefined => {
-  const baseReference = useSelectedRefsStore(
-    useShallow((state) => {
-      if (!reference) {
-        return undefined
-      }
-
-      return state.bases.get(reference.refName)
-    }),
+  const storedBase = useSelectedRefsStore(
+    useShallow((state) =>
+      reference ? (state.bases.get(reference.refName) ?? undefined) : undefined,
+    ),
   )
 
-  return baseReference ?? undefined
+  return storedBase
 }
 
 /**
- * Hook that facilitates tracking the current reference and its selected base.
- *
- * @returns An object containing:
- * - `currentReference`: The currently checked-out reference.
- * - `baseReference`: The selected base reference for that current reference.
+ * Hook that keeps the stored bases in sync when branches change.
  */
-const useSelectedReferences = () => {
-  const currentReference = useCurrentReference()
-  const baseReference = useSelectedBase(currentReference)
-
-  return {
-    currentReference,
-    baseReference,
-  }
-}
-
-/**
- * Hook that facilitates tracking the current reference and its selected base,
- * evaluating them to branches if possible.
- *
- * @returns An object containing:
- * - `currentBranch`: The branch pointed at by the currently checked-out reference, if any.
- * - `baseBranch`: The branch pointed at by the selected base reference, if any.
- */
-const useSelectedBranches = () => {
-  const { currentReference, baseReference } = useSelectedReferences()
-  const currentBranch = useBranch(currentReference)
-  const baseBranch = useBranch(baseReference)
-
-  return {
-    currentBranch,
-    baseBranch,
-  }
-}
-
-/**
- * Hook that synchronizes the selected base when the checked out reference changes.
- *
- * Chooses sensible defaults when there is no base set.
- */
-const useReferencesSync = () => {
-  const headReference = useHeadReference()
-  const branch = useBranch(headReference)
-  const currentUpstream = useSelectedUpstream(branch)
-  const prevReference = usePrevious(headReference)
-  const baseReference = useSelectedBase(prevReference)
+const useBasesSync = () => {
+  const branchesQuery = useQueryBranches()
+  const tagsQuery = useQueryTags()
+  const upstreams = useUpstreams()
+  const currentRef = useHeadReference()
 
   useEffect(() => {
-    const store = useSelectedRefsStore.getState()
+    const newBases = new Map<RefName, Reference | null>()
 
-    if (store.current?.refName !== headReference?.refName) {
-      store.changeCurrent(headReference ?? null)
-    }
+    for (const branch of branchesQuery.data ?? []) {
+      const base = chooseBase(
+        { type: 'branch', refName: branch.name },
+        upstreams.get(branch.name),
+        branchesQuery.data ?? [],
+        tagsQuery.data ?? [],
+      )
 
-    if (!headReference) {
-      return
-    }
-
-    const storedBase = store.bases.get(headReference.refName)
-
-    let newBase: Reference | null | undefined =
-      // First check if there's an override set in the store.
-      storedBase !== undefined
-        ? storedBase
-        : // Otherwise, try to use the upstream of the branch as a base.
-          headReference.type === 'branch' && currentUpstream
-          ? getUpstreamReference(currentUpstream)
-          : undefined
-
-    if (baseReference && baseReference.refName === headReference.refName) {
-      // If the new reference collides with the current base, try to fall back to the previous reference.
-      if (prevReference && prevReference.refName !== headReference.refName) {
-        newBase = prevReference
-      } else {
-        // Otherwise, clear the base.
-        newBase = undefined
+      if (base !== undefined) {
+        newBases.set(branch.name, base)
       }
     }
 
-    if (newBase !== undefined && storedBase?.refName !== newBase?.refName) {
-      store.changeBase(headReference, newBase)
+    if (currentRef?.type === 'commit') {
+      const base = chooseBase(
+        currentRef,
+        undefined,
+        branchesQuery.data ?? [],
+        tagsQuery.data ?? [],
+      )
+
+      if (base !== undefined) {
+        newBases.set(currentRef.refName, base)
+      }
     }
-  }, [headReference, prevReference, baseReference, currentUpstream])
+
+    const store = useSelectedRefsStore.getState()
+    store.setBases(newBases)
+  }, [branchesQuery.data, tagsQuery.data, currentRef, upstreams])
 }
 
-export {
-  changeSelectedBase,
-  useSelectedReferences,
-  useSelectedBranches,
-  useReferencesSync,
-}
+export { changeSelectedBase, useSelectedBase, useBasesSync }

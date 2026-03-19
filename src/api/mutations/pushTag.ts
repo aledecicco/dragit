@@ -3,8 +3,8 @@ import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
-import { useSelectedBranches } from '@/state/branches'
 import { useSelectedUpstream } from '@/state/upstream'
+import { useCurrentBranch } from '@/utils/repository'
 
 import type { RemoteName, TagInfo, TagName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
@@ -30,7 +30,7 @@ const pushTagMutation = (repoPath: string) =>
   })
 
 const usePushTag = (tag: TagInfo): Action => {
-  const { currentBranch } = useSelectedBranches()
+  const currentBranch = useCurrentBranch()
   const upstream = useSelectedUpstream(currentBranch)
 
   const pushTag = useRepositoryMutation(pushTagMutation)

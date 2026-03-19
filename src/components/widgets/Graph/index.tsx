@@ -7,18 +7,20 @@ import { SvgOverlay } from '@/widgets/Graph/SvgOverlay'
 import { useCheckout } from '@/api/mutations/checkout'
 import { useMakeBranchOff } from '@/api/mutations/createBranch'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
+import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { getPaginatedLength } from '@/api/utils'
 import { BranchToolbar } from '@/common/BranchToolbar'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
 import { prepareActionArgs, runAction } from '@/state/actions'
-import {
-  changeSelectedBase,
-  useSelectedBranches,
-  useSelectedReferences,
-} from '@/state/branches'
+import { changeSelectedBase, useSelectedBase } from '@/state/branches'
 import { useVirtualizer } from '@/utils/performance'
+import {
+  useCurrentBaseBranch,
+  useCurrentBranch,
+  useHeadReference,
+} from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { GraphBaseBranch } from './Branch/Base'
@@ -26,7 +28,6 @@ import { GraphCurrentBranch } from './Branch/Current'
 import { BranchSelectors } from './Branch/Selectors'
 import { NODE_SIZE } from './Commit/Node'
 import { CURVE_SIZE, EDGE_LENGTH, EDGE_OFFSET } from './Edges/utils'
-import { useCurrentCommonAncestor } from './utils'
 
 interface GraphProps extends ComponentProps<'div'> {}
 
@@ -38,7 +39,9 @@ interface GraphProps extends ComponentProps<'div'> {}
  */
 const Graph = (props: GraphProps) => {
   const { ...divProps } = props
-  const { currentBranch, baseBranch } = useSelectedBranches()
+
+  const currentBranch = useCurrentBranch()
+  const baseBranch = useCurrentBaseBranch()
 
   return (
     <div {...propsWithCn(divProps, 'h-full w-full min-h-0')}>
@@ -81,8 +84,12 @@ const Graph = (props: GraphProps) => {
 }
 
 const GraphInner = () => {
-  const { currentReference, baseReference } = useSelectedReferences()
-  const commonAncestor = useCurrentCommonAncestor()
+  const currentReference = useHeadReference()
+  const baseReference = useSelectedBase(currentReference)
+  const commonAncestor = useQueryCommonAncestor(
+    currentReference?.refName,
+    baseReference?.refName,
+  ).data
 
   const currentBranchHistoryQuery = useQueryCommitHistory(
     currentReference?.refName,
