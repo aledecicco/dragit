@@ -105,7 +105,7 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
           e.stopPropagation()
 
           submitValue(
-            filesQuery.data?.items ? filesQuery.data.items : undefined,
+            filesQuery.data?.items.length ? filesQuery.data.items : undefined,
           )
         }
 

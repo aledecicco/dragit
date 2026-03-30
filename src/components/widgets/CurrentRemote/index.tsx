@@ -64,7 +64,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
       {...propsWithCn(divProps, 'w-full flex flex-row items-center min-w-0')}
     >
       <Combobox
-        value={upstream?.remote}
+        value={upstream?.remote ?? ''}
         placeholder={currentBranch?.type === 'local' ? 'Remote...' : '-'}
         disabled={!remoteOptions || currentBranch?.type !== 'local'}
         Glyph={
@@ -90,20 +90,29 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
           name="remotes"
           options={remoteOptions}
           onSelect={(value) => {
-            if (currentBranch?.type === 'local') {
+            if (
+              currentBranch?.type === 'local' &&
+              !!remotesQuery.data?.find((remote) => remote.name === value)
+            ) {
               changeSelectedRemote(currentBranch, value)
             }
           }}
           noMatches={(search) => (
             <ComboboxItem
+              className={cn('text-light-600 italic')}
               value={search}
               onClick={() => {
                 showRemotesDialog({
                   defaultCreating: search,
+                  onCreate: (name) => {
+                    if (currentBranch?.type === 'local') {
+                      changeSelectedRemote(currentBranch, name)
+                    }
+                  },
                 })
               }}
             >
-              Create remote <b>{search}</b>
+              Create remote <b className={cn('text-light-50')}>{search}</b>
             </ComboboxItem>
           )}
         />

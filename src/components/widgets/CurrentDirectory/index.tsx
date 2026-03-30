@@ -40,6 +40,9 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
         .map((recentFolder) => ({
           action: makeOpenRecentFolder(recentFolder),
         }))}
+      menuButtonProps={{
+        label: 'View recent folders',
+      }}
       variant="plain"
       status="primary"
       size="md"

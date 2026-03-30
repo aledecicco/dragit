@@ -56,7 +56,8 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
               'p-2 border border-dark-100 rounded-sm',
               'cursor-pointer',
               'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
-              'hover:dithered-bg-dark-500 data-active-item:dithered-bg-dark-500',
+              'hover:dithered-bg-dark-400 data-active-item:dithered-bg-dark-400',
+              'hover:data-active-item:dithered-bg-dark-300',
               'w-full h-full',
             )}
             onDoubleClick={(e) => {
@@ -70,7 +71,6 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
           className={cn(
             'w-full h-full overflow-hidden',
             'flex flex-col gap-y-1 items-stretch',
-            'pointer-events-none',
           )}
         >
           <p

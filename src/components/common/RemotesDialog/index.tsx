@@ -19,15 +19,21 @@ interface RemotesDialogProps extends Omit<DialogProps, 'dialogKey'> {
    * If provided, the dialog will start in "creating" mode with the remote name pre-filled.
    */
   defaultCreating?: string
+
+  /**
+   * Callback to trigger when a remote is created.
+   */
+  onCreate?: (name: string, url: string) => void
 }
 
 /**
  * Dialog that displays existing remotes and allows managing them.
  */
 const RemotesDialog = (props: RemotesDialogProps) => {
-  const { defaultCreating, ...dialogProps } = props
+  const { defaultCreating, onCreate, ...dialogProps } = props
 
   const [adding, setAdding] = useState(defaultCreating !== undefined)
+  const [defaultName, setDefaultName] = useState(defaultCreating)
   const remotesQuery = useQueryRemotes()
 
   return (
@@ -59,10 +65,16 @@ const RemotesDialog = (props: RemotesDialogProps) => {
 
         {adding ? (
           <RemoteForm
+            key={defaultName}
             className={cn('-mb-1 mx-px')}
-            defaultValues={{ name: defaultCreating ?? '', url: '' }}
+            defaultValues={{ name: defaultName ?? '', url: '' }}
+            onFormSubmit={({ values }) => {
+              onCreate?.(values.name, values.url)
+              setDefaultName(undefined)
+            }}
             onCancel={() => {
               setAdding(false)
+              setDefaultName(undefined)
             }}
           />
         ) : (

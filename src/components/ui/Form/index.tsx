@@ -1,5 +1,5 @@
+import { useEffect } from 'react'
 import * as Ariakit from '@ariakit/react'
-import { useEffectOnce } from 'react-use'
 
 import { propsWithCn } from '@/utils/styles'
 import type { AnyObject } from '@/utils/types'
@@ -36,8 +36,9 @@ const Form = <T extends AnyObject>(props: FormProps<T>) => {
 
   const form = Ariakit.useFormStore({ defaultValues })
 
-  useEffectOnce(() => {
+  useEffect(() => {
     const cleanupSubmit = form.onSubmit((formState) => {
+      form.reset()
       return onFormSubmit?.(formState, form)
     })
 
@@ -49,7 +50,7 @@ const Form = <T extends AnyObject>(props: FormProps<T>) => {
       cleanupSubmit()
       cleanupValidate()
     }
-  })
+  }, [onFormSubmit, validateForm, form])
 
   return (
     <Ariakit.Form

@@ -106,12 +106,14 @@ const BranchSelectors = () => {
           options={branchOptions}
           noMatches={(search) => (
             <ComboboxItem
+              className={cn('text-light-500 italic')}
               value={search}
               onClick={() => {
                 runAction(checkout, { reference: search, isNew: true })
               }}
             >
-              Create branch <b>{search}</b> from current commit
+              Create branch <b className={cn('text-light-50')}>{search}</b> from
+              current commit
             </ComboboxItem>
           )}
         />

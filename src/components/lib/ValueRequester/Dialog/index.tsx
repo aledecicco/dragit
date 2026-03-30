@@ -27,9 +27,9 @@ const ValueRequesterDialog = <T extends AnyObject>(
       {...formDialogProps}
       formOptions={{
         ...formDialogProps.formOptions,
-        onFormSubmit: (formState, form) => {
-          formDialogProps.formOptions?.onFormSubmit?.(formState, form)
+        onFormSubmit: async (formState, form) => {
           submitValue(formState.values)
+          await formDialogProps.formOptions?.onFormSubmit?.(formState, form)
         },
       }}
       onClose={(e) => {

@@ -13,7 +13,7 @@ const LogoGlyph: Glyph = (props) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label="DraGit logo"
+      aria-label="Dragit logo"
     >
       <image href={logo} x={-2} y={-2} width={28} height={28} />
     </svg>

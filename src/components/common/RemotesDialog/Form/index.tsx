@@ -37,14 +37,14 @@ const RemoteForm = (props: RemoteFormProps) => {
       defaultValues={{ name: '', url: '' }}
       {...propsWithCn(formProps, 'flex flex-row gap-1')}
       onFormSubmit={async (formState, form) => {
-        await formProps.onFormSubmit?.(formState, form)
-
         if (formState.values.name && formState.values.url) {
           await runAction(addRemote, {
             name: formState.values.name,
             url: formState.values.url,
           })
         }
+
+        await formProps.onFormSubmit?.(formState, form)
       }}
       validateForm={async (formState, form) => {
         await formProps.validateForm?.(formState, form)

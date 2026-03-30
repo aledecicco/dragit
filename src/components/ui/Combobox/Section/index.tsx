@@ -94,15 +94,21 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
             </div>
           ))
         ) : (
-          matchingOptions.map((option) => (
-            <ComboboxItem key={option} value={option} size={size}>
-              {renderOption
-                ? renderOption(option)
-                : option
-                  ? undefined
-                  : 'Empty'}
-            </ComboboxItem>
-          ))
+          <>
+            {matchingOptions.map((option) => (
+              <ComboboxItem key={option} value={option} size={size}>
+                {renderOption
+                  ? renderOption(option)
+                  : option
+                    ? undefined
+                    : 'Empty'}
+              </ComboboxItem>
+            ))}
+            {noMatches &&
+              deferredSearch &&
+              !matchingOptions.includes(deferredSearch) &&
+              noMatches(deferredSearch)}
+          </>
         )}
       </Ariakit.ComboboxList>
     </TabPanel>
