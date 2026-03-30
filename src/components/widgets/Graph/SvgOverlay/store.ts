@@ -4,7 +4,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 type ElementId = string
 
-type ParentType = 'solid' | 'dashed' | 'unconfirmed'
+type ParentType = 'solid' | 'dashed' | 'unconfirmed' | 'draft'
 
 interface TrackedElement {
   /**

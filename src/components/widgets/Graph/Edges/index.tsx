@@ -50,10 +50,10 @@ const Edges = () => {
           'fill-none stroke-4',
           match(elem.parent.type)
             .with('solid', () => 'stroke-primary-600')
-            .with('dashed', () => 'stroke-primary-600')
+            .with('dashed', () => 'stroke-primary-600 [stroke-dasharray:8_5]')
             .with('unconfirmed', () => 'stroke-accent-400')
+            .with('draft', () => 'stroke-dark-50 [stroke-dasharray:8_5]')
             .otherwise(() => undefined),
-          elem.parent.type === 'dashed' && '[stroke-dasharray:8_5]',
         )}
         d={path}
       />

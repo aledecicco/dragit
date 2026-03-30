@@ -3,6 +3,7 @@ import type { VirtualItem } from '@tanstack/react-virtual'
 import { useQueryBranchDivergence } from '@/api/queries/branchDivergence'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
+import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { getPaginatedLength } from '@/api/utils'
 import { useSelectedBase } from '@/state/branches'
 import { useSelectedUpstream } from '@/state/upstream'
@@ -15,6 +16,8 @@ import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../../Commit'
+import { DraftCommit } from '../../Draft'
+import { EDGE_LENGTH } from '../../Edges/utils'
 import {
   ancestorIsDivergent,
   getGraphCommitData,
@@ -56,6 +59,13 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
   ).data
   const anchor = commonAncestor?.lastCommit
 
+  const hasWorktreeChanges = !!useQueryWorktreeFiles([
+    'staged',
+    'unstaged',
+    'unmerged',
+    'untracked',
+  ]).data?.items.length
+
   if (!currentReference) {
     return <BranchMessage isBase={false}>No branch checked out</BranchMessage>
   }
@@ -72,53 +82,86 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
     )
   }
 
-  return items.map((virtualRow) => {
-    if (anchor && virtualRow.index > anchor.distance) {
-      return undefined
-    }
+  return (
+    <>
+      {hasWorktreeChanges && (
+        <DraftCommit
+          parentId={mapFn(
+            historyQuery.data.pages.at(0)?.items.at(0),
+            (commit) =>
+              COMMIT_ELEMENT_ID(
+                commit.hash,
+                !!baseReference &&
+                  commit.hash === commonAncestor?.commonCommit.hash
+                  ? baseReference?.refName
+                  : currentReference.refName,
+              ),
+          )}
+          className={cn('absolute top-0 left-[3%]')}
+          style={{
+            transform: `translateY(${items[0].start}px)`,
+          }}
+        />
+      )}
 
-    const commitData = getGraphCommitData(virtualRow, historyQuery.data, anchor)
-    if (!commitData) {
-      return undefined
-    }
+      {items.map((virtualRow) => {
+        if (anchor && virtualRow.index > anchor.distance) {
+          return undefined
+        }
 
-    const parentIsDistantAnchor =
-      anchor &&
-      commitData.parent === anchor.hash &&
-      anchor.distance > virtualRow.index + 1
+        const commitData = getGraphCommitData(
+          virtualRow,
+          historyQuery.data,
+          anchor,
+        )
+        if (!commitData) {
+          return undefined
+        }
 
-    const isUnconfirmed =
-      !!mainDivergenceQuery.data &&
-      ancestorIsDivergent(virtualRow.index, mainDivergenceQuery.data)
+        const parentIsDistantAnchor =
+          anchor &&
+          commitData.parent === anchor.hash &&
+          anchor.distance > virtualRow.index + 1
 
-    return (
-      <GraphCommit
-        key={commitData.hash}
-        commitId={commitData.hash}
-        commitType={isUnconfirmed ? 'unconfirmed' : 'confirmed'}
-        elementId={COMMIT_ELEMENT_ID(commitData.hash, currentReference.refName)}
-        isCurrent={virtualRow.index === 0}
-        parent={mapFn(commitData.parent, (parentCommit) => ({
-          id: COMMIT_ELEMENT_ID(
-            parentCommit,
-            commitData.isAnchor && !!baseReference
-              ? baseReference.refName
-              : currentReference.refName,
-          ),
-          type: parentIsDistantAnchor
-            ? 'dashed'
-            : isUnconfirmed
-              ? 'unconfirmed'
-              : 'solid',
-        }))}
-        distance={virtualRow.index}
-        className={cn('absolute top-0 left-[3%]')}
-        style={{
-          transform: `translateY(${virtualRow.start}px)`,
-        }}
-      />
-    )
-  })
+        const isUnconfirmed =
+          !!mainDivergenceQuery.data &&
+          ancestorIsDivergent(virtualRow.index, mainDivergenceQuery.data)
+
+        return (
+          <GraphCommit
+            key={commitData.hash}
+            commitId={commitData.hash}
+            commitType={isUnconfirmed ? 'unconfirmed' : 'confirmed'}
+            elementId={COMMIT_ELEMENT_ID(
+              commitData.hash,
+              currentReference.refName,
+            )}
+            isCurrent={virtualRow.index === 0}
+            parent={mapFn(commitData.parent, (parentCommit) => ({
+              id: COMMIT_ELEMENT_ID(
+                parentCommit,
+                commitData.isAnchor && !!baseReference
+                  ? baseReference.refName
+                  : currentReference.refName,
+              ),
+              type: parentIsDistantAnchor
+                ? 'dashed'
+                : isUnconfirmed
+                  ? 'unconfirmed'
+                  : 'solid',
+            }))}
+            distance={
+              hasWorktreeChanges ? virtualRow.index + 1 : virtualRow.index
+            }
+            className={cn('absolute top-0 left-[3%]')}
+            style={{
+              transform: `translateY(${hasWorktreeChanges ? virtualRow.end + EDGE_LENGTH : virtualRow.start}px)`,
+            }}
+          />
+        )
+      })}
+    </>
+  )
 }
 
 export { GraphCurrentBranch, type GraphCurrentBranchProps }
