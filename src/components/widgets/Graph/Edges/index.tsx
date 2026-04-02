@@ -52,7 +52,7 @@ const Edges = () => {
             .with('solid', () => 'stroke-primary-600')
             .with('dashed', () => 'stroke-primary-600 [stroke-dasharray:8_5]')
             .with('unconfirmed', () => 'stroke-accent-400')
-            .with('draft', () => 'stroke-dark-50 [stroke-dasharray:8_5]')
+            .with('draft', () => 'stroke-light-950/40 [stroke-dasharray:8_5]')
             .otherwise(() => undefined),
         )}
         d={path}

@@ -3,8 +3,12 @@ import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 
 import type { CommitId } from '@/api/models'
+import { useAmend } from '@/api/mutations/commitIndex'
 import { useQueryCommitInfo } from '@/api/queries/commitInfo'
+import { requestCommitParams } from '@/common/CommitDialog'
+import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { QueryLoader } from '@/lib/Loader/Query'
+import { prepareActionArgs, runAction } from '@/state/actions'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { makeTracked } from '../SvgOverlay/utils'
@@ -49,10 +53,28 @@ interface GraphCommitProps extends ComponentProps<'div'> {
  * Registers/unregisters itself in the SVG overlay when mounted/unmounted.
  */
 const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
-  const { commitId, commitType, distance, trackRef, isCurrent, ...divProps } =
-    props
+  const {
+    commitId,
+    commitType,
+    distance,
+    trackRef,
+    isCurrent = false,
+    ...divProps
+  } = props
 
   const commitInfoQuery = useQueryCommitInfo(commitId)
+  const amend = useAmend()
+
+  const commonStyles = {
+    className: cn(
+      'absolute left-full top-half translate-x-2 -translate-y-half',
+      'border-4 border-dark-600 rounded-lg shadow-md',
+    ),
+    style: {
+      width: COMMIT_WIDTH,
+      height: COMMIT_HEIGHT,
+    },
+  }
 
   return (
     <div
@@ -61,32 +83,68 @@ const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
     >
       <GraphCommitNode commitType={commitType} />
 
-      <div
-        className={cn(
-          'absolute left-full top-half translate-x-2 -translate-y-half',
-          'border-4 border-dark-600 rounded-lg shadow-md',
-        )}
-        style={{
-          width: COMMIT_WIDTH,
-          height: COMMIT_HEIGHT,
-        }}
-      >
-        <QueryLoader query={commitInfoQuery}>
-          {(commitInfo) => (
-            <Ariakit.CompositeItem
-              rowId={`${distance}`}
-              render={
-                <GraphCommitCard
-                  commitInfo={commitInfo}
-                  isCurrent={isCurrent}
-                />
-              }
-            />
-          )}
-        </QueryLoader>
-      </div>
+      {isCurrent ? (
+        <DropArea
+          acceptedTypes={['worktree']}
+          label={{
+            worktree: 'amend this commit',
+          }}
+          handleDrop={async () => {
+            const args = await prepareActionArgs(amend, () =>
+              requestCommitParams(commitInfoQuery.data?.message ?? '', true),
+            )
+            runAction(amend, args)
+          }}
+          {...commonStyles}
+          overlayProps={{
+            className: cn('flex-row text-sm'),
+          }}
+        >
+          <GraphCommitInner
+            commitId={commitId}
+            distance={distance}
+            isCurrent={isCurrent}
+          />
+        </DropArea>
+      ) : (
+        <GraphCommitInner
+          commitId={commitId}
+          distance={distance}
+          isCurrent={isCurrent}
+          {...commonStyles}
+        />
+      )}
     </div>
   )
 })
+
+interface GraphCommitInnerProps extends ComponentProps<'div'> {
+  commitId: CommitId
+
+  distance: number
+
+  isCurrent: boolean
+}
+
+const GraphCommitInner = (props: GraphCommitInnerProps) => {
+  const { commitId, distance, isCurrent, ...divProps } = props
+
+  const commitInfoQuery = useQueryCommitInfo(commitId)
+
+  return (
+    <div {...divProps}>
+      <QueryLoader query={commitInfoQuery}>
+        {(commitInfo) => (
+          <Ariakit.CompositeItem
+            rowId={`${distance}`}
+            render={
+              <GraphCommitCard commitInfo={commitInfo} isCurrent={isCurrent} />
+            }
+          />
+        )}
+      </QueryLoader>
+    </div>
+  )
+}
 
 export { GraphCommit, type GraphCommitProps }

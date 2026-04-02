@@ -23,7 +23,11 @@ const DragAndDropIndicator = (props: DragAndDropIndicatorProps) => {
   return (
     <Chip
       size="lg"
-      {...propsWithCn(chipProps, 'z-4', 'flex flex-row gap-1 drop-shadow-sm ')}
+      {...propsWithCn(
+        chipProps,
+        'z-4',
+        'flex flex-row gap-1 items-center drop-shadow-sm ',
+      )}
     >
       <Icon Glyph={Glyph} size="md" />
       <span
