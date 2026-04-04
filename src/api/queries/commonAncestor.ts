@@ -63,6 +63,7 @@ const commonAncestorQuery = (
         ? (context) =>
             fetchCommonAncestor(repoPath, refName, baseRefName, context)
         : skipToken,
+    enabled: !!refName && !!baseRefName,
   })
 
 const useQueryCommonAncestor = (

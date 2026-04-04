@@ -53,6 +53,7 @@ const commitHistoryQuery = (repoPath: string, refName: string | undefined) =>
       ? (context) =>
           fetchCommitHistoryPage(repoPath, refName, context.pageParam, context)
       : skipToken,
+    enabled: !!refName,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _, lastPageParam) => {
       return lastPage.hasNext ? lastPageParam + 1 : undefined

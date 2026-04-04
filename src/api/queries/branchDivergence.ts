@@ -61,6 +61,7 @@ const branchDivergenceQuery = (
         ? (context) =>
             fetchBranchDivergence(repoPath, refName, baseRefName, context)
         : skipToken,
+    enabled: !!refName && !!baseRefName,
   })
 
 const useQueryBranchDivergence = (

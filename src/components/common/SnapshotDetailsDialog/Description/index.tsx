@@ -3,6 +3,7 @@ import { match } from 'ts-pattern'
 
 import type { SnapshotInfo } from '@/api/models'
 import { ProfilePicture } from '@/common/ProfilePicture'
+import { useRepositoryHost } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 import { useDateDifference } from '@/utils/time'
 
@@ -18,11 +19,14 @@ interface SnapshotDialogDescriptionProps extends ComponentProps<'div'> {
  */
 const SnapshotDialogDescription = (props: SnapshotDialogDescriptionProps) => {
   const { snapshotInfo, ...divProps } = props
+
   const timeAgo = useDateDifference(snapshotInfo.timestamp)
   const timeMessage = match(snapshotInfo)
     .with({ type: 'commit' }, () => 'Committed')
     .with({ type: 'stash' }, () => 'Stashed')
     .exhaustive()
+
+  const repositoryHost = useRepositoryHost()
 
   return (
     <div {...divProps}>
@@ -40,7 +44,11 @@ const SnapshotDialogDescription = (props: SnapshotDialogDescriptionProps) => {
 
       {'authorName' in snapshotInfo ? (
         <div className={cn('flex flex-row items-center gap-x-1')}>
-          <ProfilePicture username={snapshotInfo.authorName} size="md" />
+          <ProfilePicture
+            username={snapshotInfo.authorName}
+            source={repositoryHost}
+            size="md"
+          />
           <p className={cn('text-xs text-light-950')}>
             {snapshotInfo.authorName}, {timeAgo}
           </p>

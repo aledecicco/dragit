@@ -20,7 +20,7 @@ import { mapFn } from '@/utils/types'
 
 import { COMMIT_ELEMENT_ID, GraphCommit } from '../../Commit'
 import { DraftCommit } from '../../Draft'
-import { EDGE_LENGTH } from '../../Edges/utils'
+import { CURVE_SIZE, EDGE_LENGTH, EDGE_OFFSET } from '../../Edges/utils'
 import {
   ancestorIsDivergent,
   getGraphCommitData,
@@ -101,7 +101,7 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
           )}
           className={cn('absolute top-0 left-[3%]')}
           style={{
-            transform: `translateY(${items[0].start}px)`,
+            transform: `translateY(${CURVE_SIZE * 2 + EDGE_OFFSET}px)`,
           }}
         />
       )}

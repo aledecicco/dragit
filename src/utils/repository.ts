@@ -5,12 +5,14 @@ import type {
   Reference,
   RemoteInfo,
   RemoteName,
+  RepositoryHost,
   Upstream,
 } from '@/api/models'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { useQueryRemotes } from '@/api/queries/remotes'
 import { useSelectedBase } from '@/state/branches'
+import { useSelectedUpstream } from '@/state/upstream'
 
 /**
  * Finds a branch's info by name in a list of available branches.
@@ -120,6 +122,22 @@ const useRemote = (
   return remote
 }
 
+const useRepositoryHost = (): RepositoryHost | undefined => {
+  const currentBranch = useCurrentBranch()
+  const upstream = useSelectedUpstream(currentBranch)
+  const remote = useRemote(upstream?.remote)
+
+  if (!remote) {
+    return undefined
+  }
+
+  if (remote.fetchUrl.includes('github.com')) {
+    return 'github'
+  }
+
+  return undefined
+}
+
 /**
  * Get the reference an upstream points to.
  */
@@ -134,7 +152,8 @@ export {
   useHeadReference,
   useCurrentBranch,
   useCurrentBaseBranch,
+  findRemoteInfo,
+  useRemote,
+  useRepositoryHost,
   getUpstreamReference,
-  type findRemoteInfo,
-  type useRemote,
 }

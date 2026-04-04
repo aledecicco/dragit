@@ -116,43 +116,50 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
                         'flex flex-col items-center justify-between w-full h-full',
                       )}
                     >
-                      <Marquee
-                        className={cn('text-xs text-light-600 p-1 mt-1')}
-                        reverse={false}
-                      >
-                        {hasStagedChanges &&
-                          pluralize(
-                            'staged file',
-                            stagedChangesQuery.data?.items.length ?? 0,
-                            true,
+                      <div className={cn('w-full py-1 px-2')}>
+                        <Marquee
+                          className={cn('text-xs text-light-600 mt-1')}
+                          reverse={false}
+                        >
+                          {hasStagedChanges && (
+                            <span className={cn('text-success-300')}>
+                              {pluralize(
+                                'staged file',
+                                stagedChangesQuery.data?.items.length ?? 0,
+                                true,
+                              )}
+                            </span>
                           )}
-                        {hasStagedChanges && hasNotStagedChanges && ' • '}
-                        {hasNotStagedChanges &&
-                          pluralize(
-                            'unstaged file',
-                            notStagedChangesQuery.data?.items.length ?? 0,
-                            true,
-                          )}
-                      </Marquee>
+                          {hasStagedChanges && hasNotStagedChanges && ' • '}
+                          {hasNotStagedChanges &&
+                            pluralize(
+                              'unstaged file',
+                              notStagedChangesQuery.data?.items.length ?? 0,
+                              true,
+                            )}
+                        </Marquee>
+                      </div>
 
                       <Toolbar fixed className={cn('w-full')}>
                         <ToolbarItem
-                          fixed
+                          className={cn('rounded-t-none rounded-b-xs')}
                           status="neutral"
+                          action={stageAll}
+                          disabled={!hasNotStagedChanges}
                           size="sm"
                           compact={false}
-                          action={stageAll}
-                          className={cn('rounded-t-none rounded-b-xs')}
+                          fixed
                         />
 
                         <ToolbarItem
-                          fixed
+                          className={cn('rounded-t-none rounded-b-xs')}
                           status="neutral"
-                          size="sm"
-                          compact={false}
                           action={commit}
                           argsRequester={requestCommitParams}
-                          className={cn('rounded-t-none rounded-b-xs')}
+                          disabled={!hasStagedChanges}
+                          size="sm"
+                          compact={false}
+                          fixed
                         />
                       </Toolbar>
                     </div>

@@ -1,6 +1,6 @@
 import {
+  useChangeCurrentFolder,
   useMakeOpenRecentFolder,
-  useOpenFolder,
 } from '@/api/mutations/openFolder'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { useQueryRecentlyOpened } from '@/api/queries/recentlyOpened'
@@ -18,14 +18,14 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
   const { ...buttonProps } = props
 
   const currentDirQuery = useQueryCurrentDir()
-  const openFolder = useOpenFolder()
+  const changeFolder = useChangeCurrentFolder()
   const makeOpenRecentFolder = useMakeOpenRecentFolder()
 
   const recentFoldersQuery = useQueryRecentlyOpened()
 
   return (
     <ActionButton
-      action={openFolder}
+      action={changeFolder}
       argsRequester={async () => {
         const path = await chooseDirectory()
 

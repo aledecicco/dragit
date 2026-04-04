@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react'
 import { IconUserFilled } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
-import type { ProfilePictureSource } from '@/api/models'
+import type { RepositoryHost } from '@/api/models'
 import { useQueryProfilePicture } from '@/api/queries/profilePicture'
 import { Icon } from '@/ui/Icon'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -17,6 +17,10 @@ interface ProfilePictureProps extends ComponentProps<'div'> {
    * If undefined, a fallback icon is displayed.
    */
   username: string | undefined
+  /**
+   * The source to use for fetching the profile picture.
+   */
+  source: RepositoryHost | undefined
 
   /**
    * The color variant of the profile picture.
@@ -29,11 +33,6 @@ interface ProfilePictureProps extends ComponentProps<'div'> {
    * The size of the profile picture.
    */
   size?: Size
-
-  /**
-   * The source to use for fetching the profile picture.
-   */
-  source?: ProfilePictureSource
 }
 
 /**
@@ -42,13 +41,13 @@ interface ProfilePictureProps extends ComponentProps<'div'> {
 const ProfilePicture = (props: ProfilePictureProps) => {
   const {
     username,
+    source,
     variant = 'neutral',
     size = 'md',
-    source = 'github',
     ...divProps
   } = props
 
-  const picture = useQueryProfilePicture(username, source)
+  const pictureQuery = useQueryProfilePicture(username, source)
 
   return (
     <div
@@ -69,9 +68,9 @@ const ProfilePicture = (props: ProfilePictureProps) => {
         'flex items-center justify-center',
       )}
     >
-      {picture?.data ? (
+      {pictureQuery?.data?.url ? (
         <img
-          src={picture.data}
+          src={pictureQuery.data.url}
           alt={username}
           className={cn('w-full h-full')}
         />

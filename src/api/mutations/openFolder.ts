@@ -1,4 +1,4 @@
-import { IconClock } from '@tabler/icons-react'
+import { IconClock, IconFolderOpen } from '@tabler/icons-react'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
@@ -22,6 +22,24 @@ const openFolderMutation = mutationOptions({
 })
 
 const useOpenFolder = (): Action<string> => {
+  const openFolder = useMutation(openFolderMutation)
+
+  return {
+    id: { key: 'open_folder' },
+    run: async (newPath) => {
+      await openFolder.mutateAsync({ newPath })
+    },
+    label: {
+      idle: 'Choose a directory',
+      running: 'Opening folder',
+      success: 'New folder opened',
+      error: 'Failed to open folder',
+    },
+    Glyph: IconFolderOpen,
+  }
+}
+
+const useChangeCurrentFolder = (): Action<string> => {
   const openFolder = useMutation(openFolderMutation)
   const currentDirQuery = useQueryCurrentDir()
 
@@ -68,6 +86,7 @@ const useOpenRecentFolder = (folder: string): Action => {
 
 export {
   useOpenFolder,
+  useChangeCurrentFolder,
   useMakeOpenRecentFolder,
   useOpenRecentFolder,
   openFolderKey,

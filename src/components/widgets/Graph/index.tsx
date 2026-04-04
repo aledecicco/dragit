@@ -1,6 +1,7 @@
 import { type ComponentProps, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { defaultRangeExtractor, type Range } from '@tanstack/react-virtual'
+import { match } from 'ts-pattern'
 
 import { SvgOverlay } from '@/widgets/Graph/SvgOverlay'
 
@@ -17,8 +18,8 @@ import { prepareActionArgs, runAction } from '@/state/actions'
 import { changeSelectedBase, useSelectedBase } from '@/state/branches'
 import { useVirtualizer } from '@/utils/performance'
 import {
+  useBranch,
   useCurrentBaseBranch,
-  useCurrentBranch,
   useHeadReference,
 } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -40,8 +41,12 @@ interface GraphProps extends ComponentProps<'div'> {}
 const Graph = (props: GraphProps) => {
   const { ...divProps } = props
 
-  const currentBranch = useCurrentBranch()
+  const currentReference = useHeadReference()
+  const currentBranch = useBranch(currentReference)
   const baseBranch = useCurrentBaseBranch()
+
+  const checkout = useCheckout()
+  const makeBranchOff = useMakeBranchOff()
 
   return (
     <div {...propsWithCn(divProps, 'h-full w-full min-h-0')}>
@@ -50,6 +55,7 @@ const Graph = (props: GraphProps) => {
           'overflow-hidden w-full h-full',
           'grid grid-cols-[1fr_max-content_1fr] grid-rows-[max-content_max-content_1fr]',
           'gap-y-1 gap-x-8 place-items-center',
+          'relative',
         )}
       >
         <BranchSelectors />
@@ -78,6 +84,75 @@ const Graph = (props: GraphProps) => {
         >
           <GraphInner />
         </div>
+
+        <DropArea
+          className={cn('absolute top-0 left-0 w-half h-18')}
+          overlayProps={{
+            className: cn('rounded-r-none rounded-l-sm flex-row'),
+          }}
+          acceptedTypes={['branch', 'tag', 'commit']}
+          label={{
+            branch: 'checkout this branch',
+            tag: 'checkout this tag',
+            commit: 'checkout this commit',
+          }}
+          handleDrop={async (payload) => {
+            if (
+              payload.type === 'branch' &&
+              payload.dragged.type === 'remote'
+            ) {
+              const branchOff = makeBranchOff(payload.dragged.name)
+              const args = await prepareActionArgs(branchOff, () =>
+                requestBranchName(payload.dragged.name),
+              )
+              runAction(branchOff, args)
+            } else {
+              const newRef = match(payload)
+                .with({ type: 'commit' }, ({ dragged }) => dragged.id)
+                .otherwise(({ dragged }) => dragged.name)
+
+              runAction(checkout, {
+                reference: newRef,
+                isNew: false,
+              })
+            }
+          }}
+        />
+
+        <DropArea
+          extraValidation={(payload) =>
+            match(payload)
+              .with(
+                { type: 'commit' },
+                ({ dragged }) => dragged.id !== currentReference?.refName,
+              )
+              .otherwise(
+                ({ dragged }) => dragged.name !== currentReference?.refName,
+              )
+          }
+          className={cn('absolute top-0 right-0 w-half h-18')}
+          overlayProps={{
+            className: cn('rounded-l-none rounded-r-sm flex-row'),
+          }}
+          acceptedTypes={['branch', 'tag', 'commit']}
+          label={{
+            branch: 'use this branch as base',
+            tag: 'use this tag as base',
+            commit: 'use this commit as base',
+          }}
+          handleDrop={(payload) => {
+            if (currentReference) {
+              const newRef = match(payload)
+                .with({ type: 'commit' }, ({ dragged }) => dragged.id)
+                .otherwise(({ dragged }) => dragged.name)
+
+              changeSelectedBase(currentReference, {
+                type: payload.type,
+                refName: newRef,
+              })
+            }
+          }}
+        />
       </div>
     </div>
   )
@@ -125,98 +200,43 @@ const GraphInner = () => {
     overscan: 3,
   })
 
-  const checkout = useCheckout()
-  const makeBranchOff = useMakeBranchOff()
-
   return (
-    <>
-      <Ariakit.CompositeProvider focusLoop="horizontal" focusShift>
-        <Ariakit.Composite
-          render={
-            <ScrollShadowDiv
-              isScrolled={
-                virtualizer.scrollOffset !== null &&
-                virtualizer.scrollOffset > 0
-              }
-              hasScrollLeft={
-                virtualizer.scrollOffset !== null &&
-                virtualizer.scrollElement !== null &&
-                virtualizer.scrollOffset <
-                  virtualizer.totalSize - virtualizer.scrollElement.clientHeight
-              }
-              className={cn('w-full h-full col-span-3 col-start-1 row-start-3')}
-              size="md"
-            />
-          }
-        >
-          <div
-            ref={scrollContainerRef}
-            className={cn(
-              'overflow-auto scroll-smooth w-full h-full bg-dark-800/80',
-              'will-change-transform',
-            )}
-          >
-            <SvgOverlay
-              className={cn('w-full')}
-              style={{ height: virtualizer.totalSize }}
-            >
-              <GraphCurrentBranch items={virtualizer.virtualItems} />
-
-              <GraphBaseBranch items={virtualizer.virtualItems} />
-            </SvgOverlay>
-          </div>
-        </Ariakit.Composite>
-      </Ariakit.CompositeProvider>
-
-      <DropArea
-        className={cn('absolute top-0 bottom-0 left-0 w-half')}
-        overlayProps={{
-          className: 'rounded-r-none rounded-l-sm',
-        }}
-        acceptedTypes={['branch', 'tag']}
-        label={{
-          branch: 'checkout this branch',
-          tag: 'checkout this tag',
-        }}
-        handleDrop={async (payload) => {
-          if (payload.type === 'branch' && payload.dragged.type === 'remote') {
-            const branchOff = makeBranchOff(payload.dragged.name)
-            const args = await prepareActionArgs(branchOff, () =>
-              requestBranchName(payload.dragged.name),
-            )
-            runAction(branchOff, args)
-          } else {
-            runAction(checkout, {
-              reference: payload.dragged.name,
-              isNew: false,
-            })
-          }
-        }}
-      />
-
-      <DropArea
-        extraValidation={(payload) =>
-          payload.dragged.name !== currentReference?.refName
+    <Ariakit.CompositeProvider focusLoop="horizontal" focusShift>
+      <Ariakit.Composite
+        render={
+          <ScrollShadowDiv
+            isScrolled={
+              virtualizer.scrollOffset !== null && virtualizer.scrollOffset > 0
+            }
+            hasScrollLeft={
+              virtualizer.scrollOffset !== null &&
+              virtualizer.scrollElement !== null &&
+              virtualizer.scrollOffset <
+                virtualizer.totalSize - virtualizer.scrollElement.clientHeight
+            }
+            className={cn('w-full h-full col-span-3 col-start-1 row-start-3')}
+            size="md"
+          />
         }
-        className={cn('absolute top-0 bottom-0 right-0 w-half')}
-        overlayProps={{
-          className: 'rounded-l-none rounded-r-sm',
-        }}
-        acceptedTypes={['branch', 'tag']}
-        label={{
-          branch: 'use this branch as base',
-          tag: 'use this tag as base',
-        }}
-        handleDrop={(payload) => {
-          if (currentReference) {
-            changeSelectedBase(currentReference, {
-              type: payload.type,
-              refName: payload.dragged.name,
-            })
-          }
-        }}
-      />
-    </>
+      >
+        <div
+          ref={scrollContainerRef}
+          className={cn(
+            'overflow-auto scroll-smooth w-full h-full bg-dark-800/80',
+            'will-change-transform',
+          )}
+        >
+          <SvgOverlay
+            className={cn('w-full')}
+            style={{ height: virtualizer.totalSize }}
+          >
+            <GraphCurrentBranch items={virtualizer.virtualItems} />
+
+            <GraphBaseBranch items={virtualizer.virtualItems} />
+          </SvgOverlay>
+        </div>
+      </Ariakit.Composite>
+    </Ariakit.CompositeProvider>
   )
 }
 

@@ -33,7 +33,7 @@ const StartupScreen = () => {
         <div className={cn('flex flex-col items-center', 'col-start-2')}>
           <img
             src={logo}
-            alt="DraGit logo"
+            alt="Dragit logo"
             className={cn('w-80 mt-[20%] pointer-events-none select-none')}
           />
 
@@ -44,7 +44,7 @@ const StartupScreen = () => {
         <div className={cn('flex flex-col items-center', 'col-start-2')}>
           <img
             src={logo}
-            alt="DraGit logo"
+            alt="Dragit logo"
             className={cn('w-80 mt-[20%] pointer-events-none select-none')}
           />
 
@@ -76,7 +76,7 @@ const StartupScreen = () => {
               <div className={cn('flex flex-col gap-6 items-center')}>
                 <img
                   src={logo}
-                  alt="DraGit logo"
+                  alt="Dragit logo"
                   className={cn(
                     'w-80 mt-[20%] pointer-events-none select-none',
                   )}
@@ -131,31 +131,14 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
           <Marquee className={cn('text-xl')}>{location.filename}</Marquee>
         </div>
 
-        <Marquee className={cn('text-lg text-light-300')}>
+        <Marquee className={cn('text-lg text-light-800')}>
           <FilePath
             filepath={location.filedir}
             separatorProps={{
-              className: cn('text-light-950 font-bold'),
+              className: cn('text-light-500'),
             }}
           />
         </Marquee>
-
-        <ActionButton
-          action={openFolder}
-          argsRequester={async () => {
-            const path = await chooseDirectory()
-
-            if (!path) {
-              throw new Error('No folder selected')
-            }
-
-            return path
-          }}
-          aria-label="Select and open a folder in your system"
-          size="lg"
-          variant="plain"
-          status="neutral"
-        />
       </div>
 
       {currentDir.exists ? (
@@ -163,7 +146,7 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
           <div className={cn('flex flex-col gap-6 items-center')}>
             <img
               src={logo}
-              alt="DraGit logo"
+              alt="Dragit logo"
               className={cn('w-80 mt-[20%] pointer-events-none select-none')}
             />
 
@@ -203,7 +186,7 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
         <div className={cn('flex flex-col gap-6 items-center')}>
           <img
             src={logo}
-            alt="DraGit logo"
+            alt="Dragit logo"
             className={cn('w-80 mt-[20%] pointer-events-none select-none')}
           />
 

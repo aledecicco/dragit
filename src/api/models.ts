@@ -1,4 +1,4 @@
-export type ProfilePictureSource = 'github' // TODO: add more?
+export type RepositoryHost = 'github' // TODO: add more
 
 export interface Page<T> {
   items: T[]
