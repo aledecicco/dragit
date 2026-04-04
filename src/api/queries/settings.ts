@@ -5,7 +5,7 @@ import type { Settings } from '../models'
 
 const settingsQueryKey = { key: 'settings' } as const
 
-const fetchSettings = (): Promise<Settings> => invoke('get_setings')
+const fetchSettings = (): Promise<Settings> => invoke('get_settings')
 
 const settingsQuery = queryOptions({
   queryKey: [settingsQueryKey],

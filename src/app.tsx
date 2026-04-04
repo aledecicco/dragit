@@ -1,3 +1,4 @@
+import { IconSettings } from '@tabler/icons-react'
 import { enableMapSet } from 'immer'
 
 import { BranchesList } from '@/widgets/BranchesList'
@@ -15,12 +16,15 @@ import { StagedWorktreeChanges } from '@/widgets/WorktreeChanges/Staged'
 
 import { useBackendEventshandler } from '@/api/events'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
+import { showSettingsDialog } from '@/common/SettingsDialog'
+import { DecoratedButton } from '@/lib/DecoratedButton'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { useBasesSync } from '@/state/branches'
 import { useDialog } from '@/state/dialogs'
 import { cn } from '@/utils/styles'
 
 import { useMakeApplyStash } from './api/mutations/applyStash'
+import { useQuerySettings } from './api/queries/settings'
 import { runAction } from './state/actions'
 import { useUpstreamsSync } from './state/upstream'
 import { useDefaultEventPrevention } from './utils/interaction'
@@ -31,6 +35,7 @@ const App = () => {
   useBackendEventshandler()
   useDefaultEventPrevention()
 
+  const settingsQuery = useQuerySettings()
   const currentDirQuery = useQueryCurrentDir()
 
   return (
@@ -41,7 +46,8 @@ const App = () => {
           'grid grid-cols-[1fr_1.95fr_1fr] grid-rows-1 gap-4',
         )}
       >
-        {currentDirQuery.data?.path &&
+        {settingsQuery.data &&
+        currentDirQuery.data?.path &&
         currentDirQuery.data.isRepository &&
         currentDirQuery.data.exists ? (
           <InRepository />
@@ -96,9 +102,28 @@ const InRepository = () => {
       <div
         className={cn('grid grid-rows-[max-content_1fr] gap-4 overflow-hidden')}
       >
-        <CurrentDirectory className={cn('justify-self-center max-w-half')} />
+        <div
+          className={cn(
+            'flex flex-row items-center gap-2',
+            'justify-self-center max-w-half',
+          )}
+        >
+          <DecoratedButton
+            label="View settings"
+            Glyph={IconSettings}
+            onClick={() => {
+              showSettingsDialog()
+            }}
+            status="neutral"
+            variant="plain"
+            size="lg"
+            round
+            compact
+          />
+          <CurrentDirectory />
+        </div>
 
-        <div className={cn('h-full w-full min-h-0', 'relative')}>
+        <div className={cn('w-full h-full min-h-0', 'relative')}>
           <Graph />
           <PendingActions
             className={cn('absolute bottom-2 left-half -translate-x-half')}

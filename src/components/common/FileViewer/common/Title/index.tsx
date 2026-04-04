@@ -4,6 +4,7 @@ import * as Ariakit from '@ariakit/react'
 import { useCurrentPath } from '@/api/utils'
 import { FilePath } from '@/common/File/Path'
 import { Marquee } from '@/ui/Marquee'
+import { useSettings } from '@/utils/app'
 import { openFile } from '@/utils/interaction'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -26,6 +27,7 @@ const FileViewerTitle = (props: FileViewerTitleProps) => {
   const { filepath, annotation, ...buttonProps } = props
 
   const repoPath = useCurrentPath()
+  const { fileOpenerApp } = useSettings()
 
   return (
     <div className={cn('flex flex-col items-start w-full')}>
@@ -39,7 +41,7 @@ const FileViewerTitle = (props: FileViewerTitleProps) => {
         )}
         onClick={(e) => {
           buttonProps.onClick?.(e)
-          openFile(`${repoPath}/${filepath}`)
+          openFile(`${repoPath}/${filepath}`, fileOpenerApp)
         }}
       >
         <Marquee>

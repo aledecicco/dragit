@@ -10,6 +10,7 @@ static RECENT_FILES_LIMIT: usize = 10;
 static LAST_OPENED_KEY: &str = "last_opened";
 static RECENTLY_OPENED_KEY: &str = "recently_opened";
 static OPEN_LAST_ON_START_KEY: &str = "open_last_on_start";
+static FILE_OPENER_APP_KEY: &str = "file_opener_app";
 
 pub fn get_recent_folders(app_handle: &AppHandle) -> Vec<String> {
     let saved_recents = app_handle.store(RECENTS_FILE_NAME);
@@ -100,6 +101,10 @@ pub fn load_settings(app_handle: &AppHandle) -> Settings {
             Some(JsonValue::Bool(open_last)) => settings.open_last_on_start = open_last,
             _ => {}
         }
+        match saved_settings.get(FILE_OPENER_APP_KEY) {
+            Some(JsonValue::String(app)) => settings.file_opener_app = app,
+            _ => {}
+        }
     }
 
     settings
@@ -112,6 +117,7 @@ pub fn save_settings(
     let saved_settings = app_handle.store(SETTINGS_FILE_NAME)?;
 
     saved_settings.set(OPEN_LAST_ON_START_KEY, settings.open_last_on_start);
+    saved_settings.set(FILE_OPENER_APP_KEY, settings.file_opener_app.to_string());
 
     saved_settings.save()
 }

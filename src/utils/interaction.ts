@@ -3,9 +3,6 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { openPath } from '@tauri-apps/plugin-opener'
 import { useEffectOnce } from 'react-use'
 
-// TODO: make app configurable
-const DEFAULT_APP = 'code'
-
 /**
  * Prompts the user to select a directory using the native file picker.
  *
@@ -24,7 +21,7 @@ export const chooseDirectory = () => {
  * @param path - The path to the file to open.
  * @returns A promise that resolves when the file is opened.
  */
-export const openFile = (path: string, openWith: string = DEFAULT_APP) => {
+export const openFile = (path: string, openWith: string) => {
   return openPath(path, openWith)
 }
 

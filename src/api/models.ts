@@ -6,8 +6,8 @@ export interface Page<T> {
 }
 
 export interface Settings {
-  recentlyOpened: string[]
   openLastOnStart: boolean
+  fileOpenerApp: string
 }
 
 export interface CurrentDirInfo {
@@ -161,10 +161,6 @@ export interface RemoteInfo {
   name: RemoteName
   fetchUrl: string
   pushUrl: string
-}
-
-export interface Settings {
-  openLastOnStart: boolean
 }
 
 export type HeadState =
