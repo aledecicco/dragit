@@ -1,7 +1,5 @@
 import { BorshSchema } from 'borsher'
 
-export const RECENTLY_OPENED_SCHEMA = BorshSchema.Vec(BorshSchema.String)
-
 export const PAGE_SCHEMA = <T>(ITEM_SCHEMA: BorshSchema<T>) =>
   BorshSchema.Struct({
     items: BorshSchema.Vec(ITEM_SCHEMA),

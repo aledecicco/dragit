@@ -1,11 +1,10 @@
 import type { ComponentProps } from 'react'
-import { match } from 'ts-pattern'
 
 import type { SnapshotInfo } from '@/api/models'
 import { ProfilePicture } from '@/common/ProfilePicture'
 import { useRepositoryHost } from '@/utils/repository'
 import { cn } from '@/utils/styles'
-import { useDateDifference } from '@/utils/time'
+import { useDateInfo } from '@/utils/time'
 
 interface SnapshotDialogDescriptionProps extends ComponentProps<'div'> {
   /**
@@ -20,11 +19,7 @@ interface SnapshotDialogDescriptionProps extends ComponentProps<'div'> {
 const SnapshotDialogDescription = (props: SnapshotDialogDescriptionProps) => {
   const { snapshotInfo, ...divProps } = props
 
-  const timeAgo = useDateDifference(snapshotInfo.timestamp)
-  const timeMessage = match(snapshotInfo)
-    .with({ type: 'commit' }, () => 'Committed')
-    .with({ type: 'stash' }, () => 'Stashed')
-    .exhaustive()
+  const authoredTime = useDateInfo(snapshotInfo.timestamp)
 
   const repositoryHost = useRepositoryHost()
 
@@ -50,13 +45,11 @@ const SnapshotDialogDescription = (props: SnapshotDialogDescriptionProps) => {
             size="md"
           />
           <p className={cn('text-xs text-light-950')}>
-            {snapshotInfo.authorName}, {timeAgo}
+            {snapshotInfo.authorName}, {authoredTime}
           </p>
         </div>
       ) : (
-        <p className={cn('text-xs text-light-950')}>
-          {timeMessage} {timeAgo}
-        </p>
+        <p className={cn('text-xs text-light-950')}>Stashed {authoredTime}</p>
       )}
     </div>
   )

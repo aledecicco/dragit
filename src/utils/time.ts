@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { useSettings } from './app'
+
 export const MS_IN_SECOND = 1000
 export const MS_IN_MINUTE = 60 * MS_IN_SECOND
 export const MS_IN_HOUR = 60 * MS_IN_MINUTE
@@ -14,7 +16,7 @@ export const MS_IN_YEAR = 365 * MS_IN_DAY
  * @param factory - A function that returns the value to memoize.
  * @param interval - The refresh interval in milliseconds.
  */
-const useTimedValue = <T>(factory: () => T, interval: number) => {
+export const useTimedValue = <T>(factory: () => T, interval: number) => {
   const isSet = useRef(false)
   const [value, setValue] = useState(factory())
 
@@ -36,11 +38,12 @@ const dateDiffFormatter = new Intl.RelativeTimeFormat('en', { style: 'long' })
 /**
  * Builds a human-readable string with the time difference between the current time and the given date.
  *
- * @params date - The date to compare against. Can be a Date object or a timestamp in milliseconds.
+ * @params timestamp - The date to compare against. Can be a Date object or a timestamp in milliseconds.
  */
-const getDateDifference = (date: Date | number) => {
+const getDateDifference = (timestamp: Date | number) => {
   const dateDiff =
-    (typeof date === 'number' ? date : date.getTime()) - Date.now()
+    (typeof timestamp === 'number' ? timestamp : timestamp.getTime()) -
+    Date.now()
   const absDiff = Math.abs(dateDiff)
 
   if (absDiff >= MS_IN_YEAR) {
@@ -77,15 +80,28 @@ const getDateDifference = (date: Date | number) => {
  * Keeps track of the time difference between the current time and the given date,
  * updating the value every minute.
  *
- * @param date - The date to compare against. Can be a Date object or a timestamp in milliseconds.
+ * @param timestamp - The date to compare against. Can be a Date object or a timestamp in milliseconds.
  * @returns
  */
-const useDateDifference = (date: Date | number): string => {
-  const getDifference = () => {
-    return getDateDifference(date)
-  }
+export const useDateDifference = (timestamp: Date | number): string => {
+  return useTimedValue(() => getDateDifference(timestamp), MS_IN_MINUTE)
+}
 
-  return useTimedValue(getDifference, MS_IN_MINUTE)
+/**
+ * Formats a date as a human-readable string, either as an absolute date or as a relative time difference,
+ * depending on the user's settings.
+ *
+ * @param timestamp - The date to use for display. Can be a Date object or a timestamp in milliseconds.
+ * @returns
+ */
+export const useDateInfo = (timestamp: Date | number) => {
+  const settings = useSettings()
+
+  const date = typeof timestamp === 'number' ? new Date(timestamp) : timestamp
+  const dateString = `on ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`
+  const timeAgo = useDateDifference(date)
+
+  return settings.relativeTimestamps ? timeAgo : dateString
 }
 
 /**
@@ -93,8 +109,6 @@ const useDateDifference = (date: Date | number): string => {
  *
  * @param ms - The duration in milliseconds to wait.
  */
-const sleep = (ms: number) => {
+export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
-
-export { useTimedValue, useDateDifference, sleep }

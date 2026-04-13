@@ -53,8 +53,10 @@ members = [
 [workspace.dependencies]
 tauri = { version = "2.10.1", features = [] }
 serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1" }
 borsh = { version = "1.5.7", features = ["derive"] }
 tauri-plugin-store = { version = "2" }
+partially = { version = "0.2.1", features = ["derive"] }
 
 
 [profile.dev]

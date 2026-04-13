@@ -16,7 +16,7 @@ import {
 import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { cn } from '@/utils/styles'
-import { useDateDifference } from '@/utils/time'
+import { useDateInfo } from '@/utils/time'
 
 interface TagsListItemProps extends MultiSelectItemProps {
   /**
@@ -32,7 +32,7 @@ const TagsListItem = (props: TagsListItemProps) => {
   const { tag, ...itemProps } = props
 
   const interactions = useInteractions(tag)
-  const taggedTime = useDateDifference(tag.timestamp)
+  const taggedTime = useDateInfo(tag.timestamp)
 
   return (
     <Draggable
@@ -81,7 +81,7 @@ const TagsListItem = (props: TagsListItemProps) => {
             className={cn('mt-2 text-xs text-light-950/60')}
             reverse={false}
           >
-            {!!tag.authorName && `${tag.authorName}, `}
+            {tag.authorName ? `${tag.authorName}, ` : 'Tagged '}
             {taggedTime}
           </Marquee>
         </div>

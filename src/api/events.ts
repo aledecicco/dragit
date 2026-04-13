@@ -13,6 +13,7 @@ import { fileConflictsQueryKeys } from './queries/fileConflicts'
 import { fileDiffQueryKeys } from './queries/fileDiff'
 import { headInfoQueryKeys } from './queries/headInfo'
 import { remotesQueryKeys } from './queries/remotes'
+import { settingsQueryKey } from './queries/settings'
 import { stashesQueryKeys } from './queries/stashes'
 import { tagsQueryKeys } from './queries/tags'
 import { worktreeFilesQueryKeys } from './queries/worktreeFiles'
@@ -31,11 +32,16 @@ const useBackendEventshandler = () => {
       console.log(`Received event: ${JSON.stringify(event)}`)
 
       match(event.payload)
-        .with({ type: 'dirDisappeared', repoPath: P._ }, () => {
-          // TODO: show a notification that the directory is gone
+        .with({ type: 'settingsChanged' }, () => {
+          client.invalidateQueries({
+            queryKey: [settingsQueryKey],
+          })
         })
         .with({ type: 'dirChanged' }, () => {
           client.resetQueries()
+        })
+        .with({ type: 'dirDisappeared', repoPath: P._ }, () => {
+          // TODO: show a notification that the directory is gone
         })
         .with(
           { type: 'gitFolderModified', repoPath: P.string },

@@ -1,110 +1,93 @@
+use partially::Partial;
 use tauri::AppHandle;
 use tauri_plugin_store::{JsonValue, StoreExt};
 
-use models::Settings;
+use models::{PartialSettings, Settings};
 
-static SETTINGS_FILE_NAME: &str = "settings.json";
-static RECENTS_FILE_NAME: &str = "recents.json";
+static STORAGE_FILE_NAME: &str = "storage.json";
 static RECENT_FILES_LIMIT: usize = 10;
-
-static LAST_OPENED_KEY: &str = "last_opened";
-static RECENTLY_OPENED_KEY: &str = "recently_opened";
-static OPEN_LAST_ON_START_KEY: &str = "open_last_on_start";
-static FILE_OPENER_APP_KEY: &str = "file_opener_app";
-
-pub fn get_recent_folders(app_handle: &AppHandle) -> Vec<String> {
-    let saved_recents = app_handle.store(RECENTS_FILE_NAME);
-    let mut recents = Vec::new();
-
-    if let Ok(saved_recents) = saved_recents {
-        match saved_recents.get(RECENTLY_OPENED_KEY) {
-            Some(JsonValue::Array(recent)) => {
-                recents = recent
-                    .iter()
-                    .filter_map(|value| match value {
-                        JsonValue::String(value) => Some(value.to_string()),
-                        _ => None,
-                    })
-                    .collect()
-            }
-            _ => {}
-        }
-    }
-
-    recents.reverse();
-    recents
-}
 
 pub fn add_recent_folder(
     app_handle: &AppHandle,
     path: &str,
 ) -> Result<(), tauri_plugin_store::Error> {
-    let mut recents = get_recent_folders(app_handle);
-    let saved_recents = app_handle.store(RECENTS_FILE_NAME)?;
+    let mut recents = get_stored_settings(app_handle)?
+        .recent_folders
+        .unwrap_or(Vec::new());
 
     recents.retain(|recent| recent != path);
     recents.insert(0, path.to_string());
     recents.truncate(RECENT_FILES_LIMIT);
 
-    saved_recents.set(RECENTLY_OPENED_KEY, recents);
-    saved_recents.save()
+    save_settings(
+        app_handle,
+        &PartialSettings {
+            recent_folders: Some(recents),
+            ..Default::default()
+        },
+    )
 }
 
 pub fn remove_recent_folder(
     app_handle: &AppHandle,
     path: &str,
 ) -> Result<(), tauri_plugin_store::Error> {
-    let mut recents = get_recent_folders(app_handle);
-    let saved_recents = app_handle.store(RECENTS_FILE_NAME)?;
+    let recents = get_stored_settings(app_handle)?.recent_folders;
 
-    recents.retain(|recent| recent != path);
+    if let Some(mut recents) = recents {
+        recents.retain(|recent| recent != path);
 
-    saved_recents.set(RECENTLY_OPENED_KEY, recents);
-    saved_recents.save()
-}
-
-pub fn get_last_opened(app_handle: &AppHandle) -> Option<String> {
-    let saved_recents = app_handle.store(RECENTS_FILE_NAME);
-
-    saved_recents
-        .ok()?
-        .get(LAST_OPENED_KEY)
-        .and_then(|value| match value {
-            JsonValue::String(value) => Some(value.to_string()),
-            _ => None,
-        })
+        save_settings(
+            app_handle,
+            &PartialSettings {
+                recent_folders: Some(recents),
+                ..Default::default()
+            },
+        )
+    } else {
+        Ok(())
+    }
 }
 
 pub fn set_last_opened(
     app_handle: &AppHandle,
     path: &str,
 ) -> Result<(), tauri_plugin_store::Error> {
-    let saved_recents = app_handle.store(RECENTS_FILE_NAME)?;
-
-    saved_recents.set(LAST_OPENED_KEY, path);
-    saved_recents.save()
+    save_settings(
+        app_handle,
+        &PartialSettings {
+            last_opened: Some(Some(path.to_string())),
+            ..Default::default()
+        },
+    )
 }
 
 pub fn remove_last_opened(app_handle: &AppHandle) -> Result<(), tauri_plugin_store::Error> {
-    let saved_recents = app_handle.store(RECENTS_FILE_NAME)?;
+    save_settings(
+        app_handle,
+        &PartialSettings {
+            last_opened: Some(None),
+            ..Default::default()
+        },
+    )
+}
 
-    saved_recents.delete(LAST_OPENED_KEY);
-    saved_recents.save()
+fn get_stored_settings(
+    app_handle: &AppHandle,
+) -> Result<PartialSettings, tauri_plugin_store::Error> {
+    let store = app_handle.store(STORAGE_FILE_NAME)?;
+    let json = JsonValue::Object(store.entries().into_iter().collect());
+    let partial = serde_json::from_value(json).map_err(|e| tauri_plugin_store::Error::Json(e))?;
+
+    Ok(partial)
 }
 
 pub fn load_settings(app_handle: &AppHandle) -> Settings {
-    let saved_settings = app_handle.store(SETTINGS_FILE_NAME);
+    let stored_settings = get_stored_settings(app_handle);
     let mut settings = Settings::default();
 
-    if let Ok(saved_settings) = saved_settings {
-        match saved_settings.get(OPEN_LAST_ON_START_KEY) {
-            Some(JsonValue::Bool(open_last)) => settings.open_last_on_start = open_last,
-            _ => {}
-        }
-        match saved_settings.get(FILE_OPENER_APP_KEY) {
-            Some(JsonValue::String(app)) => settings.file_opener_app = app,
-            _ => {}
-        }
+    if let Ok(stored_settings) = stored_settings {
+        settings.apply_some(stored_settings);
     }
 
     settings
@@ -112,12 +95,22 @@ pub fn load_settings(app_handle: &AppHandle) -> Settings {
 
 pub fn save_settings(
     app_handle: &AppHandle,
-    settings: &Settings,
+    settings: &PartialSettings,
 ) -> Result<(), tauri_plugin_store::Error> {
-    let saved_settings = app_handle.store(SETTINGS_FILE_NAME)?;
+    let store = app_handle.store(STORAGE_FILE_NAME)?;
+    let mut stored_settings = get_stored_settings(app_handle)?;
+    stored_settings.apply_some(settings.clone());
 
-    saved_settings.set(OPEN_LAST_ON_START_KEY, settings.open_last_on_start);
-    saved_settings.set(FILE_OPENER_APP_KEY, settings.file_opener_app.to_string());
+    let json =
+        serde_json::to_value(stored_settings).map_err(|e| tauri_plugin_store::Error::Json(e))?;
 
-    saved_settings.save()
+    if let Some(keyvalues) = json.as_object() {
+        for (key, value) in keyvalues {
+            store.set(key, value.clone());
+        }
+
+        store.save()?;
+    }
+
+    Ok(())
 }

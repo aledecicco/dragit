@@ -12,15 +12,17 @@ import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
 import { runAction } from '@/state/actions'
 import { Accordion } from '@/ui/Accordion'
-import { AccordionSection } from '@/ui/Accordion/Section'
+import {
+  AccordionSection,
+  useAccordionSectionHandler,
+} from '@/ui/Accordion/Section'
 import { Chip } from '@/ui/Chip'
+import { useSettings } from '@/utils/app'
 import { pluralize } from '@/utils/string'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
 import { StashesListItem } from './Item'
-
-const STASHES_DEFAULT_OPEN = true // TODO: make configurable
 
 interface StashesListProps extends ComponentProps<'div'> {}
 
@@ -29,6 +31,11 @@ interface StashesListProps extends ComponentProps<'div'> {}
  */
 const StashesList = (props: StashesListProps) => {
   const { ...divProps } = props
+
+  const settings = useSettings()
+  const accordionHandler = useAccordionSectionHandler({
+    defaultOpen: settings.stashesOpenByDefault,
+  })
 
   const stashesQuery = useQueryStashes()
   const getStashesListActions = useGetStashesListActions()
@@ -49,16 +56,21 @@ const StashesList = (props: StashesListProps) => {
         handleDrop={(payload) => {
           runAction(stash, payload.dragged)
         }}
+        overlayProps={{
+          className: cn(!accordionHandler.isOpen && 'flex-row text-sm'),
+        }}
         {...divProps}
       >
         <Accordion className={cn('max-h-full overflow-hidden')}>
           <AccordionSection
+            store={accordionHandler.store}
             label="Stashes"
             extraInfo={
               <Chip size="sm">{stashesQuery.data?.length ?? '...'}</Chip>
             }
-            defaultOpen={STASHES_DEFAULT_OPEN}
-            className={cn('mb-2')}
+            contentProps={{
+              className: cn('mb-2'),
+            }}
           >
             <MultiInteraction
               items={stashesQuery.data ?? []}

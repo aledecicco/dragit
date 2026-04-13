@@ -7,7 +7,7 @@ import { cn, propsWithCn } from '@/utils/styles'
 
 import { Accordion } from '..'
 
-interface AccordionSectionProps extends Ariakit.DisclosureContentProps {
+interface AccordionSectionProps extends Ariakit.DisclosureProviderProps {
   /**
    * The label for the section, displayed in the header.
    */
@@ -19,19 +19,19 @@ interface AccordionSectionProps extends Ariakit.DisclosureContentProps {
   extraInfo?: ReactNode
 
   /**
-   * Whether this section should be open by default.
+   * Props to be passed to the content of the section.
    */
-  defaultOpen?: boolean
+  contentProps?: Omit<Ariakit.DisclosureContentProps, 'children'>
 }
 
 /**
  * A single section inside an {@link Accordion}.
  */
 const AccordionSection = (props: AccordionSectionProps) => {
-  const { label, extraInfo, defaultOpen, ...contentProps } = props
+  const { label, extraInfo, contentProps, children, ...disclosureProps } = props
 
   return (
-    <Ariakit.DisclosureProvider defaultOpen={defaultOpen}>
+    <Ariakit.DisclosureProvider {...disclosureProps}>
       <Ariakit.CompositeRow
         render={<div className={cn('flex flex-row items-center gap-x-2')} />}
       >
@@ -69,9 +69,26 @@ const AccordionSection = (props: AccordionSectionProps) => {
           'overflow-y-hidden grow',
           'w-full bg-dark-800 rounded-sm',
         )}
-      />
+      >
+        {children}
+      </Ariakit.DisclosureContent>
     </Ariakit.DisclosureProvider>
   )
 }
 
-export { AccordionSection, type AccordionSectionProps }
+const useAccordionSectionHandler = (
+  storeProps?: Partial<Ariakit.DisclosureStoreProps>,
+) => {
+  const store = Ariakit.useDisclosureStore({
+    ...storeProps,
+  })
+  const isOpen = Ariakit.useStoreState(store, 'open')
+
+  return { store, isOpen }
+}
+
+export {
+  AccordionSection,
+  useAccordionSectionHandler,
+  type AccordionSectionProps,
+}

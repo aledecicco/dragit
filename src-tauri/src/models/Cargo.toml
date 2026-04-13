@@ -8,6 +8,7 @@ edition = "2021"
 tauri = { workspace = true }
 serde = { workspace = true }
 borsh = { workspace = true}
+partially = { workspace = true}
 
 parking_lot = { version = "0.12.3", features = ["deadlock_detection"] }
 thiserror = { version = "1.0.64" }

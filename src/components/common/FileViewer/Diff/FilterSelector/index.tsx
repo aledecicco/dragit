@@ -10,6 +10,7 @@ import {
   useToggleHandler,
 } from '@/ui/ToggleGroup'
 import { ToggleGroupItem } from '@/ui/ToggleGroup/Item'
+import { useSettings } from '@/utils/app'
 import { cn } from '@/utils/styles'
 
 import { DIFF_FILTERS } from '../utils'
@@ -39,7 +40,6 @@ const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
           }}
         />
       </ToggleGroupItem>
-
       <ToggleGroupItem
         fixed
         size="sm"
@@ -50,7 +50,6 @@ const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
           className: cn('-rotate-90'),
         }}
       />
-
       <ToggleGroupItem
         fixed
         size="sm"
@@ -70,8 +69,12 @@ const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
   )
 }
 
-// TODO: persist toggle selection
-const useDiffFilterSelector = () => useToggleHandler(DIFF_FILTERS, 'both')
+const useDiffFilterSelector = () => {
+  const settings = useSettings()
+  const defaultValue = settings.preferInline ? 'both' : 'ours'
+
+  return useToggleHandler(DIFF_FILTERS, defaultValue)
+}
 
 export {
   DiffFilterSelector,

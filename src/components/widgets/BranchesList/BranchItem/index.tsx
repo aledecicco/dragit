@@ -29,7 +29,7 @@ import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { useCurrentBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
-import { useDateDifference } from '@/utils/time'
+import { useDateInfo } from '@/utils/time'
 
 interface BranchesListItemProps extends MultiSelectItemProps {
   /**
@@ -44,7 +44,7 @@ interface BranchesListItemProps extends MultiSelectItemProps {
 const BranchesListItem = (props: BranchesListItemProps) => {
   const { branch, ...itemProps } = props
 
-  const lastModified = useDateDifference(branch.timestamp)
+  const lastModified = useDateInfo(branch.timestamp)
 
   const remoteCounterpart = useSelectedUpstream(branch)
   const isCurrentBranch = useCurrentBranch()?.name === branch.name

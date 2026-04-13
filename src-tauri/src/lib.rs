@@ -4,7 +4,7 @@ use tauri::{Emitter, Manager};
 use git_handler::cmd_git::CmdGit;
 use models::{AppEvent, AppState, RepoWatcher, EVENT_ID};
 use repo_watcher::debounced_watcher::DebouncedWatcher;
-use settings::{get_last_opened, load_settings, remove_last_opened, remove_recent_folder};
+use settings::{load_settings, remove_last_opened, remove_recent_folder};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -21,8 +21,10 @@ pub fn run() {
             let git_handler = CmdGit::new();
             let mut repo_watcher = DebouncedWatcher::new(app_handle.clone());
 
-            if load_settings(app_handle).open_last_on_start {
-                if let Some(last) = get_last_opened(app_handle) {
+            let settings = load_settings(app_handle);
+
+            if settings.open_last_on_start {
+                if let Some(last) = settings.last_opened {
                     if Path::new(&last).is_dir() {
                         repo_watcher.watch_repository(&last)?;
                     } else {
@@ -44,8 +46,6 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             api::open_folder,
-            api::get_recently_opened,
-            api::remove_from_recent,
             api::get_settings,
             api::set_settings,
             api::get_current_dir,
@@ -93,5 +93,5 @@ pub fn run() {
             api::merge,
         ])
         .run(tauri::generate_context!())
-        .expect("Error while running tauri application");
+        .expect("Error while running application");
 }

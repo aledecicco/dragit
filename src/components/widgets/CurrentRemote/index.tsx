@@ -5,6 +5,7 @@ import {
   IconWorldCancel,
   IconWorldQuestion,
 } from '@tabler/icons-react'
+import { useInterval } from 'react-use'
 
 import type { BranchName, RemoteName } from '@/api/models'
 import { useMakeFetchRemote } from '@/api/mutations/fetchRemote'
@@ -13,6 +14,7 @@ import { useQueryRemotes } from '@/api/queries/remotes'
 import { showRemotesDialog } from '@/common/RemotesDialog'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
+import { runAction } from '@/state/actions'
 import {
   changeSelectedRemote,
   changeSelectedRemoteBranch,
@@ -22,9 +24,11 @@ import { Combobox } from '@/ui/Combobox'
 import { ComboboxItem } from '@/ui/Combobox/Item'
 import { ComboboxSection } from '@/ui/Combobox/Section'
 import { EditableText } from '@/ui/EditableText'
+import { useSettings } from '@/utils/app'
 import { ensurePresent } from '@/utils/array'
 import { useCurrentBranch } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
+import { MS_IN_MINUTE } from '@/utils/time'
 
 interface CurrentRemoteProps extends ComponentProps<'div'> {}
 
@@ -58,6 +62,14 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
       )
 
   const makeFetchRemote = useMakeFetchRemote()
+  const fetchRemote = upstream ? makeFetchRemote(upstream.remote) : undefined
+
+  const settings = useSettings()
+  useInterval(() => {
+    if (settings.autoFetchRemote && fetchRemote) {
+      runAction(fetchRemote)
+    }
+  }, 1 * MS_IN_MINUTE)
 
   return (
     <div
@@ -152,12 +164,12 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         }}
       />
 
-      {upstream && (
+      {fetchRemote && (
         <ActionButton
           compact
           round
           className={cn('ml-2')}
-          action={makeFetchRemote(upstream.remote)}
+          action={fetchRemote}
         />
       )}
 

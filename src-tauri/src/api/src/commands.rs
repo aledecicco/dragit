@@ -12,13 +12,10 @@ use crate::{
 use diffs::{compute_diff, get_diff_sources};
 use models::{
     AppError, AppEvent, AppMessage, AppState, ConflictLine, ConflictMode, CurrentDirInfo,
-    DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus, RepoWatcherError,
-    ResolutionStrategy, Settings, SnapshotInfo, UnmergedFileInfo, EVENT_ID,
+    DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus, PartialSettings,
+    RepoWatcherError, ResolutionStrategy, Settings, SnapshotInfo, UnmergedFileInfo, EVENT_ID,
 };
-use settings::{
-    add_recent_folder, get_recent_folders, load_settings, remove_recent_folder, save_settings,
-    set_last_opened,
-};
+use settings::{add_recent_folder, load_settings, save_settings, set_last_opened};
 
 /// Opens a folder that contains/will contain a git repository.
 #[tauri::command]
@@ -49,20 +46,6 @@ pub async fn open_folder(app_handle: AppHandle, new_path: &str) -> Result<(), Ap
     Ok(())
 }
 
-/// Returns the list of recently opened folders.
-#[tauri::command]
-pub async fn get_recently_opened(app_handle: AppHandle) -> Result<Response, AppError> {
-    Ok(get_recent_folders(&app_handle)).and_then(serialize_response)
-}
-
-/// Removes a folder from the list of recently opened folders.
-#[tauri::command]
-pub async fn remove_from_recent(app_handle: AppHandle, recent_path: &str) -> Result<(), AppError> {
-    remove_recent_folder(&app_handle, recent_path).or(Err(AppError::RemoveFromRecentFailed {
-        path: recent_path.to_string(),
-    }))
-}
-
 /// Returns the stored user settings.
 #[tauri::command]
 pub async fn get_settings(app_handle: AppHandle) -> Result<Settings, AppError> {
@@ -71,8 +54,15 @@ pub async fn get_settings(app_handle: AppHandle) -> Result<Settings, AppError> {
 
 /// Saves new user settings.
 #[tauri::command]
-pub async fn set_settings(app_handle: AppHandle, settings: Settings) -> Result<(), AppError> {
-    save_settings(&app_handle, &settings).or(Err(AppError::SaveSettingsFailed {}))
+pub async fn set_settings(
+    app_handle: AppHandle,
+    settings: PartialSettings,
+) -> Result<(), AppError> {
+    save_settings(&app_handle, &settings).or(Err(AppError::SaveSettingsFailed {}))?;
+
+    let _ = app_handle.emit(EVENT_ID, AppEvent::SettingsChanged);
+
+    Ok(())
 }
 
 /// Returns information about the current folder being tracked.

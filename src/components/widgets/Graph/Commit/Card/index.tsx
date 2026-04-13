@@ -15,7 +15,7 @@ import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractionHandler } from '@/lib/InteractionHandler'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
-import { useDateDifference } from '@/utils/time'
+import { useDateInfo } from '@/utils/time'
 
 interface GraphCommitCardProps extends Ariakit.ButtonProps {
   /**
@@ -35,7 +35,7 @@ interface GraphCommitCardProps extends Ariakit.ButtonProps {
 const GraphCommitCard = (props: GraphCommitCardProps) => {
   const { commitInfo, isCurrent = false, ...buttonProps } = props
 
-  const timeAgo = useDateDifference(commitInfo.timestamp)
+  const commitTime = useDateInfo(commitInfo.timestamp)
   const interactions = useInteractions(commitInfo, isCurrent)
 
   return (
@@ -86,7 +86,7 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
             className={cn('flex flex-row items-center justify-between gap-x-2')}
           >
             <Marquee className={cn('text-xs text-light-950')} reverse={false}>
-              {commitInfo.authorName}, {timeAgo}
+              {commitInfo.authorName}, {commitTime}
             </Marquee>
 
             <p className={cn('text-xs text-light-600 min-w-max')}>

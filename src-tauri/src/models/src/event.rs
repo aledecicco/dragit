@@ -7,11 +7,14 @@ pub static EVENT_ID: &str = "app-event";
     tag = "type"
 )]
 pub enum AppEvent {
-    /// The app tried to open the last folder used, but it's no longer there.
-    DirDisappeared { repo_path: String },
+    /// The settings were updated.
+    SettingsChanged,
 
     /// The app opened a new directory.
     DirChanged,
+
+    /// The app tried to open the last folder used, but it's no longer there.
+    DirDisappeared { repo_path: String },
 
     /// The .git folder was modified. The result of [`GitHandler::is_repository`] might've changed.
     GitFolderModified { repo_path: String },

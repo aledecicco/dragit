@@ -20,6 +20,7 @@ import { prepareActionArgs, runAction } from '@/state/actions'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
 import { Tab } from '@/ui/Tabs/Item'
+import { useSettings } from '@/utils/app'
 import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
@@ -34,6 +35,8 @@ interface BranchesListProps extends ComponentProps<'div'> {}
  */
 const BranchesList = (props: BranchesListProps) => {
   const { ...divProps } = props
+
+  const settings = useSettings()
 
   const allBranchesQuery = useQueryBranches()
   const localBranchesQuery = useQueryBranches('local')
@@ -165,6 +168,11 @@ const BranchesList = (props: BranchesListProps) => {
             <QueryList
               name="tags"
               query={tagsQuery}
+              getItems={(tags) =>
+                settings.sortBranchesByDate
+                  ? [...tags].sort((a, b) => b.timestamp - a.timestamp)
+                  : tags
+              }
               renderItem={(tag, position) => (
                 <TagsListItem tag={tag} itemIndex={position} />
               )}
@@ -187,6 +195,11 @@ const BranchesList = (props: BranchesListProps) => {
                 .with('remote', () => 'remote branches')
                 .otherwise(() => 'branches')}
               query={currentBranchesQuery}
+              getItems={(branches) =>
+                settings.sortBranchesByDate
+                  ? [...branches].sort((a, b) => b.timestamp - a.timestamp)
+                  : branches
+              }
               renderItem={(branch, position) => (
                 <BranchesListItem branch={branch} itemIndex={position} />
               )}

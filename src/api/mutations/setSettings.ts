@@ -7,7 +7,7 @@ import type { Action } from '@/state/actions'
 import type { Settings } from '../models'
 
 interface SetSettingsArgs {
-  settings: Settings
+  settings: Partial<Settings>
 }
 
 const setSettingsKey = { key: 'set_settings' } as const
@@ -20,7 +20,7 @@ const setSettingsMutation = mutationOptions({
   networkMode: 'always',
 })
 
-const useSaveSettings = (): Action<Settings> => {
+const useSetSettings = (): Action<Partial<Settings>> => {
   const setSettings = useMutation(setSettingsMutation)
 
   return {
@@ -39,7 +39,7 @@ const useSaveSettings = (): Action<Settings> => {
 }
 
 export {
-  useSaveSettings,
+  useSetSettings,
   setSettingsKey,
   setSettingsMutation,
   type SetSettingsArgs,

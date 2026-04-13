@@ -6,6 +6,7 @@ import {
   useToggleHandler,
 } from '@/ui/ToggleGroup'
 import { ToggleGroupItem } from '@/ui/ToggleGroup/Item'
+import { useSettings } from '@/utils/app'
 import { cn } from '@/utils/styles'
 
 interface UnmergedViewSelectorProps extends ToggleGroupProps {}
@@ -56,8 +57,12 @@ const UnmergedViewSelector = (props: UnmergedViewSelectorProps) => {
   )
 }
 
-// TODO: persist toggle selection
-const useViewModeSelector = () => useToggleHandler(DIFF_VIEW_MODES, 'inline')
+const useViewModeSelector = () => {
+  const settings = useSettings()
+  const defaultValue = settings.preferInline ? 'inline' : 'side_by_side'
+
+  return useToggleHandler(DIFF_VIEW_MODES, defaultValue)
+}
 
 export {
   UnmergedViewSelector,

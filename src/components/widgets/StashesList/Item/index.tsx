@@ -15,7 +15,7 @@ import {
 import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { cn } from '@/utils/styles'
-import { useDateDifference } from '@/utils/time'
+import { useDateInfo } from '@/utils/time'
 
 interface StashesListItemProps extends MultiSelectItemProps {
   /**
@@ -30,7 +30,7 @@ interface StashesListItemProps extends MultiSelectItemProps {
 const StashesListItem = (props: StashesListItemProps) => {
   const { stash, ...itemProps } = props
 
-  const stashedTime = useDateDifference(stash.timestamp)
+  const stashedTime = useDateInfo(stash.timestamp)
   const interactions = useInteractions(stash)
 
   return (

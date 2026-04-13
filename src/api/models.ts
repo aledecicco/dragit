@@ -8,6 +8,14 @@ export interface Page<T> {
 export interface Settings {
   openLastOnStart: boolean
   fileOpenerApp: string
+  confirmDangerousActions: boolean
+  preferInline: boolean
+  relativeTimestamps: boolean
+  sortBranchesByDate: boolean
+  autoFetchRemote: boolean
+  stashesOpenByDefault: boolean
+  recentFolders: string[]
+  lastOpened: string | null
 }
 
 export interface CurrentDirInfo {
@@ -242,8 +250,9 @@ export type AppMessage = {
 }
 
 export type AppEvent =
-  | { type: 'dirDisappeared'; repoPath: string }
+  | { type: 'settingsChanged' }
   | { type: 'dirChanged' }
+  | { type: 'dirDisappeared'; repoPath: string }
   | { type: 'gitFolderModified'; repoPath: string }
   | { type: 'branchesListUpdated'; repoPath: string }
   | { type: 'branchUpdated'; repoPath: string; name: string }
