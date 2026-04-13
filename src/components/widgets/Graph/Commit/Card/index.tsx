@@ -35,7 +35,7 @@ interface GraphCommitCardProps extends Ariakit.ButtonProps {
 const GraphCommitCard = (props: GraphCommitCardProps) => {
   const { commitInfo, isCurrent = false, ...buttonProps } = props
 
-  const commitTime = useDateInfo(commitInfo.timestamp)
+  const committedTime = useDateInfo(commitInfo.timestamp)
   const interactions = useInteractions(commitInfo, isCurrent)
 
   return (
@@ -86,7 +86,7 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
             className={cn('flex flex-row items-center justify-between gap-x-2')}
           >
             <Marquee className={cn('text-xs text-light-950')} reverse={false}>
-              {commitInfo.authorName}, {commitTime}
+              {commitInfo.authorName}, {committedTime}
             </Marquee>
 
             <p className={cn('text-xs text-light-600 min-w-max')}>

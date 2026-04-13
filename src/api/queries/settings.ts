@@ -14,4 +14,4 @@ const settingsQuery = queryOptions({
 
 const useQuerySettings = () => useQuery(settingsQuery)
 
-export { settingsQueryKey, useQuerySettings }
+export { settingsQuery, settingsQueryKey, useQuerySettings }

@@ -14,7 +14,8 @@ import { useQueryRemotes } from '@/api/queries/remotes'
 import { showRemotesDialog } from '@/common/RemotesDialog'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
-import { runAction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
+import { useSettings } from '@/state/settings'
 import {
   changeSelectedRemote,
   changeSelectedRemoteBranch,
@@ -24,7 +25,6 @@ import { Combobox } from '@/ui/Combobox'
 import { ComboboxItem } from '@/ui/Combobox/Item'
 import { ComboboxSection } from '@/ui/Combobox/Section'
 import { EditableText } from '@/ui/EditableText'
-import { useSettings } from '@/utils/app'
 import { ensurePresent } from '@/utils/array'
 import { useCurrentBranch } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -64,10 +64,10 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
   const makeFetchRemote = useMakeFetchRemote()
   const fetchRemote = upstream ? makeFetchRemote(upstream.remote) : undefined
 
-  const settings = useSettings()
+  const { autoFetchRemote } = useSettings()
   useInterval(() => {
-    if (settings.autoFetchRemote && fetchRemote) {
-      runAction(fetchRemote)
+    if (autoFetchRemote && fetchRemote) {
+      triggerInteraction({ action: fetchRemote })
     }
   }, 1 * MS_IN_MINUTE)
 

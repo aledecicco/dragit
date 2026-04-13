@@ -122,7 +122,13 @@ const useInteractions = (stash: StashInfo) => {
 
   return [
     group(interaction({ action: apply })),
-    group(interaction({ action: discard, isDangerous: true })),
+    group(
+      interaction({
+        action: discard,
+        isDangerous: true,
+        details: `discard stash #${stash.stashNumber}`,
+      }),
+    ),
   ]
 }
 

@@ -4,9 +4,9 @@ import {
 } from '@/api/mutations/openFolder'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { ActionButton } from '@/lib/ActionButton'
+import { useSettings } from '@/state/settings'
 import type { ButtonProps } from '@/ui/Button'
-import { useSettings } from '@/utils/app'
-import { chooseDirectory } from '@/utils/interaction'
+import { chooseDirectory } from '@/utils/behavior'
 import { propsWithCn } from '@/utils/styles'
 
 interface CurrentDirectoryProps extends Partial<ButtonProps> {}
@@ -21,7 +21,8 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
   const changeFolder = useChangeCurrentFolder()
   const makeOpenRecentFolder = useMakeOpenRecentFolder()
 
-  const recentFolders = useSettings().recentFolders.filter(
+  const { recentFolders } = useSettings()
+  const recentOptions = recentFolders.filter(
     (recentFolder) => recentFolder !== currentDirQuery.data?.path,
   )
 
@@ -37,12 +38,12 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
 
         return path
       }}
-      alternatives={recentFolders.map((recentFolder) => ({
+      alternatives={recentOptions.map((recentFolder) => ({
         action: makeOpenRecentFolder(recentFolder),
       }))}
       menuButtonProps={{
         label: 'View recent folders',
-        disabled: !recentFolders.length,
+        disabled: !recentOptions.length,
       }}
       variant="plain"
       status="primary"

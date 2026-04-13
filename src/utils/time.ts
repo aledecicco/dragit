@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { useSettings } from './app'
+import { useSettings } from '@/state/settings'
 
 export const MS_IN_SECOND = 1000
 export const MS_IN_MINUTE = 60 * MS_IN_SECOND
@@ -95,13 +95,13 @@ export const useDateDifference = (timestamp: Date | number): string => {
  * @returns
  */
 export const useDateInfo = (timestamp: Date | number) => {
-  const settings = useSettings()
+  const { relativeTimestamps } = useSettings()
 
   const date = typeof timestamp === 'number' ? new Date(timestamp) : timestamp
   const dateString = `on ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`
   const timeAgo = useDateDifference(date)
 
-  return settings.relativeTimestamps ? timeAgo : dateString
+  return relativeTimestamps ? timeAgo : dateString
 }
 
 /**

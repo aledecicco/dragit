@@ -23,7 +23,7 @@ import {
   MultiSelectItem,
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
-import { runAction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import { useSelectedUpstream } from '@/state/upstream'
 import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
@@ -70,8 +70,9 @@ const BranchesListItem = (props: BranchesListItemProps) => {
             {...itemProps}
             onDoubleClick={(e) => {
               itemProps.onDoubleClick?.(e)
+
               if (!isCurrentBranch) {
-                runAction(checkout)
+                triggerInteraction({ action: checkout })
               }
             }}
           />
@@ -187,6 +188,7 @@ const useInteractions = (branch: BranchInfo) => {
       interaction({
         action: deleteBranch,
         isDangerous: true,
+        details: `delete ${branch.type} branch "${branch.name}"`,
       }),
   )
 

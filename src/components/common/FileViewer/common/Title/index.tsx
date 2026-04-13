@@ -3,9 +3,9 @@ import * as Ariakit from '@ariakit/react'
 
 import { useCurrentPath } from '@/api/utils'
 import { FilePath } from '@/common/File/Path'
+import { useSettings } from '@/state/settings'
 import { Marquee } from '@/ui/Marquee'
-import { useSettings } from '@/utils/app'
-import { openFile } from '@/utils/interaction'
+import { openFile } from '@/utils/behavior'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface FileViewerTitleProps extends Ariakit.ButtonProps {

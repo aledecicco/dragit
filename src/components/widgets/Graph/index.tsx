@@ -14,7 +14,7 @@ import { BranchToolbar } from '@/common/BranchToolbar'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
-import { prepareActionArgs, runAction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import { changeSelectedBase, useSelectedBase } from '@/state/branches'
 import { useVirtualizer } from '@/utils/performance'
 import {
@@ -96,24 +96,28 @@ const Graph = (props: GraphProps) => {
             tag: 'checkout this tag',
             commit: 'checkout this commit',
           }}
-          handleDrop={async (payload) => {
+          handleDrop={(payload) => {
             if (
               payload.type === 'branch' &&
               payload.dragged.type === 'remote'
             ) {
-              const branchOff = makeBranchOff(payload.dragged.name)
-              const args = await prepareActionArgs(branchOff, () =>
-                requestBranchName(payload.dragged.name),
-              )
-              runAction(branchOff, args)
+              triggerInteraction({
+                action: makeBranchOff(payload.dragged.name),
+                argsRequester: () => requestBranchName(payload.dragged.name),
+              })
             } else {
-              const newRef = match(payload)
-                .with({ type: 'commit' }, ({ dragged }) => dragged.id)
-                .otherwise(({ dragged }) => dragged.name)
+              triggerInteraction({
+                action: checkout,
+                argsRequester: () => {
+                  const newRef = match(payload)
+                    .with({ type: 'commit' }, ({ dragged }) => dragged.id)
+                    .otherwise(({ dragged }) => dragged.name)
 
-              runAction(checkout, {
-                reference: newRef,
-                isNew: false,
+                  return {
+                    reference: newRef,
+                    isNew: false,
+                  }
+                },
               })
             }
           }}

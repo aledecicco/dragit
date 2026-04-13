@@ -4,13 +4,13 @@ import {
   IconColumns3Filled,
 } from '@tabler/icons-react'
 
+import { useSettings } from '@/state/settings'
 import {
   ToggleGroup,
   type ToggleGroupProps,
   useToggleHandler,
 } from '@/ui/ToggleGroup'
 import { ToggleGroupItem } from '@/ui/ToggleGroup/Item'
-import { useSettings } from '@/utils/app'
 import { cn } from '@/utils/styles'
 
 import { DIFF_FILTERS } from '../utils'
@@ -70,8 +70,8 @@ const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
 }
 
 const useDiffFilterSelector = () => {
-  const settings = useSettings()
-  const defaultValue = settings.preferInline ? 'both' : 'ours'
+  const { preferInline } = useSettings()
+  const defaultValue = preferInline ? 'both' : 'ours'
 
   return useToggleHandler(DIFF_FILTERS, defaultValue)
 }

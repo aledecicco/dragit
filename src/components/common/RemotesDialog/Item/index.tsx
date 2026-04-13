@@ -5,7 +5,7 @@ import { useChangeRemoteUrl } from '@/api/mutations/changeRemoteUrl'
 import { useRemoveRemote } from '@/api/mutations/removeRemote'
 import { useRenameRemote } from '@/api/mutations/renameRemote'
 import { ActionButton } from '@/lib/ActionButton'
-import { runAction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import { EditableText } from '@/ui/EditableText'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -37,7 +37,10 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
         value={remote.name}
         setValue={(newName) => {
           if (newName) {
-            runAction(renameRemote, newName)
+            triggerInteraction({
+              action: renameRemote,
+              argsRequester: () => newName,
+            })
           }
         }}
         label="remote name"
@@ -59,7 +62,10 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
         value={remote.fetchUrl}
         setValue={(newUrl) => {
           if (newUrl) {
-            runAction(changeRemoteUrl, newUrl)
+            triggerInteraction({
+              action: changeRemoteUrl,
+              argsRequester: () => newUrl,
+            })
           }
         }}
         label="remote URL"

@@ -1,12 +1,12 @@
 import { IconColumns3Filled } from '@tabler/icons-react'
 
+import { useSettings } from '@/state/settings'
 import {
   ToggleGroup,
   type ToggleGroupProps,
   useToggleHandler,
 } from '@/ui/ToggleGroup'
 import { ToggleGroupItem } from '@/ui/ToggleGroup/Item'
-import { useSettings } from '@/utils/app'
 import { cn } from '@/utils/styles'
 
 interface UnmergedViewSelectorProps extends ToggleGroupProps {}

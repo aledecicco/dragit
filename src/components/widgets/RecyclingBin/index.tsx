@@ -6,7 +6,7 @@ import { useDeleteBranches } from '@/api/mutations/deleteBranches'
 import { useDeleteTags } from '@/api/mutations/deleteTags'
 import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
-import { runAction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import { useCurrentBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 
@@ -54,22 +54,52 @@ const RecyclingBin = (props: RecyclingBinProps) => {
       handleDrop={(payload) => {
         match(payload)
           .with({ type: 'branch' }, ({ dragged }) => {
-            runAction(deleteBranches, [dragged])
+            triggerInteraction({
+              action: deleteBranches,
+              argsRequester: () => [dragged],
+              isDangerous: true,
+              details: `delete ${dragged.type} branch "${dragged.name}"`,
+            })
           })
           .with({ type: 'branches' }, ({ dragged }) => {
-            runAction(deleteBranches, dragged)
+            triggerInteraction({
+              action: deleteBranches,
+              argsRequester: () => dragged,
+              isDangerous: true,
+              details: `delete ${dragged.length} branches`,
+            })
           })
           .with({ type: 'stash' }, ({ dragged }) => {
-            runAction(discardStashes, [dragged])
+            triggerInteraction({
+              action: discardStashes,
+              argsRequester: () => [dragged],
+              isDangerous: true,
+              details: `discard stash #${dragged.id}`,
+            })
           })
           .with({ type: 'stashes' }, ({ dragged }) => {
-            runAction(discardStashes, dragged)
+            triggerInteraction({
+              action: discardStashes,
+              argsRequester: () => dragged,
+              isDangerous: true,
+              details: `discard ${dragged.length} stashes`,
+            })
           })
           .with({ type: 'tag' }, ({ dragged }) => {
-            runAction(deleteTags, [dragged])
+            triggerInteraction({
+              action: deleteTags,
+              argsRequester: () => [dragged],
+              isDangerous: true,
+              details: `delete tag "${dragged.name}"`,
+            })
           })
           .with({ type: 'tags' }, ({ dragged }) => {
-            runAction(deleteTags, dragged)
+            triggerInteraction({
+              action: deleteTags,
+              argsRequester: () => dragged,
+              isDangerous: true,
+              details: `delete ${dragged.length} tags`,
+            })
           })
           .exhaustive()
       }}

@@ -7,11 +7,7 @@ import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { ActionButton } from '@/lib/ActionButton'
-import {
-  prepareActionArgs,
-  runAction,
-  useActionPresenters,
-} from '@/state/actions'
+import { triggerInteraction, useActionPresenters } from '@/state/actions'
 import { changeSelectedBase, useSelectedBase } from '@/state/branches'
 import { useSelectedUpstream } from '@/state/upstream'
 import { Combobox } from '@/ui/Combobox'
@@ -91,15 +87,14 @@ const BranchSelectors = () => {
             )
 
             if (isRemoteBranch) {
-              const branchOff = makeBranchOff(value)
-              const args = await prepareActionArgs(branchOff, () =>
-                requestBranchName(value),
-              )
-              runAction(branchOff, args)
+              triggerInteraction({
+                action: makeBranchOff(value),
+                argsRequester: () => requestBranchName(value),
+              })
             } else {
-              runAction(checkout, {
-                reference: value,
-                isNew: false,
+              triggerInteraction({
+                action: checkout,
+                argsRequester: () => ({ reference: value, isNew: false }),
               })
             }
           }}
@@ -109,7 +104,10 @@ const BranchSelectors = () => {
               className={cn('text-light-500 italic')}
               value={search}
               onClick={() => {
-                runAction(checkout, { reference: search, isNew: true })
+                triggerInteraction({
+                  action: checkout,
+                  argsRequester: () => ({ reference: search, isNew: true }),
+                })
               }}
             >
               Create branch <b className={cn('text-light-50')}>{search}</b> from
@@ -121,9 +119,9 @@ const BranchSelectors = () => {
         <ComboboxSection
           name="tags"
           onSelect={(value) => {
-            runAction(checkout, {
-              reference: value,
-              isNew: false,
+            triggerInteraction({
+              action: checkout,
+              argsRequester: () => ({ reference: value, isNew: false }),
             })
           }}
           options={tagOptions}

@@ -8,7 +8,7 @@ import { useQueryCommitInfo } from '@/api/queries/commitInfo'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { QueryLoader } from '@/lib/Loader/Query'
-import { prepareActionArgs, runAction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { makeTracked } from '../SvgOverlay/utils'
@@ -89,11 +89,12 @@ const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
           label={{
             worktree: 'amend this commit',
           }}
-          handleDrop={async () => {
-            const args = await prepareActionArgs(amend, () =>
-              requestCommitParams(commitInfoQuery.data?.message ?? '', true),
-            )
-            runAction(amend, args)
+          handleDrop={() => {
+            triggerInteraction({
+              action: amend,
+              argsRequester: () =>
+                requestCommitParams(commitInfoQuery.data?.message ?? '', true),
+            })
           }}
           {...commonStyles}
           overlayProps={{

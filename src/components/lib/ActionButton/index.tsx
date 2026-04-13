@@ -2,10 +2,10 @@ import type { MouseEvent } from 'react'
 import { match } from 'ts-pattern'
 
 import {
-  type Action,
+  type AnyInteraction,
   hashId,
-  prepareActionArgs,
-  runAction,
+  type Interaction,
+  triggerInteraction,
   useActionStatuses,
 } from '@/state/actions'
 import { Button } from '@/ui/Button'
@@ -16,36 +16,6 @@ import type { Size } from '@/utils/types'
 
 import { DecoratedButton, type DecoratedButtonProps } from '../DecoratedButton'
 import { useActionButtonAction } from './utils'
-
-/**
- * Flows that will be triggered with a click, and that result in an action being run.
- */
-type Interaction<T> =
-  | {
-      /**
-       * The action that is triggered when the button is clicked.
-       */
-      action: Action<T>
-
-      /**
-       * Callback that requests the arguments to run the action.
-       */
-      argsRequester: (() => Promise<T>) | (() => T)
-
-      /**
-       * Whether the action is considered dangerous.
-       */
-      isDangerous?: boolean
-    }
-  | {
-      action: Action
-
-      argsRequester?: never
-
-      isDangerous?: boolean
-    }
-
-type AnyInteraction = Interaction<never>
 
 type BaseActionButtonProps = Partial<DecoratedButtonProps> & {
   /**
@@ -73,6 +43,7 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     action,
     argsRequester,
     isDangerous,
+    details,
     alternatives,
     menuButtonProps,
     ...buttonProps
@@ -94,10 +65,9 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
 
       if (actionStatus === 'idle') {
         if (argsRequester) {
-          const args = await prepareActionArgs(action, argsRequester)
-          runAction(action, args)
+          triggerInteraction({ action, argsRequester, isDangerous, details })
         } else {
-          runAction(action)
+          triggerInteraction({ action, isDangerous, details })
         }
       }
     },

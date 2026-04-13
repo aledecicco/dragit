@@ -8,8 +8,11 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { useShallow } from 'zustand/react/shallow'
 
+import { askForConfirmation } from '@/common/ConfirmationDialog'
 import type { Glyph } from '@/ui/Icon'
 import { MS_IN_SECOND } from '@/utils/time'
+
+import { getSettings } from './settings'
 
 type ActionId = Record<string, string>
 type HashedId = string
@@ -265,6 +268,41 @@ const prepareActionArgs = async <T>(
 }
 
 /**
+ * Asks for confirmation before running an action.
+ *
+ * @param action - The action to ask confirmation for.
+ * @param details - More in-detail description of the action to be shown in the confirmation dialog.
+ */
+const ensureConfirmation = async (
+  action: AnyAction,
+  details?: string,
+): Promise<boolean> => {
+  const store = useActionsStore.getState()
+  const status = store.getActionStatus(action.id) ?? 'idle'
+
+  if (status === 'running') {
+    throw new Error('Action is not ready')
+  }
+
+  store.setActionStatuses([{ id: action.id, status: 'disabled' }])
+
+  try {
+    const canRun = await askForConfirmation(
+      details ? details : action.label.idle,
+    )
+    if (!canRun) {
+      store.setActionStatuses([{ id: action.id, status: 'idle' }])
+      return false
+    }
+
+    return true
+  } catch {
+    store.setActionStatuses([{ id: action.id, status: 'idle' }])
+    return false
+  }
+}
+
+/**
  * Function to run and start tracking an action.
  *
  * @param action - The action to run.
@@ -388,12 +426,93 @@ const useActiveAction = (actions: AnyAction[]): AnyAction | undefined => {
   return activeAction
 }
 
+/**
+ * Flows that will be triggered with a click, and that results in an action being run.
+ */
+type Interaction<T> =
+  | {
+      /**
+       * The action that is triggered when the button is clicked.
+       */
+      action: Action<T>
+
+      /**
+       * Callback that requests the arguments to run the action.
+       */
+      argsRequester: (() => Promise<T>) | (() => T)
+
+      /**
+       * Whether the action is considered dangerous.
+       */
+      isDangerous?: boolean
+
+      /**
+       * More in-detail description of the action.
+       */
+      details?: string
+    }
+  | {
+      action: Action
+
+      argsRequester?: never
+
+      isDangerous?: boolean
+
+      details?: string
+    }
+
+type AnyInteraction = Interaction<never>
+
+/**
+ * Begins the flow of an interaction, asking for arguments and confirmation if necessary.
+ *
+ * @param interaction - The interaction to trigger.
+ */
+const triggerInteraction = async <T>(interaction: Interaction<T>) => {
+  const { action, argsRequester, isDangerous, details } = interaction
+
+  const { confirmDangerousActions } = getSettings()
+
+  if (argsRequester) {
+    const args = await prepareActionArgs(action, argsRequester)
+
+    const canRun =
+      !confirmDangerousActions ||
+      !isDangerous ||
+      (await ensureConfirmation(action, details))
+
+    if (!canRun) {
+      return
+    }
+
+    runAction(action, args)
+  } else {
+    const canRun =
+      !confirmDangerousActions ||
+      !isDangerous ||
+      (await ensureConfirmation(action, details))
+
+    if (!canRun) {
+      return
+    }
+
+    runAction(action)
+  }
+}
+
 export {
   useActionStatuses,
-  prepareActionArgs,
-  runAction,
   useActionPresenters,
   useActiveAction,
   hashId,
+  triggerInteraction,
 }
-export type { Action, AnyAction, ActionId, ActionStatus, ActionPresenter }
+export type {
+  Action,
+  AnyAction,
+  ActionId,
+  ActionStatus,
+  ActionPresenter,
+  Interaction,
+  AnyInteraction,
+}

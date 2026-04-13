@@ -25,9 +25,9 @@ import { cn } from '@/utils/styles'
 
 import { useMakeApplyStash } from './api/mutations/applyStash'
 import { useQuerySettings } from './api/queries/settings'
-import { runAction } from './state/actions'
+import { triggerInteraction } from './state/actions'
 import { useUpstreamsSync } from './state/upstream'
-import { useDefaultEventPrevention } from './utils/interaction'
+import { useDefaultEventPrevention } from './utils/behavior'
 
 enableMapSet()
 
@@ -88,7 +88,7 @@ const InRepository = () => {
             stash: 'apply stash changes',
           }}
           handleDrop={(payload) => {
-            runAction(makeApplyStash(payload.dragged))
+            triggerInteraction({ action: makeApplyStash(payload.dragged) })
           }}
           className={cn('grid grid-rows-2 gap-4 mb-2 overflow-hidden')}
         >

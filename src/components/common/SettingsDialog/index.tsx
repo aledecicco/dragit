@@ -1,11 +1,11 @@
 import { useSetSettings } from '@/api/mutations/setSettings'
-import { runAction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import { showDialog } from '@/state/dialogs'
+import { useSettings } from '@/state/settings'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { DialogContent } from '@/ui/Dialog/Content'
 import { EditableText } from '@/ui/EditableText'
 import { Checkbox } from '@/ui/Form/Checkbox'
-import { useSettings } from '@/utils/app'
 import { cn, propsWithCn } from '@/utils/styles'
 
 const SETTINGS_DIALOG_KEY = 'settings_dialog'
@@ -47,7 +47,10 @@ const SettingsDialog = (props: SettingsDialogProps) => {
                 label="File opener application"
                 value={settings.fileOpenerApp}
                 setValue={(app) => {
-                  runAction(setSettings, { fileOpenerApp: app })
+                  triggerInteraction({
+                    action: setSettings,
+                    argsRequester: () => ({ fileOpenerApp: app }),
+                  })
                 }}
                 className={cn('max-w-20 border border-dark-50 rounded-md')}
                 buttonProps={{
@@ -61,7 +64,10 @@ const SettingsDialog = (props: SettingsDialogProps) => {
               label="Open last folder on start"
               checked={settings.openLastOnStart}
               onChange={(e) => {
-                runAction(setSettings, { openLastOnStart: e.target.checked })
+                triggerInteraction({
+                  action: setSettings,
+                  argsRequester: () => ({ openLastOnStart: e.target.checked }),
+                })
               }}
             />
 
@@ -70,8 +76,11 @@ const SettingsDialog = (props: SettingsDialogProps) => {
               description="e.g. deleting branches, force pushing"
               checked={settings.confirmDangerousActions}
               onChange={(e) => {
-                runAction(setSettings, {
-                  confirmDangerousActions: e.target.checked,
+                triggerInteraction({
+                  action: setSettings,
+                  argsRequester: () => ({
+                    confirmDangerousActions: e.target.checked,
+                  }),
                 })
               }}
             />
@@ -81,7 +90,10 @@ const SettingsDialog = (props: SettingsDialogProps) => {
               description="Show inline diffs instead of side-by-side diffs by default"
               checked={settings.preferInline}
               onChange={(e) => {
-                runAction(setSettings, { preferInline: e.target.checked })
+                triggerInteraction({
+                  action: setSettings,
+                  argsRequester: () => ({ preferInline: e.target.checked }),
+                })
               }}
             />
 
@@ -90,7 +102,12 @@ const SettingsDialog = (props: SettingsDialogProps) => {
               description="e.g. '2 hours ago' instead of exact date"
               checked={settings.relativeTimestamps}
               onChange={(e) => {
-                runAction(setSettings, { relativeTimestamps: e.target.checked })
+                triggerInteraction({
+                  action: setSettings,
+                  argsRequester: () => ({
+                    relativeTimestamps: e.target.checked,
+                  }),
+                })
               }}
             />
 
@@ -98,7 +115,12 @@ const SettingsDialog = (props: SettingsDialogProps) => {
               label="Sort branches by latest activity date"
               checked={settings.sortBranchesByDate}
               onChange={(e) => {
-                runAction(setSettings, { sortBranchesByDate: e.target.checked })
+                triggerInteraction({
+                  action: setSettings,
+                  argsRequester: () => ({
+                    sortBranchesByDate: e.target.checked,
+                  }),
+                })
               }}
             />
 
@@ -107,7 +129,10 @@ const SettingsDialog = (props: SettingsDialogProps) => {
               description="Periodically fetch changes from the remote repository to keep it up to date"
               checked={settings.autoFetchRemote}
               onChange={(e) => {
-                runAction(setSettings, { autoFetchRemote: e.target.checked })
+                triggerInteraction({
+                  action: setSettings,
+                  argsRequester: () => ({ autoFetchRemote: e.target.checked }),
+                })
               }}
             />
 
@@ -116,8 +141,11 @@ const SettingsDialog = (props: SettingsDialogProps) => {
               description="Show the stashes list expanded by default"
               checked={settings.stashesOpenByDefault}
               onChange={(e) => {
-                runAction(setSettings, {
-                  stashesOpenByDefault: e.target.checked,
+                triggerInteraction({
+                  action: setSettings,
+                  argsRequester: () => ({
+                    stashesOpenByDefault: e.target.checked,
+                  }),
                 })
               }}
             />

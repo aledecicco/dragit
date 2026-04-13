@@ -6,6 +6,7 @@ import { interaction } from '@/lib/ActionButton/utils'
 import { useSelectedUpstream } from '@/state/upstream'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
+import { getUpstreamReference } from '@/utils/repository'
 
 interface BranchToolbarProps extends Partial<ToolbarProps> {
   /**
@@ -59,7 +60,15 @@ const BranchToolbar = (props: BranchToolbarProps) => {
         compact
         fixed
         action={push}
-        alternatives={[interaction({ action: forcePush, isDangerous: true })]}
+        alternatives={[
+          interaction({
+            action: forcePush,
+            isDangerous: true,
+            details:
+              upstream &&
+              `force push "${branch.name}" to "${getUpstreamReference(upstream).refName}"`,
+          }),
+        ]}
         disabled={
           toolbarProps.disabled ||
           !branch ||

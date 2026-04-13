@@ -77,6 +77,6 @@ function requestValueFromDialog<T extends AnyObject, P>(
 
 export {
   ValueRequesterDialog,
-  type ValueRequesterDialogProps,
   requestValueFromDialog,
+  type ValueRequesterDialogProps,
 }

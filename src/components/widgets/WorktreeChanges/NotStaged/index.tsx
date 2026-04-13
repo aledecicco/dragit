@@ -25,7 +25,7 @@ import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
-import { runAction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import {
   setNextPage,
   setPrevPage,
@@ -74,7 +74,10 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
           'staged-files': 'unstage changes',
         }}
         handleDrop={(payload) => {
-          runAction(unstage, payload.dragged)
+          triggerInteraction({
+            action: unstage,
+            argsRequester: () => payload.dragged,
+          })
         }}
       >
         <div

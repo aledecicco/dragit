@@ -16,11 +16,10 @@ import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
-import { prepareActionArgs, runAction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
 import { Tab } from '@/ui/Tabs/Item'
-import { useSettings } from '@/utils/app'
 import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
@@ -35,8 +34,6 @@ interface BranchesListProps extends ComponentProps<'div'> {}
  */
 const BranchesList = (props: BranchesListProps) => {
   const { ...divProps } = props
-
-  const settings = useSettings()
 
   const allBranchesQuery = useQueryBranches()
   const localBranchesQuery = useQueryBranches('local')
@@ -74,19 +71,19 @@ const BranchesList = (props: BranchesListProps) => {
               commit: 'track this commit',
             }
       }
-      handleDrop={async (payload) => {
+      handleDrop={(payload) => {
         if (selectedTab === 'tags') {
-          const tagCommit = makeTagCommit(payload.dragged)
-          const args = await prepareActionArgs(tagCommit, () =>
-            requestTagParams(`#${payload.dragged.shortHash}`),
-          )
-          runAction(tagCommit, args)
+          triggerInteraction({
+            action: makeTagCommit(payload.dragged),
+            argsRequester: () =>
+              requestTagParams(`#${payload.dragged.shortHash}`),
+          })
         } else {
-          const createBranchAt = makeCreateBranchAt(payload.dragged.id)
-          const args = await prepareActionArgs(createBranchAt, () =>
-            requestBranchName(`#${payload.dragged.shortHash}`),
-          )
-          runAction(createBranchAt, args)
+          triggerInteraction({
+            action: makeCreateBranchAt(payload.dragged.id),
+            argsRequester: () =>
+              requestBranchName(`#${payload.dragged.shortHash}`),
+          })
         }
       }}
     >
@@ -168,11 +165,6 @@ const BranchesList = (props: BranchesListProps) => {
             <QueryList
               name="tags"
               query={tagsQuery}
-              getItems={(tags) =>
-                settings.sortBranchesByDate
-                  ? [...tags].sort((a, b) => b.timestamp - a.timestamp)
-                  : tags
-              }
               renderItem={(tag, position) => (
                 <TagsListItem tag={tag} itemIndex={position} />
               )}
@@ -195,11 +187,6 @@ const BranchesList = (props: BranchesListProps) => {
                 .with('remote', () => 'remote branches')
                 .otherwise(() => 'branches')}
               query={currentBranchesQuery}
-              getItems={(branches) =>
-                settings.sortBranchesByDate
-                  ? [...branches].sort((a, b) => b.timestamp - a.timestamp)
-                  : branches
-              }
               renderItem={(branch, position) => (
                 <BranchesListItem branch={branch} itemIndex={position} />
               )}

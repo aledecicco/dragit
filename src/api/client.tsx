@@ -51,4 +51,4 @@ const ClientProvider = (props: PropsWithChildren) => {
   )
 }
 
-export { ClientProvider }
+export { client, ClientProvider }

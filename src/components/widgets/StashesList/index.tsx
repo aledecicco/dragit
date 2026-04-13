@@ -10,14 +10,14 @@ import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
-import { runAction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
+import { useSettings } from '@/state/settings'
 import { Accordion } from '@/ui/Accordion'
 import {
   AccordionSection,
   useAccordionSectionHandler,
 } from '@/ui/Accordion/Section'
 import { Chip } from '@/ui/Chip'
-import { useSettings } from '@/utils/app'
 import { pluralize } from '@/utils/string'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
@@ -32,9 +32,9 @@ interface StashesListProps extends ComponentProps<'div'> {}
 const StashesList = (props: StashesListProps) => {
   const { ...divProps } = props
 
-  const settings = useSettings()
+  const { stashesOpenByDefault } = useSettings()
   const accordionHandler = useAccordionSectionHandler({
-    defaultOpen: settings.stashesOpenByDefault,
+    defaultOpen: stashesOpenByDefault,
   })
 
   const stashesQuery = useQueryStashes()
@@ -54,7 +54,10 @@ const StashesList = (props: StashesListProps) => {
           'not-staged-files': 'stash changes',
         }}
         handleDrop={(payload) => {
-          runAction(stash, payload.dragged)
+          triggerInteraction({
+            action: stash,
+            argsRequester: () => payload.dragged,
+          })
         }}
         overlayProps={{
           className: cn(!accordionHandler.isOpen && 'flex-row text-sm'),

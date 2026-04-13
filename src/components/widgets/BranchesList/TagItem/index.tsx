@@ -110,7 +110,13 @@ const useInteractions = (tag: TagInfo) => {
         argsRequester: () => requestBranchName(`#${tag.reference}`),
       }),
     ),
-    group(interaction({ action: deleteTag, isDangerous: true })),
+    group(
+      interaction({
+        action: deleteTag,
+        isDangerous: true,
+        details: `delete tag "${tag.name}"`,
+      }),
+    ),
   ]
 }
 
