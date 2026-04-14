@@ -30,7 +30,7 @@ Stash of ideas in ~planned implementation order:
 - [ ] Animations pass
 - [x] Drag and drop shortcuts
 - [ ] Global keyboard shortcuts
-- [ ] Settings screen
+- [x] Settings screen
 - [ ] Another pass
 - [ ] Toasts (with lib)
 - [ ] Decide on polling vs file watcher

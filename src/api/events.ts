@@ -1,8 +1,8 @@
-import { useEffect } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
+import { useEffectOnce } from 'react-use'
 import { match, P } from 'ts-pattern'
 
+import { client } from './client'
 import type { AppEvent } from './models'
 import { branchDivergenceQueryKeys } from './queries/branchDivergence'
 import { branchesQueryKeys } from './queries/branches'
@@ -25,9 +25,7 @@ const EVENT_ID = 'app-event'
  * Subscribes the app to events coming from the backend, and invalidates queries accordingly.
  */
 const useBackendEventshandler = () => {
-  const client = useQueryClient()
-
-  useEffect(() => {
+  useEffectOnce(() => {
     const unlisten = listen<AppEvent>(EVENT_ID, (event) => {
       console.log(`Received event: ${JSON.stringify(event)}`)
 
@@ -163,7 +161,7 @@ const useBackendEventshandler = () => {
     return () => {
       unlisten.then((f) => f())
     }
-  }, [client.resetQueries, client.invalidateQueries])
+  })
 }
 
 export { useBackendEventshandler }

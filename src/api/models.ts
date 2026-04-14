@@ -14,6 +14,8 @@ export interface Settings {
   sortBranchesByDate: boolean
   autoFetchRemote: boolean
   stashesOpenByDefault: boolean
+  showLargeDiffs: boolean
+  showWordDiffs: boolean
   recentFolders: string[]
   lastOpened: string | null
 }

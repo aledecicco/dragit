@@ -19,6 +19,10 @@ pub struct Settings {
 
     pub stashes_open_by_default: bool,
 
+    pub show_large_diffs: bool,
+
+    pub show_word_diffs: bool,
+
     pub recent_folders: Vec<String>,
 
     pub last_opened: Option<String>,
@@ -42,6 +46,10 @@ impl Default for Settings {
             auto_fetch_remote: false,
 
             stashes_open_by_default: false,
+
+            show_large_diffs: false,
+
+            show_word_diffs: true,
 
             recent_folders: Vec::new(),
 

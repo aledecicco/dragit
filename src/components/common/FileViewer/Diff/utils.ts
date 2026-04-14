@@ -3,6 +3,7 @@ import type { RootContent, Text } from 'hast'
 import { match } from 'ts-pattern'
 
 import type { DiffLineSegment, DiffType, FileDiff } from '@/api/models'
+import { getSettings } from '@/state/settings'
 
 import {
   getNodeChildren,
@@ -270,8 +271,11 @@ export const highlightDiff = (
   const linesBefore = treeBefore ? splitIntoLines(treeBefore) : []
   const linesAfter = treeAfter ? splitIntoLines(treeAfter) : []
 
-  // Modify the lines in-place to add word-diff highlighting segments.
-  addWordDiff(fileDiff, linesBefore, linesAfter)
+  const { showWordDiffs } = getSettings()
+  if (showWordDiffs) {
+    // Modify the lines in-place to add word-diff highlighting segments.
+    addWordDiff(fileDiff, linesBefore, linesAfter)
+  }
 
   // We use pointers to track which lines we're going to provide when the diff
   // asks for a line from before or after.

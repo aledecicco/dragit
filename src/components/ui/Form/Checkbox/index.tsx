@@ -21,6 +21,16 @@ interface CheckboxProps extends Ariakit.CheckboxProps {
  * Checkbox component.
  */
 const Checkbox = (props: CheckboxProps) => {
+  const isComposite = !!Ariakit.useCompositeContext()
+
+  if (isComposite) {
+    return <Ariakit.CompositeItem render={<CheckboxInner {...props} />} />
+  }
+
+  return <CheckboxInner {...props} />
+}
+
+const CheckboxInner = (props: CheckboxProps) => {
   const { label, description, ...checkboxProps } = props
   const checked = checkboxProps.checked ?? false
 
@@ -30,7 +40,7 @@ const Checkbox = (props: CheckboxProps) => {
   return (
     <label
       className={cn(
-        'group/checkbox',
+        'group/checkbox relative',
         'flex gap-2 items-center cursor-pointer p-2',
         'hover:bg-light-950/5 data-focus-visible:bg-light-950/5',
         'hover:data-focus-visible:bg-light-950/10',
