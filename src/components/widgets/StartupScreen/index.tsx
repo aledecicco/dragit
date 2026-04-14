@@ -1,4 +1,5 @@
-import { IconFolderOpen, IconReload } from '@tabler/icons-react'
+import type { ComponentProps } from 'react'
+import { IconReload } from '@tabler/icons-react'
 
 import logo from '@/assets/logo.jpg'
 
@@ -10,12 +11,10 @@ import { FilePath } from '@/common/File/Path'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { QueryLoader } from '@/lib/Loader/Query'
-import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { chooseDirectory } from '@/utils/behavior'
 import { getErrorMessage } from '@/utils/error'
-import { getPathLocation } from '@/utils/string'
-import { cn } from '@/utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 
 /**
  * Main app widget that is displayed when there's no current directory open,
@@ -30,24 +29,12 @@ const StartupScreen = () => {
     <QueryLoader
       query={currentDirQuery}
       loadingFallback={
-        <div className={cn('flex flex-col items-center', 'col-start-2')}>
-          <img
-            src={logo}
-            alt="Dragit logo"
-            className={cn('w-80 mt-[20%] pointer-events-none select-none')}
-          />
-
+        <StartupScreenInner className={cn('col-start-2')}>
           <p className={cn('text-lg text-light-950 italic')}>Loading...</p>
-        </div>
+        </StartupScreenInner>
       }
       errorFallback={(error) => (
-        <div className={cn('flex flex-col items-center', 'col-start-2')}>
-          <img
-            src={logo}
-            alt="Dragit logo"
-            className={cn('w-80 mt-[20%] pointer-events-none select-none')}
-          />
-
+        <StartupScreenInner className={cn('col-start-2')}>
           <p className={cn('text-lg text-danger-600 mb-2')}>
             {getErrorMessage(error)}
           </p>
@@ -58,110 +45,20 @@ const StartupScreen = () => {
             size="lg"
             variant="plain"
             status="danger"
-            onClick={() => currentDirQuery.refetch()}
+            onClick={() => {
+              currentDirQuery.refetch()
+            }}
           />
-        </div>
+        </StartupScreenInner>
       )}
     >
       {(currentDir) => {
         if (!currentDir) {
           return (
-            <>
-              <div className={cn('px-4 py-8')}>
-                <p className={cn('text-lg text-light-950')}>
-                  No folder currently open.
-                </p>
-              </div>
-
-              <div className={cn('flex flex-col gap-6 items-center')}>
-                <img
-                  src={logo}
-                  alt="Dragit logo"
-                  className={cn(
-                    'w-80 mt-[20%] pointer-events-none select-none',
-                  )}
-                />
-
-                <ActionButton
-                  action={openFolder}
-                  argsRequester={async () => {
-                    const path = await chooseDirectory()
-
-                    if (!path) {
-                      throw new Error('No folder selected')
-                    }
-
-                    return path
-                  }}
-                  aria-label="Select and open a folder in your system"
-                  size="lg"
-                  variant="plain"
-                  status="neutral"
-                />
-              </div>
-            </>
-          )
-        }
-
-        return <InFolder currentDir={currentDir} />
-      }}
-    </QueryLoader>
-  )
-}
-
-const InFolder = (props: { currentDir: CurrentDirInfo }) => {
-  const { currentDir } = props
-
-  const initRepository = useInitRepository()
-  const location = getPathLocation(currentDir.path)
-
-  const openFolder = useOpenFolder()
-
-  return (
-    <>
-      <div className={cn('px-4 py-8 flex flex-col items-start')}>
-        <div
-          className={cn(
-            'text-primary-200',
-            'grid grid-cols-[max-content_1fr] gap-x-3 items-center min-w-0',
-          )}
-        >
-          <Icon Glyph={IconFolderOpen} size="lg" />
-
-          <Marquee className={cn('text-xl')}>{location.filename}</Marquee>
-        </div>
-
-        <Marquee className={cn('text-lg text-light-800')}>
-          <FilePath
-            filepath={location.filedir}
-            separatorProps={{
-              className: cn('text-light-500'),
-            }}
-          />
-        </Marquee>
-      </div>
-
-      {currentDir.exists ? (
-        !currentDir.isRepository && (
-          <div className={cn('flex flex-col gap-6 items-center')}>
-            <img
-              src={logo}
-              alt="Dragit logo"
-              className={cn('w-80 mt-[20%] pointer-events-none select-none')}
-            />
-
-            <p className={cn('text-lg text-light-950')}>
-              This folder is not a Git repository. Initialize it to begin.
-            </p>
-
-            <div className={cn('flex flex-col gap-2')}>
-              <ActionButton
-                action={initRepository}
-                size="lg"
-                variant="filled"
-                status="primary"
-                className="w-full"
-              />
+            <StartupScreenInner className={cn('col-start-2')}>
+              <p className={cn('text-lg text-light-950')}>
+                No folder currently open.
+              </p>
 
               <ActionButton
                 action={openFolder}
@@ -176,43 +73,96 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
                 }}
                 aria-label="Select and open a folder in your system"
                 size="lg"
-                variant="filled"
+                variant="plain"
                 status="neutral"
               />
-            </div>
-          </div>
+            </StartupScreenInner>
+          )
+        }
+
+        return <InFolder currentDir={currentDir} />
+      }}
+    </QueryLoader>
+  )
+}
+
+const InFolder = (props: { currentDir: CurrentDirInfo }) => {
+  const { currentDir } = props
+
+  const initRepository = useInitRepository()
+  const openFolder = useOpenFolder()
+
+  return (
+    <StartupScreenInner className={cn('col-start-2')}>
+      <Marquee className={cn('text-lg text-light-500')}>
+        <FilePath
+          filepath={currentDir.path}
+          separatorProps={{ className: cn('text-primary-300') }}
+        />
+      </Marquee>
+
+      {currentDir.exists ? (
+        !currentDir.isRepository && (
+          <p className={cn('text-lg text-light-950')}>
+            This folder is not a Git repository. Initialize it to begin.
+          </p>
         )
       ) : (
-        <div className={cn('flex flex-col gap-6 items-center')}>
-          <img
-            src={logo}
-            alt="Dragit logo"
-            className={cn('w-80 mt-[20%] pointer-events-none select-none')}
-          />
+        <p className={cn('text-lg text-light-950')}>
+          This folder doesn't exist.
+        </p>
+      )}
 
-          <p className={cn('text-lg text-light-950')}>
-            This folder doesn't exist.
-          </p>
-
+      <div className={cn('flex flex-col gap-2')}>
+        {currentDir.exists && !currentDir.isRepository && (
           <ActionButton
-            action={openFolder}
-            argsRequester={async () => {
-              const path = await chooseDirectory()
-
-              if (!path) {
-                throw new Error('No folder selected')
-              }
-
-              return path
-            }}
-            aria-label="Select and open a folder in your system"
+            action={initRepository}
             size="lg"
             variant="filled"
-            status="neutral"
+            status="primary"
+            className="w-full"
           />
-        </div>
+        )}
+
+        <ActionButton
+          action={openFolder}
+          argsRequester={async () => {
+            const path = await chooseDirectory()
+
+            if (!path) {
+              throw new Error('No folder selected')
+            }
+
+            return path
+          }}
+          aria-label="Select and open a folder in your system"
+          size="lg"
+          variant="filled"
+          status="neutral"
+        />
+      </div>
+    </StartupScreenInner>
+  )
+}
+
+const StartupScreenInner = (props: ComponentProps<'div'>) => {
+  const { children, ...divProps } = props
+
+  return (
+    <div
+      {...propsWithCn(
+        divProps,
+        'flex flex-col gap-6 items-center overflow-hidden',
       )}
-    </>
+    >
+      <img
+        src={logo}
+        alt="Dragit logo"
+        className={cn('w-80 mt-[20%] pointer-events-none select-none')}
+      />
+
+      {children}
+    </div>
   )
 }
 
