@@ -3,7 +3,10 @@ import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
+import { useHeadReference } from '@/utils/repository'
 
+import { useQueryCommitHistory } from '../queries/commitHistory'
+import { useQueryCommitInfo } from '../queries/commitInfo'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface CommitIndexArgs {
@@ -52,8 +55,13 @@ const useCommitIndex = (): Action<Omit<CommitIndexArgs, 'isAmend'>> => {
   }
 }
 
-const useAmend = (): Action<Omit<CommitIndexArgs, 'isAmend'>> => {
+const useAmend = (): Action => {
   const commitIndex = useRepositoryMutation(commitIndexMutation)
+  const currentReference = useHeadReference()
+  const historyQuery = useQueryCommitHistory(currentReference?.refName)
+  const commitInfoQuery = useQueryCommitInfo(
+    historyQuery.data?.pages.at(0)?.items.at(0)?.hash ?? '',
+  )
 
   return {
     id: {
@@ -65,8 +73,11 @@ const useAmend = (): Action<Omit<CommitIndexArgs, 'isAmend'>> => {
       { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
-    run: async (args) => {
-      await commitIndex.mutateAsync({ ...args, isAmend: true })
+    run: async () => {
+      await commitIndex.mutateAsync({
+        message: commitInfoQuery.data?.message ?? '',
+        isAmend: true,
+      })
     },
     label: {
       idle: 'Amend',

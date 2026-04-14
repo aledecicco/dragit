@@ -42,12 +42,13 @@ const Draggable = <T extends DragType>(props: DraggableProps<T>) => {
 
   const id = useUniqueId()
 
+  const isDisabled = isEmptyDragPayload(dragPayload)
   const componentRef = useRef<HTMLDivElement>(null)
   const { ref: dragRef, isDragging } = useDraggable({
     id,
     type: dragPayload.type,
     data: dragPayload,
-    disabled: isEmptyDragPayload(dragPayload),
+    disabled: isDisabled,
   })
 
   useBeforeDrag(({ element, source, manager }) => {
@@ -64,6 +65,7 @@ const Draggable = <T extends DragType>(props: DraggableProps<T>) => {
       {...propsWithCn(
         roleProps,
         'touch-manipulation',
+        !isDisabled && 'cursor-pointer',
         isDragging && 'border border-neutral-600',
       )}
       ref={mergeRefs([componentRef, dragRef, ref])}

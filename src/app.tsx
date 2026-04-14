@@ -28,6 +28,7 @@ import { useQuerySettings } from './api/queries/settings'
 import { triggerInteraction } from './state/actions'
 import { useUpstreamsSync } from './state/upstream'
 import { useDefaultEventPrevention } from './utils/behavior'
+import { useShortcutBinding } from './utils/shortcuts'
 
 enableMapSet()
 
@@ -70,6 +71,7 @@ const Dialogs = () => {
 const InRepository = () => {
   useBasesSync()
   useUpstreamsSync()
+  useShortcutBinding()
 
   const makeApplyStash = useMakeApplyStash()
 

@@ -21,16 +21,6 @@ interface CheckboxProps extends Ariakit.CheckboxProps {
  * Checkbox component.
  */
 const Checkbox = (props: CheckboxProps) => {
-  const isComposite = !!Ariakit.useCompositeContext()
-
-  if (isComposite) {
-    return <Ariakit.CompositeItem render={<CheckboxInner {...props} />} />
-  }
-
-  return <CheckboxInner {...props} />
-}
-
-const CheckboxInner = (props: CheckboxProps) => {
   const { label, description, ...checkboxProps } = props
   const checked = checkboxProps.checked ?? false
 

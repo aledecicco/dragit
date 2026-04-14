@@ -2,9 +2,12 @@ import { IconMinus, IconPlaylistX } from '@tabler/icons-react'
 import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
+import { STAGED_FILE_TYPES } from '@/widgets/WorktreeChanges/Staged'
+
 import type { Action } from '@/state/actions'
 
 import type { WorktreeFileInfo } from '../models'
+import { useQueryWorktreeFiles } from '../queries/worktreeFiles'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface RemoveFromIndexArgs {
@@ -84,10 +87,44 @@ const useUnstageFiles = (): Action<WorktreeFileInfo[] | string[]> => {
   }
 }
 
+const useUnstageAll = (): Action => {
+  const removeFromIndex = useRepositoryMutation(removeFromIndexMutation)
+  const stagedChangesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
+
+  return {
+    id: { key: 'file_operation', operation: 'unstage_files' },
+    blockedBy: [
+      { key: 'file_operation' },
+      { key: 'branch_operation', type: 'current' },
+    ],
+    run: async () => {
+      await removeFromIndex.mutateAsync({
+        files: ['.'],
+      })
+    },
+    derivedIds: stagedChangesQuery.data
+      ? () =>
+          stagedChangesQuery.data?.items.map((file) => ({
+            key: 'file_operation',
+            operation: 'unstage_file',
+            file: file.path,
+          }))
+      : undefined,
+    label: {
+      idle: 'Unstage all',
+      running: 'Unstaging all',
+      success: 'Unstaged all',
+      error: 'Failed',
+    },
+    Glyph: IconPlaylistX,
+  }
+}
+
 export {
   useMakeUnstageFile,
   useUnstageFile,
   useUnstageFiles,
+  useUnstageAll,
   removeFromIndexKey,
   removeFromIndexMutation,
   type RemoveFromIndexArgs,

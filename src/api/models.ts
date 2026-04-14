@@ -6,16 +6,32 @@ export interface Page<T> {
 }
 
 export interface Settings {
-  openLastOnStart: boolean
   fileOpenerApp: string
+  openLastOnStart: boolean
   confirmDangerousActions: boolean
-  preferInline: boolean
+  autoFetchRemote: boolean
+
   relativeTimestamps: boolean
   sortBranchesByDate: boolean
-  autoFetchRemote: boolean
   stashesOpenByDefault: boolean
+
+  preferInline: boolean
   showLargeDiffs: boolean
   showWordDiffs: boolean
+
+  stageAllShortcut: string
+  unstageAllShortcut: string
+  commitShortcut: string
+  amendShortcut: string
+  pushShortcut: string
+  pullShortcut: string
+  refreshShortcut: string
+  focusUnstagedShortcut: string
+  focusStagedShortcut: string
+  focusBranchesShortcut: string
+  focusStashesShortcut: string
+  focusGraphShortcut: string
+
   recentFolders: string[]
   lastOpened: string | null
 }

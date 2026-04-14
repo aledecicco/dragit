@@ -30,7 +30,7 @@ const useOpenFolder = (): Action<string> => {
       await openFolder.mutateAsync({ newPath })
     },
     label: {
-      idle: 'Choose a directory',
+      idle: 'Choose a folder',
       running: 'Opening folder',
       success: 'New folder opened',
       error: 'Failed to open folder',
@@ -51,9 +51,7 @@ const useChangeCurrentFolder = (): Action<string> => {
     label: {
       idle:
         currentDirQuery.data?.path ??
-        (currentDirQuery.isFetching
-          ? 'Loading directory...'
-          : 'Choose a directory'),
+        (currentDirQuery.isFetching ? 'Loading folder...' : 'Choose a folder'),
       running: 'Opening folder',
       success: 'New folder opened',
       error: 'Failed to open folder',
