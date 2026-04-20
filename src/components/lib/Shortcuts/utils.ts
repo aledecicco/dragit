@@ -98,6 +98,9 @@ export const formatShortcut = (keys: Set<string>) => {
     if (aIsModifier && !bIsModifier) return -1
     if (!aIsModifier && bIsModifier) return 1
 
+    if (a.length === 1 && b.length > 1) return -1
+    if (a.length > 1 && b.length === 1) return 1
+
     return a.localeCompare(b)
   })
 

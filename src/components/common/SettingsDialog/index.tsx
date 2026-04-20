@@ -106,59 +106,41 @@ const SettingsDialog = (props: SettingsDialogProps) => {
                   action="stage all changes"
                   setting="stageAllShortcut"
                 />
-                <TextSetting
-                  label="Commit"
+                <ShortcutSetting
+                  action="open the commit dialog"
                   setting="commitShortcut"
-                  contentBefore="Press "
-                  contentAfter=" to open the commit dialog"
                 />
-                <TextSetting
-                  label="Push"
+                <ShortcutSetting
+                  action="push changes to the current branch"
                   setting="pushShortcut"
-                  contentBefore="Press "
-                  contentAfter=" to push changes on the current branch"
                 />
-                <TextSetting
-                  label="Pull"
+                <ShortcutSetting
+                  action="pull changes from the current branch"
                   setting="pullShortcut"
-                  contentBefore="Press "
-                  contentAfter=" to pull changes from the current branch"
                 />
-                <TextSetting
-                  label="Refresh remote"
+                <ShortcutSetting
+                  action="fetch changes from the remote"
                   setting="refreshShortcut"
-                  contentBefore="Press "
-                  contentAfter=" to fetch changes from the remote"
                 />
-                <TextSetting
-                  label="Focus unstaged changes"
-                  setting="focusUnstagedShortcut"
-                  contentBefore="Press "
-                  contentAfter=" to focus the unstaged changes list"
-                />
-                <TextSetting
-                  label="Focus staged changes"
-                  setting="focusStagedShortcut"
-                  contentBefore="Press "
-                  contentAfter=" to focus the staged changes list"
-                />
-                <TextSetting
-                  label="Focus branches"
-                  setting="focusBranchesShortcut"
-                  contentBefore="Press "
-                  contentAfter=" to focus the branches list"
-                />
-                <TextSetting
-                  label="Focus stashes"
-                  setting="focusStashesShortcut"
-                  contentBefore="Press "
-                  contentAfter=" to focus the stashes list"
-                />
-                <TextSetting
-                  label="Focus graph"
+                <ShortcutSetting
+                  action="focus the graph view"
                   setting="focusGraphShortcut"
-                  contentBefore="Press "
-                  contentAfter=" to focus the graph view"
+                />
+                <ShortcutSetting
+                  action="focus the unstaged changes list"
+                  setting="focusUnstagedShortcut"
+                />
+                <ShortcutSetting
+                  action="focus the staged changes list"
+                  setting="focusStagedShortcut"
+                />
+                <ShortcutSetting
+                  action="focus the branches list"
+                  setting="focusBranchesShortcut"
+                />
+                <ShortcutSetting
+                  action="focus the stashes list"
+                  setting="focusStashesShortcut"
                 />
               </SettingsDialogSection>
             </Ariakit.Composite>
