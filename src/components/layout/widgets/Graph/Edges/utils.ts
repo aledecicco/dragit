@@ -1,4 +1,4 @@
-import type { Position } from '@/widgets/Graph/SvgOverlay/utils'
+import type { Position } from '@/layout/widgets/Graph/SvgOverlay/utils'
 
 /**
  * Builds the SVG path commands to connect two elements at the given positions.

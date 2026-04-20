@@ -2,7 +2,7 @@ import { IconMinus, IconPlaylistX } from '@tabler/icons-react'
 import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import { STAGED_FILE_TYPES } from '@/widgets/WorktreeChanges/Staged'
+import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
 
 import type { Action } from '@/state/actions'
 

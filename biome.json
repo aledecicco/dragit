@@ -27,7 +27,7 @@
               ":BLANK_LINE:",
               "@/assets/**",
               ":BLANK_LINE:",
-              "@/widgets/**",
+              "@/layout/**",
               ":BLANK_LINE:",
               ":ALIAS:",
               ":BLANK_LINE:"

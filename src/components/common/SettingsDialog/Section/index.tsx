@@ -3,7 +3,7 @@ import type { ComponentProps } from 'react'
 import { Separator } from '@/ui/Separator'
 import { cn, propsWithCn } from '@/utils/styles'
 
-interface SettingsDialogSectionProps extends ComponentProps<'div'> {
+interface SettingsDialogSectionProps extends ComponentProps<'section'> {
   /**
    * The label of the section.
    */
@@ -14,13 +14,16 @@ interface SettingsDialogSectionProps extends ComponentProps<'div'> {
  * A single labeled section inside the settings dialog.
  */
 const SettingsDialogSection = (props: SettingsDialogSectionProps) => {
-  const { label, ...divProps } = props
+  const { label, ...sectionProps } = props
 
   return (
     <>
       <Separator label={label} className={cn('mb-2')} />
 
-      <div {...propsWithCn(divProps, 'grid auto-rows-fr')} />
+      <section
+        {...propsWithCn(sectionProps, 'grid auto-rows-fr')}
+        aria-label={`${label}-related settings`}
+      />
     </>
   )
 }

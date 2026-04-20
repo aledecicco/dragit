@@ -2,16 +2,13 @@ import { type ComponentProps, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 
-import type { Settings } from '@/api/models'
 import { useSetSettings } from '@/api/mutations/setSettings'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/settings'
 import { EditableText } from '@/ui/EditableText'
 import { cn, propsWithCn } from '@/utils/styles'
 
-type StringSettingKey = {
-  [K in keyof Settings]: Settings[K] extends string ? K : never
-}[keyof Settings]
+import type { StringSettingKey } from '../utils'
 
 interface TextSettingProps extends ComponentProps<'div'> {
   /**
@@ -57,7 +54,6 @@ const TextSetting = (props: TextSettingProps) => {
       )}
       onClickCapture={(e) => {
         divProps.onCanPlayCapture?.(e)
-
         buttonRef.current?.focus()
       }}
     >

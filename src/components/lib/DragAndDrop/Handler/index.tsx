@@ -6,10 +6,10 @@ import { DragAndDropBackdrop } from '../Backdrop'
 import { DragAndDropIndicator } from '../Indicator'
 import { RestrictMovement, SnapToCursor } from '../utils'
 
-type DragAndDropHandlerProps = PropsWithChildren
+interface DragAndDropHandlerProps extends PropsWithChildren {}
 
 /**
- * Provides the app with drag-and-drop functionalities
+ * Provides the app with drag-and-drop functionalities.
  */
 const DragAndDropHandler = (props: DragAndDropHandlerProps) => {
   const { children } = props

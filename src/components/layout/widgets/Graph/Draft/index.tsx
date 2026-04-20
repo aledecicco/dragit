@@ -3,8 +3,8 @@ import * as Ariakit from '@ariakit/react'
 import { IconFileCheck } from '@tabler/icons-react'
 import { mergeRefs } from 'react-merge-refs'
 
-import { NOT_STAGED_FILE_TYPES } from '@/widgets/WorktreeChanges/NotStaged'
-import { STAGED_FILE_TYPES } from '@/widgets/WorktreeChanges/Staged'
+import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStaged'
+import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
 
 import { useStageAll } from '@/api/mutations/addToIndex'
 import { useCommitIndex } from '@/api/mutations/commitIndex'

@@ -1,7 +1,7 @@
 import type { VirtualItem } from '@tanstack/react-virtual'
 
-import { NOT_STAGED_FILE_TYPES } from '@/widgets/WorktreeChanges/NotStaged'
-import { STAGED_FILE_TYPES } from '@/widgets/WorktreeChanges/Staged'
+import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStaged'
+import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
 
 import { useQueryBranchDivergence } from '@/api/queries/branchDivergence'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'

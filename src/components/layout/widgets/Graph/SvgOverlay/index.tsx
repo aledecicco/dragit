@@ -1,7 +1,7 @@
 import { type ComponentProps, useRef } from 'react'
 import { mergeRefs } from 'react-merge-refs'
 
-import { Edges } from '@/widgets/Graph/Edges'
+import { Edges } from '@/layout/widgets/Graph/Edges'
 
 import { cn, propsWithCn } from '@/utils/styles'
 

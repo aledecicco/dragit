@@ -18,16 +18,15 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "baseUrl": "./src",
     "paths": {
-      "@/assets/*": ["assets/*"],
-      "@/api/*": ["api/*"],
-      "@/common/*": ["components/common/*"],
-      "@/lib/*": ["components/lib/*"],
-      "@/state/*": ["state/*"],
-      "@/ui/*": ["components/ui/*"],
-      "@/widgets/*": ["components/widgets/*"],
-      "@/utils/*": ["utils/*"]
+      "@/assets/*": ["./src/assets/*"],
+      "@/api/*": ["./src/api/*"],
+      "@/common/*": ["./src/components/common/*"],
+      "@/lib/*": ["./src/components/lib/*"],
+      "@/state/*": ["./src/state/*"],
+      "@/ui/*": ["./src/components/ui/*"],
+      "@/layout/*": ["./src/components/layout/*"],
+      "@/utils/*": ["./src/utils/*"]
     }
   },
   "include": ["src"],

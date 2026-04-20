@@ -1,14 +1,11 @@
 import * as Ariakit from '@ariakit/react'
 
-import type { Settings } from '@/api/models'
 import { useSetSettings } from '@/api/mutations/setSettings'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/settings'
 import { Checkbox, type CheckboxProps } from '@/ui/Form/Checkbox'
 
-type BooleanSettingKey = {
-  [K in keyof Settings]: Settings[K] extends boolean ? K : never
-}[keyof Settings]
+import type { BooleanSettingKey } from '../utils'
 
 interface CheckboxSettingProps extends CheckboxProps {
   /**

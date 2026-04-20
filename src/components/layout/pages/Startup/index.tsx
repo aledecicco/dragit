@@ -17,10 +17,10 @@ import { getErrorMessage } from '@/utils/error'
 import { cn, propsWithCn } from '@/utils/styles'
 
 /**
- * Main app widget that is displayed when there's no current directory open,
+ * Page that is displayed when there's no current directory open,
  * or when the current directory is not a repository.
  */
-const StartupScreen = () => {
+const StartupPage = () => {
   const currentDirQuery = useQueryCurrentDir()
 
   const openFolder = useOpenFolder()
@@ -29,12 +29,12 @@ const StartupScreen = () => {
     <QueryLoader
       query={currentDirQuery}
       loadingFallback={
-        <StartupScreenInner className={cn('col-start-2')}>
+        <StartupPageInner className={cn('col-start-2')}>
           <p className={cn('text-lg text-light-950 italic')}>Loading...</p>
-        </StartupScreenInner>
+        </StartupPageInner>
       }
       errorFallback={(error) => (
-        <StartupScreenInner className={cn('col-start-2')}>
+        <StartupPageInner className={cn('col-start-2')}>
           <p className={cn('text-lg text-danger-600 mb-2')}>
             {getErrorMessage(error)}
           </p>
@@ -49,13 +49,13 @@ const StartupScreen = () => {
               currentDirQuery.refetch()
             }}
           />
-        </StartupScreenInner>
+        </StartupPageInner>
       )}
     >
       {(currentDir) => {
         if (!currentDir) {
           return (
-            <StartupScreenInner className={cn('col-start-2')}>
+            <StartupPageInner className={cn('col-start-2')}>
               <p className={cn('text-lg text-light-950')}>
                 No folder currently open.
               </p>
@@ -76,7 +76,7 @@ const StartupScreen = () => {
                 variant="plain"
                 status="neutral"
               />
-            </StartupScreenInner>
+            </StartupPageInner>
           )
         }
 
@@ -93,7 +93,7 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
   const openFolder = useOpenFolder()
 
   return (
-    <StartupScreenInner className={cn('col-start-2')}>
+    <StartupPageInner className={cn('col-start-2')}>
       <Marquee className={cn('text-lg text-light-500')}>
         <FilePath
           filepath={currentDir.path}
@@ -141,11 +141,11 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
           status="neutral"
         />
       </div>
-    </StartupScreenInner>
+    </StartupPageInner>
   )
 }
 
-const StartupScreenInner = (props: ComponentProps<'div'>) => {
+const StartupPageInner = (props: ComponentProps<'div'>) => {
   const { children, ...divProps } = props
 
   return (
@@ -166,4 +166,4 @@ const StartupScreenInner = (props: ComponentProps<'div'>) => {
   )
 }
 
-export { StartupScreen }
+export { StartupPage }

@@ -2,7 +2,7 @@ import { IconPlaylistAdd, IconPlus } from '@tabler/icons-react'
 import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import { NOT_STAGED_FILE_TYPES } from '@/widgets/WorktreeChanges/NotStaged'
+import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStaged'
 
 import type { Action } from '@/state/actions'
 

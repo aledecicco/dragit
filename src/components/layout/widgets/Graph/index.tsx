@@ -3,7 +3,7 @@ import * as Ariakit from '@ariakit/react'
 import { defaultRangeExtractor, type Range } from '@tanstack/react-virtual'
 import { match } from 'ts-pattern'
 
-import { SvgOverlay } from '@/widgets/Graph/SvgOverlay'
+import { SvgOverlay } from '@/layout/widgets/Graph/SvgOverlay'
 
 import { useCheckout } from '@/api/mutations/checkout'
 import { useMakeBranchOff } from '@/api/mutations/createBranch'

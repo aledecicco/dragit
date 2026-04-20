@@ -8,6 +8,7 @@ import { cn, propsWithCn } from '@/utils/styles'
 import { LARGE_DIFF_THRESHOLD } from '../FileViewer/Diff'
 import { CheckboxSetting } from './CheckboxSetting'
 import { SettingsDialogSection } from './Section'
+import { ShortcutSetting } from './ShortcutSetting'
 import { TextSetting } from './TextSetting'
 
 const SETTINGS_DIALOG_KEY = 'settings_dialog'
@@ -101,11 +102,9 @@ const SettingsDialog = (props: SettingsDialogProps) => {
               </SettingsDialogSection>
 
               <SettingsDialogSection label="Shortcuts">
-                <TextSetting
-                  label="Stage all"
+                <ShortcutSetting
+                  action="stage all changes"
                   setting="stageAllShortcut"
-                  contentBefore="Press "
-                  contentAfter=" to stage all changes"
                 />
                 <TextSetting
                   label="Commit"
