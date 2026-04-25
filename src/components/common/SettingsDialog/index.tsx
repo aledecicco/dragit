@@ -125,6 +125,10 @@ const SettingsDialog = (props: SettingsDialogProps) => {
                   setting="commitShortcut"
                 />
                 <ShortcutSetting
+                  action="amend the last commit"
+                  setting="amendShortcut"
+                />
+                <ShortcutSetting
                   action="push changes to the current branch"
                   setting="pushShortcut"
                 />

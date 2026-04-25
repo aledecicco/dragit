@@ -14,6 +14,7 @@ import { useQueryRemotes } from '@/api/queries/remotes'
 import { showRemotesDialog } from '@/common/RemotesDialog'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
+import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/settings'
 import {
@@ -64,12 +65,17 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
   const makeFetchRemote = useMakeFetchRemote()
   const fetchRemote = upstream ? makeFetchRemote(upstream.remote) : undefined
 
-  const { autoFetchRemote } = useSettings()
+  const settings = useSettings()
   useInterval(() => {
-    if (autoFetchRemote && fetchRemote) {
+    if (settings.autoFetchRemote && fetchRemote) {
       triggerInteraction({ action: fetchRemote })
     }
   }, 1 * MS_IN_MINUTE)
+  useShortcutBinding(settings.refreshShortcut, () => {
+    if (fetchRemote) {
+      triggerInteraction({ action: fetchRemote })
+    }
+  })
 
   return (
     <div

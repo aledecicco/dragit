@@ -13,6 +13,9 @@ import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractionHandler } from '@/lib/InteractionHandler'
+import { useShortcutBinding } from '@/lib/Shortcuts/utils'
+import { type AnyInteraction, triggerInteraction } from '@/state/actions'
+import { useSettings } from '@/state/settings'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateInfo } from '@/utils/time'
@@ -35,8 +38,64 @@ interface GraphCommitCardProps extends Ariakit.ButtonProps {
 const GraphCommitCard = (props: GraphCommitCardProps) => {
   const { commitInfo, isCurrent = false, ...buttonProps } = props
 
+  const interactions = useInteractions(commitInfo)
+
+  return isCurrent ? (
+    <CurrentGraphCommitCard
+      commitInfo={commitInfo}
+      interactions={interactions}
+      {...buttonProps}
+    />
+  ) : (
+    <GraphCommitCardInner
+      commitInfo={commitInfo}
+      interactions={interactions}
+      {...buttonProps}
+    />
+  )
+}
+
+const CurrentGraphCommitCard = (
+  props: Omit<GraphCommitCardProps, 'isCurrent'> & {
+    interactions: AnyInteraction[][]
+  },
+) => {
+  const { commitInfo, interactions, ...buttonProps } = props
+
+  const amend = useAmend()
+  const settings = useSettings()
+
+  useShortcutBinding(settings.amendShortcut, () => {
+    triggerInteraction({
+      action: amend,
+      argsRequester: () => requestCommitParams(commitInfo.message ?? '', true),
+    })
+  })
+
+  return (
+    <GraphCommitCardInner
+      commitInfo={commitInfo}
+      interactions={[
+        group(
+          interaction({
+            action: amend,
+          }),
+        ),
+        ...interactions,
+      ]}
+      {...buttonProps}
+    />
+  )
+}
+
+const GraphCommitCardInner = (
+  props: Omit<GraphCommitCardProps, 'isCurrent'> & {
+    interactions: AnyInteraction[][]
+  },
+) => {
+  const { commitInfo, interactions, ...buttonProps } = props
+
   const committedTime = useDateInfo(commitInfo.timestamp)
-  const interactions = useInteractions(commitInfo, isCurrent)
 
   return (
     <Draggable
@@ -99,21 +158,13 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
   )
 }
 
-const useInteractions = (commit: CommitInfo, isCurrent: boolean) => {
+const useInteractions = (commit: CommitInfo) => {
   const createBranch = useCreateBranchAt(commit.id)
   const branchOff = useBranchOff(commit.id)
   const merge = useMergeCommit(commit.id)
-  const amend = useAmend()
   const tag = useTagCommit(commit)
 
   return [
-    group(
-      isCurrent &&
-        interaction({
-          action: amend,
-          argsRequester: () => requestCommitParams(commit.message ?? '', true),
-        }),
-    ),
     group(
       interaction({
         action: createBranch,
