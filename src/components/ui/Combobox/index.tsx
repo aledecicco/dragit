@@ -104,7 +104,7 @@ const ComboboxInner = (props: ComboboxProps) => {
               {...propsWithCn(
                 buttonProps,
                 'min-w-0 group/combobox gap-2 text-sm',
-                !value && 'font-thin text-light-300',
+                !value && 'font-light text-light-300',
               )}
             />
           }

@@ -100,6 +100,7 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
       onKeyDown={(e) => {
         commandMenuProps.onKeyDown?.(e)
 
+        // TODO: should these be handled through the shortcuts system instead of manually here?
         if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
           e.preventDefault()
           e.stopPropagation()

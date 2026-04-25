@@ -14,8 +14,10 @@ import { BranchToolbar } from '@/common/BranchToolbar'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
+import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
 import { changeSelectedBase, useSelectedBase } from '@/state/branches'
+import { useSettings } from '@/state/settings'
 import { useVirtualizer } from '@/utils/performance'
 import {
   useBranch,
@@ -204,9 +206,18 @@ const GraphInner = () => {
     overscan: 3,
   })
 
+  const ref = useRef<HTMLDivElement>(null)
+  const settings = useSettings()
+  useShortcutBinding(settings.focusGraphShortcut, () => {
+    ref.current?.focus()
+  })
+
   return (
     <Ariakit.CompositeProvider focusLoop="horizontal" focusShift>
       <Ariakit.Composite
+        ref={ref}
+        focusable
+        className={cn('border border-transparent focus:border-dark-100')}
         render={
           <ScrollShadowDiv
             isScrolled={
@@ -228,6 +239,7 @@ const GraphInner = () => {
           className={cn(
             'overflow-auto scroll-smooth w-full h-full bg-dark-800/80',
             'will-change-transform',
+            'border border-transparent focus:border-dark-100',
           )}
         >
           <SvgOverlay

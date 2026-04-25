@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import * as Ariakit from '@ariakit/react'
 
+import { useShortcutScopesHandler } from '@/lib/Shortcuts/utils'
 import { showDialog } from '@/state/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { DialogContent } from '@/ui/Dialog/Content'
@@ -20,6 +22,18 @@ interface SettingsDialogProps extends Omit<DialogProps, 'dialogKey'> {}
  */
 const SettingsDialog = (props: SettingsDialogProps) => {
   const { ...dialogProps } = props
+
+  const scopesHandler = useShortcutScopesHandler()
+
+  useEffect(() => {
+    // When the settings dialog is open, we disable the 'global' shortcut scope
+    // to prevent shortcuts from being triggered while the user is interacting with the settings.
+    scopesHandler.disableScope('global')
+
+    return () => {
+      scopesHandler.enableScope('global')
+    }
+  }, [scopesHandler])
 
   return (
     <Dialog

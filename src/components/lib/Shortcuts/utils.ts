@@ -11,18 +11,21 @@ import { requestCommitParams } from '@/common/CommitDialog'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/settings'
 
-export type ShortcutScope = 'app'
+export type ShortcutScope = 'app' | 'global'
 
 /**
  * Binds a callback to the given hotkey.
  *
  * @returns A ref that can be attached to a component to require it to be focused for the shortcut to work.
  */
-export const useShortcutBinding = (hotkey: string, callback: () => void) => {
-  const scope: ShortcutScope = 'app'
-
+export const useShortcutBinding = (
+  hotkey: string,
+  callback: () => void,
+  scope: ShortcutScope = 'app',
+) => {
   return useHotkeys(hotkey, callback, {
     scopes: [scope],
+    enableOnFormTags: true,
   })
 }
 
@@ -110,7 +113,7 @@ export const formatShortcut = (keys: Set<string>) => {
 }
 
 /**
- * Binds the configured global shortcuts to their respective actions.
+ * Binds the configured shortcuts to their respective actions.
  */
 export const useShortcutsSync = () => {
   const settings = useSettings()
@@ -144,9 +147,4 @@ export const useShortcutsSync = () => {
   useShortcutBinding(settings.pushShortcut, () => {})
   useShortcutBinding(settings.pullShortcut, () => {})
   useShortcutBinding(settings.refreshShortcut, () => {})
-  useShortcutBinding(settings.focusUnstagedShortcut, () => {})
-  useShortcutBinding(settings.focusStagedShortcut, () => {})
-  useShortcutBinding(settings.focusBranchesShortcut, () => {})
-  useShortcutBinding(settings.focusStashesShortcut, () => {})
-  useShortcutBinding(settings.focusGraphShortcut, () => {})
 }

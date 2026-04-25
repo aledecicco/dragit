@@ -36,13 +36,13 @@ const MultiSelectInner = (props: MultiSelectProps) => {
   const { setSelection } = useSelectionUpdater()
   const ref = useRef<HTMLDivElement>(null)
 
+  const composite = Ariakit.useCompositeStore({ store })
+
   useClickAway(ref, () => {
     if (!document.querySelector('[role="menu"], [role="dialog"]')) {
       setSelection([])
     }
   })
-
-  const composite = Ariakit.useCompositeStore({ store })
 
   return (
     <Ariakit.Composite
@@ -93,8 +93,8 @@ const MultiSelectInner = (props: MultiSelectProps) => {
       aria-multiselectable
       {...compositeProps}
       render={children}
-      ref={mergeRefs([ref, compositeProps.ref])}
       focusable
+      ref={mergeRefs([ref, compositeProps.ref])}
     />
   )
 }

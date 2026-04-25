@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react'
+import { type ComponentProps, useRef } from 'react'
 import { IconArchive } from '@tabler/icons-react'
 
 import type { StashInfo } from '@/api/models'
@@ -10,6 +10,7 @@ import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
+import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/settings'
 import { Accordion } from '@/ui/Accordion'
@@ -41,6 +42,13 @@ const StashesList = (props: StashesListProps) => {
   const getStashesListActions = useGetStashesListActions()
 
   const stash = useStashFiles()
+
+  const ref = useRef<HTMLDivElement>(null)
+  const settings = useSettings()
+  useShortcutBinding(settings.focusStashesShortcut, () => {
+    ref.current?.focus()
+    accordionHandler.store.setOpen(true)
+  })
 
   return (
     <Draggable
@@ -76,6 +84,7 @@ const StashesList = (props: StashesListProps) => {
             }}
           >
             <MultiInteraction
+              ref={ref}
               items={stashesQuery.data ?? []}
               getActions={getStashesListActions}
               getDragPayload={getDragPayload}

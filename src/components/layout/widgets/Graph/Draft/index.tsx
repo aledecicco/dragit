@@ -103,6 +103,7 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
                   className={cn(
                     'border border-dark-100 bg-dark-600 rounded-sm',
                     'w-full h-full',
+                    'focus:bg-dark-500 focus:border-light-950/30',
                   )}
                 >
                   <div

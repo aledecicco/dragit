@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react'
+import { type ComponentProps, useRef } from 'react'
 import { IconGitBranch, IconTags } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
@@ -16,7 +16,9 @@ import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { QueryList } from '@/lib/QueryList'
+import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
+import { useSettings } from '@/state/settings'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
 import { Tab } from '@/ui/Tabs/Item'
@@ -40,11 +42,11 @@ const BranchesList = (props: BranchesListProps) => {
   const remoteBranchesQuery = useQueryBranches('remote')
   const tagsQuery = useQueryTags()
 
-  const { store, selectedTab } = useTabsHandler('local', {
+  const tabsHandler = useTabsHandler('local', {
     selectOnMove: false,
   })
 
-  const currentBranchesQuery = match(selectedTab)
+  const currentBranchesQuery = match(tabsHandler.selectedTab)
     .with('local', () => localBranchesQuery)
     .with('remote', () => remoteBranchesQuery)
     .otherwise(() => allBranchesQuery)
@@ -55,6 +57,19 @@ const BranchesList = (props: BranchesListProps) => {
   const makeTagCommit = useMakeTagCommit()
   const makeCreateBranchAt = useMakeCreateBranchAt()
 
+  const ref = useRef<HTMLDivElement>(null)
+  const settings = useSettings()
+  useShortcutBinding(settings.focusBranchesShortcut, () => {
+    if (
+      ref.current === document.activeElement ||
+      ref.current?.contains(document.activeElement)
+    ) {
+      tabsHandler.store.setSelectedId(tabsHandler.store.next())
+    } else {
+      ref.current?.focus()
+    }
+  })
+
   return (
     <DropArea
       {...propsWithCn(
@@ -63,7 +78,7 @@ const BranchesList = (props: BranchesListProps) => {
       )}
       acceptedTypes={['commit']}
       label={
-        selectedTab === 'tags'
+        tabsHandler.selectedTab === 'tags'
           ? {
               commit: 'tag this commit',
             }
@@ -72,7 +87,7 @@ const BranchesList = (props: BranchesListProps) => {
             }
       }
       handleDrop={(payload) => {
-        if (selectedTab === 'tags') {
+        if (tabsHandler.selectedTab === 'tags') {
           triggerInteraction({
             action: makeTagCommit(payload.dragged),
             argsRequester: () =>
@@ -88,14 +103,14 @@ const BranchesList = (props: BranchesListProps) => {
       }}
     >
       <Tabs
-        store={store}
+        store={tabsHandler.store}
         list={
           <>
             <Draggable
               className={cn('border-none')}
               dragPayload={getBranchesDragPayload(localBranchesQuery.data)}
               onBeforeDrag={() => {
-                store.setSelectedId('local')
+                tabsHandler.store.setSelectedId('local')
               }}
             >
               <Tab id="local">
@@ -110,7 +125,7 @@ const BranchesList = (props: BranchesListProps) => {
               className={cn('border-none')}
               dragPayload={getBranchesDragPayload(remoteBranchesQuery.data)}
               onBeforeDrag={() => {
-                store.setSelectedId('remote')
+                tabsHandler.store.setSelectedId('remote')
               }}
             >
               <Tab id="remote">
@@ -125,7 +140,7 @@ const BranchesList = (props: BranchesListProps) => {
               className={cn('border-none')}
               dragPayload={getBranchesDragPayload(allBranchesQuery.data)}
               onBeforeDrag={() => {
-                store.setSelectedId('all')
+                tabsHandler.store.setSelectedId('all')
               }}
             >
               <Tab id="all">
@@ -138,7 +153,7 @@ const BranchesList = (props: BranchesListProps) => {
               className={cn('border-none')}
               dragPayload={getTagsDragPayload(tagsQuery.data)}
               onBeforeDrag={() => {
-                store.setSelectedId('tags')
+                tabsHandler.store.setSelectedId('tags')
               }}
             >
               <Tab id="tags" className={cn('ml-auto')}>
@@ -156,8 +171,9 @@ const BranchesList = (props: BranchesListProps) => {
           'w-full bg-dark-800 rounded-sm',
         )}
       >
-        {selectedTab === 'tags' ? (
+        {tabsHandler.selectedTab === 'tags' ? (
           <MultiInteraction
+            ref={ref}
             items={tagsQuery.data ?? []}
             getActions={getTagsListActions}
             getDragPayload={getTagsDragPayload}
@@ -177,12 +193,13 @@ const BranchesList = (props: BranchesListProps) => {
           </MultiInteraction>
         ) : (
           <MultiInteraction
+            ref={ref}
             items={currentBranchesQuery.data ?? []}
             getActions={getBranchesListActions}
             getDragPayload={getBranchesDragPayload}
           >
             <QueryList
-              name={match(selectedTab)
+              name={match(tabsHandler.selectedTab)
                 .with('local', () => 'local branches')
                 .with('remote', () => 'remote branches')
                 .otherwise(() => 'branches')}

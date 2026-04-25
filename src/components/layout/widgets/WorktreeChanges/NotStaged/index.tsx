@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react'
+import { type ComponentProps, useRef } from 'react'
 import { IconFiles } from '@tabler/icons-react'
 
 import type { NotStagedFile, WorktreeFileType } from '@/api/models'
@@ -25,6 +25,7 @@ import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { MultiInteraction } from '@/lib/MultiInteraction'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
+import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
 import {
   setNextPage,
@@ -32,6 +33,7 @@ import {
   useHandleFilesPageSync,
   useWorktreeFilesPage,
 } from '@/state/pages'
+import { useSettings } from '@/state/settings'
 import { Chip } from '@/ui/Chip'
 import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -62,9 +64,15 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
   const getActions = useGetActions()
   const unstage = useUnstageFiles()
 
+  const ref = useRef<HTMLDivElement>(null)
+  const settings = useSettings()
+  useShortcutBinding(settings.focusUnstagedShortcut, () => {
+    ref.current?.focus()
+  })
+
   return (
     <Draggable
-      className={cn('border-none')}
+      className={cn('border-none group/drag')}
       dragPayload={getDragPayload(filesQuery.data?.items)}
     >
       <DropArea
@@ -86,7 +94,15 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
             'py-2 flex flex-row gap-x-2 items-center',
           )}
         >
-          <p>Unstaged Changes</p>
+          <p
+            className={cn(
+              'select-none',
+              'group-focus/drag:underline',
+              'group-data-focus/drag:underline',
+            )}
+          >
+            Unstaged Changes
+          </p>
 
           {showPagination ? (
             <Pagination
@@ -112,6 +128,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
           )}
         >
           <MultiInteraction
+            ref={ref}
             items={filesQuery.data?.items ?? []}
             getActions={getActions}
             getDragPayload={getDragPayload}

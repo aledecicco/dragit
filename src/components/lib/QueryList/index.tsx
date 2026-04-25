@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import * as Ariakit from '@ariakit/react'
 import type { UseQueryResult } from '@tanstack/react-query'
 import { usePrevious } from 'react-use'
 
@@ -16,7 +15,7 @@ interface QueryListProps<T, I> extends Omit<VirtualizedDivProps<I>, 'items'> {
   query: UseQueryResult<T>
 
   /**
-   * The name of the items being displayed, used for fallback messages.
+   * The name of the items being displayed.
    */
   name: string
 
@@ -57,9 +56,6 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
       ? (getItems ? getItems(query.data) : (query.data as I[])).length
       : 0,
   )
-
-  const store = Ariakit.useCompositeContext()
-  const composite = Ariakit.useComboboxStore({ store })
 
   return (
     <QueryLoader
@@ -103,27 +99,21 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
         const items = getItems ? getItems(data) : (data as I[])
 
         return (
-          <Ariakit.Composite
-            store={composite}
-            focusable
-            render={
-              <VirtualizedDiv
-                size="sm"
-                items={items}
-                fallback={
-                  <p
-                    className={cn(
-                      'text-sm text-light-950/50 italic select-none',
-                      'p-3 rounded-md h-full',
-                    )}
-                  >
-                    No {name} found.
-                  </p>
-                }
-                {...virtualizedDivProps}
-                className={cn('h-full px-2', className)}
-              />
+          <VirtualizedDiv
+            size="sm"
+            items={items}
+            fallback={
+              <p
+                className={cn(
+                  'text-sm text-light-950/50 italic select-none',
+                  'p-3 rounded-md h-full',
+                )}
+              >
+                No {name} found.
+              </p>
             }
+            {...virtualizedDivProps}
+            className={cn('h-full px-2', className)}
           />
         )
       }}

@@ -155,7 +155,7 @@ const EditableTextInner = (props: EditableTextInnerProps) => {
           comboboxProps,
           'px-2.5 py-1.75 bg-dark-800 rounded-sm text-sm text-light-800',
           'min-w-0 text-sm',
-          search === undefined && 'font-thin text-light-300',
+          !search && 'font-light',
         )}
         placeholder={comboboxProps.placeholder ?? 'Select...'}
         onBlur={(e) => {

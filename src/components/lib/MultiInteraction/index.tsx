@@ -119,12 +119,15 @@ const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
   return (
     <Draggable
       dragPayload={allItemsPayload}
-      className={cn('border-none')}
-      ref={containerRef}
+      className={cn(
+        'border border-transparent',
+        'focus:border-dark-100',
+        'rounded-[inherit]',
+      )}
+      ref={mergeRefs([ref, containerRef])}
     >
       <ContextMenu
         {...contentProps}
-        ref={mergeRefs([ref])}
         menuId={menuId}
         onContextMenu={(e) => {
           if (selectedItemIndexes.size <= 1) {
