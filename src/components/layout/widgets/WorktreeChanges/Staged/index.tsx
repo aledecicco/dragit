@@ -10,10 +10,10 @@ import {
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
-import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import { MultiInteraction } from '@/lib/MultiInteraction'
+import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
+import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
@@ -60,9 +60,11 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
   })
 
   return (
-    <Draggable
+    <InteractiveListContainer
       className={cn('border-none group/drag')}
-      dragPayload={getDragPayload(filesQuery.data?.items)}
+      items={filesQuery.data?.items ?? []}
+      getActions={getActions}
+      getDragPayload={getDragPayload}
     >
       <DropArea
         {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}
@@ -116,7 +118,7 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
             'w-full bg-dark-800 rounded-sm',
           )}
         >
-          <MultiInteraction
+          <InteractiveSelection
             ref={ref}
             items={filesQuery.data?.items ?? []}
             getActions={getActions}
@@ -135,10 +137,10 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
                 getItemKey: (index: number) => files.items[index].path,
               }))}
             />
-          </MultiInteraction>
+          </InteractiveSelection>
         </div>
       </DropArea>
-    </Draggable>
+    </InteractiveListContainer>
   )
 }
 

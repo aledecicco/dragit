@@ -7,7 +7,7 @@ import { ChangesSummary } from '@/common/DiffSummary'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
-import { InteractionHandler } from '@/lib/InteractionHandler'
+import { InteractiveItem } from '@/lib/Interactive/Item'
 import {
   MultiSelectItem,
   type MultiSelectItemProps,
@@ -42,7 +42,7 @@ const StashesListItem = (props: StashesListItemProps) => {
         Glyph: IconArchive,
       }}
     >
-      <InteractionHandler
+      <InteractiveItem
         interactions={interactions}
         render={
           <MultiSelectItem
@@ -111,7 +111,7 @@ const StashesListItem = (props: StashesListItemProps) => {
             </Marquee>
           </div>
         </div>
-      </InteractionHandler>
+      </InteractiveItem>
     </Draggable>
   )
 }

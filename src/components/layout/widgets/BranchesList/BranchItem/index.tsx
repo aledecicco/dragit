@@ -18,7 +18,7 @@ import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
-import { InteractionHandler } from '@/lib/InteractionHandler'
+import { InteractiveItem } from '@/lib/Interactive/Item'
 import {
   MultiSelectItem,
   type MultiSelectItemProps,
@@ -62,7 +62,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
         Glyph: IconGitBranch,
       }}
     >
-      <InteractionHandler
+      <InteractiveItem
         interactions={interactions}
         render={
           <MultiSelectItem
@@ -124,7 +124,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
             Last modified {lastModified}
           </p>
         </div>
-      </InteractionHandler>
+      </InteractiveItem>
     </Draggable>
   )
 }

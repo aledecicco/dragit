@@ -12,7 +12,7 @@ import { requestTagParams } from '@/common/CreateTagDialog'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
-import { InteractionHandler } from '@/lib/InteractionHandler'
+import { InteractiveItem } from '@/lib/Interactive/Item'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { type AnyInteraction, triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/settings'
@@ -41,7 +41,7 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
   const interactions = useInteractions(commitInfo)
 
   return isCurrent ? (
-    <CurrentGraphCommitCard
+    <CurrentGraphCommitCardInner
       commitInfo={commitInfo}
       interactions={interactions}
       {...buttonProps}
@@ -55,11 +55,12 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
   )
 }
 
-const CurrentGraphCommitCard = (
-  props: Omit<GraphCommitCardProps, 'isCurrent'> & {
-    interactions: AnyInteraction[][]
-  },
-) => {
+interface GraphCommitCardInnerProps
+  extends Omit<GraphCommitCardProps, 'isCurrent'> {
+  interactions: AnyInteraction[][]
+}
+
+const CurrentGraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
   const { commitInfo, interactions, ...buttonProps } = props
 
   const amend = useAmend()
@@ -79,6 +80,8 @@ const CurrentGraphCommitCard = (
         group(
           interaction({
             action: amend,
+            argsRequester: () =>
+              requestCommitParams(commitInfo.message ?? '', true),
           }),
         ),
         ...interactions,
@@ -88,11 +91,7 @@ const CurrentGraphCommitCard = (
   )
 }
 
-const GraphCommitCardInner = (
-  props: Omit<GraphCommitCardProps, 'isCurrent'> & {
-    interactions: AnyInteraction[][]
-  },
-) => {
+const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
   const { commitInfo, interactions, ...buttonProps } = props
 
   const committedTime = useDateInfo(commitInfo.timestamp)
@@ -106,7 +105,7 @@ const GraphCommitCardInner = (
         Glyph: IconGitCommit,
       }}
     >
-      <InteractionHandler
+      <InteractiveItem
         interactions={interactions}
         render={
           <Ariakit.Button
@@ -153,7 +152,7 @@ const GraphCommitCardInner = (
             </p>
           </div>
         </div>
-      </InteractionHandler>
+      </InteractiveItem>
     </Draggable>
   )
 }

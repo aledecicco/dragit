@@ -12,17 +12,20 @@ import {
   CONTEXT_MENU_HANDLER_KEY,
   ContextMenu,
   type ContextMenuEvent,
-} from '../ContextMenu'
-import { Draggable } from '../DragAndDrop/Draggable'
+} from '../../ContextMenu'
+import { Draggable } from '../../DragAndDrop/Draggable'
 import {
   type DragPayload,
   overridePayload,
   useBeforeDrag,
-} from '../DragAndDrop/utils'
-import { MultiSelect, type MultiSelectProps } from '../MultiSelect'
-import { useSelectedItems, useSelectionUpdater } from '../MultiSelect/context'
+} from '../../DragAndDrop/utils'
+import { MultiSelect, type MultiSelectProps } from '../../MultiSelect'
+import {
+  useSelectedItems,
+  useSelectionUpdater,
+} from '../../MultiSelect/context'
 
-interface MultiInteractionProps<T>
+interface InteractiveSelectionProps<T>
   extends Omit<MultiSelectProps, 'itemsCount'> {
   /**
    * Callback that returns the list of ways to interact with the selected items.
@@ -36,38 +39,38 @@ interface MultiInteractionProps<T>
 
   /**
    * Callback that returns the payload to be used when dragging the selected items.
-   *
-   * @param items - The currently selected items.
    */
   getDragPayload: (items: T[]) => DragPayload
 }
 /**
  * A component that allows selecting arbitrary child items and performing actions on all of them.
  */
-const MultiInteraction = <T,>(props: MultiInteractionProps<T>) => {
+const InteractiveSelection = <T,>(props: InteractiveSelectionProps<T>) => {
   const { getActions, items, getDragPayload, children, ...multiSelectProps } =
     props
 
   return (
     <MultiSelect itemsCount={items.length} {...multiSelectProps}>
-      <MultiInteractionInner
+      <InteractiveSelectionInner
         getActions={getActions}
         items={items}
         getDragPayload={getDragPayload}
       >
         {children}
-      </MultiInteractionInner>
+      </InteractiveSelectionInner>
     </MultiSelect>
   )
 }
 
-type MultiInteractionInnerProps<T> = Pick<
-  MultiInteractionProps<T>,
+type InteractiveSelectionInnerProps<T> = Pick<
+  InteractiveSelectionProps<T>,
   'getActions' | 'items' | 'getDragPayload' | 'children'
 > &
   Omit<Ariakit.RoleProps, 'children'>
 
-const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
+const InteractiveSelectionInner = <T,>(
+  props: InteractiveSelectionInnerProps<T>,
+) => {
   const { getActions, items, getDragPayload, children, ref, ...contentProps } =
     props
 
@@ -181,4 +184,4 @@ const MultiInteractionInner = <T,>(props: MultiInteractionInnerProps<T>) => {
   )
 }
 
-export { MultiInteraction, type MultiInteractionProps }
+export { InteractiveSelection, type InteractiveSelectionProps }

@@ -1,7 +1,7 @@
 import { IconUpload } from '@tabler/icons-react'
 
 import type { BranchInfo } from '@/api/models'
-import { useCommitIndex } from '@/api/mutations/commitIndex'
+import { useCommit } from '@/api/mutations/commitIndex'
 import { usePushBranch } from '@/api/mutations/pushBranch'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
@@ -16,7 +16,7 @@ interface SecondaryToolbarProps extends Partial<ToolbarProps> {}
 const SecondaryToolbar = (props: SecondaryToolbarProps) => {
   const { ...toolbarProps } = props
 
-  const commit = useCommitIndex()
+  const commit = useCommit()
   const currentBranch = useCurrentBranch()
 
   return (

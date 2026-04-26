@@ -11,10 +11,10 @@ import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
-import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import { MultiInteraction } from '@/lib/MultiInteraction'
+import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
+import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
@@ -106,9 +106,11 @@ const BranchesList = (props: BranchesListProps) => {
         store={tabsHandler.store}
         list={
           <>
-            <Draggable
+            <InteractiveListContainer
               className={cn('border-none')}
-              dragPayload={getBranchesDragPayload(localBranchesQuery.data)}
+              items={localBranchesQuery.data ?? []}
+              getActions={getBranchesListActions}
+              getDragPayload={getBranchesDragPayload}
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('local')
               }}
@@ -119,11 +121,13 @@ const BranchesList = (props: BranchesListProps) => {
                   {localBranchesQuery.data?.length ?? '...'}
                 </Chip>
               </Tab>
-            </Draggable>
+            </InteractiveListContainer>
 
-            <Draggable
+            <InteractiveListContainer
               className={cn('border-none')}
-              dragPayload={getBranchesDragPayload(remoteBranchesQuery.data)}
+              items={remoteBranchesQuery.data ?? []}
+              getActions={getBranchesListActions}
+              getDragPayload={getBranchesDragPayload}
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('remote')
               }}
@@ -134,11 +138,13 @@ const BranchesList = (props: BranchesListProps) => {
                   {remoteBranchesQuery.data?.length ?? '...'}
                 </Chip>
               </Tab>
-            </Draggable>
+            </InteractiveListContainer>
 
-            <Draggable
+            <InteractiveListContainer
               className={cn('border-none')}
-              dragPayload={getBranchesDragPayload(allBranchesQuery.data)}
+              items={allBranchesQuery.data ?? []}
+              getActions={getBranchesListActions}
+              getDragPayload={getBranchesDragPayload}
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('all')
               }}
@@ -147,11 +153,13 @@ const BranchesList = (props: BranchesListProps) => {
                 All
                 <Chip size="sm">{allBranchesQuery.data?.length ?? '...'}</Chip>
               </Tab>
-            </Draggable>
+            </InteractiveListContainer>
 
-            <Draggable
+            <InteractiveListContainer
               className={cn('border-none')}
-              dragPayload={getTagsDragPayload(tagsQuery.data)}
+              items={tagsQuery.data ?? []}
+              getActions={getTagsListActions}
+              getDragPayload={getTagsDragPayload}
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('tags')
               }}
@@ -160,7 +168,7 @@ const BranchesList = (props: BranchesListProps) => {
                 Tags
                 <Chip size="sm">{tagsQuery.data?.length ?? '...'}</Chip>
               </Tab>
-            </Draggable>
+            </InteractiveListContainer>
           </>
         }
       />
@@ -172,7 +180,7 @@ const BranchesList = (props: BranchesListProps) => {
         )}
       >
         {tabsHandler.selectedTab === 'tags' ? (
-          <MultiInteraction
+          <InteractiveSelection
             ref={ref}
             items={tagsQuery.data ?? []}
             getActions={getTagsListActions}
@@ -190,9 +198,9 @@ const BranchesList = (props: BranchesListProps) => {
                 getItemKey: (index: number) => tags[index].name,
               }))}
             />
-          </MultiInteraction>
+          </InteractiveSelection>
         ) : (
-          <MultiInteraction
+          <InteractiveSelection
             ref={ref}
             items={currentBranchesQuery.data ?? []}
             getActions={getBranchesListActions}
@@ -213,7 +221,7 @@ const BranchesList = (props: BranchesListProps) => {
                 getItemKey: (index: number) => branches[index].name,
               }))}
             />
-          </MultiInteraction>
+          </InteractiveSelection>
         )}
       </div>
     </DropArea>

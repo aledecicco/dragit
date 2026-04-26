@@ -5,10 +5,10 @@ import type { StashInfo } from '@/api/models'
 import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { useStashFiles } from '@/api/mutations/saveStash'
 import { useQueryStashes } from '@/api/queries/stashes'
-import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import { MultiInteraction } from '@/lib/MultiInteraction'
+import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
+import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
@@ -39,7 +39,7 @@ const StashesList = (props: StashesListProps) => {
   })
 
   const stashesQuery = useQueryStashes()
-  const getStashesListActions = useGetStashesListActions()
+  const getActions = useGetActions()
 
   const stash = useStashFiles()
 
@@ -51,9 +51,11 @@ const StashesList = (props: StashesListProps) => {
   })
 
   return (
-    <Draggable
+    <InteractiveListContainer
       className={cn('border-none')}
-      dragPayload={getDragPayload(stashesQuery.data)}
+      items={stashesQuery.data ?? []}
+      getActions={getActions}
+      getDragPayload={getDragPayload}
     >
       <DropArea
         acceptedTypes={['staged-files', 'not-staged-files']}
@@ -83,10 +85,10 @@ const StashesList = (props: StashesListProps) => {
               className: cn('mb-2'),
             }}
           >
-            <MultiInteraction
+            <InteractiveSelection
               ref={ref}
               items={stashesQuery.data ?? []}
-              getActions={getStashesListActions}
+              getActions={getActions}
               getDragPayload={getDragPayload}
             >
               <QueryList
@@ -101,11 +103,11 @@ const StashesList = (props: StashesListProps) => {
                   getItemKey: (index: number) => stashes[index].tracker,
                 }))}
               />
-            </MultiInteraction>
+            </InteractiveSelection>
           </AccordionSection>
         </Accordion>
       </DropArea>
-    </Draggable>
+    </InteractiveListContainer>
   )
 }
 
@@ -116,7 +118,7 @@ const getDragPayload = (stashes: StashInfo[] | undefined): DragPayload => ({
   Glyph: IconArchive,
 })
 
-const useGetStashesListActions = () => {
+const useGetActions = () => {
   const discard = useDiscardStashes()
 
   return () => [[discard]]

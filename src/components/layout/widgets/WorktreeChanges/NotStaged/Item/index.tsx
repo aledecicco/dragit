@@ -18,7 +18,7 @@ import { FilePath } from '@/common/File/Path'
 import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
-import { InteractionHandler } from '@/lib/InteractionHandler'
+import { InteractiveItem } from '@/lib/Interactive/Item'
 import {
   MultiSelectItem,
   type MultiSelectItemProps,
@@ -53,7 +53,7 @@ const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
         Glyph: IconFile,
       }}
     >
-      <InteractionHandler
+      <InteractiveItem
         interactions={interactions}
         render={
           <MultiSelectItem
@@ -85,7 +85,7 @@ const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
             />
           </Marquee>
         </div>
-      </InteractionHandler>
+      </InteractiveItem>
     </Draggable>
   )
 }

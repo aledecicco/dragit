@@ -8,7 +8,7 @@ import { usePushTag } from '@/api/mutations/pushTag'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
-import { InteractionHandler } from '@/lib/InteractionHandler'
+import { InteractiveItem } from '@/lib/Interactive/Item'
 import {
   MultiSelectItem,
   type MultiSelectItemProps,
@@ -43,7 +43,7 @@ const TagsListItem = (props: TagsListItemProps) => {
         Glyph: IconTag,
       }}
     >
-      <InteractionHandler
+      <InteractiveItem
         interactions={interactions}
         render={<MultiSelectItem {...itemProps} />}
       >
@@ -85,7 +85,7 @@ const TagsListItem = (props: TagsListItemProps) => {
             {taggedTime}
           </Marquee>
         </div>
-      </InteractionHandler>
+      </InteractiveItem>
     </Draggable>
   )
 }

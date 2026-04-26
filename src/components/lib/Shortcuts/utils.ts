@@ -5,7 +5,7 @@ import {
 } from 'react-hotkeys-hook'
 
 import { useStageAll } from '@/api/mutations/addToIndex'
-import { useCommitIndex } from '@/api/mutations/commitIndex'
+import { useCommit } from '@/api/mutations/commitIndex'
 import { useUnstageAll } from '@/api/mutations/removeFromIndex'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { triggerInteraction } from '@/state/actions'
@@ -120,7 +120,7 @@ export const useShortcutsSync = () => {
 
   const stageAll = useStageAll()
   const unstageAll = useUnstageAll()
-  const commit = useCommitIndex()
+  const commit = useCommit()
 
   useShortcutBinding(settings.stageAllShortcut, () => {
     triggerInteraction({

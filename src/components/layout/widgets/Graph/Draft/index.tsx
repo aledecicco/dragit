@@ -7,7 +7,7 @@ import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStage
 import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
 
 import { useStageAll } from '@/api/mutations/addToIndex'
-import { useCommitIndex } from '@/api/mutations/commitIndex'
+import { useCommit } from '@/api/mutations/commitIndex'
 import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
@@ -66,7 +66,7 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
     const hasNotStagedChanges = !!notStagedChangesQuery.data?.items.length
 
     const stageAll = useStageAll()
-    const commit = useCommitIndex()
+    const commit = useCommit()
 
     return (
       <div {...divProps} ref={mergeRefs([trackRef, divProps.ref])}>

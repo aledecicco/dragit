@@ -6,10 +6,10 @@ import { MenuItem } from '@/ui/Menu/Item'
 import { Separator } from '@/ui/Separator'
 import { cn, propsWithCn } from '@/utils/styles'
 
-import type { AnyInteraction } from '../ActionButton'
-import { ContextMenu } from '../ContextMenu'
+import type { AnyInteraction } from '../../ActionButton'
+import { ContextMenu } from '../../ContextMenu'
 
-interface InteractionHandlerProps extends Ariakit.RoleProps {
+interface InteractiveItemProps extends Ariakit.RoleProps {
   /**
    * The list of ways to interact with this item.
    */
@@ -19,7 +19,7 @@ interface InteractionHandlerProps extends Ariakit.RoleProps {
 /**
  * An abstract component that's equipped to handle action tracking through different interactions.
  */
-const InteractionHandler = (props: InteractionHandlerProps) => {
+const InteractiveItem = (props: InteractiveItemProps) => {
   const { interactions, children, ...itemProps } = props
 
   const actions = interactions.flatMap((section) =>
@@ -51,4 +51,4 @@ const InteractionHandler = (props: InteractionHandlerProps) => {
   )
 }
 
-export { InteractionHandler, type InteractionHandlerProps }
+export { InteractiveItem, type InteractiveItemProps }
