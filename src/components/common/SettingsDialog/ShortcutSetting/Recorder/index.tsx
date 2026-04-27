@@ -1,12 +1,19 @@
-import { useEffectEvent, useRef } from 'react'
+import { Fragment, useEffectEvent, useRef } from 'react'
 import { IconCancel, IconDeviceFloppy } from '@tabler/icons-react'
 import { useEffectOnce } from 'react-use'
 
 import { useSetSettings } from '@/api/mutations/setSettings'
 import { DecoratedButton } from '@/lib/DecoratedButton'
-import { formatShortcut, type ShortcutRecorder } from '@/lib/Shortcuts/utils'
+import { ShortcutKey } from '@/lib/Shortcuts/Key'
+import {
+  formatShortcut,
+  getShortcutSequence,
+  SHORTCUT_SEPARATOR,
+  type ShortcutRecorder,
+} from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
+import { DialogContent } from '@/ui/Dialog/Content'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { StringSettingKey } from '../../utils'
@@ -43,7 +50,7 @@ const ShortcutSettingRecorder = (props: ShortcutSettingRecorderProps) => {
     triggerInteraction({
       action: setSettings,
       argsRequester: () => ({
-        [setting]: formatShortcut(recorder.recorded),
+        [setting]: formatShortcut(getShortcutSequence(recorder.recorded)),
       }),
     })
     recorder.stop()
@@ -90,8 +97,7 @@ const ShortcutSettingRecorder = (props: ShortcutSettingRecorderProps) => {
       backdrop={<div className={cn('bg-dark-950/95')} />}
       {...propsWithCn(
         dialogProps,
-        'bg-transparent border-none',
-        'flex flex-col items-center gap-6',
+        'bg-transparent border-none max-w-full',
         'text-center',
       )}
       onClose={(e) => {
@@ -99,40 +105,54 @@ const ShortcutSettingRecorder = (props: ShortcutSettingRecorderProps) => {
         recorder.stop()
       }}
     >
-      <p className={cn('text-sm text-light-600')}>
-        Press the desired key combination to{' '}
-        <span className={cn('font-medium text-light-100')}>{action}</span>
-      </p>
-
-      <p
+      <DialogContent
         className={cn(
-          'text-lg text-light-100',
-          recorder.recorded.size === 0 && 'text-light-600',
+          'grid grid-rows-[max-content_1fr_max-content] items-center gap-6 max-w-full max-h-full',
         )}
       >
-        {recorder.recorded.size > 0
-          ? formatShortcut(recorder.recorded)
-          : 'Recording...'}
-      </p>
+        <p className={cn('text-sm text-light-600')}>
+          Press the desired key combination to{' '}
+          <span className={cn('font-medium text-light-100')}>{action}</span>
+        </p>
 
-      <div className={cn('grid grid-cols-2 gap-1')}>
-        <DecoratedButton
-          label="Cancel"
-          Glyph={IconCancel}
-          status="neutral"
-          variant="filled"
-          onClick={() => recorder.stop()}
-        />
-        <DecoratedButton
-          label="Save"
-          Glyph={IconDeviceFloppy}
-          status="primary"
-          variant="filled"
-          onClick={() => {
-            saveRecording()
-          }}
-        />
-      </div>
+        <div
+          className={cn(
+            'flex flex-row justify-center flex-wrap gap-2',
+            'w-full p-4 rounded-md bg-dark-800/75',
+            'overflow-y-auto max-h-full',
+          )}
+        >
+          {recorder.recorded.size > 0 ? (
+            getShortcutSequence(recorder.recorded).map((key, index) => (
+              <Fragment key={key}>
+                {index > 0 && SHORTCUT_SEPARATOR}
+                <ShortcutKey shortcutKey={key} reactive={false} size="lg" />
+              </Fragment>
+            ))
+          ) : (
+            <p className={cn('text-md text-light-900 p-1')}>Recording...</p>
+          )}
+        </div>
+
+        <div className={cn('grid grid-cols-2 gap-1')}>
+          <DecoratedButton
+            label="Cancel"
+            Glyph={IconCancel}
+            status="neutral"
+            variant="filled"
+            onClick={() => recorder.stop()}
+          />
+          <DecoratedButton
+            label="Save"
+            Glyph={IconDeviceFloppy}
+            status="primary"
+            variant="filled"
+            onClick={() => {
+              saveRecording()
+            }}
+          />
+        </div>
+      </DialogContent>
     </Dialog>
   )
 }

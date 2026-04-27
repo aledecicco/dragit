@@ -159,7 +159,7 @@ const ComboboxInner = (props: ComboboxProps) => {
                   .with('xs', () => 'p-1.5 rounded-xs text-xs')
                   .with('sm', () => 'p-1.75 rounded-xs text-xs')
                   .with('md', () => 'p-2 rounded-sm text-sm')
-                  .with('lg', () => 'p-2.5 rounded-sm text-md')
+                  .with('lg', () => 'p-2.5 rounded-sm text-base')
                   .exhaustive(),
               )}
               onKeyDownCapture={(e) => {

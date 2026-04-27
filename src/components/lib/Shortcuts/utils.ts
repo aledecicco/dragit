@@ -13,6 +13,10 @@ import { useSettings } from '@/state/settings'
 
 export type ShortcutScope = 'app' | 'global'
 
+export type ShortcutSequence = string[]
+
+export const SHORTCUT_SEPARATOR = ' + '
+
 /**
  * Binds a callback to the given hotkey.
  *
@@ -80,6 +84,9 @@ export interface ShortcutRecorder {
   reset: () => void
 }
 
+/**
+ * Hook that provides the state and callbacks necessary to record a shortcut key combination.
+ */
 export const useShortcutRecorder = (): ShortcutRecorder => {
   const [recorded, recorder] = useRecordHotkeys()
 
@@ -92,7 +99,12 @@ export const useShortcutRecorder = (): ShortcutRecorder => {
   }
 }
 
-export const formatShortcut = (keys: Set<string>) => {
+/**
+ * Turns a set of keys into a readable shortcut sequence.
+ *
+ * @param keys - The set of keys to format.
+ */
+export const getShortcutSequence = (keys: Set<string>): ShortcutSequence => {
   const modifiers = ['ctrl', 'alt', 'shift', 'meta']
   const sortedKeys = [...keys].sort((a, b) => {
     const aIsModifier = modifiers.includes(a)
@@ -107,9 +119,16 @@ export const formatShortcut = (keys: Set<string>) => {
     return a.localeCompare(b)
   })
 
-  return sortedKeys
-    .map((key) => key.charAt(0).toUpperCase() + key.slice(1))
-    .join(' + ')
+  return sortedKeys.map((key) => key.charAt(0).toUpperCase() + key.slice(1))
+}
+
+/**
+ *  Turns a sequence of keys into a readable shortcut string.
+ *
+ * @param keys - The sequence of keys to format.
+ */
+export const formatShortcut = (keys: ShortcutSequence): string => {
+  return keys.join(SHORTCUT_SEPARATOR)
 }
 
 /**

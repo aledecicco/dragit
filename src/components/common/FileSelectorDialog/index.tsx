@@ -8,7 +8,7 @@ import {
 import { useNeedsPagination } from '@/api/utils'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
-import type { Shortcut } from '@/lib/ShortcutsCheatsheet'
+import type { Shortcut } from '@/lib/Shortcuts/Cheatsheet'
 import { requestValueFromDialog } from '@/lib/ValueRequester/Dialog'
 import {
   setNextPage,
@@ -37,30 +37,18 @@ interface FileSelectorDialogProps<T extends WorktreeFileType>
 
 const SHORTCUTS: Shortcut[] = [
   {
-    keys: [
-      { symbol: 'Ctrl', keyName: 'Control' }, // TODO: Mac key symbol
-      { symbol: '↵', keyName: 'Enter' },
-    ],
-    combined: true,
+    sequence: ['Control', 'Enter'],
     label: 'Use all matches',
   },
 ]
 
 const PAGINATION_SHORTCUTS: Shortcut[] = [
   {
-    keys: [
-      { symbol: 'Ctrl', keyName: 'Control' }, // TODO: Mac key symbol
-      { symbol: 'Q', keyName: 'q' },
-    ],
-    combined: true,
+    sequence: ['Control', 'Q'],
     label: 'Previous page',
   },
   {
-    keys: [
-      { symbol: 'Ctrl', keyName: 'Control' }, // TODO: Mac key symbol
-      { symbol: 'E', keyName: 'e' },
-    ],
-    combined: true,
+    sequence: ['Control', 'E'],
     label: 'Next page',
   },
 ]

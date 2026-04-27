@@ -102,7 +102,7 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
             'absolute top-0 left-0 w-full h-full overflow-hidden',
             'flex flex-col items-center justify-center gap-2 p-4',
             'rounded-md border border-dashed border-primary-400 bg-dark-400',
-            'text-md text-light-950/50 text-center select-none',
+            'text-base text-light-950/50 text-center select-none',
             isDropTarget && 'border-accent-400 bg-dark-300 text-light-950/80',
             disabledByValidation &&
               'border-dark-50 bg-dark-500 text-light-950/30',

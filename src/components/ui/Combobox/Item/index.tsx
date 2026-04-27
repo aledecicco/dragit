@@ -38,7 +38,7 @@ const ComboboxItem = (props: ComboboxItemProps) => {
               .with('xs', () => 'p-1 rounded-xs text-xs')
               .with('sm', () => 'p-1.25 rounded-xs text-xs')
               .with('md', () => 'p-1.5 rounded-sm text-sm')
-              .with('lg', () => 'p-1.75 rounded-sm text-md')
+              .with('lg', () => 'p-1.75 rounded-sm text-base')
               .exhaustive(),
           )}
         />

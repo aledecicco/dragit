@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import * as Ariakit from '@ariakit/react'
 
-import { type Shortcut, ShortcutCheatsheet } from '@/lib/ShortcutsCheatsheet'
+import { type Shortcut, ShortcutCheatsheet } from '@/lib/Shortcuts/Cheatsheet'
 import {
   ValueRequesterDialog,
   type ValueRequesterDialogProps,
@@ -48,18 +48,6 @@ interface CommandMenuProps
   fieldProps?: Partial<Ariakit.ComboboxProps>
 }
 
-export const DEFAULT_SHORTCUTS: Shortcut[] = [
-  { keys: [{ symbol: '↵', keyName: 'Enter' }], label: 'Select' },
-  { keys: [{ symbol: 'Esc', keyName: 'Escape' }], label: 'Cancel' },
-  {
-    keys: [
-      { symbol: '▲', keyName: 'ArrowUp' },
-      { symbol: '▼', keyName: 'ArrowDown' },
-    ],
-    label: 'Navigate',
-  },
-]
-
 /**
  * Dialog that displays a list of command options that can be searched through. Each one triggers an action when selected.
  *
@@ -70,7 +58,7 @@ export const DEFAULT_SHORTCUTS: Shortcut[] = [
 const CommandMenu = (props: CommandMenuProps) => {
   const {
     children,
-    shortcuts = DEFAULT_SHORTCUTS,
+    shortcuts,
     footer,
     onSearchChange,
     fieldProps,
@@ -115,7 +103,7 @@ const CommandMenu = (props: CommandMenuProps) => {
 
       {footer}
 
-      {!!shortcuts.length && (
+      {!!shortcuts?.length && (
         <ShortcutCheatsheet
           shortcuts={shortcuts}
           className={cn('p-2 self-center')}
