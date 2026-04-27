@@ -16,8 +16,9 @@ pub struct Settings {
     pub show_large_diffs: bool,
     pub show_word_diffs: bool,
 
-    pub stage_all_shortcut: String,
-    pub unstage_all_shortcut: String,
+    pub stage_files_shortcut: String,
+    pub unstage_files_shortcut: String,
+    pub stash_files_shortcut: String,
     pub commit_shortcut: String,
     pub amend_shortcut: String,
     pub push_shortcut: String,
@@ -49,8 +50,9 @@ impl Default for Settings {
             show_large_diffs: false,
             show_word_diffs: true,
 
-            stage_all_shortcut: "Ctrl + Shift + A".to_string(),
-            unstage_all_shortcut: "Ctrl + Shift + U".to_string(),
+            stage_files_shortcut: "Ctrl + Shift + A".to_string(),
+            unstage_files_shortcut: "Ctrl + Shift + U".to_string(),
+            stash_files_shortcut: "Ctrl + Shift + S".to_string(),
             commit_shortcut: "Ctrl + Shift + C".to_string(),
             amend_shortcut: "Ctrl + Shift + M".to_string(),
             push_shortcut: "Ctrl + Shift + P".to_string(),

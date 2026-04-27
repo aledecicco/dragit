@@ -117,8 +117,16 @@ const SettingsDialog = (props: SettingsDialogProps) => {
 
               <SettingsDialogSection label="Shortcuts">
                 <ShortcutSetting
-                  action="stage all changes"
-                  setting="stageAllShortcut"
+                  action="choose changes to stage"
+                  setting="stageFilesShortcut"
+                />
+                <ShortcutSetting
+                  action="choose changes to unstage"
+                  setting="unstageFilesShortcut"
+                />
+                <ShortcutSetting
+                  action="choose changes to stash"
+                  setting="stashFilesShortcut"
                 />
                 <ShortcutSetting
                   action="open the commit dialog"
@@ -140,6 +148,7 @@ const SettingsDialog = (props: SettingsDialogProps) => {
                   action="fetch changes from the remote"
                   setting="refreshShortcut"
                 />
+
                 <ShortcutSetting
                   action="focus the graph view"
                   setting="focusGraphShortcut"

@@ -58,9 +58,8 @@ const StashesList = (props: StashesListProps) => {
       getDragPayload={getDragPayload}
     >
       <DropArea
-        acceptedTypes={['staged-files', 'not-staged-files']}
+        acceptedTypes={['not-staged-files']}
         label={{
-          'staged-files': 'stash changes',
           'not-staged-files': 'stash changes',
         }}
         handleDrop={(payload) => {

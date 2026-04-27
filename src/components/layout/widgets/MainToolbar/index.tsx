@@ -2,6 +2,9 @@ import { useStageFiles } from '@/api/mutations/addToIndex'
 import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
 import { useStashFiles } from '@/api/mutations/saveStash'
 import { requestWorktreeFiles } from '@/common/FileSelectorDialog'
+import { useShortcutBinding } from '@/lib/Shortcuts/utils'
+import { triggerInteraction } from '@/state/actions'
+import { useSettings } from '@/state/settings'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 
@@ -20,6 +23,27 @@ const MainToolbar = (props: MainToolbarProps) => {
   const unstageFiles = useUnstageFiles()
   const stashFiles = useStashFiles()
 
+  const settings = useSettings()
+
+  useShortcutBinding(settings.stageFilesShortcut, () => {
+    triggerInteraction({
+      action: stageFiles,
+      argsRequester: () => requestWorktreeFiles(NOT_STAGED_FILE_TYPES),
+    })
+  })
+  useShortcutBinding(settings.unstageFilesShortcut, () => {
+    triggerInteraction({
+      action: unstageFiles,
+      argsRequester: () => requestWorktreeFiles(STAGED_FILE_TYPES),
+    })
+  })
+  useShortcutBinding(settings.stashFilesShortcut, () => {
+    triggerInteraction({
+      action: stashFiles,
+      argsRequester: () => requestWorktreeFiles(NOT_STAGED_FILE_TYPES),
+    })
+  })
+
   return (
     <Toolbar {...toolbarProps} fixed>
       <ToolbarItem
@@ -28,10 +52,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         size="md"
         compact={false}
         action={stageFiles}
-        argsRequester={async () => {
-          const files = await requestWorktreeFiles(NOT_STAGED_FILE_TYPES)
-          return files
-        }}
+        argsRequester={() => requestWorktreeFiles(NOT_STAGED_FILE_TYPES)}
       />
 
       <ToolbarItem
@@ -40,10 +61,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         size="md"
         compact={false}
         action={unstageFiles}
-        argsRequester={async () => {
-          const files = await requestWorktreeFiles(STAGED_FILE_TYPES)
-          return files
-        }}
+        argsRequester={() => requestWorktreeFiles(STAGED_FILE_TYPES)}
       />
 
       <ToolbarItem
@@ -52,10 +70,7 @@ const MainToolbar = (props: MainToolbarProps) => {
         size="md"
         compact={false}
         action={stashFiles}
-        argsRequester={async () => {
-          const files = await requestWorktreeFiles(NOT_STAGED_FILE_TYPES)
-          return files
-        }}
+        argsRequester={() => requestWorktreeFiles(NOT_STAGED_FILE_TYPES)}
       />
     </Toolbar>
   )

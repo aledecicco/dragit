@@ -4,13 +4,6 @@ import {
   useRecordHotkeys,
 } from 'react-hotkeys-hook'
 
-import { useStageAll } from '@/api/mutations/addToIndex'
-import { useCommit } from '@/api/mutations/commitIndex'
-import { useUnstageAll } from '@/api/mutations/removeFromIndex'
-import { requestCommitParams } from '@/common/CommitDialog'
-import { triggerInteraction } from '@/state/actions'
-import { useSettings } from '@/state/settings'
-
 export type ShortcutScope = 'app' | 'global'
 
 export type ShortcutSequence = string[]
@@ -129,32 +122,4 @@ export const getShortcutSequence = (keys: Set<string>): ShortcutSequence => {
  */
 export const formatShortcut = (keys: ShortcutSequence): string => {
   return keys.join(SHORTCUT_SEPARATOR)
-}
-
-/**
- * Binds the configured shortcuts to their respective actions.
- */
-export const useShortcutsSync = () => {
-  const settings = useSettings()
-
-  const stageAll = useStageAll()
-  const unstageAll = useUnstageAll()
-  const commit = useCommit()
-
-  useShortcutBinding(settings.stageAllShortcut, () => {
-    triggerInteraction({
-      action: stageAll,
-    })
-  })
-  useShortcutBinding(settings.unstageAllShortcut, () => {
-    triggerInteraction({
-      action: unstageAll,
-    })
-  })
-  useShortcutBinding(settings.commitShortcut, () => {
-    triggerInteraction({
-      action: commit,
-      argsRequester: requestCommitParams,
-    })
-  })
 }

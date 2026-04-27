@@ -16,7 +16,6 @@ import { useMakeApplyStash } from '@/api/mutations/applyStash'
 import { showSettingsDialog } from '@/common/SettingsDialog'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
-import { useShortcutsSync } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
 import { useBasesSync } from '@/state/branches'
 import { useUpstreamsSync } from '@/state/upstream'
@@ -28,7 +27,6 @@ import { cn } from '@/utils/styles'
 const InRepositoryPage = () => {
   useBasesSync()
   useUpstreamsSync()
-  useShortcutsSync()
 
   const makeApplyStash = useMakeApplyStash()
 

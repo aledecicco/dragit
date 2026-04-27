@@ -39,10 +39,14 @@ const BranchToolbar = (props: BranchToolbarProps) => {
 
   const settings = useSettings()
   useShortcutBinding(settings.pullShortcut, () => {
-    triggerInteraction({ action: isBase ? fastForward : pull })
+    if (!isBase) {
+      triggerInteraction({ action: pull })
+    }
   })
   useShortcutBinding(settings.pushShortcut, () => {
-    triggerInteraction({ action: push })
+    if (!isBase) {
+      triggerInteraction({ action: push })
+    }
   })
 
   return (

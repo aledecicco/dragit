@@ -19,8 +19,9 @@ export interface Settings {
   showLargeDiffs: boolean
   showWordDiffs: boolean
 
-  stageAllShortcut: string
-  unstageAllShortcut: string
+  stageFilesShortcut: string
+  unstageFilesShortcut: string
+  stashFilesShortcut: string
   commitShortcut: string
   amendShortcut: string
   pushShortcut: string

@@ -29,7 +29,7 @@ Stash of ideas in ~planned implementation order:
 - [ ] Delete remote branches and tags
 - [ ] Animations pass
 - [x] Drag and drop shortcuts
-- [ ] Global keyboard shortcuts
+- [x] Global keyboard shortcuts
 - [x] Settings screen
 - [ ] Another pass
 - [ ] Toasts (with lib)
