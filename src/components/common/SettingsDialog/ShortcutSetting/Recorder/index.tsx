@@ -9,6 +9,7 @@ import {
   formatShortcut,
   getShortcutSequence,
   SHORTCUT_SEPARATOR,
+  type ShortcutKeys,
   type ShortcutRecorder,
 } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
@@ -42,7 +43,7 @@ const ShortcutSettingRecorder = (props: ShortcutSettingRecorderProps) => {
   const { action, setting, recorder, ...dialogProps } = props
 
   const setSettings = useSetSettings()
-  const pressedKeys = useRef(new Set<string>())
+  const pressedKeys = useRef<ShortcutKeys>(new Set())
 
   const hasRecording = useEffectEvent(() => recorder.recorded.size > 0)
 

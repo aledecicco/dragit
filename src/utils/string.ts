@@ -49,3 +49,12 @@ export const getPathLocation = (filepath: string) => {
 
   return { filedir, filename }
 }
+
+/**
+ * Capitalizes the first letter of a string.
+ *
+ * @param str  - The string to capitalize.
+ */
+export const capitalize = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}

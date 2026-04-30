@@ -44,7 +44,7 @@ const ShortcutKey = (props: ShortcutsKeyProps) => {
         className={cn(
           'flex items-center justify-center',
           'rounded-sm border-b-[0.5px] border-light-950/30',
-          'text-light-800',
+          'text-light-800 capitalize',
           match(size)
             .with('xs', () => 'h-4.5 min-w-4.5 text-2xs p-1')
             .with('sm', () => 'h-5 min-w-5 text-xs p-1.25')

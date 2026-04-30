@@ -3,8 +3,6 @@ import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { usePullBranch, useRebaseBranch } from '@/api/mutations/pullBranch'
 import { useForcePushBranch, usePushBranch } from '@/api/mutations/pushBranch'
 import { interaction } from '@/lib/ActionButton/utils'
-import { useShortcutBinding } from '@/lib/Shortcuts/utils'
-import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/settings'
 import { useSelectedUpstream } from '@/state/upstream'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
@@ -38,16 +36,6 @@ const BranchToolbar = (props: BranchToolbarProps) => {
   const upstream = useSelectedUpstream(branch)
 
   const settings = useSettings()
-  useShortcutBinding(settings.pullShortcut, () => {
-    if (!isBase) {
-      triggerInteraction({ action: pull })
-    }
-  })
-  useShortcutBinding(settings.pushShortcut, () => {
-    if (!isBase) {
-      triggerInteraction({ action: push })
-    }
-  })
 
   return (
     <Toolbar {...toolbarProps} fixed>
@@ -70,6 +58,7 @@ const BranchToolbar = (props: BranchToolbarProps) => {
           branch.type !== 'local' ||
           !upstream
         }
+        shortcut={isBase ? undefined : settings.pullShortcut}
       />
       <ToolbarItem
         compact
@@ -90,6 +79,7 @@ const BranchToolbar = (props: BranchToolbarProps) => {
           branch.type !== 'local' ||
           !upstream
         }
+        shortcut={isBase ? undefined : settings.pushShortcut}
       />
     </Toolbar>
   )

@@ -11,9 +11,6 @@ import { useCommit } from '@/api/mutations/commitIndex'
 import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
-import { useShortcutBinding } from '@/lib/Shortcuts/utils'
-import { triggerInteraction } from '@/state/actions'
-import { useSettings } from '@/state/settings'
 import { Marquee } from '@/ui/Marquee'
 import { Toolbar } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
@@ -42,15 +39,6 @@ interface DraftCommitProps extends ComponentProps<'div'> {
  */
 const DraftCommit = (props: DraftCommitProps) => {
   const { parentId, ...divProps } = props
-
-  const commit = useCommit()
-  const settings = useSettings()
-  useShortcutBinding(settings.commitShortcut, () => {
-    triggerInteraction({
-      action: commit,
-      argsRequester: requestCommitParams,
-    })
-  })
 
   return (
     <DraftCommitInner

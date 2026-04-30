@@ -4,6 +4,7 @@ import type { BranchInfo } from '@/api/models'
 import { useCommit } from '@/api/mutations/commitIndex'
 import { usePushBranch } from '@/api/mutations/pushBranch'
 import { requestCommitParams } from '@/common/CommitDialog'
+import { useSettings } from '@/state/settings'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 import { useCurrentBranch } from '@/utils/repository'
@@ -19,6 +20,8 @@ const SecondaryToolbar = (props: SecondaryToolbarProps) => {
   const commit = useCommit()
   const currentBranch = useCurrentBranch()
 
+  const settings = useSettings()
+
   return (
     <Toolbar {...toolbarProps} fixed>
       <ToolbarItem
@@ -28,6 +31,7 @@ const SecondaryToolbar = (props: SecondaryToolbarProps) => {
         compact={false}
         action={commit}
         argsRequester={requestCommitParams}
+        shortcut={settings.commitShortcut}
       />
 
       {currentBranch ? (

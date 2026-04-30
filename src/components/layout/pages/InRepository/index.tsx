@@ -90,7 +90,7 @@ const InRepositoryPage = () => {
 
       <div
         className={cn(
-          'grid grid-rows-[max-content_1fr_max-content] gap-4 overflow-hidden',
+          'grid grid-rows-[max-content_1fr_max-content] gap-4',
           'relative',
         )}
       >

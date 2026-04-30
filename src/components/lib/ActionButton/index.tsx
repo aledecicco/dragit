@@ -15,6 +15,7 @@ import { cn } from '@/utils/styles'
 import type { Size } from '@/utils/types'
 
 import { DecoratedButton, type DecoratedButtonProps } from '../DecoratedButton'
+import { ShortcutIndicator } from '../Shortcuts/Indicator'
 import { useActionButtonAction } from './utils'
 
 type BaseActionButtonProps = Partial<DecoratedButtonProps> & {
@@ -29,6 +30,11 @@ type BaseActionButtonProps = Partial<DecoratedButtonProps> & {
    * When selected, they are run and tracked like the main action.
    */
   alternatives?: AnyInteraction[]
+
+  /**
+   * Shortcut that triggers the main action.
+   */
+  shortcut?: string
 }
 
 type ActionButtonProps<T> = BaseActionButtonProps & Interaction<T>
@@ -44,8 +50,9 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     argsRequester,
     isDangerous,
     details,
-    alternatives,
     menuButtonProps,
+    alternatives,
+    shortcut,
     ...buttonProps
   } = props
 
@@ -55,6 +62,16 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
   )
   const actionStatus = useActionStatuses(activeAction)
 
+  const triggerAction = () => {
+    if (actionStatus === 'idle') {
+      if (argsRequester) {
+        triggerInteraction({ action, argsRequester, isDangerous, details })
+      } else {
+        triggerInteraction({ action, isDangerous, details })
+      }
+    }
+  }
+
   const commonProps: Partial<DecoratedButtonProps> = {
     ...buttonProps,
 
@@ -62,18 +79,11 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
 
     onClick: async (e: MouseEvent<HTMLButtonElement>) => {
       buttonProps.onClick?.(e)
-
-      if (actionStatus === 'idle') {
-        if (argsRequester) {
-          triggerInteraction({ action, argsRequester, isDangerous, details })
-        } else {
-          triggerInteraction({ action, isDangerous, details })
-        }
-      }
+      triggerAction()
     },
   }
 
-  return alternatives ? (
+  const button = alternatives ? (
     <SplitButton
       {...commonProps}
       track={activeAction}
@@ -106,6 +116,17 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     />
   ) : (
     <DecoratedButton {...commonProps} track={activeAction} />
+  )
+
+  return shortcut ? (
+    <ShortcutIndicator
+      hotkey={shortcut}
+      render={button}
+      action={() => triggerAction()}
+      status={commonProps.status}
+    />
+  ) : (
+    button
   )
 }
 

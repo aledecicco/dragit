@@ -4,11 +4,16 @@ import {
   useRecordHotkeys,
 } from 'react-hotkeys-hook'
 
+import { capitalize } from '@/utils/string'
+
 export type ShortcutScope = 'app' | 'global'
 
 export type ShortcutSequence = string[]
 
+export type ShortcutKeys = Set<string>
+
 export const SHORTCUT_SEPARATOR = ' + '
+export const SHORTCUT_MODIFIERS = ['ctrl', 'shift', 'alt', 'meta']
 
 /**
  * Binds a callback to the given hotkey.
@@ -59,7 +64,7 @@ export interface ShortcutRecorder {
   /**
    * The set of keys recorded so far.
    */
-  recorded: Set<string>
+  recorded: ShortcutKeys
 
   /**
    * Callback to start listening for key presses.
@@ -93,15 +98,21 @@ export const useShortcutRecorder = (): ShortcutRecorder => {
 }
 
 /**
- * Turns a set of keys into a readable shortcut sequence.
- *
- * @param keys - The set of keys to format.
+ * Gets a set of keys from a hotkey string.
  */
-export const getShortcutSequence = (keys: Set<string>): ShortcutSequence => {
-  const modifiers = ['ctrl', 'alt', 'shift', 'meta']
+export const getShortcutKeys = (hotkey: string): ShortcutKeys => {
+  return new Set(
+    hotkey.split(SHORTCUT_SEPARATOR).map((key) => key.toLowerCase()),
+  )
+}
+
+/**
+ * Turns a set of keys into a readable shortcut sequence.
+ */
+export const getShortcutSequence = (keys: ShortcutKeys): ShortcutSequence => {
   const sortedKeys = [...keys].sort((a, b) => {
-    const aIsModifier = modifiers.includes(a)
-    const bIsModifier = modifiers.includes(b)
+    const aIsModifier = SHORTCUT_MODIFIERS.includes(a)
+    const bIsModifier = SHORTCUT_MODIFIERS.includes(b)
 
     if (aIsModifier && !bIsModifier) return -1
     if (!aIsModifier && bIsModifier) return 1
@@ -112,14 +123,12 @@ export const getShortcutSequence = (keys: Set<string>): ShortcutSequence => {
     return a.localeCompare(b)
   })
 
-  return sortedKeys.map((key) => key.charAt(0).toUpperCase() + key.slice(1))
+  return sortedKeys
 }
 
 /**
  *  Turns a sequence of keys into a readable shortcut string.
- *
- * @param keys - The sequence of keys to format.
  */
 export const formatShortcut = (keys: ShortcutSequence): string => {
-  return keys.join(SHORTCUT_SEPARATOR)
+  return keys.map(capitalize).join(SHORTCUT_SEPARATOR)
 }

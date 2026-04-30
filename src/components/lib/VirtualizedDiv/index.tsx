@@ -70,10 +70,6 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
     ...options,
   })
 
-  if (!items?.length) {
-    return fallback
-  }
-
   return (
     <ScrollShadowDiv
       isScrolled={
@@ -91,21 +87,25 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
         ref={scrollContainerRef}
         className={cn('overflow-y-auto w-full max-h-full scroll-smooth')}
       >
-        <div
-          className={cn('w-full relative')}
-          style={{ height: virtualizer.totalSize }}
-        >
-          {virtualizer.virtualItems.map((virtualRow) => (
-            <VirtualizedDivItem
-              key={virtualRow.key}
-              itemSize={itemSize}
-              position={virtualRow.start}
-              {...itemProps}
-            >
-              {renderItem(items[virtualRow.index], virtualRow.index)}
-            </VirtualizedDivItem>
-          ))}
-        </div>
+        {items?.length ? (
+          <div
+            className={cn('w-full relative')}
+            style={{ height: virtualizer.totalSize }}
+          >
+            {virtualizer.virtualItems.map((virtualRow) => (
+              <VirtualizedDivItem
+                key={virtualRow.key}
+                itemSize={itemSize}
+                position={virtualRow.start}
+                {...itemProps}
+              >
+                {renderItem(items[virtualRow.index], virtualRow.index)}
+              </VirtualizedDivItem>
+            ))}
+          </div>
+        ) : (
+          fallback
+        )}
       </div>
     </ScrollShadowDiv>
   )

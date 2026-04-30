@@ -14,7 +14,6 @@ import { useQueryRemotes } from '@/api/queries/remotes'
 import { showRemotesDialog } from '@/common/RemotesDialog'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
-import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/settings'
 import {
@@ -71,11 +70,6 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
       triggerInteraction({ action: fetchRemote })
     }
   }, 1 * MS_IN_MINUTE)
-  useShortcutBinding(settings.refreshShortcut, () => {
-    if (fetchRemote) {
-      triggerInteraction({ action: fetchRemote })
-    }
-  })
 
   return (
     <div
@@ -176,6 +170,7 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
           round
           className={cn('ml-2')}
           action={fetchRemote}
+          shortcut={settings.refreshShortcut}
         />
       )}
 
