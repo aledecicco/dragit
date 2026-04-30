@@ -14,7 +14,6 @@ import {
   SHORTCUT_SEPARATOR,
   useActiveShortcutScopes,
   useShortcutBinding,
-  useShortcutScopesHandler,
 } from '../utils'
 
 export const MODIFIERS = ['Control', 'Shift', 'Alt', 'Meta']

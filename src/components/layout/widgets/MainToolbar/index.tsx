@@ -5,6 +5,7 @@ import { requestWorktreeFiles } from '@/common/FileSelectorDialog'
 import { useSettings } from '@/state/settings'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
+import { propsWithCn } from '@/utils/styles'
 
 import { NOT_STAGED_FILE_TYPES } from '../WorktreeChanges/NotStaged'
 import { STAGED_FILE_TYPES } from '../WorktreeChanges/Staged'
@@ -24,7 +25,7 @@ const MainToolbar = (props: MainToolbarProps) => {
   const settings = useSettings()
 
   return (
-    <Toolbar {...toolbarProps} fixed>
+    <Toolbar {...propsWithCn(toolbarProps, 'grid-cols-[7fr_8fr_7fr]')} fixed>
       <ToolbarItem
         fixed
         status="primary"
