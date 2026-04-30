@@ -82,6 +82,11 @@ const SettingsDialog = (props: SettingsDialogProps) => {
 
               <SettingsDialogSection label="Appearance" className={cn('mb-4')}>
                 <CheckboxSetting
+                  label="Show shortcut indicators"
+                  setting="showShortcutIndicators"
+                  description="Display indicators for available keyboard shortcuts on interactive elements"
+                />
+                <CheckboxSetting
                   label="Relative timestamps"
                   setting="relativeTimestamps"
                   description="e.g. '2 hours ago' instead of exact date"

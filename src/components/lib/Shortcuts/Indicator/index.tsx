@@ -3,6 +3,7 @@ import * as Ariakit from '@ariakit/react'
 import { useKeyPress } from 'react-use'
 import { match } from 'ts-pattern'
 
+import { useSettings } from '@/state/settings'
 import type { ButtonStatus } from '@/ui/Button'
 import { capitalize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -11,7 +12,9 @@ import {
   getShortcutKeys,
   getShortcutSequence,
   SHORTCUT_SEPARATOR,
+  useActiveShortcutScopes,
   useShortcutBinding,
+  useShortcutScopesHandler,
 } from '../utils'
 
 export const MODIFIERS = ['Control', 'Shift', 'Alt', 'Meta']
@@ -78,11 +81,20 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
     action()
   })
 
+  const settings = useSettings()
+  const shortcutScopes = useActiveShortcutScopes()
+
+  const shouldShowIndicator =
+    settings.showShortcutIndicators &&
+    shortcutScopes.includes('app') &&
+    modifiersPressed &&
+    !!keysLeft?.length
+
   return (
     <Ariakit.Role {...propsWithCn(itemProps, 'relative')}>
       {children}
 
-      {modifiersPressed && (
+      {shouldShowIndicator && (
         <div
           className={cn(
             'z-1 absolute -bottom-2 -right-2 rounded-md py-px px-1',

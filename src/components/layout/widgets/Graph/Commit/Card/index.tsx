@@ -13,7 +13,7 @@ import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractiveItem } from '@/lib/Interactive/Item'
-import { useShortcutBinding } from '@/lib/Shortcuts/utils'
+import { ShortcutIndicator } from '@/lib/Shortcuts/Indicator'
 import { type AnyInteraction, triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/settings'
 import { Marquee } from '@/ui/Marquee'
@@ -66,28 +66,32 @@ const CurrentGraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
   const amend = useAmend()
   const settings = useSettings()
 
-  useShortcutBinding(settings.amendShortcut, () => {
-    triggerInteraction({
-      action: amend,
-      argsRequester: () => requestCommitParams(commitInfo.message ?? '', true),
-    })
-  })
-
   return (
-    <GraphCommitCardInner
-      commitInfo={commitInfo}
-      interactions={[
-        group(
-          interaction({
-            action: amend,
-            argsRequester: () =>
-              requestCommitParams(commitInfo.message ?? '', true),
-          }),
-        ),
-        ...interactions,
-      ]}
-      {...buttonProps}
-    />
+    <ShortcutIndicator
+      hotkey={settings.amendShortcut}
+      action={() => {
+        triggerInteraction({
+          action: amend,
+          argsRequester: () =>
+            requestCommitParams(commitInfo.message ?? '', true),
+        })
+      }}
+    >
+      <GraphCommitCardInner
+        commitInfo={commitInfo}
+        interactions={[
+          group(
+            interaction({
+              action: amend,
+              argsRequester: () =>
+                requestCommitParams(commitInfo.message ?? '', true),
+            }),
+          ),
+          ...interactions,
+        ]}
+        {...buttonProps}
+      />
+    </ShortcutIndicator>
   )
 }
 

@@ -8,6 +8,7 @@ pub struct Settings {
     pub confirm_dangerous_actions: bool,
     pub auto_fetch_remote: bool,
 
+    pub show_shortcut_indicators: bool,
     pub relative_timestamps: bool,
     pub sort_branches_by_date: bool,
     pub stashes_open_by_default: bool,
@@ -42,6 +43,7 @@ impl Default for Settings {
             confirm_dangerous_actions: true,
             auto_fetch_remote: false,
 
+            show_shortcut_indicators: true,
             relative_timestamps: true,
             sort_branches_by_date: true,
             stashes_open_by_default: false,

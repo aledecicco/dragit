@@ -11,6 +11,7 @@ export interface Settings {
   confirmDangerousActions: boolean
   autoFetchRemote: boolean
 
+  showShortcutIndicators: boolean
   relativeTimestamps: boolean
   sortBranchesByDate: boolean
   stashesOpenByDefault: boolean

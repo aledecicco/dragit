@@ -132,3 +132,11 @@ export const getShortcutSequence = (keys: ShortcutKeys): ShortcutSequence => {
 export const formatShortcut = (keys: ShortcutSequence): string => {
   return keys.map(capitalize).join(SHORTCUT_SEPARATOR)
 }
+
+/**
+ * Hook that tracks the set of active shortcut scopes.
+ */
+export const useActiveShortcutScopes = (): ShortcutScope[] => {
+  const hotkeysContext = useHotkeysContext()
+  return hotkeysContext.activeScopes as ShortcutScope[]
+}
