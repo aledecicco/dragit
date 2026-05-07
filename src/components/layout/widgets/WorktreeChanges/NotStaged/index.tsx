@@ -3,6 +3,7 @@ import { IconFiles } from '@tabler/icons-react'
 
 import type { NotStagedFile, WorktreeFileType } from '@/api/models'
 import { useStageFiles } from '@/api/mutations/addToIndex'
+import { useDiscardChanges } from '@/api/mutations/discardChanges'
 import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
 import { useStashFiles } from '@/api/mutations/saveStash'
 import {
@@ -70,6 +71,8 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
     ref.current?.focus()
   })
 
+  const discard = useDiscardChanges()
+
   return (
     <InteractiveListContainer
       className={cn('border-none group/drag')}
@@ -134,6 +137,14 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
             items={filesQuery.data?.items ?? []}
             getActions={getActions}
             getDragPayload={getDragPayload}
+            deleteAction={(files) => {
+              triggerInteraction({
+                action: discard,
+                argsRequester: () => files,
+                isDangerous: true,
+                details: `discard changes in ${pluralize('file', files.length, true)}`,
+              })
+            }}
           >
             <QueryList
               name="files with unstaged changes"
@@ -173,6 +184,8 @@ const useGetActions = () => {
   const ignoreDeletions = useIgnoreManyDeletions()
   const acceptNewFiles = useAcceptManyFiles()
   const ignoreNewFiles = useIgnoreManyFiles()
+
+  const discard = useDiscardChanges()
 
   return (files: NotStagedFile[]) => {
     const allBothAddedOrModified = files.every(
@@ -218,7 +231,7 @@ const useGetActions = () => {
       return [[stage]]
     }
 
-    return [[stage, stash]]
+    return [[stage, stash, discard]]
   }
 }
 

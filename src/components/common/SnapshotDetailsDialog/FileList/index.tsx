@@ -26,7 +26,13 @@ const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
   return (
     <Ariakit.RadioProvider store={radio}>
       <Ariakit.RadioGroup
-        {...propsWithCn(radioProps, 'bg-dark-800 rounded-md')}
+        focusable
+        {...propsWithCn(
+          radioProps,
+          'bg-dark-800 rounded-md',
+          'border border-transparent',
+          'focus:border-dark-100',
+        )}
       >
         <QueryList
           name="modified files"

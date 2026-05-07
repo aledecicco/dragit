@@ -70,6 +70,9 @@ const BranchesList = (props: BranchesListProps) => {
     }
   })
 
+  const deleteBranches = useDeleteBranches()
+  const deleteTags = useDeleteTags()
+
   return (
     <DropArea
       {...propsWithCn(
@@ -185,6 +188,14 @@ const BranchesList = (props: BranchesListProps) => {
             items={tagsQuery.data ?? []}
             getActions={getTagsListActions}
             getDragPayload={getTagsDragPayload}
+            deleteAction={(tags) => {
+              triggerInteraction({
+                action: deleteTags,
+                argsRequester: () => tags,
+                isDangerous: true,
+                details: `delete ${tags.length} tags`,
+              })
+            }}
           >
             <QueryList
               name="tags"
@@ -205,6 +216,14 @@ const BranchesList = (props: BranchesListProps) => {
             items={currentBranchesQuery.data ?? []}
             getActions={getBranchesListActions}
             getDragPayload={getBranchesDragPayload}
+            deleteAction={(branches) => {
+              triggerInteraction({
+                action: deleteBranches,
+                argsRequester: () => branches,
+                isDangerous: true,
+                details: `delete ${branches.length} branches`,
+              })
+            }}
           >
             <QueryList
               name={match(tabsHandler.selectedTab)

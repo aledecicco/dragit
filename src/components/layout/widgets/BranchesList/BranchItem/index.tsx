@@ -51,6 +51,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
 
   const interactions = useInteractions(branch)
   const checkout = useCheckoutBranch(branch)
+  const deleteBranch = useDeleteBranch(branch)
 
   return (
     <Draggable
@@ -66,6 +67,15 @@ const BranchesListItem = (props: BranchesListItemProps) => {
         defaultAction={() => {
           if (!isCurrentBranch) {
             triggerInteraction({ action: checkout })
+          }
+        }}
+        deleteAction={() => {
+          if (!isCurrentBranch) {
+            triggerInteraction({
+              action: deleteBranch,
+              isDangerous: true,
+              details: `delete branch "${branch.name}"`,
+            })
           }
         }}
         render={

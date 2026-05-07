@@ -12,7 +12,7 @@ interface ContextMenuEvent extends MouseEvent {
   [CONTEXT_MENU_HANDLER_KEY]?: string
 }
 
-interface ContextMenuProps
+interface WithContextMenuProps
   extends Omit<Ariakit.RoleProps, 'children' | 'render'> {
   children: Ariakit.RoleProps['render']
 
@@ -33,9 +33,9 @@ interface ContextMenuProps
 }
 
 /**
- * A context menu that appears on right-click.
+ * Wrapper that adds a context menu that appears on right-click.
  */
-const ContextMenu = (props: ContextMenuProps) => {
+const WithContextMenu = (props: WithContextMenuProps) => {
   const { children, items, menuProps, menuId, ...anchorProps } = props
 
   const menu = Ariakit.useMenuStore({ focusLoop: true, ...menuProps })
@@ -88,4 +88,4 @@ const ContextMenu = (props: ContextMenuProps) => {
   )
 }
 
-export { ContextMenu, type ContextMenuProps, type ContextMenuEvent }
+export { WithContextMenu, type WithContextMenuProps, type ContextMenuEvent }

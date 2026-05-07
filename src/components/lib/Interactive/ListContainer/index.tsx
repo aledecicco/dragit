@@ -1,8 +1,8 @@
 import { Fragment } from 'react/jsx-runtime'
 
-import { ContextMenu } from '@/lib/ContextMenu'
 import { Draggable, type DraggableProps } from '@/lib/DragAndDrop/Draggable'
 import type { DragPayload, DragType } from '@/lib/DragAndDrop/utils'
+import { WithContextMenu } from '@/lib/WithContextMenu'
 import type { Action } from '@/state/actions'
 import { MenuItem } from '@/ui/Menu/Item'
 import { Separator } from '@/ui/Separator'
@@ -37,7 +37,7 @@ const InteractiveListContainer = <T,>(
 
   return (
     <Draggable {...draggableProps} dragPayload={getDragPayload(items)}>
-      <ContextMenu
+      <WithContextMenu
         onContextMenu={(e) => {
           if (!items.length) {
             e.preventDefault()
@@ -62,7 +62,7 @@ const InteractiveListContainer = <T,>(
           ))}
       >
         {children}
-      </ContextMenu>
+      </WithContextMenu>
     </Draggable>
   )
 }

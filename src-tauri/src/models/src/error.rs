@@ -64,6 +64,9 @@ pub enum GitError {
     #[error("Failed to remove files from tree")]
     RemoveFromTreeFailed {},
 
+    #[error("Failed to discard file changes")]
+    DiscardChangesFailed {},
+
     #[error("Failed to commit the current index")]
     CommitFailed {},
 

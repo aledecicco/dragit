@@ -108,6 +108,9 @@ pub trait GitHandler {
     /// Removes the given list of files from the tree.
     fn remove_from_tree(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
 
+    /// Discards the changes in the given files.
+    fn discard_changes(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
+
     /// Commits the current index with the given message.
     fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError>;
 

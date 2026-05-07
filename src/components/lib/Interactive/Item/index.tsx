@@ -7,7 +7,7 @@ import { Separator } from '@/ui/Separator'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { AnyInteraction } from '../../ActionButton'
-import { ContextMenu } from '../../ContextMenu'
+import { WithContextMenu } from '../../WithContextMenu'
 
 interface InteractiveItemProps extends Ariakit.RoleProps {
   /**
@@ -19,20 +19,26 @@ interface InteractiveItemProps extends Ariakit.RoleProps {
    * The action to trigger by default when this item is double-clicked.
    */
   defaultAction?: () => void
+
+  /**
+   * The action to trigger when this item is deleted.
+   */
+  deleteAction?: () => void
 }
 
 /**
  * An abstract component that's equipped to handle action tracking through different interactions.
  */
 const InteractiveItem = (props: InteractiveItemProps) => {
-  const { interactions, defaultAction, children, ...itemProps } = props
+  const { interactions, defaultAction, deleteAction, children, ...itemProps } =
+    props
 
   const actions = interactions.flatMap((section) =>
     section.map((interaction) => interaction.action),
   )
 
   return (
-    <ContextMenu
+    <WithContextMenu
       items={interactions
         .filter((section) => section.length > 0)
         .map((section, i) => (
@@ -48,15 +54,18 @@ const InteractiveItem = (props: InteractiveItemProps) => {
         {...propsWithCn(itemProps, 'relative')}
         onDoubleClick={(e) => {
           itemProps.onDoubleClick?.(e)
+
           defaultAction?.()
         }}
         onKeyDown={(e) => {
-          console.log(e)
           itemProps.onKeyDown?.(e)
-          console.log('after')
+
           if (e.key === 'Enter') {
-            console.log('in')
             defaultAction?.()
+          }
+
+          if (e.key === 'Delete') {
+            deleteAction?.()
           }
         }}
       >
@@ -67,7 +76,7 @@ const InteractiveItem = (props: InteractiveItemProps) => {
           className={cn('absolute top-1 right-1')}
         />
       </Ariakit.Role>
-    </ContextMenu>
+    </WithContextMenu>
   )
 }
 

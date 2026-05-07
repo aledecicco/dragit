@@ -79,7 +79,6 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
       <Ariakit.Focusable
         ref={viewerRef}
         render={<div />}
-        autoFocus
         className={cn(
           'pl-1 py-1 text-sm overflow-y-auto',
           'grid grid-cols-[max-content_max-content_1fr] grid-rows-[1fr]',

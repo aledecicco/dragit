@@ -1,4 +1,10 @@
-import { Fragment, useEffect, useRef } from 'react'
+import {
+  Fragment,
+  type KeyboardEvent,
+  type MouseEvent,
+  useEffect,
+  useRef,
+} from 'react'
 import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 
@@ -8,11 +14,6 @@ import { MenuItem } from '@/ui/Menu/Item'
 import { Separator } from '@/ui/Separator'
 import { cn } from '@/utils/styles'
 
-import {
-  CONTEXT_MENU_HANDLER_KEY,
-  ContextMenu,
-  type ContextMenuEvent,
-} from '../../ContextMenu'
 import { Draggable } from '../../DragAndDrop/Draggable'
 import {
   type DragPayload,
@@ -24,30 +25,45 @@ import {
   useSelectedItems,
   useSelectionUpdater,
 } from '../../MultiSelect/context'
+import {
+  CONTEXT_MENU_HANDLER_KEY,
+  type ContextMenuEvent,
+  WithContextMenu,
+} from '../../WithContextMenu'
 
 interface InteractiveSelectionProps<T>
   extends Omit<MultiSelectProps, 'itemsCount'> {
-  /**
-   * Callback that returns the list of ways to interact with the selected items.
-   */
-  getActions: (items: T[]) => Action<T[]>[][]
-
   /**
    * The items being interacted with.
    */
   items: T[]
 
   /**
+   * Callback that returns the list of ways to interact with the selected items.
+   */
+  getActions: (items: T[]) => Action<T[]>[][]
+  /**
    * Callback that returns the payload to be used when dragging the selected items.
    */
   getDragPayload: (items: T[]) => DragPayload
+
+  /**
+   * The action to trigger when the selected items are deleted.
+   */
+  deleteAction?: (items: T[]) => void
 }
 /**
  * A component that allows selecting arbitrary child items and performing actions on all of them.
  */
 const InteractiveSelection = <T,>(props: InteractiveSelectionProps<T>) => {
-  const { getActions, items, getDragPayload, children, ...multiSelectProps } =
-    props
+  const {
+    items,
+    getActions,
+    getDragPayload,
+    deleteAction,
+    children,
+    ...multiSelectProps
+  } = props
 
   return (
     <MultiSelect itemsCount={items.length} {...multiSelectProps}>
@@ -55,6 +71,7 @@ const InteractiveSelection = <T,>(props: InteractiveSelectionProps<T>) => {
         getActions={getActions}
         items={items}
         getDragPayload={getDragPayload}
+        deleteAction={deleteAction}
       >
         {children}
       </InteractiveSelectionInner>
@@ -64,15 +81,22 @@ const InteractiveSelection = <T,>(props: InteractiveSelectionProps<T>) => {
 
 type InteractiveSelectionInnerProps<T> = Pick<
   InteractiveSelectionProps<T>,
-  'getActions' | 'items' | 'getDragPayload' | 'children'
+  'getActions' | 'items' | 'getDragPayload' | 'deleteAction' | 'children'
 > &
   Omit<Ariakit.RoleProps, 'children'>
 
 const InteractiveSelectionInner = <T,>(
   props: InteractiveSelectionInnerProps<T>,
 ) => {
-  const { getActions, items, getDragPayload, children, ref, ...contentProps } =
-    props
+  const {
+    getActions,
+    items,
+    getDragPayload,
+    deleteAction,
+    children,
+    ref,
+    ...contentProps
+  } = props
 
   const composite = Ariakit.useCompositeContext()
   const { setSelection } = useSelectionUpdater()
@@ -106,9 +130,9 @@ const InteractiveSelectionInner = <T,>(
       const draggedItem = items.at(itemId)
 
       if (draggedItem) {
-        // If more than one item is selected upon dragging, and the dragged item is among the selected ones,
-        // set the drag payload to include all selected items.
         if (selectedItemIndexes.size > 1 && selectedItemIndexes.has(itemId)) {
+          // If more than one item is selected upon dragging, and the dragged item is among the selected ones,
+          // set the drag payload to include all selected items.
           overridePayload(() => getDragPayload(selectedItems), source, manager)
         } else {
           setSelection(itemId)
@@ -129,9 +153,26 @@ const InteractiveSelectionInner = <T,>(
       )}
       ref={mergeRefs([ref, containerRef])}
     >
-      <ContextMenu
+      <WithContextMenu
         {...contentProps}
         menuId={menuId}
+        onKeyDownCapture={(e) => {
+          if (e.key === 'Delete') {
+            onItemEvent(
+              e,
+              composite?.getState().renderedItems ?? [],
+              selectedItemIndexes,
+              () => {
+                e.stopPropagation()
+                e.preventDefault()
+                deleteAction?.(selectedItems)
+              },
+              (itemIndex) => {
+                setSelection(itemIndex)
+              },
+            )
+          }
+        }}
         onContextMenu={(e) => {
           if (selectedItemIndexes.size < 1) {
             e.preventDefault()
@@ -142,32 +183,21 @@ const InteractiveSelectionInner = <T,>(
           }
         }}
         onContextMenuCapture={(e) => {
-          const target = e.target
-
-          if (!(target instanceof HTMLElement)) {
-            return
-          }
-
-          const itemIndex =
-            composite
-              ?.getState()
-              .renderedItems.findIndex((item) =>
-                item.element?.contains(target),
-              ) ?? -1
-
-          console.log(selectedItemIndexes.has(itemIndex), { itemIndex })
-
-          if (itemIndex >= 0) {
-            if (
-              selectedItemIndexes.size > 1 &&
-              selectedItemIndexes.has(itemIndex)
-            ) {
+          onItemEvent(
+            e,
+            composite?.getState().renderedItems ?? [],
+            selectedItemIndexes,
+            () => {
               const nativeEvent: ContextMenuEvent = e.nativeEvent
               nativeEvent[CONTEXT_MENU_HANDLER_KEY] = menuId
-            }
-          } else {
-            setSelection([...Array(items.length).keys()])
-          }
+            },
+            (itemIndex) => {
+              setSelection(itemIndex)
+            },
+            () => {
+              setSelection([...Array(items.length).keys()])
+            },
+          )
         }}
         items={actions
           .filter((section) => section.length > 0)
@@ -188,9 +218,36 @@ const InteractiveSelectionInner = <T,>(
           ))}
       >
         {children}
-      </ContextMenu>
+      </WithContextMenu>
     </Draggable>
   )
+}
+
+const onItemEvent = (
+  e: MouseEvent | KeyboardEvent,
+  compositeItems: Ariakit.CompositeStoreState['items'],
+  selectedItems: Set<number>,
+  onIncluded?: (item: number) => void,
+  onNotIncluded?: (item: number) => void,
+  onOutside?: () => void,
+) => {
+  const target = e.target
+
+  if (!(target instanceof HTMLElement)) {
+    return
+  }
+  const itemIndex =
+    compositeItems.findIndex((item) => item.element?.contains(target)) ?? -1
+
+  if (itemIndex >= 0) {
+    if (selectedItems.size > 1 && selectedItems.has(itemIndex)) {
+      onIncluded?.(itemIndex)
+    } else {
+      onNotIncluded?.(itemIndex)
+    }
+  } else {
+    onOutside?.()
+  }
 }
 
 export { InteractiveSelection, type InteractiveSelectionProps }

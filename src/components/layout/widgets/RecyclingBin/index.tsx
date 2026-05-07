@@ -4,6 +4,7 @@ import { match } from 'ts-pattern'
 
 import { useDeleteBranches } from '@/api/mutations/deleteBranches'
 import { useDeleteTags } from '@/api/mutations/deleteTags'
+import { useDiscardChanges } from '@/api/mutations/discardChanges'
 import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { triggerInteraction } from '@/state/actions'
@@ -20,6 +21,7 @@ const RecyclingBin = (props: RecyclingBinProps) => {
   const deleteBranches = useDeleteBranches()
   const deleteTags = useDeleteTags()
   const discardStashes = useDiscardStashes()
+  const discardFiles = useDiscardChanges()
 
   return (
     <DropArea
@@ -27,7 +29,15 @@ const RecyclingBin = (props: RecyclingBinProps) => {
       overlayProps={{
         className: cn('border-danger-400'),
       }}
-      acceptedTypes={['branch', 'branches', 'stash', 'stashes', 'tag', 'tags']}
+      acceptedTypes={[
+        'branch',
+        'branches',
+        'stash',
+        'stashes',
+        'tag',
+        'tags',
+        'not-staged-files',
+      ]}
       label={{
         branch: 'delete this branch',
         branches: 'delete these branches',
@@ -35,6 +45,7 @@ const RecyclingBin = (props: RecyclingBinProps) => {
         stashes: 'discard these stashes',
         tag: 'delete this tag',
         tags: 'delete these tags',
+        'not-staged-files': 'discard changes in these files',
       }}
       Glyph={IconTrashFilled}
       handleDrop={(payload) => {
@@ -85,6 +96,14 @@ const RecyclingBin = (props: RecyclingBinProps) => {
               argsRequester: () => dragged,
               isDangerous: true,
               details: `delete ${dragged.length} tags`,
+            })
+          })
+          .with({ type: 'not-staged-files' }, ({ dragged }) => {
+            triggerInteraction({
+              action: discardFiles,
+              argsRequester: () => dragged,
+              isDangerous: true,
+              details: `discard changes in ${dragged.length} files`,
             })
           })
           .exhaustive()

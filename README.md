@@ -33,7 +33,7 @@ Stash of ideas in ~planned implementation order:
 - [x] Global keyboard shortcuts
 - [x] Settings screen
 - [ ] Resolve diff segments in diff viewer
-- [ ] Uncommit, undo changes
+- [x] Uncommit, undo changes
 - [ ] Proper error handling
 - [ ] Toasts (with lib)
 - [ ] Decide on polling vs file watcher

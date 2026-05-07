@@ -438,6 +438,14 @@ impl GitHandler for CmdGit {
             .or(Err(GitError::RemoveFromTreeFailed {}))
     }
 
+    fn discard_changes(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
+        let mut args = vec!["checkout", "--"];
+        args.extend(files);
+
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::DiscardChangesFailed {}))
+    }
+
     fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError> {
         let mut args = vec!["commit", "-m", message];
 

@@ -3,6 +3,7 @@ import { match, P } from 'ts-pattern'
 
 import type { NotStagedFile } from '@/api/models'
 import { useStageFile } from '@/api/mutations/addToIndex'
+import { useDiscardFileChanges } from '@/api/mutations/discardChanges'
 import { useStashFile } from '@/api/mutations/saveStash'
 import {
   useAcceptAsIs,
@@ -23,6 +24,7 @@ import {
   MultiSelectItem,
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
+import { triggerInteraction } from '@/state/actions'
 import { Marquee } from '@/ui/Marquee'
 import { getPathLocation } from '@/utils/string'
 import { cn } from '@/utils/styles'
@@ -43,6 +45,7 @@ const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
   const { filedir, filename } = getPathLocation(file.path)
 
   const interactions = useInteractions(file)
+  const discard = useDiscardFileChanges(file)
 
   return (
     <Draggable
@@ -57,6 +60,13 @@ const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
         interactions={interactions}
         defaultAction={() => {
           showWorktreeFileDiffDialog(file)
+        }}
+        deleteAction={() => {
+          triggerInteraction({
+            action: discard,
+            isDangerous: true,
+            details: `discard changes in ${file.path}`,
+          })
         }}
         render={<MultiSelectItem {...itemProps} />}
       >
@@ -97,6 +107,8 @@ const useInteractions = (file: NotStagedFile) => {
   const acceptNewFile = useAcceptFile(file)
   const ignoreNewFile = useIgnoreFile(file)
 
+  const discard = useDiscardFileChanges(file)
+
   return file.status === 'unmerged'
     ? match(file.changes)
         .with(P.union('bothAdded', 'bothModified'), () => [
@@ -122,7 +134,16 @@ const useInteractions = (file: NotStagedFile) => {
           ),
         ])
         .exhaustive()
-    : [group(interaction({ action: stage }), interaction({ action: stash }))]
+    : [
+        group(interaction({ action: stage }), interaction({ action: stash })),
+        group(
+          interaction({
+            action: discard,
+            isDangerous: true,
+            details: `discard changes in ${file.path}`,
+          }),
+        ),
+      ]
 }
 
 export { NotStagedChangesItem, type NotStagedChangesItemProps }
