@@ -128,14 +128,29 @@ pub async fn create_branch(
     })
 }
 
-/// Deletes the given branches.
+/// Deletes the given local branches.
 #[tauri::command]
-pub async fn delete_branches(
+pub async fn delete_local_branches(
     state: State<'_, AppState>,
     repo_path: &str,
     branch_names: Vec<&str>,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.delete_branches(repo_path, &branch_names))
+    with_handler(&state, &|h| {
+        h.delete_local_branches(repo_path, &branch_names)
+    })
+}
+
+/// Deletes the given remote branches.
+#[tauri::command]
+pub async fn delete_remote_branches(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    branch_names: Vec<&str>,
+    remote: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| {
+        h.delete_remote_branches(repo_path, &branch_names, remote)
+    })
 }
 
 /// Returns a paginated list of commits leading up to the given reference.
@@ -251,6 +266,16 @@ pub async fn commit_index(
     is_amend: bool,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| h.commit_index(repo_path, message, is_amend))
+}
+
+/// Resets the HEAD to undo the given reference without changing the index or working directory.
+#[tauri::command]
+pub async fn reset_head(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    reference: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.reset_head(repo_path, reference))
 }
 
 /// Returns the commit hash of the latest common ancestor between the two given references.
@@ -487,14 +512,27 @@ pub async fn push_tag(
     with_handler(&state, &|h| h.push_tag(repo_path, tag, remote))
 }
 
-/// Removes a list of tags.
+/// Removes a list of local tags.
 #[tauri::command]
-pub async fn delete_tags(
+pub async fn delete_local_tags(
     state: State<'_, AppState>,
     repo_path: &str,
     tag_names: Vec<&str>,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.delete_tags(repo_path, &tag_names))
+    with_handler(&state, &|h| h.delete_local_tags(repo_path, &tag_names))
+}
+
+/// Removes a list of remote tags.
+#[tauri::command]
+pub async fn delete_remote_tags(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    tag_names: Vec<&str>,
+    remote: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| {
+        h.delete_remote_tags(repo_path, &tag_names, remote)
+    })
 }
 
 /// Returns the diff of a file between two sources.

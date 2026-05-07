@@ -92,7 +92,7 @@ const useStageAll = (): Action => {
   const notStagedChangesQuery = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
 
   return {
-    id: { key: 'file_operation', operation: 'add_files' },
+    id: { key: 'file_operation', operation: 'add_all_files' },
     blockedBy: [
       { key: 'file_operation' },
       { key: 'branch_operation', type: 'current' },

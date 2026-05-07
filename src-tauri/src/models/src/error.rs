@@ -58,6 +58,9 @@ pub enum GitError {
     #[error("Failed to remove files from the index")]
     RemoveFromIndexFailed {},
 
+    #[error("Failed to reset HEAD to \"{reference}\"")]
+    ResetHeadFailed { reference: String },
+
     #[error("Failed to remove files from tree")]
     RemoveFromTreeFailed {},
 

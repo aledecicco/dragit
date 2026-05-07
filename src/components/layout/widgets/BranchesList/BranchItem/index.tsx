@@ -50,7 +50,6 @@ const BranchesListItem = (props: BranchesListItemProps) => {
   const isCurrentBranch = useCurrentBranch()?.name === branch.name
 
   const interactions = useInteractions(branch)
-
   const checkout = useCheckoutBranch(branch)
 
   return (
@@ -64,18 +63,13 @@ const BranchesListItem = (props: BranchesListItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
+        defaultAction={() => {
+          if (!isCurrentBranch) {
+            triggerInteraction({ action: checkout })
+          }
+        }}
         render={
-          <MultiSelectItem
-            aria-current={isCurrentBranch}
-            {...itemProps}
-            onDoubleClick={(e) => {
-              itemProps.onDoubleClick?.(e)
-
-              if (!isCurrentBranch) {
-                triggerInteraction({ action: checkout })
-              }
-            }}
-          />
+          <MultiSelectItem aria-current={isCurrentBranch} {...itemProps} />
         }
       >
         <div className={cn('w-full text-start')}>

@@ -82,11 +82,13 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
       />
 
       <ActionButton
-        action={removeRemote}
-        compact
-        variant="filled"
         status="neutral"
+        variant="filled"
         className={cn('rounded-l-none rounded-r-sm h-auto')}
+        action={removeRemote}
+        isDangerous
+        details={`delete remote "${remote.name}"`}
+        compact
       />
     </div>
   )

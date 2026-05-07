@@ -6,6 +6,7 @@ import { useAmend } from '@/api/mutations/commitIndex'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
 import { useTagCommit } from '@/api/mutations/createTag'
 import { useMergeCommit } from '@/api/mutations/merge'
+import { useResetHead } from '@/api/mutations/resetHead'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
@@ -109,21 +110,20 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
         Glyph: IconGitCommit,
       }}
     >
-      <InteractiveItem
-        interactions={interactions}
+      <Ariakit.CompositeItem
+        {...propsWithCn(
+          buttonProps,
+          'p-2 border border-dark-100 rounded-sm',
+          'cursor-pointer',
+          'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
+          'hover:dithered-bg-dark-400 data-active-item:dithered-bg-dark-400',
+          'hover:data-active-item:dithered-bg-dark-300',
+          'w-full h-full',
+        )}
         render={
-          <Ariakit.Button
-            {...propsWithCn(
-              buttonProps,
-              'p-2 border border-dark-100 rounded-sm',
-              'cursor-pointer',
-              'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
-              'hover:dithered-bg-dark-400 data-active-item:dithered-bg-dark-400',
-              'hover:data-active-item:dithered-bg-dark-300',
-              'w-full h-full',
-            )}
-            onDoubleClick={(e) => {
-              buttonProps.onDoubleClick?.(e)
+          <InteractiveItem
+            interactions={interactions}
+            defaultAction={() => {
               showSnapshotDetailsDialog(commitInfo)
             }}
           />
@@ -156,7 +156,7 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
             </p>
           </div>
         </div>
-      </InteractiveItem>
+      </Ariakit.CompositeItem>
     </Draggable>
   )
 }
@@ -165,6 +165,7 @@ const useInteractions = (commit: CommitInfo) => {
   const createBranch = useCreateBranchAt(commit.id)
   const branchOff = useBranchOff(commit.id)
   const merge = useMergeCommit(commit.id)
+  const resetHead = useResetHead(commit.id)
   const tag = useTagCommit(commit)
 
   return [
@@ -185,6 +186,13 @@ const useInteractions = (commit: CommitInfo) => {
       interaction({
         action: tag,
         argsRequester: () => requestTagParams(`#${commit.shortHash}`),
+      }),
+    ),
+    group(
+      interaction({
+        action: resetHead,
+        isDangerous: true,
+        details: `undo commit #${commit.shortHash}`,
       }),
     ),
   ]

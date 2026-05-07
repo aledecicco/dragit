@@ -130,7 +130,9 @@ impl DebouncedWatcher {
                                     }
                                 }
 
-                                if path.starts_with(&remotes_folder) && path.is_file() {
+                                if path.starts_with(&remotes_folder) {
+                                    branches_list_updated = true;
+
                                     if let Ok(Some(branch_name)) =
                                         path.strip_prefix(&remotes_folder).map(|path| path.to_str())
                                     {

@@ -133,7 +133,11 @@ const InteractiveSelectionInner = <T,>(
         {...contentProps}
         menuId={menuId}
         onContextMenu={(e) => {
-          if (selectedItemIndexes.size <= 1) {
+          if (selectedItemIndexes.size < 1) {
+            e.preventDefault()
+          }
+
+          if (!actions.length) {
             e.preventDefault()
           }
         }}
@@ -151,13 +155,18 @@ const InteractiveSelectionInner = <T,>(
                 item.element?.contains(target),
               ) ?? -1
 
-          if (
-            selectedItemIndexes.size > 1 &&
-            itemIndex >= 0 &&
-            selectedItemIndexes.has(itemIndex)
-          ) {
-            const nativeEvent: ContextMenuEvent = e.nativeEvent
-            nativeEvent[CONTEXT_MENU_HANDLER_KEY] = menuId
+          console.log(selectedItemIndexes.has(itemIndex), { itemIndex })
+
+          if (itemIndex >= 0) {
+            if (
+              selectedItemIndexes.size > 1 &&
+              selectedItemIndexes.has(itemIndex)
+            ) {
+              const nativeEvent: ContextMenuEvent = e.nativeEvent
+              nativeEvent[CONTEXT_MENU_HANDLER_KEY] = menuId
+            }
+          } else {
+            setSelection([...Array(items.length).keys()])
           }
         }}
         items={actions

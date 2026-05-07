@@ -44,15 +44,10 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
-        render={
-          <MultiSelectItem
-            {...itemProps}
-            onDoubleClick={(e) => {
-              itemProps.onDoubleClick?.(e)
-              showWorktreeFileDiffDialog(file)
-            }}
-          />
-        }
+        defaultAction={() => {
+          showWorktreeFileDiffDialog(file)
+        }}
+        render={<MultiSelectItem {...itemProps} />}
       >
         <div className={cn('w-full flex flex-col items-start')}>
           <div

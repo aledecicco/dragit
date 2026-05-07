@@ -44,15 +44,10 @@ const StashesListItem = (props: StashesListItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
-        render={
-          <MultiSelectItem
-            {...itemProps}
-            onDoubleClick={(e) => {
-              itemProps.onDoubleClick?.(e)
-              showSnapshotDetailsDialog(stash)
-            }}
-          />
-        }
+        defaultAction={() => {
+          showSnapshotDetailsDialog(stash)
+        }}
+        render={<MultiSelectItem {...itemProps} />}
       >
         <div className={cn('flex flex-col justify-between')}>
           <div className={cn('min-w-0 w-full overflow-hidden')}>

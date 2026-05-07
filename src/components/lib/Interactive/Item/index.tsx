@@ -14,13 +14,18 @@ interface InteractiveItemProps extends Ariakit.RoleProps {
    * The list of ways to interact with this item.
    */
   interactions: AnyInteraction[][]
+
+  /**
+   * The action to trigger by default when this item is double-clicked.
+   */
+  defaultAction?: () => void
 }
 
 /**
  * An abstract component that's equipped to handle action tracking through different interactions.
  */
 const InteractiveItem = (props: InteractiveItemProps) => {
-  const { interactions, children, ...itemProps } = props
+  const { interactions, defaultAction, children, ...itemProps } = props
 
   const actions = interactions.flatMap((section) =>
     section.map((interaction) => interaction.action),
@@ -39,7 +44,22 @@ const InteractiveItem = (props: InteractiveItemProps) => {
           </Fragment>
         ))}
     >
-      <Ariakit.Role {...propsWithCn(itemProps, 'relative')}>
+      <Ariakit.Role
+        {...propsWithCn(itemProps, 'relative')}
+        onDoubleClick={(e) => {
+          itemProps.onDoubleClick?.(e)
+          defaultAction?.()
+        }}
+        onKeyDown={(e) => {
+          console.log(e)
+          itemProps.onKeyDown?.(e)
+          console.log('after')
+          if (e.key === 'Enter') {
+            console.log('in')
+            defaultAction?.()
+          }
+        }}
+      >
         {children}
 
         <ActionIndicator

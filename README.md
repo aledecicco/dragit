@@ -26,12 +26,15 @@ Stash of ideas in ~planned implementation order:
 - [x] "Init", "empty dir", and "not a repository" screens
 - [ ] Highlight matches during pathspec search
 - [x] More complete commit dialog with "amend" option
-- [ ] Delete remote branches and tags
+- [x] Delete remote branches
+- [ ] Manage remote tags
 - [ ] Animations pass
 - [x] Drag and drop shortcuts
 - [x] Global keyboard shortcuts
 - [x] Settings screen
-- [ ] Another pass
+- [ ] Resolve diff segments in diff viewer
+- [ ] Uncommit, undo changes
+- [ ] Proper error handling
 - [ ] Toasts (with lib)
 - [ ] Decide on polling vs file watcher
 - [ ] Implement git operations in Rust?

@@ -7,7 +7,6 @@ import { useDeleteTags } from '@/api/mutations/deleteTags'
 import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { triggerInteraction } from '@/state/actions'
-import { useCurrentBranch } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 
 interface RecyclingBinProps extends ComponentProps<'div'> {}
@@ -17,8 +16,6 @@ interface RecyclingBinProps extends ComponentProps<'div'> {}
  */
 const RecyclingBin = (props: RecyclingBinProps) => {
   const { ...divProps } = props
-
-  const currentBranch = useCurrentBranch()
 
   const deleteBranches = useDeleteBranches()
   const deleteTags = useDeleteTags()
@@ -40,17 +37,6 @@ const RecyclingBin = (props: RecyclingBinProps) => {
         tags: 'delete these tags',
       }}
       Glyph={IconTrashFilled}
-      extraValidation={(payload) => {
-        const isDraggingCurrentBranch =
-          (payload.type === 'branch' &&
-            payload.dragged.name === currentBranch?.name) ||
-          (payload.type === 'branches' &&
-            payload.dragged.some(
-              (branch) => branch.name === currentBranch?.name,
-            ))
-
-        return !isDraggingCurrentBranch
-      }}
       handleDrop={(payload) => {
         match(payload)
           .with({ type: 'branch' }, ({ dragged }) => {

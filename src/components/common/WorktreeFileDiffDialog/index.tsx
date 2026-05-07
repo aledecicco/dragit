@@ -14,7 +14,8 @@ import {
   useViewModeSelector,
 } from './UnmergedViewSelector'
 
-export const WORKTREE_FILE_DIFF_DIALOG_KEY = 'worktree_file_diff_dialog'
+export const WORKTREE_FILE_DIFF_DIALOG_KEY = (filepath: string) =>
+  `worktree_file_diff_dialog:${filepath}`
 
 interface WorktreeFileDiffDialogProps extends Omit<DialogProps, 'dialogKey'> {
   /**
@@ -36,7 +37,7 @@ const WorktreeFileDiffDialog = (props: WorktreeFileDiffDialogProps) => {
 
   return (
     <Dialog
-      dialogKey={WORKTREE_FILE_DIFF_DIALOG_KEY}
+      dialogKey={WORKTREE_FILE_DIFF_DIALOG_KEY(openFile.path)}
       {...propsWithCn(
         dialogProps,
         'max-w-[80%] max-h-[85%] w-full h-full grid-cols-1',
@@ -89,7 +90,7 @@ const showWorktreeFileDiffDialog = (
   file: WorktreeFileInfo,
   props?: Partial<WorktreeFileDiffDialogProps>,
 ) => {
-  showDialog(WORKTREE_FILE_DIFF_DIALOG_KEY, WorktreeFileDiffDialog, {
+  showDialog(WORKTREE_FILE_DIFF_DIALOG_KEY(file.path), WorktreeFileDiffDialog, {
     openFile: file,
     ...props,
   })

@@ -38,8 +38,20 @@ pub trait GitHandler {
         from_reference: Option<&str>,
     ) -> Result<(), GitError>;
 
-    /// Deletes the given branches.
-    fn delete_branches(&self, repo_path: &str, branch_names: &Vec<&str>) -> Result<(), GitError>;
+    /// Deletes the given local branches.
+    fn delete_local_branches(
+        &self,
+        repo_path: &str,
+        branch_names: &Vec<&str>,
+    ) -> Result<(), GitError>;
+
+    /// Deletes the given remote branches.
+    fn delete_remote_branches(
+        &self,
+        repo_path: &str,
+        branch_names: &Vec<&str>,
+        remote: &str,
+    ) -> Result<(), GitError>;
 
     /// Returns (a page of) the list of commit hashes leading up to a reference.
     fn get_commit_history_page(
@@ -98,6 +110,9 @@ pub trait GitHandler {
 
     /// Commits the current index with the given message.
     fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError>;
+
+    /// Reset the HEAD to undo the given reference without changing the index or working directory.
+    fn reset_head(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
 
     /// Returns the commit hash of the latest common ancestor between the two given branches.
     fn get_common_ancestor(
@@ -216,8 +231,16 @@ pub trait GitHandler {
     /// Pushes the given tag to the specified remote.
     fn push_tag(&self, repo_path: &str, tag: &str, remote: &str) -> Result<(), GitError>;
 
-    /// Deletes the given tags.
-    fn delete_tags(&self, repo_path: &str, tag_names: &Vec<&str>) -> Result<(), GitError>;
+    /// Deletes the given local tags.
+    fn delete_local_tags(&self, repo_path: &str, tag_names: &Vec<&str>) -> Result<(), GitError>;
+
+    /// Deletes the given remote tags.
+    fn delete_remote_tags(
+        &self,
+        repo_path: &str,
+        tag_names: &Vec<&str>,
+        remote: &str,
+    ) -> Result<(), GitError>;
 
     /// Returns the contents of a file at a given point.
     fn get_file_contents(

@@ -170,8 +170,25 @@ impl GitHandler for CmdGit {
             }))
     }
 
-    fn delete_branches(&self, repo_path: &str, branch_names: &Vec<&str>) -> Result<(), GitError> {
+    fn delete_local_branches(
+        &self,
+        repo_path: &str,
+        branch_names: &Vec<&str>,
+    ) -> Result<(), GitError> {
         let mut args = vec!["branch", "-D"];
+        args.extend(branch_names);
+
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::DeleteBranchesFailed {}))
+    }
+
+    fn delete_remote_branches(
+        &self,
+        repo_path: &str,
+        branch_names: &Vec<&str>,
+        remote: &str,
+    ) -> Result<(), GitError> {
+        let mut args = vec!["push", remote, "--delete"];
         args.extend(branch_names);
 
         self.spawn_and_await(repo_path, args)
@@ -430,6 +447,14 @@ impl GitHandler for CmdGit {
 
         self.spawn_and_await(repo_path, args)
             .or(Err(GitError::CommitFailed {}))
+    }
+
+    fn reset_head(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
+        let parent = format!("{}^{}", reference, 1);
+        self.spawn_and_await(repo_path, ["reset", "--soft", &parent])
+            .or(Err(GitError::ResetHeadFailed {
+                reference: reference.to_string(),
+            }))
     }
 
     fn get_common_ancestor(
@@ -819,8 +844,21 @@ impl GitHandler for CmdGit {
             }))
     }
 
-    fn delete_tags(&self, repo_path: &str, tag_names: &Vec<&str>) -> Result<(), GitError> {
+    fn delete_local_tags(&self, repo_path: &str, tag_names: &Vec<&str>) -> Result<(), GitError> {
         let mut args = vec!["tag", "-d"];
+        args.extend(tag_names);
+
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::DeleteTagsFailed {}))
+    }
+
+    fn delete_remote_tags(
+        &self,
+        repo_path: &str,
+        tag_names: &Vec<&str>,
+        remote: &str,
+    ) -> Result<(), GitError> {
+        let mut args = vec!["push", remote, "--delete"];
         args.extend(tag_names);
 
         self.spawn_and_await(repo_path, args)
