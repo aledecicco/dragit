@@ -2,12 +2,11 @@ import { Fragment } from 'react'
 import * as Ariakit from '@ariakit/react'
 
 import { ActionIndicator } from '@/common/ActionIndicator'
+import type { AnyInteraction } from '@/lib/ActionButton'
+import { WithContextMenu } from '@/lib/WithContextMenu'
 import { MenuItem } from '@/ui/Menu/Item'
 import { Separator } from '@/ui/Separator'
 import { cn, propsWithCn } from '@/utils/styles'
-
-import type { AnyInteraction } from '../../ActionButton'
-import { WithContextMenu } from '../../WithContextMenu'
 
 interface InteractiveItemProps extends Ariakit.RoleProps {
   /**
@@ -16,9 +15,9 @@ interface InteractiveItemProps extends Ariakit.RoleProps {
   interactions: AnyInteraction[][]
 
   /**
-   * The action to trigger by default when this item is double-clicked.
+   * The action to trigger by default when this item is activated.
    */
-  defaultAction?: () => void
+  activationAction?: () => void
 
   /**
    * The action to trigger when this item is deleted.
@@ -30,8 +29,13 @@ interface InteractiveItemProps extends Ariakit.RoleProps {
  * An abstract component that's equipped to handle action tracking through different interactions.
  */
 const InteractiveItem = (props: InteractiveItemProps) => {
-  const { interactions, defaultAction, deleteAction, children, ...itemProps } =
-    props
+  const {
+    interactions,
+    activationAction,
+    deleteAction,
+    children,
+    ...itemProps
+  } = props
 
   const actions = interactions.flatMap((section) =>
     section.map((interaction) => interaction.action),
@@ -54,14 +58,13 @@ const InteractiveItem = (props: InteractiveItemProps) => {
         {...propsWithCn(itemProps, 'relative')}
         onDoubleClick={(e) => {
           itemProps.onDoubleClick?.(e)
-
-          defaultAction?.()
+          activationAction?.()
         }}
         onKeyDown={(e) => {
           itemProps.onKeyDown?.(e)
 
           if (e.key === 'Enter') {
-            defaultAction?.()
+            activationAction?.()
           }
 
           if (e.key === 'Delete') {

@@ -5,12 +5,16 @@ import logo from '@/assets/logo.jpg'
 
 import type { CurrentDirInfo } from '@/api/models'
 import { useInitRepository } from '@/api/mutations/initRepository'
-import { useOpenFolder } from '@/api/mutations/openFolder'
+import {
+  useMakeOpenRecentFolder,
+  useOpenFolder,
+} from '@/api/mutations/openFolder'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { FilePath } from '@/common/File/Path'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { QueryLoader } from '@/lib/Loader/Query'
+import { useSettings } from '@/state/settings'
 import { Marquee } from '@/ui/Marquee'
 import { chooseDirectory } from '@/utils/behavior'
 import { getErrorMessage } from '@/utils/error'
@@ -22,8 +26,6 @@ import { cn, propsWithCn } from '@/utils/styles'
  */
 const StartupPage = () => {
   const currentDirQuery = useQueryCurrentDir()
-
-  const openFolder = useOpenFolder()
 
   return (
     <QueryLoader
@@ -60,22 +62,7 @@ const StartupPage = () => {
                 No folder currently open.
               </p>
 
-              <ActionButton
-                action={openFolder}
-                argsRequester={async () => {
-                  const path = await chooseDirectory()
-
-                  if (!path) {
-                    throw new Error('No folder selected')
-                  }
-
-                  return path
-                }}
-                aria-label="Select and open a folder in your system"
-                size="lg"
-                variant="plain"
-                status="neutral"
-              />
+              <OpenFolderButton />
             </StartupPageInner>
           )
         }
@@ -90,7 +77,6 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
   const { currentDir } = props
 
   const initRepository = useInitRepository()
-  const openFolder = useOpenFolder()
 
   return (
     <StartupPageInner className={cn('col-start-2')}>
@@ -124,22 +110,7 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
           />
         )}
 
-        <ActionButton
-          action={openFolder}
-          argsRequester={async () => {
-            const path = await chooseDirectory()
-
-            if (!path) {
-              throw new Error('No folder selected')
-            }
-
-            return path
-          }}
-          aria-label="Select and open a folder in your system"
-          size="lg"
-          variant="filled"
-          status="neutral"
-        />
+        <OpenFolderButton />
       </div>
     </StartupPageInner>
   )
@@ -163,6 +134,39 @@ const StartupPageInner = (props: ComponentProps<'div'>) => {
 
       {children}
     </div>
+  )
+}
+
+const OpenFolderButton = () => {
+  const openFolder = useOpenFolder()
+
+  const { recentFolders } = useSettings()
+  const makeOpenRecentFolder = useMakeOpenRecentFolder()
+
+  return (
+    <ActionButton
+      action={openFolder}
+      argsRequester={async () => {
+        const path = await chooseDirectory()
+
+        if (!path) {
+          throw new Error('No folder selected')
+        }
+
+        return path
+      }}
+      alternatives={recentFolders.map((recentFolder) => ({
+        action: makeOpenRecentFolder(recentFolder),
+      }))}
+      menuButtonProps={{
+        label: 'View recent folders',
+        disabled: !recentFolders.length,
+      }}
+      aria-label="Select and open a folder in your system"
+      size="lg"
+      variant="plain"
+      status="neutral"
+    />
   )
 }
 

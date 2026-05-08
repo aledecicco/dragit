@@ -1,35 +1,31 @@
-import {
-  Fragment,
-  type KeyboardEvent,
-  type MouseEvent,
-  useEffect,
-  useRef,
-} from 'react'
+import { Fragment, useEffect, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
+import { match } from 'ts-pattern'
 
+import { Draggable } from '@/lib/DragAndDrop/Draggable'
+import {
+  type DragPayload,
+  overridePayload,
+  useBeforeDrag,
+} from '@/lib/DragAndDrop/utils'
+import { MultiSelect, type MultiSelectProps } from '@/lib/MultiSelect'
+import {
+  useSelectedItems,
+  useSelectionUpdater,
+} from '@/lib/MultiSelect/context'
+import {
+  CONTEXT_MENU_HANDLER_KEY,
+  type ContextMenuEvent,
+  WithContextMenu,
+} from '@/lib/WithContextMenu'
 import type { Action } from '@/state/actions'
 import { useUniqueId } from '@/state/ids'
 import { MenuItem } from '@/ui/Menu/Item'
 import { Separator } from '@/ui/Separator'
 import { cn } from '@/utils/styles'
 
-import { Draggable } from '../../DragAndDrop/Draggable'
-import {
-  type DragPayload,
-  overridePayload,
-  useBeforeDrag,
-} from '../../DragAndDrop/utils'
-import { MultiSelect, type MultiSelectProps } from '../../MultiSelect'
-import {
-  useSelectedItems,
-  useSelectionUpdater,
-} from '../../MultiSelect/context'
-import {
-  CONTEXT_MENU_HANDLER_KEY,
-  type ContextMenuEvent,
-  WithContextMenu,
-} from '../../WithContextMenu'
+import { classifyItemEvent } from './utils'
 
 interface InteractiveSelectionProps<T>
   extends Omit<MultiSelectProps, 'itemsCount'> {
@@ -121,26 +117,23 @@ const InteractiveSelectionInner = <T,>(
       return
     }
 
-    const compositeItem = composite
-      ?.getState()
-      .renderedItems.find((item) => item.element?.contains(element))
+    const eventKind = classifyItemEvent(element, composite, selectedItemIndexes)
 
-    if (compositeItem) {
-      const itemId = Number(compositeItem.id)
-      const draggedItem = items.at(itemId)
-
-      if (draggedItem) {
-        if (selectedItemIndexes.size > 1 && selectedItemIndexes.has(itemId)) {
-          // If more than one item is selected upon dragging, and the dragged item is among the selected ones,
-          // set the drag payload to include all selected items.
-          overridePayload(() => getDragPayload(selectedItems), source, manager)
-        } else {
-          setSelection(itemId)
-        }
-      }
-    } else {
-      setSelection([...Array(items.length).keys()])
-    }
+    match(eventKind)
+      .with({ kind: 'multiSelection' }, () => {
+        // If the drag is initiated on an already selected set of items,
+        // we want to drag that selection.
+        overridePayload(() => getDragPayload(selectedItems), source, manager)
+      })
+      .with({ kind: 'singleItem' }, ({ itemIndex }) => {
+        // If the drag is initiated on an unselected item, we want to select just that item.
+        setSelection(itemIndex)
+      })
+      .with({ kind: 'outside' }, () => {
+        // If the drag is initiated outside of any item, we want to select all items.
+        setSelection([...Array(items.length).keys()])
+      })
+      .exhaustive()
   })
 
   return (
@@ -158,19 +151,25 @@ const InteractiveSelectionInner = <T,>(
         menuId={menuId}
         onKeyDownCapture={(e) => {
           if (e.key === 'Delete') {
-            onItemEvent(
-              e,
-              composite?.getState().renderedItems ?? [],
+            const eventKind = classifyItemEvent(
+              e.target,
+              composite,
               selectedItemIndexes,
-              () => {
+            )
+
+            match(eventKind)
+              .with({ kind: 'multiSelection' }, () => {
+                // If the delete key is pressed while multiple items are selected,
+                // we want to delete all of them.
                 e.stopPropagation()
                 e.preventDefault()
                 deleteAction?.(selectedItems)
-              },
-              (itemIndex) => {
+              })
+              .with({ kind: 'singleItem' }, ({ itemIndex }) => {
+                // If the delete key is pressed while a single unselected item is focused,
+                // we want to select just that item.
                 setSelection(itemIndex)
-              },
-            )
+              })
           }
         }}
         onContextMenu={(e) => {
@@ -183,21 +182,28 @@ const InteractiveSelectionInner = <T,>(
           }
         }}
         onContextMenuCapture={(e) => {
-          onItemEvent(
-            e,
-            composite?.getState().renderedItems ?? [],
+          const eventKind = classifyItemEvent(
+            e.target,
+            composite,
             selectedItemIndexes,
-            () => {
+          )
+
+          match(eventKind)
+            .with({ kind: 'multiSelection' }, () => {
+              // If the context menu is triggered on an already selected set of items,
+              // we want to take ownership of that context menu event.
               const nativeEvent: ContextMenuEvent = e.nativeEvent
               nativeEvent[CONTEXT_MENU_HANDLER_KEY] = menuId
-            },
-            (itemIndex) => {
+            })
+            .with({ kind: 'singleItem' }, ({ itemIndex }) => {
+              // If the context menu is triggered on an unselected item, we want to select just that item.
               setSelection(itemIndex)
-            },
-            () => {
+            })
+            .with({ kind: 'outside' }, () => {
+              // If the context menu is triggered outside of any item, we want to select all items.
               setSelection([...Array(items.length).keys()])
-            },
-          )
+            })
+            .exhaustive()
         }}
         items={actions
           .filter((section) => section.length > 0)
@@ -221,33 +227,6 @@ const InteractiveSelectionInner = <T,>(
       </WithContextMenu>
     </Draggable>
   )
-}
-
-const onItemEvent = (
-  e: MouseEvent | KeyboardEvent,
-  compositeItems: Ariakit.CompositeStoreState['items'],
-  selectedItems: Set<number>,
-  onIncluded?: (item: number) => void,
-  onNotIncluded?: (item: number) => void,
-  onOutside?: () => void,
-) => {
-  const target = e.target
-
-  if (!(target instanceof HTMLElement)) {
-    return
-  }
-  const itemIndex =
-    compositeItems.findIndex((item) => item.element?.contains(target)) ?? -1
-
-  if (itemIndex >= 0) {
-    if (selectedItems.size > 1 && selectedItems.has(itemIndex)) {
-      onIncluded?.(itemIndex)
-    } else {
-      onNotIncluded?.(itemIndex)
-    }
-  } else {
-    onOutside?.()
-  }
 }
 
 export { InteractiveSelection, type InteractiveSelectionProps }

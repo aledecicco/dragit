@@ -1,8 +1,9 @@
 import { useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
-import { useClickAway } from 'react-use'
+import { useClickAway, useEffectOnce } from 'react-use'
 
+import { useDragDropManager } from '../DragAndDrop/utils'
 import { MultiSelectContextProvider, useSelectionUpdater } from './context'
 import { MultiSelectItem } from './Item'
 
@@ -44,6 +45,25 @@ const MultiSelectInner = (props: MultiSelectProps) => {
     }
   })
 
+  const dragDropManager = useDragDropManager()
+
+  useEffectOnce(() => {
+    // Listen for key presses at the window level, otherwise DndKit always beats us to it.
+    const handleEscape = (e: KeyboardEvent) => {
+      const isDragging = !!dragDropManager?.dragOperation
+
+      if (e.key === 'Escape' && !isDragging) {
+        setSelection([])
+      }
+    }
+
+    window.addEventListener('keydown', handleEscape, { capture: true })
+
+    return () => {
+      window.removeEventListener('keydown', handleEscape, { capture: true })
+    }
+  })
+
   return (
     <Ariakit.Composite
       store={composite}
@@ -69,10 +89,6 @@ const MultiSelectInner = (props: MultiSelectProps) => {
 
         if (e.key === 'Enter') {
           e.preventDefault()
-        }
-
-        if (e.key === 'Escape') {
-          setSelection([])
           return
         }
 

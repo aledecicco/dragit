@@ -266,6 +266,11 @@ const overridePayload = <T extends DragType>(
 }
 
 /**
+ * Hook that returns the current drag and drop manager instance.
+ */
+const useDragDropManager = () => Dnd.useDragDropManager()
+
+/**
  * Whether the given drag payload has no items being dragged.
  */
 const isEmptyDragPayload = (payload: DragPayload): boolean =>
@@ -277,6 +282,7 @@ export {
   useBeforeDrag,
   useOnDrop,
   useCurrentDrag,
+  useDragDropManager,
   overridePayload,
   isEmptyDragPayload,
   SnapToCursor,
