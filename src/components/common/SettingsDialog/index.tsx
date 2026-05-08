@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
 import * as Ariakit from '@ariakit/react'
+import { IconBrandGithub } from '@tabler/icons-react'
 
+import { DecoratedButton } from '@/lib/DecoratedButton'
 import { useShortcutScopesHandler } from '@/lib/Shortcuts/utils'
 import { showDialog } from '@/state/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { DialogContent } from '@/ui/Dialog/Content'
+import { openLink } from '@/utils/behavior'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { LARGE_DIFF_THRESHOLD } from '../FileViewer/Diff'
@@ -120,7 +123,7 @@ const SettingsDialog = (props: SettingsDialogProps) => {
                 />
               </SettingsDialogSection>
 
-              <SettingsDialogSection label="Shortcuts">
+              <SettingsDialogSection label="Shortcuts" className={cn('mb-10')}>
                 <ShortcutSetting
                   action="choose changes to stage"
                   setting="stageFilesShortcut"
@@ -173,6 +176,22 @@ const SettingsDialog = (props: SettingsDialogProps) => {
                 <ShortcutSetting
                   action="focus the stashes list"
                   setting="focusStashesShortcut"
+                />
+              </SettingsDialogSection>
+
+              <SettingsDialogSection label="About">
+                <p className={cn('text-sm text-center text-light-500')}>
+                  Authored by Alejandro De Cicco
+                </p>
+                <DecoratedButton
+                  Glyph={IconBrandGithub}
+                  label="View source"
+                  size="sm"
+                  variant="filled"
+                  status="neutral"
+                  onClick={() => {
+                    openLink('https://github.com/aledecicco/dragit')
+                  }}
                 />
               </SettingsDialogSection>
             </Ariakit.Composite>

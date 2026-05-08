@@ -1,6 +1,6 @@
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { open } from '@tauri-apps/plugin-dialog'
-import { openPath } from '@tauri-apps/plugin-opener'
+import { openPath, openUrl } from '@tauri-apps/plugin-opener'
 import { useEffectOnce } from 'react-use'
 
 /**
@@ -23,6 +23,16 @@ export const chooseDirectory = () => {
  */
 export const openFile = (path: string, openWith: string) => {
   return openPath(path, openWith)
+}
+
+/**
+ * Opens the given url in the default web browser.
+ *
+ * @param url - The URL to open.
+ * @returns A promise that resolves when the URL is opened.
+ */
+export const openLink = (url: string) => {
+  return openUrl(url)
 }
 
 /**
