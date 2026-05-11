@@ -22,7 +22,10 @@ import {
 import { useNeedsPagination } from '@/api/utils'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
+import {
+  InteractiveListContainer,
+  type ItemsInteraction,
+} from '@/lib/Interactive/ListContainer'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
@@ -62,7 +65,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
 
   const showPagination = useNeedsPagination(filesQuery, page)
 
-  const getActions = useGetActions()
+  const getInteractions = useGetInteractions()
   const unstage = useUnstageFiles()
 
   const ref = useRef<HTMLDivElement>(null)
@@ -77,7 +80,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
     <InteractiveListContainer
       className={cn('border-none group/drag')}
       items={filesQuery.data?.items ?? []}
-      getActions={getActions}
+      getInteractions={getInteractions}
       getDragPayload={getDragPayload}
     >
       <DropArea
@@ -135,7 +138,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
           <InteractiveSelection
             ref={ref}
             items={filesQuery.data?.items ?? []}
-            getActions={getActions}
+            getInteractions={getInteractions}
             getDragPayload={getDragPayload}
             deleteAction={(files) => {
               triggerInteraction({
@@ -173,7 +176,7 @@ const getDragPayload = (files: NotStagedFile[] | undefined): DragPayload => ({
   Glyph: IconFiles,
 })
 
-const useGetActions = () => {
+const useGetInteractions = () => {
   const stage = useStageFiles()
   const stash = useStashFiles()
 
@@ -187,14 +190,20 @@ const useGetActions = () => {
 
   const discard = useDiscardChanges()
 
-  return (files: NotStagedFile[]) => {
+  return (files: NotStagedFile[]): ItemsInteraction<NotStagedFile>[][] => {
     const allBothAddedOrModified = files.every(
       (file) =>
         file.status === 'unmerged' &&
         (file.changes === 'bothAdded' || file.changes === 'bothModified'),
     )
     if (allBothAddedOrModified) {
-      return [[acceptAsIs, acceptOurs, acceptTheirs]]
+      return [
+        [
+          { action: acceptAsIs },
+          { action: acceptOurs },
+          { action: acceptTheirs },
+        ],
+      ]
     }
 
     const allAddedByUsOrThem = files.every(
@@ -203,7 +212,7 @@ const useGetActions = () => {
         (file.changes === 'addedByUs' || file.changes === 'addedByThem'),
     )
     if (allAddedByUsOrThem) {
-      return [[acceptNewFiles, ignoreNewFiles]]
+      return [[{ action: acceptNewFiles }, { action: ignoreNewFiles }]]
     }
 
     const allDeletedByUsOrThem = files.every(
@@ -212,7 +221,7 @@ const useGetActions = () => {
         (file.changes === 'deletedByUs' || file.changes === 'deletedByThem'),
     )
     if (allDeletedByUsOrThem) {
-      return [[acceptDeletions, ignoreDeletions]]
+      return [[{ action: acceptDeletions }, { action: ignoreDeletions }]]
     }
 
     const allDeleted = files.every(
@@ -223,15 +232,25 @@ const useGetActions = () => {
           file.changes === 'deletedByThem'),
     )
     if (allDeleted) {
-      return [[acceptDeletions]]
+      return [[{ action: acceptDeletions }]]
     }
 
     const anyUnmerged = files.some((file) => file.status === 'unmerged')
     if (anyUnmerged) {
-      return [[stage]]
+      return [[{ action: stage }]]
     }
 
-    return [[stage, stash, discard]]
+    return [
+      [
+        { action: stage },
+        { action: stash },
+        {
+          action: discard,
+          isDangerous: true,
+          details: `discard changes in ${pluralize('file', files.length, true)}`,
+        },
+      ],
+    ]
   }
 }
 

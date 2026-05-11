@@ -1,12 +1,11 @@
-import { Fragment } from 'react'
 import * as Ariakit from '@ariakit/react'
 
 import { ActionIndicator } from '@/common/ActionIndicator'
 import type { AnyInteraction } from '@/lib/ActionButton'
 import { WithContextMenu } from '@/lib/WithContextMenu'
-import { MenuItem } from '@/ui/Menu/Item'
-import { Separator } from '@/ui/Separator'
 import { cn, propsWithCn } from '@/utils/styles'
+
+import { InteractiveMenuItems } from '../MenuItems'
 
 interface InteractiveItemProps extends Ariakit.RoleProps {
   /**
@@ -43,16 +42,7 @@ const InteractiveItem = (props: InteractiveItemProps) => {
 
   return (
     <WithContextMenu
-      items={interactions
-        .filter((section) => section.length > 0)
-        .map((section, i) => (
-          <Fragment key={`${i + 1}`}>
-            {i > 0 && <Separator className={cn('my-0.5')} />}
-            {section.map((interaction, j) => (
-              <MenuItem key={`${i + 1}-${j + 1}`} {...interaction} />
-            ))}
-          </Fragment>
-        ))}
+      items={<InteractiveMenuItems interactions={interactions} />}
     >
       <Ariakit.Role
         {...propsWithCn(itemProps, 'relative')}

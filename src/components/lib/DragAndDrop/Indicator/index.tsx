@@ -1,3 +1,5 @@
+import { Focusable } from '@ariakit/react'
+
 import { Chip, type ChipProps } from '@/ui/Chip'
 import { type Glyph, Icon } from '@/ui/Icon'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -21,23 +23,29 @@ const DragAndDropIndicator = (props: DragAndDropIndicatorProps) => {
   const { Glyph, label, ...chipProps } = props
 
   return (
-    <Chip
-      size="lg"
-      {...propsWithCn(
-        chipProps,
-        'z-4',
-        'flex flex-row gap-1 items-center drop-shadow-sm ',
-      )}
-    >
-      <Icon Glyph={Glyph} size="md" />
-      <span
-        className={cn(
-          'text-sm text-light-900 max-w-50 text-ellipsis overflow-hidden whitespace-nowrap',
-        )}
-      >
-        {label}
-      </span>
-    </Chip>
+    <Focusable
+      autoFocus
+      render={
+        <Chip
+          autoFocus
+          size="lg"
+          {...propsWithCn(
+            chipProps,
+            'z-4',
+            'flex flex-row gap-1 items-center drop-shadow-sm ',
+          )}
+        >
+          <Icon Glyph={Glyph} size="md" />
+          <span
+            className={cn(
+              'text-sm text-light-900 max-w-50 text-ellipsis overflow-hidden whitespace-nowrap',
+            )}
+          >
+            {label}
+          </span>
+        </Chip>
+      }
+    />
   )
 }
 

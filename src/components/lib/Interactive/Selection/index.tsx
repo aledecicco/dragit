@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
@@ -19,12 +19,11 @@ import {
   type ContextMenuEvent,
   WithContextMenu,
 } from '@/lib/WithContextMenu'
-import type { Action } from '@/state/actions'
 import { useUniqueId } from '@/state/ids'
-import { MenuItem } from '@/ui/Menu/Item'
-import { Separator } from '@/ui/Separator'
 import { cn } from '@/utils/styles'
 
+import type { ItemsInteraction } from '../ListContainer'
+import { InteractiveMenuItems } from '../MenuItems'
 import { classifyItemEvent } from './utils'
 
 interface InteractiveSelectionProps<T>
@@ -37,7 +36,7 @@ interface InteractiveSelectionProps<T>
   /**
    * Callback that returns the list of ways to interact with the selected items.
    */
-  getActions: (items: T[]) => Action<T[]>[][]
+  getInteractions: (items: T[]) => ItemsInteraction<T>[][]
   /**
    * Callback that returns the payload to be used when dragging the selected items.
    */
@@ -54,7 +53,7 @@ interface InteractiveSelectionProps<T>
 const InteractiveSelection = <T,>(props: InteractiveSelectionProps<T>) => {
   const {
     items,
-    getActions,
+    getInteractions,
     getDragPayload,
     deleteAction,
     children,
@@ -64,7 +63,7 @@ const InteractiveSelection = <T,>(props: InteractiveSelectionProps<T>) => {
   return (
     <MultiSelect itemsCount={items.length} {...multiSelectProps}>
       <InteractiveSelectionInner
-        getActions={getActions}
+        getInteractions={getInteractions}
         items={items}
         getDragPayload={getDragPayload}
         deleteAction={deleteAction}
@@ -77,7 +76,7 @@ const InteractiveSelection = <T,>(props: InteractiveSelectionProps<T>) => {
 
 type InteractiveSelectionInnerProps<T> = Pick<
   InteractiveSelectionProps<T>,
-  'getActions' | 'items' | 'getDragPayload' | 'deleteAction' | 'children'
+  'getInteractions' | 'items' | 'getDragPayload' | 'deleteAction' | 'children'
 > &
   Omit<Ariakit.RoleProps, 'children'>
 
@@ -85,7 +84,7 @@ const InteractiveSelectionInner = <T,>(
   props: InteractiveSelectionInnerProps<T>,
 ) => {
   const {
-    getActions,
+    getInteractions,
     items,
     getDragPayload,
     deleteAction,
@@ -102,7 +101,12 @@ const InteractiveSelectionInner = <T,>(
   )
 
   const menuId = useUniqueId()
-  const actions = getActions(selectedItems)
+  const interactions = getInteractions(selectedItems).map((section) =>
+    section.map((interaction) => ({
+      ...interaction,
+      argsRequester: () => selectedItems,
+    })),
+  )
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset selection when items change
   useEffect(() => {
@@ -177,7 +181,7 @@ const InteractiveSelectionInner = <T,>(
             e.preventDefault()
           }
 
-          if (!actions.length) {
+          if (!interactions.length) {
             e.preventDefault()
           }
         }}
@@ -205,23 +209,12 @@ const InteractiveSelectionInner = <T,>(
             })
             .exhaustive()
         }}
-        items={actions
-          .filter((section) => section.length > 0)
-          .map((section, i) => (
-            <Fragment key={`${i + 1}`}>
-              {i > 0 && <Separator className={cn('my-0.5')} />}
-              {section.map((action, j) => (
-                <MenuItem
-                  key={`${i + 1}-${j + 1}`}
-                  action={action}
-                  argsRequester={() => selectedItems}
-                >
-                  {' '}
-                  ({selectedItems.length})
-                </MenuItem>
-              ))}
-            </Fragment>
-          ))}
+        items={
+          <InteractiveMenuItems
+            interactions={interactions}
+            itemProps={{ children: ` (${selectedItems.length})` }}
+          />
+        }
       >
         {children}
       </WithContextMenu>

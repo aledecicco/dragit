@@ -32,7 +32,10 @@ const ConfirmationDialog = (props: ConfirmationDialogProps) => {
       <DialogContent heading="Are You Sure?">
         <p className={cn('text-sm mb-6', 'bg-dark-800 p-4 rounded-md')}>
           You are about to{' '}
-          <span className={cn('text-danger-600')}>{description}</span>.
+          <span className={cn('text-danger-600', 'wrap-anywhere')}>
+            {description}
+          </span>
+          .
         </p>
 
         <div className={cn('grid grid-cols-2 gap-1')}>

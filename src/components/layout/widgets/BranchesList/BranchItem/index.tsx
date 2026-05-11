@@ -64,7 +64,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
-        defaultAction={() => {
+        activationAction={() => {
           if (!isCurrentBranch) {
             triggerInteraction({ action: checkout })
           }

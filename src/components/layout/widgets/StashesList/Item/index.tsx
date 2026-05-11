@@ -44,7 +44,7 @@ const StashesListItem = (props: StashesListItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
-        defaultAction={() => {
+        activationAction={() => {
           showSnapshotDetailsDialog(stash)
         }}
         render={<MultiSelectItem {...itemProps} />}

@@ -1,12 +1,14 @@
-import { Fragment } from 'react/jsx-runtime'
-
 import { Draggable, type DraggableProps } from '@/lib/DragAndDrop/Draggable'
 import type { DragPayload, DragType } from '@/lib/DragAndDrop/utils'
 import { WithContextMenu } from '@/lib/WithContextMenu'
-import type { Action } from '@/state/actions'
-import { MenuItem } from '@/ui/Menu/Item'
-import { Separator } from '@/ui/Separator'
-import { cn } from '@/utils/styles'
+import type { Interaction } from '@/state/actions'
+
+import { InteractiveMenuItems } from '../MenuItems'
+
+type ItemsInteraction<T> = Omit<
+  Extract<Interaction<T[]>, { argsRequester: unknown }>,
+  'argsRequester'
+>
 
 interface InteractiveListContainerProps<T>
   extends Omit<DraggableProps<DragType>, 'dragPayload'> {
@@ -18,7 +20,7 @@ interface InteractiveListContainerProps<T>
   /**
    * Callback that returns the list of ways to interact with the selected items.
    */
-  getActions: (items: T[]) => Action<T[]>[][]
+  getInteractions: (items: T[]) => ItemsInteraction<T>[][]
 
   /**
    * Callback that returns the payload to be used when dragging.
@@ -32,8 +34,20 @@ interface InteractiveListContainerProps<T>
 const InteractiveListContainer = <T,>(
   props: InteractiveListContainerProps<T>,
 ) => {
-  const { items, getActions, getDragPayload, children, ...draggableProps } =
-    props
+  const {
+    items,
+    getInteractions,
+    getDragPayload,
+    children,
+    ...draggableProps
+  } = props
+
+  const interactions = getInteractions(items).map((section) =>
+    section.map((interaction) => ({
+      ...interaction,
+      argsRequester: () => items,
+    })),
+  )
 
   return (
     <Draggable {...draggableProps} dragPayload={getDragPayload(items)}>
@@ -43,23 +57,12 @@ const InteractiveListContainer = <T,>(
             e.preventDefault()
           }
         }}
-        items={getActions(items)
-          .filter((section) => section.length > 0)
-          .map((section, i) => (
-            <Fragment key={`${i + 1}`}>
-              {i > 0 && <Separator className={cn('my-0.5')} />}
-              {section.map((action, j) => (
-                <MenuItem
-                  key={`${i + 1}-${j + 1}`}
-                  action={action}
-                  argsRequester={() => items}
-                >
-                  {' '}
-                  ({items.length})
-                </MenuItem>
-              ))}
-            </Fragment>
-          ))}
+        items={
+          <InteractiveMenuItems
+            interactions={interactions}
+            itemProps={{ children: ` (${items.length})` }}
+          />
+        }
       >
         {children}
       </WithContextMenu>
@@ -67,4 +70,8 @@ const InteractiveListContainer = <T,>(
   )
 }
 
-export { InteractiveListContainer, type InteractiveListContainerProps }
+export {
+  InteractiveListContainer,
+  type InteractiveListContainerProps,
+  type ItemsInteraction,
+}

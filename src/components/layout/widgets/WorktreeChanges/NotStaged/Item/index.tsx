@@ -58,7 +58,7 @@ const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
-        defaultAction={() => {
+        activationAction={() => {
           showWorktreeFileDiffDialog(file)
         }}
         deleteAction={() => {

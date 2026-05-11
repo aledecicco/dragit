@@ -12,7 +12,10 @@ import {
 import { useNeedsPagination } from '@/api/utils'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
+import {
+  InteractiveListContainer,
+  type ItemsInteraction,
+} from '@/lib/Interactive/ListContainer'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
@@ -50,8 +53,9 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
 
   const showPagination = useNeedsPagination(filesQuery, page)
 
-  const getActions = useGetActions()
+  const getInteractions = useGetInteractions()
   const stage = useStageFiles()
+  const unstage = useUnstageFiles()
 
   const ref = useRef<HTMLDivElement>(null)
   const settings = useSettings()
@@ -63,7 +67,7 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
     <InteractiveListContainer
       className={cn('border-none group/drag')}
       items={filesQuery.data?.items ?? []}
-      getActions={getActions}
+      getInteractions={getInteractions}
       getDragPayload={getDragPayload}
     >
       <DropArea
@@ -121,8 +125,14 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
           <InteractiveSelection
             ref={ref}
             items={filesQuery.data?.items ?? []}
-            getActions={getActions}
+            getInteractions={getInteractions}
             getDragPayload={getDragPayload}
+            deleteAction={(files) => {
+              triggerInteraction({
+                action: unstage,
+                argsRequester: () => files,
+              })
+            }}
           >
             <QueryList
               name="files with staged changes"
@@ -151,12 +161,12 @@ const getDragPayload = (files: StagedFile[] | undefined): DragPayload => ({
   Glyph: IconFiles,
 })
 
-const useGetActions = () => {
+const useGetInteractions = () => {
   const unstage = useUnstageFiles()
   const stash = useStashFiles()
 
-  return () => {
-    return [[unstage, stash]]
+  return (): ItemsInteraction<StagedFile>[][] => {
+    return [[{ action: unstage }, { action: stash }]]
   }
 }
 

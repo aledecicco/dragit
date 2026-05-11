@@ -7,7 +7,10 @@ import { useStashFiles } from '@/api/mutations/saveStash'
 import { useQueryStashes } from '@/api/queries/stashes'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
+import {
+  InteractiveListContainer,
+  type ItemsInteraction,
+} from '@/lib/Interactive/ListContainer'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
@@ -39,7 +42,7 @@ const StashesList = (props: StashesListProps) => {
   })
 
   const stashesQuery = useQueryStashes()
-  const getActions = useGetActions()
+  const getInteractions = useGetInteractions()
 
   const stash = useStashFiles()
 
@@ -54,7 +57,7 @@ const StashesList = (props: StashesListProps) => {
     <InteractiveListContainer
       className={cn('border-none')}
       items={stashesQuery.data ?? []}
-      getActions={getActions}
+      getInteractions={getInteractions}
       getDragPayload={getDragPayload}
     >
       <DropArea
@@ -87,7 +90,7 @@ const StashesList = (props: StashesListProps) => {
             <InteractiveSelection
               ref={ref}
               items={stashesQuery.data ?? []}
-              getActions={getActions}
+              getInteractions={getInteractions}
               getDragPayload={getDragPayload}
             >
               <QueryList
@@ -117,10 +120,18 @@ const getDragPayload = (stashes: StashInfo[] | undefined): DragPayload => ({
   Glyph: IconArchive,
 })
 
-const useGetActions = () => {
+const useGetInteractions = () => {
   const discard = useDiscardStashes()
 
-  return () => [[discard]]
+  return (stashes: StashInfo[]): ItemsInteraction<StashInfo>[][] => [
+    [
+      {
+        action: discard,
+        isDangerous: true,
+        details: `discard ${pluralize('stash', stashes.length, true, 'stashes')}`,
+      },
+    ],
+  ]
 }
 
 export { StashesList, type StashesListProps }

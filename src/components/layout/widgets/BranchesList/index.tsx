@@ -13,7 +13,10 @@ import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
+import {
+  InteractiveListContainer,
+  type ItemsInteraction,
+} from '@/lib/Interactive/ListContainer'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
@@ -51,8 +54,8 @@ const BranchesList = (props: BranchesListProps) => {
     .with('remote', () => remoteBranchesQuery)
     .otherwise(() => allBranchesQuery)
 
-  const getBranchesListActions = useGetBranchesListActions()
-  const getTagsListActions = useGetTagsListActions()
+  const getBranchesListInteractions = useGetBranchesListInteractions()
+  const getTagsListInteractions = useGetTagsListInteractions()
 
   const makeTagCommit = useMakeTagCommit()
   const makeCreateBranchAt = useMakeCreateBranchAt()
@@ -112,7 +115,7 @@ const BranchesList = (props: BranchesListProps) => {
             <InteractiveListContainer
               className={cn('border-none')}
               items={localBranchesQuery.data ?? []}
-              getActions={getBranchesListActions}
+              getInteractions={getBranchesListInteractions}
               getDragPayload={getBranchesDragPayload}
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('local')
@@ -129,7 +132,7 @@ const BranchesList = (props: BranchesListProps) => {
             <InteractiveListContainer
               className={cn('border-none')}
               items={remoteBranchesQuery.data ?? []}
-              getActions={getBranchesListActions}
+              getInteractions={getBranchesListInteractions}
               getDragPayload={getBranchesDragPayload}
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('remote')
@@ -146,7 +149,7 @@ const BranchesList = (props: BranchesListProps) => {
             <InteractiveListContainer
               className={cn('border-none')}
               items={allBranchesQuery.data ?? []}
-              getActions={getBranchesListActions}
+              getInteractions={getBranchesListInteractions}
               getDragPayload={getBranchesDragPayload}
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('all')
@@ -161,7 +164,7 @@ const BranchesList = (props: BranchesListProps) => {
             <InteractiveListContainer
               className={cn('border-none')}
               items={tagsQuery.data ?? []}
-              getActions={getTagsListActions}
+              getInteractions={getTagsListInteractions}
               getDragPayload={getTagsDragPayload}
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('tags')
@@ -186,7 +189,7 @@ const BranchesList = (props: BranchesListProps) => {
           <InteractiveSelection
             ref={ref}
             items={tagsQuery.data ?? []}
-            getActions={getTagsListActions}
+            getInteractions={getTagsListInteractions}
             getDragPayload={getTagsDragPayload}
             deleteAction={(tags) => {
               triggerInteraction({
@@ -214,7 +217,7 @@ const BranchesList = (props: BranchesListProps) => {
           <InteractiveSelection
             ref={ref}
             items={currentBranchesQuery.data ?? []}
-            getActions={getBranchesListActions}
+            getInteractions={getBranchesListInteractions}
             getDragPayload={getBranchesDragPayload}
             deleteAction={(branches) => {
               triggerInteraction({
@@ -263,16 +266,32 @@ const getTagsDragPayload = (tags: TagInfo[] | undefined): DragPayload => ({
   Glyph: IconTags,
 })
 
-const useGetBranchesListActions = () => {
+const useGetBranchesListInteractions = () => {
   const deleteBranches = useDeleteBranches()
 
-  return () => [[deleteBranches]]
+  return (branches: BranchInfo[]): ItemsInteraction<BranchInfo>[][] => [
+    [
+      {
+        action: deleteBranches,
+        isDangerous: true,
+        details: `delete ${pluralize('branch', branches.length, true, 'branches')}`,
+      },
+    ],
+  ]
 }
 
-const useGetTagsListActions = () => {
+const useGetTagsListInteractions = () => {
   const deleteTags = useDeleteTags()
 
-  return () => [[deleteTags]]
+  return (tags: TagInfo[]): ItemsInteraction<TagInfo>[][] => [
+    [
+      {
+        action: deleteTags,
+        isDangerous: true,
+        details: `delete ${pluralize('tag', tags.length, true)}`,
+      },
+    ],
+  ]
 }
 
 export { BranchesList, type BranchesListProps }

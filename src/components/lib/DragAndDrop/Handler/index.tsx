@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react'
+import { type PropsWithChildren, useRef } from 'react'
 import * as DndSettings from '@dnd-kit/dom'
 import * as Dnd from '@dnd-kit/react'
 
@@ -13,9 +13,19 @@ interface DragAndDropHandlerProps extends PropsWithChildren {}
  */
 const DragAndDropHandler = (props: DragAndDropHandlerProps) => {
   const { children } = props
+  const previousFocus = useRef<Element | null>(null)
 
   return (
     <Dnd.DragDropProvider
+      onDragStart={() => {
+        previousFocus.current = document.activeElement
+      }}
+      onDragEnd={() => {
+        if (previousFocus.current instanceof HTMLElement) {
+          previousFocus.current.focus()
+        }
+        previousFocus.current = null
+      }}
       sensors={[
         DndSettings.PointerSensor.configure({
           activationConstraints: [

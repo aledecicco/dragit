@@ -123,7 +123,7 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
         render={
           <InteractiveItem
             interactions={interactions}
-            defaultAction={() => {
+            activationAction={() => {
               showSnapshotDetailsDialog(commitInfo)
             }}
           />

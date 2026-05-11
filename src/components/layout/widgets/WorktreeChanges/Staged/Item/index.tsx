@@ -13,6 +13,7 @@ import {
   MultiSelectItem,
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
+import { triggerInteraction } from '@/state/actions'
 import { Marquee } from '@/ui/Marquee'
 import { getPathLocation } from '@/utils/string'
 import { cn } from '@/utils/styles'
@@ -32,6 +33,7 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
 
   const { filedir, filename } = getPathLocation(file.path)
   const interactions = useInteractions(file)
+  const unstage = useUnstageFile(file)
 
   return (
     <Draggable
@@ -44,8 +46,13 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
-        defaultAction={() => {
+        activationAction={() => {
           showWorktreeFileDiffDialog(file)
+        }}
+        deleteAction={() => {
+          triggerInteraction({
+            action: unstage,
+          })
         }}
         render={<MultiSelectItem {...itemProps} />}
       >
