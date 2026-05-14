@@ -37,7 +37,7 @@ Stash of ideas in ~planned implementation order:
 - [ ] Proper error handling
 - [ ] Toasts (with lib)
 - [ ] Decide on polling vs file watcher
-- [ ] Implement git operations in Rust?
+- [ ] Implement git operations in Rust  ?
 
 ## Development
 

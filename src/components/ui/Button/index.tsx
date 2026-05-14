@@ -57,8 +57,6 @@ const Button = (props: ButtonProps) => {
         'border-none font-semibold',
         'cursor-pointer active:scale-98',
 
-        round && 'aspect-square',
-
         match(size)
           .with('xs', () => [
             'text-xs gap-2',

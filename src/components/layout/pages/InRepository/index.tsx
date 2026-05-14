@@ -8,6 +8,7 @@ import { MainToolbar } from '@/layout/widgets/MainToolbar'
 import { PendingActions } from '@/layout/widgets/PendingActions'
 import { RecyclingBin } from '@/layout/widgets/RecyclingBin'
 import { SecondaryToolbar } from '@/layout/widgets/SecondaryToolbar'
+import { SelectedFileDiff } from '@/layout/widgets/SelectedFileDiff'
 import { StashesList } from '@/layout/widgets/StashesList'
 import { NotStagedWorktreeChanges } from '@/layout/widgets/WorktreeChanges/NotStaged'
 import { StagedWorktreeChanges } from '@/layout/widgets/WorktreeChanges/Staged'
@@ -18,6 +19,11 @@ import { DecoratedButton } from '@/lib/DecoratedButton'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { triggerInteraction } from '@/state/actions'
 import { useBasesSync } from '@/state/branches'
+import {
+  changeSelectedFile,
+  useFileDiffsSync,
+  useSelectedFile,
+} from '@/state/file'
 import { useUpstreamsSync } from '@/state/upstream'
 import { cn } from '@/utils/styles'
 
@@ -27,8 +33,10 @@ import { cn } from '@/utils/styles'
 const InRepositoryPage = () => {
   useBasesSync()
   useUpstreamsSync()
+  useFileDiffsSync()
 
   const makeApplyStash = useMakeApplyStash()
+  const selectedFile = useSelectedFile()
 
   return (
     <>
@@ -80,12 +88,30 @@ const InRepositoryPage = () => {
           <CurrentDirectory />
         </div>
 
-        <div className={cn('w-full h-full min-h-0', 'relative')}>
-          <Graph />
+        <DropArea
+          className={cn('w-full h-full min-h-0', 'relative')}
+          acceptedTypes={['staged-files', 'not-staged-files']}
+          label={{
+            'not-staged-files': 'view file diff',
+            'staged-files': 'view file diff',
+          }}
+          extraValidation={(payload) => {
+            return payload.dragged.length === 1
+          }}
+          handleDrop={(payload) => {
+            changeSelectedFile(payload.dragged.at(0))
+          }}
+        >
+          {selectedFile ? (
+            <SelectedFileDiff selectedFile={selectedFile} />
+          ) : (
+            <Graph />
+          )}
+
           <PendingActions
             className={cn('absolute bottom-2 left-half -translate-x-half')}
           />
-        </div>
+        </DropArea>
       </div>
 
       <div

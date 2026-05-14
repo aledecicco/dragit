@@ -34,8 +34,9 @@ const FileViewerTitle = (props: FileViewerTitleProps) => {
       <Ariakit.Button
         {...propsWithCn(
           buttonProps,
+          'text-sm',
           'font-medium',
-          'hover:underline focus:underline',
+          'cursor-pointer hover:underline focus:underline',
           'px-0 pt-0.5 pb-0',
           'text-light-300',
         )}

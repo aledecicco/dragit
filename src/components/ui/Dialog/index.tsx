@@ -2,6 +2,7 @@ import * as Ariakit from '@ariakit/react'
 import { IconX } from '@tabler/icons-react'
 
 import { DecoratedButton } from '@/lib/DecoratedButton'
+import { useCurrentDrag } from '@/lib/DragAndDrop/utils'
 import { type DialogKey, hideDialog } from '@/state/dialogs'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -23,6 +24,8 @@ interface DialogProps extends Ariakit.DialogProps {
 const Dialog = (props: DialogProps) => {
   const { dialogKey, showClose = true, children, ...dialogProps } = props
 
+  const isDragging = !!useCurrentDrag()
+
   return (
     <Ariakit.Dialog
       open
@@ -38,7 +41,9 @@ const Dialog = (props: DialogProps) => {
       )}
       onClose={(e) => {
         dialogProps.onClose?.(e)
-        hideDialog(dialogKey)
+        if (!isDragging) {
+          hideDialog(dialogKey)
+        }
       }}
     >
       {children}

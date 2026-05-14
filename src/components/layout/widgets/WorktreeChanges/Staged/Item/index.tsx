@@ -3,9 +3,7 @@ import { IconFile } from '@tabler/icons-react'
 import type { StagedFile } from '@/api/models'
 import { useUnstageFile } from '@/api/mutations/removeFromIndex'
 import { useStashFile } from '@/api/mutations/saveStash'
-import { FileIcon } from '@/common/File/Icon'
-import { FilePath } from '@/common/File/Path'
-import { showWorktreeFileDiffDialog } from '@/common/WorktreeFileDiffDialog'
+import { FileItem } from '@/common/File/Item'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractiveItem } from '@/lib/Interactive/Item'
@@ -14,9 +12,7 @@ import {
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
 import { triggerInteraction } from '@/state/actions'
-import { Marquee } from '@/ui/Marquee'
-import { getPathLocation } from '@/utils/string'
-import { cn } from '@/utils/styles'
+import { changeSelectedFile } from '@/state/file'
 
 interface StagedChangesItemProps extends MultiSelectItemProps {
   /**
@@ -31,7 +27,6 @@ interface StagedChangesItemProps extends MultiSelectItemProps {
 const StagedChangesItem = (props: StagedChangesItemProps) => {
   const { file, ...itemProps } = props
 
-  const { filedir, filename } = getPathLocation(file.path)
   const interactions = useInteractions(file)
   const unstage = useUnstageFile(file)
 
@@ -47,7 +42,7 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
       <InteractiveItem
         interactions={interactions}
         activationAction={() => {
-          showWorktreeFileDiffDialog(file)
+          changeSelectedFile(file)
         }}
         deleteAction={() => {
           triggerInteraction({
@@ -56,26 +51,7 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
         }}
         render={<MultiSelectItem {...itemProps} />}
       >
-        <div className={cn('w-full flex flex-col items-start')}>
-          <div
-            className={cn(
-              'grid grid-cols-[max-content_1fr] gap-x-1 items-center min-w-0',
-            )}
-          >
-            <FileIcon file={file} />
-
-            <Marquee className={cn('text-sm text-light-500')}>
-              {filename}
-            </Marquee>
-          </div>
-
-          <Marquee className={cn('text-xs text-light-900/80')}>
-            <FilePath
-              filepath={filedir}
-              separatorProps={{ className: cn('text-light-700') }}
-            />
-          </Marquee>
-        </div>
+        <FileItem file={file} />
       </InteractiveItem>
     </Draggable>
   )

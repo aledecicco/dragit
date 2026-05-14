@@ -1,16 +1,9 @@
 import { useState } from 'react'
 import { match } from 'ts-pattern'
 
-import type { SnapshotId, SnapshotInfo } from '@/api/models'
-import {
-  SNAPSHOT_FILES_PAGE_SIZE,
-  useQuerySnapshotFiles,
-} from '@/api/queries/snapshotFiles'
-import { useNeedsPagination } from '@/api/utils'
+import type { SnapshotId, SnapshotInfo, VersionedFileInfo } from '@/api/models'
 import { ChangesSummary } from '@/common/DiffSummary'
-import { Pagination } from '@/lib/Pagination'
 import { showDialog } from '@/state/dialogs'
-import { Chip } from '@/ui/Chip'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
 import { DialogContent } from '@/ui/Dialog/Content'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -21,7 +14,7 @@ import {
   useDiffFilterSelector,
 } from '../FileViewer/Diff/FilterSelector'
 import { SnapshotDialogDescription } from './Description'
-import { SnapshotDialogFileList, useFileSelector } from './FileList'
+import { SnapshotDialogFileList } from './FileList'
 
 export const SNAPSHOT_DETAILS_DIALOG_KEY = (snapshotId: SnapshotId) =>
   `snapshot_details_dialog:${snapshotId}`
@@ -41,13 +34,8 @@ interface SnapshotDetailsDialogProps extends Omit<DialogProps, 'dialogKey'> {
 const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
   const { snapshotInfo, ...dialogProps } = props
 
-  const [page, setPage] = useState(0)
-
-  const filesQuery = useQuerySnapshotFiles(snapshotInfo, page)
-  const showPagination = useNeedsPagination(filesQuery, page)
-  const fileSelector = useFileSelector(filesQuery.data)
-
   const filterSelector = useDiffFilterSelector()
+  const [selectedFile, setSelectedFile] = useState<VersionedFileInfo>()
 
   return (
     <Dialog
@@ -55,7 +43,7 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
       {...propsWithCn(
         dialogProps,
         'max-w-[90%] max-h-[85%]',
-        fileSelector.selectedFile && 'w-full h-full grid-cols-[430px_1fr]',
+        !!selectedFile && 'w-full h-full grid-cols-[430px_1fr]',
       )}
     >
       <DialogContent
@@ -92,58 +80,25 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
         >
           <SnapshotDialogDescription snapshotInfo={snapshotInfo} />
 
-          <div
-            className={cn(
-              'flex flex-col gap-y-1 overflow-hidden',
-              'h-full min-h-50',
-            )}
-          >
-            <div
-              className={cn(
-                'text-sm text-light-600 text-start',
-                'py-2 flex flex-row gap-x-2 items-center',
-              )}
-            >
-              <p>Files</p>
-
-              {showPagination ? (
-                <Pagination
-                  page={page}
-                  pageSize={SNAPSHOT_FILES_PAGE_SIZE}
-                  hasNext={!!filesQuery.data?.hasNext}
-                  setPrevPage={() => {
-                    setPage((_page) => _page - 1)
-                  }}
-                  setNextPage={() => {
-                    setPage((_page) => _page + 1)
-                  }}
-                />
-              ) : (
-                <Chip size="sm">{filesQuery.data?.items.length ?? '...'}</Chip>
-              )}
-            </div>
-
-            <SnapshotDialogFileList
-              filesQuery={filesQuery}
-              store={fileSelector.store}
-              className={cn('h-full overflow-hidden')}
-            />
-          </div>
+          <SnapshotDialogFileList
+            snapshotInfo={snapshotInfo}
+            setSelectedFile={setSelectedFile}
+          />
         </div>
       </DialogContent>
 
-      {fileSelector.selectedFile && (
+      {!!selectedFile && (
         <div className={cn('w-full h-full relative')}>
           <FileDiffViewer
             diffScope={{
               type: 'snapshot',
               snapshotId: snapshotInfo.id,
-              file: fileSelector.selectedFile,
+              file: selectedFile,
             }}
             filter={filterSelector.value}
           />
 
-          {fileSelector.selectedFile && (
+          {!!selectedFile && (
             <DiffFilterSelector
               className={cn('absolute bottom-0 left-half -translate-x-half')}
               store={filterSelector.store}

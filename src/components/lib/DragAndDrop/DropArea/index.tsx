@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { IconDragDrop, IconForbid2 } from '@tabler/icons-react'
+import { IconDragDrop } from '@tabler/icons-react'
 import { mergeRefs } from 'react-merge-refs'
 
 import { useUniqueId } from '@/state/ids'
@@ -88,13 +88,15 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
       {...propsWithCn(
         divProps,
         'relative',
-        !children && !currentDrag && 'pointer-events-none',
+        !children &&
+          (!currentDrag || disabledByValidation) &&
+          'pointer-events-none',
       )}
       ref={mergeRefs([dropRef, ref])}
     >
       {children}
 
-      {currentDrag && (
+      {currentDrag && !disabledByValidation && (
         <div
           {...propsWithCn(
             overlayProps,
@@ -104,17 +106,14 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
             'rounded-md border border-dashed border-primary-400 bg-dark-400',
             'text-base text-light-950/50 text-center select-none',
             isDropTarget && 'border-accent-400 bg-dark-300 text-light-950/80',
-            disabledByValidation &&
-              'border-dark-50 bg-dark-500 text-light-950/30',
           )}
         >
           <Icon
             size="lg"
-            Glyph={disabledByValidation ? IconForbid2 : (Glyph ?? IconDragDrop)}
+            Glyph={Glyph ?? IconDragDrop}
             className={cn('size-7')}
           />
-          {disabledByValidation ? "Can't" : 'Drop here to'}{' '}
-          {label[currentDrag.data.type]}
+          Drop here to {label[currentDrag.data.type]}
         </div>
       )}
     </div>
