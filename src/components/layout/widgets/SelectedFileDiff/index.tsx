@@ -3,15 +3,15 @@ import { IconX } from '@tabler/icons-react'
 
 import type { WorktreeFileInfo } from '@/api/models'
 import { FileConflictViewer } from '@/common/FileViewer/Conflict'
+import {
+  UnmergedViewSelector,
+  useViewModeSelector,
+} from '@/common/FileViewer/Conflict/UnmergedViewSelector'
 import { FileDiffViewer } from '@/common/FileViewer/Diff'
 import {
   DiffFilterSelector,
   useDiffFilterSelector,
 } from '@/common/FileViewer/Diff/FilterSelector'
-import {
-  UnmergedViewSelector,
-  useViewModeSelector,
-} from '@/common/FileViewer/Diff/UnmergedViewSelector'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { changeSelectedFile } from '@/state/file'

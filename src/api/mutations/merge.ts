@@ -4,7 +4,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
 
-import type { BranchInfo, CommitId, RefName } from '../models'
+import type { BranchInfo, CommitId, RefName, TagInfo } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface MergeArgs {
@@ -25,32 +25,6 @@ const mergeMutation = (repoPath: string) =>
     },
     networkMode: 'always',
   })
-
-const useMerge = (): Action<MergeArgs> => {
-  const merge = useRepositoryMutation(mergeMutation)
-
-  return {
-    id: {
-      key: 'branch_operation',
-      operation: 'merge',
-      type: 'current',
-    },
-    blockedBy: [
-      { key: 'branch_operation', type: 'current' },
-      { key: 'file_operation' },
-    ],
-    run: async (args) => {
-      await merge.mutateAsync(args)
-    },
-    Glyph: IconGitMerge,
-    label: {
-      idle: 'Merge',
-      running: 'Merging',
-      success: 'Merged',
-      error: 'Merge failed',
-    },
-  }
-}
 
 const useMakeMergeBranch = (): ((branch: BranchInfo) => Action) => {
   const merge = useRepositoryMutation(mergeMutation)
@@ -83,6 +57,34 @@ const useMergeBranch = (branch: BranchInfo): Action => {
   return useMakeMergeBranch()(branch)
 }
 
+const useMakeMergeTag = (): ((tag: TagInfo) => Action) => {
+  const merge = useRepositoryMutation(mergeMutation)
+
+  return (tag: TagInfo): Action => ({
+    id: {
+      key: 'branch_operation',
+      operation: 'merge',
+      type: 'current',
+      tag: tag.name,
+    },
+    blockedBy: [{ key: 'branch_operation', type: 'current' }],
+    run: async () => {
+      await merge.mutateAsync({ reference: tag.name })
+    },
+    Glyph: IconGitMerge,
+    label: {
+      idle: 'Merge this tag',
+      running: 'Merging',
+      success: 'Merged',
+      error: 'Merge failed',
+    },
+  })
+}
+
+const useMergeTag = (tag: TagInfo): Action => {
+  return useMakeMergeTag()(tag)
+}
+
 const useMakeMergeCommit = (): ((commit: CommitId) => Action) => {
   const merge = useRepositoryMutation(mergeMutation)
 
@@ -112,9 +114,10 @@ const useMergeCommit = (commit: CommitId): Action => {
 }
 
 export {
-  useMerge,
   useMakeMergeBranch,
   useMergeBranch,
+  useMakeMergeTag,
+  useMergeTag,
   useMakeMergeCommit,
   useMergeCommit,
   mergeKey,

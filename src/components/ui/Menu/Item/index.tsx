@@ -21,7 +21,7 @@ const MenuItem = <T,>(props: MenuItemProps<T>) => {
     <Ariakit.MenuItem
       className={cn(
         'shrink-0 gap-x-2 justify-start text-nowrap w-full',
-        'font-medium',
+        'font-medium active:scale-100',
       )}
       render={
         'action' in buttonProps ? (

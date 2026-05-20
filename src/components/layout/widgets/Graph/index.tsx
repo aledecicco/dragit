@@ -1,22 +1,16 @@
 import { type ComponentProps, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { defaultRangeExtractor, type Range } from '@tanstack/react-virtual'
-import { match } from 'ts-pattern'
 
 import { SvgOverlay } from '@/layout/widgets/Graph/SvgOverlay'
 
-import { useCheckout } from '@/api/mutations/checkout'
-import { useMakeBranchOff } from '@/api/mutations/createBranch'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { getPaginatedLength } from '@/api/utils'
 import { BranchToolbar } from '@/common/BranchToolbar'
-import { requestBranchName } from '@/common/CreateBranchDialog'
-import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
-import { triggerInteraction } from '@/state/actions'
-import { changeSelectedBase, useSelectedBase } from '@/state/branches'
+import { useSelectedBase } from '@/state/branches'
 import { useSettings } from '@/state/settings'
 import { useVirtualizer } from '@/utils/performance'
 import {
@@ -30,6 +24,7 @@ import { GraphBaseBranch } from './Branch/Base'
 import { GraphCurrentBranch } from './Branch/Current'
 import { BranchSelectors } from './Branch/Selectors'
 import { NODE_SIZE } from './Commit/Node'
+import { GraphDropAreas } from './DropAreas'
 import { CURVE_SIZE, EDGE_LENGTH, EDGE_OFFSET } from './Edges/utils'
 
 interface GraphProps extends ComponentProps<'div'> {}
@@ -46,9 +41,6 @@ const Graph = (props: GraphProps) => {
   const currentReference = useHeadReference()
   const currentBranch = useBranch(currentReference)
   const baseBranch = useCurrentBaseBranch()
-
-  const checkout = useCheckout()
-  const makeBranchOff = useMakeBranchOff()
 
   return (
     <div {...propsWithCn(divProps, 'h-full w-full min-h-0')}>
@@ -87,78 +79,7 @@ const Graph = (props: GraphProps) => {
           <GraphInner />
         </div>
 
-        <DropArea
-          className={cn('absolute top-0 left-0 w-half h-18')}
-          overlayProps={{
-            className: cn('rounded-r-none rounded-l-sm flex-row'),
-          }}
-          acceptedTypes={['branch', 'tag', 'commit']}
-          label={{
-            branch: 'checkout this branch',
-            tag: 'checkout this tag',
-            commit: 'checkout this commit',
-          }}
-          handleDrop={(payload) => {
-            if (
-              payload.type === 'branch' &&
-              payload.dragged.type === 'remote'
-            ) {
-              triggerInteraction({
-                action: makeBranchOff(payload.dragged.name),
-                argsRequester: () => requestBranchName(payload.dragged.name),
-              })
-            } else {
-              triggerInteraction({
-                action: checkout,
-                argsRequester: () => {
-                  const newRef = match(payload)
-                    .with({ type: 'commit' }, ({ dragged }) => dragged.id)
-                    .otherwise(({ dragged }) => dragged.name)
-
-                  return {
-                    reference: newRef,
-                    isNew: false,
-                  }
-                },
-              })
-            }
-          }}
-        />
-
-        <DropArea
-          extraValidation={(payload) =>
-            match(payload)
-              .with(
-                { type: 'commit' },
-                ({ dragged }) => dragged.id !== currentReference?.refName,
-              )
-              .otherwise(
-                ({ dragged }) => dragged.name !== currentReference?.refName,
-              )
-          }
-          className={cn('absolute top-0 right-0 w-half h-18')}
-          overlayProps={{
-            className: cn('rounded-l-none rounded-r-sm flex-row'),
-          }}
-          acceptedTypes={['branch', 'tag', 'commit']}
-          label={{
-            branch: 'use this branch as base',
-            tag: 'use this tag as base',
-            commit: 'use this commit as base',
-          }}
-          handleDrop={(payload) => {
-            if (currentReference) {
-              const newRef = match(payload)
-                .with({ type: 'commit' }, ({ dragged }) => dragged.id)
-                .otherwise(({ dragged }) => dragged.name)
-
-              changeSelectedBase(currentReference, {
-                type: payload.type,
-                refName: newRef,
-              })
-            }
-          }}
-        />
+        <GraphDropAreas />
       </div>
     </div>
   )

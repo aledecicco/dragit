@@ -72,7 +72,7 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset scroll when a different file is selected
   useEffect(() => {
     ref.current?.scrollTo({ top: 0, left: 0 })
-  }, [filepath])
+  }, [filepath, children])
 
   return (
     <div

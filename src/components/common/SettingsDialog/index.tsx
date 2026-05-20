@@ -185,7 +185,7 @@ const SettingsDialog = (props: SettingsDialogProps) => {
 
               <SettingsDialogSection label="About">
                 <p className={cn('text-sm text-center text-light-500')}>
-                  Authored by Alejandro De Cicco
+                  Made by Alejandro De Cicco
                 </p>
                 <DecoratedButton
                   Glyph={IconBrandGithub}
