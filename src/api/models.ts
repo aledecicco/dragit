@@ -33,6 +33,7 @@ export interface Settings {
   focusBranchesShortcut: string
   focusStashesShortcut: string
   focusMainShortcut: string
+  closeFileDiffShortcut: string
 
   recentFolders: string[]
   lastOpened: string | null

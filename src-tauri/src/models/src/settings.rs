@@ -30,6 +30,7 @@ pub struct Settings {
     pub focus_branches_shortcut: String,
     pub focus_stashes_shortcut: String,
     pub focus_main_shortcut: String,
+    pub close_file_diff_shortcut: String,
 
     pub recent_folders: Vec<String>,
     pub last_opened: Option<String>,
@@ -65,6 +66,7 @@ impl Default for Settings {
             focus_branches_shortcut: "Ctrl + 4".to_string(),
             focus_stashes_shortcut: "Ctrl + 5".to_string(),
             focus_main_shortcut: "Ctrl + 1".to_string(),
+            close_file_diff_shortcut: "Ctrl + W".to_string(),
 
             recent_folders: Vec::new(),
             last_opened: None,

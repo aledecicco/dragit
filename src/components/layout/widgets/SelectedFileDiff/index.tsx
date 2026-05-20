@@ -36,7 +36,7 @@ const SelectedFileDiff = (props: SelectedFileDiffProps) => {
   useShortcutBinding(settings.focusMainShortcut, () => {
     ref.current?.focus()
   })
-  useShortcutBinding('ctrl+w', () => {
+  useShortcutBinding(settings.closeFileDiffShortcut, () => {
     changeSelectedFile(undefined)
   })
 

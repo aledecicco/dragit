@@ -177,6 +177,10 @@ const SettingsDialog = (props: SettingsDialogProps) => {
                   action="focus the stashes list"
                   setting="focusStashesShortcut"
                 />
+                <ShortcutSetting
+                  action="close an open file diff"
+                  setting="closeFileDiffShortcut"
+                />
               </SettingsDialogSection>
 
               <SettingsDialogSection label="About">
