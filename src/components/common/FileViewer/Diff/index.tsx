@@ -1,19 +1,22 @@
-import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
-import type { DiffScope } from '@/api/models'
+import type { DiffScope, FileDiff } from '@/api/models'
 import { useQueryFileDiff } from '@/api/queries/fileDiff'
 import { FileIcon } from '@/common/File/Icon'
 import { FileStatus } from '@/common/File/Status'
 import { cn } from '@/utils/styles'
 
-import { FileViewerContainer } from '../common/Container'
+import {
+  FileViewerContainer,
+  type FileViewerContainerProps,
+} from '../common/Container'
 import { FileDiffViewerContent } from './Content'
 import type { DiffFilter } from './utils'
 
 export const LARGE_DIFF_THRESHOLD = 1000
 
-interface FileDiffViewerProps extends ComponentProps<'div'> {
+interface FileDiffViewerProps
+  extends Partial<FileViewerContainerProps<FileDiff>> {
   /**
    * The scope of the diff to display (staged changes, unstaged changes, or a specific snapshot).
    */
@@ -29,17 +32,17 @@ interface FileDiffViewerProps extends ComponentProps<'div'> {
  * Displays the contents of a file, showing changes made to it on each line.
  */
 const FileDiffViewer = (props: FileDiffViewerProps) => {
-  const { diffScope, filter = 'both', ...divProps } = props
+  const { diffScope, filter = 'both', ...containerProps } = props
 
   const fileDiffQuery = useQueryFileDiff(diffScope)
   const fileStageAnnotation =
     diffScope.type === 'unmerged'
       ? match(diffScope.stage)
           .with('ours', () => (
-            <span className={cn('text-primary-500')}>Ours</span>
+            <span className={cn('text-xs text-primary-500')}>Ours</span>
           ))
           .with('theirs', () => (
-            <span className={cn('text-warning-500')}>Theirs</span>
+            <span className={cn('text-xs text-warning-500')}>Theirs</span>
           ))
           .exhaustive()
       : match(filter)
@@ -68,7 +71,7 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
 
   return (
     <FileViewerContainer
-      {...divProps}
+      {...containerProps}
       query={fileDiffQuery}
       decoration={<FileIcon file={diffScope.file} size="lg" />}
       filepath={filepath}

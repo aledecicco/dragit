@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 import type {
   ConflictType,
@@ -10,13 +10,20 @@ import { FileIcon } from '@/common/File/Icon'
 import { FileStatus } from '@/common/File/Status'
 import { cn } from '@/utils/styles'
 
-import { FileViewerContainer } from '../common/Container'
+import {
+  FileViewerContainer,
+  type FileViewerContainerProps,
+} from '../common/Container'
 import { FileViewerContent } from '../common/Content'
 import { LineIndicator } from '../common/LineIndicator'
 import { LineNumber } from '../common/LineNumber'
 import { highlightConflicts } from './utils'
 
-interface FileConflictViewerProps extends ComponentProps<'div'> {
+interface FileConflictViewerProps
+  extends Partial<FileViewerContainerProps<FileConflicts>> {
+  /**
+   * The conflicted file to display.
+   */
   file: UnmergedFileInfo
 }
 
@@ -24,13 +31,13 @@ interface FileConflictViewerProps extends ComponentProps<'div'> {
  * Displays the conflicted version of an unmerged file, showing both sides.
  */
 const FileConflictViewer = (props: FileConflictViewerProps) => {
-  const { file, ...divProps } = props
+  const { file, ...containerProps } = props
 
   const fileConflictsQuery = useQueryFileConflicts(file)
 
   return (
     <FileViewerContainer
-      {...divProps}
+      {...containerProps}
       query={fileConflictsQuery}
       filepath={file.path}
       decoration={<FileIcon file={file} size="lg" />}

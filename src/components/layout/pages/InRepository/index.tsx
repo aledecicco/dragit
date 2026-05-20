@@ -5,7 +5,6 @@ import { CurrentDirectory } from '@/layout/widgets/CurrentDirectory'
 import { CurrentRemote } from '@/layout/widgets/CurrentRemote'
 import { Graph } from '@/layout/widgets/Graph'
 import { MainToolbar } from '@/layout/widgets/MainToolbar'
-import { PendingActions } from '@/layout/widgets/PendingActions'
 import { RecyclingBin } from '@/layout/widgets/RecyclingBin'
 import { SecondaryToolbar } from '@/layout/widgets/SecondaryToolbar'
 import { SelectedFileDiff } from '@/layout/widgets/SelectedFileDiff'
@@ -89,7 +88,7 @@ const InRepositoryPage = () => {
         </div>
 
         <DropArea
-          className={cn('w-full h-full min-h-0', 'relative')}
+          className={cn('w-full h-full min-h-0')}
           acceptedTypes={['staged-files', 'not-staged-files']}
           label={{
             'not-staged-files': 'view file diff',
@@ -107,10 +106,6 @@ const InRepositoryPage = () => {
           ) : (
             <Graph />
           )}
-
-          <PendingActions
-            className={cn('absolute bottom-2 left-half -translate-x-half')}
-          />
         </DropArea>
       </div>
 

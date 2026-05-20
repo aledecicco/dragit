@@ -7,7 +7,7 @@ import { useAmend } from '@/api/mutations/commitIndex'
 import { useQueryCommitInfo } from '@/api/queries/commitInfo'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
-import { QueryLoader } from '@/lib/Loader/Query'
+import { QueryLoader } from '@/lib/QueryLoader'
 import { triggerInteraction } from '@/state/actions'
 import { cn, propsWithCn } from '@/utils/styles'
 

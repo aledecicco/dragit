@@ -31,9 +31,9 @@ const useAbortRebase = (): Action => {
       await abortRebase.mutateAsync()
     },
     label: {
-      idle: 'Abort',
-      running: 'Aborting',
-      success: 'Aborted',
+      idle: 'Abort rebase',
+      running: 'Aborting rebase',
+      success: 'Rebase aborted',
       error: 'Failed to abort',
     },
     Glyph: IconArrowBackUpDouble,

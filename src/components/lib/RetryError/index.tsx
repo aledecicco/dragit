@@ -29,7 +29,7 @@ const RetryError = (props: RetryErrorProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'flex flex-row gap-x-1 p-2 items-center',
+        'flex flex-row gap-x-1 p-2 items-center self-start',
         'text-sm text-danger-600',
       )}
     >

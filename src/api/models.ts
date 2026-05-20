@@ -32,7 +32,7 @@ export interface Settings {
   focusStagedShortcut: string
   focusBranchesShortcut: string
   focusStashesShortcut: string
-  focusGraphShortcut: string
+  focusMainShortcut: string
 
   recentFolders: string[]
   lastOpened: string | null

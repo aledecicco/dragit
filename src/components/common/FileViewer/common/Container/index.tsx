@@ -2,13 +2,15 @@ import {
   type ComponentProps,
   Fragment,
   type ReactNode,
+  type RefObject,
   useEffect,
   useRef,
 } from 'react'
 import * as Ariakit from '@ariakit/react'
 import type { UseQueryResult } from '@tanstack/react-query'
+import { mergeRefs } from 'react-merge-refs'
 
-import { QueryLoader } from '@/lib/Loader/Query'
+import { QueryLoader } from '@/lib/QueryLoader'
 import { Separator } from '@/ui/Separator'
 import { Skeleton } from '@/ui/Skeleton'
 import { range } from '@/utils/array'
@@ -39,6 +41,11 @@ interface FileViewerContainerProps<T>
   annotation?: ReactNode
 
   /**
+   * Optional ref to hook into the file viewer.
+   */
+  viewerRef?: RefObject<HTMLDivElement | null>
+
+  /**
    * Function that accepts the query's result and returns the children to render.
    *
    * @param result - The resulting data of the query.
@@ -50,14 +57,21 @@ interface FileViewerContainerProps<T>
  * Displays the contents of a file, showing changes made to it on each line.
  */
 const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
-  const { query, filepath, decoration, annotation, children, ...divProps } =
-    props
+  const {
+    query,
+    filepath,
+    decoration,
+    annotation,
+    viewerRef,
+    children,
+    ...divProps
+  } = props
 
-  const viewerRef = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset scroll when a different file is selected
   useEffect(() => {
-    viewerRef.current?.scrollTo({ top: 0, left: 0 })
+    ref.current?.scrollTo({ top: 0, left: 0 })
   }, [filepath])
 
   return (
@@ -77,11 +91,12 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
       <Separator />
 
       <Ariakit.Focusable
-        ref={viewerRef}
+        ref={mergeRefs([ref, viewerRef])}
         render={<div />}
         className={cn(
           'pl-1 py-1 text-sm overflow-y-auto',
           'grid grid-cols-[max-content_max-content_1fr] grid-rows-[1fr]',
+          'border border-transparent focus:border-x-dark-50 focus:border-b-dark-50',
         )}
       >
         <QueryLoader

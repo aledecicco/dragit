@@ -1,13 +1,15 @@
-import { IconUpload } from '@tabler/icons-react'
+import { match } from 'ts-pattern'
 
-import type { BranchInfo } from '@/api/models'
+import { useAbortMerge } from '@/api/mutations/abortMerge'
+import { useAbortRebase } from '@/api/mutations/abortRebase'
 import { useCommit } from '@/api/mutations/commitIndex'
-import { usePushBranch } from '@/api/mutations/pushBranch'
+import { useContinueMerge } from '@/api/mutations/continueMerge'
+import { useContinueRebase } from '@/api/mutations/continueRebase'
+import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { useSettings } from '@/state/settings'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
-import { useCurrentBranch } from '@/utils/repository'
 
 interface SecondaryToolbarProps extends Partial<ToolbarProps> {}
 
@@ -17,53 +19,67 @@ interface SecondaryToolbarProps extends Partial<ToolbarProps> {}
 const SecondaryToolbar = (props: SecondaryToolbarProps) => {
   const { ...toolbarProps } = props
 
+  const worktreeStatus = useQueryHeadInfo().data?.worktreeStatus
+
   const commit = useCommit()
-  const currentBranch = useCurrentBranch()
+  const abortMerge = useAbortMerge()
+  const continueMerge = useContinueMerge()
+  const abortRebase = useAbortRebase()
+  const continueRebase = useContinueRebase()
 
   const settings = useSettings()
 
   return (
     <Toolbar {...toolbarProps} fixed>
-      <ToolbarItem
-        fixed
-        status="primary"
-        size="md"
-        compact={false}
-        action={commit}
-        argsRequester={requestCommitParams}
-        shortcut={settings.commitShortcut}
-      />
-
-      {currentBranch ? (
-        <PushItem branch={currentBranch} />
-      ) : (
-        <ToolbarItem
-          fixed
-          label="Push"
-          Glyph={IconUpload}
-          status="primary"
-          size="md"
-          compact={false}
-          disabled
-        />
-      )}
+      {match(worktreeStatus)
+        .with('merging', () => (
+          <>
+            <ToolbarItem
+              fixed
+              status="warning"
+              size="md"
+              compact={false}
+              action={abortMerge}
+            />
+            <ToolbarItem
+              fixed
+              status="warning"
+              size="md"
+              compact={false}
+              action={continueMerge}
+            />
+          </>
+        ))
+        .with('rebasing', () => (
+          <>
+            <ToolbarItem
+              fixed
+              status="warning"
+              size="md"
+              compact={false}
+              action={abortRebase}
+            />
+            <ToolbarItem
+              fixed
+              status="warning"
+              size="md"
+              compact={false}
+              action={continueRebase}
+            />
+          </>
+        ))
+        .otherwise(() => (
+          <ToolbarItem
+            fixed
+            status="primary"
+            size="md"
+            compact={false}
+            action={commit}
+            argsRequester={requestCommitParams}
+            shortcut={settings.commitShortcut}
+          />
+        ))}
     </Toolbar>
-  )
-}
-
-const PushItem = (props: { branch: BranchInfo }) => {
-  const { branch } = props
-
-  const push = usePushBranch(branch)
-
-  return (
-    <ToolbarItem
-      fixed
-      status="primary"
-      size="md"
-      compact={false}
-      action={push}
-    />
   )
 }
 

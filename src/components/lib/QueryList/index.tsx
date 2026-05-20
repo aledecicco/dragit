@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { UseQueryResult } from '@tanstack/react-query'
 import { usePrevious } from 'react-use'
 
-import { QueryLoader } from '@/lib/Loader/Query'
+import { QueryLoader } from '@/lib/QueryLoader'
 import { VirtualizedDiv, type VirtualizedDivProps } from '@/lib/VirtualizedDiv'
 import { Skeleton } from '@/ui/Skeleton'
 import { range } from '@/utils/array'

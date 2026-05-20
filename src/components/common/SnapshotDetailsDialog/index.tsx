@@ -98,12 +98,10 @@ const SnapshotDetailsDialog = (props: SnapshotDetailsDialogProps) => {
             filter={filterSelector.value}
           />
 
-          {!!selectedFile && (
-            <DiffFilterSelector
-              className={cn('absolute bottom-0 left-half -translate-x-half')}
-              store={filterSelector.store}
-            />
-          )}
+          <DiffFilterSelector
+            className={cn('absolute bottom-0 left-half -translate-x-half')}
+            store={filterSelector.store}
+          />
         </div>
       )}
     </Dialog>

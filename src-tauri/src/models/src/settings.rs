@@ -29,7 +29,7 @@ pub struct Settings {
     pub focus_staged_shortcut: String,
     pub focus_branches_shortcut: String,
     pub focus_stashes_shortcut: String,
-    pub focus_graph_shortcut: String,
+    pub focus_main_shortcut: String,
 
     pub recent_folders: Vec<String>,
     pub last_opened: Option<String>,
@@ -64,7 +64,7 @@ impl Default for Settings {
             focus_staged_shortcut: "Ctrl + 3".to_string(),
             focus_branches_shortcut: "Ctrl + 4".to_string(),
             focus_stashes_shortcut: "Ctrl + 5".to_string(),
-            focus_graph_shortcut: "Ctrl + 1".to_string(),
+            focus_main_shortcut: "Ctrl + 1".to_string(),
 
             recent_folders: Vec::new(),
             last_opened: None,

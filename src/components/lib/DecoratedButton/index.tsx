@@ -4,7 +4,7 @@ import { type AnyAction, useActionPresenters } from '@/state/actions'
 import { Button, type ButtonProps, type ButtonStatus } from '@/ui/Button'
 import { type Glyph, Icon, type IconProps } from '@/ui/Icon'
 import { Tooltip } from '@/ui/Tooltip'
-import { cn, propsWithCn } from '@/utils/styles'
+import { propsWithCn } from '@/utils/styles'
 
 interface BaseDecoratedButtonProps extends ButtonProps {
   /**
@@ -91,10 +91,10 @@ const BaseDecoratedButton = (props: BaseDecoratedButtonProps) => {
       {compact ? (
         children
       ) : (
-        <div className={cn('overflow-hidden text-ellipsis')}>
+        <>
           {label}
           {children}
-        </div>
+        </>
       )}
     </Button>
   )

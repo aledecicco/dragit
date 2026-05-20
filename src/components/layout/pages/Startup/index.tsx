@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react'
 import { IconReload } from '@tabler/icons-react'
 
-import logo from '@/assets/logo.jpg'
+import logo from '@/assets/logo.png'
 
 import type { CurrentDirInfo } from '@/api/models'
 import { useInitRepository } from '@/api/mutations/initRepository'
@@ -13,7 +13,7 @@ import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { FilePath } from '@/common/File/Path'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
-import { QueryLoader } from '@/lib/Loader/Query'
+import { QueryLoader } from '@/lib/QueryLoader'
 import { useSettings } from '@/state/settings'
 import { Marquee } from '@/ui/Marquee'
 import { chooseDirectory } from '@/utils/behavior'

@@ -24,9 +24,8 @@ const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
   const { ...toggleGroupProps } = props
 
   return (
-    <ToggleGroup fixed {...toggleGroupProps}>
+    <ToggleGroup {...toggleGroupProps}>
       <ToggleGroupItem
-        fixed
         size="sm"
         value="theirs"
         label="Before changes"
@@ -41,7 +40,6 @@ const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
         />
       </ToggleGroupItem>
       <ToggleGroupItem
-        fixed
         size="sm"
         value="both"
         label="Inline changes"
@@ -51,7 +49,6 @@ const DiffFilterSelector = (props: DiffFilterSelectorProps) => {
         }}
       />
       <ToggleGroupItem
-        fixed
         size="sm"
         value="ours"
         label="After changes"

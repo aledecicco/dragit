@@ -31,9 +31,9 @@ const useAbortMerge = (): Action => {
       await abortMerge.mutateAsync()
     },
     label: {
-      idle: 'Abort',
-      running: 'Aborting',
-      success: 'Aborted',
+      idle: 'Abort merge',
+      running: 'Aborting merge',
+      success: 'Merge aborted',
       error: 'Failed to abort',
     },
     Glyph: IconArrowBackUpDouble,

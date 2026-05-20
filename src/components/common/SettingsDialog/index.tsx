@@ -158,8 +158,8 @@ const SettingsDialog = (props: SettingsDialogProps) => {
                 />
 
                 <ShortcutSetting
-                  action="focus the graph view"
-                  setting="focusGraphShortcut"
+                  action="focus the main view"
+                  setting="focusMainShortcut"
                 />
                 <ShortcutSetting
                   action="focus the unstaged changes list"

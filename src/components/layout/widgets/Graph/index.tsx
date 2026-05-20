@@ -208,7 +208,7 @@ const GraphInner = () => {
 
   const ref = useRef<HTMLDivElement>(null)
   const settings = useSettings()
-  useShortcutBinding(settings.focusGraphShortcut, () => {
+  useShortcutBinding(settings.focusMainShortcut, () => {
     ref.current?.focus()
   })
 
@@ -239,7 +239,6 @@ const GraphInner = () => {
           className={cn(
             'overflow-auto scroll-smooth w-full h-full bg-dark-800/80',
             'will-change-transform',
-            'border border-transparent focus:border-dark-100',
           )}
         >
           <SvgOverlay

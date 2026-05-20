@@ -163,14 +163,14 @@ const Button = (props: ButtonProps) => {
             'aria-disabled:text-success-200/30',
           ])
           .with({ variant: 'filled', status: 'warning' }, () => [
-            'bg-warning-600 text-dark-500',
-            'hover:bg-warning-500',
-            'aria-expanded:bg-warning-500',
-            'aria-checked:bg-warning-500',
-            'aria-selected:bg-warning-500',
-            'data-active-item:aria-selected:bg-warning-400',
-            'focus:bg-warning-500 data-focus:bg-warning-500',
-            'aria-disabled:bg-warning-600/40 aria-disabled:text-light-700',
+            'bg-warning-700 text-warning-100',
+            'hover:bg-warning-600',
+            'aria-expanded:bg-warning-600',
+            'aria-checked:bg-warning-600',
+            'aria-selected:bg-warning-600',
+            'data-active-item:aria-selected:bg-warning-500',
+            'focus:bg-warning-600 data-focus:bg-warning-600',
+            'aria-disabled:bg-warning-700/40 aria-disabled:text-warning-700',
           ])
           .with({ variant: 'plain', status: 'warning' }, () => [
             'text-warning-200/90',

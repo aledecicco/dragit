@@ -1,4 +1,8 @@
-import { IconColumns3Filled } from '@tabler/icons-react'
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconColumns3Filled,
+} from '@tabler/icons-react'
 
 import { useSettings } from '@/state/settings'
 import {
@@ -11,7 +15,7 @@ import { cn } from '@/utils/styles'
 
 interface UnmergedViewSelectorProps extends ToggleGroupProps {}
 
-const DIFF_VIEW_MODES = ['inline', 'side_by_side'] as const
+const DIFF_VIEW_MODES = ['inline', 'ours', 'theirs'] as const
 
 /**
  * A selector to choose a view mode for unmerged files.
@@ -24,9 +28,9 @@ const UnmergedViewSelector = (props: UnmergedViewSelectorProps) => {
       <ToggleGroupItem
         fixed
         size="sm"
-        value="side_by_side"
-        label="Side by side"
-        Glyph={IconColumns3Filled}
+        value="ours"
+        label="Our changes"
+        Glyph={IconChevronLeft}
         className={cn('relative rounded-bl-none')}
       >
         <div
@@ -43,7 +47,14 @@ const UnmergedViewSelector = (props: UnmergedViewSelectorProps) => {
         value="inline"
         label="Inline conflicts"
         Glyph={IconColumns3Filled}
-        iconProps={{ className: cn('rotate-90') }}
+      />
+
+      <ToggleGroupItem
+        fixed
+        size="sm"
+        value="theirs"
+        label="Their changes"
+        Glyph={IconChevronRight}
         className={cn('relative rounded-br-none')}
       >
         <div
@@ -59,7 +70,7 @@ const UnmergedViewSelector = (props: UnmergedViewSelectorProps) => {
 
 const useViewModeSelector = () => {
   const settings = useSettings()
-  const defaultValue = settings.preferInline ? 'inline' : 'side_by_side'
+  const defaultValue = settings.preferInline ? 'inline' : 'ours'
 
   return useToggleHandler(DIFF_VIEW_MODES, defaultValue)
 }
