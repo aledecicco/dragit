@@ -49,8 +49,8 @@ const StashesList = (props: StashesListProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const settings = useSettings()
   useShortcutBinding(settings.focusStashesShortcut, () => {
-    ref.current?.focus()
     accordionHandler.store.setOpen(true)
+    ref.current?.focus()
   })
 
   return (

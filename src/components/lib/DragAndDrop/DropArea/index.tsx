@@ -45,7 +45,9 @@ interface DropAreaProps<T extends DragType> extends ComponentProps<'div'> {
   /**
    * Additional props to pass to the overlay displayed during drag operations.
    */
-  overlayProps?: ComponentProps<'div'>
+  overlayProps?:
+    | ComponentProps<'div'>
+    | ((payload: MatchingPayload<T>) => ComponentProps<'div'> | undefined)
 }
 
 /**
@@ -99,7 +101,9 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
       {currentDrag && !disabledByValidation && (
         <div
           {...propsWithCn(
-            overlayProps,
+            typeof overlayProps === 'function'
+              ? overlayProps(currentDrag.data)
+              : overlayProps,
             'z-3',
             'absolute top-0 left-0 w-full h-full overflow-hidden',
             'flex flex-col items-center justify-center gap-2 p-4',

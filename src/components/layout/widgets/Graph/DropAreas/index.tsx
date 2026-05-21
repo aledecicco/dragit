@@ -9,6 +9,7 @@ import {
 } from '@/api/mutations/merge'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
+import type { MatchingPayload } from '@/lib/DragAndDrop/utils'
 import { triggerInteraction } from '@/state/actions'
 import { changeSelectedBase } from '@/state/branches'
 import { useHeadReference } from '@/utils/repository'
@@ -26,13 +27,27 @@ const GraphDropAreas = () => {
   const makeMergeTag = useMakeMergeTag()
   const makeMergeCommit = useMakeMergeCommit()
 
+  const validateBaseBranchDrop = (
+    payload: MatchingPayload<'branch' | 'tag' | 'commit'>,
+  ) => {
+    return match(payload)
+      .with(
+        { type: 'commit' },
+        ({ dragged }) => dragged.id !== currentReference?.refName,
+      )
+      .otherwise(({ dragged }) => dragged.name !== currentReference?.refName)
+  }
+
   return (
     <>
       <DropArea
         className={cn('absolute top-0 left-0 w-half h-18')}
-        overlayProps={{
-          className: cn('rounded-r-none rounded-l-sm flex-row'),
-        }}
+        overlayProps={(payload) => ({
+          className: cn(
+            'rounded-sm flex-row',
+            validateBaseBranchDrop(payload) && 'rounded-r-none',
+          ),
+        })}
         acceptedTypes={['branch', 'tag', 'commit']}
         label={{
           branch: 'checkout this branch',
@@ -74,16 +89,7 @@ const GraphDropAreas = () => {
           tag: 'use this tag as base',
           commit: 'use this commit as base',
         }}
-        extraValidation={(payload) =>
-          match(payload)
-            .with(
-              { type: 'commit' },
-              ({ dragged }) => dragged.id !== currentReference?.refName,
-            )
-            .otherwise(
-              ({ dragged }) => dragged.name !== currentReference?.refName,
-            )
-        }
+        extraValidation={validateBaseBranchDrop}
         handleDrop={(payload) => {
           if (currentReference) {
             const newRef = match(payload)
