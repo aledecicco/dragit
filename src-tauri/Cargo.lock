@@ -1007,7 +1007,7 @@ dependencies = [
 
 [[package]]
 name = "dragit"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "api",
  "borsh",
@@ -1623,7 +1623,7 @@ dependencies = [
 
 [[package]]
 name = "git_handler"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "borsh",
  "models",

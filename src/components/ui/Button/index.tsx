@@ -97,8 +97,8 @@ const Button = (props: ButtonProps) => {
             'hover:bg-primary-300/8',
             'aria-expanded:bg-primary-300/8',
             'aria-checked:bg-primary-300/8',
-            'aria-selected:bg-primary-300/10',
-            'data-active-item:aria-selected:bg-primary-300/12',
+            'aria-selected:bg-primary-300/8',
+            'data-active-item:aria-selected:bg-primary-300/10',
             'focus:bg-primary-300/8 data-focus:bg-primary-300/8',
             'aria-disabled:text-primary-400/40',
           ])
@@ -134,12 +134,12 @@ const Button = (props: ButtonProps) => {
           ])
           .with({ variant: 'plain', status: 'neutral' }, () => [
             'text-light-50',
-            'hover:bg-dark-400',
-            'aria-expanded:bg-dark-400',
-            'aria-checked:bg-dark-400',
-            'aria-selected:bg-dark-300',
-            'data-active-item:aria-selected:bg-dark-200',
-            'focus:bg-dark-400 data-focus:bg-dark-400',
+            'hover:bg-light-50/4',
+            'aria-expanded:bg-light-50/4',
+            'aria-checked:bg-light-50/4',
+            'aria-selected:bg-light-50/6',
+            'data-active-item:aria-selected:bg-light-50/8',
+            'focus:bg-light-50/4 data-focus:bg-light-50/4',
             'aria-disabled:text-light-800',
           ])
           .with({ variant: 'filled', status: 'success' }, () => [

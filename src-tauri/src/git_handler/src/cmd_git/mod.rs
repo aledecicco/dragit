@@ -33,13 +33,18 @@ impl CmdGit {
         let mut cmd = Command::new("git");
         let args_vec: Vec<_> = args.into_iter().collect();
 
-        cmd.current_dir(path)
-            .args(&args_vec)
-            .stdout(Stdio::piped())
-            .spawn()
-            .or(Err(GitError::StartCommandFailed {
-                args: args_vec.into_iter().map(String::from).collect(),
-            }))
+        cmd.current_dir(path).args(&args_vec).stdout(Stdio::piped());
+
+        #[cfg(windows)]
+        {
+            // Avoid opening a new console window for the git process on Windows.
+            use std::os::windows::process::CommandExt;
+            cmd.creation_flags(0x08000000);
+        }
+
+        cmd.spawn().or(Err(GitError::StartCommandFailed {
+            args: args_vec.into_iter().map(String::from).collect(),
+        }))
     }
 
     fn await_child(&self, mut process: Child) -> Result<(), GitError> {
