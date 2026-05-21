@@ -1,43 +1,36 @@
-# Dragit
+<div align="center">
 
-A convenient and modern UI to interact with Git repositories.
+  <img src="./src/assets/logo.png" alt="Logo" width="200"/>
+
+  ## Dragit
+
+  A convenient and modern UI to interact with Git repositories.
+
+  [![Version](https://img.shields.io/badge/version-v1.0.0-blue)](https://semver.org/)
+  [![License](https://img.shields.io/github/license/aledecicco/dragit)](https://opensource.org/licenses/gpl-3.0)
+</div>
+
+## Introduction
+The goal of this project is to make a Git companion that is, above all, practical and pleasant to use.
+Pretty much every action can be done through keyboard shortcuts, context menues, or simple drag and drop gestures.
+All the necessary information is displayed in a single screen at every moment, speeding up the revision control process.
+Many aspects of Git's inner workings are simplified or abstracted away to make the user experience as smooth as possible.
+
+## Requirements
+
+The current version leverages the user's installed Git version.
+Git must be installed in the system and accessible at the `git` command.
+A minimum version of 2.51.0 is recommended.
 
 ## Roadmap
 
-Stash of ideas in ~planned implementation order:
-
-- [x] Keyboard shortcuts cheatsheet component
-- [x] Loading indicators
-- [x] Remotes manipulation widgets
-- [x] Commit details
-- [x] Documentation pass
-- [x] Performance pass
-- [x] Global action tracking
-- [x] Word diffs
-- [x] Store bases and upstreams
-- [x] Checkout of remote branches, create branch from commit
-- [x] Tabs for filtering in branches widget
-- [x] "Create" option on empty comboboxes
+- [ ] Implement git operations in Rust
+- [ ] Proper error handling and toasts
 - [ ] Highlight file sections in scrollbar
-- [x] Merge continuation
-- [x] Open files on click
-- [x] Display old paths in file viewers for moved files
-- [x] Paginate pathspec searches
-- [x] "Init", "empty dir", and "not a repository" screens
-- [ ] Highlight matches during pathspec search
-- [x] More complete commit dialog with "amend" option
-- [x] Delete remote branches
+- [ ] Animations
 - [ ] Manage remote tags
-- [ ] Animations pass
-- [x] Drag and drop shortcuts
-- [x] Global keyboard shortcuts
-- [x] Settings screen
 - [ ] Resolve diff segments in diff viewer
-- [x] Uncommit, undo changes
-- [ ] Proper error handling
-- [ ] Toasts (with lib)
-- [ ] Decide on polling vs file watcher
-- [ ] Implement git operations in Rust  ?
+
 
 ## Development
 
