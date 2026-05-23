@@ -1,6 +1,6 @@
-import { Fragment } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
-import { useKeyPress } from 'react-use'
+import { useEffectOnce } from 'react-use'
 import { match } from 'ts-pattern'
 
 import { useSettings } from '@/state/settings'
@@ -12,6 +12,7 @@ import {
   getShortcutKeys,
   getShortcutSequence,
   SHORTCUT_SEPARATOR,
+  type ShortcutKeys,
   useActiveShortcutScopes,
   useShortcutBinding,
 } from '../utils'
@@ -54,27 +55,58 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
   } = props
 
   const shortcutKeys = getShortcutKeys(hotkey)
-  const [modifiersPressed, keyboardEvent] = useKeyPress((event) => {
-    const modifiersCount =
-      Number(shortcutKeys.has('ctrl') && event.ctrlKey) +
-      Number(shortcutKeys.has('shift') && event.shiftKey) +
-      Number(shortcutKeys.has('alt') && event.altKey) +
-      Number(shortcutKeys.has('meta') && event.metaKey)
 
-    return modifiersCount > 1
+  const pressedKeys = useRef<ShortcutKeys>(new Set())
+  const [keysLeft, setKeysLeft] = useState<string[]>()
+  const [modifiersCount, setModifiersCount] = useState(0)
+
+  useEffectOnce(() => {
+    const updateKeysLeft = () => {
+      setKeysLeft(
+        getShortcutSequence(shortcutKeys).filter((key) => {
+          const isPressedModifier =
+            (key === 'ctrl' && pressedKeys.current.has('Control')) ||
+            (key === 'shift' && pressedKeys.current.has('Shift')) ||
+            (key === 'alt' && pressedKeys.current.has('Alt')) ||
+            (key === 'meta' && pressedKeys.current.has('Meta'))
+
+          return !isPressedModifier
+        }),
+      )
+    }
+
+    const updateModifiersCount = () => {
+      const count =
+        Number(pressedKeys.current.has('Control')) +
+        Number(pressedKeys.current.has('Shift')) +
+        Number(pressedKeys.current.has('Alt')) +
+        Number(pressedKeys.current.has('Meta'))
+
+      setModifiersCount(count)
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.repeat) return
+
+      pressedKeys.current.add(e.key)
+      updateKeysLeft()
+      updateModifiersCount()
+    }
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      pressedKeys.current.delete(e.key)
+      updateKeysLeft()
+      updateModifiersCount()
+    }
+
+    window.addEventListener('keydown', handleKeyDown, { capture: true })
+    window.addEventListener('keyup', handleKeyUp, { capture: true })
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, { capture: true })
+      window.removeEventListener('keyup', handleKeyUp, { capture: true })
+    }
   })
-
-  const keysLeft = keyboardEvent
-    ? getShortcutSequence(shortcutKeys).filter((key) => {
-        const isPressedModifier =
-          (key === 'ctrl' && keyboardEvent.ctrlKey) ||
-          (key === 'shift' && keyboardEvent.shiftKey) ||
-          (key === 'alt' && keyboardEvent.altKey) ||
-          (key === 'meta' && keyboardEvent.metaKey)
-
-        return !isPressedModifier
-      })
-    : undefined
 
   useShortcutBinding(hotkey, () => {
     action()
@@ -86,7 +118,7 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
   const shouldShowIndicator =
     settings.showShortcutIndicators &&
     shortcutScopes.includes('app') &&
-    modifiersPressed &&
+    modifiersCount > 1 &&
     !!keysLeft?.length
 
   return (
@@ -108,7 +140,7 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
               .exhaustive(),
           )}
         >
-          {keysLeft?.map((key) => (
+          {keysLeft.map((key) => (
             <Fragment key={key}>
               {SHORTCUT_SEPARATOR}
               <b>{capitalize(key)}</b>

@@ -57,10 +57,19 @@ export const useDefaultEventPrevention = () => {
       e.stopPropagation()
     }
 
+    const preventReload = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+    }
+
     window.addEventListener('contextmenu', preventContextMenu)
+    window.addEventListener('keydown', preventReload)
 
     return () => {
       window.removeEventListener('contextmenu', preventContextMenu)
+      window.removeEventListener('keydown', preventReload)
     }
   })
 }

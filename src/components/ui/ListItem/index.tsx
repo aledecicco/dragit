@@ -14,13 +14,13 @@ const ListItem = (props: ListItemProps) => {
     <Ariakit.CompositeItem
       {...propsWithCn(
         itemProps,
+        'group cursor-pointer',
         'w-full p-1.5 bg-dark-600 rounded-xs shadow-md',
         'hover:bg-dark-500 focus:bg-dark-500 data-focus:bg-dark-500',
         'aria-selected:bg-dark-400',
         'hover:aria-selected:bg-dark-300 focus:aria-selected:bg-dark-300 data-focus:aria-selected:bg-dark-300',
         'border border-transparent',
         'aria-current:border-accent-300 aria-checked:border-accent-300',
-        'cursor-pointer',
       )}
     />
   )

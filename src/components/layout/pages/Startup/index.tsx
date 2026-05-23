@@ -129,7 +129,7 @@ const StartupPageInner = (props: ComponentProps<'div'>) => {
       <img
         src={logo}
         alt="Dragit logo"
-        className={cn('w-80 mt-[20%] pointer-events-none select-none')}
+        className={cn('w-60 mt-[30%] pointer-events-none select-none')}
       />
 
       {children}

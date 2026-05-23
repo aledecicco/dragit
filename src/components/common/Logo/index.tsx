@@ -7,15 +7,15 @@ import type { Glyph } from '@/ui/Icon'
 const LogoGlyph: Glyph = (props) => {
   return (
     <svg
-      {...(props as SVGProps<SVGSVGElement>)}
-      viewBox="6 6 12 12"
       overflow="visible"
+      viewBox="4 4 12 12"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
+      {...(props as SVGProps<SVGSVGElement>)}
       aria-label="Dragit logo"
     >
-      <image href={logo} x={-2} y={-2} width={28} height={28} />
+      <image href={logo} width={20} height={20} />
     </svg>
   )
 }

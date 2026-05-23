@@ -27,8 +27,6 @@ const EVENT_ID = 'app-event'
 const useBackendEventshandler = () => {
   useEffectOnce(() => {
     const unlisten = listen<AppEvent>(EVENT_ID, (event) => {
-      console.log(`Received event: ${JSON.stringify(event)}`)
-
       match(event.payload)
         .with({ type: 'settingsChanged' }, () => {
           client.invalidateQueries({

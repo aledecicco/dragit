@@ -114,7 +114,7 @@ const Marquee = (props: MarqueeProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'group/marquee overflow-x-hidden relative max-w-full flex flex-row',
+        'group overflow-x-hidden relative max-w-full flex flex-row',
         reverse && 'justify-end',
       )}
       ref={mergeRefs([containerRef, divProps.ref])}
@@ -123,7 +123,8 @@ const Marquee = (props: MarqueeProps) => {
         ref={contentRef}
         className={cn(
           'text-nowrap whitespace-nowrap min-w-max',
-          shouldScroll && 'group-hover/marquee:animate-scroll-horizontal',
+          shouldScroll &&
+            'group-hover:animate-scroll-horizontal group-focus:animate-scroll-horizontal',
           infinite && 'relative',
         )}
         style={{
@@ -164,10 +165,11 @@ const Marquee = (props: MarqueeProps) => {
               reverse
                 ? [
                     'opacity-100',
-                    !infinite && 'group-hover/marquee:animate-fade-out',
+                    !infinite &&
+                      'group-hover:animate-fade-out group-focus:animate-fade-out',
                   ]
-                : 'opacity-0 group-hover/marquee:animate-fade-in',
-              'group-hover/marquee:animate-fade-in',
+                : 'opacity-0 group-hover:animate-fade-in group-focus:animate-fade-in',
+              'group-hover:animate-fade-in group-focus:animate-fade-in',
               'pointer-events-none',
             )}
             style={{
@@ -179,10 +181,11 @@ const Marquee = (props: MarqueeProps) => {
               'absolute top-0 -right-0.5 h-full',
               'opacity-100 w-2 bg-linear-to-l from-dark-950/70 to-transparent rounded-r-xs',
               reverse
-                ? 'opacity-0 group-hover/marquee:animate-fade-in'
+                ? 'opacity-0 group-hover:animate-fade-in group-focus:animate-fade-in'
                 : [
                     'opacity-100',
-                    !infinite && 'group-hover/marquee:animate-fade-out',
+                    !infinite &&
+                      'group-hover:animate-fade-out group-focus:animate-fade-out',
                   ],
             )}
             style={{

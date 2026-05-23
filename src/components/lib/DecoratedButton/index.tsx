@@ -3,6 +3,7 @@ import { match } from 'ts-pattern'
 import { type AnyAction, useActionPresenters } from '@/state/actions'
 import { Button, type ButtonProps, type ButtonStatus } from '@/ui/Button'
 import { type Glyph, Icon, type IconProps } from '@/ui/Icon'
+import { Marquee } from '@/ui/Marquee'
 import { Tooltip } from '@/ui/Tooltip'
 import { propsWithCn } from '@/utils/styles'
 
@@ -92,7 +93,7 @@ const BaseDecoratedButton = (props: BaseDecoratedButtonProps) => {
         children
       ) : (
         <>
-          {label}
+          <Marquee>{label}</Marquee>
           {children}
         </>
       )}

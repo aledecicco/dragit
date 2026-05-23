@@ -21,7 +21,7 @@ const deleteTagsMutation = (repoPath: string) =>
   mutationOptions({
     mutationKey: [deleteTagsKey(repoPath)],
     mutationFn: (args: DeleteTagsArgs) => {
-      return invoke('delete_tags', { repoPath, ...args })
+      return invoke('delete_local_tags', { repoPath, ...args })
     },
     networkMode: 'always',
   })
