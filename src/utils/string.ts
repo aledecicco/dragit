@@ -29,7 +29,7 @@ export const pluralize = (
  * @param filepath - The file path to split.
  */
 export const splitPath = (filepath: string): string[] => {
-  return filepath.split(Path.sep())
+  return filepath.split('/')
 }
 
 /**

@@ -1,4 +1,5 @@
 import { type ComponentProps, Fragment } from 'react'
+import * as Path from '@tauri-apps/api/path'
 
 import { splitPath } from '@/utils/string'
 import { propsWithCn } from '@/utils/styles'
@@ -30,7 +31,7 @@ const FilePath = (props: FilePathProps) => {
           {segment}
 
           {i < all.length - 1 && (
-            <span {...propsWithCn(separatorProps, 'mx-px')}>/</span>
+            <span {...propsWithCn(separatorProps, 'mx-px')}>{Path.sep()}</span>
           )}
         </Fragment>
       ))}
