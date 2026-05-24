@@ -5,7 +5,7 @@ import type { ShortcutScope } from '../utils'
 
 interface ShortcutsHandlerProps extends PropsWithChildren {}
 
-const initialScope: ShortcutScope = 'global'
+const initialScopes: ShortcutScope[] = ['global', 'app']
 
 /**
  * Provides the app with global keyboard shortcuts.
@@ -14,7 +14,7 @@ const ShortcutsHandler = (props: ShortcutsHandlerProps) => {
   const { children } = props
 
   return (
-    <HotkeysProvider initiallyActiveScopes={[initialScope]}>
+    <HotkeysProvider initiallyActiveScopes={initialScopes}>
       {children}
     </HotkeysProvider>
   )

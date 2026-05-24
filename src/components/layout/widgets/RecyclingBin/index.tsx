@@ -9,6 +9,7 @@ import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { triggerInteraction } from '@/state/actions'
 import { useCurrentBranch } from '@/utils/repository'
+import { pluralize } from '@/utils/string'
 import { cn } from '@/utils/styles'
 
 interface RecyclingBinProps extends ComponentProps<'div'> {}
@@ -77,7 +78,7 @@ const RecyclingBin = (props: RecyclingBinProps) => {
               action: deleteBranches,
               argsRequester: () => dragged,
               isDangerous: true,
-              details: `delete ${dragged.length} branches`,
+              details: `delete ${pluralize('branch', dragged.length, true, 'branches')}`,
             })
           })
           .with({ type: 'stash' }, ({ dragged }) => {
@@ -93,7 +94,7 @@ const RecyclingBin = (props: RecyclingBinProps) => {
               action: discardStashes,
               argsRequester: () => dragged,
               isDangerous: true,
-              details: `discard ${dragged.length} stashes`,
+              details: `discard ${pluralize('stash', dragged.length, true, 'stashes')}`,
             })
           })
           .with({ type: 'tag' }, ({ dragged }) => {
@@ -109,7 +110,7 @@ const RecyclingBin = (props: RecyclingBinProps) => {
               action: deleteTags,
               argsRequester: () => dragged,
               isDangerous: true,
-              details: `delete ${dragged.length} tags`,
+              details: `delete ${pluralize('tag', dragged.length, true, 'tags')}`,
             })
           })
           .with({ type: 'not-staged-files' }, ({ dragged }) => {
@@ -117,7 +118,7 @@ const RecyclingBin = (props: RecyclingBinProps) => {
               action: discardFiles,
               argsRequester: () => dragged,
               isDangerous: true,
-              details: `discard changes in ${dragged.length} files`,
+              details: `discard changes in ${pluralize('file', dragged.length, true, 'files')}`,
             })
           })
           .exhaustive()

@@ -28,6 +28,7 @@ export const useShortcutBinding = (
   return useHotkeys(hotkey, callback, {
     scopes: [scope],
     enableOnFormTags: true,
+    preventDefault: true,
   })
 }
 
