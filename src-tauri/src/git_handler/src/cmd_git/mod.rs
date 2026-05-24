@@ -451,6 +451,14 @@ impl GitHandler for CmdGit {
             .or(Err(GitError::DiscardChangesFailed {}))
     }
 
+    fn clean_files(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
+        let mut args = vec!["clean", "-f", "--"];
+        args.extend(files);
+
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::CleanFilesFailed {}))
+    }
+
     fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError> {
         let mut args = vec!["commit", "-m", message];
 

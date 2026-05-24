@@ -67,6 +67,9 @@ pub enum GitError {
     #[error("Failed to discard file changes")]
     DiscardChangesFailed {},
 
+    #[error("Failed to clean files")]
+    CleanFilesFailed {},
+
     #[error("Failed to commit the current index")]
     CommitFailed {},
 

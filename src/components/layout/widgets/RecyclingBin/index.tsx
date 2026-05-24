@@ -46,6 +46,10 @@ const RecyclingBin = (props: RecyclingBinProps) => {
           return payload.dragged.name !== currentBranch.name
         }
 
+        if (payload.type === 'not-staged-files') {
+          return !payload.dragged.some((file) => file.status === 'unmerged')
+        }
+
         return true
       }}
       label={{

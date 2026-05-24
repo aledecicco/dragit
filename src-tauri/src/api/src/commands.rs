@@ -267,6 +267,16 @@ pub async fn discard_changes(
     with_handler(&state, &|h| h.discard_changes(repo_path, &files))
 }
 
+/// Removes the given untracked files.
+#[tauri::command]
+pub async fn clean_files(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    files: Vec<&str>,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.clean_files(repo_path, &files))
+}
+
 /// Commits the current index with the given message.
 #[tauri::command]
 pub async fn commit_index(

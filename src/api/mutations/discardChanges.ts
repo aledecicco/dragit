@@ -11,6 +11,10 @@ interface DiscardChangesArgs {
   files: string[]
 }
 
+interface CleanFilesArgs {
+  files: string[]
+}
+
 const discardChangesKey = (repoPath: string) =>
   ({
     ...pathMutationKey(repoPath),
@@ -26,8 +30,24 @@ const discardChangesMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
+const cleanFilesKey = (repoPath: string) =>
+  ({
+    ...pathMutationKey(repoPath),
+    key: 'clean_files',
+  }) as const
+
+const cleanFilesMutation = (repoPath: string) =>
+  mutationOptions({
+    mutationKey: [cleanFilesKey(repoPath)],
+    mutationFn: (args: CleanFilesArgs) => {
+      return invoke('clean_files', { repoPath, ...args })
+    },
+    networkMode: 'always',
+  })
+
 const useMakeDiscardFileChanges = (): ((file: WorktreeFileInfo) => Action) => {
   const discardChanges = useRepositoryMutation(discardChangesMutation)
+  const cleanFiles = useRepositoryMutation(cleanFilesMutation)
 
   return (file: WorktreeFileInfo): Action => ({
     id: {
@@ -40,7 +60,11 @@ const useMakeDiscardFileChanges = (): ((file: WorktreeFileInfo) => Action) => {
       { key: 'branch_operation', type: 'current' },
     ],
     run: async () => {
-      await discardChanges.mutateAsync({ files: [file.path] })
+      if (file.status === 'untracked') {
+        await cleanFiles.mutateAsync({ files: [file.path] })
+      } else {
+        await discardChanges.mutateAsync({ files: [file.path] })
+      }
     },
     label: {
       idle: 'Discard',
@@ -56,8 +80,9 @@ const useDiscardFileChanges = (file: WorktreeFileInfo): Action => {
   return useMakeDiscardFileChanges()(file)
 }
 
-const useDiscardChanges = (): Action<WorktreeFileInfo[] | string[]> => {
+const useDiscardChanges = (): Action<WorktreeFileInfo[]> => {
   const discardChanges = useRepositoryMutation(discardChangesMutation)
+  const cleanFiles = useRepositoryMutation(cleanFilesMutation)
 
   return {
     id: { key: 'file_operation', operation: 'discard_changes' },
@@ -66,11 +91,24 @@ const useDiscardChanges = (): Action<WorktreeFileInfo[] | string[]> => {
       { key: 'branch_operation', type: 'current' },
     ],
     run: async (files) => {
-      await discardChanges.mutateAsync({
-        files: files.map((file) =>
-          typeof file === 'string' ? file : file.path,
-        ),
-      })
+      const untrackedFiles = files.filter((file) => file.status === 'untracked')
+      const trackedFiles = files.filter((file) => file.status !== 'untracked')
+
+      const removeUntracked =
+        untrackedFiles.length > 0
+          ? cleanFiles.mutateAsync({
+              files: untrackedFiles.map((file) => file.path),
+            })
+          : Promise.resolve()
+
+      const removeTracked =
+        trackedFiles.length > 0
+          ? discardChanges.mutateAsync({
+              files: trackedFiles.map((file) => file.path),
+            })
+          : Promise.resolve()
+
+      await Promise.all([removeUntracked, removeTracked])
     },
     derivedIds: (files) =>
       files.map((file) => ({

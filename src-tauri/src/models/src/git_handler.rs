@@ -111,6 +111,9 @@ pub trait GitHandler {
     /// Discards the changes in the given files.
     fn discard_changes(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
 
+    /// Removes untracked files from the worktree.
+    fn clean_files(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
+
     /// Commits the current index with the given message.
     fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError>;
 

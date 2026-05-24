@@ -64,6 +64,7 @@ pub fn run() {
             api::remove_from_index,
             api::remove_from_tree,
             api::discard_changes,
+            api::clean_files,
             api::commit_index,
             api::reset_head,
             api::get_common_ancestor,
