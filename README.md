@@ -6,7 +6,7 @@
 
   A convenient and modern UI to interact with Git repositories.
 
-  [![Version](https://img.shields.io/badge/version-v1.0.1-blue)](https://semver.org/)
+  [![Version](https://img.shields.io/github/v/tag/aledecicco/dragit)](https://semver.org/)
   [![License](https://img.shields.io/github/license/aledecicco/dragit)](https://opensource.org/licenses/gpl-3.0)
 </div>
 
@@ -28,7 +28,11 @@ A minimum version of `v2.51.0` is recommended.
 - [ ] Implement git operations in Rust
 - [ ] Proper error handling and toasts
 - [ ] Highlight file sections in scrollbar
+- [ ] Compare arbitrary refspecs
+- [ ] Show merge unions between branches
+- [ ] Clone and open a repo from a URL
 - [ ] Animations
+- [ ] Allow layout adjustments
 - [ ] Manage remote tags
 - [ ] Resolve diff segments in diff viewer
 

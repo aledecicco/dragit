@@ -111,35 +111,10 @@ const useRefreshCanvas = () => {
   return { refreshTrigger: rerenderTrigger, refresh }
 }
 
-/**
- * Hook that refreshes the SVG overlay when needed.
- *
- * @param ref - A ref to the container element of the SVG overlay.
- */
-const useSyncCanvas = (ref: RefObject<HTMLDivElement>) => {
-  const { refresh } = useRefreshCanvas()
-  const observer = useRef<ResizeObserver | null>(null)
-
-  useEffect(() => {
-    observer.current = new ResizeObserver(refresh)
-    const element = ref.current
-
-    if (element) {
-      observer.current.observe(element)
-    }
-
-    return () => {
-      if (element) {
-        observer.current?.disconnect()
-      }
-    }
-  }, [refresh, ref])
-}
-
 export {
   makeTracked,
   getPosition,
-  useSyncCanvas,
+  useRefreshCanvas,
   type TrackRefProps,
   type Position,
 }

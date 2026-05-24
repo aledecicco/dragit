@@ -182,6 +182,11 @@ const useInteractions = (branch: BranchInfo) => {
         requestBranchName(branch.name, branch.name.split('/').at(-1)),
     }),
     interaction({
+      action: branchOff,
+      argsRequester: () =>
+        requestBranchName(branch.name, branch.name.split('/').at(-1)),
+    }),
+    interaction({
       action: tag,
       argsRequester: () => requestTagParams(branch.name),
     }),
