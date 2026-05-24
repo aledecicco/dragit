@@ -58,7 +58,7 @@ checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
 
 [[package]]
 name = "api"
-version = "1.0.0"
+version = "0.0.0"
 dependencies = [
  "borsh",
  "diffs",
@@ -882,7 +882,7 @@ dependencies = [
 
 [[package]]
 name = "diffs"
-version = "1.0.0"
+version = "0.0.0"
 dependencies = [
  "imara-diff",
  "models",
@@ -1007,7 +1007,7 @@ dependencies = [
 
 [[package]]
 name = "dragit"
-version = "1.0.1"
+version = "1.0.3"
 dependencies = [
  "api",
  "borsh",
@@ -1623,7 +1623,7 @@ dependencies = [
 
 [[package]]
 name = "git_handler"
-version = "1.0.1"
+version = "0.0.0"
 dependencies = [
  "borsh",
  "models",
@@ -2542,7 +2542,7 @@ dependencies = [
 
 [[package]]
 name = "models"
-version = "1.0.0"
+version = "0.0.0"
 dependencies = [
  "borsh",
  "parking_lot",
@@ -3680,7 +3680,7 @@ checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
 
 [[package]]
 name = "repo_watcher"
-version = "1.0.0"
+version = "0.0.0"
 dependencies = [
  "models",
  "notify",
@@ -4178,7 +4178,7 @@ dependencies = [
 
 [[package]]
 name = "settings"
-version = "1.0.0"
+version = "0.0.0"
 dependencies = [
  "models",
  "partially",

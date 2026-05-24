@@ -2,7 +2,6 @@ import { IconFile } from '@tabler/icons-react'
 
 import type { StagedFile } from '@/api/models'
 import { useUnstageFile } from '@/api/mutations/removeFromIndex'
-import { useStashFile } from '@/api/mutations/saveStash'
 import { FileItem } from '@/common/File/Item'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
@@ -59,11 +58,8 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
 
 const useInteractions = (file: StagedFile) => {
   const unstage = useUnstageFile(file)
-  const stash = useStashFile(file)
 
-  return [
-    group(interaction({ action: unstage }), interaction({ action: stash })),
-  ]
+  return [group(interaction({ action: unstage }))]
 }
 
 export { StagedChangesItem, type StagedChangesItemProps }

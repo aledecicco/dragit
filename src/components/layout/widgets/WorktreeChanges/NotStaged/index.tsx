@@ -20,24 +20,23 @@ import {
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
+import { requestStashParams } from '@/common/StashDialog'
+import { interaction } from '@/lib/ActionButton/utils'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import {
-  InteractiveListContainer,
-  type ItemsInteraction,
-} from '@/lib/Interactive/ListContainer'
+import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
-import { triggerInteraction } from '@/state/actions'
+import { type AnyInteraction, triggerInteraction } from '@/state/actions'
 import {
   setNextPage,
   setPrevPage,
   useHandleFilesPageSync,
   useWorktreeFilesPage,
 } from '@/state/pages'
-import { useSettings } from '@/state/settings'
+import { getSettings, useSettings } from '@/state/settings'
 import { Chip } from '@/ui/Chip'
 import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -190,7 +189,7 @@ const useGetInteractions = () => {
 
   const discard = useDiscardChanges()
 
-  return (files: NotStagedFile[]): ItemsInteraction<NotStagedFile>[][] => {
+  return (files: NotStagedFile[]): AnyInteraction[][] => {
     const allBothAddedOrModified = files.every(
       (file) =>
         file.status === 'unmerged' &&
@@ -199,9 +198,9 @@ const useGetInteractions = () => {
     if (allBothAddedOrModified) {
       return [
         [
-          { action: acceptAsIs },
-          { action: acceptOurs },
-          { action: acceptTheirs },
+          interaction({ action: acceptAsIs, argsRequester: () => files }),
+          interaction({ action: acceptOurs, argsRequester: () => files }),
+          interaction({ action: acceptTheirs, argsRequester: () => files }),
         ],
       ]
     }
@@ -212,7 +211,12 @@ const useGetInteractions = () => {
         (file.changes === 'addedByUs' || file.changes === 'addedByThem'),
     )
     if (allAddedByUsOrThem) {
-      return [[{ action: acceptNewFiles }, { action: ignoreNewFiles }]]
+      return [
+        [
+          interaction({ action: acceptNewFiles, argsRequester: () => files }),
+          interaction({ action: ignoreNewFiles, argsRequester: () => files }),
+        ],
+      ]
     }
 
     const allDeletedByUsOrThem = files.every(
@@ -221,7 +225,12 @@ const useGetInteractions = () => {
         (file.changes === 'deletedByUs' || file.changes === 'deletedByThem'),
     )
     if (allDeletedByUsOrThem) {
-      return [[{ action: acceptDeletions }, { action: ignoreDeletions }]]
+      return [
+        [
+          interaction({ action: acceptDeletions, argsRequester: () => files }),
+          interaction({ action: ignoreDeletions, argsRequester: () => files }),
+        ],
+      ]
     }
 
     const allDeleted = files.every(
@@ -232,23 +241,36 @@ const useGetInteractions = () => {
           file.changes === 'deletedByThem'),
     )
     if (allDeleted) {
-      return [[{ action: acceptDeletions }]]
+      return [
+        [interaction({ action: acceptDeletions, argsRequester: () => files })],
+      ]
     }
 
     const anyUnmerged = files.some((file) => file.status === 'unmerged')
     if (anyUnmerged) {
-      return [[{ action: stage }]]
+      return [[interaction({ action: stage, argsRequester: () => files })]]
     }
 
     return [
       [
-        { action: stage },
-        { action: stash },
-        {
+        interaction({ action: stage, argsRequester: () => files }),
+        interaction({
+          action: stash,
+          argsRequester: async () => {
+            const { askForStashMessage } = getSettings()
+            const message = askForStashMessage
+              ? (await requestStashParams()).message
+              : null
+
+            return { files, message }
+          },
+        }),
+        interaction({
           action: discard,
+          argsRequester: () => files,
           isDangerous: true,
           details: `discard changes in ${pluralize('file', files.length, true)}`,
-        },
+        }),
       ],
     ]
   }

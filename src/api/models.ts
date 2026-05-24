@@ -10,6 +10,7 @@ export interface Settings {
   openLastOnStart: boolean
   confirmDangerousActions: boolean
   autoFetchRemote: boolean
+  askForStashMessage: boolean
 
   showShortcutIndicators: boolean
   relativeTimestamps: boolean

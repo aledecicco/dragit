@@ -11,16 +11,14 @@ import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
+import { interaction } from '@/lib/ActionButton/utils'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import {
-  InteractiveListContainer,
-  type ItemsInteraction,
-} from '@/lib/Interactive/ListContainer'
+import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
-import { triggerInteraction } from '@/state/actions'
+import { type AnyInteraction, triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/settings'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
@@ -269,13 +267,14 @@ const getTagsDragPayload = (tags: TagInfo[] | undefined): DragPayload => ({
 const useGetBranchesListInteractions = () => {
   const deleteBranches = useDeleteBranches()
 
-  return (branches: BranchInfo[]): ItemsInteraction<BranchInfo>[][] => [
+  return (branches: BranchInfo[]): AnyInteraction[][] => [
     [
-      {
+      interaction({
         action: deleteBranches,
+        argsRequester: () => branches,
         isDangerous: true,
         details: `delete ${pluralize('branch', branches.length, true, 'branches')}`,
-      },
+      }),
     ],
   ]
 }
@@ -283,13 +282,14 @@ const useGetBranchesListInteractions = () => {
 const useGetTagsListInteractions = () => {
   const deleteTags = useDeleteTags()
 
-  return (tags: TagInfo[]): ItemsInteraction<TagInfo>[][] => [
+  return (tags: TagInfo[]): AnyInteraction[][] => [
     [
-      {
+      interaction({
         action: deleteTags,
+        argsRequester: () => tags,
         isDangerous: true,
         details: `delete ${pluralize('tag', tags.length, true)}`,
-      },
+      }),
     ],
   ]
 }

@@ -10,24 +10,23 @@ import {
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
+import { requestStashParams } from '@/common/StashDialog'
+import { interaction } from '@/lib/ActionButton/utils'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import {
-  InteractiveListContainer,
-  type ItemsInteraction,
-} from '@/lib/Interactive/ListContainer'
+import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
-import { triggerInteraction } from '@/state/actions'
+import { type AnyInteraction, triggerInteraction } from '@/state/actions'
 import {
   setNextPage,
   setPrevPage,
   useHandleFilesPageSync,
   useWorktreeFilesPage,
 } from '@/state/pages'
-import { useSettings } from '@/state/settings'
+import { getSettings, useSettings } from '@/state/settings'
 import { Chip } from '@/ui/Chip'
 import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -165,8 +164,23 @@ const useGetInteractions = () => {
   const unstage = useUnstageFiles()
   const stash = useStashFiles()
 
-  return (): ItemsInteraction<StagedFile>[][] => {
-    return [[{ action: unstage }, { action: stash }]]
+  return (files: StagedFile[]): AnyInteraction[][] => {
+    return [
+      [
+        interaction({ action: unstage, argsRequester: () => files }),
+        interaction({
+          action: stash,
+          argsRequester: async () => {
+            const { askForStashMessage } = getSettings()
+            const message = askForStashMessage
+              ? (await requestStashParams()).message
+              : null
+
+            return { files, message }
+          },
+        }),
+      ],
+    ]
   }
 }
 

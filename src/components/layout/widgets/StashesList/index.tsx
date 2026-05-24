@@ -5,17 +5,16 @@ import type { StashInfo } from '@/api/models'
 import { useDiscardStashes } from '@/api/mutations/discardStashes'
 import { useStashFiles } from '@/api/mutations/saveStash'
 import { useQueryStashes } from '@/api/queries/stashes'
+import { requestStashParams } from '@/common/StashDialog'
+import { interaction } from '@/lib/ActionButton/utils'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import {
-  InteractiveListContainer,
-  type ItemsInteraction,
-} from '@/lib/Interactive/ListContainer'
+import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
-import { triggerInteraction } from '@/state/actions'
-import { useSettings } from '@/state/settings'
+import { type AnyInteraction, triggerInteraction } from '@/state/actions'
+import { getSettings, useSettings } from '@/state/settings'
 import { Accordion } from '@/ui/Accordion'
 import {
   AccordionSection,
@@ -68,7 +67,16 @@ const StashesList = (props: StashesListProps) => {
         handleDrop={(payload) => {
           triggerInteraction({
             action: stash,
-            argsRequester: () => payload.dragged,
+            argsRequester: async () => {
+              const files = payload.dragged
+
+              const { askForStashMessage } = getSettings()
+              const message = askForStashMessage
+                ? (await requestStashParams()).message
+                : null
+
+              return { files, message }
+            },
           })
         }}
         overlayProps={{
@@ -123,13 +131,14 @@ const getDragPayload = (stashes: StashInfo[] | undefined): DragPayload => ({
 const useGetInteractions = () => {
   const discard = useDiscardStashes()
 
-  return (stashes: StashInfo[]): ItemsInteraction<StashInfo>[][] => [
+  return (stashes: StashInfo[]): AnyInteraction[][] => [
     [
-      {
+      interaction({
         action: discard,
+        argsRequester: () => stashes,
         isDangerous: true,
         details: `discard ${pluralize('stash', stashes.length, true, 'stashes')}`,
-      },
+      }),
     ],
   ]
 }

@@ -19,10 +19,10 @@ import {
   type ContextMenuEvent,
   WithContextMenu,
 } from '@/lib/WithContextMenu'
+import type { AnyInteraction } from '@/state/actions'
 import { useUniqueId } from '@/state/ids'
 import { cn } from '@/utils/styles'
 
-import type { ItemsInteraction } from '../ListContainer'
 import { InteractiveMenuItems } from '../MenuItems'
 import { classifyItemEvent } from './utils'
 
@@ -36,7 +36,7 @@ interface InteractiveSelectionProps<T>
   /**
    * Callback that returns the list of ways to interact with the selected items.
    */
-  getInteractions: (items: T[]) => ItemsInteraction<T>[][]
+  getInteractions: (items: T[]) => AnyInteraction[][]
   /**
    * Callback that returns the payload to be used when dragging the selected items.
    */
@@ -101,12 +101,7 @@ const InteractiveSelectionInner = <T,>(
   )
 
   const menuId = useUniqueId()
-  const interactions = getInteractions(selectedItems).map((section) =>
-    section.map((interaction) => ({
-      ...interaction,
-      argsRequester: () => selectedItems,
-    })),
-  )
+  const interactions = getInteractions(selectedItems)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset selection when items change
   useEffect(() => {

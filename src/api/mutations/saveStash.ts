@@ -8,7 +8,7 @@ import type { WorktreeFileInfo } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface SaveStashArgs {
-  files: string[]
+  files: WorktreeFileInfo[] | string[]
   message: string | null
   includeUntracked: boolean
 }
@@ -28,19 +28,23 @@ const saveStashMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useMakeStashFile = (): ((file: WorktreeFileInfo) => Action) => {
+type StashFileArgs = Pick<SaveStashArgs, 'message'>
+
+const useMakeStashFile = (): ((
+  file: WorktreeFileInfo,
+) => Action<StashFileArgs>) => {
   const saveStash = useRepositoryMutation(saveStashMutation)
 
-  return (file: WorktreeFileInfo): Action => ({
+  return (file: WorktreeFileInfo): Action<StashFileArgs> => ({
     id: { key: 'file_operation', operation: 'save_stash', file: file.path },
     blockedBy: [
       { key: 'file_operation', file: file.path },
       { key: 'branch_operation', type: 'current' },
     ],
-    run: async () => {
+    run: async (args) => {
       await saveStash.mutateAsync({
         files: [file.path],
-        message: null, // TODO: allow messages
+        message: args.message ? args.message : null,
         includeUntracked: true,
       })
     },
@@ -54,11 +58,13 @@ const useMakeStashFile = (): ((file: WorktreeFileInfo) => Action) => {
   })
 }
 
-const useStashFile = (file: WorktreeFileInfo): Action => {
+const useStashFile = (file: WorktreeFileInfo): Action<StashFileArgs> => {
   return useMakeStashFile()(file)
 }
 
-const useStashFiles = (): Action<WorktreeFileInfo[] | string[]> => {
+type StashFilesArgs = Pick<SaveStashArgs, 'files' | 'message'>
+
+const useStashFiles = (): Action<StashFilesArgs> => {
   const saveStash = useRepositoryMutation(saveStashMutation)
 
   return {
@@ -67,17 +73,17 @@ const useStashFiles = (): Action<WorktreeFileInfo[] | string[]> => {
       { key: 'file_operation' },
       { key: 'branch_operation', type: 'current' },
     ],
-    run: async (files) => {
+    run: async (args) => {
       await saveStash.mutateAsync({
-        files: files.map((file) =>
+        files: args.files.map((file) =>
           typeof file === 'string' ? file : file.path,
         ),
-        message: null, // TODO: allow messages
+        message: args.message ? args.message : null,
         includeUntracked: true,
       })
     },
-    derivedIds: (files) =>
-      files.map((file) => ({
+    derivedIds: (args) =>
+      args.files.map((file) => ({
         key: 'file_operation',
         operation: 'save_stash',
         file: typeof file === 'string' ? file : file.path,

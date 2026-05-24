@@ -2,7 +2,8 @@ import { useStageFiles } from '@/api/mutations/addToIndex'
 import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
 import { useStashFiles } from '@/api/mutations/saveStash'
 import { requestWorktreeFiles } from '@/common/FileSelectorDialog'
-import { useSettings } from '@/state/settings'
+import { requestStashParams } from '@/common/StashDialog'
+import { getSettings, useSettings } from '@/state/settings'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 import { propsWithCn } from '@/utils/styles'
@@ -52,7 +53,16 @@ const MainToolbar = (props: MainToolbarProps) => {
         size="md"
         compact={false}
         action={stashFiles}
-        argsRequester={() => requestWorktreeFiles(NOT_STAGED_FILE_TYPES)}
+        argsRequester={async () => {
+          const files = await requestWorktreeFiles(NOT_STAGED_FILE_TYPES)
+
+          const { askForStashMessage } = getSettings()
+          const message = askForStashMessage
+            ? (await requestStashParams()).message
+            : null
+
+          return { files, message }
+        }}
         shortcut={settings.stashFilesShortcut}
       />
     </Toolbar>

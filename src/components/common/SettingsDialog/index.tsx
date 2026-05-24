@@ -70,7 +70,6 @@ const SettingsDialog = (props: SettingsDialogProps) => {
                   label="Open last folder on start"
                   setting="openLastOnStart"
                 />
-
                 <CheckboxSetting
                   label="Confirm dangerous actions"
                   setting="confirmDangerousActions"
@@ -80,6 +79,11 @@ const SettingsDialog = (props: SettingsDialogProps) => {
                   label="Auto-refresh remote"
                   setting="autoFetchRemote"
                   description="Periodically fetch changes from the remote repository to keep it up to date"
+                />
+                <CheckboxSetting
+                  label="Ask for stash message"
+                  setting="askForStashMessage"
+                  description="Prompt for a description message when stashing changes"
                 />
               </SettingsDialogSection>
 

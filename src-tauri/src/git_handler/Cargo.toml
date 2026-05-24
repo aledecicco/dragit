@@ -1,6 +1,5 @@
 [package]
 name = "git_handler"
-version = "1.0.1"
 edition = "2021"
 
 

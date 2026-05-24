@@ -7,6 +7,7 @@ pub struct Settings {
     pub open_last_on_start: bool,
     pub confirm_dangerous_actions: bool,
     pub auto_fetch_remote: bool,
+    pub ask_for_stash_message: bool,
 
     pub show_shortcut_indicators: bool,
     pub relative_timestamps: bool,
@@ -43,6 +44,7 @@ impl Default for Settings {
             open_last_on_start: true,
             confirm_dangerous_actions: true,
             auto_fetch_remote: false,
+            ask_for_stash_message: true,
 
             show_shortcut_indicators: true,
             relative_timestamps: true,

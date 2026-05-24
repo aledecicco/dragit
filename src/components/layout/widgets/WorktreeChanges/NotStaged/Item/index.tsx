@@ -15,6 +15,7 @@ import {
   useIgnoreFile,
 } from '@/api/mutations/solveFileConflicts'
 import { FileItem } from '@/common/File/Item'
+import { requestStashParams } from '@/common/StashDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractiveItem } from '@/lib/Interactive/Item'
@@ -24,6 +25,7 @@ import {
 } from '@/lib/MultiSelect/Item'
 import { triggerInteraction } from '@/state/actions'
 import { changeSelectedFile } from '@/state/file'
+import { getSettings } from '@/state/settings'
 
 interface NotStagedChangesItemProps extends MultiSelectItemProps {
   /**
@@ -110,7 +112,20 @@ const useInteractions = (file: NotStagedFile) => {
         ])
         .exhaustive()
     : [
-        group(interaction({ action: stage }), interaction({ action: stash })),
+        group(
+          interaction({ action: stage }),
+          interaction({
+            action: stash,
+            argsRequester: async () => {
+              const { askForStashMessage } = getSettings()
+              const message = askForStashMessage
+                ? (await requestStashParams()).message
+                : null
+
+              return { message }
+            },
+          }),
+        ),
         group(
           interaction({
             action: discard,
