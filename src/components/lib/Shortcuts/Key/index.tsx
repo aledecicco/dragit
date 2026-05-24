@@ -1,9 +1,10 @@
-import type { ComponentProps } from 'react'
-import { useKeyPress } from 'react-use'
+import { type ComponentProps, useEffect, useState } from 'react'
 import { match } from 'ts-pattern'
 
 import { cn, propsWithCn } from '@/utils/styles'
 import type { Size } from '@/utils/types'
+
+import { getShortcutKeyFromEvent } from '../utils'
 
 interface ShortcutsKeyProps extends ComponentProps<'kbd'> {
   /**
@@ -28,7 +29,33 @@ interface ShortcutsKeyProps extends ComponentProps<'kbd'> {
 const ShortcutKey = (props: ShortcutsKeyProps) => {
   const { shortcutKey, reactive = true, size = 'md', ...kbdProps } = props
 
-  const [pressed] = useKeyPress(shortcutKey)
+  const [pressed, setPressed] = useState(false)
+
+  useEffect(() => {
+    if (!reactive) {
+      return
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (getShortcutKeyFromEvent(event) === shortcutKey.toLowerCase()) {
+        setPressed(true)
+      }
+    }
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (getShortcutKeyFromEvent(event) === shortcutKey.toLowerCase()) {
+        setPressed(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [shortcutKey, reactive])
 
   return (
     <kbd

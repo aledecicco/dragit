@@ -140,3 +140,23 @@ export const useActiveShortcutScopes = (): ShortcutScope[] => {
   const hotkeysContext = useHotkeysContext()
   return hotkeysContext.activeScopes as ShortcutScope[]
 }
+
+/**
+ * Translates a keyboard eventinto a shortcut key string.
+ */
+export const getShortcutKeyFromEvent = (event: KeyboardEvent): string => {
+  if (event.key === 'Control') {
+    return 'ctrl'
+  }
+  if (event.key === 'Shift') {
+    return 'shift'
+  }
+  if (event.key === 'Alt') {
+    return 'alt'
+  }
+  if (event.key === 'Meta') {
+    return 'meta'
+  }
+
+  return event.key.toLowerCase()
+}

@@ -1,6 +1,5 @@
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
-import { useEffectOnce } from 'react-use'
 import { match } from 'ts-pattern'
 
 import { useSettings } from '@/state/settings'
@@ -9,15 +8,15 @@ import { capitalize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import {
+  getShortcutKeyFromEvent,
   getShortcutKeys,
   getShortcutSequence,
+  SHORTCUT_MODIFIERS,
   SHORTCUT_SEPARATOR,
   type ShortcutKeys,
   useActiveShortcutScopes,
   useShortcutBinding,
 } from '../utils'
-
-export const MODIFIERS = ['Control', 'Shift', 'Alt', 'Meta']
 
 interface ShortcutIndicatorProps extends Ariakit.RoleProps {
   /**
@@ -55,20 +54,27 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
   } = props
 
   const shortcutKeys = getShortcutKeys(hotkey)
+  const shortcutSequence = getShortcutSequence(shortcutKeys)
 
   const pressedKeys = useRef<ShortcutKeys>(new Set())
   const [keysLeft, setKeysLeft] = useState<string[]>()
   const [modifiersCount, setModifiersCount] = useState(0)
 
-  useEffectOnce(() => {
+  useEffect(() => {
     const updateKeysLeft = () => {
+      // If any of the currently pressed keys is not part of this shortcut, don't show the indicator.
+      if (
+        [...pressedKeys.current.values()].some((key) => !shortcutKeys.has(key))
+      ) {
+        setKeysLeft(undefined)
+        return
+      }
+
+      // Store the keys in this shortcut that are left to be pressed for the shortcut to be triggered.
       setKeysLeft(
-        getShortcutSequence(shortcutKeys).filter((key) => {
+        shortcutSequence.filter((key) => {
           const isPressedModifier =
-            (key === 'ctrl' && pressedKeys.current.has('Control')) ||
-            (key === 'shift' && pressedKeys.current.has('Shift')) ||
-            (key === 'alt' && pressedKeys.current.has('Alt')) ||
-            (key === 'meta' && pressedKeys.current.has('Meta'))
+            SHORTCUT_MODIFIERS.includes(key) && pressedKeys.current.has(key)
 
           return !isPressedModifier
         }),
@@ -76,11 +82,15 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
     }
 
     const updateModifiersCount = () => {
-      const count =
-        Number(pressedKeys.current.has('Control')) +
-        Number(pressedKeys.current.has('Shift')) +
-        Number(pressedKeys.current.has('Alt')) +
-        Number(pressedKeys.current.has('Meta'))
+      // Store the number of modifier keys in this shortcut that are currently pressed.
+      const count = SHORTCUT_MODIFIERS.reduce((count, modifier) => {
+        return (
+          count +
+          Number(
+            shortcutKeys.has(modifier) && pressedKeys.current.has(modifier),
+          )
+        )
+      }, 0)
 
       setModifiersCount(count)
     }
@@ -88,13 +98,13 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return
 
-      pressedKeys.current.add(e.key)
+      pressedKeys.current.add(getShortcutKeyFromEvent(e))
       updateKeysLeft()
       updateModifiersCount()
     }
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      pressedKeys.current.delete(e.key)
+      pressedKeys.current.delete(getShortcutKeyFromEvent(e))
       updateKeysLeft()
       updateModifiersCount()
     }
@@ -106,7 +116,7 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
       window.removeEventListener('keydown', handleKeyDown, { capture: true })
       window.removeEventListener('keyup', handleKeyUp, { capture: true })
     }
-  })
+  }, [shortcutKeys, shortcutSequence])
 
   useShortcutBinding(hotkey, () => {
     action()

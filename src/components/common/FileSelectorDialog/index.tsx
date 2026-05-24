@@ -37,18 +37,18 @@ interface FileSelectorDialogProps<T extends WorktreeFileType>
 
 const SHORTCUTS: Shortcut[] = [
   {
-    sequence: ['Control', 'Enter'],
+    sequence: ['Ctrl', 'Enter'],
     label: 'Use all matches',
   },
 ]
 
 const PAGINATION_SHORTCUTS: Shortcut[] = [
   {
-    sequence: ['Control', 'Q'],
+    sequence: ['Ctrl', 'Q'],
     label: 'Previous page',
   },
   {
-    sequence: ['Control', 'E'],
+    sequence: ['Ctrl', 'E'],
     label: 'Next page',
   },
 ]
