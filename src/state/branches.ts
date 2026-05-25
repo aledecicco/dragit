@@ -1,4 +1,6 @@
 import { useEffect } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { useEffectOnce } from 'react-use'
 import { match } from 'ts-pattern'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
@@ -11,13 +13,14 @@ import type {
   TagInfo,
   Upstream,
 } from '@/api/models'
+import { setSettingsMutation } from '@/api/mutations/setSettings'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
 import { getUpstreamReference, useHeadReference } from '@/utils/repository'
 
+import { getSettings } from './settings'
 import { useUpstreams } from './upstream'
 
-// TODO: store persistence.
 interface SelectedReferences {
   /**
    * The selected base used for comparison for each reference.
@@ -165,16 +168,28 @@ const useBasesSync = () => {
   const tagsQuery = useQueryTags()
   const upstreams = useUpstreams()
   const currentRef = useHeadReference()
+  const saveSettings = useMutation(setSettingsMutation)
+
+  useEffectOnce(() => {
+    const store = useSelectedRefsStore.getState()
+    const savedBases = getSettings().branchBases
+
+    store.setBases(new Map(savedBases))
+  })
 
   useEffect(() => {
+    if (!branchesQuery.data || !tagsQuery.data) {
+      return
+    }
+
     const newBases = new Map<RefName, Reference | null>()
 
-    for (const branch of branchesQuery.data ?? []) {
+    for (const branch of branchesQuery.data) {
       const base = chooseBase(
         { type: 'branch', refName: branch.name },
         upstreams.get(branch.name),
-        branchesQuery.data ?? [],
-        tagsQuery.data ?? [],
+        branchesQuery.data,
+        tagsQuery.data,
       )
 
       if (base !== undefined) {
@@ -186,8 +201,8 @@ const useBasesSync = () => {
       const base = chooseBase(
         currentRef,
         undefined,
-        branchesQuery.data ?? [],
-        tagsQuery.data ?? [],
+        branchesQuery.data,
+        tagsQuery.data,
       )
 
       if (base !== undefined) {
@@ -198,6 +213,24 @@ const useBasesSync = () => {
     const store = useSelectedRefsStore.getState()
     store.setBases(newBases)
   }, [branchesQuery.data, tagsQuery.data, currentRef, upstreams])
+
+  const storedBases = useBases()
+  useEffect(() => {
+    if (storedBases.size > 0) {
+      saveSettings.mutateAsync({
+        settings: {
+          branchBases: [...storedBases.entries()],
+        },
+      })
+    }
+  }, [storedBases, saveSettings.mutateAsync])
 }
 
-export { changeSelectedBase, useSelectedBase, useBasesSync }
+/**
+ * Hook that returns the currently selected bases for all references.
+ */
+const useBases = () => {
+  return useSelectedRefsStore(useShallow((state) => state.bases))
+}
+
+export { useBasesSync, useBases, changeSelectedBase, useSelectedBase }

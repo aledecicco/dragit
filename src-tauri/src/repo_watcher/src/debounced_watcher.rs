@@ -68,9 +68,6 @@ impl DebouncedWatcher {
                         .iter()
                         .filter(|event| EventKindMask::CORE.matches(&event.kind))
                         .for_each(|event| {
-                            println!("{:?}", event.kind);
-                            event.paths.iter().for_each(|path| println!("{:?}", path));
-
                             if event.paths.iter().any(|path| path.eq(&repo_path)) {
                                 folder_modified = true;
                             }
@@ -126,7 +123,6 @@ impl DebouncedWatcher {
                                                 repo_path: pathname.to_string(),
                                             },
                                         );
-                                        //println!("branch updated {}", branch_name);
                                     }
                                 }
 
@@ -143,7 +139,6 @@ impl DebouncedWatcher {
                                                 repo_path: pathname.to_string(),
                                             },
                                         );
-                                        //println!("remote branch updated {}", branch_name);
                                     }
                                 }
                             });
@@ -174,7 +169,6 @@ impl DebouncedWatcher {
                             }
                         });
 
-                    println!("");
                     if folder_modified {
                         let _ = app_handle.emit(EVENT_ID, AppEvent::DirChanged);
                     }
@@ -251,9 +245,7 @@ impl DebouncedWatcher {
                         );
                     }
                 }
-                Err(errs) => {
-                    errs.iter()
-                        .for_each(|err| eprintln!("Watcher error: {err:?}"));
+                Err(_errs) => {
                     // TODO: warn frontend about possible unsync
                 }
             };

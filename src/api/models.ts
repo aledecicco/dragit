@@ -38,6 +38,8 @@ export interface Settings {
 
   recentFolders: string[]
   lastOpened: string | null
+  branchBases: [RefName, Reference | null][]
+  branchUpstreams: [BranchName, Upstream][]
 }
 
 export interface CurrentDirInfo {

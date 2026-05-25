@@ -1,3 +1,5 @@
+use crate::{Reference, Upstream};
+
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 #[derive(partially::Partial)]
@@ -35,6 +37,8 @@ pub struct Settings {
 
     pub recent_folders: Vec<String>,
     pub last_opened: Option<String>,
+    pub branch_bases: Vec<(String, Option<Reference>)>,
+    pub branch_upstreams: Vec<(String, Upstream)>,
 }
 
 impl Default for Settings {
@@ -72,6 +76,8 @@ impl Default for Settings {
 
             recent_folders: Vec::new(),
             last_opened: None,
+            branch_bases: Vec::new(),
+            branch_upstreams: Vec::new(),
         }
     }
 }

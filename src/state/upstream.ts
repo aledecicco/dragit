@@ -1,4 +1,6 @@
 import { useEffect } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { useEffectOnce } from 'react-use'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { useShallow } from 'zustand/react/shallow'
@@ -11,13 +13,15 @@ import type {
   RemoteName,
   Upstream,
 } from '@/api/models'
+import { setSettingsMutation } from '@/api/mutations/setSettings'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryRemotes } from '@/api/queries/remotes'
 import { useCurrentBranch } from '@/utils/repository'
 
+import { getSettings } from './settings'
+
 const DEFAULT_REMOTE_NAME: RemoteName = 'origin'
 
-// TODO: store persistence.
 interface SelectedUpstreams {
   /**
    * The selected upstream for each branch.
@@ -198,14 +202,26 @@ const useUpstreamsSync = () => {
   const branchesQuery = useQueryBranches('local')
   const remotesQuery = useQueryRemotes()
   const currentBranch = useCurrentBranch()
+  const saveSettings = useMutation(setSettingsMutation)
+
+  useEffectOnce(() => {
+    const store = useSelectedUpstreamsStore.getState()
+    const storedUpstreams = getSettings().branchUpstreams
+
+    store.setUpstreams(new Map(storedUpstreams))
+  })
 
   useEffect(() => {
+    if (!branchesQuery.data || !remotesQuery.data) {
+      return
+    }
+
     const newUpstreams = new Map<BranchName, Upstream>()
 
-    for (const branch of branchesQuery.data ?? []) {
+    for (const branch of branchesQuery.data) {
       const upstream = chooseUpstream(
         branch,
-        remotesQuery.data ?? [],
+        remotesQuery.data,
         currentBranch?.type === 'local' ? currentBranch : undefined,
       )
 
@@ -217,13 +233,24 @@ const useUpstreamsSync = () => {
     const store = useSelectedUpstreamsStore.getState()
     store.setUpstreams(newUpstreams)
   }, [branchesQuery.data, remotesQuery.data, currentBranch])
+
+  const storedUpstreams = useUpstreams()
+  useEffect(() => {
+    if (storedUpstreams.size > 0) {
+      saveSettings.mutateAsync({
+        settings: {
+          branchUpstreams: [...storedUpstreams.entries()],
+        },
+      })
+    }
+  }, [storedUpstreams, saveSettings.mutateAsync])
 }
 
 /**
  * Hook that returns the currently selected upstreams for all branches.
  */
 const useUpstreams = () => {
-  return useSelectedUpstreamsStore((state) => state.upstreams)
+  return useSelectedUpstreamsStore(useShallow((state) => state.upstreams))
 }
 
 /**

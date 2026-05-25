@@ -53,6 +53,17 @@ pub struct TagInfo {
     pub author_email: Option<String>,
 }
 
+#[derive(borsh::BorshSerialize, serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase", tag = "type")]
+pub enum Reference {
+    #[serde(rename_all = "camelCase")]
+    Commit { ref_name: String },
+    #[serde(rename_all = "camelCase")]
+    Branch { ref_name: String },
+    #[serde(rename_all = "camelCase")]
+    Tag { ref_name: String },
+}
+
 #[derive(serde::Deserialize, Debug)]
 #[serde(rename_all = "camelCase", tag = "type")]
 pub enum SnapshotInfo {
@@ -236,7 +247,8 @@ pub enum BranchInfo {
     },
 }
 
-#[derive(borsh::BorshSerialize, Debug)]
+#[derive(borsh::BorshSerialize, serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Upstream {
     pub remote: String,
     pub remote_branch: String,
