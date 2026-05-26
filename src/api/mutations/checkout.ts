@@ -3,7 +3,7 @@ import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
-import { useSelectedBase } from '@/state/branches'
+import { changeSelectedBase, useSelectedBase } from '@/state/branches'
 import { useHeadReference } from '@/utils/repository'
 
 import type { BranchInfo, RefName, TagInfo } from '../models'
@@ -128,10 +128,15 @@ const useSwitchBranches = (): Action => {
     },
     blockedBy: [{ key: 'branch_operation' }],
     run: async () => {
+      if (!currentReference) {
+        throw new Error('No branch selected')
+      }
+
       if (!baseReference) {
         throw new Error('No base branch selected')
       }
 
+      changeSelectedBase(baseReference, currentReference)
       await checkout.mutateAsync({
         reference: baseReference.refName,
         isNew: false,

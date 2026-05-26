@@ -101,11 +101,30 @@ const chooseBase = (
 
   let newBase: Reference | undefined =
     // First check if there's an override set in the store.
-    prevBase ??
-    // Otherwise find a default.
-    getDefaultBase(reference, upstream)
+    validateBase(prevBase, upstream, branches, tags) ? prevBase : undefined
 
-  const baseIsValid = match(newBase)
+  if (!newBase) {
+    // Otherwise find a default.
+    const defaultBase = getDefaultBase(reference, upstream)
+    if (validateBase(defaultBase, upstream, branches, tags)) {
+      newBase = defaultBase
+    }
+  }
+
+  if (newBase?.refName === prevBase?.refName) {
+    return prevBase
+  }
+
+  return newBase
+}
+
+const validateBase = (
+  base: Reference | undefined,
+  upstream: Upstream | undefined,
+  branches: BranchInfo[],
+  tags: TagInfo[],
+) => {
+  return match(base)
     .with({ type: 'commit' }, () => true)
     .with(
       { type: 'branch' },
@@ -122,16 +141,6 @@ const chooseBase = (
     )
     .with(undefined, () => true)
     .exhaustive()
-
-  if (!baseIsValid) {
-    newBase = undefined
-  }
-
-  if (newBase?.refName === prevBase?.refName) {
-    return prevBase
-  }
-
-  return newBase
 }
 
 /**
