@@ -4,6 +4,7 @@ import type { TagInfo } from '@/api/models'
 import { useCheckoutTag } from '@/api/mutations/checkout'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
 import { useDeleteTag } from '@/api/mutations/deleteTags'
+import { useMergeTag } from '@/api/mutations/merge'
 import { usePushTag } from '@/api/mutations/pushTag'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
@@ -96,6 +97,7 @@ const useInteractions = (tag: TagInfo) => {
 
   const createBranch = useCreateBranchAt(tag.name)
   const branchOff = useBranchOff(tag.name)
+  const merge = useMergeTag(tag)
   const deleteTag = useDeleteTag(tag)
 
   return [
@@ -109,6 +111,7 @@ const useInteractions = (tag: TagInfo) => {
         action: branchOff,
         argsRequester: () => requestBranchName(`#${tag.reference}`),
       }),
+      interaction({ action: merge }),
     ),
     group(
       interaction({

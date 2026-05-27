@@ -93,7 +93,7 @@ const GraphDropAreas = () => {
         handleDrop={(payload) => {
           if (currentReference) {
             const newRef = match(payload)
-              .with({ type: 'commit' }, ({ dragged }) => dragged.id)
+              .with({ type: 'commit' }, ({ dragged }) => dragged.shortHash)
               .otherwise(({ dragged }) => dragged.name)
 
             changeSelectedBase(currentReference, {
