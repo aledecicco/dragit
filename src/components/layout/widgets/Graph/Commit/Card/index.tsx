@@ -113,8 +113,8 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
       <Ariakit.CompositeItem
         {...propsWithCn(
           buttonProps,
+          'group cursor-pointer select-none',
           'p-2 border border-dark-100 rounded-sm',
-          'cursor-pointer',
           'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
           'hover:dithered-bg-dark-400 data-active-item:dithered-bg-dark-400',
           'hover:data-active-item:dithered-bg-dark-300',
@@ -135,14 +135,15 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
             'flex flex-col gap-y-1 items-stretch',
           )}
         >
-          <p
+          <Marquee
+            reverse={false}
             className={cn(
-              'text-start text-sm text-ellipsis text-nowrap overflow-hidden',
+              'text-sm',
               !commitInfo.message && 'italic text-light-800',
             )}
           >
             {commitInfo.message ?? 'No message.'}
-          </p>
+          </Marquee>
 
           <div
             className={cn('flex flex-row items-center justify-between gap-x-2')}

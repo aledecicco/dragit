@@ -14,7 +14,7 @@ const ListItem = (props: ListItemProps) => {
     <Ariakit.CompositeItem
       {...propsWithCn(
         itemProps,
-        'group cursor-pointer',
+        'group cursor-pointer select-none',
         'w-full p-1.5 bg-dark-600 rounded-xs shadow-md',
         'hover:bg-dark-500 focus:bg-dark-500 data-focus:bg-dark-500',
         'aria-selected:bg-dark-400',

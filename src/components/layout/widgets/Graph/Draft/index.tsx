@@ -15,7 +15,7 @@ import { Marquee } from '@/ui/Marquee'
 import { Toolbar } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 import { pluralize } from '@/utils/string'
-import { cn } from '@/utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 
 import { NODE_SIZE } from '../Commit/Node'
 import { makeTracked } from '../SvgOverlay/utils'
@@ -69,7 +69,10 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
     const commit = useCommit()
 
     return (
-      <div {...divProps} ref={mergeRefs([trackRef, divProps.ref])}>
+      <div
+        {...propsWithCn(divProps, 'select-none')}
+        ref={mergeRefs([trackRef, divProps.ref])}
+      >
         <div
           className={'rounded-full shadow-sm p-0.5 bg-light-950/60'}
           style={{ width: NODE_SIZE, height: NODE_SIZE }}
