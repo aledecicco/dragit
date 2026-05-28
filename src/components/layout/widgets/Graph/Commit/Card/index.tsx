@@ -6,7 +6,8 @@ import { useAmend } from '@/api/mutations/commitIndex'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
 import { useTagCommit } from '@/api/mutations/createTag'
 import { useMergeCommit } from '@/api/mutations/merge'
-import { useResetHead } from '@/api/mutations/resetHead'
+import { useRewindCommit } from '@/api/mutations/resetHead'
+import { useRevertCommit } from '@/api/mutations/revertCommit'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { requestTagParams } from '@/common/CreateTagDialog'
@@ -166,7 +167,8 @@ const useInteractions = (commit: CommitInfo) => {
   const createBranch = useCreateBranchAt(commit.id)
   const branchOff = useBranchOff(commit.id)
   const merge = useMergeCommit(commit.id)
-  const resetHead = useResetHead(commit.id)
+  const rewind = useRewindCommit(commit.id)
+  const revert = useRevertCommit(commit.id)
   const tag = useTagCommit(commit)
 
   return [
@@ -191,9 +193,14 @@ const useInteractions = (commit: CommitInfo) => {
     ),
     group(
       interaction({
-        action: resetHead,
+        action: revert,
         isDangerous: true,
-        details: `undo commit #${commit.shortHash}`,
+        details: `revert commit #${commit.shortHash}`,
+      }),
+      interaction({
+        action: rewind,
+        isDangerous: true,
+        details: `rewind head to commit #${commit.shortHash}`,
       }),
     ),
   ]

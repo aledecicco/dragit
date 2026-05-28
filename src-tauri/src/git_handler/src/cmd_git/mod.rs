@@ -478,6 +478,13 @@ impl GitHandler for CmdGit {
             }))
     }
 
+    fn revert_commit(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["revert", reference])
+            .or(Err(GitError::RevertCommitFailed {
+                reference: reference.to_string(),
+            }))
+    }
+
     fn get_common_ancestor(
         &self,
         channel: &Channel<AppMessage>,

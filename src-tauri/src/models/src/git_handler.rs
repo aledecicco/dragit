@@ -120,6 +120,9 @@ pub trait GitHandler {
     /// Reset the HEAD to undo the given reference without changing the index or working directory.
     fn reset_head(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
 
+    /// Reverts the given commit, creating a new commit with the reverted changes.
+    fn revert_commit(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
+
     /// Returns the commit hash of the latest common ancestor between the two given branches.
     fn get_common_ancestor(
         &self,

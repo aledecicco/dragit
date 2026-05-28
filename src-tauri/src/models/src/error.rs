@@ -61,6 +61,9 @@ pub enum GitError {
     #[error("Failed to reset HEAD to \"{reference}\"")]
     ResetHeadFailed { reference: String },
 
+    #[error("Failed to revert commit \"{reference}\"")]
+    RevertCommitFailed { reference: String },
+
     #[error("Failed to remove files from tree")]
     RemoveFromTreeFailed {},
 

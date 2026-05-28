@@ -1,4 +1,4 @@
-import { IconEraser } from '@tabler/icons-react'
+import { IconPlayerTrackPrevFilled } from '@tabler/icons-react'
 import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
@@ -26,7 +26,7 @@ const resetHeadMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useResetHead = (commit: CommitId): Action => {
+const useRewindCommit = (commit: CommitId): Action => {
   const resetHead = useRepositoryMutation(resetHeadMutation)
 
   return {
@@ -51,8 +51,8 @@ const useResetHead = (commit: CommitId): Action => {
       success: 'Head rewinded',
       error: 'Failed to rewind head',
     },
-    Glyph: IconEraser,
+    Glyph: IconPlayerTrackPrevFilled,
   }
 }
 
-export { useResetHead, resetHeadKey, resetHeadMutation, type ResetHeadArgs }
+export { useRewindCommit, resetHeadKey, resetHeadMutation, type ResetHeadArgs }

@@ -332,6 +332,16 @@ pub async fn reset_head(
     with_handler(&state, &|h| h.reset_head(repo_path, reference))
 }
 
+/// Reverts the given commit, creating a new commit with the reverted changes.
+#[tauri::command]
+pub async fn revert_commit(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    reference: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.revert_commit(repo_path, reference))
+}
+
 /// Returns the commit hash of the latest common ancestor between the two given references.
 #[tauri::command]
 pub async fn get_common_ancestor(

@@ -70,6 +70,7 @@ pub fn run() {
             api::clean_files,
             api::commit_index,
             api::reset_head,
+            api::revert_commit,
             api::get_common_ancestor,
             api::get_branch_divergence,
             api::push_branch,
