@@ -26,7 +26,7 @@ import {
   useHandleFilesPageSync,
   useWorktreeFilesPage,
 } from '@/state/pages'
-import { getSettings, useSettings } from '@/state/settings'
+import { getSettings, useSettings } from '@/state/storage'
 import { Chip } from '@/ui/Chip'
 import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'

@@ -3,7 +3,7 @@ import * as Ariakit from '@ariakit/react'
 
 import { useCurrentPath } from '@/api/utils'
 import { FilePath } from '@/common/File/Path'
-import { useSettings } from '@/state/settings'
+import { useSettings } from '@/state/storage'
 import { Marquee } from '@/ui/Marquee'
 import { openFile } from '@/utils/behavior'
 import { cn, propsWithCn } from '@/utils/styles'

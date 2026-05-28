@@ -10,11 +10,11 @@ import {
   useOpenFolder,
 } from '@/api/mutations/openFolder'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
+import { useQueryStorage } from '@/api/queries/storage'
 import { FilePath } from '@/common/File/Path'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { QueryLoader } from '@/lib/QueryLoader'
-import { useSettings } from '@/state/settings'
 import { Marquee } from '@/ui/Marquee'
 import { chooseDirectory } from '@/utils/behavior'
 import { getErrorMessage } from '@/utils/error'
@@ -140,7 +140,7 @@ const StartupPageInner = (props: ComponentProps<'div'>) => {
 const OpenFolderButton = () => {
   const openFolder = useOpenFolder()
 
-  const { recentFolders } = useSettings()
+  const storageQuery = useQueryStorage()
   const makeOpenRecentFolder = useMakeOpenRecentFolder()
 
   return (
@@ -155,12 +155,14 @@ const OpenFolderButton = () => {
 
         return path
       }}
-      alternatives={recentFolders.map((recentFolder) => ({
-        action: makeOpenRecentFolder(recentFolder),
-      }))}
+      alternatives={
+        storageQuery.data?.recentFolders.map((recentFolder) => ({
+          action: makeOpenRecentFolder(recentFolder),
+        })) || []
+      }
       menuButtonProps={{
         label: 'View recent folders',
-        disabled: !recentFolders.length,
+        disabled: !storageQuery.data?.recentFolders.length,
       }}
       aria-label="Select and open a folder in your system"
       size="lg"

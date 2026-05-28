@@ -12,5 +12,5 @@ mod repo_watcher;
 pub use repo_watcher::*;
 mod repository;
 pub use repository::*;
-mod settings;
-pub use settings::*;
+mod storage;
+pub use storage::*;

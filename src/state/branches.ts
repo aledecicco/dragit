@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { useMutation } from '@tanstack/react-query'
 import { useEffectOnce } from 'react-use'
 import { match } from 'ts-pattern'
 import { create } from 'zustand'
@@ -13,12 +12,13 @@ import type {
   TagInfo,
   Upstream,
 } from '@/api/models'
-import { setSettingsMutation } from '@/api/mutations/setSettings'
+import { setBranchBasesMutation } from '@/api/mutations/setRepositoryStorage'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
+import { useCurrentPath, useRepositoryMutation } from '@/api/utils'
 import { getUpstreamReference, useHeadReference } from '@/utils/repository'
 
-import { getSettings } from './settings'
+import { getRepositoryStorage } from './storage'
 import { useUpstreams } from './upstream'
 
 interface SelectedReferences {
@@ -177,13 +177,17 @@ const useBasesSync = () => {
   const tagsQuery = useQueryTags()
   const upstreams = useUpstreams()
   const currentRef = useHeadReference()
-  const saveSettings = useMutation(setSettingsMutation)
+  const saveBases = useRepositoryMutation(setBranchBasesMutation)
+
+  const currentPath = useCurrentPath()
 
   useEffectOnce(() => {
     const store = useSelectedRefsStore.getState()
-    const savedBases = getSettings().branchBases
+    const savedBases = getRepositoryStorage(currentPath)?.branchBases
 
-    store.setBases(new Map(savedBases))
+    if (savedBases) {
+      store.setBases(new Map(savedBases))
+    }
   })
 
   useEffect(() => {
@@ -226,13 +230,11 @@ const useBasesSync = () => {
   const storedBases = useBases()
   useEffect(() => {
     if (storedBases.size > 0) {
-      saveSettings.mutateAsync({
-        settings: {
-          branchBases: [...storedBases.entries()],
-        },
+      saveBases.mutateAsync({
+        branchBases: [...storedBases.entries()],
       })
     }
-  }, [storedBases, saveSettings.mutateAsync])
+  }, [storedBases, saveBases.mutateAsync])
 }
 
 /**

@@ -1,5 +1,5 @@
 [package]
-name = "settings"
+name = "storage"
 edition = "2021"
 
 

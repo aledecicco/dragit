@@ -4,7 +4,7 @@ import {
   IconColumns3Filled,
 } from '@tabler/icons-react'
 
-import { useSettings } from '@/state/settings'
+import { useSettings } from '@/state/storage'
 import {
   ToggleGroup,
   type ToggleGroupProps,

@@ -12,17 +12,21 @@ use crate::{
 use diffs::{compute_diff, get_diff_sources};
 use models::{
     AppError, AppEvent, AppMessage, AppState, ConflictLine, ConflictMode, CurrentDirInfo,
-    DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus, PartialSettings,
-    RepoWatcherError, ResolutionStrategy, Settings, SnapshotInfo, UnmergedFileInfo, EVENT_ID,
+    DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus, PartialSettings, Reference,
+    RepoWatcherError, ResolutionStrategy, SnapshotInfo, Storage, UnmergedFileInfo, Upstream,
+    EVENT_ID,
 };
-use settings::{add_recent_folder, load_settings, save_settings, set_last_opened};
+use storage::{
+    add_recent_folder, get_storage, patch_settings, save_branch_bases, save_branch_upstreams,
+    set_last_opened,
+};
 
 /// Opens a folder that contains/will contain a git repository.
 #[tauri::command]
 pub async fn open_folder(app_handle: AppHandle, new_path: &str) -> Result<(), AppError> {
     let state: State<'_, AppState> = app_handle.state::<AppState>();
 
-    // Unwatch old repository, if any
+    // Unwatch old repository, if any.
     match state.repo_watcher.lock().unwatch_repository() {
         Err(RepoWatcherError::RepositoryNotWatched {}) => {}
         res => res?,
@@ -31,14 +35,14 @@ pub async fn open_folder(app_handle: AppHandle, new_path: &str) -> Result<(), Ap
     // If the new path is inside a git repository,use the root of that repository instead.
     let new_path = find_git_root(new_path).unwrap_or(new_path.to_string());
 
-    // Watch repository at new path
+    // Watch repository at new path.
     state
         .repo_watcher
         .lock()
         .watch_repository(&new_path)
         .map_err(AppError::from)?;
 
-    // Not worth crashing the app if this fails
+    // Not worth crashing the app if this fails.
     let _ = add_recent_folder(&app_handle, &new_path);
     let _ = set_last_opened(&app_handle, &new_path);
     let _ = app_handle.emit(EVENT_ID, AppEvent::DirChanged);
@@ -46,10 +50,10 @@ pub async fn open_folder(app_handle: AppHandle, new_path: &str) -> Result<(), Ap
     Ok(())
 }
 
-/// Returns the stored user settings.
+/// Returns the app storage.
 #[tauri::command]
-pub async fn get_settings(app_handle: AppHandle) -> Result<Settings, AppError> {
-    Ok(load_settings(&app_handle))
+pub async fn get_app_storage(app_handle: AppHandle) -> Result<Storage, AppError> {
+    Ok(get_storage(&app_handle))
 }
 
 /// Saves new user settings.
@@ -58,9 +62,39 @@ pub async fn set_settings(
     app_handle: AppHandle,
     settings: PartialSettings,
 ) -> Result<(), AppError> {
-    save_settings(&app_handle, &settings).or(Err(AppError::SaveSettingsFailed {}))?;
+    patch_settings(&app_handle, &settings).or(Err(AppError::UpdateStorageFailed {}))?;
 
-    let _ = app_handle.emit(EVENT_ID, AppEvent::SettingsChanged);
+    let _ = app_handle.emit(EVENT_ID, AppEvent::StorageUpdated);
+
+    Ok(())
+}
+
+/// Saves new branch bases for a repository.
+#[tauri::command]
+pub async fn set_branch_bases(
+    app_handle: AppHandle,
+    repo_path: &str,
+    branch_bases: Vec<(String, Option<Reference>)>,
+) -> Result<(), AppError> {
+    save_branch_bases(&app_handle, repo_path, branch_bases)
+        .or(Err(AppError::UpdateStorageFailed {}))?;
+
+    let _ = app_handle.emit(EVENT_ID, AppEvent::StorageUpdated);
+
+    Ok(())
+}
+
+/// Saves new branch upstreams for a repository.
+#[tauri::command]
+pub async fn set_branch_upstreams(
+    app_handle: AppHandle,
+    repo_path: &str,
+    branch_upstreams: Vec<(String, Upstream)>,
+) -> Result<(), AppError> {
+    save_branch_upstreams(&app_handle, repo_path, branch_upstreams)
+        .or(Err(AppError::UpdateStorageFailed {}))?;
+
+    let _ = app_handle.emit(EVENT_ID, AppEvent::StorageUpdated);
 
     Ok(())
 }

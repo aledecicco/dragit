@@ -3,7 +3,7 @@ import type { RootContent, Text } from 'hast'
 import { match } from 'ts-pattern'
 
 import type { DiffLineSegment, DiffType, FileDiff } from '@/api/models'
-import { getSettings } from '@/state/settings'
+import { getSettings } from '@/state/storage'
 
 import {
   getNodeChildren,

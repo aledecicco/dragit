@@ -2,7 +2,7 @@ import * as Ariakit from '@ariakit/react'
 
 import { useSetSettings } from '@/api/mutations/setSettings'
 import { triggerInteraction } from '@/state/actions'
-import { useSettings } from '@/state/settings'
+import { useSettings } from '@/state/storage'
 import { Checkbox, type CheckboxProps } from '@/ui/Form/Checkbox'
 
 import type { BooleanSettingKey } from '../utils'

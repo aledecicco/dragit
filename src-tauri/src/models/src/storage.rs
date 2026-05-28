@@ -4,6 +4,48 @@ use crate::{Reference, Upstream};
 #[serde(rename_all = "camelCase")]
 #[derive(partially::Partial)]
 #[partially(derive(serde::Serialize, serde::Deserialize, Debug, Default, Clone))]
+pub struct Storage {
+    pub settings: Settings,
+
+    pub recent_folders: Vec<String>,
+    pub last_opened: Option<String>,
+
+    pub per_repository: Vec<(String, RepositoryStorage)>,
+}
+
+impl Default for Storage {
+    fn default() -> Self {
+        Self {
+            settings: Settings::default(),
+
+            recent_folders: Vec::new(),
+            last_opened: None,
+
+            per_repository: Vec::new(),
+        }
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RepositoryStorage {
+    pub branch_bases: Vec<(String, Option<Reference>)>,
+    pub branch_upstreams: Vec<(String, Upstream)>,
+}
+
+impl Default for RepositoryStorage {
+    fn default() -> Self {
+        Self {
+            branch_bases: Vec::new(),
+            branch_upstreams: Vec::new(),
+        }
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+#[derive(partially::Partial)]
+#[partially(derive(serde::Serialize, serde::Deserialize, Debug, Default, Clone))]
 pub struct Settings {
     pub file_opener_app: String,
     pub open_last_on_start: bool,
@@ -34,11 +76,6 @@ pub struct Settings {
     pub focus_stashes_shortcut: String,
     pub focus_main_shortcut: String,
     pub close_file_diff_shortcut: String,
-
-    pub recent_folders: Vec<String>,
-    pub last_opened: Option<String>,
-    pub branch_bases: Vec<(String, Option<Reference>)>,
-    pub branch_upstreams: Vec<(String, Upstream)>,
 }
 
 impl Default for Settings {
@@ -73,11 +110,6 @@ impl Default for Settings {
             focus_stashes_shortcut: "Ctrl + 5".to_string(),
             focus_main_shortcut: "Ctrl + 1".to_string(),
             close_file_diff_shortcut: "Ctrl + W".to_string(),
-
-            recent_folders: Vec::new(),
-            last_opened: None,
-            branch_bases: Vec::new(),
-            branch_upstreams: Vec::new(),
         }
     }
 }

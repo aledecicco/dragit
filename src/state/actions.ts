@@ -12,7 +12,7 @@ import { askForConfirmation } from '@/common/ConfirmationDialog'
 import type { Glyph } from '@/ui/Icon'
 import { MS_IN_SECOND } from '@/utils/time'
 
-import { getSettings } from './settings'
+import { getSettings } from './storage'
 
 type ActionId = Record<string, string>
 type HashedId = string
@@ -471,14 +471,12 @@ type AnyInteraction = Interaction<never>
 const triggerInteraction = async <T>(interaction: Interaction<T>) => {
   const { action, argsRequester, isDangerous, details } = interaction
 
-  const { confirmDangerousActions } = getSettings()
-
   if (argsRequester) {
     const args = await prepareActionArgs(action, argsRequester)
 
     const canRun =
-      !confirmDangerousActions ||
       !isDangerous ||
+      !getSettings().confirmDangerousActions ||
       (await ensureConfirmation(action, details))
 
     if (!canRun) {
@@ -488,8 +486,8 @@ const triggerInteraction = async <T>(interaction: Interaction<T>) => {
     runAction(action, args)
   } else {
     const canRun =
-      !confirmDangerousActions ||
       !isDangerous ||
+      !getSettings().confirmDangerousActions ||
       (await ensureConfirmation(action, details))
 
     if (!canRun) {

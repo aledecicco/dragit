@@ -14,7 +14,7 @@ import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { type AnyInteraction, triggerInteraction } from '@/state/actions'
-import { getSettings, useSettings } from '@/state/settings'
+import { getSettings, useSettings } from '@/state/storage'
 import { Accordion } from '@/ui/Accordion'
 import {
   AccordionSection,

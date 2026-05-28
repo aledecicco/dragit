@@ -13,8 +13,8 @@ import { fileConflictsQueryKeys } from './queries/fileConflicts'
 import { fileDiffQueryKeys } from './queries/fileDiff'
 import { headInfoQueryKeys } from './queries/headInfo'
 import { remotesQueryKeys } from './queries/remotes'
-import { settingsQueryKey } from './queries/settings'
 import { stashesQueryKeys } from './queries/stashes'
+import { storageQueryKey } from './queries/storage'
 import { tagsQueryKeys } from './queries/tags'
 import { worktreeFilesQueryKeys } from './queries/worktreeFiles'
 import { pathQueryKey } from './utils'
@@ -28,9 +28,9 @@ const useBackendEventshandler = () => {
   useEffectOnce(() => {
     const unlisten = listen<AppEvent>(EVENT_ID, (event) => {
       match(event.payload)
-        .with({ type: 'settingsChanged' }, () => {
+        .with({ type: 'storageUpdated' }, () => {
           client.invalidateQueries({
-            queryKey: [settingsQueryKey],
+            queryKey: [storageQueryKey],
           })
         })
         .with({ type: 'dirChanged' }, () => {

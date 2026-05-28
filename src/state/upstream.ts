@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { useMutation } from '@tanstack/react-query'
 import { useEffectOnce } from 'react-use'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
@@ -13,12 +12,13 @@ import type {
   RemoteName,
   Upstream,
 } from '@/api/models'
-import { setSettingsMutation } from '@/api/mutations/setSettings'
+import { setBranchUpstreamsMutation } from '@/api/mutations/setRepositoryStorage'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryRemotes } from '@/api/queries/remotes'
+import { useCurrentPath, useRepositoryMutation } from '@/api/utils'
 import { useCurrentBranch } from '@/utils/repository'
 
-import { getSettings } from './settings'
+import { getRepositoryStorage } from './storage'
 
 const DEFAULT_REMOTE_NAME: RemoteName = 'origin'
 
@@ -202,13 +202,17 @@ const useUpstreamsSync = () => {
   const branchesQuery = useQueryBranches('local')
   const remotesQuery = useQueryRemotes()
   const currentBranch = useCurrentBranch()
-  const saveSettings = useMutation(setSettingsMutation)
+  const saveUpstreams = useRepositoryMutation(setBranchUpstreamsMutation)
+
+  const currentPath = useCurrentPath()
 
   useEffectOnce(() => {
     const store = useSelectedUpstreamsStore.getState()
-    const storedUpstreams = getSettings().branchUpstreams
+    const savedUpstreams = getRepositoryStorage(currentPath)?.branchUpstreams
 
-    store.setUpstreams(new Map(storedUpstreams))
+    if (savedUpstreams) {
+      store.setUpstreams(new Map(savedUpstreams))
+    }
   })
 
   useEffect(() => {
@@ -237,13 +241,11 @@ const useUpstreamsSync = () => {
   const storedUpstreams = useUpstreams()
   useEffect(() => {
     if (storedUpstreams.size > 0) {
-      saveSettings.mutateAsync({
-        settings: {
-          branchUpstreams: [...storedUpstreams.entries()],
-        },
+      saveUpstreams.mutateAsync({
+        branchUpstreams: [...storedUpstreams.entries()],
       })
     }
-  }, [storedUpstreams, saveSettings.mutateAsync])
+  }, [storedUpstreams, saveUpstreams.mutateAsync])
 }
 
 /**

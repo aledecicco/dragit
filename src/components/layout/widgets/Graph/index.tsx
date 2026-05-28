@@ -11,7 +11,7 @@ import { BranchToolbar } from '@/common/BranchToolbar'
 import { ScrollShadowDiv } from '@/lib/ScrollShadowDiv'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { useSelectedBase } from '@/state/branches'
-import { useSettings } from '@/state/settings'
+import { useSettings } from '@/state/storage'
 import { useVirtualizer } from '@/utils/performance'
 import {
   useBranch,

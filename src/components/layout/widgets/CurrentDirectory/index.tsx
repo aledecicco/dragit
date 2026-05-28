@@ -4,7 +4,7 @@ import {
 } from '@/api/mutations/openFolder'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { ActionButton } from '@/lib/ActionButton'
-import { useSettings } from '@/state/settings'
+import { useStorage } from '@/state/storage'
 import type { ButtonProps } from '@/ui/Button'
 import { chooseDirectory } from '@/utils/behavior'
 import { propsWithCn } from '@/utils/styles'
@@ -21,7 +21,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
   const changeFolder = useChangeCurrentFolder()
   const makeOpenRecentFolder = useMakeOpenRecentFolder()
 
-  const { recentFolders } = useSettings()
+  const { recentFolders } = useStorage()
   const recentOptions = recentFolders.filter(
     (recentFolder) => recentFolder !== currentDirQuery.data?.path,
   )

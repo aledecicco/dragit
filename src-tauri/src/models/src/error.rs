@@ -197,8 +197,8 @@ pub enum AppError {
         repo_watcher_error: RepoWatcherError,
     },
 
-    #[error("Failed to save settings")]
-    SaveSettingsFailed {},
+    #[error("Failed to update storage")]
+    UpdateStorageFailed {},
 
     #[error("Failed to remove \"{path}\" from the recent folders list")]
     RemoveFromRecentFailed { path: String },

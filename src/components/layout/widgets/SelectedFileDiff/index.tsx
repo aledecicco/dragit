@@ -15,7 +15,7 @@ import {
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { changeSelectedFile } from '@/state/file'
-import { useSettings } from '@/state/settings'
+import { useSettings } from '@/state/storage'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface SelectedFileDiffProps extends ComponentProps<'div'> {

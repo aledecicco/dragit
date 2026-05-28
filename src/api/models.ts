@@ -5,6 +5,13 @@ export interface Page<T> {
   hasNext: boolean
 }
 
+export interface Storage {
+  settings: Settings
+  recentFolders: string[]
+  lastOpened: string | null
+  perRepository: Map<string, RepositoryStorage>
+}
+
 export interface Settings {
   fileOpenerApp: string
   openLastOnStart: boolean
@@ -35,11 +42,11 @@ export interface Settings {
   focusStashesShortcut: string
   focusMainShortcut: string
   closeFileDiffShortcut: string
+}
 
-  recentFolders: string[]
-  lastOpened: string | null
-  branchBases: [RefName, Reference | null][]
-  branchUpstreams: [BranchName, Upstream][]
+export interface RepositoryStorage {
+  branchBases: Map<BranchName, Reference | null>
+  branchUpstreams: Map<BranchName, Upstream>
 }
 
 export interface CurrentDirInfo {
@@ -274,7 +281,7 @@ export type AppMessage = {
 }
 
 export type AppEvent =
-  | { type: 'settingsChanged' }
+  | { type: 'storageUpdated' }
   | { type: 'dirChanged' }
   | { type: 'dirDisappeared'; repoPath: string }
   | { type: 'gitFolderModified'; repoPath: string }

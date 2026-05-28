@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import type { FileDiff } from '@/api/models'
-import { useSettings } from '@/state/settings'
+import { useSettings } from '@/state/storage'
 import { Button } from '@/ui/Button'
 import { cn } from '@/utils/styles'
 

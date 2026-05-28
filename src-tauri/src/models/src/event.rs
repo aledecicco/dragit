@@ -7,8 +7,8 @@ pub static EVENT_ID: &str = "app-event";
     tag = "type"
 )]
 pub enum AppEvent {
-    /// The settings were updated.
-    SettingsChanged,
+    /// The storage was updated.
+    StorageUpdated,
 
     /// The app opened a new directory.
     DirChanged,

@@ -7,7 +7,7 @@ import { useContinueMerge } from '@/api/mutations/continueMerge'
 import { useContinueRebase } from '@/api/mutations/continueRebase'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { requestCommitParams } from '@/common/CommitDialog'
-import { useSettings } from '@/state/settings'
+import { useSettings } from '@/state/storage'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 

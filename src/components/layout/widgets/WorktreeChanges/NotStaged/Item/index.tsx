@@ -25,7 +25,7 @@ import {
 } from '@/lib/MultiSelect/Item'
 import { triggerInteraction } from '@/state/actions'
 import { changeSelectedFile } from '@/state/file'
-import { getSettings } from '@/state/settings'
+import { getSettings } from '@/state/storage'
 
 interface NotStagedChangesItemProps extends MultiSelectItemProps {
   /**

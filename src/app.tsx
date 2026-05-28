@@ -8,7 +8,7 @@ import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { DialogsHandler } from '@/lib/DialogsHandler'
 import { cn } from '@/utils/styles'
 
-import { useQuerySettings } from './api/queries/settings'
+import { useQueryStorage } from './api/queries/storage'
 import { useDefaultEventPrevention } from './utils/behavior'
 
 enableMapSet()
@@ -17,7 +17,7 @@ const App = () => {
   useBackendEventshandler()
   useDefaultEventPrevention()
 
-  const settingsQuery = useQuerySettings()
+  const storageQuery = useQueryStorage()
   const currentDirQuery = useQueryCurrentDir()
 
   return (
@@ -28,7 +28,7 @@ const App = () => {
           'grid grid-cols-[1fr_1.95fr_1fr] grid-rows-1 gap-4',
         )}
       >
-        {settingsQuery.data &&
+        {storageQuery.data &&
         currentDirQuery.data?.path &&
         currentDirQuery.data.isRepository &&
         currentDirQuery.data.exists ? (

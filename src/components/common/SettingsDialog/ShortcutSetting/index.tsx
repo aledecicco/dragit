@@ -2,7 +2,7 @@ import { type ComponentProps, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 
 import { useShortcutRecorder } from '@/lib/Shortcuts/utils'
-import { useSettings } from '@/state/settings'
+import { useSettings } from '@/state/storage'
 import { Button } from '@/ui/Button'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'

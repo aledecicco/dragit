@@ -23,7 +23,7 @@ tauri-plugin-store = { workspace = true }
 
 api = { path = "src/api" }
 models = { path = "src/models" }
-settings = { path = "src/settings" }
+storage = { path = "src/storage" }
 git_handler = { path = "src/git_handler" }
 repo_watcher = { path = "src/repo_watcher" }
 diffs = { path = "src/diffs" }
@@ -40,7 +40,7 @@ tauri-plugin-opener = "2"
 members = [
   "src/api",
   "src/models",
-  "src/settings",
+  "src/storage",
   "src/git_handler",
   "src/repo_watcher",
   "src/diffs",

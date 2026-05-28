@@ -15,7 +15,7 @@ import { showRemotesDialog } from '@/common/RemotesDialog'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { triggerInteraction } from '@/state/actions'
-import { useSettings } from '@/state/settings'
+import { useSettings } from '@/state/storage'
 import {
   changeSelectedRemote,
   changeSelectedRemoteBranch,

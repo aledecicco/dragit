@@ -2,7 +2,7 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
-import { useSettings } from '@/state/settings'
+import { useSettings } from '@/state/storage'
 import type { ButtonStatus } from '@/ui/Button'
 import { capitalize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'

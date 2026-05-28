@@ -4,7 +4,7 @@ import { mergeRefs } from 'react-merge-refs'
 
 import { useSetSettings } from '@/api/mutations/setSettings'
 import { triggerInteraction } from '@/state/actions'
-import { useSettings } from '@/state/settings'
+import { useSettings } from '@/state/storage'
 import { EditableText } from '@/ui/EditableText'
 import { cn, propsWithCn } from '@/utils/styles'
 
