@@ -58,7 +58,11 @@ const GraphDropAreas = () => {
           if (payload.type === 'branch' && payload.dragged.type === 'remote') {
             triggerInteraction({
               action: makeBranchOff(payload.dragged.name),
-              argsRequester: () => requestBranchName(payload.dragged.name),
+              argsRequester: () =>
+                requestBranchName(
+                  payload.dragged.name,
+                  payload.dragged.name.split('/').at(-1),
+                ),
             })
           } else {
             triggerInteraction({

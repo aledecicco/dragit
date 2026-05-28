@@ -31,6 +31,7 @@ A minimum version of `v2.51.0` is recommended.
 - [ ] Compare arbitrary refspecs
 - [ ] Show merge unions between branches
 - [ ] Clone and open a repo from a URL
+- [ ] Git revert (and revert continuation)
 - [ ] Animations
 - [ ] Allow layout adjustments
 - [ ] Manage remote tags

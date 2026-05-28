@@ -89,7 +89,8 @@ const BranchSelectors = () => {
             if (isRemoteBranch) {
               triggerInteraction({
                 action: makeBranchOff(value),
-                argsRequester: () => requestBranchName(value),
+                argsRequester: () =>
+                  requestBranchName(value, value.split('/').at(-1)),
               })
             } else {
               triggerInteraction({

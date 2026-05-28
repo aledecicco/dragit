@@ -46,10 +46,10 @@ const useResetHead = (commit: CommitId): Action => {
       })
     },
     label: {
-      idle: 'Uncommit',
-      running: 'Undoing commit',
-      success: 'Commit undone',
-      error: 'Failed to undo commit',
+      idle: 'Rewind head to this commit',
+      running: 'Rewinding head',
+      success: 'Head rewinded',
+      error: 'Failed to rewind head',
     },
     Glyph: IconEraser,
   }

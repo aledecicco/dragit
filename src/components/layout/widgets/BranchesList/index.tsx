@@ -178,6 +178,7 @@ const BranchesList = (props: BranchesListProps) => {
       />
 
       <div
+        key={tabsHandler.selectedTab}
         className={cn(
           'overflow-y-hidden grow',
           'w-full bg-dark-800 rounded-sm',

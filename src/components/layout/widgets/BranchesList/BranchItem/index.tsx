@@ -51,6 +51,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
 
   const interactions = useInteractions(branch)
   const checkout = useCheckoutBranch(branch)
+  const branchOff = useBranchOff(branch.name)
   const deleteBranch = useDeleteBranch(branch)
 
   return (
@@ -65,7 +66,13 @@ const BranchesListItem = (props: BranchesListItemProps) => {
       <InteractiveItem
         interactions={interactions}
         activationAction={() => {
-          if (!isCurrentBranch) {
+          if (branch.type === 'remote') {
+            triggerInteraction({
+              action: branchOff,
+              argsRequester: () =>
+                requestBranchName(branch.name, branch.name.split('/').at(-1)),
+            })
+          } else if (!isCurrentBranch) {
             triggerInteraction({ action: checkout })
           }
         }}
