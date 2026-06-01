@@ -52,7 +52,6 @@ const useStorage = (): Storage => {
 const useSettings = (): Settings => {
   const storage = useStorage()
 
-  console.log({ storage })
   return storage.settings
 }
 

@@ -1,14 +1,22 @@
 import * as Ariakit from '@ariakit/react'
 
-import type { VersionedFileInfo } from '@/api/models'
+import type { SnapshotInfo, VersionedFileInfo } from '@/api/models'
+import { useRestoreFileState } from '@/api/mutations/restore'
 import { FileItem } from '@/common/File/Item'
-import { ListItem, type ListItemProps } from '@/ui/ListItem'
+import { group, interaction } from '@/lib/ActionButton/utils'
+import { InteractiveItem } from '@/lib/Interactive/Item'
+import {
+  MultiSelectItem,
+  type MultiSelectItemProps,
+} from '@/lib/MultiSelect/Item'
 
-interface SnapshotDetailsDialogItemProps extends ListItemProps {
+interface SnapshotDetailsDialogItemProps extends MultiSelectItemProps {
   /**
    * The file that this list item should display.
    */
   file: VersionedFileInfo
+
+  snapshotInfo: SnapshotInfo
 }
 
 /**
@@ -17,18 +25,44 @@ interface SnapshotDetailsDialogItemProps extends ListItemProps {
  * Displays as a radio item to allow selecting files.
  */
 const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
-  const { file, ...itemProps } = props
+  const { file, snapshotInfo, ...itemProps } = props
+
+  const interactions = useInteractions(file, snapshotInfo)
+
+  const radio = Ariakit.useRadioContext()
 
   return (
     <Ariakit.Radio
+      onClick={(e) => {
+        e.preventDefault()
+      }}
       value={file.path}
       render={
-        <ListItem {...itemProps}>
+        <InteractiveItem
+          interactions={interactions}
+          activationAction={() => {
+            if (radio?.getState().value === file.path) {
+              radio.setValue(null)
+            } else {
+              radio?.setValue(file.path)
+            }
+          }}
+          render={<MultiSelectItem {...itemProps} />}
+        >
           <FileItem file={file} />
-        </ListItem>
+        </InteractiveItem>
       }
     />
   )
+}
+
+const useInteractions = (
+  file: VersionedFileInfo,
+  snapshotInfo: SnapshotInfo,
+) => {
+  const restore = useRestoreFileState(file, snapshotInfo.id)
+
+  return [group(interaction({ action: restore }))]
 }
 
 export { SnapshotDetailsDialogItem, type SnapshotDetailsDialogItemProps }

@@ -1,11 +1,11 @@
 import type { ComponentProps } from 'react'
 import { IconTrashFilled } from '@tabler/icons-react'
-import { match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
 import { useDeleteBranches } from '@/api/mutations/deleteBranches'
 import { useDeleteTags } from '@/api/mutations/deleteTags'
-import { useDiscardChanges } from '@/api/mutations/discardChanges'
 import { useDiscardStashes } from '@/api/mutations/discardStashes'
+import { useDiscardChanges } from '@/api/mutations/restore'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { triggerInteraction } from '@/state/actions'
 import { useCurrentBranch } from '@/utils/repository'
@@ -41,6 +41,7 @@ const RecyclingBin = (props: RecyclingBinProps) => {
         'tag',
         'tags',
         'not-staged-files',
+        'staged-files',
       ]}
       extraValidation={(payload) => {
         if (payload.type === 'branch' && currentBranch) {
@@ -61,6 +62,7 @@ const RecyclingBin = (props: RecyclingBinProps) => {
         tag: 'delete this tag',
         tags: 'delete these tags',
         'not-staged-files': 'discard changes in these files',
+        'staged-files': 'discard changes in these files',
       }}
       Glyph={IconTrashFilled}
       handleDrop={(payload) => {
@@ -113,14 +115,17 @@ const RecyclingBin = (props: RecyclingBinProps) => {
               details: `delete ${pluralize('tag', dragged.length, true, 'tags')}`,
             })
           })
-          .with({ type: 'not-staged-files' }, ({ dragged }) => {
-            triggerInteraction({
-              action: discardFiles,
-              argsRequester: () => dragged,
-              isDangerous: true,
-              details: `discard changes in ${pluralize('file', dragged.length, true, 'files')}`,
-            })
-          })
+          .with(
+            { type: P.union('not-staged-files', 'staged-files') },
+            ({ dragged }) => {
+              triggerInteraction({
+                action: discardFiles,
+                argsRequester: () => dragged,
+                isDangerous: true,
+                details: `discard changes in ${pluralize('file', dragged.length, true, 'files')}`,
+              })
+            },
+          )
           .exhaustive()
       }}
     />

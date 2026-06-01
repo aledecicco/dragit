@@ -291,16 +291,6 @@ pub async fn remove_from_tree(
     with_handler(&state, &|h| h.remove_from_tree(repo_path, &files))
 }
 
-/// Discards the changes in the given files.
-#[tauri::command]
-pub async fn discard_changes(
-    state: State<'_, AppState>,
-    repo_path: &str,
-    files: Vec<&str>,
-) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.discard_changes(repo_path, &files))
-}
-
 /// Removes the given untracked files.
 #[tauri::command]
 pub async fn clean_files(
@@ -340,6 +330,21 @@ pub async fn revert_commit(
     reference: &str,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| h.revert_commit(repo_path, reference))
+}
+
+/// Restores the status of the given files to the one in the given revision.
+#[tauri::command]
+pub async fn restore(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    reference: Option<&str>,
+    is_staged: bool,
+    is_worktree: bool,
+    files: Vec<&str>,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| {
+        h.restore(repo_path, reference, is_staged, is_worktree, &files)
+    })
 }
 
 /// Returns the commit hash of the latest common ancestor between the two given references.

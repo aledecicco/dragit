@@ -67,11 +67,6 @@ const MultiSelectInner = (props: MultiSelectProps) => {
           return
         }
 
-        if (e.key === 'Enter') {
-          e.preventDefault()
-          return
-        }
-
         if (e.key === 'Escape') {
           setSelection([])
           e.preventDefault()

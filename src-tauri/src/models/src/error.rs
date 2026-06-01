@@ -64,11 +64,11 @@ pub enum GitError {
     #[error("Failed to revert commit \"{reference}\"")]
     RevertCommitFailed { reference: String },
 
+    #[error("Failed to restore files")]
+    RestoreFailed {},
+
     #[error("Failed to remove files from tree")]
     RemoveFromTreeFailed {},
-
-    #[error("Failed to discard file changes")]
-    DiscardChangesFailed {},
 
     #[error("Failed to clean files")]
     CleanFilesFailed {},

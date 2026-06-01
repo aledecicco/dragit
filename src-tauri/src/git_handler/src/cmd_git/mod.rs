@@ -443,14 +443,6 @@ impl GitHandler for CmdGit {
             .or(Err(GitError::RemoveFromTreeFailed {}))
     }
 
-    fn discard_changes(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
-        let mut args = vec!["checkout", "--"];
-        args.extend(files);
-
-        self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::DiscardChangesFailed {}))
-    }
-
     fn clean_files(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
         let mut args = vec!["clean", "-f", "--"];
         args.extend(files);
@@ -483,6 +475,36 @@ impl GitHandler for CmdGit {
             .or(Err(GitError::RevertCommitFailed {
                 reference: reference.to_string(),
             }))
+    }
+
+    fn restore(
+        &self,
+        repo_path: &str,
+        reference: Option<&str>,
+        is_staged: bool,
+        is_worktree: bool,
+        files: &Vec<&str>,
+    ) -> Result<(), GitError> {
+        let mut args = vec!["restore"];
+
+        if let Some(reference) = reference {
+            args.push("--source");
+            args.push(reference);
+        }
+
+        if is_staged {
+            args.push("--staged");
+        }
+
+        if is_worktree {
+            args.push("--worktree");
+        }
+
+        args.push("--");
+        args.extend(files);
+
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::RestoreFailed {}))
     }
 
     fn get_common_ancestor(

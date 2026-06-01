@@ -3,7 +3,7 @@ import { match, P } from 'ts-pattern'
 
 import type { NotStagedFile } from '@/api/models'
 import { useStageFile } from '@/api/mutations/addToIndex'
-import { useDiscardFileChanges } from '@/api/mutations/discardChanges'
+import { useDiscardFileChanges } from '@/api/mutations/restore'
 import { useStashFile } from '@/api/mutations/saveStash'
 import {
   useAcceptAsIs,

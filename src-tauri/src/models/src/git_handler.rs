@@ -108,9 +108,6 @@ pub trait GitHandler {
     /// Removes the given list of files from the tree.
     fn remove_from_tree(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
 
-    /// Discards the changes in the given files.
-    fn discard_changes(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
-
     /// Removes untracked files from the worktree.
     fn clean_files(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
 
@@ -122,6 +119,16 @@ pub trait GitHandler {
 
     /// Reverts the given commit, creating a new commit with the reverted changes.
     fn revert_commit(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
+
+    /// Restores the status of the given files to the one in the given revision.
+    fn restore(
+        &self,
+        repo_path: &str,
+        reference: Option<&str>,
+        is_staged: bool,
+        is_worktree: bool,
+        files: &Vec<&str>,
+    ) -> Result<(), GitError>;
 
     /// Returns the commit hash of the latest common ancestor between the two given branches.
     fn get_common_ancestor(

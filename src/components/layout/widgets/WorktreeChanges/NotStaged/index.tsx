@@ -3,8 +3,8 @@ import { IconFiles } from '@tabler/icons-react'
 
 import type { NotStagedFile, WorktreeFileType } from '@/api/models'
 import { useStageFiles } from '@/api/mutations/addToIndex'
-import { useDiscardChanges } from '@/api/mutations/discardChanges'
 import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
+import { useDiscardChanges } from '@/api/mutations/restore'
 import { useStashFiles } from '@/api/mutations/saveStash'
 import {
   useAcceptManyAsIs,

@@ -2,14 +2,19 @@ import { type ComponentProps, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
 
 import type { SnapshotInfo, VersionedFileInfo } from '@/api/models'
+import { useRestoreFileStates } from '@/api/mutations/restore'
 import {
   SNAPSHOT_FILES_PAGE_SIZE,
   useQuerySnapshotFiles,
 } from '@/api/queries/snapshotFiles'
 import { useNeedsPagination } from '@/api/utils'
+import { interaction } from '@/lib/ActionButton/utils'
+import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
+import type { AnyInteraction } from '@/state/actions'
 import { Chip } from '@/ui/Chip'
+import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
@@ -46,6 +51,8 @@ const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
       )
     },
   })
+
+  const getInteractions = useGetInteractions(snapshotInfo)
 
   return (
     <div
@@ -90,21 +97,46 @@ const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
             'focus:border-dark-100',
           )}
         >
-          <QueryList
-            name="modified files"
-            query={filesQuery}
-            getItems={(d) => d.items}
-            renderItem={(file) => <SnapshotDetailsDialogItem file={file} />}
-            itemSize={48}
-            size="md"
-            options={mapFn(filesQuery.data, (page) => ({
-              getItemKey: (index: number) => page.items[index].path,
-            }))}
-          />
+          <InteractiveSelection
+            items={filesQuery.data?.items ?? []}
+            getInteractions={getInteractions}
+          >
+            <QueryList
+              name="modified files"
+              query={filesQuery}
+              getItems={(d) => d.items}
+              renderItem={(file, position) => (
+                <SnapshotDetailsDialogItem
+                  file={file}
+                  snapshotInfo={snapshotInfo}
+                  itemIndex={position}
+                />
+              )}
+              itemSize={48}
+              size="md"
+              options={mapFn(filesQuery.data, (page) => ({
+                getItemKey: (index: number) => page.items[index].path,
+              }))}
+            />
+          </InteractiveSelection>
         </Ariakit.RadioGroup>
       </Ariakit.RadioProvider>
     </div>
   )
+}
+
+const useGetInteractions = (snapshotInfo: SnapshotInfo) => {
+  const restore = useRestoreFileStates(snapshotInfo.id)
+
+  return (files: VersionedFileInfo[]): AnyInteraction[][] => [
+    [
+      interaction({
+        action: restore,
+        argsRequester: () => files,
+        details: `restore contents in ${pluralize('file', files.length, true)}`,
+      }),
+    ],
+  ]
 }
 
 export { SnapshotDialogFileList, type SnapshotDialogFileListProps }
