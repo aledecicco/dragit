@@ -11,12 +11,12 @@ use std::{
 };
 use tauri::{AppHandle, Emitter};
 
-use crate::{
-    get_branches_folder, get_config_folder, get_git_folder, get_head_file, get_index_file,
-    get_objects_folder, get_remotes_folder, get_stashes_file,
-    utils::{get_merge_file, get_rebase_folder, get_tags_folder},
-};
 use models::{AppEvent, RepoWatcher, RepoWatcherError, EVENT_ID};
+use utils::{
+    get_branches_folder, get_cherry_pick_head_file, get_config_folder, get_git_folder,
+    get_head_file, get_index_file, get_merge_head_file, get_objects_folder, get_rebase_head_file,
+    get_remotes_folder, get_revert_head_file, get_stashes_file, get_tags_folder,
+};
 
 /// Implementation of [`RepoWatcher`] that uses a debouncer to group events.
 pub struct DebouncedWatcher {
@@ -48,8 +48,10 @@ impl DebouncedWatcher {
         let index_file = get_index_file(&repo_path);
         let stashes_file = get_stashes_file(&repo_path);
         let tags_folder = get_tags_folder(&repo_path);
-        let rebase_folder = get_rebase_folder(&repo_path);
-        let merge_file = get_merge_file(&repo_path);
+        let merge_head_file = get_merge_head_file(&repo_path);
+        let rebase_head_file = get_rebase_head_file(&repo_path);
+        let cherry_pick_head_file = get_cherry_pick_head_file(&repo_path);
+        let revert_head_file = get_revert_head_file(&repo_path);
 
         move |res: Result<Vec<DebouncedEvent>, Vec<notify::Error>>| {
             match res {
@@ -100,8 +102,10 @@ impl DebouncedWatcher {
                                 stashes_updated = true;
                             }
 
-                            if event.paths.contains(&rebase_folder)
-                                || event.paths.contains(&merge_file)
+                            if event.paths.contains(&merge_head_file)
+                                || event.paths.contains(&rebase_head_file)
+                                || event.paths.contains(&cherry_pick_head_file)
+                                || event.paths.contains(&revert_head_file)
                             {
                                 head_changed = true;
                             }

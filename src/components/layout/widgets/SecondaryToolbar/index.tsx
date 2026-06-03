@@ -1,10 +1,14 @@
-import { match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
+import { useAbortCherryPick } from '@/api/mutations/abortCherryPick'
 import { useAbortMerge } from '@/api/mutations/abortMerge'
 import { useAbortRebase } from '@/api/mutations/abortRebase'
+import { useAbortRevert } from '@/api/mutations/abortRevert'
 import { useCommit } from '@/api/mutations/commitIndex'
+import { useContinueCherryPick } from '@/api/mutations/continueCherryPick'
 import { useContinueMerge } from '@/api/mutations/continueMerge'
 import { useContinueRebase } from '@/api/mutations/continueRebase'
+import { useContinueRevert } from '@/api/mutations/continueRevert'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { useSettings } from '@/state/storage'
@@ -26,6 +30,10 @@ const SecondaryToolbar = (props: SecondaryToolbarProps) => {
   const continueMerge = useContinueMerge()
   const abortRebase = useAbortRebase()
   const continueRebase = useContinueRebase()
+  const abortCherryPick = useAbortCherryPick()
+  const continueCherryPick = useContinueCherryPick()
+  const abortRevert = useAbortRevert()
+  const continueRevert = useContinueRevert()
 
   const settings = useSettings()
 
@@ -68,7 +76,43 @@ const SecondaryToolbar = (props: SecondaryToolbarProps) => {
             />
           </>
         ))
-        .otherwise(() => (
+        .with('cherry-picking', () => (
+          <>
+            <ToolbarItem
+              fixed
+              status="warning"
+              size="md"
+              compact={false}
+              action={abortCherryPick}
+            />
+            <ToolbarItem
+              fixed
+              status="warning"
+              size="md"
+              compact={false}
+              action={continueCherryPick}
+            />
+          </>
+        ))
+        .with('reverting', () => (
+          <>
+            <ToolbarItem
+              fixed
+              status="warning"
+              size="md"
+              compact={false}
+              action={abortRevert}
+            />
+            <ToolbarItem
+              fixed
+              status="warning"
+              size="md"
+              compact={false}
+              action={continueRevert}
+            />
+          </>
+        ))
+        .with(P.union('clean', undefined), () => (
           <ToolbarItem
             fixed
             status="primary"
@@ -78,7 +122,8 @@ const SecondaryToolbar = (props: SecondaryToolbarProps) => {
             argsRequester={requestCommitParams}
             shortcut={settings.commitShortcut}
           />
-        ))}
+        ))
+        .exhaustive()}
     </Toolbar>
   )
 }

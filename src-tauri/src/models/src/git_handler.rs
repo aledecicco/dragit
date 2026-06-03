@@ -117,9 +117,6 @@ pub trait GitHandler {
     /// Reset the HEAD to undo the given reference without changing the index or working directory.
     fn reset_head(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
 
-    /// Reverts the given commit, creating a new commit with the reverted changes.
-    fn revert_commit(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
-
     /// Restores the status of the given files to the one in the given revision.
     fn restore(
         &self,
@@ -287,8 +284,26 @@ pub trait GitHandler {
     /// Continues the ongoing rebase operation.
     fn continue_rebase(&self, repo_path: &str) -> Result<(), GitError>;
 
+    /// Aborts the ongoing cherry-pick operation.
+    fn abort_cherry_pick(&self, repo_path: &str) -> Result<(), GitError>;
+
+    /// Continues the ongoing cherry-pick operation.
+    fn continue_cherry_pick(&self, repo_path: &str) -> Result<(), GitError>;
+
+    /// Aborts the ongoing revert operation.
+    fn abort_revert(&self, repo_path: &str) -> Result<(), GitError>;
+
+    /// Continues the ongoing revert operation.
+    fn continue_revert(&self, repo_path: &str) -> Result<(), GitError>;
+
     /// Merges the given reference into the current branch.
     fn merge(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
+
+    /// Cherry-picks the given references, applying their changes to the current branch.
+    fn cherry_pick(&self, repo_path: &str, references: &Vec<&str>) -> Result<(), GitError>;
+
+    /// Reverts the given commit, creating a new commit with the reverted changes.
+    fn revert_commit(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
 }
 
 #[derive(serde::Deserialize, Debug)]

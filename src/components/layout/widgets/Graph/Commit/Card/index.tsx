@@ -2,6 +2,7 @@ import * as Ariakit from '@ariakit/react'
 import { IconGitCommit } from '@tabler/icons-react'
 
 import type { CommitInfo } from '@/api/models'
+import { useCherryPickCommit } from '@/api/mutations/cherryPick'
 import { useAmend } from '@/api/mutations/commitIndex'
 import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
 import { useTagCommit } from '@/api/mutations/createTag'
@@ -169,6 +170,7 @@ const useInteractions = (commit: CommitInfo) => {
   const merge = useMergeCommit(commit.id)
   const rewind = useRewindCommit(commit.id)
   const revert = useRevertCommit(commit.id)
+  const cherryPick = useCherryPickCommit(commit.id)
   const tag = useTagCommit(commit)
 
   return [
@@ -181,9 +183,6 @@ const useInteractions = (commit: CommitInfo) => {
         action: branchOff,
         argsRequester: () => requestBranchName(`#${commit.shortHash}`),
       }),
-      interaction({
-        action: merge,
-      }),
     ),
     group(
       interaction({
@@ -193,14 +192,16 @@ const useInteractions = (commit: CommitInfo) => {
     ),
     group(
       interaction({
+        action: merge,
+      }),
+      interaction({
+        action: cherryPick,
+      }),
+      interaction({
         action: revert,
-        isDangerous: true,
-        details: `revert commit #${commit.shortHash}`,
       }),
       interaction({
         action: rewind,
-        isDangerous: true,
-        details: `rewind head to commit #${commit.shortHash}`,
       }),
     ),
   ]

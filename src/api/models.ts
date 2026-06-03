@@ -206,7 +206,12 @@ export type HeadState =
   | { type: 'detached'; commit: CommitId }
   | { type: 'branch'; name: BranchName }
 
-export type WorktreeStatus = 'clean' | 'merging' | 'rebasing'
+export type WorktreeStatus =
+  | 'clean'
+  | 'merging'
+  | 'rebasing'
+  | 'cherry-picking'
+  | 'reverting'
 
 export type HeadInfo = {
   state: HeadState

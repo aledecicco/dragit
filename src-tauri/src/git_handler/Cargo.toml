@@ -6,4 +6,6 @@ edition = "2021"
 [dependencies]
 borsh = { workspace = true }
 tauri = { workspace = true }
+
 models = { path = "../models" }
+utils = { path = "../utils" }

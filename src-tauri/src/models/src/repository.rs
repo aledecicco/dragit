@@ -208,6 +208,8 @@ pub enum WorktreeStatus {
     Clean,
     Merging,
     Rebasing,
+    CherryPicking,
+    Reverting,
 }
 
 #[derive(borsh::BorshSerialize, Debug)]

@@ -322,16 +322,6 @@ pub async fn reset_head(
     with_handler(&state, &|h| h.reset_head(repo_path, reference))
 }
 
-/// Reverts the given commit, creating a new commit with the reverted changes.
-#[tauri::command]
-pub async fn revert_commit(
-    state: State<'_, AppState>,
-    repo_path: &str,
-    reference: &str,
-) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.revert_commit(repo_path, reference))
-}
-
 /// Restores the status of the given files to the one in the given revision.
 #[tauri::command]
 pub async fn restore(
@@ -730,6 +720,36 @@ pub async fn continue_rebase(state: State<'_, AppState>, repo_path: &str) -> Res
     with_handler(&state, &|h| h.continue_rebase(repo_path))
 }
 
+/// Aborts the ongoing cherry-pick operation.
+#[tauri::command]
+pub async fn abort_cherry_pick(
+    state: State<'_, AppState>,
+    repo_path: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.abort_cherry_pick(repo_path))
+}
+
+/// Continues the ongoing cherry-pick operation.
+#[tauri::command]
+pub async fn continue_cherry_pick(
+    state: State<'_, AppState>,
+    repo_path: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.continue_cherry_pick(repo_path))
+}
+
+/// Aborts the ongoing revert operation.
+#[tauri::command]
+pub async fn abort_revert(state: State<'_, AppState>, repo_path: &str) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.abort_revert(repo_path))
+}
+
+/// Continues the ongoing revert operation.
+#[tauri::command]
+pub async fn continue_revert(state: State<'_, AppState>, repo_path: &str) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.continue_revert(repo_path))
+}
+
 /// Merges the given reference into the current branch.
 #[tauri::command]
 pub async fn merge(
@@ -738,4 +758,24 @@ pub async fn merge(
     reference: &str,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| h.merge(repo_path, reference))
+}
+
+/// Cherry-picks the given references into the current branch.
+#[tauri::command]
+pub async fn cherry_pick(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    references: Vec<&str>,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.cherry_pick(repo_path, &references))
+}
+
+/// Reverts the given commit, creating a new commit with the reverted changes.
+#[tauri::command]
+pub async fn revert_commit(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    reference: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h| h.revert_commit(repo_path, reference))
 }

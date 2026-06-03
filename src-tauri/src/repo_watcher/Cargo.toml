@@ -7,6 +7,7 @@ edition = "2021"
 tauri = { workspace = true }
 
 models = { path = "../models" }
+utils = { path = "../utils" }
 
 notify = { version = "8.2.0" }
 notify-debouncer-full = { version = "0.7.0" }

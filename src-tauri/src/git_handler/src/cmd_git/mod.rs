@@ -1,3 +1,6 @@
+mod utils;
+use utils::*;
+
 use std::{
     collections::HashMap,
     fmt::Debug,
@@ -8,8 +11,9 @@ use std::{
 };
 use tauri::ipc::Channel;
 
-mod utils;
-use utils::*;
+use ::utils::{
+    get_cherry_pick_head_file, get_merge_head_file, get_rebase_head_file, get_revert_head_file,
+};
 
 use models::{
     AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
@@ -288,10 +292,15 @@ impl GitHandler for CmdGit {
             .collect();
 
         let head_state = parse_head_state(&lines).ok_or(GitError::GetHeadInfoFailed {})?;
+
         let merge_in_progress =
-            fs::exists(Path::new(repo_path).join(".git").join("MERGE_HEAD")).unwrap_or(false);
+            fs::exists(get_merge_head_file(&Path::new(repo_path))).unwrap_or(false);
         let rebase_in_progress =
-            fs::exists(Path::new(repo_path).join(".git").join("rebase-merge")).unwrap_or(false);
+            fs::exists(get_rebase_head_file(&Path::new(repo_path))).unwrap_or(false);
+        let cherry_pick_in_progress =
+            fs::exists(get_cherry_pick_head_file(&Path::new(repo_path))).unwrap_or(false);
+        let revert_in_progress =
+            fs::exists(get_revert_head_file(&Path::new(repo_path))).unwrap_or(false);
 
         Ok(HeadInfo {
             state: head_state,
@@ -299,6 +308,10 @@ impl GitHandler for CmdGit {
                 WorktreeStatus::Merging
             } else if rebase_in_progress {
                 WorktreeStatus::Rebasing
+            } else if cherry_pick_in_progress {
+                WorktreeStatus::CherryPicking
+            } else if revert_in_progress {
+                WorktreeStatus::Reverting
             } else {
                 WorktreeStatus::Clean
             },
@@ -466,13 +479,6 @@ impl GitHandler for CmdGit {
         let parent = format!("{}^{}", reference, 1);
         self.spawn_and_await(repo_path, ["reset", "--soft", &parent])
             .or(Err(GitError::ResetHeadFailed {
-                reference: reference.to_string(),
-            }))
-    }
-
-    fn revert_commit(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
-        self.spawn_and_await(repo_path, ["revert", reference])
-            .or(Err(GitError::RevertCommitFailed {
                 reference: reference.to_string(),
             }))
     }
@@ -974,9 +980,44 @@ impl GitHandler for CmdGit {
             .or(Err(GitError::ContinueRebaseFailed {}))
     }
 
+    fn continue_cherry_pick(&self, repo_path: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["cherry-pick", "--continue"])
+            .or(Err(GitError::ContinueCherryPickFailed {}))
+    }
+
+    fn abort_cherry_pick(&self, repo_path: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["cherry-pick", "--abort"])
+            .or(Err(GitError::AbortCherryPickFailed {}))
+    }
+
+    fn continue_revert(&self, repo_path: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["revert", "--continue"])
+            .or(Err(GitError::ContinueRevertFailed {}))
+    }
+
+    fn abort_revert(&self, repo_path: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["revert", "--abort"])
+            .or(Err(GitError::AbortRevertFailed {}))
+    }
+
     fn merge(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["merge", reference])
             .or(Err(GitError::MergeFailed {
+                reference: reference.to_string(),
+            }))
+    }
+
+    fn cherry_pick(&self, repo_path: &str, references: &Vec<&str>) -> Result<(), GitError> {
+        let mut args = vec!["cherry-pick"];
+        args.extend(references);
+
+        self.spawn_and_await(repo_path, args)
+            .or(Err(GitError::CherryPickFailed {}))
+    }
+
+    fn revert_commit(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["revert", reference])
+            .or(Err(GitError::RevertCommitFailed {
                 reference: reference.to_string(),
             }))
     }

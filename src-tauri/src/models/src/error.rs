@@ -61,9 +61,6 @@ pub enum GitError {
     #[error("Failed to reset HEAD to \"{reference}\"")]
     ResetHeadFailed { reference: String },
 
-    #[error("Failed to revert commit \"{reference}\"")]
-    RevertCommitFailed { reference: String },
-
     #[error("Failed to restore files")]
     RestoreFailed {},
 
@@ -166,8 +163,26 @@ pub enum GitError {
     #[error("Failed to continue rebase in progress")]
     ContinueRebaseFailed {},
 
+    #[error("Failed to abort cherry-pick in progress")]
+    AbortCherryPickFailed {},
+
+    #[error("Failed to continue cherry-pick in progress")]
+    ContinueCherryPickFailed {},
+
+    #[error("Failed to abort revert in progress")]
+    AbortRevertFailed {},
+
+    #[error("Failed to continue revert in progress")]
+    ContinueRevertFailed {},
+
     #[error("Failed to merge \"{reference}\" into current branch")]
     MergeFailed { reference: String },
+
+    #[error("Failed to cherry-pick references into current branch")]
+    CherryPickFailed {},
+
+    #[error("Failed to revert commit \"{reference}\"")]
+    RevertCommitFailed { reference: String },
 }
 
 #[derive(thiserror::Error, serde::Serialize, Debug)]
