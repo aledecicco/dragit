@@ -46,10 +46,10 @@ const useRewindCommit = (commit: CommitId): Action => {
       })
     },
     label: {
-      idle: 'Rewind head to this commit',
-      running: 'Rewinding head',
-      success: 'Head rewinded',
-      error: 'Failed to rewind head',
+      idle: 'Rewind to before this commit',
+      running: 'Rewinding',
+      success: 'Rewinded',
+      error: 'Failed to rewind',
     },
     Glyph: IconPlayerTrackPrevFilled,
   }

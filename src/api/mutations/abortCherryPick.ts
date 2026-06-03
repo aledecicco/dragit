@@ -34,7 +34,7 @@ const useAbortCherryPick = (): Action => {
       idle: 'Abort cherry-pick',
       running: 'Aborting cherry-pick',
       success: 'Cherry-pick aborted',
-      error: 'Failed to abort cherry-pick',
+      error: 'Failed to abort',
     },
     Glyph: IconArrowBackUpDouble,
   }

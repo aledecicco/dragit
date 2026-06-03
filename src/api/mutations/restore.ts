@@ -57,6 +57,7 @@ const useMakeDiscardFileChanges = (): ((file: WorktreeFileInfo) => Action) => {
       key: 'file_operation',
       operation: 'discard_file_changes',
       file: file.path,
+      status: file.status,
     },
     blockedBy: [
       { key: 'file_operation', file: file.path },
@@ -70,7 +71,7 @@ const useMakeDiscardFileChanges = (): ((file: WorktreeFileInfo) => Action) => {
           files: [file.path],
           reference: null,
           isStaged: file.status === 'staged',
-          isWorktree: file.changes === 'deleted',
+          isWorktree: true,
         })
       }
     },
@@ -100,21 +101,9 @@ const useDiscardChanges = (): Action<WorktreeFileInfo[]> => {
     ],
     run: async (files) => {
       const untrackedFiles = files.filter((file) => file.status === 'untracked')
-      const stagedFiles = files.filter(
-        (file) => file.status === 'staged' && file.changes !== 'deleted',
-      )
-      const deletedStagedFiles = files.filter(
-        (file) => file.status === 'staged' && file.changes === 'deleted',
-      )
+      const stagedFiles = files.filter((file) => file.status === 'staged')
       const unstagedFiles = files.filter(
-        (file) =>
-          (file.status === 'unstaged' || file.status === 'unmerged') &&
-          file.changes !== 'deleted',
-      )
-      const deletedUnstagedFiles = files.filter(
-        (file) =>
-          (file.status === 'unstaged' || file.status === 'unmerged') &&
-          file.changes === 'deleted',
+        (file) => file.status === 'unstaged' || file.status === 'unmerged',
       )
 
       if (untrackedFiles.length > 0) {
@@ -126,15 +115,6 @@ const useDiscardChanges = (): Action<WorktreeFileInfo[]> => {
       if (stagedFiles.length > 0) {
         await restoreFiles.mutateAsync({
           files: stagedFiles.map((file) => file.path),
-          reference: null,
-          isStaged: true,
-          isWorktree: false,
-        })
-      }
-
-      if (deletedStagedFiles.length > 0) {
-        await restoreFiles.mutateAsync({
-          files: deletedStagedFiles.map((file) => file.path),
           reference: null,
           isStaged: true,
           isWorktree: true,
@@ -149,21 +129,13 @@ const useDiscardChanges = (): Action<WorktreeFileInfo[]> => {
           isWorktree: true,
         })
       }
-
-      if (deletedUnstagedFiles.length > 0) {
-        await restoreFiles.mutateAsync({
-          files: deletedUnstagedFiles.map((file) => file.path),
-          reference: null,
-          isStaged: false,
-          isWorktree: true,
-        })
-      }
     },
     derivedIds: (files) =>
       files.map((file) => ({
         key: 'file_operation',
         operation: 'discard_file_changes',
         file: file.path,
+        status: file.status,
       })),
     label: {
       idle: 'Discard changes',

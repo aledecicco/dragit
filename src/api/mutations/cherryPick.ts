@@ -4,11 +4,12 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
 
-import type { CommitId } from '../models'
+import type { CommitInfo } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface CherryPickArgs {
   references: string[]
+  isMerge: boolean
 }
 
 const cherryPickKey = (repoPath: string) =>
@@ -26,15 +27,16 @@ const cherryPickMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useCherryPickCommit = (commit: CommitId): Action => {
+const useCherryPickCommit = (commit: CommitInfo): Action => {
   const cherryPick = useRepositoryMutation(cherryPickMutation)
+  const isMerge = commit.parents.length > 1
 
   return {
     id: {
       key: 'branch_operation',
       operation: 'cherry_pick_commit',
       type: 'current',
-      reference: commit,
+      reference: commit.id,
     },
     blockedBy: [
       { key: 'branch_operation', type: 'current' },
@@ -42,14 +44,17 @@ const useCherryPickCommit = (commit: CommitId): Action => {
     ],
     run: async () => {
       await cherryPick.mutateAsync({
-        references: [commit],
+        references: [commit.id],
+        isMerge,
       })
     },
     label: {
-      idle: 'Cherry-pick this commit',
-      running: 'Cherry-picking commit',
-      success: 'Commit cherry-picked',
-      error: 'Failed to cherry-pick commit',
+      idle: isMerge ? 'Cherry-pick this merge' : 'Cherry-pick this commit',
+      running: isMerge ? 'Cherry-picking merge' : 'Cherry-picking commit',
+      success: isMerge ? 'Merge cherry-picked' : 'Commit cherry-picked',
+      error: isMerge
+        ? 'Failed to cherry-pick merge'
+        : 'Failed to cherry-pick commit',
     },
     Glyph: IconCherry,
   }

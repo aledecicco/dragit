@@ -34,7 +34,7 @@ const useAbortRevert = (): Action => {
       idle: 'Abort revert',
       running: 'Aborting revert',
       success: 'Revert aborted',
-      error: 'Failed to abort revert',
+      error: 'Failed to abort',
     },
     Glyph: IconArrowBackUpDouble,
   }

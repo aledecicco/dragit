@@ -9,7 +9,7 @@ use models::{
 
 /// Format used to get the needed information about a commit.
 pub(crate) const COMMIT_INFO_FORMAT: &str =
-    "--format=format:%H%x00%h%x00%an%x00%ae%x00%ct%x00%B%x00";
+    "--format=format:%H%x00%h%x00%an%x00%ae%x00%ct%x00%B%x00%ph%x00";
 /// The prefix of the line with the commit hash when printing the current status.
 pub(crate) const HEAD_INFO_COMMIT_PREFIX: &str = "# branch.oid ";
 /// The prefix of the line with the branch name when printing the current status.
@@ -61,6 +61,11 @@ pub(crate) fn parse_commit_info(line: &String) -> Option<CommitInfo> {
         message: segments
             .next()
             .and_then(|s| (!s.is_empty()).then_some(s.to_string())),
+        parents: segments
+            .next()?
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect(),
         changes: segments
             .next()
             .and_then(|line| parse_diff_summary(&line.trim_ascii().to_string())),

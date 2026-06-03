@@ -300,10 +300,20 @@ pub trait GitHandler {
     fn merge(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
 
     /// Cherry-picks the given references, applying their changes to the current branch.
-    fn cherry_pick(&self, repo_path: &str, references: &Vec<&str>) -> Result<(), GitError>;
+    fn cherry_pick(
+        &self,
+        repo_path: &str,
+        references: &Vec<&str>,
+        is_merge: bool,
+    ) -> Result<(), GitError>;
 
     /// Reverts the given commit, creating a new commit with the reverted changes.
-    fn revert_commit(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
+    fn revert_commit(
+        &self,
+        repo_path: &str,
+        reference: &str,
+        is_merge: bool,
+    ) -> Result<(), GitError>;
 }
 
 #[derive(serde::Deserialize, Debug)]

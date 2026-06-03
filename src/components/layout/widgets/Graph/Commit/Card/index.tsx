@@ -169,8 +169,8 @@ const useInteractions = (commit: CommitInfo) => {
   const branchOff = useBranchOff(commit.id)
   const merge = useMergeCommit(commit.id)
   const rewind = useRewindCommit(commit.id)
-  const revert = useRevertCommit(commit.id)
-  const cherryPick = useCherryPickCommit(commit.id)
+  const revert = useRevertCommit(commit)
+  const cherryPick = useCherryPickCommit(commit)
   const tag = useTagCommit(commit)
 
   return [

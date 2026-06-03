@@ -41,6 +41,8 @@ const fetchHeadInfo = async (
       .with({ Clean: {} }, () => 'clean')
       .with({ Merging: {} }, () => 'merging')
       .with({ Rebasing: {} }, () => 'rebasing')
+      .with({ CherryPicking: {} }, () => 'cherry-picking')
+      .with({ Reverting: {} }, () => 'reverting')
       .exhaustive(),
   }
 }

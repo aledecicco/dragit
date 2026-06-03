@@ -28,6 +28,7 @@ export const COMMIT_INFO_SCHEMA = BorshSchema.Struct({
   timestamp: BorshSchema.u32,
   message: BorshSchema.Option(BorshSchema.String),
   changes: BorshSchema.Option(DIFF_SUMMARY_SCHEMA),
+  parents: BorshSchema.Vec(BorshSchema.String),
 })
 
 export const ANCESTOR_INFO_SCHEMA = BorshSchema.Struct({
@@ -65,6 +66,8 @@ export const WORKTREE_STATUS_SCHEMA = BorshSchema.Enum({
   Clean: BorshSchema.Unit,
   Merging: BorshSchema.Unit,
   Rebasing: BorshSchema.Unit,
+  CherryPicking: BorshSchema.Unit,
+  Reverting: BorshSchema.Unit,
 })
 
 export const HEAD_INFO_SCHEMA = BorshSchema.Struct({

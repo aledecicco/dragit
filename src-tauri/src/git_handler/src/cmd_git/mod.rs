@@ -1007,16 +1007,43 @@ impl GitHandler for CmdGit {
             }))
     }
 
-    fn cherry_pick(&self, repo_path: &str, references: &Vec<&str>) -> Result<(), GitError> {
+    fn cherry_pick(
+        &self,
+        repo_path: &str,
+        references: &Vec<&str>,
+        is_merge: bool,
+    ) -> Result<(), GitError> {
         let mut args = vec!["cherry-pick"];
+
+        if is_merge {
+            args.push("-m");
+            args.push("1");
+        }
+
+        args.push("--");
         args.extend(references);
 
         self.spawn_and_await(repo_path, args)
             .or(Err(GitError::CherryPickFailed {}))
     }
 
-    fn revert_commit(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
-        self.spawn_and_await(repo_path, ["revert", reference])
+    fn revert_commit(
+        &self,
+        repo_path: &str,
+        reference: &str,
+        is_merge: bool,
+    ) -> Result<(), GitError> {
+        let mut args = vec!["revert"];
+
+        if is_merge {
+            args.push("-m");
+            args.push("1");
+        }
+
+        args.push("--");
+        args.push(reference);
+
+        self.spawn_and_await(repo_path, args)
             .or(Err(GitError::RevertCommitFailed {
                 reference: reference.to_string(),
             }))

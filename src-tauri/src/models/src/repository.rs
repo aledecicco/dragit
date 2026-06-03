@@ -29,6 +29,7 @@ pub struct CommitInfo {
     pub timestamp: u32,
     pub message: Option<String>,
     pub changes: Option<DiffSummary>,
+    pub parents: Vec<String>,
 }
 
 #[derive(borsh::BorshSerialize, serde::Deserialize, Debug)]

@@ -103,6 +103,7 @@ export interface CommitInfo {
   timestamp: number
   message: string | null
   changes: DiffSummary | null
+  parents: CommitId[]
 }
 
 export type SnapshotInfo = CommitInfo | StashInfo

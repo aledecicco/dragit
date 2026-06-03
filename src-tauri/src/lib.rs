@@ -69,7 +69,6 @@ pub fn run() {
             api::clean_files,
             api::commit_index,
             api::reset_head,
-            api::revert_commit,
             api::restore,
             api::get_common_ancestor,
             api::get_branch_divergence,
@@ -99,7 +98,13 @@ pub fn run() {
             api::continue_merge,
             api::abort_rebase,
             api::continue_rebase,
+            api::continue_cherry_pick,
+            api::abort_cherry_pick,
+            api::abort_revert,
+            api::continue_revert,
             api::merge,
+            api::revert_commit,
+            api::cherry_pick,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running application");

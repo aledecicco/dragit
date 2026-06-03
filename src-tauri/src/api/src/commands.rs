@@ -766,8 +766,9 @@ pub async fn cherry_pick(
     state: State<'_, AppState>,
     repo_path: &str,
     references: Vec<&str>,
+    is_merge: bool,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.cherry_pick(repo_path, &references))
+    with_handler(&state, &|h| h.cherry_pick(repo_path, &references, is_merge))
 }
 
 /// Reverts the given commit, creating a new commit with the reverted changes.
@@ -776,6 +777,7 @@ pub async fn revert_commit(
     state: State<'_, AppState>,
     repo_path: &str,
     reference: &str,
+    is_merge: bool,
 ) -> Result<(), AppError> {
-    with_handler(&state, &|h| h.revert_commit(repo_path, reference))
+    with_handler(&state, &|h| h.revert_commit(repo_path, reference, is_merge))
 }
