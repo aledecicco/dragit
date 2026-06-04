@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { IconCheck } from '@tabler/icons-react'
+import { relaunch } from '@tauri-apps/plugin-process'
 
 import { useCheckUpdates } from '@/api/mutations/checkUpdates'
 import { useInstallUpdate } from '@/api/mutations/installUpdate'
@@ -60,13 +61,14 @@ interface WithUpdateProps {
 const WithUpdate = (props: WithUpdateProps) => {
   const { update } = props
 
-  const [progress, setProgres] = useState<number>()
+  const [progress, setProgress] = useState<number>()
 
   const installUpdate = useInstallUpdate((newProgress) => {
-    if (newProgress === 1000) {
-      setProgres(undefined)
+    if (newProgress === 100) {
+      setProgress(undefined)
+      relaunch()
     } else {
-      setProgres(newProgress)
+      setProgress(newProgress)
     }
   })
 

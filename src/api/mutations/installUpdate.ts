@@ -32,7 +32,11 @@ const installUpdateMutation = mutationOptions({
         .with({ event: 'Progress' }, ({ data }) => {
           downloadedLength += data.chunkLength
           if (totalLength > 0) {
-            args.onProgress?.((downloadedLength / totalLength) * 100)
+            args.onProgress?.(
+              Number.parseFloat(
+                ((downloadedLength / totalLength) * 100).toFixed(2),
+              ),
+            )
           }
         })
         .with({ event: 'Finished' }, () => {
