@@ -66,7 +66,8 @@ jobs:
       - name: cache Rust dependencies
         uses: swatinem/rust-cache@v2
         with:
-          key: ${{ matrix.platform }}-cargo
+          workspaces: |
+            src-tauri -> target
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'

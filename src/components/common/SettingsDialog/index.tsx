@@ -41,7 +41,7 @@ const SettingsDialog = (props: SettingsDialogProps) => {
   return (
     <Dialog
       dialogKey={SETTINGS_DIALOG_KEY}
-      {...propsWithCn(dialogProps, 'grid-cols-[max-content_600px] max-h-half')}
+      {...propsWithCn(dialogProps, 'grid-cols-[max-content_600px] max-h-[70%]')}
     >
       <Tabs
         className={cn('bg-dark-700')}

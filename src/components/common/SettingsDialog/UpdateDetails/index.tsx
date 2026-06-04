@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { IconCheck } from '@tabler/icons-react'
-import { relaunch } from '@tauri-apps/plugin-process'
 
 import { useCheckUpdates } from '@/api/mutations/checkUpdates'
 import { useInstallUpdate } from '@/api/mutations/installUpdate'
@@ -66,7 +65,6 @@ const WithUpdate = (props: WithUpdateProps) => {
   const installUpdate = useInstallUpdate((newProgress) => {
     if (newProgress === 100) {
       setProgress(undefined)
-      relaunch()
     } else {
       setProgress(newProgress)
     }
@@ -80,8 +78,9 @@ const WithUpdate = (props: WithUpdateProps) => {
 
       <p
         className={cn(
+          'w-full bg-dark-800 p-4 rounded-sm max-h-40 overflow-auto',
           'text-sm text-light-900 font-light whitespace-pre-wrap',
-          !update.description && 'italic text-light-950',
+          !update.description && 'italic text-light-900/75',
         )}
       >
         {update.description ? update.description : 'No description.'}

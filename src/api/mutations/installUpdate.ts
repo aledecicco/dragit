@@ -1,5 +1,6 @@
 import { IconCloudDownload } from '@tabler/icons-react'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
+import { relaunch } from '@tauri-apps/plugin-process'
 import { match } from 'ts-pattern'
 
 import type { Action } from '@/state/actions'
@@ -63,6 +64,8 @@ const useInstallUpdate = (onProgress?: (progress: number) => void): Action => {
         update: availableUpdate.data,
         onProgress,
       })
+
+      relaunch()
     },
     label: {
       idle: 'Install update',
