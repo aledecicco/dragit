@@ -2,6 +2,8 @@ export type ReactSetter<T> = React.Dispatch<React.SetStateAction<T>>
 
 export type Size = 'xs' | 'sm' | 'md' | 'lg'
 
+export type Direction = 'horizontal' | 'vertical'
+
 /**
  * Functor map function. Applies a function to a value if defined, and returns `undefined` otherwise.
  *

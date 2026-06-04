@@ -77,7 +77,6 @@ const SplitButton = (props: SplitButtonProps) => {
           'border-r',
           match(buttonProps.status)
             .with('primary', () => 'border-r-primary-800')
-            .with('cta', () => 'border-r-accent-700')
             .with('success', () => 'border-r-green-800')
             .with('warning', () => 'border-r-warning-700')
             .with('danger', () => 'border-r-danger-900')
@@ -100,7 +99,6 @@ const SplitButton = (props: SplitButtonProps) => {
           'border max-w-max',
           match(buttonProps.status)
             .with('primary', () => 'border-primary-300/20')
-            .with('cta', () => 'border-accent-600/20')
             .with('success', () => 'border-success-300/20')
             .with('warning', () => 'border-warning-200/20')
             .with('danger', () => 'border-danger-600/20')

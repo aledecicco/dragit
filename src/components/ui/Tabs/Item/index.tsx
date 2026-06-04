@@ -10,13 +10,18 @@ interface TabProps extends ButtonProps {
    * The tab identifier.
    */
   id: string
+
+  /**
+   * Whether the tabs should be given a curved shape.
+   */
+  withDecoration?: boolean
 }
 
 /**
  * A single tab inside a {@link Tabs} list.
  */
 const Tab = (props: TabProps) => {
-  const { id, ...buttonProps } = props
+  const { id, withDecoration = true, ...buttonProps } = props
 
   return (
     <Ariakit.Tab
@@ -26,24 +31,29 @@ const Tab = (props: TabProps) => {
           variant="plain"
           {...propsWithCn(
             buttonProps,
-            'relative rounded-xl rounded-b-none font-medium',
+            'font-medium',
+            withDecoration && 'relative rounded-xl rounded-b-none',
           )}
         >
-          <div
-            className={cn('absolute -left-2 bottom-0 bg-inherit w-2 h-2.5')}
-            style={{
-              clipPath: 'path("M 0 10 C 6 7.5 6 7.5 8 0 L 8 10 Z")',
-            }}
-          />
+          {withDecoration && (
+            <div
+              className={cn('absolute -left-2 bottom-0 bg-inherit w-2 h-2.5')}
+              style={{
+                clipPath: 'path("M 0 10 C 6 7.5 6 7.5 8 0 L 8 10 Z")',
+              }}
+            />
+          )}
 
           {buttonProps.children}
 
-          <div
-            className={cn('absolute -right-2 bottom-0 bg-inherit w-2 h-2.5')}
-            style={{
-              clipPath: 'path("M 8 10 C 2 7.5 2 7.5 0 0 L 0 10 Z")',
-            }}
-          />
+          {withDecoration && (
+            <div
+              className={cn('absolute -right-2 bottom-0 bg-inherit w-2 h-2.5')}
+              style={{
+                clipPath: 'path("M 8 10 C 2 7.5 2 7.5 0 0 L 0 10 Z")',
+              }}
+            />
+          )}
         </Button>
       }
     />

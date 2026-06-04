@@ -6,13 +6,7 @@ import type { Size } from '@/utils/types'
 
 type ButtonVariant = 'filled' | 'plain'
 
-type ButtonStatus =
-  | 'primary'
-  | 'cta'
-  | 'neutral'
-  | 'success'
-  | 'warning'
-  | 'danger'
+type ButtonStatus = 'primary' | 'neutral' | 'success' | 'warning' | 'danger'
 
 interface ButtonProps extends Ariakit.ButtonProps {
   /**
@@ -101,26 +95,6 @@ const Button = (props: ButtonProps) => {
             'data-active-item:aria-selected:bg-primary-300/10',
             'focus:bg-primary-300/8 data-focus:bg-primary-300/8',
             'aria-disabled:text-primary-400/40',
-          ])
-          .with({ variant: 'filled', status: 'cta' }, () => [
-            'bg-accent-600 text-light-50',
-            'hover:bg-accent-500',
-            'aria-expanded:bg-accent-500',
-            'aria-checked:bg-accent-500',
-            'aria-selected:bg-accent-500',
-            'data-active-item:aria-selected:bg-accent-400',
-            'focus:bg-accent-500 data-focus:bg-accent-500',
-            'aria-disabled:bg-accent-600/40 aria-disabled:text-light-700',
-          ])
-          .with({ variant: 'plain', status: 'cta' }, () => [
-            'text-accent-400',
-            'hover:bg-accent-400/8',
-            'aria-expanded:bg-accent-400/8',
-            'aria-checked:bg-accent-400/8',
-            'aria-selected:bg-accent-400/10',
-            'data-active-item:aria-selected:bg-accent-400/12',
-            'focus:bg-accent-400/8 data-focus:bg-accent-400/8',
-            'aria-disabled:text-accent-500/40',
           ])
           .with({ variant: 'filled', status: 'neutral' }, () => [
             'bg-dark-300 text-light-50',

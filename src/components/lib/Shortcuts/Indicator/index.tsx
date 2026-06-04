@@ -143,7 +143,6 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
             match(status)
               .with('neutral', () => 'bg-dark-100 border-light-950/30')
               .with('primary', () => 'bg-primary-700 border-primary-300/30')
-              .with('cta', () => 'bg-accent-700 border-accent-300/30')
               .with('success', () => 'bg-success-700 border-success-300/30')
               .with('warning', () => 'bg-warning-700 border-warning-300/30')
               .with('danger', () => 'bg-danger-800 border-danger-300/30')

@@ -83,7 +83,6 @@ const BaseToolbarItem = (props: BaseToolbarItemProps) => {
         'not-last:border-solid not-last:border-r',
         match(status)
           .with('primary', () => 'not-last:border-r-primary-800')
-          .with('cta', () => 'not-last:border-r-accent-700')
           .with('success', () => 'not-last:border-r-green-800')
           .with('warning', () => 'not-last:border-r-warning-800')
           .with('danger', () => 'not-last:border-r-danger-900')

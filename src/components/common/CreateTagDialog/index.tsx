@@ -62,7 +62,13 @@ const CreateTagDialog = (props: CreateTagDialogProps) => {
           </>
         }
       >
-        <InputField label="tag name" name="name" autoFocus required />
+        <InputField
+          label="tag name"
+          name="name"
+          autoFocus
+          required
+          containerProps={{ className: cn('mb-6') }}
+        />
 
         <TextField label="tag description" name="message" />
 

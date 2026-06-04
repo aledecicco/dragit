@@ -1,20 +1,17 @@
 import { useEffect } from 'react'
-import * as Ariakit from '@ariakit/react'
-import { IconBrandGithub } from '@tabler/icons-react'
+import { IconAdjustments, IconInfoCircle } from '@tabler/icons-react'
 
-import { DecoratedButton } from '@/lib/DecoratedButton'
 import { useShortcutScopesHandler } from '@/lib/Shortcuts/utils'
 import { showDialog } from '@/state/dialogs'
 import { Dialog, type DialogProps } from '@/ui/Dialog'
-import { DialogContent } from '@/ui/Dialog/Content'
-import { openLink } from '@/utils/behavior'
+import { Icon } from '@/ui/Icon'
+import { Tabs, useTabsHandler } from '@/ui/Tabs'
+import { Tab } from '@/ui/Tabs/Item'
+import { TabPanel } from '@/ui/Tabs/Panel'
 import { cn, propsWithCn } from '@/utils/styles'
 
-import { LARGE_DIFF_THRESHOLD } from '../FileViewer/Diff'
-import { CheckboxSetting } from './CheckboxSetting'
-import { SettingsDialogSection } from './Section'
-import { ShortcutSetting } from './ShortcutSetting'
-import { TextSetting } from './TextSetting'
+import { SettingsDialogAboutContent } from './AboutContent'
+import { SettingsDialogPreferencesContent } from './PreferencesContent'
 
 const SETTINGS_DIALOG_KEY = 'settings_dialog'
 
@@ -27,6 +24,9 @@ const SettingsDialog = (props: SettingsDialogProps) => {
   const { ...dialogProps } = props
 
   const scopesHandler = useShortcutScopesHandler()
+  const tabsHandler = useTabsHandler('preferences', {
+    selectOnMove: false,
+  })
 
   useEffect(() => {
     // When the settings dialog is open, we disable the 'global' shortcut scope
@@ -41,171 +41,39 @@ const SettingsDialog = (props: SettingsDialogProps) => {
   return (
     <Dialog
       dialogKey={SETTINGS_DIALOG_KEY}
-      {...propsWithCn(dialogProps, 'grid-cols-[600px] max-h-half')}
+      {...propsWithCn(dialogProps, 'grid-cols-[max-content_600px] max-h-half')}
     >
-      <DialogContent
-        heading="Settings"
-        className={cn('h-full grid grid-rows-[max-content_1fr]')}
-      >
-        <div className={cn('overflow-hidden h-full')}>
-          <Ariakit.CompositeProvider orientation="vertical" focusLoop>
-            <Ariakit.Composite
-              render={
-                <div
-                  className={cn(
-                    'p-2 rounded-md bg-dark-800 h-full overflow-auto',
-                  )}
-                />
-              }
+      <Tabs
+        className={cn('bg-dark-700')}
+        direction="vertical"
+        store={tabsHandler.store}
+        list={
+          <>
+            <Tab
+              id="preferences"
+              withDecoration={false}
+              className={cn('rounded-none px-5 py-4')}
             >
-              <SettingsDialogSection label="Behavior" className={cn('mb-4')}>
-                <TextSetting
-                  label="File opener application"
-                  setting="fileOpenerApp"
-                  contentBefore="Use "
-                  contentAfter=" to open files externally"
-                />
+              <Icon Glyph={IconAdjustments} size="lg" />
+            </Tab>
+            <Tab
+              id="about"
+              withDecoration={false}
+              className={cn('rounded-none px-5 py-4')}
+            >
+              <Icon Glyph={IconInfoCircle} size="lg" />
+            </Tab>
+          </>
+        }
+      >
+        <TabPanel tabId="preferences">
+          <SettingsDialogPreferencesContent />
+        </TabPanel>
 
-                <CheckboxSetting
-                  label="Open last folder on start"
-                  setting="openLastOnStart"
-                />
-                <CheckboxSetting
-                  label="Confirm dangerous actions"
-                  setting="confirmDangerousActions"
-                  description="e.g. deleting branches, force pushing"
-                />
-                <CheckboxSetting
-                  label="Auto-refresh remote"
-                  setting="autoFetchRemote"
-                  description="Periodically fetch changes from the remote repository to keep it up to date"
-                />
-                <CheckboxSetting
-                  label="Ask for stash message"
-                  setting="askForStashMessage"
-                  description="Prompt for a description message when stashing changes"
-                />
-              </SettingsDialogSection>
-
-              <SettingsDialogSection label="Appearance" className={cn('mb-4')}>
-                <CheckboxSetting
-                  label="Show shortcut indicators"
-                  setting="showShortcutIndicators"
-                  description="Display indicators for available keyboard shortcuts on interactive elements"
-                />
-                <CheckboxSetting
-                  label="Relative timestamps"
-                  setting="relativeTimestamps"
-                  description="e.g. '2 hours ago' instead of exact date"
-                />
-                <CheckboxSetting
-                  label="Sort branches by latest activity date"
-                  setting="sortBranchesByDate"
-                />
-                <CheckboxSetting
-                  label="Stashes open by default"
-                  description="Show the stashes list expanded by default"
-                  setting="stashesOpenByDefault"
-                />
-              </SettingsDialogSection>
-
-              <SettingsDialogSection label="Diffs" className={cn('mb-4')}>
-                <CheckboxSetting
-                  label="Prefer inline diffs"
-                  description="Show inline diffs instead of side-by-side diffs by default"
-                  setting="preferInline"
-                />
-                <CheckboxSetting
-                  label="Show large diffs"
-                  description={`Load diffs with more than ${LARGE_DIFF_THRESHOLD} lines by default`}
-                  setting="showLargeDiffs"
-                />
-                <CheckboxSetting
-                  label="Show word diffs"
-                  description="Highlight changed words in modified lines"
-                  setting="showWordDiffs"
-                />
-              </SettingsDialogSection>
-
-              <SettingsDialogSection label="Shortcuts" className={cn('mb-10')}>
-                <ShortcutSetting
-                  action="choose changes to stage"
-                  setting="stageFilesShortcut"
-                />
-                <ShortcutSetting
-                  action="choose changes to unstage"
-                  setting="unstageFilesShortcut"
-                />
-                <ShortcutSetting
-                  action="choose changes to stash"
-                  setting="stashFilesShortcut"
-                />
-                <ShortcutSetting
-                  action="open the commit dialog"
-                  setting="commitShortcut"
-                />
-                <ShortcutSetting
-                  action="amend the last commit"
-                  setting="amendShortcut"
-                />
-                <ShortcutSetting
-                  action="push changes to the current branch"
-                  setting="pushShortcut"
-                />
-                <ShortcutSetting
-                  action="pull changes from the current branch"
-                  setting="pullShortcut"
-                />
-                <ShortcutSetting
-                  action="fetch changes from the remote"
-                  setting="refreshShortcut"
-                />
-
-                <ShortcutSetting
-                  action="focus the main view"
-                  setting="focusMainShortcut"
-                />
-                <ShortcutSetting
-                  action="focus the unstaged changes list"
-                  setting="focusUnstagedShortcut"
-                />
-                <ShortcutSetting
-                  action="focus the staged changes list"
-                  setting="focusStagedShortcut"
-                />
-                <ShortcutSetting
-                  action="focus the branches list"
-                  setting="focusBranchesShortcut"
-                />
-                <ShortcutSetting
-                  action="focus the stashes list"
-                  setting="focusStashesShortcut"
-                />
-                <ShortcutSetting
-                  action="close an open file diff"
-                  setting="closeFileDiffShortcut"
-                />
-              </SettingsDialogSection>
-
-              <SettingsDialogSection label="About">
-                <p className={cn('text-sm text-center text-light-500')}>
-                  Made by Alejandro De Cicco
-                </p>
-                <DecoratedButton
-                  Glyph={IconBrandGithub}
-                  label="View source"
-                  size="sm"
-                  variant="filled"
-                  status="neutral"
-                  onClick={() => {
-                    openLink('https://github.com/aledecicco/dragit')
-                  }}
-                />
-              </SettingsDialogSection>
-            </Ariakit.Composite>
-          </Ariakit.CompositeProvider>
-        </div>
-      </DialogContent>
+        <TabPanel tabId="about">
+          <SettingsDialogAboutContent />
+        </TabPanel>
+      </Tabs>
     </Dialog>
   )
 }
