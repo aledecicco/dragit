@@ -89,7 +89,7 @@ const WithUpdate = (props: WithUpdateProps) => {
       <p className={cn('text-sm text-light-500 font-light')}>
         v{update.version}
         {update.date &&
-          `- ${update.date.toLocaleDateString()} at ${update.date.toLocaleTimeString()}`}
+          ` - ${update.date.toLocaleDateString()} at ${update.date.toLocaleTimeString()}`}
       </p>
 
       <ActionButton

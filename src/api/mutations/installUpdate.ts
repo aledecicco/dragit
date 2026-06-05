@@ -65,7 +65,7 @@ const useInstallUpdate = (onProgress?: (progress: number) => void): Action => {
         onProgress,
       })
 
-      relaunch()
+      await relaunch()
     },
     label: {
       idle: 'Install update',
