@@ -109,12 +109,20 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
       updateModifiersCount()
     }
 
+    const handleBlur = () => {
+      pressedKeys.current.clear()
+      setKeysLeft(undefined)
+      setModifiersCount(0)
+    }
+
     window.addEventListener('keydown', handleKeyDown, { capture: true })
     window.addEventListener('keyup', handleKeyUp, { capture: true })
+    window.addEventListener('blur', handleBlur)
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown, { capture: true })
       window.removeEventListener('keyup', handleKeyUp, { capture: true })
+      window.removeEventListener('blur', handleBlur)
     }
   }, [shortcutKeys, shortcutSequence])
 
