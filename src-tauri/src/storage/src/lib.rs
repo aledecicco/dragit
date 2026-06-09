@@ -2,7 +2,9 @@ use partially::Partial;
 use tauri::AppHandle;
 use tauri_plugin_store::{JsonValue, StoreExt};
 
-use models::{PartialSettings, PartialStorage, Reference, RepositoryStorage, Storage, Upstream};
+use models::{
+    PartialRepositoryStorage, PartialSettings, PartialStorage, RepositoryStorage, Storage,
+};
 
 static STORAGE_FILE_NAME: &str = "storage.json";
 static FOLDERS_LIMIT: usize = 10;
@@ -122,7 +124,7 @@ pub fn patch_settings(
 pub fn load_repository_storage(app_handle: &AppHandle, repo_path: &str) -> RepositoryStorage {
     let stored = get_storage(app_handle);
 
-    let found = stored.per_repository.iter().find_map(|(path, storage)| {
+    let found = stored.repo_specific.iter().find_map(|(path, storage)| {
         if path == repo_path {
             Some(storage.clone())
         } else {
@@ -133,14 +135,14 @@ pub fn load_repository_storage(app_handle: &AppHandle, repo_path: &str) -> Repos
     found.unwrap_or_default()
 }
 
-pub fn save_branch_bases(
+pub fn patch_repository_storage(
     app_handle: &AppHandle,
     repo_path: &str,
-    branch_bases: Vec<(String, Option<Reference>)>,
+    new_storage: &PartialRepositoryStorage,
 ) -> Result<(), tauri_plugin_store::Error> {
     let mut stored = get_storage(app_handle);
     let mut repo_storage = stored
-        .per_repository
+        .repo_specific
         .iter()
         .find_map(|(path, storage)| {
             if path == repo_path {
@@ -151,41 +153,12 @@ pub fn save_branch_bases(
         })
         .unwrap_or_default();
 
-    repo_storage.branch_bases = branch_bases.clone();
-    stored.per_repository.retain(|(path, _)| path != repo_path);
+    repo_storage.apply_some(new_storage.clone());
+    stored.repo_specific.retain(|(path, _)| path != repo_path);
     stored
-        .per_repository
+        .repo_specific
         .insert(0, (repo_path.to_string(), repo_storage));
-    stored.per_repository.truncate(FOLDERS_LIMIT);
-
-    set_storage(app_handle, &stored)
-}
-
-pub fn save_branch_upstreams(
-    app_handle: &AppHandle,
-    repo_path: &str,
-    branch_upstreams: Vec<(String, Upstream)>,
-) -> Result<(), tauri_plugin_store::Error> {
-    let mut stored = get_storage(app_handle);
-    let mut repo_storage = stored
-        .per_repository
-        .iter()
-        .find_map(|(path, storage)| {
-            if path == repo_path {
-                Some(storage.clone())
-            } else {
-                None
-            }
-        })
-        .unwrap_or_default();
-
-    repo_storage.branch_upstreams = branch_upstreams.clone();
-
-    stored.per_repository.retain(|(path, _)| path != repo_path);
-    stored
-        .per_repository
-        .insert(0, (repo_path.to_string(), repo_storage));
-    stored.per_repository.truncate(FOLDERS_LIMIT);
+    stored.repo_specific.truncate(FOLDERS_LIMIT);
 
     set_storage(app_handle, &stored)
 }

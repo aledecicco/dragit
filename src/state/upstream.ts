@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { useEffectOnce } from 'react-use'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { useShallow } from 'zustand/react/shallow'
@@ -12,13 +11,13 @@ import type {
   RemoteName,
   Upstream,
 } from '@/api/models'
-import { setBranchUpstreamsMutation } from '@/api/mutations/setRepositoryStorage'
+import { setRepositoryStorageMutation } from '@/api/mutations/setRepositoryStorage'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryRemotes } from '@/api/queries/remotes'
-import { useCurrentPath, useRepositoryMutation } from '@/api/utils'
+import { useRepositoryMutation } from '@/api/utils'
 import { useCurrentBranch } from '@/utils/repository'
 
-import { getRepositoryStorage } from './storage'
+import { getCurrentRepositoryStorage } from './storage'
 
 const DEFAULT_REMOTE_NAME: RemoteName = 'origin'
 
@@ -150,12 +149,12 @@ const chooseUpstream = (
 const changeSelectedRemote = (
   branch: LocalBranch,
   remote: RemoteName | undefined,
-) => {
+): Upstream | undefined => {
   const store = useSelectedUpstreamsStore.getState()
 
   if (!remote) {
     store.changeUpstream(branch.name, undefined)
-    return
+    return undefined
   }
 
   const currentUpstream = store.upstreams.get(branch.name)
@@ -166,6 +165,38 @@ const changeSelectedRemote = (
   }
 
   store.changeUpstream(branch.name, newUpstream)
+  return newUpstream
+}
+
+/**
+ * Provides a callback to change the currently selected remote for a branch
+ */
+const useChangeSelectedRemote = () => {
+  const setRepositoryStorage = useRepositoryMutation(
+    setRepositoryStorageMutation,
+  )
+
+  return (branch: LocalBranch, remote: RemoteName | undefined) => {
+    const newUpstream = changeSelectedRemote(branch, remote)
+
+    const repoStorage = getCurrentRepositoryStorage()
+
+    if (repoStorage) {
+      const newSavedUpstreams = new Map(repoStorage.branchUpstreams)
+
+      if (newUpstream) {
+        newSavedUpstreams.set(branch.name, newUpstream)
+        setRepositoryStorage.mutateAsync({
+          branchUpstreams: newSavedUpstreams,
+        })
+      } else {
+        newSavedUpstreams.delete(branch.name)
+        setRepositoryStorage.mutateAsync({
+          branchUpstreams: newSavedUpstreams,
+        })
+      }
+    }
+  }
 }
 
 /**
@@ -174,12 +205,12 @@ const changeSelectedRemote = (
 const changeSelectedRemoteBranch = (
   branch: LocalBranch,
   remoteBranch: BranchName | undefined,
-) => {
+): Upstream | undefined => {
   const store = useSelectedUpstreamsStore.getState()
   const currentUpstream = store.upstreams.get(branch.name)
 
   if (!currentUpstream) {
-    return
+    return undefined
   }
 
   if (!remoteBranch) {
@@ -193,6 +224,68 @@ const changeSelectedRemoteBranch = (
   }
 
   store.changeUpstream(branch.name, newUpstream)
+  return newUpstream
+}
+
+/**
+ * Provides a callback to change the currently selected remote branch for a branch
+ */
+const useChangeSelectedRemoteBranch = () => {
+  const setRepositoryStorage = useRepositoryMutation(
+    setRepositoryStorageMutation,
+  )
+
+  return (branch: LocalBranch, remoteBranch: BranchName | undefined) => {
+    const newUpstream = changeSelectedRemoteBranch(branch, remoteBranch)
+
+    const repoStorage = getCurrentRepositoryStorage()
+
+    if (repoStorage) {
+      const newSavedUpstreams = new Map(repoStorage.branchUpstreams)
+
+      if (newUpstream) {
+        newSavedUpstreams.set(branch.name, newUpstream)
+        setRepositoryStorage.mutateAsync({
+          branchUpstreams: newSavedUpstreams,
+        })
+      } else {
+        newSavedUpstreams.delete(branch.name)
+        setRepositoryStorage.mutateAsync({
+          branchUpstreams: newSavedUpstreams,
+        })
+      }
+    }
+  }
+}
+
+/**
+ * Calculates the set of upstreams to use for each branch and stores it.
+ */
+const computeUpstreams = (
+  branches: LocalBranch[] | undefined,
+  remotes: RemoteInfo[] | undefined,
+  currentBranch: BranchInfo | undefined,
+) => {
+  if (!branches || !remotes) {
+    return
+  }
+
+  const newUpstreams = new Map<BranchName, Upstream>()
+
+  for (const branch of branches) {
+    const upstream = chooseUpstream(
+      branch,
+      remotes,
+      currentBranch?.type === 'local' ? currentBranch : undefined,
+    )
+
+    if (upstream) {
+      newUpstreams.set(branch.name, upstream)
+    }
+  }
+
+  const store = useSelectedUpstreamsStore.getState()
+  store.setUpstreams(newUpstreams)
 }
 
 /**
@@ -202,50 +295,21 @@ const useUpstreamsSync = () => {
   const branchesQuery = useQueryBranches('local')
   const remotesQuery = useQueryRemotes()
   const currentBranch = useCurrentBranch()
-  const saveUpstreams = useRepositoryMutation(setBranchUpstreamsMutation)
 
-  const currentPath = useCurrentPath()
-
-  useEffectOnce(() => {
+  useEffect(() => {
     const store = useSelectedUpstreamsStore.getState()
-    const savedUpstreams = getRepositoryStorage(currentPath)?.branchUpstreams
+    const savedUpstreams = getCurrentRepositoryStorage()?.branchUpstreams
 
-    if (savedUpstreams) {
+    if (
+      savedUpstreams &&
+      savedUpstreams.size > 0 &&
+      store.upstreams.size === 0
+    ) {
       store.setUpstreams(new Map(savedUpstreams))
     }
-  })
 
-  useEffect(() => {
-    if (!branchesQuery.data || !remotesQuery.data) {
-      return
-    }
-
-    const newUpstreams = new Map<BranchName, Upstream>()
-
-    for (const branch of branchesQuery.data) {
-      const upstream = chooseUpstream(
-        branch,
-        remotesQuery.data,
-        currentBranch?.type === 'local' ? currentBranch : undefined,
-      )
-
-      if (upstream) {
-        newUpstreams.set(branch.name, upstream)
-      }
-    }
-
-    const store = useSelectedUpstreamsStore.getState()
-    store.setUpstreams(newUpstreams)
+    computeUpstreams(branchesQuery.data, remotesQuery.data, currentBranch)
   }, [branchesQuery.data, remotesQuery.data, currentBranch])
-
-  const storedUpstreams = useUpstreams()
-  useEffect(() => {
-    if (storedUpstreams.size > 0) {
-      saveUpstreams.mutateAsync({
-        branchUpstreams: [...storedUpstreams.entries()],
-      })
-    }
-  }, [storedUpstreams, saveUpstreams.mutateAsync])
 }
 
 /**
@@ -274,6 +338,6 @@ export {
   useUpstreamsSync,
   useUpstreams,
   useSelectedUpstream,
-  changeSelectedRemote,
-  changeSelectedRemoteBranch,
+  useChangeSelectedRemote,
+  useChangeSelectedRemoteBranch,
 }

@@ -12,13 +12,12 @@ use crate::{
 use diffs::{compute_diff, get_diff_sources};
 use models::{
     AppError, AppEvent, AppMessage, AppState, ConflictLine, ConflictMode, CurrentDirInfo,
-    DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus, PartialSettings, Reference,
-    RepoWatcherError, ResolutionStrategy, SnapshotInfo, Storage, UnmergedFileInfo, Upstream,
+    DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus, PartialRepositoryStorage,
+    PartialSettings, RepoWatcherError, ResolutionStrategy, SnapshotInfo, Storage, UnmergedFileInfo,
     EVENT_ID,
 };
 use storage::{
-    add_recent_folder, get_storage, patch_settings, save_branch_bases, save_branch_upstreams,
-    set_last_opened,
+    add_recent_folder, get_storage, patch_repository_storage, patch_settings, set_last_opened,
 };
 
 /// Opens a folder that contains/will contain a git repository.
@@ -69,29 +68,14 @@ pub async fn set_settings(
     Ok(())
 }
 
-/// Saves new branch bases for a repository.
+/// Saves new data for a given repository.
 #[tauri::command]
-pub async fn set_branch_bases(
+pub async fn set_repository_storage(
     app_handle: AppHandle,
     repo_path: &str,
-    branch_bases: Vec<(String, Option<Reference>)>,
+    storage: PartialRepositoryStorage,
 ) -> Result<(), AppError> {
-    save_branch_bases(&app_handle, repo_path, branch_bases)
-        .or(Err(AppError::UpdateStorageFailed {}))?;
-
-    let _ = app_handle.emit(EVENT_ID, AppEvent::StorageUpdated);
-
-    Ok(())
-}
-
-/// Saves new branch upstreams for a repository.
-#[tauri::command]
-pub async fn set_branch_upstreams(
-    app_handle: AppHandle,
-    repo_path: &str,
-    branch_upstreams: Vec<(String, Upstream)>,
-) -> Result<(), AppError> {
-    save_branch_upstreams(&app_handle, repo_path, branch_upstreams)
+    patch_repository_storage(&app_handle, repo_path, &storage)
         .or(Err(AppError::UpdateStorageFailed {}))?;
 
     let _ = app_handle.emit(EVENT_ID, AppEvent::StorageUpdated);

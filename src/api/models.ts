@@ -9,7 +9,7 @@ export interface Storage {
   settings: Settings
   recentFolders: string[]
   lastOpened: string | null
-  perRepository: Map<string, RepositoryStorage>
+  repoSpecific: Map<string, RepositoryStorage>
 }
 
 export interface Settings {
@@ -47,6 +47,7 @@ export interface Settings {
 export interface RepositoryStorage {
   branchBases: Map<BranchName, Reference | null>
   branchUpstreams: Map<BranchName, Upstream>
+  defaultBase: RefName | null
 }
 
 export interface CurrentDirInfo {

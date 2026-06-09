@@ -1,16 +1,16 @@
-import { type ComponentProps, useRef } from 'react'
+import { type ComponentProps, type ReactNode, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 
 import { useSetSettings } from '@/api/mutations/setSettings'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/storage'
-import { EditableText } from '@/ui/EditableText'
+import { EditableText, type EditableTextProps } from '@/ui/EditableText'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import type { StringSettingKey } from '../utils'
 
-interface TextSettingProps extends ComponentProps<'div'> {
+interface TextSettingProps extends Partial<EditableTextProps> {
   /**
    * The label of the setting.
    */
@@ -19,24 +19,36 @@ interface TextSettingProps extends ComponentProps<'div'> {
   /**
    * The key of the setting this text input controls.
    */
-  setting: StringSettingKey
+  setting?: StringSettingKey
 
   /**
    * Content to display before the text input.
    */
-  contentBefore?: React.ReactNode
+  contentBefore?: ReactNode
 
   /**
    * Content to display after the text input.
    */
-  contentAfter?: React.ReactNode
+  contentAfter?: ReactNode
+
+  /**
+   * Extra props for the container.
+   */
+  divProps?: ComponentProps<'div'>
 }
 
 /**
  * A single setting inside the settings dialog that can be edited as text.
  */
 const TextSetting = (props: TextSettingProps) => {
-  const { label, setting, contentBefore, contentAfter, ...divProps } = props
+  const {
+    label,
+    setting,
+    contentBefore,
+    contentAfter,
+    divProps,
+    ...inputProps
+  } = props
 
   const settings = useSettings()
   const setSettings = useSetSettings()
@@ -53,7 +65,8 @@ const TextSetting = (props: TextSettingProps) => {
         'hover:data-focus-visible:bg-light-950/10',
       )}
       onClickCapture={(e) => {
-        divProps.onCanPlayCapture?.(e)
+        divProps?.onClickCapture?.(e)
+
         buttonRef.current?.focus()
       }}
     >
@@ -62,18 +75,30 @@ const TextSetting = (props: TextSettingProps) => {
         render={(props) => (
           <EditableText
             label={label}
-            value={settings[setting]}
+            {...propsWithCn(
+              inputProps,
+              'max-w-20 border border-dark-50 rounded-md',
+            )}
+            value={setting ? settings[setting] : (inputProps.value ?? '')}
             setValue={(value) => {
-              triggerInteraction({
-                action: setSettings,
-                argsRequester: () => ({ [setting]: value }),
-              })
+              inputProps.setValue?.(value)
+
+              if (setting && value) {
+                triggerInteraction({
+                  action: setSettings,
+                  argsRequester: () => ({ [setting]: value }),
+                })
+              }
             }}
-            className={cn('max-w-20 border border-dark-50 rounded-md')}
             buttonProps={{
-              className: cn('max-w-20'),
+              className: cn('max-w-20 border border-dark-50 rounded-md'),
               ...props,
-              ref: mergeRefs([props.ref, buttonRef]),
+              ...inputProps.buttonProps,
+              ref: mergeRefs([
+                props.ref,
+                buttonRef,
+                inputProps.buttonProps?.ref,
+              ]),
             }}
           />
         )}

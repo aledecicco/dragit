@@ -28,4 +28,4 @@ const currentDirQuery = queryOptions({
 
 const useQueryCurrentDir = () => useQuery(currentDirQuery)
 
-export { currentDirQueryKey, useQueryCurrentDir }
+export { currentDirQuery, currentDirQueryKey, useQueryCurrentDir }

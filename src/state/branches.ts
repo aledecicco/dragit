@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { useEffectOnce } from 'react-use'
 import { match } from 'ts-pattern'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
@@ -12,13 +11,16 @@ import type {
   TagInfo,
   Upstream,
 } from '@/api/models'
-import { setBranchBasesMutation } from '@/api/mutations/setRepositoryStorage'
+import { setRepositoryStorageMutation } from '@/api/mutations/setRepositoryStorage'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
-import { useCurrentPath, useRepositoryMutation } from '@/api/utils'
+import { useRepositoryMutation } from '@/api/utils'
 import { getUpstreamReference, useHeadReference } from '@/utils/repository'
 
-import { getRepositoryStorage } from './storage'
+import {
+  getCurrentRepositoryStorage,
+  useCurrentRepositoryStorage,
+} from './storage'
 import { useUpstreams } from './upstream'
 
 interface SelectedReferences {
@@ -75,6 +77,15 @@ const getDefaultBase = (
   reference: Reference,
   upstream: Upstream | undefined,
 ): Reference | undefined => {
+  const repoStorage = getCurrentRepositoryStorage()
+
+  if (
+    repoStorage?.defaultBase &&
+    reference.refName !== repoStorage.defaultBase
+  ) {
+    return { type: 'branch', refName: repoStorage.defaultBase }
+  }
+
   if (reference.type === 'branch' && !!upstream) {
     return getUpstreamReference(upstream)
   }
@@ -91,8 +102,9 @@ const chooseBase = (
   branches: BranchInfo[],
   tags: TagInfo[],
 ): Reference | null | undefined => {
-  const store = useSelectedRefsStore.getState()
-  const prevBase = store.bases.get(reference.refName)
+  const prevBase = getCurrentRepositoryStorage()?.branchBases.get(
+    reference.refName,
+  )
 
   if (prevBase === null) {
     // The user explicitly chose to have no base for this reference.
@@ -155,6 +167,35 @@ const changeSelectedBase = (
 }
 
 /**
+ * Provides a callback to change the currently selected base for a reference.
+ */
+const useChangeSelectedBase = () => {
+  const setRepoStorage = useRepositoryMutation(setRepositoryStorageMutation)
+
+  return (reference: Reference, newBase: Reference | null) => {
+    changeSelectedBase(reference, newBase)
+
+    const repoStorage = getCurrentRepositoryStorage()
+
+    if (repoStorage) {
+      const newSavedBases = new Map(repoStorage.branchBases)
+
+      if (newBase) {
+        newSavedBases.set(reference.refName, newBase)
+        setRepoStorage.mutateAsync({
+          branchBases: newSavedBases,
+        })
+      } else {
+        newSavedBases.delete(reference.refName)
+        setRepoStorage.mutateAsync({
+          branchBases: newSavedBases,
+        })
+      }
+    }
+  }
+}
+
+/**
  * Hook that facilitates tracking the selected base for a reference.
  */
 const useSelectedBase = (
@@ -170,6 +211,46 @@ const useSelectedBase = (
 }
 
 /**
+ * Calculates the set of bases to use for each reference and stores it.
+ */
+const computeBases = (
+  branches: BranchInfo[] | undefined,
+  tags: TagInfo[] | undefined,
+  currentRef: Reference | undefined,
+  upstreams: Map<string, Upstream>,
+) => {
+  if (!branches || !tags) {
+    return
+  }
+
+  const newBases = new Map<RefName, Reference | null>()
+
+  for (const branch of branches) {
+    const base = chooseBase(
+      { type: 'branch', refName: branch.name },
+      upstreams.get(branch.name),
+      branches,
+      tags,
+    )
+
+    if (base !== undefined) {
+      newBases.set(branch.name, base)
+    }
+  }
+
+  if (currentRef?.type === 'commit') {
+    const base = chooseBase(currentRef, undefined, branches, tags)
+
+    if (base !== undefined) {
+      newBases.set(currentRef.refName, base)
+    }
+  }
+
+  const store = useSelectedRefsStore.getState()
+  store.setBases(newBases)
+}
+
+/**
  * Hook that keeps the stored bases in sync when branches change.
  */
 const useBasesSync = () => {
@@ -177,64 +258,26 @@ const useBasesSync = () => {
   const tagsQuery = useQueryTags()
   const upstreams = useUpstreams()
   const currentRef = useHeadReference()
-  const saveBases = useRepositoryMutation(setBranchBasesMutation)
 
-  const currentPath = useCurrentPath()
+  const repositoryStorage = useCurrentRepositoryStorage()
 
-  useEffectOnce(() => {
+  // biome-ignore lint/correctness/useExhaustiveDependencies(repositoryStorage?.defaultBase): re-compute bases when default base changes
+  useEffect(() => {
     const store = useSelectedRefsStore.getState()
-    const savedBases = getRepositoryStorage(currentPath)?.branchBases
+    const savedBases = getCurrentRepositoryStorage()?.branchBases
 
-    if (savedBases) {
+    if (savedBases && savedBases.size > 0 && store.bases.size === 0) {
       store.setBases(new Map(savedBases))
     }
-  })
 
-  useEffect(() => {
-    if (!branchesQuery.data || !tagsQuery.data) {
-      return
-    }
-
-    const newBases = new Map<RefName, Reference | null>()
-
-    for (const branch of branchesQuery.data) {
-      const base = chooseBase(
-        { type: 'branch', refName: branch.name },
-        upstreams.get(branch.name),
-        branchesQuery.data,
-        tagsQuery.data,
-      )
-
-      if (base !== undefined) {
-        newBases.set(branch.name, base)
-      }
-    }
-
-    if (currentRef?.type === 'commit') {
-      const base = chooseBase(
-        currentRef,
-        undefined,
-        branchesQuery.data,
-        tagsQuery.data,
-      )
-
-      if (base !== undefined) {
-        newBases.set(currentRef.refName, base)
-      }
-    }
-
-    const store = useSelectedRefsStore.getState()
-    store.setBases(newBases)
-  }, [branchesQuery.data, tagsQuery.data, currentRef, upstreams])
-
-  const storedBases = useBases()
-  useEffect(() => {
-    if (storedBases.size > 0) {
-      saveBases.mutateAsync({
-        branchBases: [...storedBases.entries()],
-      })
-    }
-  }, [storedBases, saveBases.mutateAsync])
+    computeBases(branchesQuery.data, tagsQuery.data, currentRef, upstreams)
+  }, [
+    branchesQuery.data,
+    tagsQuery.data,
+    currentRef,
+    upstreams,
+    repositoryStorage?.defaultBase,
+  ])
 }
 
 /**
@@ -244,4 +287,4 @@ const useBases = () => {
   return useSelectedRefsStore(useShallow((state) => state.bases))
 }
 
-export { useBasesSync, useBases, changeSelectedBase, useSelectedBase }
+export { useBasesSync, useBases, useChangeSelectedBase, useSelectedBase }

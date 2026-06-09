@@ -17,8 +17,8 @@ import { DecoratedButton } from '@/lib/DecoratedButton'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/storage'
 import {
-  changeSelectedRemote,
-  changeSelectedRemoteBranch,
+  useChangeSelectedRemote,
+  useChangeSelectedRemoteBranch,
   useSelectedUpstream,
 } from '@/state/upstream'
 import { Combobox } from '@/ui/Combobox'
@@ -40,6 +40,8 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
 
   const currentBranch = useCurrentBranch()
   const upstream = useSelectedUpstream(currentBranch)
+  const changeSelectedRemote = useChangeSelectedRemote()
+  const changeSelectedRemoteBranch = useChangeSelectedRemoteBranch()
 
   const remotesQuery = useQueryRemotes()
   const branchesQuery = useQueryBranches()

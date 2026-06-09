@@ -3,7 +3,7 @@ import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
-import { changeSelectedBase, useSelectedBase } from '@/state/branches'
+import { useChangeSelectedBase, useSelectedBase } from '@/state/branches'
 import { useHeadReference } from '@/utils/repository'
 
 import type { BranchInfo, RefName, TagInfo } from '../models'
@@ -119,6 +119,7 @@ const useCheckoutTag = (tag: TagInfo): Action => {
 const useSwitchBranches = (): Action => {
   const currentReference = useHeadReference()
   const baseReference = useSelectedBase(currentReference)
+  const changeSelectedBase = useChangeSelectedBase()
   const checkout = useRepositoryMutation(checkoutMutation)
 
   return {

@@ -127,7 +127,7 @@ const EditableTextInner = (props: EditableTextInnerProps) => {
   useEffectOnce(() => {
     // Listen for key presses at the window level, otherwise Ariakit always beats us to it.
     const handleEditing = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !combobox.getState().open) {
+      if (e.key === 'Escape') {
         discardValue()
         e.stopPropagation()
         e.preventDefault()
@@ -153,7 +153,7 @@ const EditableTextInner = (props: EditableTextInnerProps) => {
         aria-label={`${label}. Press Enter to save. Press Escape to cancel.`}
         {...propsWithCn(
           comboboxProps,
-          'px-2.5 py-1.75 bg-dark-800 rounded-sm text-sm text-light-800',
+          'px-2.5 py-1.5 bg-dark-800 rounded-sm text-sm text-light-800',
           'min-w-0 text-sm',
           !search && 'font-light',
         )}

@@ -11,7 +11,7 @@ interface CheckboxSettingProps extends CheckboxProps {
   /**
    * The key of the setting this checkbox controls.
    */
-  setting: BooleanSettingKey
+  setting?: BooleanSettingKey
 }
 
 /**
@@ -28,14 +28,18 @@ const CheckboxSetting = (props: CheckboxSettingProps) => {
       render={
         <Checkbox
           {...checkboxProps}
-          checked={settings[setting]}
+          checked={setting ? settings[setting] : checkboxProps.checked}
           onChange={(e) => {
-            triggerInteraction({
-              action: setSettings,
-              argsRequester: () => ({
-                [setting]: e.target.checked,
-              }),
-            })
+            checkboxProps.onChange?.(e)
+
+            if (setting) {
+              triggerInteraction({
+                action: setSettings,
+                argsRequester: () => ({
+                  [setting]: e.target.checked,
+                }),
+              })
+            }
           }}
         />
       }

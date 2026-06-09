@@ -9,7 +9,7 @@ import { requestBranchName } from '@/common/CreateBranchDialog'
 import { ActionButton } from '@/lib/ActionButton'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { triggerInteraction, useActionPresenters } from '@/state/actions'
-import { changeSelectedBase, useSelectedBase } from '@/state/branches'
+import { useChangeSelectedBase, useSelectedBase } from '@/state/branches'
 import { useSelectedUpstream } from '@/state/upstream'
 import { Combobox } from '@/ui/Combobox'
 import { ComboboxItem } from '@/ui/Combobox/Item'
@@ -35,6 +35,7 @@ const BranchSelectors = () => {
   const currentUpstream = useSelectedUpstream(currentBranch)
   const baseReference = useSelectedBase(currentReference)
   const baseBranch = useBranch(baseReference)
+  const changeSelectedBase = useChangeSelectedBase()
 
   const checkout = useCheckout()
   const checkoutTracker = useActionPresenters(checkout)

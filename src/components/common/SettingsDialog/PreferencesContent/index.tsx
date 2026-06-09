@@ -5,6 +5,7 @@ import { DialogContent } from '@/ui/Dialog/Content'
 import { cn } from '@/utils/styles'
 
 import { CheckboxSetting } from '../CheckboxSetting'
+import { PerRepositoryPreferences } from '../PerRepository'
 import { SettingsDialogSection } from '../Section'
 import { ShortcutSetting } from '../ShortcutSetting'
 import { TextSetting } from '../TextSetting'
@@ -32,6 +33,7 @@ const SettingsDialogPreferencesContent = () => {
             <SettingsDialogSection label="Behavior" className={cn('mb-4')}>
               <TextSetting
                 label="File opener application"
+                placeholder="..."
                 setting="fileOpenerApp"
                 contentBefore="Use "
                 contentAfter=" to open files externally"
@@ -46,6 +48,9 @@ const SettingsDialogPreferencesContent = () => {
                 setting="confirmDangerousActions"
                 description="e.g. deleting branches, force pushing"
               />
+
+              <PerRepositoryPreferences />
+
               <CheckboxSetting
                 label="Auto-refresh remote"
                 setting="autoFetchRemote"

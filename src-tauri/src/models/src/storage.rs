@@ -7,10 +7,13 @@ use crate::{Reference, Upstream};
 pub struct Storage {
     pub settings: Settings,
 
+    #[serde(default)]
     pub recent_folders: Vec<String>,
+
     pub last_opened: Option<String>,
 
-    pub per_repository: Vec<(String, RepositoryStorage)>,
+    #[serde(default)]
+    pub repo_specific: Vec<(String, RepositoryStorage)>,
 }
 
 impl Default for Storage {
@@ -21,16 +24,19 @@ impl Default for Storage {
             recent_folders: Vec::new(),
             last_opened: None,
 
-            per_repository: Vec::new(),
+            repo_specific: Vec::new(),
         }
     }
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
+#[derive(partially::Partial)]
+#[partially(derive(serde::Serialize, serde::Deserialize, Debug, Default, Clone))]
 pub struct RepositoryStorage {
     pub branch_bases: Vec<(String, Option<Reference>)>,
     pub branch_upstreams: Vec<(String, Upstream)>,
+    pub default_base: String,
 }
 
 impl Default for RepositoryStorage {
@@ -38,6 +44,7 @@ impl Default for RepositoryStorage {
         Self {
             branch_bases: Vec::new(),
             branch_upstreams: Vec::new(),
+            default_base: "".to_string(),
         }
     }
 }

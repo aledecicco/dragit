@@ -1,10 +1,17 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { RepositoryStorage, Storage } from '../models'
+import type { BranchName, Reference, Storage, Upstream } from '../models'
 
 type StorageResponse = Storage & {
-  perRepository: [string, RepositoryStorage][]
+  repoSpecific: [
+    string,
+    {
+      branchBases: [BranchName, Reference | null][]
+      branchUpstreams: [BranchName, Upstream][]
+      defaultBase: string
+    },
+  ][]
 }
 
 const storageQueryKey = { key: 'storage' } as const
@@ -14,7 +21,16 @@ const fetchStorage = async (): Promise<Storage> => {
 
   return {
     ...res,
-    perRepository: new Map(res.perRepository),
+    repoSpecific: new Map(
+      res.repoSpecific.map(([repoPath, repoStorage]) => [
+        repoPath,
+        {
+          branchBases: new Map(repoStorage.branchBases),
+          branchUpstreams: new Map(repoStorage.branchUpstreams),
+          defaultBase: repoStorage.defaultBase,
+        },
+      ]),
+    ),
   }
 }
 

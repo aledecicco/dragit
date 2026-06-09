@@ -1,52 +1,86 @@
+import { IconDeviceFloppy } from '@tabler/icons-react'
 import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { BranchName, Reference, RefName, Upstream } from '../models'
-import { pathMutationKey } from '../utils'
+import type { Action } from '@/state/actions'
 
-interface SetBranchBasesArgs {
-  branchBases: [RefName, Reference | null][]
+import type {
+  BranchName,
+  Reference,
+  RefName,
+  RepositoryStorage,
+  Upstream,
+} from '../models'
+import { pathMutationKey, useRepositoryMutation } from '../utils'
+
+type SetRepositoryStorageArgs = Partial<RepositoryStorage>
+
+interface SetRepositoryStorageRequest {
+  storage: Partial<{
+    branchBases: [BranchName, Reference | null][]
+    branchUpstreams?: [BranchName, Upstream][]
+    defaultBase?: RefName
+  }>
 }
 
-interface SetBranchUpstreamsArgs {
-  branchUpstreams: [BranchName, Upstream][]
-}
-
-const setBranchBasesKey = (repoPath: string) =>
+const setRepositoryStorageKey = (repoPath: string) =>
   ({
     ...pathMutationKey(repoPath),
-    key: 'set_branch_bases',
+    key: 'set_repository_storage',
   }) as const
 
-const setBranchBasesMutation = (repoPath: string) =>
+const setRepositoryStorageMutation = (repoPath: string) =>
   mutationOptions({
-    mutationKey: [setBranchBasesKey(repoPath)],
-    mutationFn: (args: SetBranchBasesArgs) => {
-      return invoke('set_branch_bases', { repoPath, ...args })
+    mutationKey: [setRepositoryStorageKey(repoPath)],
+    mutationFn: (args: SetRepositoryStorageArgs) => {
+      const requestArgs: SetRepositoryStorageRequest = {
+        storage: {},
+      }
+
+      if (args.branchBases) {
+        requestArgs.storage.branchBases = [...args.branchBases.entries()]
+      }
+
+      if (args.branchUpstreams) {
+        requestArgs.storage.branchUpstreams = [
+          ...args.branchUpstreams.entries(),
+        ]
+      }
+
+      if (args.defaultBase !== undefined) {
+        requestArgs.storage.defaultBase = args.defaultBase
+          ? args.defaultBase
+          : ''
+      }
+
+      return invoke('set_repository_storage', { repoPath, ...requestArgs })
     },
     networkMode: 'always',
   })
 
-const setBranchUpstreamsKey = (repoPath: string) =>
-  ({
-    ...pathMutationKey(repoPath),
-    key: 'set_branch_upstreams',
-  }) as const
+const useSetRepositoryStorage = (): Action<Partial<RepositoryStorage>> => {
+  const setRepositoryStorage = useRepositoryMutation(
+    setRepositoryStorageMutation,
+  )
 
-const setBranchUpstreamsMutation = (repoPath: string) =>
-  mutationOptions({
-    mutationKey: [setBranchUpstreamsKey(repoPath)],
-    mutationFn: (args: SetBranchUpstreamsArgs) => {
-      return invoke('set_branch_upstreams', { repoPath, ...args })
+  return {
+    id: { key: 'set_repository_storage' },
+    run: async (args) => {
+      await setRepositoryStorage.mutateAsync(args)
     },
-    networkMode: 'always',
-  })
+    label: {
+      idle: 'Save settings for this repository',
+      running: 'Saving settings',
+      success: 'Settings saved',
+      error: 'Failed to save settings',
+    },
+    Glyph: IconDeviceFloppy,
+  }
+}
 
 export {
-  setBranchBasesKey,
-  setBranchBasesMutation,
-  setBranchUpstreamsKey,
-  setBranchUpstreamsMutation,
-  type SetBranchBasesArgs,
-  type SetBranchUpstreamsArgs,
+  useSetRepositoryStorage,
+  setRepositoryStorageKey,
+  setRepositoryStorageMutation,
+  type SetRepositoryStorageArgs,
 }

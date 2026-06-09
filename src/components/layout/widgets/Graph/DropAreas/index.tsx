@@ -11,7 +11,7 @@ import { requestBranchName } from '@/common/CreateBranchDialog'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { MatchingPayload } from '@/lib/DragAndDrop/utils'
 import { triggerInteraction } from '@/state/actions'
-import { changeSelectedBase, useSelectedBase } from '@/state/branches'
+import { useChangeSelectedBase, useSelectedBase } from '@/state/branches'
 import { useHeadReference } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 
@@ -21,6 +21,7 @@ import { cn } from '@/utils/styles'
 const GraphDropAreas = () => {
   const currentReference = useHeadReference()
   const baseReference = useSelectedBase(currentReference)
+  const changeSelectedBase = useChangeSelectedBase()
 
   const checkout = useCheckout()
   const switchBranches = useSwitchBranches()
