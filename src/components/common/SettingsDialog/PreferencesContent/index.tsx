@@ -30,7 +30,7 @@ const SettingsDialogPreferencesContent = () => {
               />
             }
           >
-            <SettingsDialogSection label="Behavior" className={cn('mb-4')}>
+            <SettingsDialogSection label="Behavior">
               <TextSetting
                 label="File opener application"
                 placeholder="..."
@@ -49,8 +49,6 @@ const SettingsDialogPreferencesContent = () => {
                 description="e.g. deleting branches, force pushing"
               />
 
-              <PerRepositoryPreferences />
-
               <CheckboxSetting
                 label="Auto-refresh remote"
                 setting="autoFetchRemote"
@@ -63,7 +61,9 @@ const SettingsDialogPreferencesContent = () => {
               />
             </SettingsDialogSection>
 
-            <SettingsDialogSection label="Appearance" className={cn('mb-4')}>
+            <PerRepositoryPreferences />
+
+            <SettingsDialogSection label="Appearance">
               <CheckboxSetting
                 label="Show shortcut indicators"
                 setting="showShortcutIndicators"
@@ -85,7 +85,7 @@ const SettingsDialogPreferencesContent = () => {
               />
             </SettingsDialogSection>
 
-            <SettingsDialogSection label="Diffs" className={cn('mb-4')}>
+            <SettingsDialogSection label="Diffs">
               <CheckboxSetting
                 label="Prefer inline diffs"
                 description="Show inline diffs instead of side-by-side diffs by default"

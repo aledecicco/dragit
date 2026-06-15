@@ -22,8 +22,8 @@ const Menu = (props: MenuProps) => {
         'z-7',
         'rounded-md shadow-md',
         'bg-dark-300',
-        '[&>[role=menuitem]:not(:first-of-type)]:rounded-t-none',
-        '[&>[role=menuitem]:not(:last-of-type)]:rounded-b-none',
+        '*:[[role=menuitem]]:not-first-of-type:rounded-t-none',
+        '*:[[role=menuitem]]:not-last-of-type:rounded-b-none',
       )}
       onBlur={(e) => {
         menuProps.onBlur?.(e)

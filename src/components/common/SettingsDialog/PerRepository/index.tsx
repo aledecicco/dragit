@@ -4,16 +4,20 @@ import { useCurrentRepositoryStorage } from '@/state/storage'
 import { cn } from '@/utils/styles'
 
 import { CheckboxSetting } from '../CheckboxSetting'
+import { SettingsDialogSection } from '../Section'
 import { TextSetting } from '../TextSetting'
 
 const DEFAULT_BASE_BRANCH = 'main'
 
+/**
+ * Displays controls for the preferences that are specific to the current repository.
+ */
 const PerRepositoryPreferences = () => {
   const repositoryStorage = useCurrentRepositoryStorage()
   const setRepositoryStorage = useSetRepositoryStorage()
 
   return (
-    <>
+    <SettingsDialogSection label="Per repository">
       <CheckboxSetting
         label="Use remote-tracking branch as default base for comparison"
         description="The default base branch will be the one being tracked by the current branch"
@@ -59,7 +63,7 @@ const PerRepositoryPreferences = () => {
           }}
         />
       )}
-    </>
+    </SettingsDialogSection>
   )
 }
 
