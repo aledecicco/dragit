@@ -37,6 +37,11 @@ interface ComboboxProps extends Partial<ButtonProps> {
    * Additional props to pass to the decorator icon.
    */
   iconProps?: Partial<IconProps>
+
+  /**
+   * Aditional props for the select provider.
+   */
+  providerProps?: Partial<Ariakit.SelectProviderProps<string>>
 }
 
 /**
@@ -60,6 +65,7 @@ const ComboboxInner = (props: ComboboxProps) => {
     Glyph,
     iconProps,
     size = 'md',
+    providerProps,
     ...buttonProps
   } = props
 
@@ -79,6 +85,8 @@ const ComboboxInner = (props: ComboboxProps) => {
     <Ariakit.ComboboxProvider
       value={search}
       setValue={(newValue) => {
+        providerProps?.setValue?.(newValue)
+
         startTransition(() => {
           setSearch(newValue)
         })
@@ -95,6 +103,7 @@ const ComboboxInner = (props: ComboboxProps) => {
         setValue={(newValue) => {
           group?.onSelect(newValue)
         }}
+        {...providerProps}
       >
         <Ariakit.Select
           render={

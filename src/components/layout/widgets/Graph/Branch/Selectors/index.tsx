@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useSelectStore } from '@ariakit/react'
 import { IconGitBranch } from '@tabler/icons-react'
 
 import { useSwitchBranches } from '@/api/mutations/checkout'
@@ -26,16 +26,29 @@ const BranchSelectors = () => {
   const switchBranches = useSwitchBranches()
 
   const settings = useSettings()
-  const currentBranchRef = useRef<HTMLButtonElement>(null)
-  const baseBranchRef = useRef<HTMLButtonElement>(null)
+
+  const currentSelector = useSelectStore({
+    defaultValue: '',
+  })
+  const baseSelector = useSelectStore({
+    defaultValue: '',
+  })
 
   useShortcutBinding(settings.checkoutShortcut, () => {
-    currentBranchRef.current?.focus()
-    currentBranchRef.current?.click()
+    baseSelector.setOpen(false)
+
+    if (!currentSelector.getState().open) {
+      currentSelector.getState().disclosureElement?.focus()
+      currentSelector.setOpen(true)
+    }
   })
   useShortcutBinding(settings.changeBaseShortcut, () => {
-    baseBranchRef.current?.focus()
-    baseBranchRef.current?.click()
+    currentSelector.setOpen(false)
+
+    if (!baseSelector.getState().open) {
+      baseSelector.getState().disclosureElement?.focus()
+      baseSelector.setOpen(true)
+    }
   })
 
   return (
@@ -56,7 +69,11 @@ const BranchSelectors = () => {
               : undefined
           }
         >
-          <CurrentBranchSelector ref={currentBranchRef} />
+          <CurrentBranchSelector
+            providerProps={{
+              store: currentSelector,
+            }}
+          />
         </Draggable>
       </ShortcutIndicator>
 
@@ -87,7 +104,11 @@ const BranchSelectors = () => {
               : undefined
           }
         >
-          <BaseBranchSelector ref={baseBranchRef} />
+          <BaseBranchSelector
+            providerProps={{
+              store: baseSelector,
+            }}
+          />
         </Draggable>
       </ShortcutIndicator>
     </>

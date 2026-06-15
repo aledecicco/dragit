@@ -29,6 +29,7 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
 
   const checkout = useCheckout()
   const checkoutTracker = useActionPresenters(checkout)
+  // TODO: the action presenter should know about "branch off" actions
   const makeBranchOff = useMakeBranchOff()
 
   const branchOptions = branchesQuery.data?.map((branch) => branch.name) ?? []
