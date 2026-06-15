@@ -116,6 +116,16 @@ const SettingsDialogPreferencesContent = () => {
                 action="choose changes to stash"
                 setting="stashFilesShortcut"
               />
+
+              <ShortcutSetting
+                action="open the branch switcher"
+                setting="checkoutShortcut"
+              />
+              <ShortcutSetting
+                action="change the comparison branch"
+                setting="changeBaseShortcut"
+              />
+
               <ShortcutSetting
                 action="open the commit dialog"
                 setting="commitShortcut"

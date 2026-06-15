@@ -31,6 +31,8 @@ export interface Settings {
   stageFilesShortcut: string
   unstageFilesShortcut: string
   stashFilesShortcut: string
+  checkoutShortcut: string
+  changeBaseShortcut: string
   commitShortcut: string
   amendShortcut: string
   pushShortcut: string

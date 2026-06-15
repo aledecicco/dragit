@@ -19,12 +19,20 @@ const Menu = (props: MenuProps) => {
       gutter={4}
       {...propsWithCn(
         menuProps,
-        'z-6',
+        'z-7',
         'rounded-md shadow-md',
         'bg-dark-300',
         '[&>[role=menuitem]:not(:first-of-type)]:rounded-t-none',
         '[&>[role=menuitem]:not(:last-of-type)]:rounded-b-none',
       )}
+      onBlur={(e) => {
+        menuProps.onBlur?.(e)
+
+        if (!e.relatedTarget) {
+          // Hide the menu if focus leaves to an element that's not a menu item.
+          menuProps.store?.hide()
+        }
+      }}
     />
   )
 }

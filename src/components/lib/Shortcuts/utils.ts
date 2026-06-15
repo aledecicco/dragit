@@ -29,6 +29,9 @@ export const useShortcutBinding = (
     scopes: [scope],
     enableOnFormTags: true,
     preventDefault: true,
+    keydown: false,
+    keyup: true,
+    enabled: !!hotkey,
   })
 }
 

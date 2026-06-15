@@ -4,14 +4,13 @@ import { IconFiles } from '@tabler/icons-react'
 import type { StagedFile, WorktreeFileType } from '@/api/models'
 import { useStageFiles } from '@/api/mutations/addToIndex'
 import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
-import { useStashFiles } from '@/api/mutations/saveStash'
+import { useDiscardChanges } from '@/api/mutations/restore'
 import {
   useQueryWorktreeFiles,
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
-import { requestStashParams } from '@/common/StashDialog'
-import { interaction } from '@/lib/ActionButton/utils'
+import { group, interaction } from '@/lib/ActionButton/utils'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
@@ -26,7 +25,7 @@ import {
   useHandleFilesPageSync,
   useWorktreeFilesPage,
 } from '@/state/pages'
-import { getSettings, useSettings } from '@/state/storage'
+import { useSettings } from '@/state/storage'
 import { Chip } from '@/ui/Chip'
 import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -162,24 +161,19 @@ const getDragPayload = (files: StagedFile[] | undefined): DragPayload => ({
 
 const useGetInteractions = () => {
   const unstage = useUnstageFiles()
-  const stash = useStashFiles()
+  const discard = useDiscardChanges()
 
   return (files: StagedFile[]): AnyInteraction[][] => {
     return [
-      [
-        interaction({ action: unstage, argsRequester: () => files }),
+      group(interaction({ action: unstage, argsRequester: () => files })),
+      group(
         interaction({
-          action: stash,
-          argsRequester: async () => {
-            const { askForStashMessage } = getSettings()
-            const message = askForStashMessage
-              ? (await requestStashParams()).message
-              : null
-
-            return { files, message }
-          },
+          action: discard,
+          argsRequester: () => files,
+          isDangerous: true,
+          details: `discard changes in ${pluralize('file', files.length, true)}`,
         }),
-      ],
+      ),
     ]
   }
 }

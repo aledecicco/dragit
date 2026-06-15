@@ -5,6 +5,7 @@ import { mergeRefs } from 'react-merge-refs'
 
 import { useUniqueId } from '@/state/ids'
 import { propsWithCn } from '@/utils/styles'
+import type { MakeRequired } from '@/utils/types'
 
 import {
   type Draggable as DraggableSource,
@@ -22,7 +23,7 @@ interface DraggableProps<T extends DragType>
   /**
    * Extra data carried by the item.
    */
-  dragPayload: MatchingPayload<T>
+  dragPayload?: MatchingPayload<T>
 
   /**
    * Callback to trigger on drag.
@@ -38,17 +39,34 @@ interface DraggableProps<T extends DragType>
  * An abstract component that makes its child draggable.
  */
 const Draggable = <T extends DragType>(props: DraggableProps<T>) => {
-  const { dragPayload, onBeforeDrag, children, ref, ...roleProps } = props
+  const { dragPayload, onBeforeDrag, children, ...roleProps } = props
 
+  const isDisabled = !dragPayload || isEmptyDragPayload(dragPayload)
+
+  return isDisabled ? (
+    <Ariakit.Role {...roleProps} render={children} />
+  ) : (
+    <DraggableInner
+      {...roleProps}
+      dragPayload={dragPayload}
+      onBeforeDrag={onBeforeDrag}
+    >
+      {children}
+    </DraggableInner>
+  )
+}
+
+const DraggableInner = <T extends DragType>(
+  props: MakeRequired<DraggableProps<T>, 'dragPayload'>,
+) => {
+  const { dragPayload, onBeforeDrag, children, ref, ...roleProps } = props
   const id = useUniqueId()
 
-  const isDisabled = isEmptyDragPayload(dragPayload)
   const componentRef = useRef<HTMLDivElement>(null)
   const { ref: dragRef, isDragging } = useDraggable({
     id,
     type: dragPayload.type,
     data: dragPayload,
-    disabled: isDisabled,
   })
 
   useBeforeDrag(({ element, source, manager }) => {
@@ -64,8 +82,7 @@ const Draggable = <T extends DragType>(props: DraggableProps<T>) => {
     <Ariakit.Role
       {...propsWithCn(
         roleProps,
-        'touch-manipulation',
-        !isDisabled && 'cursor-pointer',
+        'touch-manipulation cursor-pointer',
         isDragging && 'border border-neutral-600',
       )}
       ref={mergeRefs([componentRef, dragRef, ref])}

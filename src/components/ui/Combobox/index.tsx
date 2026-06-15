@@ -103,7 +103,7 @@ const ComboboxInner = (props: ComboboxProps) => {
               status="neutral"
               {...propsWithCn(
                 buttonProps,
-                'min-w-0 group/combobox gap-2 text-sm',
+                'min-w-0 gap-2 text-sm',
                 !value && 'font-normal text-light-300',
               )}
             />
@@ -114,16 +114,17 @@ const ComboboxInner = (props: ComboboxProps) => {
           <Icon
             Glyph={IconChevronDown}
             size={size}
-            className={cn('group-aria-expanded/combobox:rotate-180')}
+            className={cn('group-aria-expanded:rotate-180')}
           />
         </Ariakit.Select>
+
         <Ariakit.SelectPopover
           portal
           sameWidth
           unmountOnHide
           gutter={4}
           className={cn(
-            'shadow-md min-w-50 bg-dark-300',
+            'z-5 shadow-md min-w-50 bg-dark-300 border-2 border-dark-50',
 
             match(size)
               .with('xs', () => 'p-1.5 rounded-sm')

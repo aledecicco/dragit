@@ -1,4 +1,5 @@
-import type { MouseEvent } from 'react'
+import { type MouseEvent, useRef } from 'react'
+import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
 
 import {
@@ -16,6 +17,7 @@ import type { Size } from '@/utils/types'
 
 import { DecoratedButton, type DecoratedButtonProps } from '../DecoratedButton'
 import { ShortcutIndicator } from '../Shortcuts/Indicator'
+import { useShortcutBinding } from '../Shortcuts/utils'
 import { useActionButtonAction } from './utils'
 
 type BaseActionButtonProps = Partial<DecoratedButtonProps> & {
@@ -72,8 +74,12 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     }
   }
 
+  const ref = useRef<HTMLButtonElement>(null)
+
   const commonProps: Partial<DecoratedButtonProps> = {
     ...buttonProps,
+
+    ref: mergeRefs([ref, buttonProps.ref]),
 
     status: isDangerous ? 'danger' : buttonProps.status,
 
@@ -118,11 +124,15 @@ const ActionButton = <T,>(props: ActionButtonProps<T>) => {
     <DecoratedButton {...commonProps} track={activeAction} />
   )
 
+  useShortcutBinding(shortcut ?? '', () => {
+    ref.current?.focus()
+    triggerAction()
+  })
+
   return shortcut ? (
     <ShortcutIndicator
       hotkey={shortcut}
       render={button}
-      action={() => triggerAction()}
       status={commonProps.status}
     />
   ) : (

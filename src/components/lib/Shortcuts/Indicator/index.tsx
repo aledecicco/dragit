@@ -15,7 +15,6 @@ import {
   SHORTCUT_SEPARATOR,
   type ShortcutKeys,
   useActiveShortcutScopes,
-  useShortcutBinding,
 } from '../utils'
 
 interface ShortcutIndicatorProps extends Ariakit.RoleProps {
@@ -23,11 +22,6 @@ interface ShortcutIndicatorProps extends Ariakit.RoleProps {
    * The hotkey being tracked.
    */
   hotkey: string
-
-  /**
-   * The action triggered by the shortcut.
-   */
-  action: () => void
 
   /**
    * The label for the hotkey.
@@ -44,14 +38,7 @@ interface ShortcutIndicatorProps extends Ariakit.RoleProps {
  * An indicator that pops up as a reminder that a shortcut is available.
  */
 const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
-  const {
-    hotkey,
-    action,
-    label,
-    status = 'neutral',
-    children,
-    ...itemProps
-  } = props
+  const { hotkey, label, status = 'neutral', children, ...itemProps } = props
 
   const shortcutKeys = getShortcutKeys(hotkey)
   const shortcutSequence = getShortcutSequence(shortcutKeys)
@@ -126,10 +113,6 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
     }
   }, [shortcutKeys, shortcutSequence])
 
-  useShortcutBinding(hotkey, () => {
-    action()
-  })
-
   const settings = useSettings()
   const shortcutScopes = useActiveShortcutScopes()
 
@@ -147,7 +130,7 @@ const ShortcutIndicator = (props: ShortcutIndicatorProps) => {
         <div
           className={cn(
             'z-1 absolute -bottom-2 -right-2 rounded-md py-px px-1',
-            'border text-xs text-light-100 text-nowrap',
+            'border text-xs text-light-100 text-nowrap select-none pointer-events-none',
             match(status)
               .with('neutral', () => 'bg-dark-100 border-light-950/30')
               .with('primary', () => 'bg-primary-700 border-primary-300/30')

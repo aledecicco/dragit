@@ -208,7 +208,7 @@ const InteractiveSelectionInner = <T,>(
 
   return getDragPayload ? (
     <Draggable
-      dragPayload={getDragPayload?.(items)}
+      dragPayload={getDragPayload(items)}
       className={cn(
         'border border-transparent',
         'focus:border-dark-100',

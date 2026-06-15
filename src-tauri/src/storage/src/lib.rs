@@ -13,10 +13,23 @@ pub fn get_storage(app_handle: &AppHandle) -> Storage {
     let store = app_handle.store(STORAGE_FILE_NAME);
 
     if let Ok(store) = store {
-        let json = JsonValue::Object(store.entries().into_iter().collect());
-        let stored = serde_json::from_value::<Storage>(json).unwrap_or_default();
+        let mut entries: serde_json::Map<String, JsonValue> = store.entries().into_iter().collect();
 
-        stored
+        let mut res = Storage::default();
+
+        // Deserialize settings separately as PartialSettings,
+        // so that newly added fields don't cause the whole storage load to fail.
+        if let Some(settings_json) = entries.remove("settings") {
+            if let Ok(partial) = serde_json::from_value::<PartialSettings>(settings_json) {
+                res.settings.apply_some(partial);
+            }
+        }
+
+        if let Ok(stored) = serde_json::from_value::<PartialStorage>(JsonValue::Object(entries)) {
+            res.apply_some(stored);
+        }
+
+        res
     } else {
         Storage::default()
     }

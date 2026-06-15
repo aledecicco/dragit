@@ -17,6 +17,7 @@ import { group, interaction } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractiveItem } from '@/lib/Interactive/Item'
 import { ShortcutIndicator } from '@/lib/Shortcuts/Indicator'
+import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { type AnyInteraction, triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/storage'
 import { Marquee } from '@/ui/Marquee'
@@ -69,17 +70,15 @@ const CurrentGraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
   const amend = useAmend()
   const settings = useSettings()
 
+  useShortcutBinding(settings.amendShortcut, () => {
+    triggerInteraction({
+      action: amend,
+      argsRequester: () => requestCommitParams(commitInfo.message ?? '', true),
+    })
+  })
+
   return (
-    <ShortcutIndicator
-      hotkey={settings.amendShortcut}
-      action={() => {
-        triggerInteraction({
-          action: amend,
-          argsRequester: () =>
-            requestCommitParams(commitInfo.message ?? '', true),
-        })
-      }}
-    >
+    <ShortcutIndicator hotkey={settings.amendShortcut}>
       <GraphCommitCardInner
         commitInfo={commitInfo}
         interactions={[

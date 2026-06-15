@@ -74,7 +74,7 @@ const SplitButton = (props: SplitButtonProps) => {
         size={size}
         className={cn(
           'rounded-l-[inherit] rounded-r-none grow overflow-hidden',
-          'border-r',
+          buttonProps.variant !== 'plain' && 'border-r',
           match(buttonProps.status)
             .with('primary', () => 'border-r-primary-800')
             .with('success', () => 'border-r-green-800')

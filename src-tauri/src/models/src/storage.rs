@@ -36,6 +36,7 @@ impl Default for Storage {
 pub struct RepositoryStorage {
     pub branch_bases: Vec<(String, Option<Reference>)>,
     pub branch_upstreams: Vec<(String, Upstream)>,
+    #[serde(default)]
     pub default_base: String,
 }
 
@@ -72,6 +73,8 @@ pub struct Settings {
     pub stage_files_shortcut: String,
     pub unstage_files_shortcut: String,
     pub stash_files_shortcut: String,
+    pub checkout_shortcut: String,
+    pub change_base_shortcut: String,
     pub commit_shortcut: String,
     pub amend_shortcut: String,
     pub push_shortcut: String,
@@ -106,6 +109,8 @@ impl Default for Settings {
             stage_files_shortcut: "Ctrl + Shift + A".to_string(),
             unstage_files_shortcut: "Ctrl + Shift + U".to_string(),
             stash_files_shortcut: "Ctrl + Shift + S".to_string(),
+            checkout_shortcut: "Ctrl + Shift + X".to_string(),
+            change_base_shortcut: "Ctrl + Shift + B".to_string(),
             commit_shortcut: "Ctrl + Shift + C".to_string(),
             amend_shortcut: "Ctrl + Shift + M".to_string(),
             push_shortcut: "Ctrl + Shift + P".to_string(),

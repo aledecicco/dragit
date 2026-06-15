@@ -28,5 +28,16 @@ export type AnyObject = Record<never, never>
  */
 export type RequireOnly<T, K extends keyof T> = Partial<T> & Pick<T, K>
 
+/**
+ * Makes the keys specified in `K` of a type `T` optional,
+ */
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>
+
+/**
+ * Makes the keys specified in `K` of a type `T` required.
+ */
+export type MakeRequired<T extends object, K extends keyof T> = Required<
+  Pick<T, K>
+> &
+  Omit<T, K>

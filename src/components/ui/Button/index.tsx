@@ -49,7 +49,7 @@ const Button = (props: ButtonProps) => {
         'group cursor-pointer active:scale-98 select-none',
         'h-max text-nowrap',
         'flex flex-row justify-center items-center text-center',
-        'border-none font-semibold',
+        'border-0 font-semibold',
 
         match(size)
           .with('xs', () => [
