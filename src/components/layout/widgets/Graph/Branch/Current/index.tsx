@@ -9,6 +9,7 @@ import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { getPaginatedLength } from '@/api/utils'
 import { useSelectedBase } from '@/state/branches'
+import { useWorktreeFilesPage } from '@/state/pages'
 import { useSelectedUpstream } from '@/state/upstream'
 import {
   getUpstreamReference,
@@ -62,9 +63,13 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
   ).data
   const anchor = commonAncestor?.lastCommit
 
+  const stagedPage = useWorktreeFilesPage(STAGED_FILE_TYPES)
+  const notStagedPage = useWorktreeFilesPage(NOT_STAGED_FILE_TYPES)
   const stagedChangesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
   const notStagedChangesQuery = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
   const hasWorktreeChanges =
+    stagedPage > 0 ||
+    notStagedPage > 0 ||
     !!stagedChangesQuery.data?.items.length ||
     !!notStagedChangesQuery.data?.items.length
 

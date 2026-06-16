@@ -98,11 +98,19 @@ const GraphInner = () => {
   )
   const baseBranchHistoryQuery = useQueryCommitHistory(baseReference?.refName)
 
-  const baseBranchLength = getPaginatedLength(baseBranchHistoryQuery.data)
-  const currentBranchLength = Math.min(
-    (commonAncestor?.lastCommit?.distance ?? Number.POSITIVE_INFINITY) + 1,
-    getPaginatedLength(currentBranchHistoryQuery.data),
-  )
+  const baseBranchLength = commonAncestor?.commonCommit
+    ? Math.max(
+        commonAncestor.commonCommit.distance + 1,
+        getPaginatedLength(baseBranchHistoryQuery.data),
+      )
+    : getPaginatedLength(baseBranchHistoryQuery.data)
+  const currentBranchLength =
+    commonAncestor?.lastCommit?.distance !== undefined
+      ? Math.max(
+          commonAncestor.lastCommit.distance + 1,
+          getPaginatedLength(currentBranchHistoryQuery.data),
+        )
+      : getPaginatedLength(currentBranchHistoryQuery.data)
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const virtualizer = useVirtualizer({
@@ -118,7 +126,7 @@ const GraphInner = () => {
         indexes.add(commonAncestor.lastCommit.distance)
       }
 
-      return [...indexes].sort((a, b) => a - b)
+      return [...indexes.values()].sort((a, b) => a - b)
     },
     gap: EDGE_LENGTH,
     paddingStart: CURVE_SIZE * 2 + EDGE_OFFSET,

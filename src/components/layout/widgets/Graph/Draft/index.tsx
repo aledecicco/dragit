@@ -8,9 +8,13 @@ import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
 
 import { useStageAll } from '@/api/mutations/addToIndex'
 import { useCommit } from '@/api/mutations/commitIndex'
-import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
+import {
+  useQueryWorktreeFiles,
+  WORKTREE_FILES_PAGE_SIZE,
+} from '@/api/queries/worktreeFiles'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
+import { useWorktreeFilesPage } from '@/state/pages'
 import { Marquee } from '@/ui/Marquee'
 import { Toolbar } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
@@ -60,10 +64,21 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
   (props) => {
     const { trackRef, ...divProps } = props
 
+    const stagedPage = useWorktreeFilesPage(STAGED_FILE_TYPES)
     const stagedChangesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
+    const hasStagedChanges =
+      stagedPage > 0 || !!stagedChangesQuery.data?.items.length
+    const stagedCount =
+      stagedPage * WORKTREE_FILES_PAGE_SIZE +
+      (stagedChangesQuery.data?.items.length ?? 0)
+
+    const notStagedPage = useWorktreeFilesPage(NOT_STAGED_FILE_TYPES)
     const notStagedChangesQuery = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
-    const hasStagedChanges = !!stagedChangesQuery.data?.items.length
-    const hasNotStagedChanges = !!notStagedChangesQuery.data?.items.length
+    const hasNotStagedChanges =
+      notStagedPage > 0 || !!notStagedChangesQuery.data?.items.length
+    const notStagedCount =
+      notStagedPage * WORKTREE_FILES_PAGE_SIZE +
+      (notStagedChangesQuery.data?.items.length ?? 0)
 
     const stageAll = useStageAll()
     const commit = useCommit()
@@ -81,11 +96,11 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
         <Draggable
           dragPayload={{
             type: 'worktree',
-            label: pluralize(
-              'staged file',
-              stagedChangesQuery.data?.items.length ?? 0,
-              true,
-            ),
+            label: `${
+              stagedChangesQuery.data?.hasNext || stagedChangesQuery.isFetching
+                ? `${stagedCount}+`
+                : stagedCount
+            } ${pluralize('staged file', stagedCount, false)}`,
             Glyph: IconFileCheck,
             dragged: stagedChangesQuery.data?.items ?? [],
           }}
@@ -127,20 +142,27 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
                         >
                           {hasStagedChanges && (
                             <span className={cn('text-success-300')}>
-                              {pluralize(
-                                'staged file',
-                                stagedChangesQuery.data?.items.length ?? 0,
-                                true,
-                              )}
+                              {stagedChangesQuery.data?.hasNext ||
+                              stagedChangesQuery.isFetching
+                                ? `${stagedCount}+`
+                                : stagedCount}{' '}
+                              {pluralize('staged file', stagedCount, false)}
                             </span>
                           )}
                           {hasStagedChanges && hasNotStagedChanges && ' • '}
-                          {hasNotStagedChanges &&
-                            pluralize(
-                              'unstaged file',
-                              notStagedChangesQuery.data?.items.length ?? 0,
-                              true,
-                            )}
+                          {hasNotStagedChanges && (
+                            <>
+                              {notStagedChangesQuery.data?.hasNext ||
+                              notStagedChangesQuery.isFetching
+                                ? `${notStagedCount}+`
+                                : notStagedCount}{' '}
+                              {pluralize(
+                                'not staged file',
+                                notStagedCount,
+                                false,
+                              )}
+                            </>
+                          )}
                         </Marquee>
                       </div>
 
