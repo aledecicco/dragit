@@ -4,7 +4,7 @@ import { match } from 'ts-pattern'
 
 import type { BranchInfo, TagInfo } from '@/api/models'
 import { useMakeCreateBranchAt } from '@/api/mutations/createBranch'
-import { useMakeTagCommit } from '@/api/mutations/createTag'
+import { useMakeTagBranch, useMakeTagCommit } from '@/api/mutations/createTag'
 import { useDeleteBranches } from '@/api/mutations/deleteBranches'
 import { useDeleteTags } from '@/api/mutations/deleteTags'
 import { useQueryBranches } from '@/api/queries/branches'
@@ -55,6 +55,7 @@ const BranchesList = (props: BranchesListProps) => {
   const getBranchesListInteractions = useGetBranchesListInteractions()
   const getTagsListInteractions = useGetTagsListInteractions()
 
+  const makeTagBranch = useMakeTagBranch()
   const makeTagCommit = useMakeTagCommit()
   const makeCreateBranchAt = useMakeCreateBranchAt()
 
@@ -80,29 +81,51 @@ const BranchesList = (props: BranchesListProps) => {
         divProps,
         'grid grid-rows-[max-content_1fr] gap-y-1 overflow-hidden',
       )}
-      acceptedTypes={['commit']}
+      acceptedTypes={['commit', 'branch']}
       label={
         tabsHandler.selectedTab === 'tags'
           ? {
               commit: 'tag this commit',
+              branch: 'tag this branch',
             }
           : {
               commit: 'track this commit',
+              branch: 'track this branch',
             }
       }
       handleDrop={(payload) => {
         if (tabsHandler.selectedTab === 'tags') {
-          triggerInteraction({
-            action: makeTagCommit(payload.dragged),
-            argsRequester: () =>
-              requestTagParams(`#${payload.dragged.shortHash}`),
-          })
+          match(payload)
+            .with({ type: 'commit' }, (payload) => {
+              triggerInteraction({
+                action: makeTagCommit(payload.dragged),
+                argsRequester: () =>
+                  requestTagParams(`#${payload.dragged.shortHash}`),
+              })
+            })
+            .with({ type: 'branch' }, (payload) => {
+              triggerInteraction({
+                action: makeTagBranch(payload.dragged),
+                argsRequester: () => requestTagParams(payload.dragged.name),
+              })
+            })
+            .exhaustive()
         } else {
-          triggerInteraction({
-            action: makeCreateBranchAt(payload.dragged.id),
-            argsRequester: () =>
-              requestBranchName(`#${payload.dragged.shortHash}`),
-          })
+          match(payload)
+            .with({ type: 'commit' }, (payload) => {
+              triggerInteraction({
+                action: makeCreateBranchAt(payload.dragged.id),
+                argsRequester: () =>
+                  requestBranchName(`#${payload.dragged.shortHash}`),
+              })
+            })
+            .with({ type: 'branch' }, (payload) => {
+              triggerInteraction({
+                action: makeCreateBranchAt(payload.dragged.name),
+                argsRequester: () => requestBranchName(payload.dragged.name),
+              })
+            })
+            .exhaustive()
         }
       }}
     >
