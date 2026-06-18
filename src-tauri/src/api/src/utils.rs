@@ -26,9 +26,10 @@ pub(crate) fn with_handler<T>(
 /// Reads the contents of a file from disk, given the repository path and the relative file path.
 pub(crate) fn get_disk_file_contents(repo_path: &str, filepath: &str) -> Result<String, AppError> {
     let full_path = Path::new(repo_path).join(filepath);
-    let contents = fs::read_to_string(full_path).or(Err(AppError::ReadFileFailed {
+    let contents = fs::read_to_string(full_path).map_err(|err| AppError::ReadFileFailed {
         path: filepath.to_string(),
-    }))?;
+        reason: err.to_string(),
+    })?;
 
     Ok(contents)
 }

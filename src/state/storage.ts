@@ -5,7 +5,7 @@ import { storageQuery, useQueryStorage } from '@/api/queries/storage'
 import { useCurrentPath } from '@/api/utils'
 
 /**
- * Returns the currently loaded app storage.
+ * @returns The currently loaded app storage.
  * @throws If the storage is not loaded yet.
  */
 const getStorage = (): Storage => {
@@ -19,7 +19,7 @@ const getStorage = (): Storage => {
 }
 
 /**
- * Returns the currently loaded settings.
+ * @returns The currently loaded settings.
  * @throws If the storage is not loaded yet.
  */
 const getSettings = (): Settings => {
@@ -27,7 +27,7 @@ const getSettings = (): Settings => {
 }
 
 /**
- * Returns a repository-specific storage.
+ * @returns A repository-specific storage.
  * @throws If the storage is not loaded yet.
  */
 const getRepositoryStorage = (
@@ -40,7 +40,8 @@ const getRepositoryStorage = (
 }
 
 /**
- * Returns the repository-specific storage for the currently loaded repository.
+ * @returns The repository-specific storage for the currently loaded repository.
+ * @throws If there is no repository currently loaded.
  */
 const getCurrentRepositoryStorage = (): RepositoryStorage | undefined => {
   const currentDir = client.getQueryData(currentDirQuery.queryKey)

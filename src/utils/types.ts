@@ -4,6 +4,8 @@ export type Size = 'xs' | 'sm' | 'md' | 'lg'
 
 export type Direction = 'horizontal' | 'vertical'
 
+export type Status = 'primary' | 'neutral' | 'success' | 'warning' | 'danger'
+
 /**
  * Functor map function. Applies a function to a value if defined, and returns `undefined` otherwise.
  *

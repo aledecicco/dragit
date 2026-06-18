@@ -58,6 +58,7 @@ pub struct Settings {
     pub file_opener_app: String,
     pub open_last_on_start: bool,
     pub confirm_dangerous_actions: bool,
+    pub show_toasts: bool,
     pub auto_fetch_remote: bool,
     pub ask_for_stash_message: bool,
 
@@ -94,6 +95,7 @@ impl Default for Settings {
             file_opener_app: "code".to_string(),
             open_last_on_start: true,
             confirm_dangerous_actions: true,
+            show_toasts: true,
             auto_fetch_remote: false,
             ask_for_stash_message: true,
 

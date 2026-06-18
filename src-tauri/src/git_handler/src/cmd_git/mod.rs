@@ -3,7 +3,6 @@ use utils::*;
 
 use std::{
     collections::HashMap,
-    fmt::Debug,
     fs,
     io::{BufRead, BufReader, Lines, Read},
     path::Path,
@@ -32,12 +31,15 @@ impl CmdGit {
 
     fn spawn_command<'a, I>(&self, path: &str, args: I) -> Result<Child, GitError>
     where
-        I: IntoIterator<Item = &'a str>,
+        I: IntoIterator<Item = &'a str> + Clone,
     {
         let mut cmd = Command::new("git");
-        let args_vec: Vec<_> = args.into_iter().collect();
+        let args_vec: Vec<_> = args.clone().into_iter().collect();
 
-        cmd.current_dir(path).args(&args_vec).stdout(Stdio::piped());
+        cmd.current_dir(path)
+            .args(&args_vec)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
 
         #[cfg(windows)]
         {
@@ -46,21 +48,10 @@ impl CmdGit {
             cmd.creation_flags(0x08000000);
         }
 
-        cmd.spawn().or(Err(GitError::StartCommandFailed {
-            args: args_vec.into_iter().map(String::from).collect(),
-        }))
-    }
-
-    fn await_child(&self, mut process: Child) -> Result<(), GitError> {
-        let status = process
-            .wait()
-            .map_err(|_| GitError::GetCommandOutputFailed {})?;
-
-        if status.success() {
-            Ok(())
-        } else {
-            Err(GitError::GetCommandOutputFailed {})
-        }
+        cmd.spawn().map_err(|err| GitError::StartCommandFailed {
+            command: format!("git {}", args_vec.join(" ")),
+            reason: err.to_string(),
+        })
     }
 
     fn spawn_and_notify<'a, I>(
@@ -70,7 +61,7 @@ impl CmdGit {
         args: I,
     ) -> Result<Child, GitError>
     where
-        I: IntoIterator<Item = &'a str>,
+        I: IntoIterator<Item = &'a str> + Clone,
     {
         let process = self.spawn_command(path, args)?;
         let _ = channel.send(AppMessage::ProcessStarted { pid: process.id() });
@@ -80,34 +71,109 @@ impl CmdGit {
 
     fn spawn_and_await<'a, I>(&self, path: &str, args: I) -> Result<(), GitError>
     where
-        I: IntoIterator<Item = &'a str> + Debug,
+        I: IntoIterator<Item = &'a str> + Clone,
     {
-        let res = self.spawn_command(path, args)?;
-        self.await_child(res)
+        let command_str = format!(
+            "git {}",
+            args.clone().into_iter().collect::<Vec<_>>().join(" ")
+        );
+        let mut res = self.spawn_command(path, args)?;
+        let stderr = res.stderr.take();
+
+        let status = res.wait().map_err(|err| GitError::CommandFailed {
+            command: command_str.clone(),
+            reason: err.to_string(),
+        })?;
+
+        if !status.success() {
+            let reason = stderr
+                .and_then(|mut s| {
+                    let mut buf = String::new();
+                    s.read_to_string(&mut buf).ok()?;
+                    let trimmed = buf.trim().to_string();
+                    if trimmed.is_empty() {
+                        None
+                    } else {
+                        Some(trimmed)
+                    }
+                })
+                .unwrap_or_else(|| {
+                    format!(
+                        "Process exited with status code \"{}\"",
+                        status.code().unwrap_or(-1)
+                    )
+                });
+
+            return Err(GitError::CommandFailed {
+                command: command_str,
+                reason,
+            });
+        }
+
+        Ok(())
     }
 
-    fn get_output_lines_stream<'a>(
+    fn spawn_and_stream<'a, I>(
         &self,
-        process: Child,
-    ) -> Result<Lines<BufReader<ChildStdout>>, GitError> {
-        let stdout = process.stdout.ok_or(GitError::GetCommandOutputFailed {})?;
+        channel: &Channel<AppMessage>,
+        path: &str,
+        args: I,
+    ) -> Result<Lines<BufReader<ChildStdout>>, GitError>
+    where
+        I: IntoIterator<Item = &'a str> + Clone,
+    {
+        let process = self.spawn_and_notify(channel, path, args.clone())?;
+        let stdout = process.stdout.ok_or(GitError::GetCommandOutputFailed {
+            command: format!("git {}", args.into_iter().collect::<Vec<&str>>().join(" ")),
+            reason: process
+                .stderr
+                .map_or("Unknown error".to_string(), |mut stderr| {
+                    let mut buffer = String::new();
+                    stderr.read_to_string(&mut buffer).ok();
+                    buffer
+                }),
+        })?;
 
         let reader = BufReader::new(stdout);
         Ok(reader.lines())
     }
 
-    fn get_all_output<'a>(&self, mut process: Child) -> Result<String, GitError> {
+    fn spawn_and_get_output<'a, I>(
+        &self,
+        channel: &Channel<AppMessage>,
+        path: &str,
+        args: I,
+    ) -> Result<String, GitError>
+    where
+        I: IntoIterator<Item = &'a str> + Clone,
+    {
+        let command_str = format!(
+            "git {}",
+            args.clone().into_iter().collect::<Vec<&str>>().join(" ")
+        );
+        let mut process = self.spawn_and_notify(channel, path, args)?;
         let stdout = process
             .stdout
             .take()
-            .ok_or(GitError::GetCommandOutputFailed {})?;
+            .ok_or(GitError::GetCommandOutputFailed {
+                command: command_str.clone(),
+                reason: "Failed to capture output".to_string(),
+            })?;
 
         let mut buffer = String::new();
         BufReader::new(stdout)
             .read_to_string(&mut buffer)
-            .map_err(|_| GitError::GetCommandOutputFailed {})?;
+            .map_err(|err| GitError::GetCommandOutputFailed {
+                command: command_str.clone(),
+                reason: err.to_string(),
+            })?;
 
-        self.await_child(process)?;
+        process
+            .wait()
+            .map_err(|err| GitError::GetCommandOutputFailed {
+                command: command_str,
+                reason: err.to_string(),
+            })?;
 
         Ok(buffer)
     }
@@ -127,12 +193,11 @@ impl GitHandler for CmdGit {
         channel: &Channel<AppMessage>,
         repo_path: &str,
     ) -> Result<Vec<BranchInfo>, GitError> {
-        let process = self.spawn_and_notify(
+        let lines = self.spawn_and_stream(
             channel,
             repo_path,
             ["branch", "--list", "-a", BRANCHES_INFO_FORMAT],
         )?;
-        let lines = self.get_output_lines_stream(process)?;
         let branches: Vec<_> = lines
             .filter_map(|line| line.ok().and_then(|line| parse_branch_info(&line)))
             .collect();
@@ -157,9 +222,6 @@ impl GitHandler for CmdGit {
         }
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::CheckoutFailed {
-                reference: reference.to_string(),
-            }))
     }
 
     fn create_branch(
@@ -174,9 +236,6 @@ impl GitHandler for CmdGit {
         }
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::CreateBranchFailed {
-                branch_name: branch_name.to_string(),
-            }))
     }
 
     fn delete_local_branches(
@@ -188,7 +247,6 @@ impl GitHandler for CmdGit {
         args.extend(branch_names);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::DeleteBranchesFailed {}))
     }
 
     fn delete_remote_branches(
@@ -201,7 +259,6 @@ impl GitHandler for CmdGit {
         args.extend(branch_names);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::DeleteBranchesFailed {}))
     }
 
     fn get_commit_history_page(
@@ -216,27 +273,23 @@ impl GitHandler for CmdGit {
         let page_size_arg = (limit + 1).to_string();
         let reference_arg = reference.to_string() + "~" + &page_arg;
 
-        let process = self.spawn_and_notify(
-            channel,
-            repo_path,
-            [
-                "rev-list",
-                &reference_arg,
-                "-n",
-                &page_size_arg,
-                "--first-parent",
-                "--parents",
-            ],
-        )?;
-        let mut lines = self.get_output_lines_stream(process)?;
+        let args = [
+            "rev-list",
+            &reference_arg,
+            "-n",
+            &page_size_arg,
+            "--first-parent",
+            "--parents",
+        ];
+        let mut lines = self.spawn_and_stream(channel, repo_path, args)?;
 
         let items = lines
             .by_ref()
             .take(limit)
             .map(|line| line.ok().and_then(|line| parse_history_item(&line)))
             .collect::<Option<_>>()
-            .ok_or(GitError::GetReferenceHistoryFailed {
-                reference: reference.to_string(),
+            .ok_or(GitError::ParseCommandOutputFailed {
+                command: format!("git {}", args.join(" ")),
             })?;
         let has_next = lines.next().is_some();
 
@@ -249,21 +302,17 @@ impl GitHandler for CmdGit {
         repo_path: &str,
         reference: &str,
     ) -> Result<CommitInfo, GitError> {
-        let process = self.spawn_and_notify(
-            channel,
-            repo_path,
-            [
-                "show",
-                reference,
-                COMMIT_INFO_FORMAT,
-                "--quiet",
-                "--shortstat",
-                "--first-parent",
-            ],
-        )?;
-        let output = self.get_all_output(process)?;
-        parse_commit_info(&output).ok_or(GitError::GetCommitInfoFailed {
-            reference: reference.to_string(),
+        let args = [
+            "show",
+            reference,
+            COMMIT_INFO_FORMAT,
+            "--quiet",
+            "--shortstat",
+            "--first-parent",
+        ];
+        let output = self.spawn_and_get_output(channel, repo_path, args)?;
+        parse_commit_info(&output).ok_or(GitError::ParseCommandOutputFailed {
+            command: format!("git {}", args.join(" ")),
         })
     }
 
@@ -272,26 +321,21 @@ impl GitHandler for CmdGit {
         channel: &Channel<AppMessage>,
         repo_path: &str,
     ) -> Result<HeadInfo, GitError> {
-        let process = self.spawn_and_notify(
-            channel,
-            repo_path,
-            [
-                "--no-optional-locks",
-                "status",
-                "--branch",
-                "--porcelain=2",
-                "--no-show-stash",
-                "--no-ahead-behind",
-                ".git",
-            ],
-        )?;
-        let lines = self
-            .get_all_output(process)?
-            .lines()
-            .map(String::from)
-            .collect();
+        let args = [
+            "--no-optional-locks",
+            "status",
+            "--branch",
+            "--porcelain=2",
+            "--no-show-stash",
+            "--no-ahead-behind",
+            ".git",
+        ];
+        let output = self.spawn_and_get_output(channel, repo_path, args)?;
+        let lines = output.lines().map(String::from).collect();
 
-        let head_state = parse_head_state(&lines).ok_or(GitError::GetHeadInfoFailed {})?;
+        let head_state = parse_head_state(&lines).ok_or(GitError::ParseCommandOutputFailed {
+            command: format!("git {}", args.join(" ")),
+        })?;
 
         let merge_in_progress =
             fs::exists(get_merge_head_file(&Path::new(repo_path))).unwrap_or(false);
@@ -372,8 +416,7 @@ impl GitHandler for CmdGit {
             None
         };
 
-        let process = self.spawn_and_notify(channel, repo_path, args)?;
-        let lines = self.get_output_lines_stream(process)?;
+        let lines = self.spawn_and_stream(channel, repo_path, args)?;
 
         let mut items_iter = lines
             .filter_map(|line| line.ok().and_then(parse_line))
@@ -420,8 +463,7 @@ impl GitHandler for CmdGit {
         };
 
         // TODO: doesn't work for initial commit
-        let process = self.spawn_and_notify(channel, repo_path, args)?;
-        let lines = self.get_output_lines_stream(process)?;
+        let lines = self.spawn_and_stream(channel, repo_path, args)?;
 
         let mut items_iter = lines
             .filter_map(|line| line.ok().and_then(|line| parse_versioned_file_info(&line)))
@@ -437,7 +479,6 @@ impl GitHandler for CmdGit {
         args.extend(files);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::AddToIndexFailed {}))
     }
 
     fn remove_from_index(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
@@ -445,7 +486,6 @@ impl GitHandler for CmdGit {
         args.extend(files);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::RemoveFromIndexFailed {}))
     }
 
     fn remove_from_tree(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
@@ -453,7 +493,6 @@ impl GitHandler for CmdGit {
         args.extend(files);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::RemoveFromTreeFailed {}))
     }
 
     fn clean_files(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
@@ -461,7 +500,6 @@ impl GitHandler for CmdGit {
         args.extend(files);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::CleanFilesFailed {}))
     }
 
     fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError> {
@@ -472,15 +510,11 @@ impl GitHandler for CmdGit {
         }
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::CommitFailed {}))
     }
 
     fn reset_head(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
         let parent = format!("{}^{}", reference, 1);
         self.spawn_and_await(repo_path, ["reset", "--soft", &parent])
-            .or(Err(GitError::ResetHeadFailed {
-                reference: reference.to_string(),
-            }))
     }
 
     fn restore(
@@ -510,7 +544,6 @@ impl GitHandler for CmdGit {
         args.extend(files);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::RestoreFailed {}))
     }
 
     fn get_common_ancestor(
@@ -520,22 +553,20 @@ impl GitHandler for CmdGit {
         reference_a: &str,
         reference_b: &str,
     ) -> Result<Option<CommonAncestorInfo>, GitError> {
-        let process_a = self.spawn_and_notify(
-            channel,
-            repo_path,
-            ["rev-list", "--first-parent", reference_a],
-        )?;
-        let process_b = self.spawn_and_notify(
-            channel,
-            repo_path,
-            ["rev-list", "--first-parent", reference_b],
-        )?;
-
         let mut iter_a = self
-            .get_output_lines_stream(process_a)?
+            .spawn_and_stream(
+                channel,
+                repo_path,
+                ["rev-list", "--first-parent", reference_a],
+            )?
             .filter_map(Result::ok);
+
         let mut iter_b = self
-            .get_output_lines_stream(process_b)?
+            .spawn_and_stream(
+                channel,
+                repo_path,
+                ["rev-list", "--first-parent", reference_b],
+            )?
             .filter_map(Result::ok);
 
         let mut prev_ref_a_pointer = None;
@@ -602,21 +633,16 @@ impl GitHandler for CmdGit {
         branch: &str,
         base_branch: &str,
     ) -> Result<BranchDivergence, GitError> {
-        let process = self.spawn_and_notify(
-            channel,
-            repo_path,
-            [
-                "rev-list",
-                "--left-right",
-                "--count",
-                &format!("{}...{}", branch, base_branch),
-            ],
-        )?;
+        let args = [
+            "rev-list",
+            "--left-right",
+            "--count",
+            &format!("{}...{}", branch, base_branch),
+        ];
+        let output = self.spawn_and_get_output(channel, repo_path, args)?;
 
-        let output = self.get_all_output(process)?;
-        parse_branch_divergence(&output).ok_or(GitError::GetBranchDivergenceFailed {
-            branch: branch.to_string(),
-            base_branch: base_branch.to_string(),
+        parse_branch_divergence(&output).ok_or(GitError::ParseCommandOutputFailed {
+            command: format!("git {}", args.join(" ")),
         })
     }
 
@@ -641,11 +667,6 @@ impl GitHandler for CmdGit {
         }
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::PushBranchFailed {
-                branch: branch.to_string(),
-                remote: remote.to_string(),
-                remote_branch: remote_branch.to_string(),
-            }))
     }
 
     fn pull_branch(
@@ -666,11 +687,6 @@ impl GitHandler for CmdGit {
         }
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::PullBranchFailed {
-                branch: branch.to_string(),
-                remote: remote.to_string(),
-                remote_branch: remote_branch.to_string(),
-            }))
     }
 
     fn fast_forward_branch(
@@ -684,11 +700,6 @@ impl GitHandler for CmdGit {
         let args = vec!["fetch", remote, &remote_ref];
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::FastForwardBranchFailed {
-                branch: branch.to_string(),
-                remote: remote.to_string(),
-                remote_branch: remote_branch.to_string(),
-            }))
     }
 
     fn get_remotes(
@@ -696,9 +707,8 @@ impl GitHandler for CmdGit {
         channel: &Channel<AppMessage>,
         repo_path: &str,
     ) -> Result<Vec<RemoteInfo>, GitError> {
-        let process = self.spawn_and_notify(channel, repo_path, ["remote", "--verbose"])?;
         let lines: Vec<String> = self
-            .get_all_output(process)?
+            .spawn_and_get_output(channel, repo_path, ["remote", "--verbose"])?
             .lines()
             .map(String::from)
             .collect();
@@ -708,9 +718,6 @@ impl GitHandler for CmdGit {
 
     fn fetch_remote(&self, repo_path: &str, name: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["fetch", name, "--tags"])
-            .or(Err(GitError::FetchRemoteFailed {
-                name: name.to_string(),
-            }))
     }
 
     fn set_upstream(
@@ -720,31 +727,18 @@ impl GitHandler for CmdGit {
         remote_ref: &str,
     ) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["branch", "-u", remote_ref, branch])
-            .or(Err(GitError::SetUpstreamFailed {
-                branch: branch.to_string(),
-                remote_ref: remote_ref.to_string(),
-            }))
     }
 
     fn add_remote(&self, repo_path: &str, name: &str, url: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["remote", "add", name, url])
-            .or(Err(GitError::AddRemoteFailed {
-                name: name.to_string(),
-            }))
     }
 
     fn remove_remote(&self, repo_path: &str, name: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["remote", "remove", name])
-            .or(Err(GitError::RemoveRemoteFailed {
-                name: name.to_string(),
-            }))
     }
 
     fn rename_remote(&self, repo_path: &str, name: &str, new_name: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["remote", "rename", name, new_name])
-            .or(Err(GitError::RenameRemoteFailed {
-                name: name.to_string(),
-            }))
     }
 
     fn change_remote_url(
@@ -754,9 +748,6 @@ impl GitHandler for CmdGit {
         new_url: &str,
     ) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["remote", "set-url", name, new_url])
-            .or(Err(GitError::ChangeRemoteUrlFailed {
-                name: name.to_string(),
-            }))
     }
 
     fn get_stashes(
@@ -764,12 +755,8 @@ impl GitHandler for CmdGit {
         channel: &Channel<AppMessage>,
         repo_path: &str,
     ) -> Result<Vec<StashInfo>, GitError> {
-        let process = self.spawn_and_notify(
-            channel,
-            repo_path,
-            ["stash", "list", STASH_INFO_FORMAT, "--shortstat"],
-        )?;
-        let mut lines = self.get_output_lines_stream(process)?.peekable();
+        let args = ["stash", "list", STASH_INFO_FORMAT, "--shortstat"];
+        let mut lines = self.spawn_and_stream(channel, repo_path, args)?.peekable();
         let mut stashes = Vec::new();
 
         lines.next(); // Skip the first line
@@ -778,12 +765,17 @@ impl GitHandler for CmdGit {
                 .by_ref()
                 .take(4)
                 .collect::<Result<Vec<String>, _>>()
-                .or(Err(GitError::GetCommandOutputFailed {}))?;
+                .or(Err(GitError::ParseCommandOutputFailed {
+                    command: format!("git {}", args.join(" ")),
+                }))?;
 
-            let diff_line = lines
-                .next()
-                .transpose()
-                .or(Err(GitError::GetCommandOutputFailed {}))?;
+            let diff_line =
+                lines
+                    .next()
+                    .transpose()
+                    .or(Err(GitError::ParseCommandOutputFailed {
+                        command: format!("git {}", args.join(" ")),
+                    }))?;
 
             if let Some(diff_line) = diff_line {
                 if !diff_line.is_empty() {
@@ -793,7 +785,10 @@ impl GitHandler for CmdGit {
                 }
             }
 
-            let stash_info = parse_stash_info(&stash_lines).ok_or(GitError::GetStashesFailed {})?;
+            let stash_info =
+                parse_stash_info(&stash_lines).ok_or(GitError::ParseCommandOutputFailed {
+                    command: format!("git {}", args.join(" ")),
+                })?;
             stashes.push(stash_info);
         }
 
@@ -822,14 +817,10 @@ impl GitHandler for CmdGit {
         args.extend(files);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::CreateStashFailed {}))
     }
 
     fn apply_stash(&self, repo_path: &str, stash_id: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["stash", "pop", &stash_id])
-            .or(Err(GitError::ApplyStashFailed {
-                stash_id: stash_id.to_string(),
-            }))
     }
 
     fn discard_stashes(&self, repo_path: &str, stash_ids: &Vec<&str>) -> Result<(), GitError> {
@@ -838,10 +829,7 @@ impl GitHandler for CmdGit {
         sorted_ids.sort_by(|a, b| b.cmp(a));
 
         for stash_id in sorted_ids {
-            self.spawn_and_await(repo_path, ["stash", "drop", stash_id])
-                .or(Err(GitError::DiscardStashFailed {
-                    stash_id: stash_id.to_string(),
-                }))?;
+            self.spawn_and_await(repo_path, ["stash", "drop", stash_id])?;
         }
 
         Ok(())
@@ -852,21 +840,23 @@ impl GitHandler for CmdGit {
         channel: &Channel<AppMessage>,
         repo_path: &str,
     ) -> Result<Vec<models::TagInfo>, GitError> {
-        let process = self.spawn_and_notify(
+        let args = ["for-each-ref", "refs/tags", TAG_INFO_FORMAT];
+        let output = self.spawn_and_get_output(
             channel,
             repo_path,
             ["for-each-ref", "refs/tags", TAG_INFO_FORMAT],
         )?;
-
-        let output = self.get_all_output(process)?;
         let segments = output.split('\0');
 
         segments
             .collect::<Vec<&str>>()
             .chunks_exact(8)
             .map(|chunk| {
-                parse_tag_info(&chunk.iter().skip(1).map(|&s| s.to_string()).collect())
-                    .ok_or(GitError::GetTagsFailed {})
+                parse_tag_info(&chunk.iter().skip(1).map(|&s| s.to_string()).collect()).ok_or(
+                    GitError::ParseCommandOutputFailed {
+                        command: format!("git {}", args.join(" ")),
+                    },
+                )
             })
             .collect()
     }
@@ -886,18 +876,10 @@ impl GitHandler for CmdGit {
         }
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::TagFailed {
-                name: tag_name.to_string(),
-                reference: reference.to_string(),
-            }))
     }
 
     fn push_tag(&self, repo_path: &str, tag: &str, remote: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["push", remote, tag])
-            .or(Err(GitError::PushTagFailed {
-                tag: tag.to_string(),
-                remote: remote.to_string(),
-            }))
     }
 
     fn delete_local_tags(&self, repo_path: &str, tag_names: &Vec<&str>) -> Result<(), GitError> {
@@ -905,7 +887,6 @@ impl GitHandler for CmdGit {
         args.extend(tag_names);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::DeleteTagsFailed {}))
     }
 
     fn delete_remote_tags(
@@ -918,7 +899,6 @@ impl GitHandler for CmdGit {
         args.extend(tag_names);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::DeleteTagsFailed {}))
     }
 
     fn get_file_contents(
@@ -928,18 +908,11 @@ impl GitHandler for CmdGit {
         reference: &str,
         filepath: &str,
     ) -> Result<String, GitError> {
-        let process = self.spawn_and_notify(
+        self.spawn_and_get_output(
             channel,
             repo_path,
             ["show", &format!("{}:{}", reference, filepath)],
-        )?;
-
-        Ok(self
-            .get_all_output(process)
-            .or(Err(GitError::GetFileContentsFailed {
-                reference: reference.to_string(),
-                filepath: filepath.to_string(),
-            }))?)
+        )
     }
 
     fn solve_file_conflicts(
@@ -957,54 +930,42 @@ impl GitHandler for CmdGit {
         }
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::SolveFileConflictsFailed {}))
     }
 
     fn abort_merge(&self, repo_path: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["merge", "--abort"])
-            .or(Err(GitError::AbortMergeFailed {}))
     }
 
     fn continue_merge(&self, repo_path: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["merge", "--continue"])
-            .or(Err(GitError::ContinueMergeFailed {}))
     }
 
     fn abort_rebase(&self, repo_path: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["rebase", "--abort"])
-            .or(Err(GitError::AbortRebaseFailed {}))
     }
 
     fn continue_rebase(&self, repo_path: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["rebase", "--continue"])
-            .or(Err(GitError::ContinueRebaseFailed {}))
     }
 
     fn continue_cherry_pick(&self, repo_path: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["cherry-pick", "--continue"])
-            .or(Err(GitError::ContinueCherryPickFailed {}))
     }
 
     fn abort_cherry_pick(&self, repo_path: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["cherry-pick", "--abort"])
-            .or(Err(GitError::AbortCherryPickFailed {}))
     }
 
     fn continue_revert(&self, repo_path: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["revert", "--continue"])
-            .or(Err(GitError::ContinueRevertFailed {}))
     }
 
     fn abort_revert(&self, repo_path: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["revert", "--abort"])
-            .or(Err(GitError::AbortRevertFailed {}))
     }
 
     fn merge(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
         self.spawn_and_await(repo_path, ["merge", reference])
-            .or(Err(GitError::MergeFailed {
-                reference: reference.to_string(),
-            }))
     }
 
     fn cherry_pick(
@@ -1024,7 +985,6 @@ impl GitHandler for CmdGit {
         args.extend(references);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::CherryPickFailed {}))
     }
 
     fn revert_commit(
@@ -1044,8 +1004,5 @@ impl GitHandler for CmdGit {
         args.push(reference);
 
         self.spawn_and_await(repo_path, args)
-            .or(Err(GitError::RevertCommitFailed {
-                reference: reference.to_string(),
-            }))
     }
 }

@@ -6,8 +6,8 @@ import {
   DecoratedButton,
   type DecoratedButtonProps,
 } from '@/lib/DecoratedButton'
-import type { ButtonStatus } from '@/ui/Button'
 import { propsWithCn } from '@/utils/styles'
+import type { Status } from '@/utils/types'
 
 import { Toolbar } from '..'
 
@@ -21,7 +21,7 @@ interface BaseToolbarItemProps extends Ariakit.ToolbarItemProps {
   /**
    * The status of the item.
    */
-  status?: ButtonStatus
+  status?: Status
 }
 
 type ToolbarItemProps<T = void> =

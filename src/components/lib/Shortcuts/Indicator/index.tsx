@@ -3,9 +3,9 @@ import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
 import { useSettings } from '@/state/storage'
-import type { ButtonStatus } from '@/ui/Button'
 import { capitalize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
+import type { Status } from '@/utils/types'
 
 import {
   getShortcutKeyFromEvent,
@@ -31,7 +31,7 @@ interface ShortcutIndicatorProps extends Ariakit.RoleProps {
   /**
    * The status of the indicator.
    */
-  status?: ButtonStatus
+  status?: Status
 }
 
 /**

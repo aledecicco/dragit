@@ -1,11 +1,12 @@
 import { match } from 'ts-pattern'
 
 import { type AnyAction, useActionPresenters } from '@/state/actions'
-import { Button, type ButtonProps, type ButtonStatus } from '@/ui/Button'
+import { Button, type ButtonProps } from '@/ui/Button'
 import { type Glyph, Icon, type IconProps } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { Tooltip } from '@/ui/Tooltip'
 import { propsWithCn } from '@/utils/styles'
+import type { Status } from '@/utils/types'
 
 interface BaseDecoratedButtonProps extends ButtonProps {
   /**
@@ -60,7 +61,7 @@ const TrackerDecoratedButton = (props: TrackerDecoratedButtonProps) => {
 
   const { label, Glyph, actionStatus } = useActionPresenters(track)
   const buttonStatus = match(actionStatus)
-    .returnType<ButtonStatus>()
+    .returnType<Status>()
     .with('idle', () => buttonProps.status ?? 'neutral')
     .with('running', () => buttonProps.status ?? 'neutral')
     .with('success', () => 'success')

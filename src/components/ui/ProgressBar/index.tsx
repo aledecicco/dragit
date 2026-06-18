@@ -2,8 +2,7 @@ import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
 import { cn, propsWithCn } from '@/utils/styles'
-
-import type { ButtonStatus } from '../Button'
+import type { Status } from '@/utils/types'
 
 interface ProgressBarProps extends ComponentProps<'div'> {
   /**
@@ -14,7 +13,7 @@ interface ProgressBarProps extends ComponentProps<'div'> {
   /**
    * Status of the progress bar to control its styles.
    */
-  status?: ButtonStatus
+  status?: Status
 }
 
 /**

@@ -250,7 +250,12 @@ impl DebouncedWatcher {
                     }
                 }
                 Err(_errs) => {
-                    // TODO: warn frontend about possible unsync
+                    let _ = app_handle.emit(
+                        EVENT_ID,
+                        AppEvent::FileWatcherMissed {
+                            repo_path: pathname.to_string(),
+                        },
+                    );
                 }
             };
         }

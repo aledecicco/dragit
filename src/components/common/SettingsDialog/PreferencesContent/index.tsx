@@ -48,6 +48,11 @@ const SettingsDialogPreferencesContent = () => {
                 setting="confirmDangerousActions"
                 description="e.g. deleting branches, force pushing"
               />
+              <CheckboxSetting
+                label="Show toasts if something goes wrong"
+                setting="showToasts"
+                description="Display warning and error toasts when operations fail"
+              />
 
               <CheckboxSetting
                 label="Auto-refresh remote"

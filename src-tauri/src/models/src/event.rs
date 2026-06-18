@@ -1,12 +1,15 @@
 pub static EVENT_ID: &str = "app-event";
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(
     rename_all = "camelCase",
     rename_all_fields = "camelCase",
     tag = "type"
 )]
 pub enum AppEvent {
+    /// The frontend is ready to receive events.
+    FrontendReady,
+
     /// The storage was updated.
     StorageUpdated,
 
@@ -42,6 +45,8 @@ pub enum AppEvent {
 
     /// The tags were updated.
     TagsUpdated { repo_path: String },
+
+    FileWatcherMissed { repo_path: String  },
 }
 
 #[derive(Debug, Clone, serde::Serialize)]

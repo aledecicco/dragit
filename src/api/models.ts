@@ -16,6 +16,7 @@ export interface Settings {
   fileOpenerApp: string
   openLastOnStart: boolean
   confirmDangerousActions: boolean
+  showToasts: boolean
   autoFetchRemote: boolean
   askForStashMessage: boolean
 
@@ -290,9 +291,11 @@ export type AppMessage = {
 }
 
 export type AppEvent =
+  | { type: 'frontendReady' }
   | { type: 'storageUpdated' }
   | { type: 'dirChanged' }
   | { type: 'dirDisappeared'; repoPath: string }
+  | { type: 'fileWatcherMissed'; filePath: string }
   | { type: 'gitFolderModified'; repoPath: string }
   | { type: 'branchesListUpdated'; repoPath: string }
   | { type: 'branchUpdated'; repoPath: string; name: string }

@@ -1,5 +1,5 @@
 use std::path::Path;
-use tauri::{Emitter, Manager};
+use tauri::{Emitter, Listener, Manager};
 
 use git_handler::cmd_git::CmdGit;
 use models::{AppEvent, AppState, RepoWatcher, EVENT_ID};
@@ -29,12 +29,23 @@ pub fn run() {
                     if Path::new(&last).is_dir() {
                         repo_watcher.watch_repository(&last)?;
                     } else {
-                        let _ = app_handle.emit(
-                            EVENT_ID,
-                            AppEvent::DirDisappeared {
-                                repo_path: last.to_string(),
-                            },
-                        );
+                        let new_handle = app_handle.clone();
+                        let dir_path = last.clone();
+
+                        app_handle.once(EVENT_ID, move |event| {
+                            if let Ok(payload) = serde_json::from_str::<AppEvent>(&event.payload())
+                            {
+                                if let AppEvent::FrontendReady = payload {
+                                    let _ = new_handle.emit(
+                                        EVENT_ID,
+                                        AppEvent::DirDisappeared {
+                                            repo_path: dir_path.to_string(),
+                                        },
+                                    );
+                                }
+                            }
+                        });
+
                         let _ = remove_recent_folder(app_handle, &last);
                         let _ = remove_last_opened(app_handle);
                     }

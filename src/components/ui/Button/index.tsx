@@ -2,11 +2,9 @@ import * as Ariakit from '@ariakit/react'
 import { match } from 'ts-pattern'
 
 import { propsWithCn } from '@/utils/styles'
-import type { Size } from '@/utils/types'
+import type { Size, Status } from '@/utils/types'
 
 type ButtonVariant = 'filled' | 'plain'
-
-type ButtonStatus = 'primary' | 'neutral' | 'success' | 'warning' | 'danger'
 
 interface ButtonProps extends Ariakit.ButtonProps {
   /**
@@ -17,7 +15,7 @@ interface ButtonProps extends Ariakit.ButtonProps {
   /**
    * The status of the button, which affects its color and style.
    */
-  status?: ButtonStatus
+  status?: Status
 
   /**
    * Whether the button should be round, with a square aspect ratio.
@@ -182,4 +180,4 @@ const Button = (props: ButtonProps) => {
   )
 }
 
-export { Button, type ButtonProps, type ButtonVariant, type ButtonStatus }
+export { Button, type ButtonProps, type ButtonVariant }

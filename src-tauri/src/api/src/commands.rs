@@ -61,7 +61,9 @@ pub async fn set_settings(
     app_handle: AppHandle,
     settings: PartialSettings,
 ) -> Result<(), AppError> {
-    patch_settings(&app_handle, &settings).or(Err(AppError::UpdateStorageFailed {}))?;
+    patch_settings(&app_handle, &settings).map_err(|err| AppError::UpdateStorageFailed {
+        reason: err.to_string(),
+    })?;
 
     let _ = app_handle.emit(EVENT_ID, AppEvent::StorageUpdated);
 
@@ -75,8 +77,11 @@ pub async fn set_repository_storage(
     repo_path: &str,
     storage: PartialRepositoryStorage,
 ) -> Result<(), AppError> {
-    patch_repository_storage(&app_handle, repo_path, &storage)
-        .or(Err(AppError::UpdateStorageFailed {}))?;
+    patch_repository_storage(&app_handle, repo_path, &storage).map_err(|err| {
+        AppError::UpdateStorageFailed {
+            reason: err.to_string(),
+        }
+    })?;
 
     let _ = app_handle.emit(EVENT_ID, AppEvent::StorageUpdated);
 
