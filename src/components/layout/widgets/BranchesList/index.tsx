@@ -3,22 +3,27 @@ import { IconGitBranch, IconTags } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo, TagInfo } from '@/api/models'
-import { useMakeCreateBranchAt } from '@/api/mutations/createBranch'
-import { useMakeTagBranch, useMakeTagCommit } from '@/api/mutations/createTag'
-import { useDeleteBranches } from '@/api/mutations/deleteBranches'
-import { useDeleteTags } from '@/api/mutations/deleteTags'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
-import { requestBranchName } from '@/common/CreateBranchDialog'
-import { requestTagParams } from '@/common/CreateTagDialog'
-import { interaction } from '@/lib/ActionButton/utils'
+import {
+  useCreateBranchAtSomeBranchInteraction,
+  useCreateBranchAtSomeCommitInteraction,
+  useDeleteBranchesInteraction,
+  useGetBranchesListInteractions,
+} from '@/interactions/branch'
+import {
+  useDeleteTagsInteraction,
+  useGetTagsListInteractions,
+  useTagSomeBranchInteraction,
+  useTagSomeCommitInteraction,
+} from '@/interactions/tag'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
-import { type AnyInteraction, triggerInteraction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/storage'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
@@ -54,10 +59,13 @@ const BranchesList = (props: BranchesListProps) => {
 
   const getBranchesListInteractions = useGetBranchesListInteractions()
   const getTagsListInteractions = useGetTagsListInteractions()
+  const deleteBranches = useDeleteBranchesInteraction()
+  const deleteTags = useDeleteTagsInteraction()
 
-  const makeTagBranch = useMakeTagBranch()
-  const makeTagCommit = useMakeTagCommit()
-  const makeCreateBranchAt = useMakeCreateBranchAt()
+  const tagDroppedCommit = useTagSomeCommitInteraction()
+  const tagDroppedBranch = useTagSomeBranchInteraction()
+  const createBranchAtDroppedCommit = useCreateBranchAtSomeCommitInteraction()
+  const createBranchAtDroppedBranch = useCreateBranchAtSomeBranchInteraction()
 
   const ref = useRef<HTMLDivElement>(null)
   const settings = useSettings()
@@ -71,9 +79,6 @@ const BranchesList = (props: BranchesListProps) => {
       ref.current?.focus()
     }
   })
-
-  const deleteBranches = useDeleteBranches()
-  const deleteTags = useDeleteTags()
 
   return (
     <DropArea
@@ -96,34 +101,20 @@ const BranchesList = (props: BranchesListProps) => {
       handleDrop={(payload) => {
         if (tabsHandler.selectedTab === 'tags') {
           match(payload)
-            .with({ type: 'commit' }, (payload) => {
-              triggerInteraction({
-                action: makeTagCommit(payload.dragged),
-                argsRequester: () =>
-                  requestTagParams(`#${payload.dragged.shortHash}`),
-              })
+            .with({ type: 'commit' }, ({ dragged }) => {
+              triggerInteraction(tagDroppedCommit(dragged))
             })
-            .with({ type: 'branch' }, (payload) => {
-              triggerInteraction({
-                action: makeTagBranch(payload.dragged),
-                argsRequester: () => requestTagParams(payload.dragged.name),
-              })
+            .with({ type: 'branch' }, ({ dragged }) => {
+              triggerInteraction(tagDroppedBranch(dragged))
             })
             .exhaustive()
         } else {
           match(payload)
-            .with({ type: 'commit' }, (payload) => {
-              triggerInteraction({
-                action: makeCreateBranchAt(payload.dragged.id),
-                argsRequester: () =>
-                  requestBranchName(`#${payload.dragged.shortHash}`),
-              })
+            .with({ type: 'commit' }, ({ dragged }) => {
+              triggerInteraction(createBranchAtDroppedCommit(dragged))
             })
-            .with({ type: 'branch' }, (payload) => {
-              triggerInteraction({
-                action: makeCreateBranchAt(payload.dragged.name),
-                argsRequester: () => requestBranchName(payload.dragged.name),
-              })
+            .with({ type: 'branch' }, ({ dragged }) => {
+              triggerInteraction(createBranchAtDroppedBranch(dragged))
             })
             .exhaustive()
         }
@@ -214,12 +205,7 @@ const BranchesList = (props: BranchesListProps) => {
             getInteractions={getTagsListInteractions}
             getDragPayload={getTagsDragPayload}
             deleteAction={(tags) => {
-              triggerInteraction({
-                action: deleteTags,
-                argsRequester: () => tags,
-                isDangerous: true,
-                details: `delete ${tags.length} tags`,
-              })
+              triggerInteraction(deleteTags(tags))
             }}
           >
             <QueryList
@@ -242,12 +228,7 @@ const BranchesList = (props: BranchesListProps) => {
             getInteractions={getBranchesListInteractions}
             getDragPayload={getBranchesDragPayload}
             deleteAction={(branches) => {
-              triggerInteraction({
-                action: deleteBranches,
-                argsRequester: () => branches,
-                isDangerous: true,
-                details: `delete ${branches.length} branches`,
-              })
+              triggerInteraction(deleteBranches(branches))
             }}
           >
             <QueryList
@@ -287,35 +268,5 @@ const getTagsDragPayload = (tags: TagInfo[] | undefined): DragPayload => ({
   label: pluralize('tag', tags?.length ?? 0, true),
   Glyph: IconTags,
 })
-
-const useGetBranchesListInteractions = () => {
-  const deleteBranches = useDeleteBranches()
-
-  return (branches: BranchInfo[]): AnyInteraction[][] => [
-    [
-      interaction({
-        action: deleteBranches,
-        argsRequester: () => branches,
-        isDangerous: true,
-        details: `delete ${pluralize('branch', branches.length, true, 'branches')}`,
-      }),
-    ],
-  ]
-}
-
-const useGetTagsListInteractions = () => {
-  const deleteTags = useDeleteTags()
-
-  return (tags: TagInfo[]): AnyInteraction[][] => [
-    [
-      interaction({
-        action: deleteTags,
-        argsRequester: () => tags,
-        isDangerous: true,
-        details: `delete ${pluralize('tag', tags.length, true)}`,
-      }),
-    ],
-  ]
-}
 
 export { BranchesList, type BranchesListProps }

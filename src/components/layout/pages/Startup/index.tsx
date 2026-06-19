@@ -4,19 +4,18 @@ import { IconReload } from '@tabler/icons-react'
 import logo from '@/assets/logo.png'
 
 import type { CurrentDirInfo } from '@/api/models'
-import { useInitRepository } from '@/api/mutations/initRepository'
-import {
-  useMakeOpenRecentFolder,
-  useOpenFolder,
-} from '@/api/mutations/openFolder'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { useQueryStorage } from '@/api/queries/storage'
 import { FilePath } from '@/common/File/Path'
+import {
+  useInitRepositoryInteraction,
+  useOpenFolderInteraction,
+  useOpenSomeRecentFolderInteraction,
+} from '@/interactions/folder'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { QueryLoader } from '@/lib/QueryLoader'
 import { Marquee } from '@/ui/Marquee'
-import { chooseDirectory } from '@/utils/behavior'
 import { getErrorMessage } from '@/utils/error'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -76,7 +75,7 @@ const StartupPage = () => {
 const InFolder = (props: { currentDir: CurrentDirInfo }) => {
   const { currentDir } = props
 
-  const initRepository = useInitRepository()
+  const initRepository = useInitRepositoryInteraction()
 
   return (
     <StartupPageInner className={cn('col-start-2')}>
@@ -102,7 +101,7 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
       <div className={cn('flex flex-col gap-2')}>
         {currentDir.exists && !currentDir.isRepository && (
           <ActionButton
-            action={initRepository}
+            {...initRepository}
             size="lg"
             variant="filled"
             status="primary"
@@ -138,27 +137,18 @@ const StartupPageInner = (props: ComponentProps<'div'>) => {
 }
 
 const OpenFolderButton = () => {
-  const openFolder = useOpenFolder()
+  const openFolder = useOpenFolderInteraction()
+  const openRecentFolder = useOpenSomeRecentFolderInteraction()
 
   const storageQuery = useQueryStorage()
-  const makeOpenRecentFolder = useMakeOpenRecentFolder()
 
   return (
     <ActionButton
-      action={openFolder}
-      argsRequester={async () => {
-        const path = await chooseDirectory()
-
-        if (!path) {
-          throw new Error('No folder selected')
-        }
-
-        return path
-      }}
+      {...openFolder}
       alternatives={
-        storageQuery.data?.recentFolders.map((recentFolder) => ({
-          action: makeOpenRecentFolder(recentFolder),
-        })) || []
+        storageQuery.data?.recentFolders.map((folder) =>
+          openRecentFolder(folder),
+        ) || []
       }
       menuButtonProps={{
         label: 'View recent folders',

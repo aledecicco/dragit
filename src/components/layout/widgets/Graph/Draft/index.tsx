@@ -6,13 +6,14 @@ import { mergeRefs } from 'react-merge-refs'
 import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStaged'
 import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
 
-import { useStageAll } from '@/api/mutations/addToIndex'
-import { useCommit } from '@/api/mutations/commitIndex'
 import {
   useQueryWorktreeFiles,
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
-import { requestCommitParams } from '@/common/CommitDialog'
+import {
+  useCommitInteraction,
+  useStageAllInteraction,
+} from '@/interactions/operations'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { useWorktreeFilesPage } from '@/state/pages'
 import { Marquee } from '@/ui/Marquee'
@@ -80,8 +81,8 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
       notStagedPage * WORKTREE_FILES_PAGE_SIZE +
       (notStagedChangesQuery.data?.items.length ?? 0)
 
-    const stageAll = useStageAll()
-    const commit = useCommit()
+    const stageAll = useStageAllInteraction()
+    const commit = useCommitInteraction()
 
     return (
       <div
@@ -170,7 +171,7 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
                         <ToolbarItem
                           className={cn('rounded-t-none rounded-b-xs')}
                           status="neutral"
-                          action={stageAll}
+                          {...stageAll}
                           disabled={!hasNotStagedChanges}
                           size="sm"
                           compact={false}
@@ -180,8 +181,7 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
                         <ToolbarItem
                           className={cn('rounded-t-none rounded-b-xs')}
                           status="neutral"
-                          action={commit}
-                          argsRequester={requestCommitParams}
+                          {...commit}
                           disabled={!hasStagedChanges}
                           size="sm"
                           compact={false}

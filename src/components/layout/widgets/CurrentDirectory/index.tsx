@@ -1,12 +1,11 @@
-import {
-  useChangeCurrentFolder,
-  useMakeOpenRecentFolder,
-} from '@/api/mutations/openFolder'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
+import {
+  useChangeFolderInteraction,
+  useOpenSomeRecentFolderInteraction,
+} from '@/interactions/folder'
 import { ActionButton } from '@/lib/ActionButton'
 import { useStorage } from '@/state/storage'
 import type { ButtonProps } from '@/ui/Button'
-import { chooseDirectory } from '@/utils/behavior'
 import { propsWithCn } from '@/utils/styles'
 
 interface CurrentDirectoryProps extends Partial<ButtonProps> {}
@@ -18,8 +17,8 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
   const { ...buttonProps } = props
 
   const currentDirQuery = useQueryCurrentDir()
-  const changeFolder = useChangeCurrentFolder()
-  const makeOpenRecentFolder = useMakeOpenRecentFolder()
+  const changeFolder = useChangeFolderInteraction()
+  const openRecentFolder = useOpenSomeRecentFolderInteraction()
 
   const { recentFolders } = useStorage()
   const recentOptions = recentFolders.filter(
@@ -28,19 +27,8 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
 
   return (
     <ActionButton
-      action={changeFolder}
-      argsRequester={async () => {
-        const path = await chooseDirectory()
-
-        if (!path) {
-          throw new Error('No folder selected')
-        }
-
-        return path
-      }}
-      alternatives={recentOptions.map((recentFolder) => ({
-        action: makeOpenRecentFolder(recentFolder),
-      }))}
+      {...changeFolder}
+      alternatives={recentOptions.map((folder) => openRecentFolder(folder))}
       menuButtonProps={{
         label: 'View recent folders',
         disabled: !recentOptions.length,

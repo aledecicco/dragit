@@ -50,13 +50,8 @@ const useMakeRenameRemote = (): ((name: RemoteName) => Action<RemoteName>) => {
   })
 }
 
-const useRenameRemote = (name: RemoteName): Action<RemoteName> => {
-  return useMakeRenameRemote()(name)
-}
-
 export {
   useMakeRenameRemote,
-  useRenameRemote,
   renameRemoteKey,
   renameRemoteMutation,
   type RenameRemoteArgs,

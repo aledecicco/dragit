@@ -1,15 +1,12 @@
-import { useStageFiles } from '@/api/mutations/addToIndex'
-import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
-import { useStashFiles } from '@/api/mutations/saveStash'
-import { requestWorktreeFiles } from '@/common/FileSelectorDialog'
-import { requestStashParams } from '@/common/StashDialog'
-import { getSettings, useSettings } from '@/state/storage'
+import {
+  useSelectAndStageFilesInteraction,
+  useSelectAndStashFilesInteraction,
+  useSelectAndUnstageFilesInteraction,
+} from '@/interactions/file'
+import { useSettings } from '@/state/storage'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 import { propsWithCn } from '@/utils/styles'
-
-import { NOT_STAGED_FILE_TYPES } from '../WorktreeChanges/NotStaged'
-import { STAGED_FILE_TYPES } from '../WorktreeChanges/Staged'
 
 interface MainToolbarProps extends Partial<Omit<ToolbarProps, 'fixed'>> {}
 
@@ -19,51 +16,39 @@ interface MainToolbarProps extends Partial<Omit<ToolbarProps, 'fixed'>> {}
 const MainToolbar = (props: MainToolbarProps) => {
   const { ...toolbarProps } = props
 
-  const stageFiles = useStageFiles()
-  const unstageFiles = useUnstageFiles()
-  const stashFiles = useStashFiles()
+  const stageFiles = useSelectAndStageFilesInteraction()
+  const unstageFiles = useSelectAndUnstageFilesInteraction()
+  const stashFiles = useSelectAndStashFilesInteraction()
 
   const settings = useSettings()
 
   return (
     <Toolbar {...propsWithCn(toolbarProps, 'grid-cols-[7fr_8fr_7fr]')} fixed>
       <ToolbarItem
-        fixed
-        status="primary"
-        size="md"
-        compact={false}
-        action={stageFiles}
-        argsRequester={() => requestWorktreeFiles(NOT_STAGED_FILE_TYPES)}
+        {...stageFiles}
         shortcut={settings.stageFilesShortcut}
-      />
-
-      <ToolbarItem
         fixed
         status="primary"
         size="md"
         compact={false}
-        action={unstageFiles}
-        argsRequester={() => requestWorktreeFiles(STAGED_FILE_TYPES)}
+      />
+
+      <ToolbarItem
+        {...unstageFiles}
         shortcut={settings.unstageFilesShortcut}
-      />
-
-      <ToolbarItem
         fixed
         status="primary"
         size="md"
         compact={false}
-        action={stashFiles}
-        argsRequester={async () => {
-          const files = await requestWorktreeFiles(NOT_STAGED_FILE_TYPES)
+      />
 
-          const { askForStashMessage } = getSettings()
-          const message = askForStashMessage
-            ? (await requestStashParams()).message
-            : null
-
-          return { files, message }
-        }}
+      <ToolbarItem
+        {...stashFiles}
         shortcut={settings.stashFilesShortcut}
+        fixed
+        status="primary"
+        size="md"
+        compact={false}
       />
     </Toolbar>
   )

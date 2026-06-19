@@ -2,14 +2,13 @@ import type { ComponentProps } from 'react'
 import { IconTrashFilled } from '@tabler/icons-react'
 import { match, P } from 'ts-pattern'
 
-import { useDeleteBranches } from '@/api/mutations/deleteBranches'
-import { useDeleteTags } from '@/api/mutations/deleteTags'
-import { useDiscardStashes } from '@/api/mutations/discardStashes'
-import { useDiscardChanges } from '@/api/mutations/restore'
+import { useDeleteBranchesInteraction } from '@/interactions/branch'
+import { useDiscardFilesInteraction } from '@/interactions/file'
+import { useDiscardStashesInteraction } from '@/interactions/stash'
+import { useDeleteTagsInteraction } from '@/interactions/tag'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { triggerInteraction } from '@/state/actions'
 import { useCurrentBranch } from '@/utils/repository'
-import { pluralize } from '@/utils/string'
 import { cn } from '@/utils/styles'
 
 interface RecyclingBinProps extends ComponentProps<'div'> {}
@@ -22,10 +21,10 @@ const RecyclingBin = (props: RecyclingBinProps) => {
 
   const currentBranch = useCurrentBranch()
 
-  const deleteBranches = useDeleteBranches()
-  const deleteTags = useDeleteTags()
-  const discardStashes = useDiscardStashes()
-  const discardFiles = useDiscardChanges()
+  const deleteBranches = useDeleteBranchesInteraction()
+  const discardStashes = useDiscardStashesInteraction()
+  const deleteTags = useDeleteTagsInteraction()
+  const discardFiles = useDiscardFilesInteraction()
 
   return (
     <DropArea
@@ -68,62 +67,27 @@ const RecyclingBin = (props: RecyclingBinProps) => {
       handleDrop={(payload) => {
         match(payload)
           .with({ type: 'branch' }, ({ dragged }) => {
-            triggerInteraction({
-              action: deleteBranches,
-              argsRequester: () => [dragged],
-              isDangerous: true,
-              details: `delete ${dragged.type} branch "${dragged.name}"`,
-            })
+            triggerInteraction(deleteBranches([dragged]))
           })
           .with({ type: 'branches' }, ({ dragged }) => {
-            triggerInteraction({
-              action: deleteBranches,
-              argsRequester: () => dragged,
-              isDangerous: true,
-              details: `delete ${pluralize('branch', dragged.length, true, 'branches')}`,
-            })
+            triggerInteraction(deleteBranches(dragged))
           })
           .with({ type: 'stash' }, ({ dragged }) => {
-            triggerInteraction({
-              action: discardStashes,
-              argsRequester: () => [dragged],
-              isDangerous: true,
-              details: `discard stash #${dragged.id}`,
-            })
+            triggerInteraction(discardStashes([dragged]))
           })
           .with({ type: 'stashes' }, ({ dragged }) => {
-            triggerInteraction({
-              action: discardStashes,
-              argsRequester: () => dragged,
-              isDangerous: true,
-              details: `discard ${pluralize('stash', dragged.length, true, 'stashes')}`,
-            })
+            triggerInteraction(discardStashes(dragged))
           })
           .with({ type: 'tag' }, ({ dragged }) => {
-            triggerInteraction({
-              action: deleteTags,
-              argsRequester: () => [dragged],
-              isDangerous: true,
-              details: `delete tag "${dragged.name}"`,
-            })
+            triggerInteraction(deleteTags([dragged]))
           })
           .with({ type: 'tags' }, ({ dragged }) => {
-            triggerInteraction({
-              action: deleteTags,
-              argsRequester: () => dragged,
-              isDangerous: true,
-              details: `delete ${pluralize('tag', dragged.length, true, 'tags')}`,
-            })
+            triggerInteraction(deleteTags(dragged))
           })
           .with(
             { type: P.union('not-staged-files', 'staged-files') },
             ({ dragged }) => {
-              triggerInteraction({
-                action: discardFiles,
-                argsRequester: () => dragged,
-                isDangerous: true,
-                details: `discard changes in ${pluralize('file', dragged.length, true, 'files')}`,
-              })
+              triggerInteraction(discardFiles(dragged))
             },
           )
           .exhaustive()

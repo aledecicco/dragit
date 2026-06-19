@@ -53,10 +53,6 @@ const useMakeTagBranch = (): ((branch: BranchInfo) => TagAction) => {
   })
 }
 
-const useTagBranch = (branch: BranchInfo): TagAction => {
-  return useMakeTagBranch()(branch)
-}
-
 const useMakeTagCommit = (): ((commit: CommitInfo) => TagAction) => {
   const createTag = useRepositoryMutation(createTagMutation)
 
@@ -80,15 +76,9 @@ const useMakeTagCommit = (): ((commit: CommitInfo) => TagAction) => {
   })
 }
 
-const useTagCommit = (commit: CommitInfo): TagAction => {
-  return useMakeTagCommit()(commit)
-}
-
 export {
   useMakeTagBranch,
-  useTagBranch,
   useMakeTagCommit,
-  useTagCommit,
   createTagKey,
   createTagMutation,
   type CreateTagArgs,

@@ -2,7 +2,7 @@ import { Fragment, useEffectEvent, useRef } from 'react'
 import { IconCancel, IconDeviceFloppy } from '@tabler/icons-react'
 import { useEffectOnce } from 'react-use'
 
-import { useSetSettings } from '@/api/mutations/setSettings'
+import { useSetSettingInteraction } from '@/interactions/storage'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { ShortcutKey } from '@/lib/Shortcuts/Key'
 import {
@@ -42,18 +42,15 @@ interface ShortcutSettingRecorderProps extends Partial<DialogProps> {
 const ShortcutSettingRecorder = (props: ShortcutSettingRecorderProps) => {
   const { action, setting, recorder, ...dialogProps } = props
 
-  const setSettings = useSetSettings()
+  const setSettingInteraction = useSetSettingInteraction()
   const pressedKeys = useRef<ShortcutKeys>(new Set())
 
   const hasRecording = useEffectEvent(() => recorder.recorded.size > 0)
 
   const saveRecording = useEffectEvent(() => {
-    triggerInteraction({
-      action: setSettings,
-      argsRequester: () => ({
-        [setting]: formatShortcut(getShortcutSequence(recorder.recorded)),
-      }),
-    })
+    triggerInteraction(
+      setSettingInteraction(setting, formatShortcut(getShortcutSequence(recorder.recorded))),
+    )
     recorder.stop()
   })
 

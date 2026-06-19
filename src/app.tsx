@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { enableMapSet } from 'immer'
 
 import { InRepositoryPage } from '@/layout/pages/InRepository'

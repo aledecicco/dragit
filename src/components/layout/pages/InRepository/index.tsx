@@ -12,8 +12,8 @@ import { StashesList } from '@/layout/widgets/StashesList'
 import { NotStagedWorktreeChanges } from '@/layout/widgets/WorktreeChanges/NotStaged'
 import { StagedWorktreeChanges } from '@/layout/widgets/WorktreeChanges/Staged'
 
-import { useMakeApplyStash } from '@/api/mutations/applyStash'
 import { showSettingsDialog } from '@/common/SettingsDialog'
+import { useApplySomeStashInteraction } from '@/interactions/stash'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { triggerInteraction } from '@/state/actions'
@@ -34,8 +34,8 @@ const InRepositoryPage = () => {
   useUpstreamsSync()
   useFileDiffsSync()
 
-  const makeApplyStash = useMakeApplyStash()
   const selectedFile = useSelectedFile()
+  const applyStash = useApplySomeStashInteraction()
 
   return (
     <>
@@ -51,8 +51,8 @@ const InRepositoryPage = () => {
           label={{
             stash: 'apply stash changes',
           }}
-          handleDrop={(payload) => {
-            triggerInteraction({ action: makeApplyStash(payload.dragged) })
+          handleDrop={({ dragged }) => {
+            triggerInteraction(applyStash(dragged))
           }}
           className={cn('grid grid-rows-2 gap-4 mb-2 overflow-hidden')}
         >

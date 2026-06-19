@@ -24,3 +24,5 @@ target
 *.njsproj
 *.sln
 *.sw?
+# CocoIndex Code (ccc)
+/.cocoindex_code/

@@ -53,10 +53,6 @@ const useMakeMergeBranch = (): ((branch: BranchInfo) => Action) => {
   })
 }
 
-const useMergeBranch = (branch: BranchInfo): Action => {
-  return useMakeMergeBranch()(branch)
-}
-
 const useMakeMergeTag = (): ((tag: TagInfo) => Action) => {
   const merge = useRepositoryMutation(mergeMutation)
 
@@ -79,10 +75,6 @@ const useMakeMergeTag = (): ((tag: TagInfo) => Action) => {
       error: 'Merge failed',
     },
   })
-}
-
-const useMergeTag = (tag: TagInfo): Action => {
-  return useMakeMergeTag()(tag)
 }
 
 const useMakeMergeCommit = (): ((commit: CommitId) => Action) => {
@@ -109,17 +101,10 @@ const useMakeMergeCommit = (): ((commit: CommitId) => Action) => {
   })
 }
 
-const useMergeCommit = (commit: CommitId): Action => {
-  return useMakeMergeCommit()(commit)
-}
-
 export {
   useMakeMergeBranch,
-  useMergeBranch,
   useMakeMergeTag,
-  useMergeTag,
   useMakeMergeCommit,
-  useMergeCommit,
   mergeKey,
   mergeMutation,
   type MergeArgs,

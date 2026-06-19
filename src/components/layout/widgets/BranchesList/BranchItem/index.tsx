@@ -2,21 +2,12 @@ import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@/api/models'
-import { useCheckoutBranch } from '@/api/mutations/checkout'
 import {
-  useBranchOff,
-  useCreateBranchAt,
-  useTrackBranch,
-} from '@/api/mutations/createBranch'
-import { useTagBranch } from '@/api/mutations/createTag'
-import { useDeleteBranch } from '@/api/mutations/deleteBranches'
-import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
-import { useMergeBranch } from '@/api/mutations/merge'
-import { usePullBranch, useRebaseBranch } from '@/api/mutations/pullBranch'
-import { useForcePushBranch, usePushBranch } from '@/api/mutations/pushBranch'
-import { requestBranchName } from '@/common/CreateBranchDialog'
-import { requestTagParams } from '@/common/CreateTagDialog'
-import { group, interaction } from '@/lib/ActionButton/utils'
+  useBranchOffBranchInteraction,
+  useCheckoutBranchInteraction,
+  useDeleteBranchInteraction,
+  useSingleBranchInteractions,
+} from '@/interactions/branch'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractiveItem } from '@/lib/Interactive/Item'
 import {
@@ -49,10 +40,10 @@ const BranchesListItem = (props: BranchesListItemProps) => {
   const remoteCounterpart = useSelectedUpstream(branch)
   const isCurrentBranch = useCurrentBranch()?.name === branch.name
 
-  const interactions = useInteractions(branch)
-  const checkout = useCheckoutBranch(branch)
-  const branchOff = useBranchOff(branch.name)
-  const deleteBranch = useDeleteBranch(branch)
+  const interactions = useSingleBranchInteractions(branch)
+  const checkout = useCheckoutBranchInteraction(branch)
+  const branchOff = useBranchOffBranchInteraction(branch)
+  const deleteBranch = useDeleteBranchInteraction(branch)
 
   return (
     <Draggable
@@ -67,22 +58,14 @@ const BranchesListItem = (props: BranchesListItemProps) => {
         interactions={interactions}
         activationAction={() => {
           if (branch.type === 'remote') {
-            triggerInteraction({
-              action: branchOff,
-              argsRequester: () =>
-                requestBranchName(branch.name, branch.name.split('/').at(-1)),
-            })
+            triggerInteraction(branchOff)
           } else if (!isCurrentBranch) {
-            triggerInteraction({ action: checkout })
+            triggerInteraction(checkout)
           }
         }}
         deleteAction={() => {
           if (!isCurrentBranch) {
-            triggerInteraction({
-              action: deleteBranch,
-              isDangerous: true,
-              details: `delete branch "${branch.name}"`,
-            })
+            triggerInteraction(deleteBranch)
           }
         }}
         render={
@@ -138,80 +121,6 @@ const BranchesListItem = (props: BranchesListItemProps) => {
       </InteractiveItem>
     </Draggable>
   )
-}
-
-const useInteractions = (branch: BranchInfo) => {
-  const isCurrentBranch = useCurrentBranch()?.name === branch.name
-
-  const checkout = useCheckoutBranch(branch)
-  const fastForward = useFastForwardBranch(branch)
-  const pull = usePullBranch(branch)
-  const rebase = useRebaseBranch(branch)
-  const push = usePushBranch(branch)
-  const forcePush = useForcePushBranch(branch)
-  const deleteBranch = useDeleteBranch(branch)
-  const createBranch = useCreateBranchAt(branch.name)
-  const branchOff = useBranchOff(branch.name)
-  const merge = useMergeBranch(branch)
-  const track = useTrackBranch(branch)
-  const tag = useTagBranch(branch)
-
-  const forLocal1 = group(
-    !isCurrentBranch && interaction({ action: checkout }),
-    interaction({ action: isCurrentBranch ? pull : fastForward }),
-    isCurrentBranch && [
-      interaction({ action: rebase }),
-      interaction({ action: push }),
-      interaction({ action: forcePush, isDangerous: true }),
-    ],
-  )
-
-  const forLocal2 = group(
-    interaction({
-      action: createBranch,
-      argsRequester: () => requestBranchName(branch.name),
-    }),
-    interaction({
-      action: branchOff,
-      argsRequester: () => requestBranchName(branch.name),
-    }),
-    interaction({
-      action: tag,
-      argsRequester: () => requestTagParams(branch.name),
-    }),
-    !isCurrentBranch && interaction({ action: merge }),
-  )
-
-  const forRemote = group(
-    interaction({
-      action: track,
-      argsRequester: () =>
-        requestBranchName(branch.name, branch.name.split('/').at(-1)),
-    }),
-    interaction({
-      action: branchOff,
-      argsRequester: () =>
-        requestBranchName(branch.name, branch.name.split('/').at(-1)),
-    }),
-    interaction({
-      action: tag,
-      argsRequester: () => requestTagParams(branch.name),
-    }),
-  )
-
-  const forDelete = group(
-    !isCurrentBranch &&
-      interaction({
-        action: deleteBranch,
-        isDangerous: true,
-        details: `delete ${branch.type} branch "${branch.name}"`,
-      }),
-  )
-
-  return match(branch.type)
-    .with('local', () => [forLocal1, forLocal2, forDelete])
-    .with('remote', () => [forRemote, forDelete])
-    .exhaustive()
 }
 
 export { BranchesListItem, type BranchesListItemProps }

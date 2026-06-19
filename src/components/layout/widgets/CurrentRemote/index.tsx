@@ -8,10 +8,10 @@ import {
 import { useInterval } from 'react-use'
 
 import type { BranchName, RemoteName } from '@/api/models'
-import { useMakeFetchRemote } from '@/api/mutations/fetchRemote'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryRemotes } from '@/api/queries/remotes'
 import { showRemotesDialog } from '@/common/RemotesDialog'
+import { useFetchRemoteInteraction } from '@/interactions/remote'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { triggerInteraction } from '@/state/actions'
@@ -63,13 +63,12 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
         true,
       )
 
-  const makeFetchRemote = useMakeFetchRemote()
-  const fetchRemote = upstream ? makeFetchRemote(upstream.remote) : undefined
+  const fetchRemote = useFetchRemoteInteraction(upstream?.remote)
 
   const settings = useSettings()
   useInterval(() => {
     if (settings.autoFetchRemote && fetchRemote) {
-      triggerInteraction({ action: fetchRemote })
+      triggerInteraction(fetchRemote)
     }
   }, 1 * MS_IN_MINUTE)
 
@@ -168,10 +167,10 @@ const CurrentRemote = (props: CurrentRemoteProps) => {
 
       {fetchRemote && (
         <ActionButton
+          {...fetchRemote}
           compact
           round
           className={cn('ml-2')}
-          action={fetchRemote}
           shortcut={settings.refreshShortcut}
         />
       )}

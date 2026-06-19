@@ -1,12 +1,16 @@
 import { IconGitBranch, IconGitCommit, IconTag } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
-import { useCheckout } from '@/api/mutations/checkout'
-import { useMakeBranchOff } from '@/api/mutations/createBranch'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryTags } from '@/api/queries/tags'
-import { requestBranchName } from '@/common/CreateBranchDialog'
-import { triggerInteraction, useActionPresenters } from '@/state/actions'
+import { useBranchOffSomeBranchInteraction } from '@/interactions/branch'
+import {
+  useCheckoutPresenter,
+  useCheckoutSomeBranchInteraction,
+  useCheckoutSomeTagInteraction,
+  useCreateAndCheckoutBranchInteraction,
+} from '@/interactions/checkout'
+import { triggerInteraction } from '@/state/actions'
 import { Combobox, type ComboboxProps } from '@/ui/Combobox'
 import { ComboboxItem } from '@/ui/Combobox/Item'
 import { ComboboxSection } from '@/ui/Combobox/Section'
@@ -27,10 +31,12 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
 
   const currentReference = useHeadReference()
 
-  const checkout = useCheckout()
-  const checkoutTracker = useActionPresenters(checkout)
+  const checkoutTracker = useCheckoutPresenter()
   // TODO: the action presenter should know about "branch off" actions
-  const makeBranchOff = useMakeBranchOff()
+  const branchOff = useBranchOffSomeBranchInteraction()
+  const checkoutBranch = useCheckoutSomeBranchInteraction()
+  const checkoutTag = useCheckoutSomeTagInteraction()
+  const createAndCheckoutBranch = useCreateAndCheckoutBranchInteraction()
 
   const branchOptions = branchesQuery.data?.map((branch) => branch.name) ?? []
   const tagOptions = tagsQuery.data?.map((tag) => tag.name) ?? []
@@ -66,21 +72,19 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
       <ComboboxSection
         name="branches"
         onSelect={async (value) => {
-          const isRemoteBranch = remoteBranchesQuery.data?.some(
+          const remoteBranch = remoteBranchesQuery.data?.find(
             (branch) => branch.name === value,
           )
 
-          if (isRemoteBranch) {
-            triggerInteraction({
-              action: makeBranchOff(value),
-              argsRequester: () =>
-                requestBranchName(value, value.split('/').at(-1)),
-            })
+          if (remoteBranch) {
+            triggerInteraction(branchOff(remoteBranch))
           } else {
-            triggerInteraction({
-              action: checkout,
-              argsRequester: () => ({ reference: value, isNew: false }),
-            })
+            const localBranch = branchesQuery.data?.find(
+              (branch) => branch.name === value,
+            )
+            if (localBranch) {
+              triggerInteraction(checkoutBranch(localBranch))
+            }
           }
         }}
         options={branchOptions}
@@ -89,10 +93,7 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
             className={cn('text-light-500 italic')}
             value={search}
             onClick={() => {
-              triggerInteraction({
-                action: checkout,
-                argsRequester: () => ({ reference: search, isNew: true }),
-              })
+              triggerInteraction(createAndCheckoutBranch(search))
             }}
           >
             Create branch <b className={cn('text-light-50')}>{search}</b> from
@@ -104,10 +105,10 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
       <ComboboxSection
         name="tags"
         onSelect={(value) => {
-          triggerInteraction({
-            action: checkout,
-            argsRequester: () => ({ reference: value, isNew: false }),
-          })
+          const tag = tagsQuery.data?.find((t) => t.name === value)
+          if (tag) {
+            triggerInteraction(checkoutTag(tag))
+          }
         }}
         options={tagOptions}
       />

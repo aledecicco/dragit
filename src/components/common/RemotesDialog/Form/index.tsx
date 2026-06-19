@@ -1,7 +1,7 @@
 import { IconX } from '@tabler/icons-react'
 
-import { useAddRemote } from '@/api/mutations/addRemote'
 import { useQueryRemotes } from '@/api/queries/remotes'
+import { useAddRemoteInteraction } from '@/interactions/remote'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { triggerInteraction, useActionStatuses } from '@/state/actions'
 import { Form, type FormProps } from '@/ui/Form'
@@ -27,8 +27,8 @@ const RemoteForm = (props: RemoteFormProps) => {
   const { onCancel, ...formProps } = props
 
   const remotesQuery = useQueryRemotes()
-  const addRemote = useAddRemote()
-  const status = useActionStatuses(addRemote)
+  const addRemoteInteraction = useAddRemoteInteraction()
+  const status = useActionStatuses(addRemoteInteraction.action)
 
   const hasDefaultName = !!formProps.defaultValues?.name
 
@@ -39,11 +39,8 @@ const RemoteForm = (props: RemoteFormProps) => {
       onFormSubmit={async (formState, form) => {
         if (formState.values.name && formState.values.url) {
           await triggerInteraction({
-            action: addRemote,
-            argsRequester: () => ({
-              name: formState.values.name,
-              url: formState.values.url,
-            }),
+            ...addRemoteInteraction,
+            argsRequester: () => formState.values,
           })
         }
 
@@ -81,7 +78,7 @@ const RemoteForm = (props: RemoteFormProps) => {
       <DecoratedButton
         type="submit"
         className={cn('w-max')}
-        track={addRemote}
+        track={addRemoteInteraction.action}
         status="primary"
         compact
       />

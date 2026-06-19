@@ -1,13 +1,15 @@
 import type { BranchInfo } from '@/api/models'
-import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
-import { usePullBranch, useRebaseBranch } from '@/api/mutations/pullBranch'
-import { useForcePushBranch, usePushBranch } from '@/api/mutations/pushBranch'
-import { interaction } from '@/lib/ActionButton/utils'
+import {
+  useFastForwardBranchInteraction,
+  useForcePushBranchInteraction,
+  usePullBranchInteraction,
+  usePushBranchInteraction,
+  useRebaseBranchInteraction,
+} from '@/interactions/branch'
 import { useSettings } from '@/state/storage'
 import { useSelectedUpstream } from '@/state/upstream'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
-import { getUpstreamReference } from '@/utils/repository'
 
 interface BranchToolbarProps extends Partial<ToolbarProps> {
   /**
@@ -27,11 +29,11 @@ interface BranchToolbarProps extends Partial<ToolbarProps> {
 const BranchToolbar = (props: BranchToolbarProps) => {
   const { branch, isBase = false, ...toolbarProps } = props
 
-  const push = usePushBranch(branch)
-  const forcePush = useForcePushBranch(branch)
-  const pull = usePullBranch(branch)
-  const rebase = useRebaseBranch(branch)
-  const fastForward = useFastForwardBranch(branch)
+  const push = usePushBranchInteraction(branch)
+  const forcePush = useForcePushBranchInteraction(branch)
+  const pull = usePullBranchInteraction(branch)
+  const rebase = useRebaseBranchInteraction(branch)
+  const fastForward = useFastForwardBranchInteraction(branch)
 
   const upstream = useSelectedUpstream(branch)
 
@@ -40,18 +42,8 @@ const BranchToolbar = (props: BranchToolbarProps) => {
   return (
     <Toolbar {...toolbarProps} fixed>
       <ToolbarItem
-        compact
-        fixed
-        action={isBase ? fastForward : pull}
-        alternatives={
-          isBase
-            ? undefined
-            : [
-                interaction({
-                  action: rebase,
-                }),
-              ]
-        }
+        {...(isBase ? fastForward : pull)}
+        alternatives={isBase ? undefined : [rebase]}
         disabled={
           toolbarProps.disabled ||
           !branch ||
@@ -59,20 +51,12 @@ const BranchToolbar = (props: BranchToolbarProps) => {
           !upstream
         }
         shortcut={isBase ? undefined : settings.pullShortcut}
-      />
-      <ToolbarItem
         compact
         fixed
-        action={push}
-        alternatives={[
-          interaction({
-            action: forcePush,
-            isDangerous: true,
-            details:
-              upstream &&
-              `force push "${branch.name}" to "${getUpstreamReference(upstream).refName}"`,
-          }),
-        ]}
+      />
+      <ToolbarItem
+        {...push}
+        alternatives={[forcePush]}
         disabled={
           toolbarProps.disabled ||
           !branch ||
@@ -80,6 +64,8 @@ const BranchToolbar = (props: BranchToolbarProps) => {
           !upstream
         }
         shortcut={isBase ? undefined : settings.pushShortcut}
+        compact
+        fixed
       />
     </Toolbar>
   )

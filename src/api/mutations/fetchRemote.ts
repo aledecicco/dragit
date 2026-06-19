@@ -51,13 +51,8 @@ const useMakeFetchRemote = (): ((name: RemoteName) => Action) => {
   })
 }
 
-const useFetchRemote = (name: RemoteName): Action => {
-  return useMakeFetchRemote()(name)
-}
-
 export {
   useMakeFetchRemote,
-  useFetchRemote,
   fetchRemoteKey,
   fetchRemoteMutation,
   type FetchRemoteArgs,

@@ -3,9 +3,8 @@ import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 
 import type { CommitId } from '@/api/models'
-import { useAmend } from '@/api/mutations/commitIndex'
 import { useQueryCommitInfo } from '@/api/queries/commitInfo'
-import { requestCommitParams } from '@/common/CommitDialog'
+import { useAmendSomeCommitInteraction } from '@/interactions/commit'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { QueryLoader } from '@/lib/QueryLoader'
 import { triggerInteraction } from '@/state/actions'
@@ -61,7 +60,7 @@ const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
   } = props
 
   const commitInfoQuery = useQueryCommitInfo(commitId)
-  const amend = useAmend()
+  const amendCommit = useAmendSomeCommitInteraction()
 
   const commonStyles = {
     className: cn(
@@ -88,11 +87,9 @@ const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
             worktree: 'amend this commit',
           }}
           handleDrop={() => {
-            triggerInteraction({
-              action: amend,
-              argsRequester: () =>
-                requestCommitParams(commitInfoQuery.data?.message ?? '', true),
-            })
+            if (commitInfoQuery.data) {
+              triggerInteraction(amendCommit(commitInfoQuery.data))
+            }
           }}
           {...commonStyles}
           overlayProps={{

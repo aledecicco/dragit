@@ -49,13 +49,8 @@ const useMakeRemoveRemote = (): ((name: RemoteName) => Action) => {
   })
 }
 
-const useRemoveRemote = (name: RemoteName): Action => {
-  return useMakeRemoveRemote()(name)
-}
-
 export {
   useMakeRemoveRemote,
-  useRemoveRemote,
   removeRemoteKey,
   removeRemoteMutation,
   type RemoveRemoteArgs,

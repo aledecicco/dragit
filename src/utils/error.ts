@@ -1,3 +1,9 @@
+import { match, P } from 'ts-pattern'
+
+import { gitOperationFailedToast } from '@/common/Toasts/GitOperationFailed'
+import { toast } from '@/lib/Toasts/Toast'
+import { getSettings } from '@/state/storage'
+
 export type AppError =
   | {
       type: 'gitOperationFailed'
@@ -43,4 +49,23 @@ export const getErrorMessage = (error: unknown): string => {
   }
 
   return 'Something went wrong'
+}
+
+/**
+ * Announces to the user an error resulting from an interaction.
+ */
+export const announceInteractionError = (
+  description: string,
+  error: AppError,
+) => {
+  const settings = getSettings()
+
+  if (settings.showToasts) {
+    match(error).with(
+      { type: 'gitOperationFailed', gitError: P.select() },
+      (e) => {
+        toast(gitOperationFailedToast(description, e))
+      },
+    )
+  }
 }

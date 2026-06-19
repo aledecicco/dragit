@@ -2,18 +2,12 @@ import * as Ariakit from '@ariakit/react'
 import { IconGitCommit } from '@tabler/icons-react'
 
 import type { CommitInfo } from '@/api/models'
-import { useCherryPickCommit } from '@/api/mutations/cherryPick'
-import { useAmend } from '@/api/mutations/commitIndex'
-import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
-import { useTagCommit } from '@/api/mutations/createTag'
-import { useMergeCommit } from '@/api/mutations/merge'
-import { useRewindCommit } from '@/api/mutations/resetHead'
-import { useRevertCommit } from '@/api/mutations/revertCommit'
-import { requestCommitParams } from '@/common/CommitDialog'
-import { requestBranchName } from '@/common/CreateBranchDialog'
-import { requestTagParams } from '@/common/CreateTagDialog'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
-import { group, interaction } from '@/lib/ActionButton/utils'
+import {
+  useAmendInteraction,
+  useSingleCommitInteractions,
+} from '@/interactions/commit'
+import { group } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractiveItem } from '@/lib/Interactive/Item'
 import { ShortcutIndicator } from '@/lib/Shortcuts/Indicator'
@@ -42,7 +36,7 @@ interface GraphCommitCardProps extends Ariakit.ButtonProps {
 const GraphCommitCard = (props: GraphCommitCardProps) => {
   const { commitInfo, isCurrent = false, ...buttonProps } = props
 
-  const interactions = useInteractions(commitInfo)
+  const interactions = useSingleCommitInteractions(commitInfo)
 
   return isCurrent ? (
     <CurrentGraphCommitCardInner
@@ -67,30 +61,18 @@ interface GraphCommitCardInnerProps
 const CurrentGraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
   const { commitInfo, interactions, ...buttonProps } = props
 
-  const amend = useAmend()
+  const amend = useAmendInteraction(commitInfo)
   const settings = useSettings()
 
   useShortcutBinding(settings.amendShortcut, () => {
-    triggerInteraction({
-      action: amend,
-      argsRequester: () => requestCommitParams(commitInfo.message ?? '', true),
-    })
+    triggerInteraction(amend)
   })
 
   return (
     <ShortcutIndicator hotkey={settings.amendShortcut}>
       <GraphCommitCardInner
         commitInfo={commitInfo}
-        interactions={[
-          group(
-            interaction({
-              action: amend,
-              argsRequester: () =>
-                requestCommitParams(commitInfo.message ?? '', true),
-            }),
-          ),
-          ...interactions,
-        ]}
+        interactions={[group(amend), ...interactions]}
         {...buttonProps}
       />
     </ShortcutIndicator>
@@ -161,49 +143,6 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
       </Ariakit.CompositeItem>
     </Draggable>
   )
-}
-
-const useInteractions = (commit: CommitInfo) => {
-  const createBranch = useCreateBranchAt(commit.id)
-  const branchOff = useBranchOff(commit.id)
-  const merge = useMergeCommit(commit.id)
-  const rewind = useRewindCommit(commit.id)
-  const revert = useRevertCommit(commit)
-  const cherryPick = useCherryPickCommit(commit)
-  const tag = useTagCommit(commit)
-
-  return [
-    group(
-      interaction({
-        action: createBranch,
-        argsRequester: () => requestBranchName(`#${commit.shortHash}`),
-      }),
-      interaction({
-        action: branchOff,
-        argsRequester: () => requestBranchName(`#${commit.shortHash}`),
-      }),
-    ),
-    group(
-      interaction({
-        action: tag,
-        argsRequester: () => requestTagParams(`#${commit.shortHash}`),
-      }),
-    ),
-    group(
-      interaction({
-        action: merge,
-      }),
-      interaction({
-        action: cherryPick,
-      }),
-      interaction({
-        action: revert,
-      }),
-      interaction({
-        action: rewind,
-      }),
-    ),
-  ]
 }
 
 export { GraphCommitCard, type GraphCommitCardProps }

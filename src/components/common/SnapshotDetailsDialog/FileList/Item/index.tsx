@@ -1,9 +1,8 @@
 import * as Ariakit from '@ariakit/react'
 
 import type { SnapshotInfo, VersionedFileInfo } from '@/api/models'
-import { useRestoreFileState } from '@/api/mutations/restore'
 import { FileItem } from '@/common/File/Item'
-import { group, interaction } from '@/lib/ActionButton/utils'
+import { useSingleVersionedFileInteractions } from '@/interactions/file'
 import { InteractiveItem } from '@/lib/Interactive/Item'
 import {
   MultiSelectItem,
@@ -27,7 +26,7 @@ interface SnapshotDetailsDialogItemProps extends MultiSelectItemProps {
 const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
   const { file, snapshotInfo, ...itemProps } = props
 
-  const interactions = useInteractions(file, snapshotInfo)
+  const interactions = useSingleVersionedFileInteractions(file, snapshotInfo.id)
 
   const radio = Ariakit.useRadioContext()
 
@@ -54,15 +53,6 @@ const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
       }
     />
   )
-}
-
-const useInteractions = (
-  file: VersionedFileInfo,
-  snapshotInfo: SnapshotInfo,
-) => {
-  const restore = useRestoreFileState(file, snapshotInfo.id)
-
-  return [group(interaction({ action: restore }))]
 }
 
 export { SnapshotDetailsDialogItem, type SnapshotDetailsDialogItemProps }

@@ -2,19 +2,19 @@ import { type ComponentProps, useRef } from 'react'
 import { IconArchive } from '@tabler/icons-react'
 
 import type { StashInfo } from '@/api/models'
-import { useDiscardStashes } from '@/api/mutations/discardStashes'
-import { useStashFiles } from '@/api/mutations/saveStash'
 import { useQueryStashes } from '@/api/queries/stashes'
-import { requestStashParams } from '@/common/StashDialog'
-import { interaction } from '@/lib/ActionButton/utils'
+import {
+  useGetStashesListInteractions,
+  useStashFilesInteraction,
+} from '@/interactions/stash'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
-import { type AnyInteraction, triggerInteraction } from '@/state/actions'
-import { getSettings, useSettings } from '@/state/storage'
+import { triggerInteraction } from '@/state/actions'
+import { useSettings } from '@/state/storage'
 import { Accordion } from '@/ui/Accordion'
 import {
   AccordionSection,
@@ -41,9 +41,8 @@ const StashesList = (props: StashesListProps) => {
   })
 
   const stashesQuery = useQueryStashes()
-  const getInteractions = useGetInteractions()
-
-  const stash = useStashFiles()
+  const getInteractions = useGetStashesListInteractions()
+  const stashFiles = useStashFilesInteraction()
 
   const ref = useRef<HTMLDivElement>(null)
   const settings = useSettings()
@@ -64,20 +63,8 @@ const StashesList = (props: StashesListProps) => {
         label={{
           'not-staged-files': 'stash changes',
         }}
-        handleDrop={(payload) => {
-          triggerInteraction({
-            action: stash,
-            argsRequester: async () => {
-              const files = payload.dragged
-
-              const { askForStashMessage } = getSettings()
-              const message = askForStashMessage
-                ? (await requestStashParams()).message
-                : null
-
-              return { files, message }
-            },
-          })
+        handleDrop={({ dragged }) => {
+          triggerInteraction(stashFiles(dragged))
         }}
         overlayProps={{
           className: cn(!accordionHandler.isOpen && 'flex-row text-sm'),
@@ -127,20 +114,5 @@ const getDragPayload = (stashes: StashInfo[] | undefined): DragPayload => ({
   label: pluralize('stash', stashes?.length ?? 0, true, 'stashes'),
   Glyph: IconArchive,
 })
-
-const useGetInteractions = () => {
-  const discard = useDiscardStashes()
-
-  return (stashes: StashInfo[]): AnyInteraction[][] => [
-    [
-      interaction({
-        action: discard,
-        argsRequester: () => stashes,
-        isDangerous: true,
-        details: `discard ${pluralize('stash', stashes.length, true, 'stashes')}`,
-      }),
-    ],
-  ]
-}
 
 export { StashesList, type StashesListProps }

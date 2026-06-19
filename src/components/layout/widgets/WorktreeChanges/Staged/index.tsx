@@ -2,15 +2,16 @@ import { type ComponentProps, useRef } from 'react'
 import { IconFiles } from '@tabler/icons-react'
 
 import type { StagedFile, WorktreeFileType } from '@/api/models'
-import { useStageFiles } from '@/api/mutations/addToIndex'
-import { useUnstageFiles } from '@/api/mutations/removeFromIndex'
-import { useDiscardChanges } from '@/api/mutations/restore'
 import {
   useQueryWorktreeFiles,
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
-import { group, interaction } from '@/lib/ActionButton/utils'
+import {
+  useGetStagedFilesInteractions,
+  useStageFilesInteraction,
+  useUnstageFilesInteraction,
+} from '@/interactions/file'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
@@ -18,7 +19,7 @@ import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
-import { type AnyInteraction, triggerInteraction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import {
   setNextPage,
   setPrevPage,
@@ -51,9 +52,9 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
 
   const showPagination = useNeedsPagination(filesQuery, page)
 
-  const getInteractions = useGetInteractions()
-  const stage = useStageFiles()
-  const unstage = useUnstageFiles()
+  const getInteractions = useGetStagedFilesInteractions()
+  const stageFiles = useStageFilesInteraction()
+  const unstageFiles = useUnstageFilesInteraction()
 
   const ref = useRef<HTMLDivElement>(null)
   const settings = useSettings()
@@ -74,11 +75,8 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
         label={{
           'not-staged-files': 'stage changes',
         }}
-        handleDrop={(payload) => {
-          triggerInteraction({
-            action: stage,
-            argsRequester: () => payload.dragged,
-          })
+        handleDrop={({ dragged }) => {
+          triggerInteraction(stageFiles(dragged))
         }}
       >
         <div
@@ -126,10 +124,7 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
             getInteractions={getInteractions}
             getDragPayload={getDragPayload}
             deleteAction={(files) => {
-              triggerInteraction({
-                action: unstage,
-                argsRequester: () => files,
-              })
+              triggerInteraction(unstageFiles(files))
             }}
           >
             <QueryList
@@ -158,24 +153,5 @@ const getDragPayload = (files: StagedFile[] | undefined): DragPayload => ({
   label: pluralize('file', files?.length ?? 0, true),
   Glyph: IconFiles,
 })
-
-const useGetInteractions = () => {
-  const unstage = useUnstageFiles()
-  const discard = useDiscardChanges()
-
-  return (files: StagedFile[]): AnyInteraction[][] => {
-    return [
-      group(interaction({ action: unstage, argsRequester: () => files })),
-      group(
-        interaction({
-          action: discard,
-          argsRequester: () => files,
-          isDangerous: true,
-          details: `discard changes in ${pluralize('file', files.length, true)}`,
-        }),
-      ),
-    ]
-  }
-}
 
 export { StagedWorktreeChanges, type StagedWorktreeChangesProps }

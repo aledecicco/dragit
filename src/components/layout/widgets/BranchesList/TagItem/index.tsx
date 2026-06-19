@@ -1,19 +1,17 @@
 import { IconGitCommit, IconTag } from '@tabler/icons-react'
 
 import type { TagInfo } from '@/api/models'
-import { useCheckoutTag } from '@/api/mutations/checkout'
-import { useBranchOff, useCreateBranchAt } from '@/api/mutations/createBranch'
-import { useDeleteTag } from '@/api/mutations/deleteTags'
-import { useMergeTag } from '@/api/mutations/merge'
-import { usePushTag } from '@/api/mutations/pushTag'
-import { requestBranchName } from '@/common/CreateBranchDialog'
-import { group, interaction } from '@/lib/ActionButton/utils'
+import {
+  useDeleteTagInteraction,
+  useSingleTagInteractions,
+} from '@/interactions/tag'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractiveItem } from '@/lib/Interactive/Item'
 import {
   MultiSelectItem,
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
+import { triggerInteraction } from '@/state/actions'
 import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { cn } from '@/utils/styles'
@@ -32,7 +30,8 @@ interface TagsListItemProps extends MultiSelectItemProps {
 const TagsListItem = (props: TagsListItemProps) => {
   const { tag, ...itemProps } = props
 
-  const interactions = useInteractions(tag)
+  const interactions = useSingleTagInteractions(tag)
+  const deleteTag = useDeleteTagInteraction(tag)
   const taggedTime = useDateInfo(tag.timestamp)
 
   return (
@@ -46,6 +45,9 @@ const TagsListItem = (props: TagsListItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
+        deleteAction={() => {
+          triggerInteraction(deleteTag)
+        }}
         render={<MultiSelectItem {...itemProps} />}
       >
         <div className={cn('flex flex-col justify-between')}>
@@ -89,38 +91,6 @@ const TagsListItem = (props: TagsListItemProps) => {
       </InteractiveItem>
     </Draggable>
   )
-}
-
-const useInteractions = (tag: TagInfo) => {
-  const checkout = useCheckoutTag(tag)
-  const push = usePushTag(tag)
-
-  const createBranch = useCreateBranchAt(tag.name)
-  const branchOff = useBranchOff(tag.name)
-  const merge = useMergeTag(tag)
-  const deleteTag = useDeleteTag(tag)
-
-  return [
-    group(interaction({ action: checkout }), interaction({ action: push })),
-    group(
-      interaction({
-        action: createBranch,
-        argsRequester: () => requestBranchName(`#${tag.reference}`),
-      }),
-      interaction({
-        action: branchOff,
-        argsRequester: () => requestBranchName(`#${tag.reference}`),
-      }),
-      interaction({ action: merge }),
-    ),
-    group(
-      interaction({
-        action: deleteTag,
-        isDangerous: true,
-        details: `delete tag "${tag.name}"`,
-      }),
-    ),
-  ]
 }
 
 export { TagsListItem, type TagsListItemProps }

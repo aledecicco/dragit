@@ -1,9 +1,11 @@
 import type { ComponentProps } from 'react'
 
 import type { RemoteInfo } from '@/api/models'
-import { useChangeRemoteUrl } from '@/api/mutations/changeRemoteUrl'
-import { useRemoveRemote } from '@/api/mutations/removeRemote'
-import { useRenameRemote } from '@/api/mutations/renameRemote'
+import {
+  useChangeRemoteUrlInteraction,
+  useRemoveRemoteInteraction,
+  useRenameRemoteInteraction,
+} from '@/interactions/remote'
 import { ActionButton } from '@/lib/ActionButton'
 import { triggerInteraction } from '@/state/actions'
 import { EditableText } from '@/ui/EditableText'
@@ -24,9 +26,9 @@ interface RemotesDialogItemProps extends ComponentProps<'div'> {
 const RemotesDialogItem = (props: RemotesDialogItemProps) => {
   const { remote, ...divProps } = props
 
-  const removeRemote = useRemoveRemote(remote.name)
-  const renameRemote = useRenameRemote(remote.name)
-  const changeRemoteUrl = useChangeRemoteUrl(remote.name)
+  const renameRemote = useRenameRemoteInteraction(remote)
+  const changeRemoteUrl = useChangeRemoteUrlInteraction(remote)
+  const removeRemote = useRemoveRemoteInteraction(remote)
 
   return (
     <div
@@ -37,10 +39,7 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
         value={remote.name}
         setValue={(newName) => {
           if (newName) {
-            triggerInteraction({
-              action: renameRemote,
-              argsRequester: () => newName,
-            })
+            triggerInteraction(renameRemote(newName))
           }
         }}
         label="remote name"
@@ -62,10 +61,7 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
         value={remote.fetchUrl}
         setValue={(newUrl) => {
           if (newUrl) {
-            triggerInteraction({
-              action: changeRemoteUrl,
-              argsRequester: () => newUrl,
-            })
+            triggerInteraction(changeRemoteUrl(newUrl))
           }
         }}
         label="remote URL"
@@ -82,12 +78,10 @@ const RemotesDialogItem = (props: RemotesDialogItemProps) => {
       />
 
       <ActionButton
+        {...removeRemote}
         status="neutral"
         variant="filled"
         className={cn('rounded-l-none rounded-r-sm h-auto')}
-        action={removeRemote}
-        isDangerous
-        details={`delete remote "${remote.name}"`}
         compact
       />
     </div>

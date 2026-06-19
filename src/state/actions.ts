@@ -3,16 +3,14 @@ import {
   IconCheck,
   IconLoader2,
 } from '@tabler/icons-react'
-import { match, P } from 'ts-pattern'
+import { match } from 'ts-pattern'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { useShallow } from 'zustand/react/shallow'
 
 import { askForConfirmation } from '@/common/ConfirmationDialog'
-import { gitOperationFailedToast } from '@/common/Toasts/GitOperationFailed'
-import { toast } from '@/lib/Toasts/Toast'
 import type { Glyph } from '@/ui/Icon'
-import type { AppError } from '@/utils/error'
+import { announceInteractionError } from '@/utils/error'
 import { MS_IN_SECOND } from '@/utils/time'
 
 import { getSettings } from './storage'
@@ -453,7 +451,7 @@ type Interaction<T> =
       /**
        * More in-detail description of the action.
        */
-      details?: string
+      details: string
     }
   | {
       action: Action
@@ -462,7 +460,7 @@ type Interaction<T> =
 
       isDangerous?: boolean
 
-      details?: string
+      details: string
     }
 
 type AnyInteraction = Interaction<never>
@@ -488,10 +486,7 @@ const triggerInteraction = async <T>(interaction: Interaction<T>) => {
     }
 
     runAction(action, args).catch((e) => {
-      const settings = getSettings()
-      if (settings.showToasts) {
-        toast(gitOperationFailedToast(action.label.idle, e))
-      }
+      announceInteractionError(interaction.details, e)
     })
   } else {
     const canRun =
@@ -503,16 +498,8 @@ const triggerInteraction = async <T>(interaction: Interaction<T>) => {
       return
     }
 
-    runAction(action).catch((e: AppError) => {
-      const settings = getSettings()
-      if (settings.showToasts) {
-        match(e).with(
-          { type: 'gitOperationFailed', gitError: P.select() },
-          (e) => {
-            toast(gitOperationFailedToast(action.label.idle, e))
-          },
-        )
-      }
+    runAction(action).catch((e) => {
+      announceInteractionError(interaction.details, e)
     })
   }
 }

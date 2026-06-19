@@ -1,8 +1,8 @@
 import { useSelectStore } from '@ariakit/react'
 import { IconGitBranch } from '@tabler/icons-react'
 
-import { useSwitchBranches } from '@/api/mutations/checkout'
 import { ActionButton } from '@/lib/ActionButton'
+import { useSwitchBranchesInteraction } from '@/interactions/checkout'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { ShortcutIndicator } from '@/lib/Shortcuts/Indicator'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
@@ -23,7 +23,7 @@ const BranchSelectors = () => {
   const baseReference = useSelectedBase(currentReference)
   const baseBranch = useBranch(baseReference)
 
-  const switchBranches = useSwitchBranches()
+  const switchBranches = useSwitchBranchesInteraction()
 
   const settings = useSettings()
 
@@ -78,7 +78,7 @@ const BranchSelectors = () => {
       </ShortcutIndicator>
 
       <ActionButton
-        action={switchBranches}
+        {...switchBranches}
         className={cn('mx-1 col-start-2 row-start-1')}
         variant="filled"
         status="neutral"

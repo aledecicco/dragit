@@ -1,4 +1,4 @@
-import { useSetRepositoryStorage } from '@/api/mutations/setRepositoryStorage'
+import { useSetRepositoryStorageInteraction } from '@/interactions/storage'
 import { triggerInteraction } from '@/state/actions'
 import { useCurrentRepositoryStorage } from '@/state/storage'
 import { cn } from '@/utils/styles'
@@ -14,7 +14,7 @@ const DEFAULT_BASE_BRANCH = 'main'
  */
 const PerRepositoryPreferences = () => {
   const repositoryStorage = useCurrentRepositoryStorage()
-  const setRepositoryStorage = useSetRepositoryStorage()
+  const setRepositoryStorageInteraction = useSetRepositoryStorageInteraction()
 
   return (
     <SettingsDialogSection label="Per repository">
@@ -23,12 +23,11 @@ const PerRepositoryPreferences = () => {
         description="The default base branch will be the one being tracked by the current branch"
         checked={repositoryStorage ? !repositoryStorage.defaultBase : true}
         onChange={(e) => {
-          triggerInteraction({
-            action: setRepositoryStorage,
-            argsRequester: () => ({
+          triggerInteraction(
+            setRepositoryStorageInteraction({
               defaultBase: e.target.checked ? null : DEFAULT_BASE_BRANCH,
             }),
-          })
+          )
         }}
       />
 
@@ -51,12 +50,7 @@ const PerRepositoryPreferences = () => {
           }
           contentAfter=" as default base branch for comparison"
           setValue={(newBase) => {
-            triggerInteraction({
-              action: setRepositoryStorage,
-              argsRequester: () => ({
-                defaultBase: newBase,
-              }),
-            })
+            triggerInteraction(setRepositoryStorageInteraction({ defaultBase: newBase }))
           }}
           divProps={{
             className: cn('relative'),

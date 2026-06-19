@@ -1,11 +1,9 @@
 import { IconArchive, IconGitBranch } from '@tabler/icons-react'
 
 import type { StashInfo } from '@/api/models'
-import { useApplyStash } from '@/api/mutations/applyStash'
-import { useDiscardStash } from '@/api/mutations/discardStashes'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
-import { group, interaction } from '@/lib/ActionButton/utils'
+import { useSingleStashInteractions } from '@/interactions/stash'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractiveItem } from '@/lib/Interactive/Item'
 import {
@@ -31,7 +29,7 @@ const StashesListItem = (props: StashesListItemProps) => {
   const { stash, ...itemProps } = props
 
   const stashedTime = useDateInfo(stash.timestamp)
-  const interactions = useInteractions(stash)
+  const interactions = useSingleStashInteractions(stash)
 
   return (
     <Draggable
@@ -109,22 +107,6 @@ const StashesListItem = (props: StashesListItemProps) => {
       </InteractiveItem>
     </Draggable>
   )
-}
-
-const useInteractions = (stash: StashInfo) => {
-  const apply = useApplyStash(stash)
-  const discard = useDiscardStash(stash)
-
-  return [
-    group(interaction({ action: apply })),
-    group(
-      interaction({
-        action: discard,
-        isDangerous: true,
-        details: `discard stash #${stash.stashNumber}`,
-      }),
-    ),
-  ]
 }
 
 export { StashesListItem, type StashesListItemProps }

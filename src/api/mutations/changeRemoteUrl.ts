@@ -50,13 +50,8 @@ const useMakeChangeRemoteUrl = (): ((name: RemoteName) => Action<string>) => {
   })
 }
 
-const useChangeRemoteUrl = (name: RemoteName): Action<string> => {
-  return useMakeChangeRemoteUrl()(name)
-}
-
 export {
   useMakeChangeRemoteUrl,
-  useChangeRemoteUrl,
   changeRemoteUrlKey,
   changeRemoteUrlMutation,
   type ChangeRemoteUrlArgs,

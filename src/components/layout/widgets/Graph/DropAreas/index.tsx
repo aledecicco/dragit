@@ -1,13 +1,17 @@
 import { match } from 'ts-pattern'
 
-import { useCheckout, useSwitchBranches } from '@/api/mutations/checkout'
-import { useMakeBranchOff } from '@/api/mutations/createBranch'
 import {
-  useMakeMergeBranch,
-  useMakeMergeCommit,
-  useMakeMergeTag,
-} from '@/api/mutations/merge'
-import { requestBranchName } from '@/common/CreateBranchDialog'
+  useBranchOffSomeBranchInteraction,
+  useMergeSomeBranchInteraction,
+} from '@/interactions/branch'
+import {
+  useCheckoutSomeBranchInteraction,
+  useCheckoutSomeCommitInteraction,
+  useCheckoutSomeTagInteraction,
+  useSwitchBranchesInteraction,
+} from '@/interactions/checkout'
+import { useMergeSomeCommitInteraction } from '@/interactions/commit'
+import { useMergeSomeTagInteraction } from '@/interactions/tag'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { MatchingPayload } from '@/lib/DragAndDrop/utils'
 import { triggerInteraction } from '@/state/actions'
@@ -23,12 +27,14 @@ const GraphDropAreas = () => {
   const baseReference = useSelectedBase(currentReference)
   const changeSelectedBase = useChangeSelectedBase()
 
-  const checkout = useCheckout()
-  const switchBranches = useSwitchBranches()
-  const makeBranchOff = useMakeBranchOff()
-  const makeMergeBranch = useMakeMergeBranch()
-  const makeMergeTag = useMakeMergeTag()
-  const makeMergeCommit = useMakeMergeCommit()
+  const switchBranches = useSwitchBranchesInteraction()
+  const branchOff = useBranchOffSomeBranchInteraction()
+  const checkoutBranch = useCheckoutSomeBranchInteraction()
+  const checkoutTag = useCheckoutSomeTagInteraction()
+  const checkoutCommit = useCheckoutSomeCommitInteraction()
+  const mergeBranch = useMergeSomeBranchInteraction()
+  const mergeTag = useMergeSomeTagInteraction()
+  const mergeCommit = useMergeSomeCommitInteraction()
 
   const validateBranchDrop = (
     payload: MatchingPayload<'branch' | 'tag' | 'commit'>,
@@ -71,28 +77,13 @@ const GraphDropAreas = () => {
         extraValidation={validateBranchDrop}
         handleDrop={(payload) => {
           if (payload.type === 'branch' && payload.dragged.type === 'remote') {
-            triggerInteraction({
-              action: makeBranchOff(payload.dragged.name),
-              argsRequester: () =>
-                requestBranchName(
-                  payload.dragged.name,
-                  payload.dragged.name.split('/').at(-1),
-                ),
-            })
+            triggerInteraction(branchOff(payload.dragged))
+          } else if (payload.type === 'branch') {
+            triggerInteraction(checkoutBranch(payload.dragged))
+          } else if (payload.type === 'tag') {
+            triggerInteraction(checkoutTag(payload.dragged))
           } else {
-            triggerInteraction({
-              action: checkout,
-              argsRequester: () => {
-                const newRef = match(payload)
-                  .with({ type: 'commit' }, ({ dragged }) => dragged.id)
-                  .otherwise(({ dragged }) => dragged.name)
-
-                return {
-                  reference: newRef,
-                  isNew: false,
-                }
-              },
-            })
+            triggerInteraction(checkoutCommit(payload.dragged))
           }
         }}
       />
@@ -119,9 +110,7 @@ const GraphDropAreas = () => {
               .otherwise(({ dragged }) => dragged.name)
 
             if (newRef === currentReference.refName) {
-              triggerInteraction({
-                action: switchBranches,
-              })
+              triggerInteraction(switchBranches)
             } else {
               changeSelectedBase(currentReference, {
                 type: payload.type,
@@ -144,19 +133,13 @@ const GraphDropAreas = () => {
         handleDrop={(payload) => {
           match(payload)
             .with({ type: 'branch' }, ({ dragged }) => {
-              triggerInteraction({
-                action: makeMergeBranch(dragged),
-              })
+              triggerInteraction(mergeBranch(dragged))
             })
             .with({ type: 'tag' }, ({ dragged }) => {
-              triggerInteraction({
-                action: makeMergeTag(dragged),
-              })
+              triggerInteraction(mergeTag(dragged))
             })
             .with({ type: 'commit' }, ({ dragged }) => {
-              triggerInteraction({
-                action: makeMergeCommit(dragged.id),
-              })
+              triggerInteraction(mergeCommit(dragged))
             })
             .exhaustive()
         }}

@@ -2,7 +2,7 @@ import { type ComponentProps, type ReactNode, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 
-import { useSetSettings } from '@/api/mutations/setSettings'
+import { useSetSettingInteraction } from '@/interactions/storage'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/storage'
 import { EditableText, type EditableTextProps } from '@/ui/EditableText'
@@ -51,7 +51,7 @@ const TextSetting = (props: TextSettingProps) => {
   } = props
 
   const settings = useSettings()
-  const setSettings = useSetSettings()
+  const setSettingInteraction = useSetSettingInteraction()
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -84,10 +84,7 @@ const TextSetting = (props: TextSettingProps) => {
               inputProps.setValue?.(value)
 
               if (setting && value) {
-                triggerInteraction({
-                  action: setSettings,
-                  argsRequester: () => ({ [setting]: value }),
-                })
+                triggerInteraction(setSettingInteraction(setting, value))
               }
             }}
             buttonProps={{

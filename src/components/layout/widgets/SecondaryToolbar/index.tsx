@@ -1,16 +1,17 @@
 import { match, P } from 'ts-pattern'
 
-import { useAbortCherryPick } from '@/api/mutations/abortCherryPick'
-import { useAbortMerge } from '@/api/mutations/abortMerge'
-import { useAbortRebase } from '@/api/mutations/abortRebase'
-import { useAbortRevert } from '@/api/mutations/abortRevert'
-import { useCommit } from '@/api/mutations/commitIndex'
-import { useContinueCherryPick } from '@/api/mutations/continueCherryPick'
-import { useContinueMerge } from '@/api/mutations/continueMerge'
-import { useContinueRebase } from '@/api/mutations/continueRebase'
-import { useContinueRevert } from '@/api/mutations/continueRevert'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
-import { requestCommitParams } from '@/common/CommitDialog'
+import {
+  useAbortCherryPickInteraction,
+  useAbortMergeInteraction,
+  useAbortRebaseInteraction,
+  useAbortRevertInteraction,
+  useCommitInteraction,
+  useContinueCherryPickInteraction,
+  useContinueMergeInteraction,
+  useContinueRebaseInteraction,
+  useContinueRevertInteraction,
+} from '@/interactions/operations'
 import { useSettings } from '@/state/storage'
 import { Toolbar, type ToolbarProps } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
@@ -25,15 +26,15 @@ const SecondaryToolbar = (props: SecondaryToolbarProps) => {
 
   const worktreeStatus = useQueryHeadInfo().data?.worktreeStatus
 
-  const commit = useCommit()
-  const abortMerge = useAbortMerge()
-  const continueMerge = useContinueMerge()
-  const abortRebase = useAbortRebase()
-  const continueRebase = useContinueRebase()
-  const abortCherryPick = useAbortCherryPick()
-  const continueCherryPick = useContinueCherryPick()
-  const abortRevert = useAbortRevert()
-  const continueRevert = useContinueRevert()
+  const commit = useCommitInteraction()
+  const abortMerge = useAbortMergeInteraction()
+  const continueMerge = useContinueMergeInteraction()
+  const abortRebase = useAbortRebaseInteraction()
+  const continueRebase = useContinueRebaseInteraction()
+  const abortCherryPick = useAbortCherryPickInteraction()
+  const continueCherryPick = useContinueCherryPickInteraction()
+  const abortRevert = useAbortRevertInteraction()
+  const continueRevert = useContinueRevertInteraction()
 
   const settings = useSettings()
 
@@ -43,84 +44,83 @@ const SecondaryToolbar = (props: SecondaryToolbarProps) => {
         .with('merging', () => (
           <>
             <ToolbarItem
+              {...abortMerge}
               fixed
               status="warning"
               size="md"
               compact={false}
-              action={abortMerge}
             />
             <ToolbarItem
+              {...continueMerge}
               fixed
               status="warning"
               size="md"
               compact={false}
-              action={continueMerge}
             />
           </>
         ))
         .with('rebasing', () => (
           <>
             <ToolbarItem
+              {...abortRebase}
               fixed
               status="warning"
               size="md"
               compact={false}
-              action={abortRebase}
             />
             <ToolbarItem
+              {...continueRebase}
               fixed
               status="warning"
               size="md"
               compact={false}
-              action={continueRebase}
             />
           </>
         ))
         .with('cherry-picking', () => (
           <>
             <ToolbarItem
+              {...abortCherryPick}
               fixed
               status="warning"
               size="md"
               compact={false}
-              action={abortCherryPick}
             />
             <ToolbarItem
+              {...continueCherryPick}
               fixed
               status="warning"
               size="md"
               compact={false}
-              action={continueCherryPick}
             />
           </>
         ))
         .with('reverting', () => (
           <>
             <ToolbarItem
+              {...abortRevert}
               fixed
               status="warning"
               size="md"
               compact={false}
-              action={abortRevert}
             />
             <ToolbarItem
+              {...continueRevert}
               fixed
               status="warning"
               size="md"
               compact={false}
-              action={continueRevert}
             />
           </>
         ))
         .with(P.union('clean', undefined), () => (
           <ToolbarItem
+            {...commit}
+            shortcut={settings.commitShortcut}
             fixed
             status="primary"
             size="md"
             compact={false}
-            action={commit}
-            argsRequester={requestCommitParams}
-            shortcut={settings.commitShortcut}
           />
         ))
         .exhaustive()}

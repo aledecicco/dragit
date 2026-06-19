@@ -85,10 +85,6 @@ const useMakeCheckoutBranch = (): ((branch: BranchInfo) => Action) => {
   })
 }
 
-const useCheckoutBranch = (branch: BranchInfo): Action => {
-  return useMakeCheckoutBranch()(branch)
-}
-
 const useMakeCheckoutTag = (): ((tag: TagInfo) => Action) => {
   const checkout = useRepositoryMutation(checkoutMutation)
 
@@ -110,10 +106,6 @@ const useMakeCheckoutTag = (): ((tag: TagInfo) => Action) => {
       error: 'Checkout failed',
     },
   })
-}
-
-const useCheckoutTag = (tag: TagInfo): Action => {
-  return useMakeCheckoutTag()(tag)
 }
 
 const useSwitchBranches = (): Action => {
@@ -165,10 +157,8 @@ const useSwitchBranches = (): Action => {
 export {
   useCheckout,
   useMakeCheckoutBranch,
-  useCheckoutBranch,
   useSwitchBranches,
   useMakeCheckoutTag,
-  useCheckoutTag,
   checkoutKey,
   checkoutMutation,
   type CheckoutArgs,

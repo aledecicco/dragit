@@ -101,10 +101,6 @@ const useMakeDeleteBranch = (): ((branch: BranchInfo) => Action) => {
   })
 }
 
-const useDeleteBranch = (branch: BranchInfo): Action => {
-  return useMakeDeleteBranch()(branch)
-}
-
 const useDeleteBranches = (): Action<BranchInfo[]> => {
   const deleteLocalBranches = useRepositoryMutation(deleteLocalBranchesMutation)
   const deleteRemoteBranches = useRepositoryMutation(
@@ -216,7 +212,6 @@ const groupBranchesByRemote = (
 
 export {
   useMakeDeleteBranch,
-  useDeleteBranch,
   useDeleteBranches,
   deleteLocalBranchesKey,
   deleteLocalBranchesMutation,

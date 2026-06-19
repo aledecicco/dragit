@@ -1,6 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 
-import { useSetSettings } from '@/api/mutations/setSettings'
+import { useSetSettingInteraction } from '@/interactions/storage'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/storage'
 import { Checkbox, type CheckboxProps } from '@/ui/Form/Checkbox'
@@ -21,7 +21,7 @@ const CheckboxSetting = (props: CheckboxSettingProps) => {
   const { setting, ...checkboxProps } = props
 
   const settings = useSettings()
-  const setSettings = useSetSettings()
+  const setSettingInteraction = useSetSettingInteraction()
 
   return (
     <Ariakit.CompositeItem
@@ -33,12 +33,7 @@ const CheckboxSetting = (props: CheckboxSettingProps) => {
             checkboxProps.onChange?.(e)
 
             if (setting) {
-              triggerInteraction({
-                action: setSettings,
-                argsRequester: () => ({
-                  [setting]: e.target.checked,
-                }),
-              })
+              triggerInteraction(setSettingInteraction(setting, e.target.checked))
             }
           }}
         />

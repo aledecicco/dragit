@@ -45,10 +45,6 @@ const useMakeDeleteTag = (): ((tag: TagInfo) => Action) => {
   })
 }
 
-const useDeleteTag = (tag: TagInfo): Action => {
-  return useMakeDeleteTag()(tag)
-}
-
 const useDeleteTags = (): Action<TagInfo[]> => {
   const deleteTags = useRepositoryMutation(deleteTagsMutation)
 
@@ -76,7 +72,6 @@ const useDeleteTags = (): Action<TagInfo[]> => {
 
 export {
   useMakeDeleteTag,
-  useDeleteTag,
   useDeleteTags,
   deleteTagsKey,
   deleteTagsMutation,

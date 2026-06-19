@@ -53,13 +53,8 @@ const useMakeApplyStash = (): ((stash: StashInfo) => Action) => {
   })
 }
 
-const useApplyStash = (stash: StashInfo): Action => {
-  return useMakeApplyStash()(stash)
-}
-
 export {
   useMakeApplyStash,
-  useApplyStash,
   applyStashKey,
   applyStashMutation,
   type ApplyStashArgs,

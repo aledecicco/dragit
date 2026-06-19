@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { IconCheck } from '@tabler/icons-react'
 
-import { useCheckUpdates } from '@/api/mutations/checkUpdates'
-import { useInstallUpdate } from '@/api/mutations/installUpdate'
 import {
   type UpdateInfo,
   useQueryAvailableUpdate,
 } from '@/api/queries/availableUpdate'
+import {
+  useCheckForUpdatesInteraction,
+  useInstallUpdateInteraction,
+} from '@/interactions/updates'
 import { ActionButton } from '@/lib/ActionButton'
 import { QueryLoader } from '@/lib/QueryLoader'
 import { Icon } from '@/ui/Icon'
@@ -18,7 +20,7 @@ import { cn } from '@/utils/styles'
  */
 const UpdateDetails = () => {
   const availableUpdateQuery = useQueryAvailableUpdate()
-  const checkForUpdates = useCheckUpdates()
+  const checkForUpdates = useCheckForUpdatesInteraction()
 
   return (
     <div className={cn('min-h-11 mt-10', 'flex flex-col items-center gap-2')}>
@@ -42,7 +44,7 @@ const UpdateDetails = () => {
               <ActionButton
                 status="neutral"
                 variant="filled"
-                action={checkForUpdates}
+                {...checkForUpdates}
                 size="xs"
               />
             </div>
@@ -61,8 +63,7 @@ const WithUpdate = (props: WithUpdateProps) => {
   const { update } = props
 
   const [progress, setProgress] = useState<number>()
-
-  const installUpdate = useInstallUpdate((newProgress) => {
+  const installUpdate = useInstallUpdateInteraction((newProgress) => {
     if (newProgress === 100) {
       setProgress(undefined)
     } else {
@@ -93,9 +94,9 @@ const WithUpdate = (props: WithUpdateProps) => {
       </p>
 
       <ActionButton
+        {...installUpdate}
         status="primary"
         variant="filled"
-        action={installUpdate}
         className={cn('mt-4')}
       />
 

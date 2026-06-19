@@ -1,9 +1,4 @@
-import {
-  IconCloudDown,
-  IconGitBranch,
-  IconPlus,
-  IconRouteAltLeft,
-} from '@tabler/icons-react'
+import { IconCloudDown, IconPlus, IconRouteAltLeft } from '@tabler/icons-react'
 import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
@@ -33,26 +28,6 @@ const createBranchMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useCreateBranch = (): Action<CreateBranchArgs> => {
-  const createBranch = useRepositoryMutation(createBranchMutation)
-
-  return {
-    id: {
-      key: 'create_branch',
-    },
-    run: async (args) => {
-      await createBranch.mutateAsync(args)
-    },
-    label: {
-      idle: 'Create branch',
-      running: 'Creating branch',
-      success: 'Branch created',
-      error: 'Failed to create branch',
-    },
-    Glyph: IconGitBranch,
-  }
-}
-
 const useMakeCreateBranchAt = (): ((
   reference: RefName,
 ) => Action<BranchName>) => {
@@ -79,10 +54,6 @@ const useMakeCreateBranchAt = (): ((
   })
 }
 
-const useCreateBranchAt = (reference: RefName): Action<BranchName> => {
-  return useMakeCreateBranchAt()(reference)
-}
-
 const useMakeTrackBranch = (): ((branch: BranchInfo) => Action<BranchName>) => {
   const createBranch = useRepositoryMutation(createBranchMutation)
 
@@ -107,10 +78,6 @@ const useMakeTrackBranch = (): ((branch: BranchInfo) => Action<BranchName>) => {
       })
     },
   })
-}
-
-const useTrackBranch = (branch: BranchInfo): Action<BranchName> => {
-  return useMakeTrackBranch()(branch)
 }
 
 const useMakeBranchOff = (): ((reference: RefName) => Action<BranchName>) => {
@@ -140,18 +107,10 @@ const useMakeBranchOff = (): ((reference: RefName) => Action<BranchName>) => {
   })
 }
 
-const useBranchOff = (reference: RefName): Action<BranchName> => {
-  return useMakeBranchOff()(reference)
-}
-
 export {
-  useCreateBranch,
   useMakeCreateBranchAt,
-  useCreateBranchAt,
   useMakeTrackBranch,
-  useTrackBranch,
   useMakeBranchOff,
-  useBranchOff,
   createBranchKey,
   createBranchMutation,
   type CreateBranchArgs,
