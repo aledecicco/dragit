@@ -27,7 +27,7 @@ export const useChangeFolderInteraction = () => {
   return interaction({
     action: changeFolder,
     argsRequester: chooseFolderArgsRequester,
-    details: 'open folder',
+    details: 'change folder',
   })
 }
 

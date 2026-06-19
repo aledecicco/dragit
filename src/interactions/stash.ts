@@ -1,7 +1,7 @@
 import type { NotStagedFile, StashInfo } from '@/api/models'
 import { useMakeApplyStash } from '@/api/mutations/applyStash'
 import {
-  useDiscardStash,
+  useMakeDiscardStash,
   useDiscardStashes,
 } from '@/api/mutations/discardStashes'
 import { useStashFiles } from '@/api/mutations/saveStash'
@@ -12,7 +12,7 @@ import { getSettings } from '@/state/storage'
 import { pluralize } from '@/utils/string'
 
 export const useDiscardStashInteraction = (stash: StashInfo) => {
-  const discard = useDiscardStash(stash)
+  const discard = useMakeDiscardStash()(stash)
 
   return interaction({
     action: discard,
