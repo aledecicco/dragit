@@ -78,7 +78,8 @@ impl CmdGit {
             args.clone().into_iter().collect::<Vec<_>>().join(" ")
         );
         let mut res = self.spawn_command(path, args)?;
-        let stderr = res.stderr.take();
+        let mut stderr = res.stderr.take();
+        let mut stdout = res.stdout.take();
 
         let status = res.wait().map_err(|err| GitError::CommandFailed {
             command: command_str.clone(),
@@ -87,16 +88,9 @@ impl CmdGit {
 
         if !status.success() {
             let reason = stderr
-                .and_then(|mut s| {
-                    let mut buf = String::new();
-                    s.read_to_string(&mut buf).ok()?;
-                    let trimmed = buf.trim().to_string();
-                    if trimmed.is_empty() {
-                        None
-                    } else {
-                        Some(trimmed)
-                    }
-                })
+                .as_mut()
+                .and_then(read_stream)
+                .or(stdout.as_mut().and_then(read_stream))
                 .unwrap_or_else(|| {
                     format!(
                         "Process exited with status code \"{}\"",
@@ -122,16 +116,14 @@ impl CmdGit {
     where
         I: IntoIterator<Item = &'a str> + Clone,
     {
-        let process = self.spawn_and_notify(channel, path, args.clone())?;
+        let mut process = self.spawn_and_notify(channel, path, args.clone())?;
         let stdout = process.stdout.ok_or(GitError::GetCommandOutputFailed {
             command: format!("git {}", args.into_iter().collect::<Vec<&str>>().join(" ")),
             reason: process
                 .stderr
-                .map_or("Unknown error".to_string(), |mut stderr| {
-                    let mut buffer = String::new();
-                    stderr.read_to_string(&mut buffer).ok();
-                    buffer
-                }),
+                .as_mut()
+                .and_then(read_stream)
+                .unwrap_or_else(|| "Unknown error".to_string()),
         })?;
 
         let reader = BufReader::new(stdout);
@@ -155,18 +147,16 @@ impl CmdGit {
         let stdout = process
             .stdout
             .take()
-            .ok_or(GitError::GetCommandOutputFailed {
+            .ok_or_else(|| GitError::GetCommandOutputFailed {
                 command: command_str.clone(),
-                reason: "Failed to capture output".to_string(),
+                reason: process
+                    .stderr
+                    .as_mut()
+                    .and_then(read_stream)
+                    .unwrap_or("Failed to capture output".to_string()),
             })?;
 
-        let mut buffer = String::new();
-        BufReader::new(stdout)
-            .read_to_string(&mut buffer)
-            .map_err(|err| GitError::GetCommandOutputFailed {
-                command: command_str.clone(),
-                reason: err.to_string(),
-            })?;
+        let buffer = read_stream(&mut BufReader::new(stdout)).unwrap_or_default();
 
         process
             .wait()
