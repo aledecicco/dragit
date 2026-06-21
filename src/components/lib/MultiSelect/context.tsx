@@ -167,11 +167,31 @@ const useIsSelected = (item: number) => {
 }
 
 /**
- * Hook that provides functions to update the combobox state.
+ * Hook that retrieves the anchor and extension end of the current selection range.
  *
  * @returns An object containing:
- * - `setSearch`: Function to update the search query.
- * - `setCurrentGroup`: Function to update the current group.
+ * - `lastSelected`: The index of the last selected item.
+ * - `lastExtension`: The index of the last item used for extending selection.
+ */
+const useSelectionAnchors = () => {
+  const store = useMultiSelectContext()
+
+  return useStore(
+    store,
+    useShallow((state) => ({
+      lastSelected: state.lastSelected,
+      lastExtension: state.lastExtension,
+    })),
+  )
+}
+
+/**
+ * Hook that provides functions to update the selection state.
+ *
+ * @returns An object containing:
+ * - `toggle`: Toggle an item's selected state.
+ * - `extendSelection`: Extend the selection from the last selected item to a specific item.
+ * - `setSelection`: Override the selection with a new set of items.
  */
 const useSelectionUpdater = () => {
   const store = useMultiSelectContext()
@@ -190,5 +210,6 @@ export {
   MultiSelectContextProvider,
   useSelectedItems,
   useIsSelected,
+  useSelectionAnchors,
   useSelectionUpdater,
 }

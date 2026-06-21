@@ -3,7 +3,11 @@ import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 import { useClickAway } from 'react-use'
 
-import { MultiSelectContextProvider, useSelectionUpdater } from './context'
+import {
+  MultiSelectContextProvider,
+  useSelectionAnchors,
+  useSelectionUpdater,
+} from './context'
 import { MultiSelectItem } from './Item'
 
 interface MultiSelectProps
@@ -33,7 +37,8 @@ const MultiSelect = (props: MultiSelectProps) => {
 const MultiSelectInner = (props: MultiSelectProps) => {
   const { children, itemsCount, store, ...compositeProps } = props
 
-  const { setSelection } = useSelectionUpdater()
+  const { lastSelected } = useSelectionAnchors()
+  const { setSelection, extendSelection } = useSelectionUpdater()
   const ref = useRef<HTMLDivElement>(null)
 
   const composite = Ariakit.useCompositeStore({ store })
@@ -67,6 +72,20 @@ const MultiSelectInner = (props: MultiSelectProps) => {
           return
         }
 
+        if (
+          (e.key === 'ArrowUp' || e.key === 'ArrowDown') &&
+          e.shiftKey &&
+          lastSelected !== undefined
+        ) {
+          const newExtension = composite.getState().activeId
+
+          if (newExtension) {
+            extendSelection(Number(newExtension))
+          }
+
+          return
+        }
+
         if (e.key === 'Escape') {
           setSelection([])
           e.preventDefault()
@@ -74,15 +93,14 @@ const MultiSelectInner = (props: MultiSelectProps) => {
         }
 
         if ((e.key === 'a' || e.key === 'A') && (e.metaKey || e.ctrlKey)) {
-          setSelection([...Array(itemsCount).keys()])
+          const lastItem = composite.getState().items.at(-1)?.id
 
-          if (!composite.getState().activeId) {
-            const lastItem = composite.getState().items.at(-1)?.id
-
-            if (lastItem) {
-              composite.move(lastItem)
-            }
+          if (lastItem) {
+            composite.move(lastItem)
           }
+
+          setSelection(0)
+          extendSelection(itemsCount - 1)
 
           e.preventDefault()
           e.stopPropagation()
