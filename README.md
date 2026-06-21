@@ -28,63 +28,99 @@ Don't want to type? Everything can be done with a drag-and-drop gesture.
 
 Like using the keyboard? Hotkeys and command palettes allow you to go through the workflow without having to reach for the mouse.
 
+Here are a few:
+
 <br/>
 
 <div align="center">
-<img src="./assets/stage-file.gif" width="500"/>
-<p>Stage or unstage a file</p>
+  <table>
+    <tr>
+      <td>
+        <img src="./assets/stage-file.gif" width="500"/>
+      </td>
+    </tr>
+  </table>
+  <p>Stage or unstage a file</p>
 </div>
 
 <br/>
 
 <div align="center">
-<img src="./assets/stage-many.gif" width="500"/>
-<p>Or all of them at once</p>
+  <table>
+    <tr>
+      <td>
+        <img src="./assets/stage-many.gif" width="500"/>
+      </td>
+    </tr>
+  </table>
+  <p>Or all of them at once</p>
 </div>
 
 <br/>
 
 <div align="center">
-<img src="./assets/amend.gif" width="500"/>
-<p>Made a mistake? Amend that last commit</p>
+  <table>
+    <tr>
+      <td>
+        <img src="./assets/amend.gif" width="500"/>
+      </td>
+    </tr>
+  </table>
+  <p>Made a mistake? Amend that last commit</p>
 </div>
 
 <br/>
 
 <div align="center">
-<img src="./assets/delete.gif" width="500"/>
-<p>Have a bunch of old branches lying around? Drag them to the recycling bin</p>
+    <table>
+      <tr>
+        <td>
+            <img src="./assets/delete.gif" width="500"/>
+        </td>
+      </tr>
+    </table>
+    <p>Drag old branches that are lying around to the recycling bin</p>
 </div>
 
 <br/>
 
 <div align="center">
-<img src="./assets/context.gif" width="500"/>
-<p>Open context menus for a more detailed list of all actions available</p>
+    <table>
+      <tr>
+        <td>
+            <img src="./assets/context.gif" width="500"/>
+        </td>
+      </tr>
+    </table>
+    <p>Open context menus for a more detailed list of all actions available</p>
 </div>
 
 <br/>
 
 <div align="center">
-<img src="./assets/shortcut.gif" width="500"/>
-<p>Or trigger keyboard shortcuts to go faster</p>
+    <table>
+      <tr>
+        <td>
+            <img src="./assets/shortcut.gif" width="500"/>
+        </td>
+      </tr>
+    </table>
+    <p>Or trigger keyboard shortcuts to go faster</p>
 </div>
 
 <br/>
 
 <div align="center">
-<img src="./assets/diff.gif" align="center" width="800"/>
-<p>Check your changes with the word-level diff viewer</p>
-<p>Complete with syntax highlighting for all languages, including unmerged conflict views</p>
+    <table>
+      <tr>
+        <td>
+            <img src="./assets/diff.gif" align="center" width="800"/>
+        </td>
+      </tr>
+    </table>
+    <p>Check your changes with the word-level diff viewer</p>
+    <p>Complete with syntax highlighting for all languages, including unmerged conflict views</p>
 </div>
-
-### And more
-
-- **Branch and tag management**: create, delete, push, pull, fetch, fast-forward, and set upstreams
-- **Stash management**: stash selected files, apply, or discard
-- **Remote management**: add, remove, rename remotes and change URLs
-- **In-progress operation toolbar**: contextual abort/continue actions surface automatically during merge, rebase, cherry-pick, and revert
-- **Auto-updater**: built-in update mechanism via GitHub Releases
 
 
 ## Architecture
