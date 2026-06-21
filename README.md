@@ -31,42 +31,42 @@ Like using the keyboard? Hotkeys and command palettes allow you to go through th
 <br/>
 
 <div align="center">
-<img src="./assets/stage-file.gif" width="600"/>
+<img src="./assets/stage-file.gif" width="500"/>
 <p>Stage or unstage a file</p>
 </div>
 
 <br/>
 
 <div align="center">
-<img src="./assets/stage-many.gif" width="600"/>
+<img src="./assets/stage-many.gif" width="500"/>
 <p>Or all of them at once</p>
 </div>
 
 <br/>
 
 <div align="center">
-<img src="./assets/amend.gif" width="600"/>
+<img src="./assets/amend.gif" width="500"/>
 <p>Made a mistake? Amend that last commit</p>
 </div>
 
 <br/>
 
 <div align="center">
-<img src="./assets/delete.gif" width="600"/>
+<img src="./assets/delete.gif" width="500"/>
 <p>Have a bunch of old branches lying around? Drag them to the recycling bin</p>
 </div>
 
 <br/>
 
 <div align="center">
-<img src="./assets/context.gif" width="600"/>
-<p>Open context menues for a more detailed list of all actions available</p>
+<img src="./assets/context.gif" width="500"/>
+<p>Open context menus for a more detailed list of all actions available</p>
 </div>
 
 <br/>
 
 <div align="center">
-<img src="./assets/shortcut.gif" width="600"/>
+<img src="./assets/shortcut.gif" width="500"/>
 <p>Or trigger keyboard shortcuts to go faster</p>
 </div>
 
