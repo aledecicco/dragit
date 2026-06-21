@@ -44,6 +44,11 @@ const SettingsDialogPreferencesContent = () => {
                 setting="openLastOnStart"
               />
               <CheckboxSetting
+                label="Check for updates"
+                setting="checkForUpdates"
+                description="Automatically check and notify about available updates on startup"
+              />
+              <CheckboxSetting
                 label="Confirm dangerous actions"
                 setting="confirmDangerousActions"
                 description="e.g. deleting branches, force pushing"

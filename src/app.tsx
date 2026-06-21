@@ -39,8 +39,8 @@ const App = () => {
         )}
       </div>
 
-      <DialogsHandler />
       <ToastsHandler />
+      <DialogsHandler />
     </>
   )
 }

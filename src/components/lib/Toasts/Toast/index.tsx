@@ -50,6 +50,7 @@ const Toast = (props: ToastProps) => {
       onClick={(e) => {
         if (
           e.target instanceof Element &&
+          !e.target.closest('.toast-action') &&
           e.target.closest('.prevent-toast-action')
         ) {
           return
@@ -61,6 +62,7 @@ const Toast = (props: ToastProps) => {
         <div
           {...propsWithCn(
             divProps,
+            'z-6',
             'flex flex-col p-4 gap-3 rounded-md shadow-md w-max max-w-130',
             'border-2 border-dark-50 bg-dark-300',
             '[&:hover:not(:has(.prevent-toast-action:hover))]:bg-dark-200',
@@ -124,7 +126,10 @@ const Toast = (props: ToastProps) => {
 const toast = (props: ToastArgs) => {
   const settings = getSettings()
 
-  if (settings.showToasts) {
+  if (
+    settings.showToasts ||
+    (props.status !== 'danger' && props.status !== 'warning')
+  ) {
     sonnerToast.custom((id) => <Toast id={id} {...props} />)
   }
 }

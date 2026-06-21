@@ -57,6 +57,7 @@ impl Default for RepositoryStorage {
 pub struct Settings {
     pub file_opener_app: String,
     pub open_last_on_start: bool,
+    pub check_for_updates: bool,
     pub confirm_dangerous_actions: bool,
     pub show_toasts: bool,
     pub auto_fetch_remote: bool,
@@ -94,6 +95,7 @@ impl Default for Settings {
         Self {
             file_opener_app: "code".to_string(),
             open_last_on_start: true,
+            check_for_updates: true,
             confirm_dangerous_actions: true,
             show_toasts: true,
             auto_fetch_remote: false,

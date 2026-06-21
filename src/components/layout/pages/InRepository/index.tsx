@@ -24,6 +24,7 @@ import {
   useSelectedFile,
 } from '@/state/file'
 import { useUpstreamsSync } from '@/state/upstream'
+import { useCheckForUpdates } from '@/utils/behavior'
 import { cn } from '@/utils/styles'
 
 /**
@@ -33,6 +34,7 @@ const InRepositoryPage = () => {
   useBasesSync()
   useUpstreamsSync()
   useFileDiffsSync()
+  useCheckForUpdates()
 
   const selectedFile = useSelectedFile()
   const applyStash = useApplySomeStashInteraction()

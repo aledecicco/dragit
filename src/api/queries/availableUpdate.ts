@@ -3,7 +3,7 @@ import { check, type Update } from '@tauri-apps/plugin-updater'
 
 interface UpdateInfo {
   version: string
-  date: Date | undefined
+  date: Date
   description: string | undefined
   rawData: Update
 }
@@ -19,7 +19,7 @@ const fetchAvailableUpdate = async (): Promise<UpdateInfo | null> => {
 
   return {
     version: update.version,
-    date: update.date ? new Date(update.date) : undefined,
+    date: update.date ? new Date(update.date) : new Date(),
     description: update.body,
     rawData: update,
   }

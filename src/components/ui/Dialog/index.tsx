@@ -33,7 +33,7 @@ const Dialog = (props: DialogProps) => {
       backdrop={<div className={cn('bg-black/50')} />}
       {...propsWithCn(
         dialogProps,
-        'z-6',
+        'z-7',
         'fixed top-half left-half -translate-half',
         'max-w-[70%] max-h-[70%] rounded-lg overflow-hidden',
         'border-2 border-dark-900 bg-dark-900',

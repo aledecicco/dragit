@@ -15,16 +15,21 @@ import { SettingsDialogPreferencesContent } from './PreferencesContent'
 
 const SETTINGS_DIALOG_KEY = 'settings_dialog'
 
-interface SettingsDialogProps extends Omit<DialogProps, 'dialogKey'> {}
+interface SettingsDialogProps extends Omit<DialogProps, 'dialogKey'> {
+  /**
+   * The tab to have initially open when the dialog is shown.
+   */
+  initialTab?: 'preferences' | 'about'
+}
 
 /**
  * Dialog that displays existing settings and allows managing them.
  */
 const SettingsDialog = (props: SettingsDialogProps) => {
-  const { ...dialogProps } = props
+  const { initialTab = 'preferences', ...dialogProps } = props
 
   const scopesHandler = useShortcutScopesHandler()
-  const tabsHandler = useTabsHandler('preferences', {
+  const tabsHandler = useTabsHandler(initialTab, {
     selectOnMove: false,
   })
 

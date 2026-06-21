@@ -15,6 +15,7 @@ export interface Storage {
 export interface Settings {
   fileOpenerApp: string
   openLastOnStart: boolean
+  checkForUpdates: boolean
   confirmDangerousActions: boolean
   showToasts: boolean
   autoFetchRemote: boolean

@@ -81,7 +81,6 @@ const getDateDifference = (timestamp: Date | number) => {
  * updating the value every minute.
  *
  * @param timestamp - The date to compare against. Can be a Date object or a timestamp in milliseconds.
- * @returns
  */
 export const useDateDifference = (timestamp: Date | number): string => {
   return useTimedValue(() => getDateDifference(timestamp), MS_IN_MINUTE)
@@ -92,7 +91,6 @@ export const useDateDifference = (timestamp: Date | number): string => {
  * depending on the user's settings.
  *
  * @param timestamp - The date to use for display. Can be a Date object or a timestamp in milliseconds.
- * @returns
  */
 export const useDateInfo = (timestamp: Date | number) => {
   const { relativeTimestamps } = useSettings()
@@ -107,7 +105,7 @@ export const useDateInfo = (timestamp: Date | number) => {
 /**
  * Promise that resolves after the given time.
  *
- * @param ms - The duration in milliseconds to wait.
+ * @param ms - The number of milliseconds to wait for.
  */
 export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms))

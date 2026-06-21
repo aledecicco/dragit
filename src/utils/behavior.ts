@@ -1,7 +1,13 @@
+import { useEffect, useRef } from 'react'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openPath, openUrl } from '@tauri-apps/plugin-opener'
 import { useEffectOnce } from 'react-use'
+
+import { useQueryAvailableUpdate } from '@/api/queries/availableUpdate'
+import { newUpdateAvailableToast } from '@/common/Toasts/NewUpdateAvailable'
+import { toast } from '@/lib/Toasts/Toast'
+import { getSettings } from '@/state/storage'
 
 /**
  * Prompts the user to select a directory using the native file picker.
@@ -63,4 +69,23 @@ export const useDefaultEventPrevention = () => {
       window.removeEventListener('contextmenu', preventContextMenu)
     }
   })
+}
+
+/**
+ * Waits for the query of available updates to load and notifies the user if the option is enabled.
+ */
+export const useCheckForUpdates = () => {
+  const updatesChecked = useRef(false)
+  const updateQuery = useQueryAvailableUpdate()
+
+  useEffect(() => {
+    if (!updatesChecked.current && updateQuery.data) {
+      updatesChecked.current = true
+      const settings = getSettings()
+
+      if (settings.checkForUpdates) {
+        toast(newUpdateAvailableToast(updateQuery.data))
+      }
+    }
+  }, [updateQuery.data])
 }
