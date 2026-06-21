@@ -180,22 +180,15 @@ const useChangeSelectedRemote = () => {
     const newUpstream = changeSelectedRemote(branch, remote)
 
     const repoStorage = getCurrentRepositoryStorage()
+    const newSavedUpstreams = new Map(repoStorage?.branchUpstreams)
 
-    if (repoStorage) {
-      const newSavedUpstreams = new Map(repoStorage.branchUpstreams)
-
-      if (newUpstream) {
-        newSavedUpstreams.set(branch.name, newUpstream)
-        setRepositoryStorage.mutateAsync({
-          branchUpstreams: newSavedUpstreams,
-        })
-      } else {
-        newSavedUpstreams.delete(branch.name)
-        setRepositoryStorage.mutateAsync({
-          branchUpstreams: newSavedUpstreams,
-        })
-      }
+    if (newUpstream) {
+      newSavedUpstreams.set(branch.name, newUpstream)
+    } else {
+      newSavedUpstreams.delete(branch.name)
     }
+
+    setRepositoryStorage.mutateAsync({ branchUpstreams: newSavedUpstreams })
   }
 }
 

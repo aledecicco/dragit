@@ -176,22 +176,10 @@ const useChangeSelectedBase = () => {
     changeSelectedBase(reference, newBase)
 
     const repoStorage = getCurrentRepositoryStorage()
+    const newSavedBases = new Map(repoStorage?.branchBases)
 
-    if (repoStorage) {
-      const newSavedBases = new Map(repoStorage.branchBases)
-
-      if (newBase) {
-        newSavedBases.set(reference.refName, newBase)
-        setRepoStorage.mutateAsync({
-          branchBases: newSavedBases,
-        })
-      } else {
-        newSavedBases.delete(reference.refName)
-        setRepoStorage.mutateAsync({
-          branchBases: newSavedBases,
-        })
-      }
-    }
+    newSavedBases.set(reference.refName, newBase)
+    setRepoStorage.mutateAsync({ branchBases: newSavedBases })
   }
 }
 
