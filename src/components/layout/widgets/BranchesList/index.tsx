@@ -126,7 +126,13 @@ const BranchesList = (props: BranchesListProps) => {
           <>
             <InteractiveListContainer
               className={cn('border-none')}
-              items={localBranchesQuery.data ?? []}
+              items={
+                (settings.sortBranchesByDate
+                  ? localBranchesQuery.data?.sort((a, b) => {
+                      return b.timestamp - a.timestamp
+                    })
+                  : localBranchesQuery.data) ?? []
+              }
               getInteractions={getBranchesListInteractions}
               getDragPayload={getBranchesDragPayload}
               onBeforeDrag={() => {
@@ -143,7 +149,13 @@ const BranchesList = (props: BranchesListProps) => {
 
             <InteractiveListContainer
               className={cn('border-none')}
-              items={remoteBranchesQuery.data ?? []}
+              items={
+                (settings.sortBranchesByDate
+                  ? remoteBranchesQuery.data?.sort((a, b) => {
+                      return b.timestamp - a.timestamp
+                    })
+                  : remoteBranchesQuery.data) ?? []
+              }
               getInteractions={getBranchesListInteractions}
               getDragPayload={getBranchesDragPayload}
               onBeforeDrag={() => {
@@ -160,7 +172,13 @@ const BranchesList = (props: BranchesListProps) => {
 
             <InteractiveListContainer
               className={cn('border-none')}
-              items={allBranchesQuery.data ?? []}
+              items={
+                (settings.sortBranchesByDate
+                  ? allBranchesQuery.data?.sort((a, b) => {
+                      return b.timestamp - a.timestamp
+                    })
+                  : allBranchesQuery.data) ?? []
+              }
               getInteractions={getBranchesListInteractions}
               getDragPayload={getBranchesDragPayload}
               onBeforeDrag={() => {
@@ -175,7 +193,13 @@ const BranchesList = (props: BranchesListProps) => {
 
             <InteractiveListContainer
               className={cn('border-none')}
-              items={tagsQuery.data ?? []}
+              items={
+                (settings.sortBranchesByDate
+                  ? tagsQuery.data?.sort((a, b) => {
+                      return b.timestamp - a.timestamp
+                    })
+                  : tagsQuery.data) ?? []
+              }
               getInteractions={getTagsListInteractions}
               getDragPayload={getTagsDragPayload}
               onBeforeDrag={() => {
