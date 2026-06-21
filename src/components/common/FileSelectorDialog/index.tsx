@@ -1,4 +1,5 @@
-import { startTransition, useDeferredValue, useState } from 'react'
+import { useState } from 'react'
+import { useDebounce } from 'react-use'
 
 import type { FileOfType, WorktreeFileType } from '@/api/models'
 import {
@@ -62,10 +63,11 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
   const { types, submitValue, ...commandMenuProps } = props
 
   const [search, setSearch] = useState('')
-  const deferredSearch = useDeferredValue(search)
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  useDebounce(() => setDebouncedSearch(search), 150, [search])
 
-  const filesQuery = useQueryWorktreeFiles(types, deferredSearch)
-  useHandleFilesPageSync(types, deferredSearch)
+  const filesQuery = useQueryWorktreeFiles(types, debouncedSearch)
+  useHandleFilesPageSync(types, debouncedSearch)
 
   const page = useWorktreeFilesPage(types)
   const showPagination = useNeedsPagination(filesQuery, page)
@@ -112,10 +114,8 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
         ...commandMenuProps.fieldProps,
       }}
       onSearchChange={(newSearch) => {
-        startTransition(() => {
-          commandMenuProps.onSearchChange?.(newSearch)
-          setSearch(newSearch)
-        })
+        commandMenuProps.onSearchChange?.(`**${newSearch}**`)
+        setSearch(`**${newSearch}**`)
       }}
       footer={
         showPagination && (

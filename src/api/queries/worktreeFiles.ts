@@ -1,5 +1,6 @@
 import {
   type QueryFunctionContext,
+  keepPreviousData,
   queryOptions,
   type UseQueryResult,
 } from '@tanstack/react-query'
@@ -167,6 +168,7 @@ const worktreeFilesQuery = <T extends WorktreeFileType>(
         page,
         context,
       ),
+    placeholderData: keepPreviousData,
   })
 
 const useQueryWorktreeFiles = <T extends WorktreeFileType>(

@@ -32,7 +32,6 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
   const currentReference = useHeadReference()
 
   const checkoutTracker = useCheckoutPresenter()
-  // TODO: the action presenter should know about "branch off" actions
   const branchOff = useBranchOffSomeBranchInteraction()
   const checkoutBranch = useCheckoutSomeBranchInteraction()
   const checkoutTag = useCheckoutSomeTagInteraction()
