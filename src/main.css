@@ -132,6 +132,7 @@
   outline: none;
 }
 
+
 :root {
   font-family: "Inter", sans-serif;
   @apply bg-dark-600 text-light-50;

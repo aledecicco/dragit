@@ -1,0 +1,22 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV APPIMAGE_EXTRACT_AND_RUN=1
+ENV npm_config_store_dir=/pnpm-store
+
+RUN apt-get update && apt-get install -y \
+    curl file build-essential xdg-utils \
+    libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf \
+    && rm -rf /var/lib/apt/lists/*
+
+# Node.js LTS
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get install -y nodejs \
+    && corepack enable \
+    && rm -rf /var/lib/apt/lists/*
+
+# Rust stable
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:$PATH"
+
+WORKDIR /app
