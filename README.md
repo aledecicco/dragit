@@ -11,8 +11,7 @@
   [![Version](https://img.shields.io/github/v/tag/aledecicco/dragit)](https://github.com/aledecicco/dragit/releases)
   [![License](https://img.shields.io/github/license/aledecicco/dragit)](https://opensource.org/licenses/gpl-3.0)
 
-  <!-- GIF: drag a branch from the list onto the graph merge zone this is the hero shot -->
-  ![Demo](./docs/gifs/drag-merge.gif)
+  ![Demo](./assets/merge.gif)
 </div>
 
 
