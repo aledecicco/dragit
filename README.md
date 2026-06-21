@@ -11,7 +11,7 @@
   [![Version](https://img.shields.io/github/v/tag/aledecicco/dragit)](https://github.com/aledecicco/dragit/releases)
   [![License](https://img.shields.io/github/license/aledecicco/dragit)](https://opensource.org/licenses/gpl-3.0)
 
-  <img src="./assets/merge.gif" width="800"/>
+  <img src="./assets/merge.webp" width="800"/>
 </div>
 
 <br/>
@@ -33,91 +33,50 @@ Here are a few:
 <br/>
 
 <div align="center">
-  <table>
-    <tr>
-      <td>
-        <img src="./assets/stage-file.gif" width="500"/>
-      </td>
-    </tr>
-  </table>
-  <p>Stage or unstage a file</p>
+    <img src="./assets/stage-file.webp" width="500"/>
+    <br/>
+    <p>Stage or unstage a file</p>
 </div>
 
 <br/>
 
 <div align="center">
-  <table>
-    <tr>
-      <td>
-        <img src="./assets/stage-many.gif" width="500"/>
-      </td>
-    </tr>
-  </table>
-  <p>Or all of them at once</p>
+    <img src="./assets/stage-many.webp" width="500"/>
+    <p>Or all of them at once</p>
 </div>
 
 <br/>
 
 <div align="center">
-  <table>
-    <tr>
-      <td>
-        <img src="./assets/amend.gif" width="500"/>
-      </td>
-    </tr>
-  </table>
-  <p>Made a mistake? Amend that last commit</p>
+    <img src="./assets/amend.webp" width="500"/>
+    <p>Made a mistake? Amend that last commit</p>
 </div>
 
 <br/>
 
 <div align="center">
-    <table>
-      <tr>
-        <td>
-            <img src="./assets/delete.gif" width="500"/>
-        </td>
-      </tr>
-    </table>
+    <img src="./assets/delete.webp" width="500"/>
     <p>Drag old branches that are lying around to the recycling bin</p>
 </div>
 
 <br/>
 
 <div align="center">
-    <table>
-      <tr>
-        <td>
-            <img src="./assets/context.gif" width="500"/>
-        </td>
-      </tr>
-    </table>
+    <img src="./assets/context.webp" width="500"/>
     <p>Open context menus for a more detailed list of all actions available</p>
 </div>
 
 <br/>
 
 <div align="center">
-    <table>
-      <tr>
-        <td>
-            <img src="./assets/shortcut.gif" width="500"/>
-        </td>
-      </tr>
-    </table>
+    <img src="./assets/shortcut.webp" width="500"/>
     <p>Or trigger keyboard shortcuts to go faster</p>
 </div>
 
 <br/>
 
 <div align="center">
-    <table>
-      <tr>
-        <td>
-            <img src="./assets/diff.gif" align="center" width="800"/>
-        </td>
-      </tr>
-    </table>
+    <img src="./assets/diff.webp" align="center" width="800"/>
     <p>Check your changes with the word-level diff viewer</p>
     <p>Complete with syntax highlighting for all languages, including unmerged conflict views</p>
 </div>
