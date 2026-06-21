@@ -11,8 +11,10 @@
   [![Version](https://img.shields.io/github/v/tag/aledecicco/dragit)](https://github.com/aledecicco/dragit/releases)
   [![License](https://img.shields.io/github/license/aledecicco/dragit)](https://opensource.org/licenses/gpl-3.0)
 
-  ![Demo](./assets/merge.gif)
+  <img src="./assets/merge.gif" width="800"/>
 </div>
+
+<br/>
 
 
 ## Why
