@@ -10,10 +10,8 @@ import {
   useQueryWorktreeFiles,
   WORKTREE_FILES_PAGE_SIZE,
 } from '@/api/queries/worktreeFiles'
-import {
-  useCommitInteraction,
-  useStageAllInteraction,
-} from '@/interactions/operations'
+import { useStageAllInteraction } from '@/interactions/file'
+import { useCommitInteraction } from '@/interactions/operations'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { useWorktreeFilesPage } from '@/state/pages'
 import { Marquee } from '@/ui/Marquee'

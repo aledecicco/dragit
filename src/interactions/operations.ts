@@ -2,7 +2,6 @@ import { useAbortCherryPick } from '@/api/mutations/abortCherryPick'
 import { useAbortMerge } from '@/api/mutations/abortMerge'
 import { useAbortRebase } from '@/api/mutations/abortRebase'
 import { useAbortRevert } from '@/api/mutations/abortRevert'
-import { useStageAll } from '@/api/mutations/addToIndex'
 import { useCommit } from '@/api/mutations/commitIndex'
 import { useContinueCherryPick } from '@/api/mutations/continueCherryPick'
 import { useContinueMerge } from '@/api/mutations/continueMerge'
@@ -10,11 +9,6 @@ import { useContinueRebase } from '@/api/mutations/continueRebase'
 import { useContinueRevert } from '@/api/mutations/continueRevert'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { interaction } from '@/lib/ActionButton/utils'
-
-export const useStageAllInteraction = () => {
-  const stageAll = useStageAll()
-  return interaction({ action: stageAll, details: 'stage all changes' })
-}
 
 export const useCommitInteraction = () => {
   const commit = useCommit()
@@ -31,8 +25,8 @@ export const useAbortMergeInteraction = () => {
 }
 
 export const useContinueMergeInteraction = () => {
-  const cont = useContinueMerge()
-  return interaction({ action: cont, details: 'continue merge' })
+  const continueMerge = useContinueMerge()
+  return interaction({ action: continueMerge, details: 'continue merge' })
 }
 
 export const useAbortRebaseInteraction = () => {
@@ -41,8 +35,8 @@ export const useAbortRebaseInteraction = () => {
 }
 
 export const useContinueRebaseInteraction = () => {
-  const cont = useContinueRebase()
-  return interaction({ action: cont, details: 'continue rebase' })
+  const continueRebase = useContinueRebase()
+  return interaction({ action: continueRebase, details: 'continue rebase' })
 }
 
 export const useAbortCherryPickInteraction = () => {
@@ -51,8 +45,11 @@ export const useAbortCherryPickInteraction = () => {
 }
 
 export const useContinueCherryPickInteraction = () => {
-  const cont = useContinueCherryPick()
-  return interaction({ action: cont, details: 'continue cherry-pick' })
+  const continueCherryPick = useContinueCherryPick()
+  return interaction({
+    action: continueCherryPick,
+    details: 'continue cherry-pick',
+  })
 }
 
 export const useAbortRevertInteraction = () => {
@@ -61,6 +58,6 @@ export const useAbortRevertInteraction = () => {
 }
 
 export const useContinueRevertInteraction = () => {
-  const cont = useContinueRevert()
-  return interaction({ action: cont, details: 'continue revert' })
+  const continueRevert = useContinueRevert()
+  return interaction({ action: continueRevert, details: 'continue revert' })
 }

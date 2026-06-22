@@ -1,10 +1,10 @@
 import type { NotStagedFile, StashInfo } from '@/api/models'
 import { useMakeApplyStash } from '@/api/mutations/applyStash'
 import {
-  useMakeDiscardStash,
   useDiscardStashes,
+  useMakeDiscardStash,
 } from '@/api/mutations/discardStashes'
-import { useStashFiles } from '@/api/mutations/saveStash'
+import { useStashAll, useStashFiles } from '@/api/mutations/saveStash'
 import { requestStashParams } from '@/common/StashDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import type { AnyInteraction } from '@/state/actions'
@@ -59,6 +59,18 @@ export const useStashFilesInteraction = () => {
       },
       details: `stash ${pluralize('file', files.length, true)}`,
     })
+}
+
+export const useStashAllInteraction = () => {
+  const stashAll = useStashAll()
+
+  return interaction({
+    action: stashAll,
+    argsRequester: async () => {
+      return { message: null }
+    },
+    details: 'stash all changes',
+  })
 }
 
 export const useDiscardStashesInteraction = () => {

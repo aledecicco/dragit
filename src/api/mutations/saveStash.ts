@@ -2,9 +2,13 @@ import { IconPackage } from '@tabler/icons-react'
 import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
+import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStaged'
+import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
+
 import type { Action } from '@/state/actions'
 
 import type { WorktreeFileInfo } from '../models'
+import { useQueryWorktreeFiles } from '../queries/worktreeFiles'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface SaveStashArgs {
@@ -98,10 +102,51 @@ const useStashFiles = (): Action<StashFilesArgs> => {
   }
 }
 
+const useStashAll = (): Action<Omit<StashFilesArgs, 'files'>> => {
+  const saveStash = useRepositoryMutation(saveStashMutation)
+  const notStagedChangesQuery = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
+  const stagedChangesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
+
+  return {
+    id: { key: 'file_operation', operation: 'stash_all_files' },
+    blockedBy: [
+      { key: 'file_operation' },
+      { key: 'branch_operation', type: 'current' },
+    ],
+    run: async (args) => {
+      await saveStash.mutateAsync({
+        ...args,
+        files: ['.'],
+        includeUntracked: true,
+      })
+    },
+    derivedIds: () => [
+      ...(notStagedChangesQuery.data?.items.map((file) => ({
+        key: 'file_operation',
+        operation: 'save_stash',
+        file: file.path,
+      })) ?? []),
+      ...(stagedChangesQuery.data?.items.map((file) => ({
+        key: 'file_operation',
+        operation: 'save_stash',
+        file: file.path,
+      })) ?? []),
+    ],
+    label: {
+      idle: 'Stash all',
+      running: 'Stashing all',
+      success: 'Stashed all',
+      error: 'Failed',
+    },
+    Glyph: IconPackage,
+  }
+}
+
 export {
   useMakeStashFile,
   useStashFile,
   useStashFiles,
+  useStashAll,
   saveStashKey,
   saveStashMutation,
   type SaveStashArgs,

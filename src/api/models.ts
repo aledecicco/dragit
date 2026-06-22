@@ -30,6 +30,7 @@ export interface Settings {
   showLargeDiffs: boolean
   showWordDiffs: boolean
 
+  commandPaletteShortcut: string
   stageFilesShortcut: string
   unstageFilesShortcut: string
   stashFilesShortcut: string

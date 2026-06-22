@@ -72,6 +72,7 @@ pub struct Settings {
     pub show_large_diffs: bool,
     pub show_word_diffs: bool,
 
+    pub command_palette_shortcut: String,
     pub stage_files_shortcut: String,
     pub unstage_files_shortcut: String,
     pub stash_files_shortcut: String,
@@ -110,6 +111,7 @@ impl Default for Settings {
             show_large_diffs: false,
             show_word_diffs: true,
 
+            command_palette_shortcut: "Ctrl + P".to_string(),
             stage_files_shortcut: "Ctrl + Shift + A".to_string(),
             unstage_files_shortcut: "Ctrl + Shift + U".to_string(),
             stash_files_shortcut: "Ctrl + Shift + S".to_string(),

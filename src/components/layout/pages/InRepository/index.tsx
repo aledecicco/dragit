@@ -12,10 +12,12 @@ import { StashesList } from '@/layout/widgets/StashesList'
 import { NotStagedWorktreeChanges } from '@/layout/widgets/WorktreeChanges/NotStaged'
 import { StagedWorktreeChanges } from '@/layout/widgets/WorktreeChanges/Staged'
 
+import { showCommandPalette } from '@/common/CommandPalette'
 import { showSettingsDialog } from '@/common/SettingsDialog'
 import { useApplySomeStashInteraction } from '@/interactions/stash'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
+import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
 import { useBasesSync } from '@/state/branches'
 import {
@@ -23,6 +25,7 @@ import {
   useFileDiffsSync,
   useSelectedFile,
 } from '@/state/file'
+import { useSettings } from '@/state/storage'
 import { useUpstreamsSync } from '@/state/upstream'
 import { useCheckForUpdates } from '@/utils/behavior'
 import { cn } from '@/utils/styles'
@@ -38,6 +41,9 @@ const InRepositoryPage = () => {
 
   const selectedFile = useSelectedFile()
   const applyStash = useApplySomeStashInteraction()
+
+  const settings = useSettings()
+  useShortcutBinding(settings.commandPaletteShortcut, showCommandPalette)
 
   return (
     <>

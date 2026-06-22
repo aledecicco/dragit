@@ -11,7 +11,11 @@ import type {
   VersionedFileInfo,
   WorktreeFileInfo,
 } from '@/api/models'
-import { useStageFile, useStageFiles } from '@/api/mutations/addToIndex'
+import {
+  useStageAll,
+  useStageFile,
+  useStageFiles,
+} from '@/api/mutations/addToIndex'
 import {
   useUnstageFile,
   useUnstageFiles,
@@ -237,6 +241,11 @@ export const useStageFilesInteraction = () => {
       argsRequester: () => files,
       details: `stage ${pluralize('file', files.length, true)}`,
     })
+}
+
+export const useStageAllInteraction = () => {
+  const stageAll = useStageAll()
+  return interaction({ action: stageAll, details: 'stage all changes' })
 }
 
 export const useAcceptManyAsIsInteraction = () => {
