@@ -55,6 +55,7 @@ export const useStashFilesInteraction = () => {
         const message = askForStashMessage
           ? (await requestStashParams()).message
           : null
+
         return { files, message }
       },
       details: `stash ${pluralize('file', files.length, true)}`,
@@ -67,7 +68,12 @@ export const useStashAllInteraction = () => {
   return interaction({
     action: stashAll,
     argsRequester: async () => {
-      return { message: null }
+      const { askForStashMessage } = getSettings()
+      const message = askForStashMessage
+        ? (await requestStashParams()).message
+        : null
+
+      return { message }
     },
     details: 'stash all changes',
   })

@@ -1,4 +1,7 @@
-import { triggerInteraction } from '@/state/actions'
+import type { CommitIndexArgs } from '@/api/mutations/commitIndex'
+import type { SaveStashArgs } from '@/api/mutations/saveStash'
+import { requestCommitParams } from '@/common/CommitDialog'
+import { type Interaction, triggerInteraction } from '@/state/actions'
 
 import { useStageAllInteraction } from './file'
 import { useCommitInteraction } from './operations'
@@ -22,8 +25,12 @@ export const useQuickCommitFlow = (): Flow => {
     label: 'Quick Commit',
     description: 'Stage and commit all changes',
     execute: async () => {
+      const params = await requestCommitParams()
       await triggerInteraction(stageAll)
-      await triggerInteraction(commit)
+      await triggerInteraction({
+        ...commit,
+        argsRequester: () => params,
+      } as Interaction<CommitIndexArgs>)
     },
   }
 }
@@ -37,7 +44,12 @@ export const useQuickStashFlow = (): Flow => {
     label: 'Quick Stash',
     description: 'Stash all changes',
     execute: async () => {
-      await triggerInteraction(stashAll)
+      await triggerInteraction({
+        ...stashAll,
+        argsRequester: async () => ({
+          message: null,
+        }),
+      } as Interaction<SaveStashArgs>)
     },
   }
 }
