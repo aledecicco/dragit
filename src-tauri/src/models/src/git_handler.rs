@@ -145,22 +145,20 @@ pub trait GitHandler {
         base_branch: &str,
     ) -> Result<BranchDivergence, GitError>;
 
-    /// Pushes the given branch, updating the refspec specified by the remote name and the remote branch.
+    /// Pushes the current branch, updating the refspec specified by the remote name and the remote branch.
     fn push_branch(
         &self,
         repo_path: &str,
-        branch: &str,
         remote: &str,
         remote_branch: &str,
         is_force: bool,
         set_upstream: bool,
     ) -> Result<(), GitError>;
 
-    /// Pulls the given branch, updating it from the refspec specified by the remote name and the remote branch.
+    /// Pulls the current branch, updating it from the refspec specified by the remote name and the remote branch.
     fn pull_branch(
         &self,
         repo_path: &str,
-        branch: &str,
         remote: &str,
         remote_branch: &str,
         is_rebase: bool,

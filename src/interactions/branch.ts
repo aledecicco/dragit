@@ -11,10 +11,16 @@ import {
   useDeleteBranches,
   useMakeDeleteBranch,
 } from '@/api/mutations/deleteBranches'
-import { useFastForwardBranch } from '@/api/mutations/fastForwardBranch'
+import { useMakeFastForwardBranch } from '@/api/mutations/fastForwardBranch'
 import { useMakeMergeBranch } from '@/api/mutations/merge'
-import { usePullBranch, useRebaseBranch } from '@/api/mutations/pullBranch'
-import { useForcePushBranch, usePushBranch } from '@/api/mutations/pushBranch'
+import {
+  useMakePullBranch,
+  useMakeRebaseBranch,
+} from '@/api/mutations/pullBranch'
+import {
+  useMakeForcePushBranch,
+  useMakePushBranch,
+} from '@/api/mutations/pushBranch'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
 import type { AnyInteraction } from '@/state/actions'
@@ -30,37 +36,52 @@ export const useCheckoutBranchInteraction = (branch: BranchInfo) => {
 }
 
 export const useFastForwardBranchInteraction = (branch: BranchInfo) => {
-  const fastForward = useFastForwardBranch(branch)
+  const fastForward = useMakeFastForwardBranch()
 
   return interaction({
-    action: fastForward,
+    action: fastForward(branch),
     details: `fast-forward "${branch.name}"`,
   })
 }
 
 export const usePullBranchInteraction = (branch: BranchInfo) => {
-  const pull = usePullBranch(branch)
+  const pull = useMakePullBranch()
 
-  return interaction({ action: pull, details: `pull "${branch.name}"` })
+  return interaction({ action: pull(branch), details: `pull "${branch.name}"` })
+}
+
+export const useRebaseSomeBranchInteraction = () => {
+  const rebase = useMakeRebaseBranch()
+
+  return (branch: BranchInfo) =>
+    interaction({
+      action: rebase(branch),
+      details: `rebase "${branch.name}"`,
+    })
 }
 
 export const useRebaseBranchInteraction = (branch: BranchInfo) => {
-  const rebase = useRebaseBranch(branch)
+  const rebaseSome = useRebaseSomeBranchInteraction()
+  return rebaseSome(branch)
+}
 
-  return interaction({ action: rebase, details: `rebase "${branch.name}"` })
+export const usePushSomeBranchInteraction = () => {
+  const push = useMakePushBranch()
+
+  return (branch: BranchInfo) =>
+    interaction({ action: push(branch), details: `push "${branch.name}"` })
 }
 
 export const usePushBranchInteraction = (branch: BranchInfo) => {
-  const push = usePushBranch(branch)
-
-  return interaction({ action: push, details: `push "${branch.name}"` })
+  const pushSome = usePushSomeBranchInteraction()
+  return pushSome(branch)
 }
 
 export const useForcePushBranchInteraction = (branch: BranchInfo) => {
-  const forcePush = useForcePushBranch(branch)
+  const forcePush = useMakeForcePushBranch()
 
   return interaction({
-    action: forcePush,
+    action: forcePush(branch),
     isDangerous: true,
     details: `force push "${branch.name}"`,
   })

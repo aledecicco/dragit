@@ -4,6 +4,7 @@ import type { Flow } from '@/interactions/flows'
 import { ShortcutKey } from '@/lib/Shortcuts/Key'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { hideDialog } from '@/state/dialogs'
+import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { COMMAND_PALETTE_DIALOG_KEY, CommandPalette } from '..'
@@ -38,7 +39,8 @@ const CommandPaletteItem = (props: CommandPaletteItemProps) => {
     <Ariakit.CompositeItem
       {...propsWithCn(
         itemProps,
-        'flex flex-row items-center gap-3 w-full p-2 rounded-md',
+        'grid grid-cols-[max-content_max-content_1fr] w-full overflow-hidden',
+        'items-center gap-3 p-2 rounded-md',
         'focus:bg-dark-500/80 hover:bg-dark-500/80',
       )}
       onClick={(e) => {
@@ -47,8 +49,10 @@ const CommandPaletteItem = (props: CommandPaletteItemProps) => {
       }}
     >
       <ShortcutKey shortcutKey={flow.key} size="md" />
-      <span className="text-sm font-medium">{flow.label}</span>
-      <span className="text-sm text-light-950">{flow.description}</span>
+      <span className={cn('text-sm font-medium')}>{flow.label}</span>
+      <Marquee reverse={false} className={cn('text-sm text-light-950')}>
+        {flow.description}
+      </Marquee>{' '}
     </Ariakit.CompositeItem>
   )
 }

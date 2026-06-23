@@ -3,7 +3,7 @@ import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
-import { useSelectedUpstream } from '@/state/upstream'
+import { getSelectedUpstream } from '@/state/upstream'
 
 import type { BranchInfo, BranchName, RemoteName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
@@ -29,11 +29,10 @@ const fastForwardBranchMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const useFastForwardBranch = (branch: BranchInfo): Action => {
+const useMakeFastForwardBranch = (): ((branch: BranchInfo) => Action) => {
   const fastForwardBranch = useRepositoryMutation(fastForwardBranchMutation)
-  const upstream = useSelectedUpstream(branch)
 
-  return {
+  return (branch: BranchInfo): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'fast_forward',
@@ -45,6 +44,7 @@ const useFastForwardBranch = (branch: BranchInfo): Action => {
         throw new Error('Branch is not local')
       }
 
+      const upstream = getSelectedUpstream(branch.name)
       if (!upstream) {
         throw new Error('No upstream set for branch')
       }
@@ -62,11 +62,11 @@ const useFastForwardBranch = (branch: BranchInfo): Action => {
       error: 'Failed to fast-forward',
     },
     Glyph: IconDownload,
-  }
+  })
 }
 
 export {
-  useFastForwardBranch,
+  useMakeFastForwardBranch,
   fastForwardBranchKey,
   fastForwardBranchMutation,
   type FastForwardBranchArgs,

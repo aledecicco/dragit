@@ -64,6 +64,13 @@ const useSelectedUpstreamsStore = create<SelectedUpstreams & Setters>()(
 )
 
 /**
+ * Getter for the currently selected upstream for a given branch.
+ */
+const getSelectedUpstream = (branchName: BranchName): Upstream | undefined => {
+  return useSelectedUpstreamsStore.getState().upstreams.get(branchName)
+}
+
+/**
  * Figures out the default remote name to use for a given branch.
  */
 const getDefaultRemoteName = (
@@ -331,6 +338,7 @@ export {
   useUpstreamsSync,
   useUpstreams,
   useSelectedUpstream,
+  getSelectedUpstream,
   useChangeSelectedRemote,
   useChangeSelectedRemoteBranch,
 }

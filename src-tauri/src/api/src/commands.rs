@@ -356,41 +356,32 @@ pub async fn get_branch_divergence(
     .and_then(serialize_response)
 }
 
-/// Pushes the given branch to the given remote.
+/// Pushes the current branch to the given remote.
 #[tauri::command]
 pub async fn push_branch(
     state: State<'_, AppState>,
     repo_path: &str,
-    branch: &str,
     remote: &str,
     remote_branch: &str,
     is_force: bool,
     set_upstream: bool,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| {
-        h.push_branch(
-            repo_path,
-            branch,
-            remote,
-            remote_branch,
-            is_force,
-            set_upstream,
-        )
+        h.push_branch(repo_path, remote, remote_branch, is_force, set_upstream)
     })
 }
 
-/// Pulls the given branch from the given remote.
+/// Pulls the current branch from the given remote.
 #[tauri::command]
 pub async fn pull_branch(
     state: State<'_, AppState>,
     repo_path: &str,
-    branch: &str,
     remote: &str,
     remote_branch: &str,
     is_rebase: bool,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| {
-        h.pull_branch(repo_path, branch, remote, remote_branch, is_rebase)
+        h.pull_branch(repo_path, remote, remote_branch, is_rebase)
     })
 }
 

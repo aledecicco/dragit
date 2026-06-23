@@ -1,4 +1,8 @@
-import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
+import {
+  type QueryFunctionContext,
+  queryOptions,
+  skipToken,
+} from '@tanstack/react-query'
 
 import { MS_IN_SECOND } from '@/utils/time'
 
@@ -12,7 +16,7 @@ const commitInfoQueryKeys = {
       ...pathQueryKey(repoPath),
       key: 'commit_info',
     }) as const,
-  commit: (repoPath: string, commit: CommitId) =>
+  commit: (repoPath: string, commit: CommitId | undefined) =>
     ({
       ...commitInfoQueryKeys.all(repoPath),
       commit: commit,
@@ -38,13 +42,15 @@ const fetchCommitInfo = async (
   }
 }
 
-const commitInfoQuery = (repoPath: string, commitId: CommitId) =>
+const commitInfoQuery = (repoPath: string, commitId: CommitId | undefined) =>
   queryOptions({
     queryKey: [commitInfoQueryKeys.commit(repoPath, commitId)],
-    queryFn: (context) => fetchCommitInfo(repoPath, commitId, context),
+    queryFn: commitId
+      ? (context) => fetchCommitInfo(repoPath, commitId, context)
+      : skipToken,
   })
 
-const useQueryCommitInfo = (commitId: CommitId) =>
+const useQueryCommitInfo = (commitId: CommitId | undefined) =>
   useRepositoryQuery(commitInfoQuery, commitId)
 
 export { commitInfoQueryKeys, useQueryCommitInfo }

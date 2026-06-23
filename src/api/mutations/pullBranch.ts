@@ -3,13 +3,12 @@ import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
-import { useSelectedUpstream } from '@/state/upstream'
+import { getSelectedUpstream } from '@/state/upstream'
 
 import type { BranchInfo, BranchName, RemoteName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface PullBranchArgs {
-  branch: BranchName
   remote: RemoteName
   remoteBranch: BranchName
   isRebase: boolean
@@ -30,15 +29,15 @@ const pullBranchMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const usePullBranch = (branch: BranchInfo): Action => {
+const useMakePullBranch = (): ((branch: BranchInfo) => Action) => {
   const pullBranch = useRepositoryMutation(pullBranchMutation)
-  const upstream = useSelectedUpstream(branch)
 
-  return {
+  return (branch: BranchInfo): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'pull',
       type: 'current',
+      branch: branch.name,
     },
     blockedBy: [
       { key: 'branch_operation', branch: branch.name },
@@ -50,12 +49,12 @@ const usePullBranch = (branch: BranchInfo): Action => {
         throw new Error('Branch is not local')
       }
 
+      const upstream = getSelectedUpstream(branch.name)
       if (!upstream) {
         throw new Error('No upstream set for branch')
       }
 
       await pullBranch.mutateAsync({
-        branch: branch.name,
         remote: upstream.remote,
         remoteBranch: upstream.remoteBranch,
         isRebase: false,
@@ -68,18 +67,18 @@ const usePullBranch = (branch: BranchInfo): Action => {
       error: 'Failed to pull',
     },
     Glyph: IconDownload,
-  }
+  })
 }
 
-const useRebaseBranch = (branch: BranchInfo): Action => {
+const useMakeRebaseBranch = (): ((branch: BranchInfo) => Action) => {
   const pullBranch = useRepositoryMutation(pullBranchMutation)
-  const upstream = useSelectedUpstream(branch)
 
-  return {
+  return (branch: BranchInfo): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'rebase',
       type: 'current',
+      branch: branch.name,
     },
     blockedBy: [
       { key: 'branch_operation', branch: branch.name },
@@ -91,12 +90,12 @@ const useRebaseBranch = (branch: BranchInfo): Action => {
         throw new Error('Branch is not local')
       }
 
+      const upstream = getSelectedUpstream(branch.name)
       if (!upstream) {
         throw new Error('No upstream set for branch')
       }
 
       await pullBranch.mutateAsync({
-        branch: branch.name,
         remote: upstream.remote,
         remoteBranch: upstream.remoteBranch,
         isRebase: true,
@@ -109,12 +108,12 @@ const useRebaseBranch = (branch: BranchInfo): Action => {
       error: 'Failed to rebase',
     },
     Glyph: IconDownload,
-  }
+  })
 }
 
 export {
-  usePullBranch,
-  useRebaseBranch,
+  useMakePullBranch,
+  useMakeRebaseBranch,
   pullBranchKey,
   pullBranchMutation,
   type PullBranchArgs,

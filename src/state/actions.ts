@@ -485,8 +485,9 @@ const triggerInteraction = async <T>(interaction: Interaction<T>) => {
       return
     }
 
-    runAction(action, args).catch((e) => {
+    await runAction(action, args).catch((e) => {
       announceInteractionError(interaction.details, e)
+      throw e
     })
   } else {
     const canRun =
@@ -498,8 +499,9 @@ const triggerInteraction = async <T>(interaction: Interaction<T>) => {
       return
     }
 
-    runAction(action).catch((e) => {
+    await runAction(action).catch((e) => {
       announceInteractionError(interaction.details, e)
+      throw e
     })
   }
 }

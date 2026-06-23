@@ -639,14 +639,12 @@ impl GitHandler for CmdGit {
     fn push_branch(
         &self,
         repo_path: &str,
-        branch: &str,
         remote: &str,
         remote_branch: &str,
         is_force: bool,
         set_upstream: bool,
     ) -> Result<(), GitError> {
-        let remote_ref = format!("{}:{}", branch, remote_branch);
-        let mut args = vec!["push", remote, &remote_ref];
+        let mut args = vec!["push", remote, remote_branch];
 
         if is_force {
             args.push("--force");
@@ -662,13 +660,11 @@ impl GitHandler for CmdGit {
     fn pull_branch(
         &self,
         repo_path: &str,
-        branch: &str,
         remote: &str,
         remote_branch: &str,
         is_rebase: bool,
     ) -> Result<(), GitError> {
-        let remote_ref = format!("{}:{}", branch, remote_branch);
-        let mut args = vec!["pull", remote, &remote_ref];
+        let mut args = vec!["pull", remote, remote_branch];
 
         if is_rebase {
             args.push("--rebase");
