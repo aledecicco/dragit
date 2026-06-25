@@ -5,58 +5,55 @@ import {
 } from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
-import { MS_IN_SECOND } from '@/utils/time'
-
 import type {
   ChangeStatus,
   MovedStatus,
   Page,
-  SnapshotId,
-  SnapshotInfo,
+  RefName,
   VersionedFileInfo,
 } from '../models'
-import { SNAPSHOT_FILES_PAGE_SCHEMA } from '../schemas'
+import { VERSIONED_FILES_PAGE_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 
-export const SNAPSHOT_FILES_PAGE_SIZE = 1000
+export const VERSIONED_FILES_PAGE_SIZE = 1000
 
-const snapshotFilesQueryKeys = {
+const versionedFilesQueryKeys = {
   all: (repoPath: string) =>
     ({
       ...pathQueryKey(repoPath),
-      key: 'snapshot_files',
+      key: 'versioned_files',
     }) as const,
-  snapshot: (repoPath: string, snapshot: SnapshotId) => ({
+  snapshot: (repoPath: string, reference: RefName, against?: RefName) => ({
     all: {
-      ...snapshotFilesQueryKeys.all(repoPath),
-      snapshot,
+      ...versionedFilesQueryKeys.all(repoPath),
+      reference,
+      against,
     } as const,
     page: (page: number) =>
       ({
-        ...snapshotFilesQueryKeys.snapshot(repoPath, snapshot).all,
+        ...versionedFilesQueryKeys.snapshot(repoPath, reference, against).all,
         page: page,
       }) as const,
   }),
 }
 
-const fetchSnapshotFilesPage = async (
+const fetchVersionedFilesPage = async (
   repoPath: string,
-  snapshot: SnapshotInfo,
+  reference: RefName,
+  against: RefName | undefined,
   page: number,
   context: QueryFunctionContext,
 ): Promise<Page<VersionedFileInfo>> => {
   const res = await fetchAndDeserialize(
-    'get_snapshot_files_page',
+    'get_versioned_files_page',
     {
       repoPath,
-      snapshot: {
-        ...snapshot,
-        timestamp: snapshot.timestamp / MS_IN_SECOND,
-      },
-      startAfter: page * SNAPSHOT_FILES_PAGE_SIZE,
-      limit: SNAPSHOT_FILES_PAGE_SIZE,
+      reference,
+      against: against ?? null,
+      startAfter: page * VERSIONED_FILES_PAGE_SIZE,
+      limit: VERSIONED_FILES_PAGE_SIZE,
     },
-    SNAPSHOT_FILES_PAGE_SCHEMA,
+    VERSIONED_FILES_PAGE_SCHEMA,
     context,
   )
 
@@ -93,23 +90,25 @@ const fetchSnapshotFilesPage = async (
   }
 }
 
-const snapshotFilesQuery = (
+const versionedFilesQuery = (
   repoPath: string,
+  reference: RefName,
   page: number,
-  snapshot: SnapshotInfo,
+  against?: RefName,
 ) =>
   queryOptions({
     queryKey: [
-      snapshotFilesQueryKeys.snapshot(repoPath, snapshot.id).page(page),
+      versionedFilesQueryKeys.snapshot(repoPath, reference, against).page(page),
     ],
     queryFn: (context) =>
-      fetchSnapshotFilesPage(repoPath, snapshot, page, context),
+      fetchVersionedFilesPage(repoPath, reference, against, page, context),
   })
 
-const useQuerySnapshotFiles = (
-  snapshot: SnapshotInfo,
+const useQueryVersionedFiles = (
+  reference: RefName,
   page: number,
+  against?: RefName,
 ): UseQueryResult<Page<VersionedFileInfo>> =>
-  useRepositoryQuery(snapshotFilesQuery, page, snapshot)
+  useRepositoryQuery(versionedFilesQuery, reference, page, against)
 
-export { snapshotFilesQueryKeys, useQuerySnapshotFiles }
+export { versionedFilesQueryKeys, useQueryVersionedFiles }

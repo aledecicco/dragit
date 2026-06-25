@@ -65,11 +65,14 @@ pub enum Reference {
     Tag { ref_name: String },
 }
 
-#[derive(serde::Deserialize, Debug)]
-#[serde(rename_all = "camelCase", tag = "type")]
-pub enum SnapshotInfo {
-    Commit(CommitInfo),
-    Stash(StashInfo),
+impl ToString for Reference {
+    fn to_string(&self) -> String {
+        match self {
+            Reference::Commit { ref_name } => ref_name.to_string(),
+            Reference::Branch { ref_name } => ref_name.to_string(),
+            Reference::Tag { ref_name } => ref_name.to_string(),
+        }
+    }
 }
 
 #[derive(strum::EnumString, Debug)]

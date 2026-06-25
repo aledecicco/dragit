@@ -1,8 +1,8 @@
 use tauri::ipc::Channel;
 
 use crate::{
-    AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, GitError, HeadInfo,
-    HistoryItem, Page, RemoteInfo, SnapshotInfo, StashInfo, TagInfo, VersionedFileInfo,
+    AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo, DiffSummary,
+    GitError, HeadInfo, HistoryItem, Page, RemoteInfo, StashInfo, TagInfo, VersionedFileInfo,
     WorktreeFileInfo,
 };
 
@@ -71,6 +71,15 @@ pub trait GitHandler {
         reference: &str,
     ) -> Result<CommitInfo, GitError>;
 
+    /// Returns the diff summary between two arbitrary refs.
+    fn get_diff_summary(
+        &self,
+        channel: &Channel<AppMessage>,
+        repo_path: &str,
+        reference: &str,
+        against: Option<&str>,
+    ) -> Result<DiffSummary, GitError>;
+
     /// Returns information about the current state of the HEAD.
     fn get_head_info(
         &self,
@@ -90,11 +99,12 @@ pub trait GitHandler {
     ) -> Result<Page<WorktreeFileInfo>, GitError>;
 
     /// Returns (a page of) the list of files in the given snapshot.
-    fn get_snapshot_files_page(
+    fn get_versioned_files_page(
         &self,
         channel: &Channel<AppMessage>,
         repo_path: &str,
-        snapshot: &SnapshotInfo,
+        reference: &str,
+        against: Option<&str>,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<VersionedFileInfo>, GitError>;

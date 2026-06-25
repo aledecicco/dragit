@@ -4,7 +4,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
 
-import type { SnapshotId, VersionedFileInfo, WorktreeFileInfo } from '../models'
+import type { RefName, VersionedFileInfo, WorktreeFileInfo } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface RestoreArgs {
@@ -149,7 +149,7 @@ const useDiscardChanges = (): Action<WorktreeFileInfo[]> => {
 
 const useRestoreFileState = (
   file: VersionedFileInfo,
-  snapshot: SnapshotId,
+  snapshot: RefName,
 ): Action => {
   const restore = useRepositoryMutation(restoreMutation)
 
@@ -183,7 +183,7 @@ const useRestoreFileState = (
 }
 
 const useRestoreFileStates = (
-  snapshot: SnapshotId,
+  snapshot: RefName,
 ): Action<VersionedFileInfo[]> => {
   const restore = useRepositoryMutation(restoreMutation)
 

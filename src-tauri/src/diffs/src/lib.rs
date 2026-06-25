@@ -45,16 +45,26 @@ pub fn compute_diff(before: &str, after: &str) -> Vec<DiffLine> {
 
 pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
     match &scope {
-        DiffScope::Snapshot { snapshot_id, file } => (
+        DiffScope::Versioned {
+            file,
+            reference,
+            against,
+        } => (
             match &file.status {
                 VersionedFileStatus::Moved {
                     changes: _,
                     old_path,
-                } => DiffSource::GitReference(format!("{snapshot_id}^1"), old_path.to_string()),
+                } => DiffSource::GitReference(
+                    against.clone().unwrap_or(format!("{reference}^1")),
+                    old_path.to_string(),
+                ),
                 VersionedFileStatus::Changed {
                     changes: ChangeStatus::Added,
                 } => DiffSource::Empty,
-                _ => DiffSource::GitReference(format!("{snapshot_id}^1"), file.path.to_string()),
+                _ => DiffSource::GitReference(
+                    against.clone().unwrap_or(format!("{reference}^1")),
+                    file.path.to_string(),
+                ),
             },
             match file.status {
                 VersionedFileStatus::Changed {
@@ -64,7 +74,7 @@ pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
                 // VersionedFileStatus::Changed {
                 //     changes: ChangeStatus::Added,
                 // } => DiffSource::GitReference(format!("{snapshot_id}^3"), file.path.to_string()),
-                _ => DiffSource::GitReference(snapshot_id.to_string(), file.path.to_string()),
+                _ => DiffSource::GitReference(reference.to_string(), file.path.to_string()),
             },
         ),
 

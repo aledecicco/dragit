@@ -162,7 +162,7 @@ export const VERSIONED_FILE_INFO_SCHEMA = BorshSchema.Struct({
     }),
   }),
 })
-export const SNAPSHOT_FILES_PAGE_SCHEMA = PAGE_SCHEMA(
+export const VERSIONED_FILES_PAGE_SCHEMA = PAGE_SCHEMA(
   VERSIONED_FILE_INFO_SCHEMA,
 )
 

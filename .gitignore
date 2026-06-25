@@ -24,4 +24,5 @@ target
 *.njsproj
 *.sln
 *.sw?
+.claude
 .cocoindex_code/*

@@ -6,6 +6,7 @@ import type {
   RemoteInfo,
   RemoteName,
   RepositoryHost,
+  SnapshotScope,
   Upstream,
 } from '@/api/models'
 import { useQueryBranches } from '@/api/queries/branches'

@@ -1,6 +1,6 @@
 import {
-  type QueryFunctionContext,
   keepPreviousData,
+  type QueryFunctionContext,
   queryOptions,
   type UseQueryResult,
 } from '@tanstack/react-query'

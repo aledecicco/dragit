@@ -1,11 +1,11 @@
 import { type ComponentProps, useState } from 'react'
 import * as Ariakit from '@ariakit/react'
 
-import type { SnapshotInfo, VersionedFileInfo } from '@/api/models'
+import type { RefName, VersionedFileInfo } from '@/api/models'
 import {
-  SNAPSHOT_FILES_PAGE_SIZE,
-  useQuerySnapshotFiles,
-} from '@/api/queries/snapshotFiles'
+  useQueryVersionedFiles,
+  VERSIONED_FILES_PAGE_SIZE,
+} from '@/api/queries/versionedFiles'
 import { useNeedsPagination } from '@/api/utils'
 import { useGetVersionedFilesInteractions } from '@/interactions/file'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
@@ -15,13 +15,13 @@ import { Chip } from '@/ui/Chip'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-import { SnapshotDetailsDialogItem } from './Item'
+import { SnapshotDetailsDialogFileItem } from './Item'
 
-interface SnapshotDialogFileListProps extends ComponentProps<'div'> {
+interface SnapshotDetailsDialogFileListProps extends ComponentProps<'div'> {
   /**
    * The snapshot for which to display the files.
    */
-  snapshotInfo: SnapshotInfo
+  snapshot: RefName
 
   /**
    * Callback to set the currently selected file, which will be shown in the diff viewer.
@@ -32,12 +32,14 @@ interface SnapshotDialogFileListProps extends ComponentProps<'div'> {
 /**
  * Displays a list of files that can be selected.
  */
-const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
-  const { snapshotInfo, setSelectedFile, ...divProps } = props
+const SnapshotDetailsDialogFileList = (
+  props: SnapshotDetailsDialogFileListProps,
+) => {
+  const { snapshot, setSelectedFile, ...divProps } = props
 
   const [page, setPage] = useState(0)
 
-  const filesQuery = useQuerySnapshotFiles(snapshotInfo, page)
+  const filesQuery = useQueryVersionedFiles(snapshot, page)
   const showPagination = useNeedsPagination(filesQuery, page)
 
   const radio = Ariakit.useRadioStore({
@@ -49,7 +51,7 @@ const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
     },
   })
 
-  const getInteractions = useGetVersionedFilesInteractions(snapshotInfo)
+  const getInteractions = useGetVersionedFilesInteractions(snapshot)
 
   return (
     <div
@@ -70,7 +72,7 @@ const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
         {showPagination ? (
           <Pagination
             page={page}
-            pageSize={SNAPSHOT_FILES_PAGE_SIZE}
+            pageSize={VERSIONED_FILES_PAGE_SIZE}
             hasNext={!!filesQuery.data?.hasNext}
             setPrevPage={() => {
               setPage((_page) => _page - 1)
@@ -103,9 +105,9 @@ const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
               query={filesQuery}
               getItems={(d) => d.items}
               renderItem={(file, position) => (
-                <SnapshotDetailsDialogItem
+                <SnapshotDetailsDialogFileItem
                   file={file}
-                  snapshotInfo={snapshotInfo}
+                  snapshot={snapshot}
                   itemIndex={position}
                 />
               )}
@@ -122,4 +124,7 @@ const SnapshotDialogFileList = (props: SnapshotDialogFileListProps) => {
   )
 }
 
-export { SnapshotDialogFileList, type SnapshotDialogFileListProps }
+export {
+  SnapshotDetailsDialogFileList,
+  type SnapshotDetailsDialogFileListProps,
+}

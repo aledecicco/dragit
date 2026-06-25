@@ -13,8 +13,7 @@ use diffs::{compute_diff, get_diff_sources};
 use models::{
     AppError, AppEvent, AppMessage, AppState, ConflictLine, ConflictMode, CurrentDirInfo,
     DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus, PartialRepositoryStorage,
-    PartialSettings, RepoWatcherError, ResolutionStrategy, SnapshotInfo, Storage, UnmergedFileInfo,
-    EVENT_ID,
+    PartialSettings, RepoWatcherError, ResolutionStrategy, Storage, UnmergedFileInfo, EVENT_ID,
 };
 use storage::{
     add_recent_folder, get_storage, patch_repository_storage, patch_settings, set_last_opened,
@@ -206,6 +205,21 @@ pub async fn get_commit_info(
     .and_then(serialize_response)
 }
 
+/// Returns the diff summary  between two arbitrary refs.
+#[tauri::command]
+pub async fn get_diff_summary(
+    state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
+    repo_path: &str,
+    reference: &str,
+    against: Option<&str>,
+) -> Result<Response, AppError> {
+    with_handler(&state, &|h| {
+        h.get_diff_summary(&channel, repo_path, reference, against)
+    })
+    .and_then(serialize_response)
+}
+
 /// Returns the current status of the repository's HEAD.
 #[tauri::command]
 pub async fn get_head_info(
@@ -236,16 +250,17 @@ pub async fn get_worktree_files_page(
 /// Returns a paginated list of the files versioned in the given snapshot.
 /// Optionally receives a parent to compare against.
 #[tauri::command]
-pub async fn get_snapshot_files_page(
+pub async fn get_versioned_files_page(
     state: State<'_, AppState>,
     channel: Channel<AppMessage>,
     repo_path: &str,
-    snapshot: SnapshotInfo,
+    reference: &str,
+    against: Option<&str>,
     start_after: usize,
     limit: usize,
 ) -> Result<Response, AppError> {
     with_handler(&state, &|h| {
-        h.get_snapshot_files_page(&channel, repo_path, &snapshot, start_after, limit)
+        h.get_versioned_files_page(&channel, repo_path, reference, against, start_after, limit)
     })
     .and_then(serialize_response)
 }

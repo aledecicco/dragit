@@ -5,8 +5,7 @@ import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
 
 import type {
   NotStagedFile,
-  SnapshotId,
-  SnapshotInfo,
+  RefName,
   StagedFile,
   VersionedFileInfo,
   WorktreeFileInfo,
@@ -152,9 +151,9 @@ export const useIgnoreNewFileInteraction = (file: WorktreeFileInfo) => {
 
 export const useRestoreFileInteraction = (
   file: VersionedFileInfo,
-  snapshotId: SnapshotId,
+  snapshot: RefName,
 ) => {
-  const restore = useRestoreFileState(file, snapshotId)
+  const restore = useRestoreFileState(file, snapshot)
 
   return interaction({
     action: restore,
@@ -202,9 +201,9 @@ export const useSingleStagedFileInteractions = (file: StagedFile) => {
 
 export const useSingleVersionedFileInteractions = (
   file: VersionedFileInfo,
-  snapshotId: SnapshotId,
+  snapshot: RefName,
 ) => {
-  const restore = useRestoreFileInteraction(file, snapshotId)
+  const restore = useRestoreFileInteraction(file, snapshot)
 
   return [group(restore)]
 }
@@ -414,8 +413,8 @@ export const useGetStagedFilesInteractions = () => {
   ]
 }
 
-export const useRestoreFileStatesInteraction = (snapshotInfo: SnapshotInfo) => {
-  const restore = useRestoreFileStates(snapshotInfo.id)
+export const useRestoreFileStatesInteraction = (snapshot: RefName) => {
+  const restore = useRestoreFileStates(snapshot)
 
   return (files: VersionedFileInfo[]) =>
     interaction({
@@ -425,10 +424,8 @@ export const useRestoreFileStatesInteraction = (snapshotInfo: SnapshotInfo) => {
     })
 }
 
-export const useGetVersionedFilesInteractions = (
-  snapshotInfo: SnapshotInfo,
-) => {
-  const restore = useRestoreFileStatesInteraction(snapshotInfo)
+export const useGetVersionedFilesInteractions = (snapshot: RefName) => {
+  const restore = useRestoreFileStatesInteraction(snapshot)
 
   return (files: VersionedFileInfo[]): AnyInteraction[][] => [
     group(restore(files)),

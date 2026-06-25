@@ -64,7 +64,6 @@ export interface CurrentDirInfo {
 export type CommitId = string
 export type StashId = string
 export type TagName = string
-export type SnapshotId = CommitId | StashId
 export type BranchName = string
 export type RemoteName = string
 export type RemoteRef = `${RemoteName}/${BranchName}`
@@ -111,8 +110,6 @@ export interface CommitInfo {
   changes: DiffSummary | null
   parents: CommitId[]
 }
-
-export type SnapshotInfo = CommitInfo | StashInfo
 
 export interface AncestorInfo {
   distance: number
@@ -273,7 +270,12 @@ export type CleanFileInfo = Exclude<WorktreeFileInfo, UnmergedFileInfo>
 export type DiffScope =
   | { type: 'worktree'; file: CleanFileInfo }
   | { type: 'unmerged'; file: UnmergedFileInfo; stage: MergeDiffStage }
-  | { type: 'snapshot'; snapshotId: SnapshotId; file: VersionedFileInfo }
+  | {
+      type: 'versioned'
+      reference: RefName
+      against: RefName | null
+      file: VersionedFileInfo
+    }
 
 export const conflictTypes = ['ours', 'theirs', 'unchanged'] as const
 export type ConflictType = (typeof conflictTypes)[number]

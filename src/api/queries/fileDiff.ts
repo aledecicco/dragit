@@ -41,7 +41,7 @@ const fetchFileDiff = async (
           .with({ type: 'unmerged', file: P.select() }, (file) =>
             serializeUnmergedFile(file),
           )
-          .with({ type: 'snapshot', file: P.select() }, (file) =>
+          .with({ type: 'versioned', file: P.select() }, (file) =>
             serializeVersionedFile(file),
           )
           .exhaustive(),

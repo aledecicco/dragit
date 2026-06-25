@@ -2,7 +2,7 @@ import { IconArchive, IconGitBranch } from '@tabler/icons-react'
 
 import type { StashInfo } from '@/api/models'
 import { ChangesSummary } from '@/common/DiffSummary'
-import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
+import { showStashSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog/Stash'
 import { useSingleStashInteractions } from '@/interactions/stash'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractiveItem } from '@/lib/Interactive/Item'
@@ -43,7 +43,7 @@ const StashesListItem = (props: StashesListItemProps) => {
       <InteractiveItem
         interactions={interactions}
         activationAction={() => {
-          showSnapshotDetailsDialog(stash)
+          showStashSnapshotDetailsDialog(stash)
         }}
         render={<MultiSelectItem {...itemProps} />}
       >

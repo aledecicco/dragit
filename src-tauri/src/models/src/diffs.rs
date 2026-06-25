@@ -32,9 +32,10 @@ pub enum DiffScope {
         file: CleanFileInfo,
     },
 
-    Snapshot {
+    Versioned {
         file: VersionedFileInfo,
-        snapshot_id: String,
+        reference: String,
+        against: Option<String>,
     },
 }
 

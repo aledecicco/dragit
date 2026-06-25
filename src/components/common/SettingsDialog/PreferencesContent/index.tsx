@@ -115,9 +115,22 @@ const SettingsDialogPreferencesContent = () => {
 
             <SettingsDialogSection label="Shortcuts">
               <ShortcutSetting
+                action="open the quick command palette"
+                setting="commandPaletteShortcut"
+              />
+              <ShortcutSetting
+                action="open the branch switcher"
+                setting="checkoutShortcut"
+              />
+              <ShortcutSetting
+                action="change the comparison branch"
+                setting="changeBaseShortcut"
+              />
+              <ShortcutSetting
                 action="choose changes to stage"
                 setting="stageFilesShortcut"
               />
+
               <ShortcutSetting
                 action="choose changes to unstage"
                 setting="unstageFilesShortcut"
@@ -128,16 +141,7 @@ const SettingsDialogPreferencesContent = () => {
               />
 
               <ShortcutSetting
-                action="open the branch switcher"
-                setting="checkoutShortcut"
-              />
-              <ShortcutSetting
-                action="change the comparison branch"
-                setting="changeBaseShortcut"
-              />
-
-              <ShortcutSetting
-                action="open the commit dialog"
+                action="commit the current changes"
                 setting="commitShortcut"
               />
               <ShortcutSetting
@@ -145,18 +149,20 @@ const SettingsDialogPreferencesContent = () => {
                 setting="amendShortcut"
               />
               <ShortcutSetting
-                action="push changes to the current branch"
+                action="push changes in the current branch"
                 setting="pushShortcut"
               />
               <ShortcutSetting
-                action="pull changes from the current branch"
+                action="pull changes into the current branch"
                 setting="pullShortcut"
               />
               <ShortcutSetting
                 action="fetch changes from the remote"
                 setting="refreshShortcut"
               />
+            </SettingsDialogSection>
 
+            <SettingsDialogSection label="Navigation shortcuts">
               <ShortcutSetting
                 action="focus the main view"
                 setting="focusMainShortcut"

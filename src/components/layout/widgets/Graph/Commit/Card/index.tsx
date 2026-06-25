@@ -2,7 +2,7 @@ import * as Ariakit from '@ariakit/react'
 import { IconGitCommit } from '@tabler/icons-react'
 
 import type { CommitInfo } from '@/api/models'
-import { showSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog'
+import { showCommitSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog/Commit'
 import {
   useAmendInteraction,
   useSingleCommitInteractions,
@@ -107,7 +107,7 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
           <InteractiveItem
             interactions={interactions}
             activationAction={() => {
-              showSnapshotDetailsDialog(commitInfo)
+              showCommitSnapshotDetailsDialog(commitInfo)
             }}
           />
         }

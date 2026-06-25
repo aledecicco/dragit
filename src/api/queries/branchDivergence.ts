@@ -51,22 +51,22 @@ const fetchBranchDivergence = (
 
 const branchDivergenceQuery = (
   repoPath: string,
-  refName: string | undefined,
-  baseRefName: string | undefined,
+  branch: BranchName | undefined,
+  baseBranch: BranchName | undefined,
 ) =>
   queryOptions({
-    queryKey: [branchDivergenceQueryKeys.pair(repoPath, refName, baseRefName)],
+    queryKey: [branchDivergenceQueryKeys.pair(repoPath, branch, baseBranch)],
     queryFn:
-      refName && baseRefName
+      branch && baseBranch
         ? (context) =>
-            fetchBranchDivergence(repoPath, refName, baseRefName, context)
+            fetchBranchDivergence(repoPath, branch, baseBranch, context)
         : skipToken,
-    enabled: !!refName && !!baseRefName,
+    enabled: !!branch && !!baseBranch,
   })
 
 const useQueryBranchDivergence = (
-  refName: string | undefined,
-  baseRefName: string | undefined,
-) => useRepositoryQuery(branchDivergenceQuery, refName, baseRefName)
+  branch: BranchName | undefined,
+  baseBranch: BranchName | undefined,
+) => useRepositoryQuery(branchDivergenceQuery, branch, baseBranch)
 
 export { branchDivergenceQueryKeys, useQueryBranchDivergence }

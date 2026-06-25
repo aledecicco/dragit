@@ -1,6 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 
-import type { SnapshotInfo, VersionedFileInfo } from '@/api/models'
+import type { RefName, VersionedFileInfo } from '@/api/models'
 import { FileItem } from '@/common/File/Item'
 import { useSingleVersionedFileInteractions } from '@/interactions/file'
 import { InteractiveItem } from '@/lib/Interactive/Item'
@@ -9,13 +9,16 @@ import {
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
 
-interface SnapshotDetailsDialogItemProps extends MultiSelectItemProps {
+interface SnapshotDetailsDialogFileItemProps extends MultiSelectItemProps {
   /**
    * The file that this list item should display.
    */
   file: VersionedFileInfo
 
-  snapshotInfo: SnapshotInfo
+  /**
+   * The snapshot this file belongs to.
+   */
+  snapshot: RefName
 }
 
 /**
@@ -23,10 +26,12 @@ interface SnapshotDetailsDialogItemProps extends MultiSelectItemProps {
  *
  * Displays as a radio item to allow selecting files.
  */
-const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
-  const { file, snapshotInfo, ...itemProps } = props
+const SnapshotDetailsDialogFileItem = (
+  props: SnapshotDetailsDialogFileItemProps,
+) => {
+  const { file, snapshot, ...itemProps } = props
 
-  const interactions = useSingleVersionedFileInteractions(file, snapshotInfo.id)
+  const interactions = useSingleVersionedFileInteractions(file, snapshot)
 
   const radio = Ariakit.useRadioContext()
 
@@ -55,4 +60,7 @@ const SnapshotDetailsDialogItem = (props: SnapshotDetailsDialogItemProps) => {
   )
 }
 
-export { SnapshotDetailsDialogItem, type SnapshotDetailsDialogItemProps }
+export {
+  SnapshotDetailsDialogFileItem,
+  type SnapshotDetailsDialogFileItemProps,
+}

@@ -16,9 +16,8 @@ use ::utils::{
 
 use models::{
     AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
-    ResolutionStrategy, SnapshotInfo, StashInfo, VersionedFileInfo, WorktreeFileInfo,
-    WorktreeStatus,
+    DiffSummary, FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
+    ResolutionStrategy, StashInfo, VersionedFileInfo, WorktreeFileInfo, WorktreeStatus,
 };
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
@@ -301,8 +300,32 @@ impl GitHandler for CmdGit {
             "--first-parent",
         ];
         let output = self.spawn_and_get_output(channel, repo_path, args)?;
+
         parse_commit_info(&output).ok_or(GitError::ParseCommandOutputFailed {
             command: format!("git {}", args.join(" ")),
+        })
+    }
+
+    fn get_diff_summary(
+        &self,
+        channel: &Channel<AppMessage>,
+        repo_path: &str,
+        reference: &str,
+        against: Option<&str>,
+    ) -> Result<DiffSummary, GitError> {
+        let mut args = vec!["diff", "--shortstat", reference];
+        if let Some(against) = against {
+            args.push(against);
+        }
+        let command_str = format!(
+            "git {}",
+            args.clone().into_iter().collect::<Vec<&str>>().join(" ")
+        );
+
+        let output = self.spawn_and_get_output(channel, repo_path, args)?;
+
+        parse_diff_summary(&output.trim().to_string()).ok_or(GitError::ParseCommandOutputFailed {
+            command: format!("git {}", command_str,),
         })
     }
 
@@ -417,40 +440,29 @@ impl GitHandler for CmdGit {
         Ok(Page { items, has_next })
     }
 
-    fn get_snapshot_files_page(
+    fn get_versioned_files_page(
         &self,
         channel: &Channel<AppMessage>,
         repo_path: &str,
-        snapshot: &SnapshotInfo,
+        reference: &str,
+        against: Option<&str>,
         start_after: usize,
         limit: usize,
     ) -> Result<Page<VersionedFileInfo>, GitError> {
-        let parent;
-        let args = match snapshot {
-            SnapshotInfo::Commit(commit) => {
-                parent = format!("{}^{}", commit.id, 1);
-                vec![
-                    "diff-tree",
-                    "-r",
-                    "--root",
-                    "--name-status",
-                    "--find-copies",
-                    "--no-commit-id",
-                    &parent,
-                    &commit.id,
-                ]
-            }
-            SnapshotInfo::Stash(stash) => vec![
-                "stash",
-                "show",
-                "-r",
-                "-u",
-                "--name-status",
-                "--find-copies",
-                "--no-commit-id",
-                &stash.id,
-            ],
-        };
+        let parent = against
+            .map(str::to_string)
+            .unwrap_or(format!("{}^1", reference));
+
+        let args = vec![
+            "diff-tree",
+            "-r",
+            "--root",
+            "--name-status",
+            "--find-copies",
+            "--no-commit-id",
+            &parent,
+            &reference,
+        ];
 
         // TODO: doesn't work for initial commit
         let lines = self.spawn_and_stream(channel, repo_path, args)?;
