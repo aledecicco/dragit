@@ -154,15 +154,27 @@ impl CmdGit {
                     .and_then(read_stream)
                     .unwrap_or("Failed to capture output".to_string()),
             })?;
+        let mut stderr = process.stderr.take();
 
         let buffer = read_stream(&mut BufReader::new(stdout)).unwrap_or_default();
 
-        process
-            .wait()
-            .map_err(|err| GitError::GetCommandOutputFailed {
+        let status = process.wait().map_err(|err| GitError::CommandFailed {
+            command: command_str.clone(),
+            reason: err.to_string(),
+        })?;
+
+        if !status.success() {
+            let reason = stderr.as_mut().and_then(read_stream).unwrap_or_else(|| {
+                format!(
+                    "Process exited with status code \"{}\"",
+                    status.code().unwrap_or(-1)
+                )
+            });
+            return Err(GitError::CommandFailed {
                 command: command_str,
-                reason: err.to_string(),
-            })?;
+                reason,
+            });
+        }
 
         Ok(buffer)
     }
