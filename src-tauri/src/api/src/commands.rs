@@ -265,6 +265,22 @@ pub async fn get_versioned_files_page(
     .and_then(serialize_response)
 }
 
+/// Returns (a page of) the list of files in a stash, including untracked files.
+#[tauri::command]
+pub async fn get_stash_files_page(
+    state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
+    repo_path: &str,
+    stash_id: &str,
+    start_after: usize,
+    limit: usize,
+) -> Result<Response, AppError> {
+    with_handler(&state, &|h| {
+        h.get_stash_files_page(&channel, repo_path, stash_id, start_after, limit)
+    })
+    .and_then(serialize_response)
+}
+
 /// Staged the given files.
 #[tauri::command]
 pub async fn add_to_index(
@@ -602,9 +618,12 @@ pub async fn get_file_diff(
     let before_content = match before_source {
         DiffSource::Empty => "".to_string(),
         DiffSource::DiskFile(filepath) => get_disk_file_contents(repo_path, &filepath)?,
-        DiffSource::GitReference(reference, filepath) => with_handler(&state, &|h| {
-            h.get_file_contents(&channel, repo_path, &reference, &filepath)
-        })?,
+        DiffSource::GitReference(reference, filepath)
+        | DiffSource::GitReferenceWithFallback(reference, _, filepath) => {
+            with_handler(&state, &|h| {
+                h.get_file_contents(&channel, repo_path, &reference, &filepath)
+            })?
+        }
     };
 
     let after_content = match after_source {
@@ -613,6 +632,12 @@ pub async fn get_file_diff(
         DiffSource::GitReference(reference, filepath) => with_handler(&state, &|h| {
             h.get_file_contents(&channel, repo_path, &reference, &filepath)
         })?,
+        DiffSource::GitReferenceWithFallback(reference, fallback, filepath) => {
+            with_handler(&state, &|h| {
+                h.get_file_contents(&channel, repo_path, &reference, &filepath)
+                    .or_else(|_| h.get_file_contents(&channel, repo_path, &fallback, &filepath))
+            })?
+        }
     };
 
     let diff = compute_diff(&before_content, &after_content);

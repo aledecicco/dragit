@@ -109,6 +109,16 @@ pub trait GitHandler {
         limit: usize,
     ) -> Result<Page<VersionedFileInfo>, GitError>;
 
+    /// Returns (a page of) the list of files in a stash, including untracked files.
+    fn get_stash_files_page(
+        &self,
+        channel: &Channel<AppMessage>,
+        repo_path: &str,
+        stash_id: &str,
+        start_after: usize,
+        limit: usize,
+    ) -> Result<Page<VersionedFileInfo>, GitError>;
+
     /// Adds the given list of files to the current index.
     fn add_to_index(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError>;
 

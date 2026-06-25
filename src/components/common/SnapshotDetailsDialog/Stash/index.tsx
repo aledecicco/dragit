@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import type { CommitId, StashInfo, VersionedFileInfo } from '@/api/models'
+import { useQueryStashFiles } from '@/api/queries/stashFiles'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { FileDiffViewer } from '@/common/FileViewer/Diff'
 import {
@@ -37,6 +38,9 @@ const StashSnapshotDetailsDialog = (props: StashSnapshotDetailsDialogProps) => {
   const filterSelector = useDiffFilterSelector()
   const [selectedFile, setSelectedFile] = useState<VersionedFileInfo>()
 
+  const [page, setPage] = useState(0)
+  const filesQuery = useQueryStashFiles(stash.id, page)
+
   return (
     <Dialog
       dialogKey={STASH_SNAPSHOT_DETAILS_DIALOG_KEY(stash.id)}
@@ -70,6 +74,9 @@ const StashSnapshotDetailsDialog = (props: StashSnapshotDetailsDialogProps) => {
 
           <SnapshotDetailsDialogFileList
             snapshot={stash.id}
+            filesQuery={filesQuery}
+            page={page}
+            setPage={setPage}
             setSelectedFile={setSelectedFile}
           />
         </div>

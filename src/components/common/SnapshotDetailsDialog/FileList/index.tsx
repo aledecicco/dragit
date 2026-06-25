@@ -1,11 +1,9 @@
-import { type ComponentProps, useState } from 'react'
+import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 import * as Ariakit from '@ariakit/react'
+import type { UseQueryResult } from '@tanstack/react-query'
 
-import type { RefName, VersionedFileInfo } from '@/api/models'
-import {
-  useQueryVersionedFiles,
-  VERSIONED_FILES_PAGE_SIZE,
-} from '@/api/queries/versionedFiles'
+import type { Page, RefName, VersionedFileInfo } from '@/api/models'
+import { VERSIONED_FILES_PAGE_SIZE } from '@/api/queries/versionedFiles'
 import { useNeedsPagination } from '@/api/utils'
 import { useGetVersionedFilesInteractions } from '@/interactions/file'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
@@ -19,9 +17,24 @@ import { SnapshotDetailsDialogFileItem } from './Item'
 
 interface SnapshotDetailsDialogFileListProps extends ComponentProps<'div'> {
   /**
-   * The snapshot for which to display the files.
+   * The snapshot for which to display the files (used for interactions).
    */
   snapshot: RefName
+
+  /**
+   * The query result providing the current page of files.
+   */
+  filesQuery: UseQueryResult<Page<VersionedFileInfo>>
+
+  /**
+   * The current page index.
+   */
+  page: number
+
+  /**
+   * Setter for the page index.
+   */
+  setPage: Dispatch<SetStateAction<number>>
 
   /**
    * Callback to set the currently selected file, which will be shown in the diff viewer.
@@ -35,11 +48,9 @@ interface SnapshotDetailsDialogFileListProps extends ComponentProps<'div'> {
 const SnapshotDetailsDialogFileList = (
   props: SnapshotDetailsDialogFileListProps,
 ) => {
-  const { snapshot, setSelectedFile, ...divProps } = props
+  const { snapshot, filesQuery, page, setPage, setSelectedFile, ...divProps } =
+    props
 
-  const [page, setPage] = useState(0)
-
-  const filesQuery = useQueryVersionedFiles(snapshot, page)
   const showPagination = useNeedsPagination(filesQuery, page)
 
   const radio = Ariakit.useRadioStore({

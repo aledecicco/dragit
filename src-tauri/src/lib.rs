@@ -67,6 +67,7 @@ pub fn run() {
             api::get_head_info,
             api::get_worktree_files_page,
             api::get_versioned_files_page,
+            api::get_stash_files_page,
             api::checkout,
             api::create_branch,
             api::delete_local_branches,

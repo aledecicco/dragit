@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import type { CommitId, CommitInfo, VersionedFileInfo } from '@/api/models'
+import { useQueryVersionedFiles } from '@/api/queries/versionedFiles'
 import { ChangesSummary } from '@/common/DiffSummary'
 import { FileDiffViewer } from '@/common/FileViewer/Diff'
 import {
@@ -39,6 +40,9 @@ const CommitSnapshotDetailsDialog = (
   const filterSelector = useDiffFilterSelector()
   const [selectedFile, setSelectedFile] = useState<VersionedFileInfo>()
 
+  const [page, setPage] = useState(0)
+  const filesQuery = useQueryVersionedFiles(commit.id, page)
+
   return (
     <Dialog
       dialogKey={COMMIT_SNAPSHOT_DETAILS_DIALOG_KEY(commit.id)}
@@ -72,6 +76,9 @@ const CommitSnapshotDetailsDialog = (
 
           <SnapshotDetailsDialogFileList
             snapshot={commit.id}
+            filesQuery={filesQuery}
+            page={page}
+            setPage={setPage}
             setSelectedFile={setSelectedFile}
           />
         </div>

@@ -476,6 +476,36 @@ impl GitHandler for CmdGit {
         Ok(Page { items, has_next })
     }
 
+    fn get_stash_files_page(
+        &self,
+        channel: &Channel<AppMessage>,
+        repo_path: &str,
+        stash_id: &str,
+        start_after: usize,
+        limit: usize,
+    ) -> Result<Page<VersionedFileInfo>, GitError> {
+        let args = vec![
+            "stash",
+            "show",
+            "-r",
+            "-u",
+            "--name-status",
+            "--find-copies",
+            "--no-commit-id",
+            stash_id,
+        ];
+
+        let lines = self.spawn_and_stream(channel, repo_path, args)?;
+
+        let mut items_iter = lines
+            .filter_map(|line| line.ok().and_then(|line| parse_versioned_file_info(&line)))
+            .skip(start_after);
+        let items: Vec<_> = items_iter.by_ref().take(limit).collect();
+        let has_next = items_iter.next().is_some();
+
+        Ok(Page { items, has_next })
+    }
+
     fn add_to_index(&self, repo_path: &str, files: &Vec<&str>) -> Result<(), GitError> {
         let mut args = vec!["add"];
         args.extend(files);

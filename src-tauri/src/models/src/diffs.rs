@@ -42,6 +42,7 @@ pub enum DiffScope {
 #[derive(Debug)]
 pub enum DiffSource {
     GitReference(String, String),
+    GitReferenceWithFallback(String, String, String),
     DiskFile(String),
     Empty,
 }
