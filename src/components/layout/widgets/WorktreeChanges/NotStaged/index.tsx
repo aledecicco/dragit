@@ -75,7 +75,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
   return (
     <InteractiveBatch
       className={cn('border-none group/drag')}
-      count={hasMore ? `${count}+` : `${count}`}
+      count={count ? (hasMore ? `${count}+` : `${count}`) : undefined}
       getInteractions={() => [[stageAll]]}
       getDragPayload={() => ({
         type: 'worktree',

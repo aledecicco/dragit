@@ -115,9 +115,11 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
         >
           <InteractiveBatch
             count={
-              stagedCount.hasMore
-                ? `${stagedCount.count}+`
-                : `${stagedCount.count}`
+              stagedCount.count
+                ? stagedCount.hasMore
+                  ? `${stagedCount.count}+`
+                  : `${stagedCount.count}`
+                : undefined
             }
             getInteractions={() => [[unstageAll]]}
             getDragPayload={() => ({

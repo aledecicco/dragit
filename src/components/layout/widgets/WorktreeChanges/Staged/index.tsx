@@ -74,7 +74,11 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
     <InteractiveBatch
       className={cn('border-none group/drag')}
       count={
-        stagedCount.hasMore ? `${stagedCount.count}+` : `${stagedCount.count}`
+        stagedCount.count
+          ? stagedCount.hasMore
+            ? `${stagedCount.count}+`
+            : `${stagedCount.count}`
+          : undefined
       }
       getInteractions={() => [[unstageAll]]}
       getDragPayload={() => ({

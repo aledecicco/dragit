@@ -10,7 +10,7 @@ interface InteractiveBatchProps
   /**
    * Label that represents the number of items contained.
    */
-  count: string | undefined
+  count: string | number | undefined
 
   /**
    * Callback that returns the list of ways to interact with the items.
@@ -20,7 +20,7 @@ interface InteractiveBatchProps
   /**
    * Callback that returns the payload to be used when dragging.
    */
-  getDragPayload: () => DragPayload
+  getDragPayload: () => DragPayload | undefined
 }
 
 /**
@@ -36,7 +36,10 @@ const InteractiveBatch = (props: InteractiveBatchProps) => {
   } = props
 
   return (
-    <Draggable {...draggableProps} dragPayload={getDragPayload()}>
+    <Draggable
+      {...draggableProps}
+      dragPayload={count ? getDragPayload() : undefined}
+    >
       <WithContextMenu
         onContextMenu={(e) => {
           if (!count) {

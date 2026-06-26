@@ -126,7 +126,7 @@ const BranchesList = (props: BranchesListProps) => {
           <>
             <InteractiveBatch
               className={cn('border-none')}
-              count={`${localBranchesQuery.data?.length ?? 0}`}
+              count={localBranchesQuery.data?.length}
               getInteractions={() =>
                 getBranchesListInteractions(localBranchesQuery.data ?? [])
               }
@@ -147,7 +147,7 @@ const BranchesList = (props: BranchesListProps) => {
 
             <InteractiveBatch
               className={cn('border-none')}
-              count={`${remoteBranchesQuery.data?.length ?? 0}`}
+              count={remoteBranchesQuery.data?.length}
               getInteractions={() =>
                 getBranchesListInteractions(remoteBranchesQuery.data ?? [])
               }
@@ -168,7 +168,7 @@ const BranchesList = (props: BranchesListProps) => {
 
             <InteractiveBatch
               className={cn('border-none')}
-              count={`${allBranchesQuery.data?.length ?? 0}`}
+              count={allBranchesQuery.data?.length}
               getInteractions={() =>
                 getBranchesListInteractions(allBranchesQuery.data ?? [])
               }
@@ -187,7 +187,7 @@ const BranchesList = (props: BranchesListProps) => {
 
             <InteractiveBatch
               className={cn('border-none')}
-              count={`${tagsQuery.data?.length ?? 0}`}
+              count={tagsQuery.data?.length}
               getInteractions={() =>
                 getTagsListInteractions(tagsQuery.data ?? [])
               }

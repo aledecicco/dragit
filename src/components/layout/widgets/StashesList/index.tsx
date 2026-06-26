@@ -54,7 +54,7 @@ const StashesList = (props: StashesListProps) => {
   return (
     <InteractiveBatch
       className={cn('border-none')}
-      count={`${stashesQuery.data?.length ?? 0}`}
+      count={stashesQuery.data?.length}
       getInteractions={() => getInteractions(stashesQuery.data ?? [])}
       getDragPayload={() => getDragPayload(stashesQuery.data)}
     >
