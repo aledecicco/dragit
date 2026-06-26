@@ -63,6 +63,15 @@ pub trait GitHandler {
         limit: usize,
     ) -> Result<Page<HistoryItem>, GitError>;
 
+    /// Returns the first `limit` commits that match the given search hash.
+    fn get_matching_commits(
+        &self,
+        channel: &Channel<AppMessage>,
+        repo_path: &str,
+        hash_search: &str,
+        limit: usize,
+    ) -> Result<Vec<String>, GitError>;
+
     /// Returns information about the given commit.
     fn get_commit_info(
         &self,

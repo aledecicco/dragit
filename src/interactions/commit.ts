@@ -51,7 +51,7 @@ export const useBranchOffCommitInteraction = (commit: CommitInfo) => {
 }
 
 export const useTagCommitInteraction = (commit: CommitInfo) => {
-  const tag = useMakeTagCommit()(commit)
+  const tag = useMakeTagCommit()(commit.id)
 
   return interaction({
     action: tag,

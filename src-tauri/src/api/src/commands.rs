@@ -191,6 +191,21 @@ pub async fn get_commit_history_page(
     .and_then(serialize_response)
 }
 
+/// Returns the first commits that match the given search hash.
+#[tauri::command]
+pub async fn get_matching_commits(
+    state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
+    repo_path: &str,
+    hash_search: &str,
+    limit: usize,
+) -> Result<Response, AppError> {
+    with_handler(&state, &|h| {
+        h.get_matching_commits(&channel, repo_path, hash_search, limit)
+    })
+    .and_then(serialize_response)
+}
+
 /// Returns detailed information about the commit pointed at by the given reference.
 #[tauri::command]
 pub async fn get_commit_info(

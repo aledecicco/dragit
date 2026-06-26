@@ -16,6 +16,7 @@ import {
   useStageFiles,
 } from '@/api/mutations/addToIndex'
 import {
+  useUnstageAll,
   useUnstageFile,
   useUnstageFiles,
 } from '@/api/mutations/removeFromIndex'
@@ -217,6 +218,12 @@ export const useUnstageFilesInteraction = () => {
       argsRequester: () => files,
       details: `unstage ${pluralize('file', files.length, true)}`,
     })
+}
+
+export const useUnstageAllInteraction = () => {
+  const unstageAll = useUnstageAll()
+
+  return interaction({ action: unstageAll, details: 'unstage all changes' })
 }
 
 export const useDiscardFilesInteraction = () => {
@@ -434,6 +441,7 @@ export const useGetVersionedFilesInteractions = (snapshot: RefName) => {
 
 export const useSelectAndStageFilesInteraction = () => {
   const stage = useStageFiles()
+
   return interaction({
     action: stage,
     argsRequester: () => requestWorktreeFiles(NOT_STAGED_FILE_TYPES),
@@ -443,6 +451,7 @@ export const useSelectAndStageFilesInteraction = () => {
 
 export const useSelectAndUnstageFilesInteraction = () => {
   const unstage = useUnstageFiles()
+
   return interaction({
     action: unstage,
     argsRequester: () => requestWorktreeFiles(STAGED_FILE_TYPES),
@@ -452,6 +461,7 @@ export const useSelectAndUnstageFilesInteraction = () => {
 
 export const useSelectAndStashFilesInteraction = () => {
   const stash = useStashFiles()
+
   return interaction({
     action: stash,
     argsRequester: async () => {

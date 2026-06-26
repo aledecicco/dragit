@@ -1,6 +1,6 @@
 import { IconTag } from '@tabler/icons-react'
 
-import type { RefName } from '@/api/models'
+import type { RefName, TagName } from '@/api/models'
 import { useQueryTags } from '@/api/queries/tags'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import {
@@ -65,12 +65,16 @@ const CreateTagDialog = (props: CreateTagDialogProps) => {
         <InputField
           label="tag name"
           name="name"
-          autoFocus
+          autoFocus={!dialogProps.formOptions.defaultValues.name}
           required
           containerProps={{ className: cn('mb-6') }}
         />
 
-        <TextField label="tag description" name="message" />
+        <TextField
+          label="tag description"
+          name="message"
+          autoFocus={!!dialogProps.formOptions.defaultValues.name}
+        />
 
         <DecoratedButton
           type="submit"
@@ -84,19 +88,21 @@ const CreateTagDialog = (props: CreateTagDialogProps) => {
   )
 }
 
-const requestTagParams = (reference: RefName) => {
-  return requestValueFromDialog(CreateTagDialog, {
+const requestTagParams = async (reference: RefName, defaultName?: TagName) => {
+  const { name, message } = await requestValueFromDialog(CreateTagDialog, {
     reference,
     formOptions: {
       defaultValues: {
-        name: '',
+        name: defaultName ?? '',
         message: '',
       },
     },
-  }).then(({ name, message }) => ({
+  })
+
+  return {
     tagName: name,
     message: message ? message : null,
-  }))
+  }
 }
 
 export {

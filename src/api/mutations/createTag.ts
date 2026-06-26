@@ -4,7 +4,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
 
-import type { BranchInfo, CommitInfo } from '../models'
+import type { BranchName, CommitId } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface CreateTagArgs {
@@ -30,16 +30,16 @@ const createTagMutation = (repoPath: string) =>
 
 type TagAction = Action<Omit<CreateTagArgs, 'reference'>>
 
-const useMakeTagBranch = (): ((branch: BranchInfo) => TagAction) => {
+const useMakeTagBranch = (): ((branch: BranchName) => TagAction) => {
   const createTag = useRepositoryMutation(createTagMutation)
 
-  return (branch: BranchInfo): TagAction => ({
-    id: { key: 'tag_operation', operation: 'create_tag', branch: branch.name },
-    blockedBy: [{ key: 'tag_operation', branch: branch.name }],
+  return (branch: BranchName): TagAction => ({
+    id: { key: 'tag_operation', operation: 'create_tag', branch },
+    blockedBy: [{ key: 'tag_operation', branch }],
     run: async (args) => {
       await createTag.mutateAsync({
         tagName: args.tagName,
-        reference: branch.name,
+        reference: branch,
         message: args.message,
       })
     },
@@ -53,16 +53,16 @@ const useMakeTagBranch = (): ((branch: BranchInfo) => TagAction) => {
   })
 }
 
-const useMakeTagCommit = (): ((commit: CommitInfo) => TagAction) => {
+const useMakeTagCommit = (): ((commit: CommitId) => TagAction) => {
   const createTag = useRepositoryMutation(createTagMutation)
 
-  return (commit: CommitInfo): TagAction => ({
-    id: { key: 'tag_operation', operation: 'create_tag', commit: commit.id },
-    blockedBy: [{ key: 'tag_operation', commit: commit.id }],
+  return (commit: CommitId): TagAction => ({
+    id: { key: 'tag_operation', operation: 'create_tag', commit },
+    blockedBy: [{ key: 'tag_operation', commit }],
     run: async (args) => {
       await createTag.mutateAsync({
         tagName: args.tagName,
-        reference: commit.id,
+        reference: commit,
         message: args.message,
       })
     },

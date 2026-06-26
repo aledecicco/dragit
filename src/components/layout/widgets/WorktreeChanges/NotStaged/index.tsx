@@ -1,5 +1,6 @@
 import { type ComponentProps, useRef } from 'react'
-import { IconFiles } from '@tabler/icons-react'
+import { IconFileCheck, IconFiles } from '@tabler/icons-react'
+import { match } from 'ts-pattern'
 
 import type { NotStagedFile, WorktreeFileType } from '@/api/models'
 import {
@@ -10,11 +11,13 @@ import { useNeedsPagination } from '@/api/utils'
 import {
   useDiscardFilesInteraction,
   useGetNotStagedFilesInteractions,
+  useStageAllInteraction,
+  useUnstageAllInteraction,
   useUnstageFilesInteraction,
 } from '@/interactions/file'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
+import { InteractiveBatch } from '@/lib/Interactive/Batch'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
@@ -28,6 +31,7 @@ import {
 } from '@/state/pages'
 import { useSettings } from '@/state/storage'
 import { Chip } from '@/ui/Chip'
+import { useNotStagedCount } from '@/utils/repository'
 import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
@@ -56,6 +60,8 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
 
   const getInteractions = useGetNotStagedFilesInteractions()
   const unstageFiles = useUnstageFilesInteraction()
+  const unstageAll = useUnstageAllInteraction()
+  const stageAll = useStageAllInteraction()
   const discardFiles = useDiscardFilesInteraction()
 
   const ref = useRef<HTMLDivElement>(null)
@@ -64,21 +70,36 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
     ref.current?.focus()
   })
 
+  const { count, hasMore } = useNotStagedCount()
+
   return (
-    <InteractiveListContainer
+    <InteractiveBatch
       className={cn('border-none group/drag')}
-      items={filesQuery.data?.items ?? []}
-      getInteractions={getInteractions}
-      getDragPayload={getDragPayload}
+      count={hasMore ? `${count}+` : `${count}`}
+      getInteractions={() => [[stageAll]]}
+      getDragPayload={() => ({
+        type: 'worktree',
+        label: pluralize('unstaged file', count, true),
+        Glyph: IconFileCheck,
+        dragged: undefined,
+      })}
     >
       <DropArea
         {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}
-        acceptedTypes={['staged-files']}
+        acceptedTypes={['staged-files', 'index']}
         label={{
           'staged-files': 'unstage changes',
+          index: 'unstage all changes',
         }}
-        handleDrop={({ dragged }) => {
-          triggerInteraction(unstageFiles(dragged))
+        handleDrop={(payload) => {
+          match(payload)
+            .with({ type: 'staged-files' }, ({ dragged }) => {
+              triggerInteraction(unstageFiles(dragged))
+            })
+            .with({ type: 'index' }, () => {
+              triggerInteraction(unstageAll)
+            })
+            .exhaustive()
         }}
       >
         <div
@@ -145,7 +166,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
           </InteractiveSelection>
         </div>
       </DropArea>
-    </InteractiveListContainer>
+    </InteractiveBatch>
   )
 }
 

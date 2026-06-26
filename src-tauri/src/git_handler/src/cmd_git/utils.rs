@@ -34,7 +34,7 @@ pub(crate) const BRANCH_PREFIX: &str = "refs/heads/";
 /// The string that denotes that a branch is local when printing its status.
 pub(crate) const REMOTE_BRANCH_PREFIX: &str = "refs/remotes/";
 /// Format used to get the needed information about a stash.
-pub(crate) const STASH_INFO_FORMAT: &str = "--format=format:%n%p%n%gd%n%ct%n%s";
+pub(crate) const STASH_INFO_FORMAT: &str = "--format=format:%p%n%gd%n%ct%n%s";
 /// The string that precedes the stash identifier.
 pub(crate) const STASH_NAME_PREFIX: &str = "stash@{";
 /// The string that denotes that a stash was created from a detached state.

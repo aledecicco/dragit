@@ -19,7 +19,7 @@ import {
 } from '@/interactions/tag'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
+import { InteractiveBatch } from '@/lib/Interactive/Batch'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
@@ -102,10 +102,10 @@ const BranchesList = (props: BranchesListProps) => {
         if (tabsHandler.selectedTab === 'tags') {
           match(payload)
             .with({ type: 'commit' }, ({ dragged }) => {
-              triggerInteraction(tagDroppedCommit(dragged))
+              triggerInteraction(tagDroppedCommit(dragged.shortHash))
             })
             .with({ type: 'branch' }, ({ dragged }) => {
-              triggerInteraction(tagDroppedBranch(dragged))
+              triggerInteraction(tagDroppedBranch(dragged.name))
             })
             .exhaustive()
         } else {
@@ -124,17 +124,15 @@ const BranchesList = (props: BranchesListProps) => {
         store={tabsHandler.store}
         list={
           <>
-            <InteractiveListContainer
+            <InteractiveBatch
               className={cn('border-none')}
-              items={
-                (settings.sortBranchesByDate
-                  ? localBranchesQuery.data?.sort((a, b) => {
-                      return b.timestamp - a.timestamp
-                    })
-                  : localBranchesQuery.data) ?? []
+              count={`${localBranchesQuery.data?.length ?? 0}`}
+              getInteractions={() =>
+                getBranchesListInteractions(localBranchesQuery.data ?? [])
               }
-              getInteractions={getBranchesListInteractions}
-              getDragPayload={getBranchesDragPayload}
+              getDragPayload={() =>
+                getBranchesDragPayload(localBranchesQuery.data ?? [])
+              }
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('local')
               }}
@@ -145,19 +143,17 @@ const BranchesList = (props: BranchesListProps) => {
                   {localBranchesQuery.data?.length ?? '...'}
                 </Chip>
               </Tab>
-            </InteractiveListContainer>
+            </InteractiveBatch>
 
-            <InteractiveListContainer
+            <InteractiveBatch
               className={cn('border-none')}
-              items={
-                (settings.sortBranchesByDate
-                  ? remoteBranchesQuery.data?.sort((a, b) => {
-                      return b.timestamp - a.timestamp
-                    })
-                  : remoteBranchesQuery.data) ?? []
+              count={`${remoteBranchesQuery.data?.length ?? 0}`}
+              getInteractions={() =>
+                getBranchesListInteractions(remoteBranchesQuery.data ?? [])
               }
-              getInteractions={getBranchesListInteractions}
-              getDragPayload={getBranchesDragPayload}
+              getDragPayload={() =>
+                getBranchesDragPayload(remoteBranchesQuery.data ?? [])
+              }
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('remote')
               }}
@@ -168,19 +164,17 @@ const BranchesList = (props: BranchesListProps) => {
                   {remoteBranchesQuery.data?.length ?? '...'}
                 </Chip>
               </Tab>
-            </InteractiveListContainer>
+            </InteractiveBatch>
 
-            <InteractiveListContainer
+            <InteractiveBatch
               className={cn('border-none')}
-              items={
-                (settings.sortBranchesByDate
-                  ? allBranchesQuery.data?.sort((a, b) => {
-                      return b.timestamp - a.timestamp
-                    })
-                  : allBranchesQuery.data) ?? []
+              count={`${allBranchesQuery.data?.length ?? 0}`}
+              getInteractions={() =>
+                getBranchesListInteractions(allBranchesQuery.data ?? [])
               }
-              getInteractions={getBranchesListInteractions}
-              getDragPayload={getBranchesDragPayload}
+              getDragPayload={() =>
+                getBranchesDragPayload(allBranchesQuery.data ?? [])
+              }
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('all')
               }}
@@ -189,19 +183,15 @@ const BranchesList = (props: BranchesListProps) => {
                 All
                 <Chip size="sm">{allBranchesQuery.data?.length ?? '...'}</Chip>
               </Tab>
-            </InteractiveListContainer>
+            </InteractiveBatch>
 
-            <InteractiveListContainer
+            <InteractiveBatch
               className={cn('border-none')}
-              items={
-                (settings.sortBranchesByDate
-                  ? tagsQuery.data?.sort((a, b) => {
-                      return b.timestamp - a.timestamp
-                    })
-                  : tagsQuery.data) ?? []
+              count={`${tagsQuery.data?.length ?? 0}`}
+              getInteractions={() =>
+                getTagsListInteractions(tagsQuery.data ?? [])
               }
-              getInteractions={getTagsListInteractions}
-              getDragPayload={getTagsDragPayload}
+              getDragPayload={() => getTagsDragPayload(tagsQuery.data ?? [])}
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('tags')
               }}
@@ -210,7 +200,7 @@ const BranchesList = (props: BranchesListProps) => {
                 Tags
                 <Chip size="sm">{tagsQuery.data?.length ?? '...'}</Chip>
               </Tab>
-            </InteractiveListContainer>
+            </InteractiveBatch>
           </>
         }
       />
@@ -277,19 +267,17 @@ const BranchesList = (props: BranchesListProps) => {
   )
 }
 
-const getBranchesDragPayload = (
-  branches: BranchInfo[] | undefined,
-): DragPayload => ({
+const getBranchesDragPayload = (branches: BranchInfo[]): DragPayload => ({
   type: 'branches',
   dragged: branches ?? [],
-  label: pluralize('branch', branches?.length ?? 0, true, 'branches'),
+  label: pluralize('branch', branches.length, true, 'branches'),
   Glyph: IconGitBranch,
 })
 
-const getTagsDragPayload = (tags: TagInfo[] | undefined): DragPayload => ({
+const getTagsDragPayload = (tags: TagInfo[]): DragPayload => ({
   type: 'tags',
   dragged: tags ?? [],
-  label: pluralize('tag', tags?.length ?? 0, true),
+  label: pluralize('tag', tags.length, true),
   Glyph: IconTags,
 })
 

@@ -12,11 +12,7 @@ import type {
   Page,
 } from '@/api/models'
 import { HISTORY_PAGE_SIZE } from '@/api/queries/commitHistory'
-import { useQueryWorktreeFiles } from '@/api/queries/worktreeFiles'
 import { getPaginatedItem, getPaginatedLength } from '@/api/utils'
-
-import { NOT_STAGED_FILE_TYPES } from '../WorktreeChanges/NotStaged'
-import { STAGED_FILE_TYPES } from '../WorktreeChanges/Staged'
 
 type HistoryQuery = UseInfiniteQueryResult<InfiniteData<Page<HistoryItem>>>
 
@@ -116,20 +112,9 @@ const getGraphCommitData = (
   return { hash, isAnchor, parent }
 }
 
-/**
- * Hook that determines whether there are uncommitted changes in the worktree.
- */
-const useHasUncommittedChanges = (): boolean => {
-  const stagedFiles = useQueryWorktreeFiles(STAGED_FILE_TYPES)
-  const unstagedFiles = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
-
-  return !!stagedFiles.data?.items.length || !!unstagedFiles.data?.items.length
-}
-
 export {
   ancestorNotInRange,
   ancestorIsDivergent,
   useInfiniteScroll,
   getGraphCommitData,
-  useHasUncommittedChanges,
 }

@@ -3,11 +3,12 @@ import * as Ariakit from '@ariakit/react'
 import { mergeRefs } from 'react-merge-refs'
 
 import type { CommitId } from '@/api/models'
+import type { CommitIndexArgs } from '@/api/mutations/commitIndex'
 import { useQueryCommitInfo } from '@/api/queries/commitInfo'
 import { useAmendSomeCommitInteraction } from '@/interactions/commit'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { QueryLoader } from '@/lib/QueryLoader'
-import { triggerInteraction } from '@/state/actions'
+import { type Interaction, triggerInteraction } from '@/state/actions'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { makeTracked } from '../SvgOverlay/utils'
@@ -82,13 +83,19 @@ const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
 
       {isCurrent ? (
         <DropArea
-          acceptedTypes={['worktree']}
+          acceptedTypes={['index']}
           label={{
-            worktree: 'amend this commit',
+            index: 'amend this commit',
           }}
           handleDrop={() => {
             if (commitInfoQuery.data) {
-              triggerInteraction(amendCommit(commitInfoQuery.data))
+              triggerInteraction({
+                ...amendCommit(commitInfoQuery.data),
+                argsRequester: () => ({
+                  message: commitInfoQuery.data.message,
+                  isAmend: true,
+                }),
+              } as Interaction<CommitIndexArgs>)
             }
           }}
           {...commonStyles}

@@ -128,7 +128,7 @@ export const useBranchOffBranchInteraction = (branch: BranchInfo) => {
 export const useTagBranchInteraction = (branch: BranchInfo) => {
   const tagSome = useTagSomeBranchInteraction()
 
-  return tagSome(branch)
+  return tagSome(branch.name)
 }
 
 export const useMergeSomeBranchInteraction = () => {

@@ -1,0 +1,110 @@
+import type { ReactNode } from 'react'
+import { IconGitBranch, IconGitCommit, IconTag } from '@tabler/icons-react'
+import { match } from 'ts-pattern'
+
+import type { BranchInfo, BranchName, Reference, TagInfo } from '@/api/models'
+import { useQueryBranches } from '@/api/queries/branches'
+import { useQueryTags } from '@/api/queries/tags'
+import { Combobox, type ComboboxProps } from '@/ui/Combobox'
+import { ComboboxSection } from '@/ui/Combobox/Section'
+
+interface RefSelectorProps extends Partial<Omit<ComboboxProps, 'value'>> {
+  /**
+   * The currently selected reference.
+   */
+  reference: Reference | null | undefined
+
+  /**
+   * Branches to ensure are present at the top.
+   */
+  pinnedBranches?: BranchName[]
+
+  /**
+   * Branches to ensure are not present.
+   */
+  excludedBranches?: BranchName[]
+
+  /**
+   * Callback to trigger when a branch is selected.
+   */
+  onSelectBranch: (value: string, branch: BranchInfo | undefined) => void
+
+  /**
+   * Callback to trigger when a tag is selected.
+   */
+  onSelectTag: (value: string, tag: TagInfo | undefined) => void
+
+  /**
+   * Element to display when no branch matches the search.
+   */
+  noBranchMatches?: (search: string) => ReactNode
+
+  /**
+   * Element to display when no tag matches the search.
+   */
+  noTagMatches?: (search: string) => ReactNode
+}
+
+/**
+ * A combobox that allows selecting a branch, a tag, or a commit.
+ */
+const RefSelector = ({
+  reference,
+  pinnedBranches,
+  excludedBranches,
+  onSelectBranch,
+  onSelectTag,
+  noBranchMatches,
+  noTagMatches,
+  ...comboboxProps
+}: RefSelectorProps) => {
+  const branchesQuery = useQueryBranches()
+  const tagsQuery = useQueryTags()
+
+  const value =
+    reference?.type === 'commit'
+      ? `#${reference.refName}`
+      : (reference?.refName ?? '')
+
+  const Glyph = match(reference?.type)
+    .with('commit', () => IconGitCommit)
+    .with('tag', () => IconTag)
+    .otherwise(() => IconGitBranch)
+
+  const branchOptions = [
+    ...(pinnedBranches ?? []),
+    ...(branchesQuery.data?.map((b) => b.name) ?? []).filter(
+      (b) => !pinnedBranches?.includes(b) && !excludedBranches?.includes(b),
+    ),
+  ]
+  const tagOptions = tagsQuery.data?.map((t) => t.name) ?? []
+
+  return (
+    <Combobox value={value} Glyph={Glyph} {...comboboxProps}>
+      <ComboboxSection
+        name="branches"
+        onSelect={(value) =>
+          onSelectBranch(
+            value,
+            branchesQuery.data?.find((b) => b.name === value),
+          )
+        }
+        options={branchOptions}
+        noMatches={noBranchMatches}
+      />
+      <ComboboxSection
+        name="tags"
+        onSelect={(value) =>
+          onSelectTag(
+            value,
+            tagsQuery.data?.find((t) => t.name === value),
+          )
+        }
+        options={tagOptions}
+        noMatches={noTagMatches}
+      />
+    </Combobox>
+  )
+}
+
+export { RefSelector, type RefSelectorProps }

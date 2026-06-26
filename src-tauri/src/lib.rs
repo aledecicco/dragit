@@ -73,6 +73,7 @@ pub fn run() {
             api::delete_local_branches,
             api::delete_remote_branches,
             api::get_commit_history_page,
+            api::get_matching_commits,
             api::get_commit_info,
             api::get_diff_summary,
             api::add_to_index,

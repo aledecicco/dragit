@@ -9,7 +9,7 @@ import {
 } from '@/interactions/stash'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
-import { InteractiveListContainer } from '@/lib/Interactive/ListContainer'
+import { InteractiveBatch } from '@/lib/Interactive/Batch'
 import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
@@ -52,11 +52,11 @@ const StashesList = (props: StashesListProps) => {
   })
 
   return (
-    <InteractiveListContainer
+    <InteractiveBatch
       className={cn('border-none')}
-      items={stashesQuery.data ?? []}
-      getInteractions={getInteractions}
-      getDragPayload={getDragPayload}
+      count={`${stashesQuery.data?.length ?? 0}`}
+      getInteractions={() => getInteractions(stashesQuery.data ?? [])}
+      getDragPayload={() => getDragPayload(stashesQuery.data)}
     >
       <DropArea
         acceptedTypes={['not-staged-files']}
@@ -104,7 +104,7 @@ const StashesList = (props: StashesListProps) => {
           </AccordionSection>
         </Accordion>
       </DropArea>
-    </InteractiveListContainer>
+    </InteractiveBatch>
   )
 }
 

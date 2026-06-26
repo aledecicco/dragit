@@ -1,8 +1,7 @@
-import { IconGitBranch, IconGitCommit, IconTag } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
-import { useQueryBranches } from '@/api/queries/branches'
-import { useQueryTags } from '@/api/queries/tags'
+import { requestTagParams } from '@/common/CreateTagDialog'
+import { RefSelector } from '@/common/RefSelector'
 import { useBranchOffSomeBranchInteraction } from '@/interactions/branch'
 import {
   useCheckoutPresenter,
@@ -10,10 +9,13 @@ import {
   useCheckoutSomeTagInteraction,
   useCreateAndCheckoutBranchInteraction,
 } from '@/interactions/checkout'
-import { triggerInteraction } from '@/state/actions'
-import { Combobox, type ComboboxProps } from '@/ui/Combobox'
+import {
+  useTagSomeBranchInteraction,
+  useTagSomeCommitInteraction,
+} from '@/interactions/tag'
+import { type AnyInteraction, triggerInteraction } from '@/state/actions'
+import type { ComboboxProps } from '@/ui/Combobox'
 import { ComboboxItem } from '@/ui/Combobox/Item'
-import { ComboboxSection } from '@/ui/Combobox/Section'
 import { useHeadReference } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -25,28 +27,16 @@ interface CurrentBranchSelectorProps extends Partial<ComboboxProps> {}
 const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
   const { ...comboboxProps } = props
 
-  const remoteBranchesQuery = useQueryBranches('remote')
-  const branchesQuery = useQueryBranches()
-  const tagsQuery = useQueryTags()
-
   const currentReference = useHeadReference()
 
   const checkoutTracker = useCheckoutPresenter()
   const branchOff = useBranchOffSomeBranchInteraction()
   const checkoutBranch = useCheckoutSomeBranchInteraction()
   const checkoutTag = useCheckoutSomeTagInteraction()
-  const createAndCheckoutBranch = useCreateAndCheckoutBranchInteraction()
-
-  const branchOptions = branchesQuery.data?.map((branch) => branch.name) ?? []
-  const tagOptions = tagsQuery.data?.map((tag) => tag.name) ?? []
 
   return (
-    <Combobox
+    <RefSelector
       placeholder="Checkout a branch..."
-      Glyph={match(currentReference?.type)
-        .with('commit', () => IconGitCommit)
-        .with('tag', () => IconTag)
-        .otherwise(() => IconGitBranch)}
       iconProps={propsWithCn(
         comboboxProps.iconProps,
         match(checkoutTracker.actionStatus)
@@ -60,59 +50,78 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
         checkoutTracker.actionStatus === 'running' ||
         checkoutTracker.actionStatus === 'disabled' ||
         !currentReference ||
-        comboboxProps.disabled
+        props.disabled
       }
-      value={
-        currentReference?.type === 'commit'
-          ? `#${currentReference.refName}`
-          : (currentReference?.refName ?? '')
-      }
-    >
-      <ComboboxSection
-        name="branches"
-        onSelect={async (value) => {
-          const remoteBranch = remoteBranchesQuery.data?.find(
-            (branch) => branch.name === value,
-          )
-
-          if (remoteBranch) {
-            triggerInteraction(branchOff(remoteBranch))
-          } else {
-            const localBranch = branchesQuery.data?.find(
-              (branch) => branch.name === value,
-            )
-            if (localBranch) {
-              triggerInteraction(checkoutBranch(localBranch))
-            }
-          }
-        }}
-        options={branchOptions}
-        noMatches={(search) => (
-          <ComboboxItem
-            className={cn('text-light-500 italic')}
-            value={search}
-            onClick={() => {
-              triggerInteraction(createAndCheckoutBranch(search))
-            }}
-          >
-            Create branch <b className={cn('text-light-50')}>{search}</b> from
-            current commit
-          </ComboboxItem>
-        )}
-      />
-
-      <ComboboxSection
-        name="tags"
-        onSelect={(value) => {
-          const tag = tagsQuery.data?.find((t) => t.name === value)
-          if (tag) {
-            triggerInteraction(checkoutTag(tag))
-          }
-        }}
-        options={tagOptions}
-      />
-    </Combobox>
+      reference={currentReference}
+      onSelectBranch={(_, branch) => {
+        if (branch?.type === 'remote') {
+          triggerInteraction(branchOff(branch))
+        } else if (branch?.type === 'local') {
+          triggerInteraction(checkoutBranch(branch))
+        }
+      }}
+      onSelectTag={(_, tag) => {
+        if (tag) {
+          triggerInteraction(checkoutTag(tag))
+        }
+      }}
+      noBranchMatches={(search) => <NoBranchMatches search={search} />}
+      noTagMatches={(search) => <NoTagMatches search={search} />}
+    />
   )
 }
 
-export { CurrentBranchSelector }
+const NoBranchMatches = (props: { search: string }) => {
+  const { search } = props
+  const createAndCheckoutBranch = useCreateAndCheckoutBranchInteraction()
+
+  return (
+    <ComboboxItem
+      className={cn('text-light-500 italic')}
+      value={search}
+      onClick={() => {
+        triggerInteraction(createAndCheckoutBranch(search))
+      }}
+    >
+      Create branch <b className={cn('text-light-50')}>{search}</b> from current
+      commit
+    </ComboboxItem>
+  )
+}
+
+const NoTagMatches = (props: { search: string }) => {
+  const { search } = props
+  const currentReference = useHeadReference()
+  const tagBranch = useTagSomeBranchInteraction()
+  const tagCommit = useTagSomeCommitInteraction()
+
+  return (
+    <ComboboxItem
+      className={cn('text-light-500 italic')}
+      value={search}
+      onClick={() => {
+        if (!currentReference) return
+
+        match(currentReference)
+          .with({ type: 'commit' }, ({ refName: commitId }) => {
+            triggerInteraction({
+              ...tagCommit(commitId),
+              argsRequester: () => requestTagParams(commitId, search),
+            } as AnyInteraction)
+          })
+          .with({ type: 'branch' }, ({ refName: branchName }) => {
+            triggerInteraction({
+              ...tagBranch(branchName),
+              argsRequester: () => requestTagParams(branchName, search),
+            } as AnyInteraction)
+          })
+          .exhaustive()
+      }}
+    >
+      Create tag <b className={cn('text-light-50')}>{search}</b> from current
+      commit
+    </ComboboxItem>
+  )
+}
+
+export { CurrentBranchSelector, type CurrentBranchSelectorProps }

@@ -198,7 +198,7 @@ const InteractiveSelectionInner = <T,>(
       items={
         <InteractiveMenuItems
           interactions={interactions}
-          itemProps={{ children: ` (${selectedItems.length})` }}
+          itemProps={{ children: `(${selectedItems.length})` }}
         />
       }
     >

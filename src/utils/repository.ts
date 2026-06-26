@@ -1,19 +1,28 @@
 import { match } from 'ts-pattern'
 
+import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStaged'
+import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
+
 import type {
   BranchInfo,
   Reference,
   RemoteInfo,
   RemoteName,
   RepositoryHost,
-  SnapshotScope,
   Upstream,
 } from '@/api/models'
 import { useQueryBranches } from '@/api/queries/branches'
 import { useQueryHeadInfo } from '@/api/queries/headInfo'
 import { useQueryRemotes } from '@/api/queries/remotes'
+import {
+  useQueryWorktreeFiles,
+  WORKTREE_FILES_PAGE_SIZE,
+} from '@/api/queries/worktreeFiles'
 import { useSelectedBase } from '@/state/branches'
+import { useWorktreeFilesPage } from '@/state/pages'
 import { useSelectedUpstream } from '@/state/upstream'
+
+import { pluralize } from './string'
 
 /**
  * Finds a branch's info by name in a list of available branches.
@@ -21,7 +30,7 @@ import { useSelectedUpstream } from '@/state/upstream'
  * @param refName - The name to search for.
  * @param branches - The list of branches to search in.
  */
-const findBranchInfo = (
+export const findBranchInfo = (
   refName: string,
   branches: BranchInfo[],
 ): BranchInfo | undefined => {
@@ -35,7 +44,7 @@ const findBranchInfo = (
  *
  * @returns A stable reference to the branch's info if found.
  */
-const useBranch = (
+export const useBranch = (
   reference: Reference | undefined,
 ): BranchInfo | undefined => {
   const branchesQuery = useQueryBranches()
@@ -51,11 +60,13 @@ const useBranch = (
 /**
  * Hook that tracks the currently checked out reference.
  */
-const useHeadReference = (): Reference | undefined => {
+export const useHeadReference = ():
+  | Exclude<Reference, { type: 'tag' }>
+  | undefined => {
   const headInfoQuery = useQueryHeadInfo()
 
   const currentRef = match(headInfoQuery.data?.state)
-    .returnType<Reference | undefined>()
+    .returnType<Exclude<Reference, { type: 'tag' }> | undefined>()
     .with({ type: 'branch' }, (reference) => ({
       type: 'branch',
       refName: reference.name,
@@ -73,7 +84,7 @@ const useHeadReference = (): Reference | undefined => {
 /**
  * Hook that tracks the currently checked out branch, if any.
  */
-const useCurrentBranch = (): BranchInfo | undefined => {
+export const useCurrentBranch = (): BranchInfo | undefined => {
   const currentReference = useHeadReference()
   const branch = useBranch(currentReference)
 
@@ -83,7 +94,7 @@ const useCurrentBranch = (): BranchInfo | undefined => {
 /**
  * Hook that tracks the currently selected base branch, if any.
  */
-const useCurrentBaseBranch = (): BranchInfo | undefined => {
+export const useCurrentBaseBranch = (): BranchInfo | undefined => {
   const currentReference = useHeadReference()
   const baseBranch = useBranch(useSelectedBase(currentReference))
 
@@ -96,7 +107,7 @@ const useCurrentBaseBranch = (): BranchInfo | undefined => {
  * @param remoteName - The name to search for.
  * @param remotes - The list of remotes to search in.
  */
-const findRemoteInfo = (
+export const findRemoteInfo = (
   remoteName: string,
   remotes: RemoteInfo[],
 ): RemoteInfo | undefined => {
@@ -110,7 +121,7 @@ const findRemoteInfo = (
  *
  * @returns A stable reference to the remote's info if found.
  */
-const useRemote = (
+export const useRemote = (
   remoteName: RemoteName | undefined,
 ): RemoteInfo | undefined => {
   const remotesQuery = useQueryRemotes()
@@ -123,7 +134,10 @@ const useRemote = (
   return remote
 }
 
-const useRepositoryHost = (): RepositoryHost | undefined => {
+/**
+ * Hook that tracks where the current repository is hosted in.
+ */
+export const useRepositoryHost = (): RepositoryHost | undefined => {
   const currentBranch = useCurrentBranch()
   const upstream = useSelectedUpstream(currentBranch)
   const remote = useRemote(upstream?.remote)
@@ -142,19 +156,60 @@ const useRepositoryHost = (): RepositoryHost | undefined => {
 /**
  * Get the reference an upstream points to.
  */
-const getUpstreamReference = (upstream: Upstream): Reference => ({
+export const getUpstreamReference = (upstream: Upstream): Reference => ({
   type: 'branch',
   refName: `${upstream.remote}/${upstream.remoteBranch}`,
 })
 
-export {
-  findBranchInfo,
-  useBranch,
-  useHeadReference,
-  useCurrentBranch,
-  useCurrentBaseBranch,
-  findRemoteInfo,
-  useRemote,
-  useRepositoryHost,
-  getUpstreamReference,
+/**
+ * Hook that tracks whether there are any staged changes in the worktree.
+ */
+export const useHasStagedChanges = () => {
+  const stagedPage = useWorktreeFilesPage(STAGED_FILE_TYPES)
+  const stagedChangesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
+
+  return stagedPage > 0 || !!stagedChangesQuery.data?.items.length
+}
+
+/**
+ * Hook that tracks the number of staged changes in the worktree.
+ */
+export const useStagedCount = () => {
+  const stagedPage = useWorktreeFilesPage(STAGED_FILE_TYPES)
+  const stagedChangesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
+  const stagedCount =
+    stagedPage * WORKTREE_FILES_PAGE_SIZE +
+    (stagedChangesQuery.data?.items.length ?? 0)
+
+  return {
+    count: stagedCount,
+    hasMore: stagedChangesQuery.data?.hasNext || stagedChangesQuery.isFetching,
+  }
+}
+
+/**
+ * Hook that tracks whether there are any not staged changes in the worktree.
+ */
+export const useHasNotStagedChanges = () => {
+  const notStagedPage = useWorktreeFilesPage(NOT_STAGED_FILE_TYPES)
+  const notStagedChangesQuery = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
+
+  return notStagedPage > 0 || !!notStagedChangesQuery.data?.items.length
+}
+
+/**
+ * Hook that tracks the number of not staged changes in the worktree.
+ */
+export const useNotStagedCount = () => {
+  const notStagedPage = useWorktreeFilesPage(NOT_STAGED_FILE_TYPES)
+  const notStagedChangesQuery = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
+  const notStagedCount =
+    notStagedPage * WORKTREE_FILES_PAGE_SIZE +
+    (notStagedChangesQuery.data?.items.length ?? 0)
+
+  return {
+    count: notStagedCount,
+    hasMore:
+      notStagedChangesQuery.data?.hasNext || notStagedChangesQuery.isFetching,
+  }
 }

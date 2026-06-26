@@ -297,6 +297,33 @@ impl GitHandler for CmdGit {
         Ok(Page { items, has_next })
     }
 
+    fn get_matching_commits(
+        &self,
+        channel: &Channel<AppMessage>,
+        repo_path: &str,
+        hash_search: &str,
+        limit: usize,
+    ) -> Result<Vec<String>, GitError> {
+        let args = ["log", "--all"];
+        let lines = self
+            .spawn_and_stream(channel, repo_path, args)?
+            .filter_map(Result::ok);
+
+        let mut found = vec![];
+
+        for line in lines {
+            if line.contains(hash_search) {
+                found.push(line);
+            }
+
+            if found.len() >= limit {
+                break;
+            }
+        }
+
+        Ok(found)
+    }
+
     fn get_commit_info(
         &self,
         channel: &Channel<AppMessage>,
@@ -795,13 +822,12 @@ impl GitHandler for CmdGit {
         channel: &Channel<AppMessage>,
         repo_path: &str,
     ) -> Result<Vec<StashInfo>, GitError> {
-        let args = ["stash", "list", STASH_INFO_FORMAT, "--shortstat"];
+        let args = ["stash", "list", STASH_INFO_FORMAT];
         let mut lines = self.spawn_and_stream(channel, repo_path, args)?.peekable();
         let mut stashes = Vec::new();
 
-        lines.next(); // Skip the first line
         while lines.peek().is_some() {
-            let mut stash_lines = lines
+            let stash_lines = lines
                 .by_ref()
                 .take(4)
                 .collect::<Result<Vec<String>, _>>()
@@ -809,26 +835,19 @@ impl GitHandler for CmdGit {
                     command: format!("git {}", args.join(" ")),
                 }))?;
 
-            let diff_line =
-                lines
-                    .next()
-                    .transpose()
-                    .or(Err(GitError::ParseCommandOutputFailed {
-                        command: format!("git {}", args.join(" ")),
-                    }))?;
-
-            if let Some(diff_line) = diff_line {
-                if !diff_line.is_empty() {
-                    stash_lines.push(diff_line);
-                    lines.next();
-                    lines.next();
-                }
-            }
-
-            let stash_info =
+            let mut stash_info =
                 parse_stash_info(&stash_lines).ok_or(GitError::ParseCommandOutputFailed {
                     command: format!("git {}", args.join(" ")),
                 })?;
+
+            if let Ok(output) = self.spawn_and_get_output(
+                channel,
+                repo_path,
+                ["stash", "show", "-u", "--shortstat", &stash_info.id],
+            ) {
+                stash_info.changes = parse_diff_summary(&output.trim().to_string());
+            }
+
             stashes.push(stash_info);
         }
 

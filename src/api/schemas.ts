@@ -53,6 +53,8 @@ export const HISTORY_ITEM_SCHEMA = BorshSchema.Struct({
 })
 export const HISTORY_PAGE_SCHEMA = PAGE_SCHEMA(HISTORY_ITEM_SCHEMA)
 
+export const MATCHING_COMMITS_SCHEMA = BorshSchema.Vec(BorshSchema.String)
+
 export const HEAD_STATE_SCHEMA = BorshSchema.Enum({
   Detached: BorshSchema.Struct({
     commit: BorshSchema.String,

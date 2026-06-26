@@ -106,7 +106,7 @@ const GraphDropAreas = () => {
         handleDrop={(payload) => {
           if (currentReference) {
             const newRef = match(payload)
-              .with({ type: 'commit' }, ({ dragged }) => dragged.shortHash)
+              .with({ type: 'commit' }, ({ dragged }) => dragged.id)
               .otherwise(({ dragged }) => dragged.name)
 
             if (newRef === currentReference.refName) {

@@ -3,20 +3,24 @@ import * as Ariakit from '@ariakit/react'
 import { IconFileCheck } from '@tabler/icons-react'
 import { mergeRefs } from 'react-merge-refs'
 
-import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStaged'
-import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
-
+import type { CommitId } from '@/api/models'
 import {
-  useQueryWorktreeFiles,
-  WORKTREE_FILES_PAGE_SIZE,
-} from '@/api/queries/worktreeFiles'
-import { useStageAllInteraction } from '@/interactions/file'
+  useStageAllInteraction,
+  useUnstageAllInteraction,
+} from '@/interactions/file'
 import { useCommitInteraction } from '@/interactions/operations'
-import { Draggable } from '@/lib/DragAndDrop/Draggable'
-import { useWorktreeFilesPage } from '@/state/pages'
+import { DropArea } from '@/lib/DragAndDrop/DropArea'
+import { InteractiveBatch } from '@/lib/Interactive/Batch'
+import { triggerInteraction } from '@/state/actions'
 import { Marquee } from '@/ui/Marquee'
 import { Toolbar } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
+import {
+  useHasNotStagedChanges,
+  useHasStagedChanges,
+  useNotStagedCount,
+  useStagedCount,
+} from '@/utils/repository'
 import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -32,7 +36,7 @@ interface DraftCommitProps extends ComponentProps<'div'> {
   /**
    * The id of the last commit.
    */
-  parentId: string | undefined
+  parentId: CommitId | undefined
 }
 
 /**
@@ -63,24 +67,25 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
   (props) => {
     const { trackRef, ...divProps } = props
 
-    const stagedPage = useWorktreeFilesPage(STAGED_FILE_TYPES)
-    const stagedChangesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
-    const hasStagedChanges =
-      stagedPage > 0 || !!stagedChangesQuery.data?.items.length
-    const stagedCount =
-      stagedPage * WORKTREE_FILES_PAGE_SIZE +
-      (stagedChangesQuery.data?.items.length ?? 0)
-
-    const notStagedPage = useWorktreeFilesPage(NOT_STAGED_FILE_TYPES)
-    const notStagedChangesQuery = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
-    const hasNotStagedChanges =
-      notStagedPage > 0 || !!notStagedChangesQuery.data?.items.length
-    const notStagedCount =
-      notStagedPage * WORKTREE_FILES_PAGE_SIZE +
-      (notStagedChangesQuery.data?.items.length ?? 0)
+    const hasStagedChanges = useHasStagedChanges()
+    const hasNotStagedChanges = useHasNotStagedChanges()
+    const stagedCount = useStagedCount()
+    const notStagedCount = useNotStagedCount()
 
     const stageAll = useStageAllInteraction()
+    const unstageAll = useUnstageAllInteraction()
     const commit = useCommitInteraction()
+
+    const commonStyles = {
+      className: cn(
+        'absolute left-full top-half translate-x-2 -translate-y-half',
+        'border-4 border-dark-600 rounded-lg shadow-md',
+      ),
+      style: {
+        width: COMMIT_WIDTH * 0.75,
+        height: COMMIT_HEIGHT * 1.1,
+      },
+    }
 
     return (
       <div
@@ -92,107 +97,121 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
           style={{ width: NODE_SIZE, height: NODE_SIZE }}
         />
 
-        <Draggable
-          dragPayload={{
-            type: 'worktree',
-            label: `${
-              stagedChangesQuery.data?.hasNext || stagedChangesQuery.isFetching
-                ? `${stagedCount}+`
-                : stagedCount
-            } ${pluralize('staged file', stagedCount, false)}`,
-            Glyph: IconFileCheck,
-            dragged: stagedChangesQuery.data?.items ?? [],
+        <DropArea
+          acceptedTypes={['index']}
+          label={{
+            index: 'commit changes',
           }}
-          className={cn(
-            'absolute left-full top-half translate-x-2 -translate-y-half',
-            'border-4 border-dark-600 rounded-lg shadow-md',
-          )}
-          style={{
-            width: COMMIT_WIDTH * 0.75,
-            height: COMMIT_HEIGHT * 1.1,
+          handleDrop={() => {
+            triggerInteraction(commit)
+          }}
+          extraValidation={(payload) => {
+            return !payload.dragged.fromDraft
+          }}
+          {...commonStyles}
+          overlayProps={{
+            className: cn('flex-row text-sm'),
           }}
         >
-          <div>
-            <Ariakit.CompositeItem
-              rowId="0"
-              render={
-                <div
-                  className={cn(
-                    'border border-dark-100 bg-dark-600 rounded-sm',
-                    'w-full h-full',
-                    'focus:bg-dark-500 focus:border-light-950/30',
-                  )}
-                >
+          <InteractiveBatch
+            count={
+              stagedCount.hasMore
+                ? `${stagedCount.count}+`
+                : `${stagedCount.count}`
+            }
+            getInteractions={() => [[unstageAll]]}
+            getDragPayload={() => ({
+              type: 'index',
+              label: pluralize('staged file', stagedCount.count, true),
+              Glyph: IconFileCheck,
+              dragged: { fromDraft: true },
+            })}
+            className={cn('w-full h-full')}
+          >
+            <div>
+              <Ariakit.CompositeItem
+                rowId="0"
+                render={
                   <div
                     className={cn(
-                      'w-full h-full overflow-hidden',
-                      'flex flex-col gap-y-1 items-stretch',
+                      'border border-dark-100 bg-dark-600 rounded-sm',
+                      'w-full h-full',
+                      'focus:bg-dark-500 focus:border-light-950/30',
                     )}
                   >
                     <div
                       className={cn(
-                        'flex flex-col items-center justify-between w-full h-full',
+                        'w-full h-full overflow-hidden',
+                        'flex flex-col gap-y-1 items-stretch',
                       )}
                     >
-                      <div className={cn('w-full py-1 px-2')}>
-                        <Marquee
-                          className={cn('text-xs text-light-600 mt-1')}
-                          reverse={false}
-                        >
-                          {hasStagedChanges && (
-                            <span className={cn('text-success-300')}>
-                              {stagedChangesQuery.data?.hasNext ||
-                              stagedChangesQuery.isFetching
-                                ? `${stagedCount}+`
-                                : stagedCount}{' '}
-                              {pluralize('staged file', stagedCount, false)}
-                            </span>
-                          )}
-                          {hasStagedChanges && hasNotStagedChanges && ' • '}
-                          {hasNotStagedChanges && (
-                            <>
-                              {notStagedChangesQuery.data?.hasNext ||
-                              notStagedChangesQuery.isFetching
-                                ? `${notStagedCount}+`
-                                : notStagedCount}{' '}
-                              {pluralize(
-                                'not staged file',
-                                notStagedCount,
-                                false,
-                              )}
-                            </>
-                          )}
-                        </Marquee>
+                      <div
+                        className={cn(
+                          'flex flex-col items-center justify-between w-full h-full',
+                        )}
+                      >
+                        <div className={cn('w-full py-1 px-2')}>
+                          <Marquee
+                            className={cn('text-xs text-light-600 mt-1')}
+                            reverse={false}
+                          >
+                            {hasStagedChanges && (
+                              <span className={cn('text-success-300')}>
+                                {stagedCount.hasMore
+                                  ? `${stagedCount.count}+`
+                                  : `${stagedCount.count}`}{' '}
+                                {pluralize(
+                                  'staged file',
+                                  stagedCount.count,
+                                  false,
+                                )}
+                              </span>
+                            )}
+                            {hasStagedChanges && hasNotStagedChanges && ' • '}
+                            {hasNotStagedChanges && (
+                              <span>
+                                {notStagedCount.hasMore
+                                  ? `${notStagedCount.count}+`
+                                  : `${notStagedCount.count}`}{' '}
+                                {pluralize(
+                                  'unstaged file',
+                                  notStagedCount.count,
+                                  false,
+                                )}
+                              </span>
+                            )}
+                          </Marquee>
+                        </div>
+
+                        <Toolbar fixed className={cn('w-full')}>
+                          <ToolbarItem
+                            className={cn('rounded-t-none rounded-b-xs')}
+                            status="neutral"
+                            {...stageAll}
+                            disabled={!hasNotStagedChanges}
+                            size="sm"
+                            compact={false}
+                            fixed
+                          />
+
+                          <ToolbarItem
+                            className={cn('rounded-t-none rounded-b-xs')}
+                            status="neutral"
+                            {...commit}
+                            disabled={!hasStagedChanges}
+                            size="sm"
+                            compact={false}
+                            fixed
+                          />
+                        </Toolbar>
                       </div>
-
-                      <Toolbar fixed className={cn('w-full')}>
-                        <ToolbarItem
-                          className={cn('rounded-t-none rounded-b-xs')}
-                          status="neutral"
-                          {...stageAll}
-                          disabled={!hasNotStagedChanges}
-                          size="sm"
-                          compact={false}
-                          fixed
-                        />
-
-                        <ToolbarItem
-                          className={cn('rounded-t-none rounded-b-xs')}
-                          status="neutral"
-                          {...commit}
-                          disabled={!hasStagedChanges}
-                          size="sm"
-                          compact={false}
-                          fixed
-                        />
-                      </Toolbar>
                     </div>
                   </div>
-                </div>
-              }
-            />
-          </div>
-        </Draggable>
+                }
+              />
+            </div>
+          </InteractiveBatch>
+        </DropArea>
       </div>
     )
   },

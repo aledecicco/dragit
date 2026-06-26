@@ -5,52 +5,48 @@ import type { AnyInteraction } from '@/state/actions'
 
 import { InteractiveMenuItems } from '../MenuItems'
 
-interface InteractiveListContainerProps<T>
+interface InteractiveBatchProps
   extends Omit<DraggableProps<DragType>, 'dragPayload'> {
   /**
-   * The items being interacted with.
+   * Label that represents the number of items contained.
    */
-  items: T[]
+  count: string | undefined
 
   /**
-   * Callback that returns the list of ways to interact with the selected items.
+   * Callback that returns the list of ways to interact with the items.
    */
-  getInteractions: (items: T[]) => AnyInteraction[][]
+  getInteractions: () => AnyInteraction[][]
 
   /**
    * Callback that returns the payload to be used when dragging.
    */
-  getDragPayload: (items: T[]) => DragPayload
+  getDragPayload: () => DragPayload
 }
 
 /**
- * A list that allows interacting with all of its items at once.
+ * A container that allows interacting with a batch of items at once.
  */
-const InteractiveListContainer = <T,>(
-  props: InteractiveListContainerProps<T>,
-) => {
+const InteractiveBatch = (props: InteractiveBatchProps) => {
   const {
-    items,
+    count,
     getInteractions,
     getDragPayload,
     children,
     ...draggableProps
   } = props
 
-  const interactions = getInteractions(items)
-
   return (
-    <Draggable {...draggableProps} dragPayload={getDragPayload(items)}>
+    <Draggable {...draggableProps} dragPayload={getDragPayload()}>
       <WithContextMenu
         onContextMenu={(e) => {
-          if (!items.length) {
+          if (!count) {
             e.preventDefault()
           }
         }}
         items={
           <InteractiveMenuItems
-            interactions={interactions}
-            itemProps={{ children: ` (${items.length})` }}
+            interactions={getInteractions()}
+            itemProps={{ children: `(${count})` }}
           />
         }
       >
@@ -60,4 +56,4 @@ const InteractiveListContainer = <T,>(
   )
 }
 
-export { InteractiveListContainer, type InteractiveListContainerProps }
+export { InteractiveBatch, type InteractiveBatchProps }

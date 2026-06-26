@@ -20,11 +20,7 @@ import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
 import { useBasesSync } from '@/state/branches'
-import {
-  changeSelectedFile,
-  useFileDiffsSync,
-  useSelectedFile,
-} from '@/state/file'
+import { useFileDiffsSync, useSelectedFile } from '@/state/file'
 import { useSettings } from '@/state/storage'
 import { useUpstreamsSync } from '@/state/upstream'
 import { useCheckForUpdates } from '@/utils/behavior'
@@ -86,35 +82,26 @@ const InRepositoryPage = () => {
             onClick={() => {
               showSettingsDialog()
             }}
-            status="neutral"
+            status="primary"
             variant="plain"
             size="lg"
             round
             compact
+            className={cn(
+              'text-primary-200 p-1.5 border border-primary-200/10 ',
+            )}
           />
           <CurrentDirectory />
         </div>
 
-        <DropArea
-          className={cn('w-full h-full min-h-0')}
-          acceptedTypes={['staged-files', 'not-staged-files']}
-          label={{
-            'not-staged-files': 'view file diff',
-            'staged-files': 'view file diff',
-          }}
-          extraValidation={(payload) => {
-            return payload.dragged.length === 1
-          }}
-          handleDrop={(payload) => {
-            changeSelectedFile(payload.dragged.at(0))
-          }}
-        >
-          {selectedFile ? (
-            <SelectedFileDiff selectedFile={selectedFile} />
-          ) : (
-            <Graph />
-          )}
-        </DropArea>
+        {selectedFile ? (
+          <SelectedFileDiff
+            selectedFile={selectedFile}
+            className={cn('w-full h-full min-h-0')}
+          />
+        ) : (
+          <Graph />
+        )}
       </div>
 
       <div
