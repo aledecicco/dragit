@@ -68,6 +68,11 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
         commitId={commitData.hash}
         commitType="confirmed"
         elementId={COMMIT_ELEMENT_ID(commitData.hash, baseReference.refName)}
+        isCurrent={
+          virtualRow.index === 0 &&
+          commonAncestor?.lastCommit === null &&
+          commitData.hash === commonAncestor?.commonCommit?.hash
+        }
         parent={mapFn(commitData.parent, (parentCommit) => ({
           id: COMMIT_ELEMENT_ID(parentCommit, baseReference.refName),
           type: parentIsDistantAnchor ? 'dashed' : 'solid',
