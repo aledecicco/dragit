@@ -1,4 +1,4 @@
-import type { BranchName, TagInfo } from '@/api/models'
+import type { BranchName, CommitId, TagInfo } from '@/api/models'
 import { useMakeCheckoutTag } from '@/api/mutations/checkout'
 import {
   useMakeBranchOff,

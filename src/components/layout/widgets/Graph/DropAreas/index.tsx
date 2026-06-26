@@ -1,7 +1,6 @@
 import { match } from 'ts-pattern'
 
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
-import { commitInfoQueryKeys } from '@/api/queries/commitInfo'
 import {
   useBranchOffSomeBranchInteraction,
   useMergeSomeBranchInteraction,
