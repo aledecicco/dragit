@@ -4,7 +4,7 @@ import {
   skipToken,
 } from '@tanstack/react-query'
 
-import type { DiffSummary, Reference, RefName } from '../models'
+import type { DiffSummary, RefName } from '../models'
 import { DIFF_SUMMARY_SCHEMA } from '../schemas'
 import { fetchAndDeserialize, pathQueryKey, useRepositoryQuery } from '../utils'
 

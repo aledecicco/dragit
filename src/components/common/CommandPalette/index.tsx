@@ -7,8 +7,7 @@ import {
   useQuickCommitFlow,
   useQuickStashFlow,
 } from '@/interactions/flows'
-import { ShortcutKey } from '@/lib/Shortcuts/Key'
-import { hideDialog, showDialog } from '@/state/dialogs'
+import { showDialog } from '@/state/dialogs'
 import { Dialog } from '@/ui/Dialog'
 import { cn } from '@/utils/styles'
 

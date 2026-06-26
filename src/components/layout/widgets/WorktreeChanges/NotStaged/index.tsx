@@ -1,5 +1,5 @@
 import { type ComponentProps, useRef } from 'react'
-import { IconFileCheck, IconFiles } from '@tabler/icons-react'
+import { IconFiles } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { NotStagedFile, WorktreeFileType } from '@/api/models'
@@ -80,7 +80,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
       getDragPayload={() => ({
         type: 'worktree',
         label: pluralize('unstaged file', count, true),
-        Glyph: IconFileCheck,
+        Glyph: IconFiles,
         dragged: undefined,
       })}
     >

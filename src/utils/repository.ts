@@ -22,8 +22,6 @@ import { useSelectedBase } from '@/state/branches'
 import { useWorktreeFilesPage } from '@/state/pages'
 import { useSelectedUpstream } from '@/state/upstream'
 
-import { pluralize } from './string'
-
 /**
  * Finds a branch's info by name in a list of available branches.
  *

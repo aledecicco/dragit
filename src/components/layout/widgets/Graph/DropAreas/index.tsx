@@ -1,5 +1,7 @@
 import { match } from 'ts-pattern'
 
+import { useQueryCommitHistory } from '@/api/queries/commitHistory'
+import { commitInfoQueryKeys } from '@/api/queries/commitInfo'
 import {
   useBranchOffSomeBranchInteraction,
   useMergeSomeBranchInteraction,
@@ -36,7 +38,9 @@ const GraphDropAreas = () => {
   const mergeTag = useMergeSomeTagInteraction()
   const mergeCommit = useMergeSomeCommitInteraction()
 
-  const validateBranchDrop = (
+  const historyQuery = useQueryCommitHistory(currentReference?.refName)
+
+  const validateReferenceDrop = (
     payload: MatchingPayload<'branch' | 'tag' | 'commit'>,
   ) => {
     return match(payload)
@@ -47,7 +51,7 @@ const GraphDropAreas = () => {
       .otherwise(({ dragged }) => dragged.name !== currentReference?.refName)
   }
 
-  const validateBaseBranchDrop = (
+  const validateBaseReferenceDrop = (
     payload: MatchingPayload<'branch' | 'tag' | 'commit'>,
   ) => {
     return match(payload)
@@ -65,7 +69,7 @@ const GraphDropAreas = () => {
         overlayProps={(payload) => ({
           className: cn(
             'rounded-sm flex-row',
-            validateBaseBranchDrop(payload) && 'rounded-r-none',
+            validateBaseReferenceDrop(payload) && 'rounded-r-none',
           ),
         })}
         acceptedTypes={['branch', 'tag', 'commit']}
@@ -74,7 +78,7 @@ const GraphDropAreas = () => {
           tag: 'checkout this tag',
           commit: 'checkout this commit',
         }}
-        extraValidation={validateBranchDrop}
+        extraValidation={validateReferenceDrop}
         handleDrop={(payload) => {
           if (payload.type === 'branch' && payload.dragged.type === 'remote') {
             triggerInteraction(branchOff(payload.dragged))
@@ -93,7 +97,7 @@ const GraphDropAreas = () => {
         overlayProps={(payload) => ({
           className: cn(
             'rounded-sm flex-row',
-            validateBranchDrop(payload) && 'rounded-l-none',
+            validateReferenceDrop(payload) && 'rounded-l-none',
           ),
         })}
         acceptedTypes={['branch', 'tag', 'commit']}
@@ -102,7 +106,7 @@ const GraphDropAreas = () => {
           tag: 'use this tag as base',
           commit: 'use this commit as base',
         }}
-        extraValidation={validateBaseBranchDrop}
+        extraValidation={validateBaseReferenceDrop}
         handleDrop={(payload) => {
           if (currentReference) {
             const newRef = match(payload)
@@ -129,7 +133,18 @@ const GraphDropAreas = () => {
           tag: 'merge this tag',
           commit: 'merge this commit',
         }}
-        extraValidation={validateBranchDrop}
+        extraValidation={(payload) => {
+          if (
+            payload.type === 'commit' &&
+            historyQuery.data?.pages.find((page) =>
+              page.items.find((item) => item.hash === payload.dragged.id),
+            )
+          ) {
+            return false
+          }
+
+          return validateReferenceDrop(payload)
+        }}
         handleDrop={(payload) => {
           match(payload)
             .with({ type: 'branch' }, ({ dragged }) => {
