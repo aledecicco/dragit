@@ -13,7 +13,7 @@ build:
     IMAGE="dragit-builder"
     if ! docker image inspect "$IMAGE" &>/dev/null; then
         echo "Building Docker image..."
-        docker build -f Dockerfile.build -t "$IMAGE" .
+        docker build -f packaging/Dockerfile.build -t "$IMAGE" .
     fi
     docker run --rm \
         -v "$(pwd)":/app \

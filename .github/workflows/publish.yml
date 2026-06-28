@@ -100,46 +100,12 @@ jobs:
           VERSION="${{ github.ref_name }}"
           VERSION="${VERSION#v}"
 
-          DEB=$(find src-tauri/target/release/bundle/deb -name "*.deb" | head -1)
-          SHA_X86_64=$(sha256sum "$DEB" | cut -d' ' -f1)
+          APPIMAGE=$(find src-tauri/target/release/bundle/appimage -name "*.AppImage" ! -name "*.tar.gz" | head -1)
+          SHA=$(sha256sum "$APPIMAGE" | cut -d' ' -f1)
 
-          cat > PKGBUILD << PKGBUILD_EOF
-          # Maintainer: Alejandro De Cicco <alejandrodecicco99@gmail.com>
-          pkgname=dragit
-          pkgver=${VERSION}
-          pkgrel=1
-          pkgdesc="A convenient and modern Git client"
-          arch=('x86_64')
-          url="https://github.com/aledecicco/dragit"
-          license=('GPL-3.0-only')
-          depends=('cairo' 'desktop-file-utils' 'gdk-pixbuf2' 'glib2' 'gtk3' 'hicolor-icon-theme' 'libsoup3' 'pango' 'webkit2gtk-4.1')
-          options=('!strip' '!debug')
-          install=\${pkgname}.install
-          source=("\${url}/releases/download/v\${pkgver}/Dragit_\${pkgver}_amd64.deb")
-          sha256sums=('${SHA_X86_64}')
+          sed "s/@VERSION@/${VERSION}/; s/@SHA256@/${SHA}/" \
+            packaging/arch/PKGBUILD.template > Dragit_${VERSION}_arch.PKGBUILD
 
-          package() {
-            tar -xf data.tar.* -C "\${pkgdir}"
-          }
-          PKGBUILD_EOF
-
-          cat > dragit.install << 'INSTALL_EOF'
-          post_install() {
-            gtk-update-icon-cache -q -t -f usr/share/icons/hicolor
-            update-desktop-database -q
-          }
-
-          post_upgrade() {
-            post_install
-          }
-
-          post_remove() {
-            gtk-update-icon-cache -q -t -f usr/share/icons/hicolor
-            update-desktop-database -q
-          }
-          INSTALL_EOF
-
-          mv PKGBUILD Dragit_${VERSION}_arch.PKGBUILD
-          mv dragit.install Dragit_${VERSION}_arch.install
+          cp packaging/arch/dragit.install Dragit_${VERSION}_arch.install
 
           gh release upload "v${VERSION}" Dragit_${VERSION}_arch.PKGBUILD Dragit_${VERSION}_arch.install --clobber

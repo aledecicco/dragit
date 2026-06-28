@@ -1,0 +1,42 @@
+# Maintainer: Alejandro De Cicco <alejandrodecicco99@gmail.com>
+pkgname=dragit
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc="A modern and convenient Git client"
+arch=('x86_64')
+url="https://github.com/aledecicco/dragit"
+license=('GPL-3.0-only')
+depends=('cairo' 'desktop-file-utils' 'fuse2' 'gdk-pixbuf2' 'glib2' 'gtk3' 'hicolor-icon-theme' 'libsoup3' 'pango' 'webkit2gtk-4.1')
+options=('!strip' '!emptydirs')
+install=${pkgname}.install
+source_x86_64=("${url}/releases/download/v${pkgver}/Dragit_${pkgver}_amd64.AppImage")
+sha256sums_x86_64=('@SHA256@')
+
+package() {
+  chmod +x "Dragit_${pkgver}_amd64.AppImage"
+  APPIMAGE_EXTRACT_AND_RUN=1 "./Dragit_${pkgver}_amd64.AppImage" --appimage-extract
+
+  install -Dm755 "Dragit_${pkgver}_amd64.AppImage" "${pkgdir}/opt/${pkgname}/${pkgname}.AppImage"
+
+  install -Dm644 squashfs-root/usr/share/applications/dragit.desktop \
+    "${pkgdir}/usr/share/applications/dragit.desktop"
+
+  find squashfs-root/usr/share/icons -type f | while IFS= read -r icon; do
+    rel="${icon#squashfs-root/usr/share/icons/}"
+    install -Dm644 "$icon" "${pkgdir}/usr/share/icons/$rel"
+  done
+
+  cat > "${srcdir}/dragit-launcher" << 'LAUNCHER'
+#!/bin/bash
+USER_APPIMAGE="${XDG_DATA_HOME:-$HOME/.local/share}/dragit/dragit.AppImage"
+SYSTEM_APPIMAGE="/opt/dragit/dragit.AppImage"
+if [ ! -f "$USER_APPIMAGE" ]; then
+  mkdir -p "$(dirname "$USER_APPIMAGE")"
+  cp "$SYSTEM_APPIMAGE" "$USER_APPIMAGE"
+  chmod +x "$USER_APPIMAGE"
+fi
+APPIMAGE="$USER_APPIMAGE" exec "$USER_APPIMAGE" "$@"
+LAUNCHER
+
+  install -Dm755 "${srcdir}/dragit-launcher" "${pkgdir}/usr/bin/${pkgname}"
+}
