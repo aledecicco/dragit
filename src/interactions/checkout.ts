@@ -1,7 +1,9 @@
 import type { BranchInfo, CommitId, TagInfo } from '@/api/models'
 import {
-  useCheckout,
+  useCheckoutNew,
+  useDummyCheckout,
   useMakeCheckoutBranch,
+  useMakeCheckoutCommit,
   useMakeCheckoutTag,
   useSwitchBranches,
 } from '@/api/mutations/checkout'
@@ -9,7 +11,7 @@ import { interaction } from '@/lib/ActionButton/utils'
 import { useActionPresenters } from '@/state/actions'
 
 export const useCheckoutPresenter = () => {
-  const checkout = useCheckout()
+  const checkout = useDummyCheckout()
   return useActionPresenters(checkout)
 }
 
@@ -19,10 +21,11 @@ export const useSwitchBranchesInteraction = () => {
 }
 
 export const useCheckoutSomeCommitInteraction = () => {
-  const checkout = useCheckout()
+  const makeCheckout = useMakeCheckoutCommit()
+
   return (commit: CommitId) =>
     interaction({
-      action: checkout,
+      action: makeCheckout(commit),
       argsRequester: () => ({ reference: commit, isNew: false }),
       details: `checkout commit #${commit}`,
     })
@@ -33,16 +36,16 @@ export const useCheckoutSomeBranchInteraction = () => {
   return (branch: BranchInfo) =>
     interaction({
       action: makeCheckout(branch),
-      details: `checkout "${branch.name}"`,
+      details: `checkout branch "${branch.name}"`,
     })
 }
 
 export const useCreateAndCheckoutBranchInteraction = () => {
-  const checkout = useCheckout()
+  const checkout = useCheckoutNew()
   return (name: string) =>
     interaction({
       action: checkout,
-      argsRequester: () => ({ reference: name, isNew: true }),
+      argsRequester: () => name,
       details: `create and checkout branch "${name}"`,
     })
 }
