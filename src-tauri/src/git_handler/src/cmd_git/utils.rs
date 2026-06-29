@@ -10,6 +10,8 @@ use models::{
 /// Format used to get the needed information about a commit.
 pub(crate) const COMMIT_INFO_FORMAT: &str =
     "--format=format:%H%x00%h%x00%an%x00%ae%x00%ct%x00%B%x00%ph%x00";
+/// Format used to get a list of matching commits.
+pub(crate) const MATCHING_COMMITS_FORMAT: &str = "--format=format:%H %h";
 /// The prefix of the line with the commit hash when printing the current status.
 pub(crate) const HEAD_INFO_COMMIT_PREFIX: &str = "# branch.oid ";
 /// The prefix of the line with the branch name when printing the current status.

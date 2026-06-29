@@ -1,4 +1,4 @@
-import type { BranchName, CommitId, TagInfo } from '@/api/models'
+import type { BranchName, CommitId, TagInfo, TagName } from '@/api/models'
 import { useMakeCheckoutTag } from '@/api/mutations/checkout'
 import {
   useMakeBranchOff,
@@ -92,10 +92,10 @@ export const useSingleTagInteractions = (tag: TagInfo) => {
 export const useTagSomeCommitInteraction = () => {
   const makeTagCommit = useMakeTagCommit()
 
-  return (commit: CommitId) =>
+  return (commit: CommitId, defaultName?: TagName) =>
     interaction({
       action: makeTagCommit(commit),
-      argsRequester: () => requestTagParams(`#${commit}`),
+      argsRequester: () => requestTagParams(`commit #${commit}`, defaultName),
       details: `tag commit #${commit}`,
     })
 }
@@ -103,10 +103,10 @@ export const useTagSomeCommitInteraction = () => {
 export const useTagSomeBranchInteraction = () => {
   const makeTagBranch = useMakeTagBranch()
 
-  return (branch: BranchName) =>
+  return (branch: BranchName, defaultName?: TagName) =>
     interaction({
       action: makeTagBranch(branch),
-      argsRequester: () => requestTagParams(branch),
+      argsRequester: () => requestTagParams(`branch "${branch}"`, defaultName),
       details: `tag branch "${branch}"`,
     })
 }

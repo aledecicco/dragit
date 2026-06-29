@@ -6,7 +6,7 @@ import type { Action } from '@/state/actions'
 import { useChangeSelectedBase, useSelectedBase } from '@/state/branches'
 import { useHeadReference } from '@/utils/repository'
 
-import type { BranchInfo, RefName, TagInfo } from '../models'
+import type { BranchInfo, CommitId, RefName, TagInfo } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface CheckoutArgs {
@@ -30,28 +30,13 @@ const checkoutMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useCheckout = (): Action<CheckoutArgs> => {
-  const checkout = useRepositoryMutation(checkoutMutation)
-
+const useDummyCheckout = (): Action => {
   return {
     id: {
       key: 'branch_operation',
       operation: 'checkout',
     },
-    blockedBy: [
-      { key: 'branch_operation' },
-      { key: 'branch_operation', type: 'current' },
-    ],
-    run: async (args) => {
-      await checkout.mutateAsync(args)
-    },
-    derivedIds: (args) => [
-      {
-        key: 'branch_operation',
-        operation: 'checkout',
-        reference: args.reference,
-      },
-    ],
+    run: async () => {},
     Glyph: IconGitBranch,
     label: {
       idle: 'Checkout',
@@ -60,6 +45,52 @@ const useCheckout = (): Action<CheckoutArgs> => {
       error: 'Checkout failed',
     },
   }
+}
+
+const useCheckoutNew = (): Action<RefName> => {
+  const checkout = useRepositoryMutation(checkoutMutation)
+
+  return {
+    id: {
+      key: 'branch_operation',
+      operation: 'checkout',
+      refType: 'new',
+    },
+    blockedBy: [{ key: 'branch_operation' }],
+    run: async (refName) => {
+      await checkout.mutateAsync({ reference: refName, isNew: true })
+    },
+    Glyph: IconGitBranch,
+    label: {
+      idle: 'Create and check out',
+      running: 'Checking out',
+      success: 'Checked out',
+      error: 'Checkout failed',
+    },
+  }
+}
+
+const useMakeCheckoutCommit = (): ((commit: CommitId) => Action) => {
+  const checkout = useRepositoryMutation(checkoutMutation)
+
+  return (commit: CommitId): Action => ({
+    id: {
+      key: 'branch_operation',
+      operation: 'checkout',
+      reference: commit,
+    },
+    blockedBy: [{ key: 'branch_operation' }],
+    run: async () => {
+      await checkout.mutateAsync({ reference: commit, isNew: false })
+    },
+    Glyph: IconGitBranch,
+    label: {
+      idle: 'Checkout',
+      running: 'Checking out',
+      success: 'Checked out',
+      error: 'Checkout failed',
+    },
+  })
 }
 
 const useMakeCheckoutBranch = (): ((branch: BranchInfo) => Action) => {
@@ -155,7 +186,9 @@ const useSwitchBranches = (): Action => {
 }
 
 export {
-  useCheckout,
+  useDummyCheckout,
+  useCheckoutNew,
+  useMakeCheckoutCommit,
   useMakeCheckoutBranch,
   useSwitchBranches,
   useMakeCheckoutTag,

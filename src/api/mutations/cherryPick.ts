@@ -36,7 +36,7 @@ const useCherryPickCommit = (commit: CommitInfo): Action => {
       key: 'branch_operation',
       operation: 'cherry_pick_commit',
       type: 'current',
-      reference: commit.id,
+      reference: commit.shortHash,
     },
     blockedBy: [
       { key: 'branch_operation', type: 'current' },
@@ -44,7 +44,7 @@ const useCherryPickCommit = (commit: CommitInfo): Action => {
     ],
     run: async () => {
       await cherryPick.mutateAsync({
-        references: [commit.id],
+        references: [commit.shortHash],
         isMerge,
       })
     },

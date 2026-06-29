@@ -2,10 +2,18 @@ import type { ReactNode } from 'react'
 import { IconGitBranch, IconGitCommit, IconTag } from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
-import type { BranchInfo, BranchName, Reference, TagInfo } from '@/api/models'
+import type {
+  BranchInfo,
+  BranchName,
+  CommitId,
+  Reference,
+  TagInfo,
+} from '@/api/models'
 import { useQueryBranches } from '@/api/queries/branches'
+import { useQueryMatchingCommits } from '@/api/queries/matchingCommits'
 import { useQueryTags } from '@/api/queries/tags'
 import { Combobox, type ComboboxProps } from '@/ui/Combobox'
+import { useComboboxState } from '@/ui/Combobox/context'
 import { ComboboxSection } from '@/ui/Combobox/Section'
 
 interface RefSelectorProps extends Partial<Omit<ComboboxProps, 'value'>> {
@@ -35,6 +43,11 @@ interface RefSelectorProps extends Partial<Omit<ComboboxProps, 'value'>> {
   onSelectTag: (value: string, tag: TagInfo | undefined) => void
 
   /**
+   * Callback to trigger when a commit is selected.
+   */
+  onSelectCommit: (value: string, commit: CommitId | undefined) => void
+
+  /**
    * Element to display when no branch matches the search.
    */
   noBranchMatches?: (search: string) => ReactNode
@@ -43,6 +56,11 @@ interface RefSelectorProps extends Partial<Omit<ComboboxProps, 'value'>> {
    * Element to display when no tag matches the search.
    */
   noTagMatches?: (search: string) => ReactNode
+
+  /**
+   * Element to display when no commit matches the search.
+   */
+  noCommitMatches?: (search: string) => ReactNode
 }
 
 /**
@@ -54,8 +72,10 @@ const RefSelector = ({
   excludedBranches,
   onSelectBranch,
   onSelectTag,
+  onSelectCommit,
   noBranchMatches,
   noTagMatches,
+  noCommitMatches,
   ...comboboxProps
 }: RefSelectorProps) => {
   const branchesQuery = useQueryBranches()
@@ -103,7 +123,33 @@ const RefSelector = ({
         options={tagOptions}
         noMatches={noTagMatches}
       />
+
+      <CommitSection
+        onSelectCommit={onSelectCommit}
+        noCommitMatches={noCommitMatches}
+      />
     </Combobox>
+  )
+}
+
+const CommitSection = (
+  props: Pick<RefSelectorProps, 'onSelectCommit' | 'noCommitMatches'>,
+) => {
+  const { onSelectCommit, noCommitMatches } = props
+
+  const { search } = useComboboxState()
+  const matchingCommitsQuery = useQueryMatchingCommits(search)
+
+  const commitOptions =
+    matchingCommitsQuery.data?.map((hash) => `#${hash}`) ?? []
+
+  return (
+    <ComboboxSection
+      name="commits"
+      onSelect={(value) => onSelectCommit(value.slice(1), value.slice(1))}
+      options={commitOptions}
+      noMatches={noCommitMatches}
+    />
   )
 }
 

@@ -41,11 +41,11 @@ const CommitSnapshotDetailsDialog = (
   const [selectedFile, setSelectedFile] = useState<VersionedFileInfo>()
 
   const [page, setPage] = useState(0)
-  const filesQuery = useQueryVersionedFiles(commit.id, page)
+  const filesQuery = useQueryVersionedFiles(commit.shortHash, page)
 
   return (
     <Dialog
-      dialogKey={COMMIT_SNAPSHOT_DETAILS_DIALOG_KEY(commit.id)}
+      dialogKey={COMMIT_SNAPSHOT_DETAILS_DIALOG_KEY(commit.shortHash)}
       {...propsWithCn(
         dialogProps,
         'max-w-[90%] max-h-[85%]',
@@ -75,7 +75,7 @@ const CommitSnapshotDetailsDialog = (
           <CommitSnapshotDetailsDialogDescription commit={commit} />
 
           <SnapshotDetailsDialogFileList
-            snapshot={commit.id}
+            snapshot={commit.shortHash}
             filesQuery={filesQuery}
             page={page}
             setPage={setPage}
@@ -89,7 +89,7 @@ const CommitSnapshotDetailsDialog = (
           <FileDiffViewer
             diffScope={{
               type: 'versioned',
-              reference: commit.id,
+              reference: commit.shortHash,
               against: null,
               file: selectedFile,
             }}
@@ -111,7 +111,7 @@ const showCommitSnapshotDetailsDialog = (
   props?: Partial<CommitSnapshotDetailsDialogProps>,
 ) => {
   showDialog(
-    COMMIT_SNAPSHOT_DETAILS_DIALOG_KEY(commit.id),
+    COMMIT_SNAPSHOT_DETAILS_DIALOG_KEY(commit.shortHash),
     CommitSnapshotDetailsDialog,
     {
       commit,

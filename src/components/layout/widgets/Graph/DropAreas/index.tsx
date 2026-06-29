@@ -45,7 +45,7 @@ const GraphDropAreas = () => {
     return match(payload)
       .with(
         { type: 'commit' },
-        ({ dragged }) => dragged.id !== currentReference?.refName,
+        ({ dragged }) => dragged.shortHash !== currentReference?.refName,
       )
       .otherwise(({ dragged }) => dragged.name !== currentReference?.refName)
   }
@@ -56,9 +56,15 @@ const GraphDropAreas = () => {
     return match(payload)
       .with(
         { type: 'commit' },
-        ({ dragged }) => dragged.id !== baseReference?.refName,
+        ({ dragged }) =>
+          dragged.shortHash !== baseReference?.refName &&
+          dragged.shortHash !== currentReference?.refName,
       )
-      .otherwise(({ dragged }) => dragged.name !== baseReference?.refName)
+      .otherwise(
+        ({ dragged }) =>
+          dragged.name !== baseReference?.refName &&
+          dragged.name !== currentReference?.refName,
+      )
   }
 
   return (
@@ -86,7 +92,7 @@ const GraphDropAreas = () => {
           } else if (payload.type === 'tag') {
             triggerInteraction(checkoutTag(payload.dragged))
           } else {
-            triggerInteraction(checkoutCommit(payload.dragged))
+            triggerInteraction(checkoutCommit(payload.dragged.shortHash))
           }
         }}
       />
@@ -109,7 +115,7 @@ const GraphDropAreas = () => {
         handleDrop={(payload) => {
           if (currentReference) {
             const newRef = match(payload)
-              .with({ type: 'commit' }, ({ dragged }) => dragged.id)
+              .with({ type: 'commit' }, ({ dragged }) => dragged.shortHash)
               .otherwise(({ dragged }) => dragged.name)
 
             if (newRef === currentReference.refName) {
@@ -136,7 +142,9 @@ const GraphDropAreas = () => {
           if (
             payload.type === 'commit' &&
             historyQuery.data?.pages.find((page) =>
-              page.items.find((item) => item.hash === payload.dragged.id),
+              page.items.find(
+                (item) => item.hash === payload.dragged.shortHash,
+              ),
             )
           ) {
             return false

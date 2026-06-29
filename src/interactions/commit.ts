@@ -5,14 +5,21 @@ import {
   useMakeBranchOff,
   useMakeCreateBranchAt,
 } from '@/api/mutations/createBranch'
-import { useMakeTagCommit } from '@/api/mutations/createTag'
 import { useMakeMergeCommit } from '@/api/mutations/merge'
 import { useRewindCommit } from '@/api/mutations/resetHead'
 import { useRevertCommit } from '@/api/mutations/revertCommit'
 import { requestCommitParams } from '@/common/CommitDialog'
 import { requestBranchName } from '@/common/CreateBranchDialog'
-import { requestTagParams } from '@/common/CreateTagDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
+
+import { useCheckoutSomeCommitInteraction } from './checkout'
+import { useTagSomeCommitInteraction } from './tag'
+
+export const useCheckoutCommitInteraction = (commit: CommitInfo) => {
+  const checkout = useCheckoutSomeCommitInteraction()
+
+  return checkout(commit.shortHash)
+}
 
 export const useAmendSomeCommitInteraction = () => {
   const amend = useAmend()
@@ -27,11 +34,12 @@ export const useAmendSomeCommitInteraction = () => {
 
 export const useAmendInteraction = (commit: CommitInfo) => {
   const amendSome = useAmendSomeCommitInteraction()
+
   return amendSome(commit)
 }
 
 export const useCreateBranchAtCommitInteraction = (commit: CommitInfo) => {
-  const createBranch = useMakeCreateBranchAt()(commit.id)
+  const createBranch = useMakeCreateBranchAt()(commit.shortHash)
 
   return interaction({
     action: createBranch,
@@ -41,7 +49,7 @@ export const useCreateBranchAtCommitInteraction = (commit: CommitInfo) => {
 }
 
 export const useBranchOffCommitInteraction = (commit: CommitInfo) => {
-  const branchOff = useMakeBranchOff()(commit.id)
+  const branchOff = useMakeBranchOff()(commit.shortHash)
 
   return interaction({
     action: branchOff,
@@ -51,13 +59,9 @@ export const useBranchOffCommitInteraction = (commit: CommitInfo) => {
 }
 
 export const useTagCommitInteraction = (commit: CommitInfo) => {
-  const tag = useMakeTagCommit()(commit.id)
+  const tag = useTagSomeCommitInteraction()
 
-  return interaction({
-    action: tag,
-    argsRequester: () => requestTagParams(`commit #${commit.shortHash}`),
-    details: `tag commit #${commit.shortHash}`,
-  })
+  return tag(commit.shortHash)
 }
 
 export const useMergeSomeCommitInteraction = () => {
@@ -65,13 +69,14 @@ export const useMergeSomeCommitInteraction = () => {
 
   return (commit: CommitInfo) =>
     interaction({
-      action: makeMerge(commit.id),
+      action: makeMerge(commit.shortHash),
       details: `merge commit #${commit.shortHash} into worktree`,
     })
 }
 
 export const useMergeCommitInteraction = (commit: CommitInfo) => {
   const mergeSome = useMergeSomeCommitInteraction()
+
   return mergeSome(commit)
 }
 
@@ -94,7 +99,7 @@ export const useRevertCommitInteraction = (commit: CommitInfo) => {
 }
 
 export const useRewindCommitInteraction = (commit: CommitInfo) => {
-  const rewind = useRewindCommit(commit.id)
+  const rewind = useRewindCommit(commit.shortHash)
 
   return interaction({
     action: rewind,
@@ -103,6 +108,7 @@ export const useRewindCommitInteraction = (commit: CommitInfo) => {
 }
 
 export const useSingleCommitInteractions = (commit: CommitInfo) => {
+  const checkout = useCheckoutCommitInteraction(commit)
   const createBranch = useCreateBranchAtCommitInteraction(commit)
   const branchOff = useBranchOffCommitInteraction(commit)
   const tag = useTagCommitInteraction(commit)
@@ -112,8 +118,8 @@ export const useSingleCommitInteractions = (commit: CommitInfo) => {
   const rewind = useRewindCommitInteraction(commit)
 
   return [
-    group(createBranch, branchOff),
-    group(tag),
+    group(tag, createBranch),
+    group(checkout, branchOff),
     group(merge, cherryPick, revert, rewind),
   ]
 }
