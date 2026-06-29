@@ -19,6 +19,11 @@ interface SnapshotDetailsDialogFileItemProps extends MultiSelectItemProps {
    * The snapshot this file belongs to.
    */
   snapshot: RefName
+
+  /**
+   * The snapshot this file is being compared against.
+   */
+  against?: RefName
 }
 
 /**
@@ -29,7 +34,7 @@ interface SnapshotDetailsDialogFileItemProps extends MultiSelectItemProps {
 const SnapshotDetailsDialogFileItem = (
   props: SnapshotDetailsDialogFileItemProps,
 ) => {
-  const { file, snapshot, ...itemProps } = props
+  const { file, snapshot, against, ...itemProps } = props
 
   const interactions = useSingleVersionedFileInteractions(file, snapshot)
 
@@ -43,7 +48,7 @@ const SnapshotDetailsDialogFileItem = (
       value={file.path}
       render={
         <InteractiveItem
-          interactions={interactions}
+          interactions={against ? [] : interactions}
           activationAction={() => {
             if (radio?.getState().value === file.path) {
               radio.setValue(null)

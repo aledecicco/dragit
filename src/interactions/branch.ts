@@ -28,6 +28,7 @@ import { useCurrentBranch } from '@/utils/repository'
 import { pluralize } from '@/utils/string'
 
 import { useTagSomeBranchInteraction } from './tag'
+import { useCompareBranchInteraction } from './view'
 
 export const useCheckoutBranchInteraction = (branch: BranchInfo) => {
   const checkout = useMakeCheckoutBranch()(branch)
@@ -182,6 +183,7 @@ export const useSingleBranchInteractions = (branch: BranchInfo) => {
   const merge = useMergeBranchInteraction(branch)
   const track = useTrackBranchInteraction(branch)
   const deleteInteraction = useDeleteBranchInteraction(branch)
+  const compare = useCompareBranchInteraction(branch)
 
   const forLocal1 = group(
     !isCurrentBranch && checkout,
@@ -198,11 +200,12 @@ export const useSingleBranchInteractions = (branch: BranchInfo) => {
 
   const forRemote = group(track, branchOff, tag)
 
+  const forCommon = group(compare)
   const forDelete = group(!isCurrentBranch && deleteInteraction)
 
   return match(branch.type)
-    .with('local', () => [forLocal1, forLocal2, forDelete])
-    .with('remote', () => [forRemote, forDelete])
+    .with('local', () => [forLocal1, forLocal2, forCommon, forDelete])
+    .with('remote', () => [forRemote, forCommon, forDelete])
     .exhaustive()
 }
 

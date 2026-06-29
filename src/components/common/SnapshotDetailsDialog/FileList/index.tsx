@@ -22,6 +22,11 @@ interface SnapshotDetailsDialogFileListProps extends ComponentProps<'div'> {
   snapshot: RefName
 
   /**
+   * The snapshot the files are being compared against.
+   */
+  against?: RefName
+
+  /**
    * The query result providing the current page of files.
    */
   filesQuery: UseQueryResult<Page<VersionedFileInfo>>
@@ -48,8 +53,15 @@ interface SnapshotDetailsDialogFileListProps extends ComponentProps<'div'> {
 const SnapshotDetailsDialogFileList = (
   props: SnapshotDetailsDialogFileListProps,
 ) => {
-  const { snapshot, filesQuery, page, setPage, setSelectedFile, ...divProps } =
-    props
+  const {
+    snapshot,
+    against,
+    filesQuery,
+    page,
+    setPage,
+    setSelectedFile,
+    ...divProps
+  } = props
 
   const showPagination = useNeedsPagination(filesQuery, page)
 
@@ -109,7 +121,7 @@ const SnapshotDetailsDialogFileList = (
         >
           <InteractiveSelection
             items={filesQuery.data?.items ?? []}
-            getInteractions={getInteractions}
+            getInteractions={against ? () => [] : getInteractions}
           >
             <QueryList
               name="modified files"
@@ -119,6 +131,7 @@ const SnapshotDetailsDialogFileList = (
                 <SnapshotDetailsDialogFileItem
                   file={file}
                   snapshot={snapshot}
+                  against={against}
                   itemIndex={position}
                 />
               )}

@@ -42,6 +42,11 @@ interface ComboboxProps extends Partial<ButtonProps> {
    * Aditional props for the select provider.
    */
   providerProps?: Partial<Ariakit.SelectProviderProps<string>>
+
+  /**
+   * Additional props for the dropdown.
+   */
+  popoverProps?: Partial<Ariakit.SelectPopoverProps>
 }
 
 /**
@@ -66,6 +71,7 @@ const ComboboxInner = (props: ComboboxProps) => {
     iconProps,
     size = 'md',
     providerProps,
+    popoverProps,
     ...buttonProps
   } = props
 
@@ -132,9 +138,9 @@ const ComboboxInner = (props: ComboboxProps) => {
           sameWidth
           unmountOnHide
           gutter={4}
-          className={cn(
+          {...propsWithCn(
+            popoverProps,
             'z-5 shadow-md min-w-50 bg-dark-300 border-2 border-dark-50',
-
             match(size)
               .with('xs', () => 'p-1.5 rounded-sm')
               .with('sm', () => 'p-1.5 rounded-md')

@@ -14,6 +14,8 @@ import { group, interaction } from '@/lib/ActionButton/utils'
 import type { AnyInteraction } from '@/state/actions'
 import { pluralize } from '@/utils/string'
 
+import { useCompareTagInteraction } from './view'
+
 export const useCheckoutTagInteraction = (tag: TagInfo) => {
   const checkout = useMakeCheckoutTag()(tag)
 
@@ -81,10 +83,12 @@ export const useSingleTagInteractions = (tag: TagInfo) => {
   const branchOff = useBranchOffTagInteraction(tag)
   const merge = useMergeTagInteraction(tag)
   const deleteTag = useDeleteTagInteraction(tag)
+  const compare = useCompareTagInteraction(tag)
 
   return [
     group(checkout, push),
     group(createBranch, branchOff, merge),
+    group(compare),
     group(deleteTag),
   ]
 }

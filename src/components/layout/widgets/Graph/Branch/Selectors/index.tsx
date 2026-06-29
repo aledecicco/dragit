@@ -1,13 +1,15 @@
 import { useSelectStore } from '@ariakit/react'
 import { IconGitBranch } from '@tabler/icons-react'
 
-import { ActionButton } from '@/lib/ActionButton'
 import { useSwitchBranchesInteraction } from '@/interactions/checkout'
+import { useCompareTwoInteraction } from '@/interactions/view'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { ShortcutIndicator } from '@/lib/Shortcuts/Indicator'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { useSelectedBase } from '@/state/branches'
 import { useSettings } from '@/state/storage'
+import { Toolbar } from '@/ui/Toolbar'
+import { ToolbarItem } from '@/ui/Toolbar/Item'
 import { useBranch, useHeadReference } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 
@@ -24,6 +26,7 @@ const BranchSelectors = () => {
   const baseBranch = useBranch(baseReference)
 
   const switchBranches = useSwitchBranchesInteraction()
+  const compareTwo = useCompareTwoInteraction()
 
   const settings = useSettings()
 
@@ -77,16 +80,30 @@ const BranchSelectors = () => {
         </Draggable>
       </ShortcutIndicator>
 
-      <ActionButton
-        {...switchBranches}
-        className={cn('mx-1 col-start-2 row-start-1')}
-        variant="filled"
-        status="neutral"
-        disabled={!currentReference || !baseReference}
-        size="md"
-        round
-        compact
-      />
+      <Toolbar className={cn('mx-1 col-start-2 row-start-1')}>
+        <ToolbarItem
+          {...switchBranches}
+          className={cn(currentReference && baseReference && 'pl-3 pr-2')}
+          variant="filled"
+          status="neutral"
+          disabled={!currentReference || !baseReference}
+          size="md"
+          round
+          compact
+        />
+
+        {currentReference && baseReference && (
+          <ToolbarItem
+            {...compareTwo(currentReference, baseReference)}
+            className={cn('pl-2 pr-3')}
+            variant="filled"
+            status="neutral"
+            size="md"
+            round
+            compact
+          />
+        )}
+      </Toolbar>
 
       <ShortcutIndicator
         hotkey={settings.changeBaseShortcut}
