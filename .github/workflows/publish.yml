@@ -100,8 +100,8 @@ jobs:
           VERSION="${{ github.ref_name }}"
           VERSION="${VERSION#v}"
 
-          APPIMAGE=$(find src-tauri/target/release/bundle/appimage -name "*.AppImage" ! -name "*.tar.gz" | head -1)
-          SHA=$(sha256sum "$APPIMAGE" | cut -d' ' -f1)
+          DEB=$(find src-tauri/target/release/bundle/deb -name "*.deb" | head -1)
+          SHA=$(sha256sum "$DEB" | cut -d' ' -f1)
 
           sed "s/@VERSION@/${VERSION}/; s/@SHA256@/${SHA}/" \
             packaging/arch/PKGBUILD.template > Dragit_${VERSION}_arch.PKGBUILD

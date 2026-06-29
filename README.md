@@ -96,6 +96,8 @@ Linux builds also use [`Docker`](https://docs.docker.com/get-docker) to run insi
 
 After the build, you'll find the compiled binaries in the `src-tauri/target/release/bundle` directory.
 
+There's also a convenience command for Arch users that uses the binaries produced by the build and installs the app: `just build-aur`.
+
 
 ## Tech Stack
 
