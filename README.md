@@ -129,7 +129,7 @@ There's always things to improve:
 
 - [ ] Replace `CmdGit` with a native Rust Git backend (removes the system `git` dependency)
 - [ ] Highlight changed file sections in the diff scrollbar
-- [ ] Compare arbitrary refspecs side-by-side
+- [x] Compare arbitrary refspecs side-by-side
 - [ ] Show merge unions between branches
 - [ ] Clone and open a repository from a URL
 - [ ] Animations

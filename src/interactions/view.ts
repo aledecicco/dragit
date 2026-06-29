@@ -20,7 +20,7 @@ export const useCompareSomeReferenceInteraction = () => {
         },
         Glyph: IconGitCompare,
         label: {
-          idle: against ? 'Compare' : 'Compare...',
+          idle: against ? 'Compare selected refs' : 'Compare against...',
           running: 'Opening comparison',
           success: 'Comparison open',
           error: 'Failed to compare',

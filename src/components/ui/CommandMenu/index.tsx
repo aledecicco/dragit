@@ -67,7 +67,7 @@ const CommandMenu = (props: CommandMenuProps) => {
 
   return (
     <ValueRequesterDialog
-      {...propsWithCn(dialogProps, 'rounded-md bg-dark-300')}
+      {...propsWithCn(dialogProps, 'rounded-lg bg-dark-300')}
       formOptions={{
         defaultValues: { selected: '' },
         className: cn('gap-0'),

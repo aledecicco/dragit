@@ -60,12 +60,13 @@ type DragPayload =
   | DragDef<'commit', CommitInfo>
   | DragDef<'worktree', undefined>
   | DragDef<'index', { fromDraft: boolean }>
+  | DragDef<'dialog', { dialogKey: string }>
 
 type DragType = DragPayload['type']
 
 type MatchingPayload<T extends DragType> = Extract<DragPayload, { type: T }>
 
-const collisionDetector = DndCollision.shapeIntersection
+const collisionDetector = DndCollision.pointerIntersection
 
 /**
  * A modifier that restricts the drag overlay to within the window.

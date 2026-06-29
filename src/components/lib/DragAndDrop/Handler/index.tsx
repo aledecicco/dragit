@@ -1,10 +1,15 @@
-import { type PropsWithChildren, useRef } from 'react'
+import { type PropsWithChildren, useRef, useState } from 'react'
 import * as DndSettings from '@dnd-kit/dom'
 import * as Dnd from '@dnd-kit/react'
 
 import { DragAndDropBackdrop } from '../Backdrop'
 import { DragAndDropIndicator } from '../Indicator'
-import { RestrictMovement, SnapToCursor } from '../utils'
+import {
+  type DragPayload,
+  type DragType,
+  RestrictMovement,
+  SnapToCursor,
+} from '../utils'
 
 interface DragAndDropHandlerProps extends PropsWithChildren {}
 
@@ -15,16 +20,20 @@ const DragAndDropHandler = (props: DragAndDropHandlerProps) => {
   const { children } = props
   const previousFocus = useRef<Element | null>(null)
 
+  const [dragType, setDragType] = useState<DragType>()
+
   return (
-    <Dnd.DragDropProvider
-      onDragStart={() => {
+    <Dnd.DragDropProvider<DragPayload>
+      onBeforeDragStart={(e) => {
         previousFocus.current = document.activeElement
+        setDragType(e.operation.source?.data.type)
       }}
       onDragEnd={() => {
         if (previousFocus.current instanceof HTMLElement) {
           previousFocus.current.focus()
         }
         previousFocus.current = null
+        setDragType(undefined)
       }}
       sensors={[
         DndSettings.PointerSensor.configure({
@@ -53,21 +62,23 @@ const DragAndDropHandler = (props: DragAndDropHandlerProps) => {
     >
       {children}
 
-      <DragAndDropBackdrop />
+      {dragType && dragType !== 'dialog' && <DragAndDropBackdrop />}
 
-      <Dnd.DragOverlay
-        style={{
-          width: 'fit-content',
-          height: 'fit-content',
-        }}
-      >
-        {(dragging) => (
-          <DragAndDropIndicator
-            Glyph={dragging.data.Glyph}
-            label={dragging.data.label}
-          />
-        )}
-      </Dnd.DragOverlay>
+      {dragType && dragType !== 'dialog' && (
+        <Dnd.DragOverlay
+          style={{
+            width: 'fit-content',
+            height: 'fit-content',
+          }}
+        >
+          {(dragging) => (
+            <DragAndDropIndicator
+              Glyph={dragging.data.Glyph}
+              label={dragging.data.label}
+            />
+          )}
+        </Dnd.DragOverlay>
+      )}
     </Dnd.DragDropProvider>
   )
 }
