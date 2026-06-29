@@ -113,6 +113,18 @@ pub async fn init_repository(state: State<'_, AppState>, repo_path: &str) -> Res
     })
 }
 
+/// Clones a git repository from a url into the given path.
+#[tauri::command]
+pub async fn clone_repository(
+    state: State<'_, AppState>,
+    repo_path: &str,
+    url: &str,
+) -> Result<(), AppError> {
+    with_handler(&state, &|h: &Box<dyn GitHandler + Send + Sync>| {
+        h.clone_repository(repo_path, url)
+    })
+}
+
 /// Returns a list of the current known local and remote branches.
 #[tauri::command]
 pub async fn get_branches(

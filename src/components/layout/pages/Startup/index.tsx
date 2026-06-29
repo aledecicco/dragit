@@ -8,10 +8,13 @@ import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { useQueryStorage } from '@/api/queries/storage'
 import { FilePath } from '@/common/File/Path'
 import {
-  useInitRepositoryInteraction,
   useOpenFolderInteraction,
   useOpenSomeRecentFolderInteraction,
 } from '@/interactions/folder'
+import {
+  useCloneRepositoryInteraction,
+  useInitRepositoryInteraction,
+} from '@/interactions/repository'
 import { ActionButton } from '@/lib/ActionButton'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { QueryLoader } from '@/lib/QueryLoader'
@@ -76,6 +79,7 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
   const { currentDir } = props
 
   const initRepository = useInitRepositoryInteraction()
+  const cloneRepository = useCloneRepositoryInteraction()
 
   return (
     <StartupPageInner className={cn('col-start-2')}>
@@ -100,13 +104,22 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
 
       <div className={cn('flex flex-col gap-2')}>
         {currentDir.exists && !currentDir.isRepository && (
-          <ActionButton
-            {...initRepository}
-            size="lg"
-            variant="filled"
-            status="primary"
-            className="w-full"
-          />
+          <>
+            <ActionButton
+              {...initRepository}
+              size="lg"
+              variant="filled"
+              status="primary"
+              className="w-full"
+            />
+            <ActionButton
+              {...cloneRepository}
+              size="lg"
+              variant="filled"
+              status="neutral"
+              className="w-full"
+            />
+          </>
         )}
 
         <OpenFolderButton />
@@ -145,10 +158,11 @@ const OpenFolderButton = () => {
   return (
     <ActionButton
       {...openFolder}
+      className={cn('border border-dark-50')}
       alternatives={
         storageQuery.data?.recentFolders.map((folder) =>
           openRecentFolder(folder),
-        ) || []
+        ) ?? []
       }
       menuButtonProps={{
         label: 'View recent folders',

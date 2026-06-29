@@ -185,6 +185,10 @@ impl GitHandler for CmdGit {
         self.spawn_and_await(repo_path, ["init"])
     }
 
+    fn clone_repository(&self, repo_path: &str, url: &str) -> Result<(), GitError> {
+        self.spawn_and_await(repo_path, ["clone", url, "./"])
+    }
+
     fn is_repository(&self, repo_path: &str) -> bool {
         self.spawn_and_await(repo_path, ["rev-parse"]).is_ok()
     }
@@ -355,10 +359,12 @@ impl GitHandler for CmdGit {
         reference: &str,
         against: Option<&str>,
     ) -> Result<DiffSummary, GitError> {
-        let mut args = vec!["diff", "--shortstat", reference];
+        let mut args = vec!["diff", "--shortstat"];
         if let Some(against) = against {
             args.push(against);
         }
+        args.push(reference);
+
         let command_str = format!(
             "git {}",
             args.clone().into_iter().collect::<Vec<&str>>().join(" ")

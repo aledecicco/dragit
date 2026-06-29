@@ -63,6 +63,7 @@ pub fn run() {
             api::set_repository_storage,
             api::get_current_dir,
             api::init_repository,
+            api::clone_repository,
             api::get_branches,
             api::get_head_info,
             api::get_worktree_files_page,

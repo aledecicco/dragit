@@ -1,4 +1,3 @@
-import { useInitRepository } from '@/api/mutations/initRepository'
 import {
   useChangeCurrentFolder,
   useMakeOpenRecentFolder,
@@ -39,12 +38,4 @@ export const useOpenSomeRecentFolderInteraction = () => {
       action: makeOpenRecentFolder(folder),
       details: `open "${folder}"`,
     })
-}
-
-export const useInitRepositoryInteraction = () => {
-  const initRepository = useInitRepository()
-  return interaction({
-    action: initRepository,
-    details: 'initialize repository',
-  })
 }

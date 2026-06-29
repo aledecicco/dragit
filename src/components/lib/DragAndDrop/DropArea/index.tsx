@@ -1,4 +1,5 @@
-import type { ComponentProps } from 'react'
+import { type ComponentProps, useLayoutEffect, useRef, useState } from 'react'
+import * as Ariakit from '@ariakit/react'
 import { IconDragDrop } from '@tabler/icons-react'
 import { mergeRefs } from 'react-merge-refs'
 
@@ -85,6 +86,21 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
     }
   })
 
+  const sizeRef = useRef<HTMLDivElement>(null)
+  const [rect, setRect] = useState({ top: 0, left: 0, width: 0, height: 0 })
+
+  useLayoutEffect(() => {
+    if (currentDrag && !disabledByValidation && sizeRef.current) {
+      const newRect = sizeRef.current.getBoundingClientRect()
+      setRect({
+        top: newRect.top,
+        left: newRect.left,
+        width: newRect.width,
+        height: newRect.height,
+      })
+    }
+  }, [currentDrag, disabledByValidation])
+
   return (
     <div
       {...propsWithCn(
@@ -94,31 +110,34 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
           (!currentDrag || disabledByValidation) &&
           'pointer-events-none',
       )}
-      ref={mergeRefs([dropRef, ref])}
+      ref={mergeRefs([dropRef, ref, sizeRef])}
     >
       {children}
 
       {currentDrag && !disabledByValidation && (
-        <div
-          {...propsWithCn(
-            typeof overlayProps === 'function'
-              ? overlayProps(currentDrag.data)
-              : overlayProps,
-            'z-3',
-            'absolute top-0 left-0 w-full h-full overflow-hidden',
-            'flex flex-col items-center justify-center gap-2 p-4',
-            'rounded-md border border-dashed border-primary-400 bg-dark-400',
-            'text-base text-light-950/50 text-center select-none',
-            isDropTarget && 'border-accent-400 bg-dark-300 text-light-950/80',
-          )}
-        >
-          <Icon
-            size="lg"
-            Glyph={Glyph ?? IconDragDrop}
-            className={cn('size-7')}
-          />
-          Drop here to {label[currentDrag.data.type]}
-        </div>
+        <Ariakit.Portal>
+          <div
+            {...propsWithCn(
+              typeof overlayProps === 'function'
+                ? overlayProps(currentDrag.data)
+                : overlayProps,
+              'z-3',
+              'fixed overflow-hidden',
+              'flex flex-col items-center justify-center gap-2 p-4',
+              'rounded-md border border-dashed border-primary-400 bg-dark-400',
+              'text-base text-light-950/50 text-center select-none',
+              isDropTarget && 'border-accent-400 bg-dark-300 text-light-950/80',
+            )}
+            style={rect}
+          >
+            <Icon
+              size="lg"
+              Glyph={Glyph ?? IconDragDrop}
+              className={cn('size-7')}
+            />
+            Drop here to {label[currentDrag.data.type]}
+          </div>
+        </Ariakit.Portal>
       )}
     </div>
   )

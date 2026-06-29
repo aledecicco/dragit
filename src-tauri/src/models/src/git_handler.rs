@@ -11,6 +11,9 @@ pub trait GitHandler {
     /// Initializes the current open folder as a git repository.
     fn init_repository(&self, repo_path: &str) -> Result<(), GitError>;
 
+    /// Clones a git repository from a url into the given path.
+    fn clone_repository(&self, repo_path: &str, url: &str) -> Result<(), GitError>;
+
     /// Returns whether the current open folder is a git repository.
     fn is_repository(&self, repo_path: &str) -> bool;
 

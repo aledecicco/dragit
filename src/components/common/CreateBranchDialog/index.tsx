@@ -71,17 +71,20 @@ const CreateBranchDialog = (props: CreateBranchDialogProps) => {
   )
 }
 
-const requestBranchName = (
+const requestBranchName = async (
   fromReference: RefName,
   defaultName: BranchName = '',
 ) => {
-  return requestValueFromDialog(CreateBranchDialog, {
+  const { name } = await requestValueFromDialog(CreateBranchDialog, {
     fromReference,
     formOptions: {
       defaultValues: { name: defaultName },
     },
-  }).then(({ name }) => name)
+  })
+
+  return name
 }
+
 export {
   CreateBranchDialog,
   requestBranchName,
