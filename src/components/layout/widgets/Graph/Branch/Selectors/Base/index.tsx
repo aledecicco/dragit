@@ -50,6 +50,14 @@ const BaseBranchSelector = (props: BaseBranchSelectorProps) => {
           changeSelectedBase(currentReference, { type: 'tag', refName: value })
         }
       }}
+      onSelectCommit={(value) => {
+        if (currentReference) {
+          changeSelectedBase(currentReference, {
+            type: 'commit',
+            refName: value,
+          })
+        }
+      }}
     />
   )
 }

@@ -16,8 +16,8 @@ use ::utils::{
 
 use models::{
     AncestorInfo, AppMessage, BranchDivergence, BranchInfo, CommitInfo, CommonAncestorInfo,
-    DiffSummary, FileTypesFilter, GitError, GitHandler, HeadInfo, HistoryItem, Page, RemoteInfo,
-    ResolutionStrategy, StashInfo, VersionedFileInfo, WorktreeFileInfo, WorktreeStatus,
+    DiffSummary, FileTypesFilter, GitError, GitHandler, HeadInfo, HeadState, HistoryItem, Page,
+    RemoteInfo, ResolutionStrategy, StashInfo, VersionedFileInfo, WorktreeFileInfo, WorktreeStatus,
 };
 
 /// Implementation of [`GitHandler`] that uses the `git` cmd for its operations.
@@ -281,6 +281,7 @@ impl GitHandler for CmdGit {
             &page_size_arg,
             "--first-parent",
             "--parents",
+            "--abbrev-commit",
         ];
         let mut lines = self.spawn_and_stream(channel, repo_path, args)?;
 
@@ -304,7 +305,7 @@ impl GitHandler for CmdGit {
         hash_search: &str,
         limit: usize,
     ) -> Result<Vec<String>, GitError> {
-        let args = ["log", "--all"];
+        let args = ["log", "--all", MATCHING_COMMITS_FORMAT];
         let lines = self
             .spawn_and_stream(channel, repo_path, args)?
             .filter_map(Result::ok);
@@ -312,8 +313,10 @@ impl GitHandler for CmdGit {
         let mut found = vec![];
 
         for line in lines {
-            if line.contains(hash_search) {
-                found.push(line);
+            if let Some((hash, short_hash)) = line.split_once(" ") {
+                if hash.contains(hash_search) {
+                    found.push(short_hash.to_string());
+                }
             }
 
             if found.len() >= limit {
@@ -388,6 +391,17 @@ impl GitHandler for CmdGit {
         let head_state = parse_head_state(&lines).ok_or(GitError::ParseCommandOutputFailed {
             command: format!("git {}", args.join(" ")),
         })?;
+
+        let head_state = match head_state {
+            HeadState::Detached { .. } => {
+                let short_hash = self
+                    .spawn_and_get_output(channel, repo_path, ["rev-parse", "--short", "HEAD"])?
+                    .trim()
+                    .to_string();
+                HeadState::Detached { commit: short_hash }
+            }
+            other => other,
+        };
 
         let merge_in_progress =
             fs::exists(get_merge_head_file(&Path::new(repo_path))).unwrap_or(false);
@@ -628,7 +642,7 @@ impl GitHandler for CmdGit {
             .spawn_and_stream(
                 channel,
                 repo_path,
-                ["rev-list", "--first-parent", reference_a],
+                ["rev-list", "--first-parent", "--abbrev-commit", reference_a],
             )?
             .filter_map(Result::ok);
 
@@ -636,7 +650,7 @@ impl GitHandler for CmdGit {
             .spawn_and_stream(
                 channel,
                 repo_path,
-                ["rev-list", "--first-parent", reference_b],
+                ["rev-list", "--first-parent", "--abbrev-commit", reference_b],
             )?
             .filter_map(Result::ok);
 

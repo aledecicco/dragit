@@ -17,23 +17,23 @@ const matchingCommitsQueryKeys = {
       ...pathQueryKey(repoPath),
       key: 'matching_commits',
     }) as const,
-  search: (repoPath: string, search: string) =>
+  hashSearch: (repoPath: string, hashSearch: string) =>
     ({
       ...matchingCommitsQueryKeys.all(repoPath),
-      search,
+      hashSearch,
     }) as const,
 }
 
 const fetchMatchingCommits = (
   repoPath: string,
-  search: string,
+  hashSearch: string,
   context: QueryFunctionContext,
 ): Promise<CommitId[]> => {
   return fetchAndDeserialize(
     'get_matching_commits',
     {
       repoPath,
-      search,
+      hashSearch,
       limit: MATCHING_COMMITS_LIMIT,
     },
     MATCHING_COMMITS_SCHEMA,
@@ -41,17 +41,17 @@ const fetchMatchingCommits = (
   )
 }
 
-const matchingCommitsQuery = (repoPath: string, search: string) =>
+const matchingCommitsQuery = (repoPath: string, hashSearch: string) =>
   queryOptions({
-    queryKey: [matchingCommitsQueryKeys.search(repoPath, search)],
-    queryFn: search
-      ? (context) => fetchMatchingCommits(repoPath, search, context)
+    queryKey: [matchingCommitsQueryKeys.hashSearch(repoPath, hashSearch)],
+    queryFn: hashSearch
+      ? (context) => fetchMatchingCommits(repoPath, hashSearch, context)
       : skipToken,
-    enabled: !!search,
+    enabled: !!hashSearch,
     placeholderData: keepPreviousData,
   })
 
-const useQueryMatchingCommits = (search: string) =>
-  useRepositoryQuery(matchingCommitsQuery, search)
+const useQueryMatchingCommits = (hashSearch: string) =>
+  useRepositoryQuery(matchingCommitsQuery, hashSearch)
 
 export { matchingCommitsQueryKeys, useQueryMatchingCommits }

@@ -1,11 +1,11 @@
 import { match } from 'ts-pattern'
 
-import { requestTagParams } from '@/common/CreateTagDialog'
 import { RefSelector } from '@/common/RefSelector'
 import { useBranchOffSomeBranchInteraction } from '@/interactions/branch'
 import {
   useCheckoutPresenter,
   useCheckoutSomeBranchInteraction,
+  useCheckoutSomeCommitInteraction,
   useCheckoutSomeTagInteraction,
   useCreateAndCheckoutBranchInteraction,
 } from '@/interactions/checkout'
@@ -13,10 +13,10 @@ import {
   useTagSomeBranchInteraction,
   useTagSomeCommitInteraction,
 } from '@/interactions/tag'
-import { type AnyInteraction, triggerInteraction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import type { ComboboxProps } from '@/ui/Combobox'
 import { ComboboxItem } from '@/ui/Combobox/Item'
-import { useHeadReference } from '@/utils/repository'
+import { useBranch, useHeadReference } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
 
 interface CurrentBranchSelectorProps extends Partial<ComboboxProps> {}
@@ -28,11 +28,13 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
   const { ...comboboxProps } = props
 
   const currentReference = useHeadReference()
+  const currentBranch = useBranch(currentReference)
 
   const checkoutTracker = useCheckoutPresenter()
   const branchOff = useBranchOffSomeBranchInteraction()
   const checkoutBranch = useCheckoutSomeBranchInteraction()
   const checkoutTag = useCheckoutSomeTagInteraction()
+  const checkoutCommit = useCheckoutSomeCommitInteraction()
 
   return (
     <RefSelector
@@ -53,6 +55,7 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
         props.disabled
       }
       reference={currentReference}
+      pinnedBranches={currentBranch ? [currentBranch.name] : undefined}
       onSelectBranch={(_, branch) => {
         if (branch?.type === 'remote') {
           triggerInteraction(branchOff(branch))
@@ -63,6 +66,11 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
       onSelectTag={(_, tag) => {
         if (tag) {
           triggerInteraction(checkoutTag(tag))
+        }
+      }}
+      onSelectCommit={(_, commit) => {
+        if (commit) {
+          triggerInteraction(checkoutCommit(commit))
         }
       }}
       noBranchMatches={(search) => <NoBranchMatches search={search} />}
@@ -104,16 +112,10 @@ const NoTagMatches = (props: { search: string }) => {
 
         match(currentReference)
           .with({ type: 'commit' }, ({ refName: commitId }) => {
-            triggerInteraction({
-              ...tagCommit(commitId),
-              argsRequester: () => requestTagParams(commitId, search),
-            } as AnyInteraction)
+            triggerInteraction(tagCommit(commitId, search))
           })
           .with({ type: 'branch' }, ({ refName: branchName }) => {
-            triggerInteraction({
-              ...tagBranch(branchName),
-              argsRequester: () => requestTagParams(branchName, search),
-            } as AnyInteraction)
+            triggerInteraction(tagBranch(branchName, search))
           })
           .exhaustive()
       }}

@@ -36,7 +36,7 @@ const useRevertCommit = (commit: CommitInfo): Action => {
       key: 'branch_operation',
       operation: 'revert_commit',
       type: 'current',
-      reference: commit.id,
+      reference: commit.shortHash,
     },
     blockedBy: [
       { key: 'branch_operation', type: 'current' },
@@ -44,7 +44,7 @@ const useRevertCommit = (commit: CommitInfo): Action => {
     ],
     run: async () => {
       await revertCommit.mutateAsync({
-        reference: commit.id,
+        reference: commit.shortHash,
         isMerge,
       })
     },

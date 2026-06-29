@@ -223,7 +223,7 @@ export const useCreateBranchAtSomeCommitInteraction = () => {
 
   return (commit: CommitInfo) =>
     interaction({
-      action: makeCreateBranchAt(commit.id),
+      action: makeCreateBranchAt(commit.shortHash),
       argsRequester: () => requestBranchName(`#${commit.shortHash}`),
       details: `create a new branch at commit #${commit.shortHash}`,
     })

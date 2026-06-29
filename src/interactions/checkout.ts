@@ -1,4 +1,4 @@
-import type { BranchInfo, CommitInfo, TagInfo } from '@/api/models'
+import type { BranchInfo, CommitId, TagInfo } from '@/api/models'
 import {
   useCheckout,
   useMakeCheckoutBranch,
@@ -20,11 +20,11 @@ export const useSwitchBranchesInteraction = () => {
 
 export const useCheckoutSomeCommitInteraction = () => {
   const checkout = useCheckout()
-  return (commit: CommitInfo) =>
+  return (commit: CommitId) =>
     interaction({
       action: checkout,
-      argsRequester: () => ({ reference: commit.id, isNew: false }),
-      details: `checkout commit #${commit.shortHash}`,
+      argsRequester: () => ({ reference: commit, isNew: false }),
+      details: `checkout commit #${commit}`,
     })
 }
 
