@@ -69,7 +69,7 @@ const CommitSnapshotDetailsDialog = (
 
         <div
           className={cn(
-            'grid grid-rows-[max-content_1fr] gap-y-4 overflow-y-hidden',
+            'grid grid-rows-[max-content_minmax(0,1fr)] gap-y-4 overflow-y-hidden',
           )}
         >
           <CommitSnapshotDetailsDialogDescription commit={commit} />

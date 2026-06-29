@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { match } from 'ts-pattern'
 
-import type { Reference, RefName, VersionedFileInfo } from '@/api/models'
+import type { Reference, VersionedFileInfo } from '@/api/models'
 import { useQueryDiffSummary } from '@/api/queries/diffSummary'
 import { useQueryVersionedFiles } from '@/api/queries/versionedFiles'
 import { ChangesSummary } from '@/common/DiffSummary'
@@ -152,7 +151,7 @@ const ComparisonSnapshotDetailsDialog = (
         )}
 
         {against && (
-          <div className={cn('grid grid-rows-[1fr] gap-y-4 overflow-y-hidden')}>
+          <div className={cn('grid grid-rows-1 gap-y-4 overflow-y-hidden')}>
             <SnapshotDetailsDialogFileList
               snapshot={reference.refName}
               against={against?.refName}

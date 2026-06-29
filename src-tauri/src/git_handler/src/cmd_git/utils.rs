@@ -278,9 +278,17 @@ pub(crate) fn parse_remote_infos(lines: &Vec<String>) -> Vec<RemoteInfo> {
 }
 
 pub(crate) fn parse_diff_summary(line: &String) -> Option<DiffSummary> {
-    let files_count;
+    let mut files_count = 0;
     let mut insertions = 0;
     let mut deletions = 0;
+
+    if line.is_empty() {
+        return Some(DiffSummary {
+            files_count,
+            insertions,
+            deletions,
+        });
+    }
 
     let mut sections = line.split(',');
 

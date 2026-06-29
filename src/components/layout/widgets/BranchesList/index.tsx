@@ -34,6 +34,7 @@ import { mapFn } from '@/utils/types'
 
 import { BranchesListItem } from './BranchItem'
 import { TagsListItem } from './TagItem'
+import { useQueryItems } from './utils'
 
 interface BranchesListProps extends ComponentProps<'div'> {}
 
@@ -43,10 +44,16 @@ interface BranchesListProps extends ComponentProps<'div'> {}
 const BranchesList = (props: BranchesListProps) => {
   const { ...divProps } = props
 
+  const settings = useSettings()
+
   const allBranchesQuery = useQueryBranches()
+  const allBranchesItems = useQueryItems(allBranchesQuery)
   const localBranchesQuery = useQueryBranches('local')
+  const localBranchesItems = useQueryItems(localBranchesQuery)
   const remoteBranchesQuery = useQueryBranches('remote')
+  const remoteBranchesItems = useQueryItems(remoteBranchesQuery)
   const tagsQuery = useQueryTags()
+  const tagsItems = useQueryItems(tagsQuery)
 
   const tabsHandler = useTabsHandler('local', {
     selectOnMove: false,
@@ -56,6 +63,10 @@ const BranchesList = (props: BranchesListProps) => {
     .with('local', () => localBranchesQuery)
     .with('remote', () => remoteBranchesQuery)
     .otherwise(() => allBranchesQuery)
+  const currentBranchesItems = match(tabsHandler.selectedTab)
+    .with('local', () => localBranchesItems)
+    .with('remote', () => remoteBranchesItems)
+    .otherwise(() => allBranchesItems)
 
   const getBranchesListInteractions = useGetBranchesListInteractions()
   const getTagsListInteractions = useGetTagsListInteractions()
@@ -68,7 +79,6 @@ const BranchesList = (props: BranchesListProps) => {
   const createBranchAtDroppedBranch = useCreateBranchAtSomeBranchInteraction()
 
   const ref = useRef<HTMLDivElement>(null)
-  const settings = useSettings()
   useShortcutBinding(settings.focusBranchesShortcut, () => {
     if (
       ref.current === document.activeElement ||
@@ -126,12 +136,12 @@ const BranchesList = (props: BranchesListProps) => {
           <>
             <InteractiveBatch
               className={cn('border-none')}
-              count={localBranchesQuery.data?.length}
+              count={localBranchesItems?.length}
               getInteractions={() =>
-                getBranchesListInteractions(localBranchesQuery.data ?? [])
+                getBranchesListInteractions(localBranchesItems ?? [])
               }
               getDragPayload={() =>
-                getBranchesDragPayload(localBranchesQuery.data ?? [])
+                getBranchesDragPayload(localBranchesItems ?? [])
               }
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('local')
@@ -139,20 +149,18 @@ const BranchesList = (props: BranchesListProps) => {
             >
               <Tab id="local">
                 Local
-                <Chip size="sm">
-                  {localBranchesQuery.data?.length ?? '...'}
-                </Chip>
+                <Chip size="sm">{localBranchesItems?.length ?? '...'}</Chip>
               </Tab>
             </InteractiveBatch>
 
             <InteractiveBatch
               className={cn('border-none')}
-              count={remoteBranchesQuery.data?.length}
+              count={remoteBranchesItems?.length}
               getInteractions={() =>
-                getBranchesListInteractions(remoteBranchesQuery.data ?? [])
+                getBranchesListInteractions(remoteBranchesItems ?? [])
               }
               getDragPayload={() =>
-                getBranchesDragPayload(remoteBranchesQuery.data ?? [])
+                getBranchesDragPayload(remoteBranchesItems ?? [])
               }
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('remote')
@@ -160,20 +168,18 @@ const BranchesList = (props: BranchesListProps) => {
             >
               <Tab id="remote">
                 Remote
-                <Chip size="sm">
-                  {remoteBranchesQuery.data?.length ?? '...'}
-                </Chip>
+                <Chip size="sm">{remoteBranchesItems?.length ?? '...'}</Chip>
               </Tab>
             </InteractiveBatch>
 
             <InteractiveBatch
               className={cn('border-none')}
-              count={allBranchesQuery.data?.length}
+              count={allBranchesItems?.length}
               getInteractions={() =>
-                getBranchesListInteractions(allBranchesQuery.data ?? [])
+                getBranchesListInteractions(allBranchesItems ?? [])
               }
               getDragPayload={() =>
-                getBranchesDragPayload(allBranchesQuery.data ?? [])
+                getBranchesDragPayload(allBranchesItems ?? [])
               }
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('all')
@@ -181,24 +187,22 @@ const BranchesList = (props: BranchesListProps) => {
             >
               <Tab id="all">
                 All
-                <Chip size="sm">{allBranchesQuery.data?.length ?? '...'}</Chip>
+                <Chip size="sm">{allBranchesItems?.length ?? '...'}</Chip>
               </Tab>
             </InteractiveBatch>
 
             <InteractiveBatch
               className={cn('border-none')}
-              count={tagsQuery.data?.length}
-              getInteractions={() =>
-                getTagsListInteractions(tagsQuery.data ?? [])
-              }
-              getDragPayload={() => getTagsDragPayload(tagsQuery.data ?? [])}
+              count={tagsItems?.length}
+              getInteractions={() => getTagsListInteractions(tagsItems ?? [])}
+              getDragPayload={() => getTagsDragPayload(tagsItems ?? [])}
               onBeforeDrag={() => {
                 tabsHandler.store.setSelectedId('tags')
               }}
             >
               <Tab id="tags" className={cn('ml-auto')}>
                 Tags
-                <Chip size="sm">{tagsQuery.data?.length ?? '...'}</Chip>
+                <Chip size="sm">{tagsItems?.length ?? '...'}</Chip>
               </Tab>
             </InteractiveBatch>
           </>
@@ -215,7 +219,7 @@ const BranchesList = (props: BranchesListProps) => {
         {tabsHandler.selectedTab === 'tags' ? (
           <InteractiveSelection
             ref={ref}
-            items={tagsQuery.data ?? []}
+            items={tagsItems ?? []}
             getInteractions={getTagsListInteractions}
             getDragPayload={getTagsDragPayload}
             deleteAction={(tags) => {
@@ -225,12 +229,13 @@ const BranchesList = (props: BranchesListProps) => {
             <QueryList
               name="tags"
               query={tagsQuery}
+              getItems={() => tagsItems ?? []}
               renderItem={(tag, position) => (
                 <TagsListItem tag={tag} itemIndex={position} />
               )}
               size="sm"
               itemSize={74}
-              options={mapFn(tagsQuery.data, (tags) => ({
+              options={mapFn(tagsItems, (tags) => ({
                 getItemKey: (index: number) => tags[index].name,
               }))}
             />
@@ -238,7 +243,7 @@ const BranchesList = (props: BranchesListProps) => {
         ) : (
           <InteractiveSelection
             ref={ref}
-            items={currentBranchesQuery.data ?? []}
+            items={currentBranchesItems ?? []}
             getInteractions={getBranchesListInteractions}
             getDragPayload={getBranchesDragPayload}
             deleteAction={(branches) => {
@@ -251,12 +256,13 @@ const BranchesList = (props: BranchesListProps) => {
                 .with('remote', () => 'remote branches')
                 .otherwise(() => 'branches')}
               query={currentBranchesQuery}
+              getItems={() => currentBranchesItems ?? []}
               renderItem={(branch, position) => (
                 <BranchesListItem branch={branch} itemIndex={position} />
               )}
               size="sm"
               itemSize={74}
-              options={mapFn(currentBranchesQuery.data, (branches) => ({
+              options={mapFn(currentBranchesItems, (branches) => ({
                 getItemKey: (index: number) => branches[index].name,
               }))}
             />

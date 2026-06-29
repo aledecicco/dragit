@@ -43,6 +43,7 @@ const InteractiveItem = (props: InteractiveItemProps) => {
   return (
     <WithContextMenu
       items={<InteractiveMenuItems interactions={interactions} />}
+      onContextMenu={actions.length === 0 ? (e) => e.preventDefault() : undefined}
     >
       <Ariakit.Role
         {...propsWithCn(itemProps, 'relative')}

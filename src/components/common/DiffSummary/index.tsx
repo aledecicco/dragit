@@ -23,7 +23,10 @@ interface ChangesSummaryProps extends ComponentProps<'span'> {
 const ChangesSummary = (props: ChangesSummaryProps) => {
   const { diff, compact = true, ...spanProps } = props
 
-  if (!diff) {
+  if (
+    !diff ||
+    (diff.insertions === 0 && diff.deletions === 0 && diff.filesCount === 0)
+  ) {
     return (
       <span {...propsWithCn(spanProps, 'text-light-950/60')}>No changes</span>
     )

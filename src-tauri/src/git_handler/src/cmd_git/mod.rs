@@ -367,7 +367,7 @@ impl GitHandler for CmdGit {
         let output = self.spawn_and_get_output(channel, repo_path, args)?;
 
         parse_diff_summary(&output.trim().to_string()).ok_or(GitError::ParseCommandOutputFailed {
-            command: format!("git {}", command_str,),
+            command: command_str,
         })
     }
 
