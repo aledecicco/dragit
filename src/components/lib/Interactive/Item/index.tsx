@@ -43,7 +43,9 @@ const InteractiveItem = (props: InteractiveItemProps) => {
   return (
     <WithContextMenu
       items={<InteractiveMenuItems interactions={interactions} />}
-      onContextMenu={actions.length === 0 ? (e) => e.preventDefault() : undefined}
+      onContextMenu={
+        actions.length === 0 ? (e) => e.preventDefault() : undefined
+      }
     >
       <Ariakit.Role
         {...propsWithCn(itemProps, 'relative')}
@@ -67,7 +69,7 @@ const InteractiveItem = (props: InteractiveItemProps) => {
 
         <ActionIndicator
           actions={actions}
-          className={cn('absolute top-1 right-1')}
+          containerProps={{ className: cn('absolute top-1 right-1') }}
         />
       </Ariakit.Role>
     </WithContextMenu>

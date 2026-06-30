@@ -65,7 +65,7 @@ const TagsListItem = (props: TagsListItemProps) => {
                   <Icon
                     Glyph={IconGitCommit}
                     size="sm"
-                    className={cn('inline-block')}
+                    containerProps={{ className: cn('inline-block') }}
                   />
                   {tag.reference}
                 </span>

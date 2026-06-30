@@ -1,3 +1,5 @@
+import { mergeRefs } from 'react-merge-refs'
+
 import {
   type AnyAction,
   useActionPresenters,
@@ -5,6 +7,7 @@ import {
 } from '@/state/actions'
 import { Icon, type IconProps } from '@/ui/Icon'
 import { Tooltip } from '@/ui/Tooltip'
+import { useAnimateSpinner } from '@/utils/animation'
 import { propsWithCn } from '@/utils/styles'
 
 interface ActionIndicatorProps extends Partial<IconProps> {
@@ -35,6 +38,7 @@ const ActiveActionIndicator = (
   const { action, ...iconProps } = props
 
   const presenter = useActionPresenters(action)
+  const iconRef = useAnimateSpinner(presenter.actionStatus)
 
   return (
     <Tooltip
@@ -44,10 +48,11 @@ const ActiveActionIndicator = (
         <Icon
           size="sm"
           Glyph={presenter.Glyph}
-          {...propsWithCn(
-            iconProps,
-            'p-0.5 bg-dark-50 text-light-950 rounded-full',
-            presenter.actionStatus === 'running' && 'animate-spin',
+          {...propsWithCn(iconProps, 'p-0.5 text-light-950')}
+          ref={mergeRefs([iconRef, iconProps.ref])}
+          containerProps={propsWithCn(
+            iconProps.containerProps,
+            'bg-dark-50 rounded-full',
           )}
         />
       }

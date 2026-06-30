@@ -72,7 +72,7 @@ const WithContextMenu = (props: WithContextMenuProps) => {
 
       <Menu
         store={menu}
-        modal
+        portal
         unmountOnHide
         autoFocus
         getAnchorRect={() => anchorRect.current}

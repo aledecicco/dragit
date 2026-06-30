@@ -64,8 +64,8 @@ const Toast = (props: ToastProps) => {
             divProps,
             'z-6',
             'flex flex-col p-4 gap-3 rounded-md shadow-md w-max max-w-130',
-            'border-2 border-dark-50 bg-dark-300',
-            '[&:hover:not(:has(.prevent-toast-action:hover))]:bg-dark-200',
+            'border-2 border-dark-50 bg-dark-400',
+            '[&:hover:not(:has(.prevent-toast-action:hover))]:bg-dark-300',
             '[&:hover:not(:has(.prevent-toast-action:hover))]:cursor-pointer',
           )}
         >

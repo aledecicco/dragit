@@ -32,6 +32,7 @@
     "@tauri-apps/plugin-store": "~2.4.2",
     "@tauri-apps/plugin-updater": "~2.10.1",
     "@wooorm/starry-night": "^3.8.0",
+    "animejs": "^4.5.0",
     "borsher": "^4.0.0",
     "hast-util-to-jsx-runtime": "^2.3.6",
     "immer": "^10.2.0",

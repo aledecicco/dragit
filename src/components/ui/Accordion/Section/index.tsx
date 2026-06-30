@@ -54,7 +54,9 @@ const AccordionSection = (props: AccordionSectionProps) => {
         >
           <Icon
             Glyph={IconChevronDown}
-            className={cn('group-aria-expanded/accordion:rotate-180')}
+            className={cn(
+              /* TODO: 'group-aria-expanded/accordion:rotate-180'*/
+            )}
           />
           {label}
         </Ariakit.CompositeItem>

@@ -24,7 +24,7 @@ const checkoutKey = (repoPath: string) =>
 const checkoutMutation = (repoPath: string) =>
   mutationOptions({
     mutationKey: [checkoutKey(repoPath)],
-    mutationFn: (args: CheckoutArgs) => {
+    mutationFn: async (args: CheckoutArgs) => {
       return invoke('checkout', { repoPath, ...args })
     },
     networkMode: 'always',

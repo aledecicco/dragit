@@ -129,7 +129,7 @@ const ComboboxInner = (props: ComboboxProps) => {
           <Icon
             Glyph={IconChevronDown}
             size={size}
-            className={cn('group-aria-expanded:rotate-180')}
+            className={cn(/* TODO: 'group-aria-expanded:rotate-180' */)}
           />
         </Ariakit.Select>
 

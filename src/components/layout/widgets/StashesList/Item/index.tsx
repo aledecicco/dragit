@@ -62,7 +62,7 @@ const StashesListItem = (props: StashesListItemProps) => {
                   <Icon
                     Glyph={IconGitBranch}
                     size="sm"
-                    className={cn('inline-block')}
+                    containerProps={{ className: cn('inline-block') }}
                   />{' '}
                   {stash.createdOn}
                 </span>

@@ -1,3 +1,4 @@
+import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
 
 import { type AnyAction, useActionPresenters } from '@/state/actions'
@@ -5,7 +6,7 @@ import { Button, type ButtonProps } from '@/ui/Button'
 import { type Glyph, Icon, type IconProps } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { Tooltip } from '@/ui/Tooltip'
-import { propsWithCn } from '@/utils/styles'
+import { useAnimateSpinner } from '@/utils/animation'
 import type { Status } from '@/utils/types'
 
 interface BaseDecoratedButtonProps extends ButtonProps {
@@ -69,6 +70,8 @@ const TrackerDecoratedButton = (props: TrackerDecoratedButtonProps) => {
     .with('disabled', () => buttonProps.status ?? 'neutral')
     .exhaustive()
 
+  const iconRef = useAnimateSpinner(actionStatus)
+
   return (
     <BaseDecoratedButton
       {...buttonProps}
@@ -76,10 +79,10 @@ const TrackerDecoratedButton = (props: TrackerDecoratedButtonProps) => {
       Glyph={Glyph}
       status={buttonStatus}
       disabled={buttonProps.disabled || actionStatus === 'disabled'}
-      iconProps={propsWithCn(
-        buttonProps.iconProps,
-        actionStatus === 'running' ? 'animate-spin' : undefined,
-      )}
+      iconProps={{
+        ...buttonProps.iconProps,
+        ref: mergeRefs([iconRef, buttonProps.iconProps?.ref]),
+      }}
     />
   )
 }

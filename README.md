@@ -131,7 +131,7 @@ There's always things to improve:
 - [ ] Highlight changed file sections in the diff scrollbar
 - [x] Compare arbitrary refspecs side-by-side
 - [ ] Show merge unions between branches
-- [ ] Clone and open a repository from a URL
+- [x] Clone and open a repository from a URL
 - [ ] Animations
 - [ ] Allow layout adjustments
 - [ ] Manage remote tags

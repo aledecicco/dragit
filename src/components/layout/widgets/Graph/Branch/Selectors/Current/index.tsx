@@ -1,3 +1,4 @@
+import { mergeRefs } from 'react-merge-refs'
 import { match } from 'ts-pattern'
 
 import { RefSelector } from '@/common/RefSelector'
@@ -16,6 +17,7 @@ import {
 import { triggerInteraction } from '@/state/actions'
 import type { ComboboxProps } from '@/ui/Combobox'
 import { ComboboxItem } from '@/ui/Combobox/Item'
+import { useAnimateSpinner } from '@/utils/animation'
 import { useBranch, useHeadReference } from '@/utils/repository'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -36,15 +38,25 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
   const checkoutTag = useCheckoutSomeTagInteraction()
   const checkoutCommit = useCheckoutSomeCommitInteraction()
 
+  const iconRef = useAnimateSpinner(checkoutTracker.actionStatus)
+
   return (
     <RefSelector
       placeholder="Checkout a branch..."
+      Glyph={
+        checkoutTracker.actionStatus !== 'disabled' &&
+        checkoutTracker.actionStatus !== 'idle'
+          ? checkoutTracker.Glyph
+          : undefined
+      }
       iconProps={propsWithCn(
-        comboboxProps.iconProps,
+        {
+          ...comboboxProps.iconProps,
+          ref: mergeRefs([iconRef, comboboxProps.iconProps?.ref]),
+        },
         match(checkoutTracker.actionStatus)
           .with('success', () => 'text-success-300')
           .with('error', () => 'text-danger-600')
-          .with('running', () => 'animate-spin')
           .otherwise(() => undefined),
       )}
       {...propsWithCn(comboboxProps, 'w-full border border-dark-50')}

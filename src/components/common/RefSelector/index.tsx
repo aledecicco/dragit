@@ -100,7 +100,11 @@ const RefSelector = ({
   const tagOptions = tagsQuery.data?.map((t) => t.name) ?? []
 
   return (
-    <Combobox value={value} Glyph={Glyph} {...comboboxProps}>
+    <Combobox
+      value={value}
+      {...comboboxProps}
+      Glyph={comboboxProps.Glyph ?? Glyph}
+    >
       <ComboboxSection
         name="branches"
         onSelect={(value) =>
