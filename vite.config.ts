@@ -17,14 +17,6 @@ export default defineConfig(async () => ({
     tsconfigPaths(),
   ],
 
-  resolve: {
-    alias: {
-      // TODO: workaround for slow loading times in dev mode. Might be fixed by a future version of @tabler-icons
-      // https://github.com/tabler/tabler-icons/issues/1233
-      '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
-    },
-  },
-
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent vite from obscuring rust errors

@@ -41,7 +41,7 @@ const AccordionSection = (props: AccordionSectionProps) => {
             <Ariakit.Disclosure
               className={cn(
                 'capitalize',
-                'cursor-pointer w-full group/accordion',
+                'cursor-pointer w-full group',
                 'text-sm text-light-600 text-start',
                 'py-2 flex flex-row gap-x-2 items-center w-max',
                 'hover:underline',
@@ -54,9 +54,7 @@ const AccordionSection = (props: AccordionSectionProps) => {
         >
           <Icon
             Glyph={IconChevronDown}
-            className={cn(
-              /* TODO: 'group-aria-expanded/accordion:rotate-180'*/
-            )}
+            className={cn('group-aria-expanded:rotate-180')}
           />
           {label}
         </Ariakit.CompositeItem>
