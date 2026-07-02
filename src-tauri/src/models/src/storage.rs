@@ -118,12 +118,14 @@ impl Default for Settings {
             ai_base_url: "".to_string(),
             ai_model: "".to_string(),
             ai_system_prompt:
-                "You are a tool that writes git commit messages. \
+                "You are a tool that writes very quick git commit messages. \
+                Respond immediately without any preamble, thoughts, or explanation. \
+                Do not use internal reasoning, thinking tags, or chain-of-thought. \
                 Given a staged diff, respond with a single, concise commit message and nothing else. \
+                Use the given diff and nothing more, and don't do any exploration. \
                 Use the imperative mood (\"Add\", \"Fix\", \"Refactor\"). \
-                Keep the subject line under ~72 characters. \
                 Only add a body (after a blank line) if the change genuinely needs explanation. \
-                Do not wrap the message in quotes, backticks, or markdown."
+                Do not wrap the message in quotes, backticks, or markdown, or add anything to it other than the diff explanation itself."
                 .to_string(),
 
             command_palette_shortcut: "Ctrl + P".to_string(),

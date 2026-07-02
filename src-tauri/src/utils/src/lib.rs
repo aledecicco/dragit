@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    io::Read,
+    path::{Path, PathBuf},
+};
 
 static GIT_FOLDER_NAME: &str = ".git";
 static CONFIG_FOLDER_NAME: &str = "config";
@@ -73,4 +76,20 @@ pub fn get_cherry_pick_head_file(repo_path: &Path) -> PathBuf {
 
 pub fn get_revert_head_file(repo_path: &Path) -> PathBuf {
     get_git_folder(repo_path).join(REVERT_HEAD_FILE_NAME)
+}
+
+pub fn read_raw_buffer(raw: Vec<u8>) -> Option<String> {
+    let trimmed = String::from_utf8_lossy(&raw).trim().to_string();
+    if trimmed.is_empty() {
+        None
+    } else {
+        Some(trimmed)
+    }
+}
+
+pub fn read_stream(r: &mut impl Read) -> Option<String> {
+    let mut raw = Vec::new();
+    r.read_to_end(&mut raw).ok()?;
+
+    read_raw_buffer(raw)
 }

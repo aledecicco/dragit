@@ -396,14 +396,3 @@ pub(crate) fn parse_tag_info(segments: &Vec<String>) -> Option<TagInfo> {
         message,
     })
 }
-
-pub(crate) fn read_stream(r: &mut impl Read) -> Option<String> {
-    let mut raw = Vec::new();
-    r.read_to_end(&mut raw).ok()?;
-    let trimmed = String::from_utf8_lossy(&raw).trim().to_string();
-    if trimmed.is_empty() {
-        None
-    } else {
-        Some(trimmed)
-    }
-}

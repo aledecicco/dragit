@@ -332,16 +332,16 @@ export const useIgnoreManyNewFilesInteraction = () => {
 }
 
 export const useGetNotStagedFilesInteractions = () => {
-  const stageInteraction = useStageFilesInteraction()
-  const stashInteraction = useStashFilesInteraction()
-  const acceptAsIsInteraction = useAcceptManyAsIsInteraction()
-  const acceptOursInteraction = useAcceptManyOursInteraction()
-  const acceptTheirsInteraction = useAcceptManyTheirsInteraction()
-  const acceptDeletionsInteraction = useAcceptManyDeletionsInteraction()
-  const ignoreDeletionsInteraction = useIgnoreManyDeletionsInteraction()
-  const acceptNewFilesInteraction = useAcceptManyNewFilesInteraction()
-  const ignoreNewFilesInteraction = useIgnoreManyNewFilesInteraction()
-  const discardInteraction = useDiscardFilesInteraction()
+  const stage = useStageFilesInteraction()
+  const stash = useStashFilesInteraction()
+  const acceptAsIs = useAcceptManyAsIsInteraction()
+  const acceptOurs = useAcceptManyOursInteraction()
+  const acceptTheirs = useAcceptManyTheirsInteraction()
+  const acceptDeletions = useAcceptManyDeletionsInteraction()
+  const ignoreDeletions = useIgnoreManyDeletionsInteraction()
+  const acceptNewFiles = useAcceptManyNewFilesInteraction()
+  const ignoreNewFiles = useIgnoreManyNewFilesInteraction()
+  const discard = useDiscardFilesInteraction()
 
   return (files: NotStagedFile[]): AnyInteraction[][] => {
     const allBothAddedOrModified = files.every(
@@ -350,13 +350,7 @@ export const useGetNotStagedFilesInteractions = () => {
         (file.changes === 'bothAdded' || file.changes === 'bothModified'),
     )
     if (allBothAddedOrModified) {
-      return [
-        group(
-          acceptAsIsInteraction(files),
-          acceptOursInteraction(files),
-          acceptTheirsInteraction(files),
-        ),
-      ]
+      return [group(acceptAsIs(files), acceptOurs(files), acceptTheirs(files))]
     }
 
     const allAddedByUsOrThem = files.every(
@@ -365,12 +359,7 @@ export const useGetNotStagedFilesInteractions = () => {
         (file.changes === 'addedByUs' || file.changes === 'addedByThem'),
     )
     if (allAddedByUsOrThem) {
-      return [
-        group(
-          acceptNewFilesInteraction(files),
-          ignoreNewFilesInteraction(files),
-        ),
-      ]
+      return [group(acceptNewFiles(files), ignoreNewFiles(files))]
     }
 
     const allDeletedByUsOrThem = files.every(
@@ -379,12 +368,7 @@ export const useGetNotStagedFilesInteractions = () => {
         (file.changes === 'deletedByUs' || file.changes === 'deletedByThem'),
     )
     if (allDeletedByUsOrThem) {
-      return [
-        group(
-          acceptDeletionsInteraction(files),
-          ignoreDeletionsInteraction(files),
-        ),
-      ]
+      return [group(acceptDeletions(files), ignoreDeletions(files))]
     }
 
     const allDeleted = files.every(
@@ -395,28 +379,25 @@ export const useGetNotStagedFilesInteractions = () => {
           file.changes === 'deletedByThem'),
     )
     if (allDeleted) {
-      return [group(acceptDeletionsInteraction(files))]
+      return [group(acceptDeletions(files))]
     }
 
     const anyUnmerged = files.some((file) => file.status === 'unmerged')
     if (anyUnmerged) {
-      return [group(stageInteraction(files))]
+      return [group(stage(files))]
     }
 
-    return [
-      group(stageInteraction(files), stashInteraction(files)),
-      group(discardInteraction(files)),
-    ]
+    return [group(stage(files), stash(files)), group(discard(files))]
   }
 }
 
 export const useGetStagedFilesInteractions = () => {
-  const unstageInteraction = useUnstageFilesInteraction()
-  const discardInteraction = useDiscardFilesInteraction()
+  const unstage = useUnstageFilesInteraction()
+  const discard = useDiscardFilesInteraction()
 
   return (files: StagedFile[]): AnyInteraction[][] => [
-    group(unstageInteraction(files)),
-    group(discardInteraction(files)),
+    group(unstage(files)),
+    group(discard(files)),
   ]
 }
 

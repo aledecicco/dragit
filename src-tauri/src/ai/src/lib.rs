@@ -5,6 +5,7 @@ use std::{
 
 use models::AgentError;
 use serde::Deserialize;
+use utils::read_raw_buffer;
 
 /// Service/user pair under which the API key is stored in the OS keychain.
 const KEYRING_SERVICE: &str = "dragit";
@@ -61,34 +62,23 @@ struct ChoiceMessage {
     content: String,
 }
 
-/// Returns the trimmed stream contents, or `None` when empty.
-fn read_stream(bytes: &[u8]) -> Option<String> {
-    let trimmed = String::from_utf8_lossy(bytes).trim().to_string();
-    if trimmed.is_empty() {
-        None
-    } else {
-        Some(trimmed)
-    }
-}
-
-/// Drafts a commit message via a local CLI (e.g. `claude`), piping the diff on
-/// stdin. Runs under the user's own login, so no API key is needed.
+/// Drafts a commit message via a local CLI.
 fn generate_via_cli(
     command: &str,
     model: &str,
     system_prompt: &str,
     diff: &str,
 ) -> Result<String, AgentError> {
-    let mut cmd = Command::new(command);
-    cmd.args([
-        "-p",
-        "--strict-mcp-config",
-        "--system-prompt",
-        system_prompt,
-    ])
-    .stdin(Stdio::piped())
-    .stdout(Stdio::piped())
-    .stderr(Stdio::piped());
+    let mut parts = command.split_whitespace();
+    let program = parts.next().ok_or_else(|| AgentError::RequestFailed {
+        reason: "No CLI command configured".to_string(),
+    })?;
+
+    let mut cmd = Command::new(program);
+    cmd.args(parts)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
 
     if !model.trim().is_empty() {
         cmd.args(["--model", model]);
@@ -102,7 +92,7 @@ fn generate_via_cli(
     }
 
     let mut process = cmd.spawn().map_err(|err| AgentError::RequestFailed {
-        reason: format!("Failed to launch \"{command}\": {err}"),
+        reason: err.to_string(),
     })?;
 
     process
@@ -111,31 +101,33 @@ fn generate_via_cli(
         .ok_or_else(|| AgentError::RequestFailed {
             reason: "Failed to open the CLI's input".to_string(),
         })?
-        .write_all(diff.as_bytes())
+        .write_all(format!("{system_prompt}\n\n{diff}").as_bytes())
         .map_err(|err| AgentError::RequestFailed {
             reason: err.to_string(),
         })?;
 
-    let output = process
+    let result = process
         .wait_with_output()
         .map_err(|err| AgentError::RequestFailed {
             reason: err.to_string(),
         })?;
 
-    if !output.status.success() {
-        let reason = read_stream(&output.stderr)
-            .or(read_stream(&output.stdout))
+    if !result.status.success() {
+        let reason = read_raw_buffer(result.stderr)
+            .or(read_raw_buffer(result.stdout))
             .unwrap_or_else(|| {
                 format!(
                     "Process exited with status code \"{}\"",
-                    output.status.code().unwrap_or(-1)
+                    result.status.code().unwrap_or(-1)
                 )
             });
 
         return Err(AgentError::RequestFailed { reason });
     }
 
-    Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+    read_raw_buffer(result.stdout).ok_or_else(|| AgentError::RequestFailed {
+        reason: "Failed to get CLI's output".to_string(),
+    })
 }
 
 /// Drafts a commit message from the configured OpenAI-compatible provider.

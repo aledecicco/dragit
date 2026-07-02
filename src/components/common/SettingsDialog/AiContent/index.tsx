@@ -32,14 +32,17 @@ const SettingsDialogAiContent = () => {
               />
             }
           >
-            <SettingsDialogSection label="API config">
+            <SettingsDialogSection
+              label="API config"
+              className={cn('auto-rows-auto')}
+            >
               <TextSetting
-                label="API URL"
-                placeholder='https://... or "claude"'
+                label="URL or command"
+                placeholder="..."
                 setting="aiBaseUrl"
                 contentBefore="AI Agent URL: "
-                className={cn('max-w-70')}
-                buttonProps={{ className: cn('max-w-70') }}
+                className={cn('max-w-80 w-80')}
+                buttonProps={{ className: cn('max-w-80') }}
               />
 
               <TextSetting
@@ -56,7 +59,9 @@ const SettingsDialogAiContent = () => {
                 placeholder="Configure..."
                 contentBefore="AI Agent API key: "
                 className={cn('max-w-70')}
-                buttonProps={{ className: cn('max-w-70') }}
+                buttonProps={{
+                  className: cn('text-light-50/60 font-normal'),
+                }}
                 value={
                   hasApiKeyQuery.isFetching
                     ? 'Loading...'
@@ -72,14 +77,15 @@ const SettingsDialogAiContent = () => {
               />
 
               <TextSetting
-                label="Commit generation prompt"
+                label="commit generation prompt"
                 placeholder="Configure..."
                 setting="aiSystemPrompt"
                 contentBefore="Commit generation prompt: "
-                className={cn('max-w-full w-full resize-none', '')}
+                className={cn('max-w-full w-full resize-none')}
                 render={<textarea rows={5} />}
                 buttonProps={{
                   children: 'Modify',
+                  className: cn('text-light-50/60 font-normal'),
                 }}
                 divProps={{
                   className: cn('flex-wrap'),

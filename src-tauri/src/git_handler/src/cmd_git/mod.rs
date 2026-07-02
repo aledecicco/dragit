@@ -12,6 +12,7 @@ use tauri::ipc::Channel;
 
 use ::utils::{
     get_cherry_pick_head_file, get_merge_head_file, get_rebase_head_file, get_revert_head_file,
+    read_stream,
 };
 
 use models::{
@@ -143,7 +144,7 @@ impl CmdGit {
             args.clone().into_iter().collect::<Vec<&str>>().join(" ")
         );
         let mut process = self.spawn_and_notify(channel, path, args)?;
-        let stdout = process
+        let mut stdout = process
             .stdout
             .take()
             .ok_or_else(|| GitError::GetCommandOutputFailed {
@@ -156,7 +157,7 @@ impl CmdGit {
             })?;
         let mut stderr = process.stderr.take();
 
-        let buffer = read_stream(&mut BufReader::new(stdout)).unwrap_or_default();
+        let buffer = read_stream(&mut stdout).unwrap_or_default();
 
         let status = process.wait().map_err(|err| GitError::CommandFailed {
             command: command_str.clone(),

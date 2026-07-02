@@ -160,7 +160,7 @@ const EditableTextInner = (props: EditableTextInnerProps) => {
         aria-label={`${label}. Press Enter to save. Press Escape to cancel.`}
         {...propsWithCn(
           comboboxProps,
-          'px-2.5 py-1.5 bg-dark-800 rounded-md text-sm text-light-800',
+          'px-2.5 py-1.75 bg-dark-800 rounded-md text-sm text-light-800',
           'min-w-0 text-sm',
           !search && 'font-light',
         )}

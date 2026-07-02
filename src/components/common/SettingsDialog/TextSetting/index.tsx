@@ -6,7 +6,7 @@ import { useSetSettingInteraction } from '@/interactions/storage'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/storage'
 import { EditableText, type EditableTextProps } from '@/ui/EditableText'
-import { cn, propsWithCn } from '@/utils/styles'
+import { propsWithCn } from '@/utils/styles'
 
 import type { StringSettingKey } from '../utils'
 
@@ -55,6 +55,8 @@ const TextSetting = (props: TextSettingProps) => {
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
+  const value = setting ? settings[setting] : (inputProps.value ?? '')
+
   return (
     <div
       {...propsWithCn(
@@ -79,18 +81,21 @@ const TextSetting = (props: TextSettingProps) => {
               inputProps,
               'max-w-20 border border-dark-50 rounded-md',
             )}
-            value={setting ? settings[setting] : (inputProps.value ?? '')}
-            setValue={(value) => {
-              inputProps.setValue?.(value)
+            value={value}
+            setValue={(newValue) => {
+              inputProps.setValue?.(newValue)
 
               if (setting) {
-                triggerInteraction(setSettingInteraction(setting, value))
+                triggerInteraction(setSettingInteraction(setting, newValue))
               }
             }}
             buttonProps={{
-              className: cn('max-w-20 border border-dark-50 rounded-md'),
               ...props,
-              ...inputProps.buttonProps,
+              ...propsWithCn(
+                inputProps.buttonProps,
+                'max-w-20 border border-dark-50 rounded-md',
+                !value && 'text-light-50/60 font-normal',
+              ),
               ref: mergeRefs([
                 props.ref,
                 buttonRef,
