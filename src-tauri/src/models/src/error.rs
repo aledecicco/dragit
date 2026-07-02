@@ -16,6 +16,19 @@ pub enum GitError {
 
 #[derive(thiserror::Error, serde::Serialize, Debug)]
 #[serde(rename_all(serialize = "camelCase"), tag = "type")]
+pub enum AgentError {
+    #[error("The AI provider is not configured")]
+    NotConfigured { reason: String },
+
+    #[error("Failed to access the secure credential store")]
+    KeychainFailed { reason: String },
+
+    #[error("The AI request failed")]
+    RequestFailed { reason: String },
+}
+
+#[derive(thiserror::Error, serde::Serialize, Debug)]
+#[serde(rename_all(serialize = "camelCase"), tag = "type")]
 pub enum RepoWatcherError {
     #[error("Failed to setup file watcher")]
     SetupFailed {},
@@ -43,6 +56,9 @@ pub enum AppError {
     #[error("Error with git operation: {git_error}")]
     GitOperationFailed { git_error: GitError },
 
+    #[error("Error with AI operation: {agent_error}")]
+    AgentFailed { agent_error: AgentError },
+
     #[error("Error during file watcher setup")]
     RepoWatcherFailed {
         repo_watcher_error: RepoWatcherError,
@@ -67,5 +83,11 @@ impl From<GitError> for AppError {
 impl From<RepoWatcherError> for AppError {
     fn from(repo_watcher_error: RepoWatcherError) -> AppError {
         AppError::RepoWatcherFailed { repo_watcher_error }
+    }
+}
+
+impl From<AgentError> for AppError {
+    fn from(agent_error: AgentError) -> AppError {
+        AppError::AgentFailed { agent_error }
     }
 }

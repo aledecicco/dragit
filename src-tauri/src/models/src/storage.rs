@@ -72,6 +72,10 @@ pub struct Settings {
     pub show_large_diffs: bool,
     pub show_word_diffs: bool,
 
+    pub ai_base_url: String,
+    pub ai_model: String,
+    pub ai_system_prompt: String,
+
     pub command_palette_shortcut: String,
     pub stage_files_shortcut: String,
     pub unstage_files_shortcut: String,
@@ -110,6 +114,17 @@ impl Default for Settings {
             prefer_inline: true,
             show_large_diffs: false,
             show_word_diffs: true,
+
+            ai_base_url: "".to_string(),
+            ai_model: "".to_string(),
+            ai_system_prompt:
+                "You are a tool that writes git commit messages. \
+                Given a staged diff, respond with a single, concise commit message and nothing else. \
+                Use the imperative mood (\"Add\", \"Fix\", \"Refactor\"). \
+                Keep the subject line under ~72 characters. \
+                Only add a body (after a blank line) if the change genuinely needs explanation. \
+                Do not wrap the message in quotes, backticks, or markdown."
+                .to_string(),
 
             command_palette_shortcut: "Ctrl + P".to_string(),
             stage_files_shortcut: "Ctrl + Shift + A".to_string(),

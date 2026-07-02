@@ -1,5 +1,6 @@
 import { match, P } from 'ts-pattern'
 
+import { agentFailedToast } from '@/common/Toasts/AgentFailed'
 import { gitOperationFailedToast } from '@/common/Toasts/GitOperationFailed'
 import { toast } from '@/lib/Toasts/Toast'
 import { getSettings } from '@/state/storage'
@@ -9,10 +10,11 @@ export type AppError =
       type: 'gitOperationFailed'
       gitError: GitError
     }
-  | { type: 'repoWatcherFailed' }
-  | { type: 'updateStorageFailed' }
+  | { type: 'agentFailed'; agentError: AgentError }
+  | { type: 'repoWatcherFailed'; watcherError: RepoWatcherError }
+  | { type: 'updateStorageFailed'; reason: string }
   | { type: 'serializationFailed' }
-  | { type: 'readFileFailed' }
+  | { type: 'readFileFailed'; reason: string }
 
 export type GitError =
   | {
@@ -33,6 +35,34 @@ export type GitError =
   | {
       type: 'parseCommandOutputFailed'
       command: string
+    }
+
+export type AgentError =
+  | {
+      type: 'notConfigured'
+      reason: string
+    }
+  | { type: 'keychainFailed'; reason: 'string' }
+  | { type: 'requestFailed'; reason: 'string' }
+
+export type RepoWatcherError =
+  | {
+      type: 'setupFailed'
+    }
+  | {
+      type: 'repositoryNotWatched'
+    }
+  | {
+      type: 'watchFolderFailed'
+      path: string
+    }
+  | {
+      type: 'unwatchFolderFailed'
+      path: string
+    }
+  | {
+      type: 'notADirectory'
+      path: string
     }
 
 /**
@@ -61,11 +91,12 @@ export const announceInteractionError = (
   const settings = getSettings()
 
   if (settings.showToasts) {
-    match(error).with(
-      { type: 'gitOperationFailed', gitError: P.select() },
-      (e) => {
+    match(error)
+      .with({ type: 'gitOperationFailed', gitError: P.select() }, (e) => {
         toast(gitOperationFailedToast(description, e))
-      },
-    )
+      })
+      .with({ type: 'agentFailed', agentError: P.select() }, (e) => {
+        toast(agentFailedToast(description, e))
+      })
   }
 }

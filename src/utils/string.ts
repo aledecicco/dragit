@@ -13,7 +13,7 @@ export const pluralize = (
   count: number,
   include?: boolean,
   plural?: string,
-) => {
+): string => {
   const suffix = count === 1 ? singular : (plural ?? `${singular}s`)
 
   if (include) {
@@ -21,6 +21,17 @@ export const pluralize = (
   }
 
   return suffix
+}
+
+/**
+ * Given a word, returns what article to use for it.
+ *
+ * This is a rudimentary implementation, just to get out of some edge cases.
+ *
+ * @param word - The word to check.
+ */
+export const chooseArticle = (word: string): string => {
+  return ['a', 'e', 'i', 'o', 'u'].includes(word[0].toLowerCase()) ? 'an' : 'a'
 }
 
 /**

@@ -48,3 +48,47 @@ pub(crate) fn find_git_root(path: &str) -> Option<String> {
         }
     }
 }
+
+/// Splits a budget of chars fairly between the files in a diff.
+pub(crate) fn budget_diff(diff: &str, budget: usize) -> String {
+    let mut sections: Vec<String> = Vec::new();
+    for line in diff.lines() {
+        match sections.last_mut() {
+            Some(section) if !line.starts_with("diff --git ") => {
+                section.push_str(line);
+                section.push('\n');
+            }
+            _ => sections.push(format!("{line}\n")),
+        }
+    }
+
+    sections.sort_by_cached_key(|section| section.chars().count());
+
+    let mut remaining_budget = budget;
+    let mut length_cap = budget;
+    let mut sections_left = sections.len();
+
+    for section in &sections {
+        let share = remaining_budget / sections_left;
+        let length = section.chars().count();
+
+        if length > share {
+            length_cap = share;
+            break;
+        }
+
+        remaining_budget -= length;
+        sections_left -= 1;
+    }
+
+    sections
+        .into_iter()
+        .map(|section| {
+            if section.chars().count() > length_cap {
+                format!("{}[diff truncated]\n", &section[..length_cap - 1])
+            } else {
+                section
+            }
+        })
+        .collect()
+}

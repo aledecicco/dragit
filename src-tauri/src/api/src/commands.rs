@@ -6,14 +6,15 @@ use tauri::{
 
 use crate::{
     serialize_response,
-    utils::{find_git_root, get_disk_file_contents},
+    utils::{budget_diff, find_git_root, get_disk_file_contents},
     with_handler,
 };
 use diffs::{compute_diff, get_diff_sources};
 use models::{
-    AppError, AppEvent, AppMessage, AppState, ConflictLine, ConflictMode, CurrentDirInfo,
-    DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus, PartialRepositoryStorage,
-    PartialSettings, RepoWatcherError, ResolutionStrategy, Storage, UnmergedFileInfo, EVENT_ID,
+    AgentError, AppError, AppEvent, AppMessage, AppState, ConflictLine, ConflictMode,
+    CurrentDirInfo, DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus,
+    PartialRepositoryStorage, PartialSettings, RepoWatcherError, ResolutionStrategy, Storage,
+    UnmergedFileInfo, EVENT_ID,
 };
 use storage::{
     add_recent_folder, get_storage, patch_repository_storage, patch_settings, set_last_opened,
@@ -827,4 +828,50 @@ pub async fn revert_commit(
     is_merge: bool,
 ) -> Result<(), AppError> {
     with_handler(&state, &|h| h.revert_commit(repo_path, reference, is_merge))
+}
+
+/// Drafts a commit message for the currently staged changes using the configured AI provider.
+#[tauri::command]
+pub async fn generate_commit_message(
+    app_handle: AppHandle,
+    state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
+    repo_path: &str,
+) -> Result<Response, AppError> {
+    let settings = get_storage(&app_handle).settings;
+
+    // A non-HTTP base URL means the local CLI, which has its own default model.
+    let is_cli = !settings.ai_base_url.trim().starts_with("http");
+    if settings.ai_base_url.trim().is_empty() || (!is_cli && settings.ai_model.trim().is_empty()) {
+        return Err(AgentError::NotConfigured {
+            reason: "Set the AI base URL and model in the settings first".to_string(),
+        }
+        .into());
+    }
+
+    let diff = with_handler(&state, &|h| h.get_staged_diff(&channel, repo_path))?;
+    let diff = budget_diff(&diff, 12_000);
+
+    let message = ai::generate_commit_message(
+        &settings.ai_base_url,
+        &settings.ai_model,
+        &settings.ai_system_prompt,
+        &diff,
+    )
+    .await
+    .map_err(AppError::from)?;
+
+    serialize_response(message)
+}
+
+/// Stores the AI provider API key in the OS keychain. An empty key clears it.
+#[tauri::command]
+pub async fn set_ai_api_key(key: String) -> Result<(), AppError> {
+    ai::set_api_key(&key).map_err(AppError::from)
+}
+
+/// Returns whether an AI provider API key has been stored.
+#[tauri::command]
+pub async fn has_ai_api_key() -> Result<bool, AppError> {
+    Ok(ai::has_api_key())
 }

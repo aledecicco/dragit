@@ -5,6 +5,7 @@ import { useEffectOnce, usePrevious } from 'react-use'
 
 import { Button, type ButtonProps } from '@/ui/Button'
 import { Marquee } from '@/ui/Marquee'
+import { chooseArticle } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { EditableTextItem } from './Item'
@@ -59,8 +60,12 @@ const EditableText = (props: EditableTextProps) => {
     <EditableTextInner
       autoFocus
       {...propsWithCn(comboboxProps, 'font-medium')}
-      defaultValue={value}
-      placeholder={comboboxProps.placeholder ?? `Enter a ${label}...`}
+      defaultValue={
+        typeof comboboxProps.defaultValue === 'string'
+          ? comboboxProps.defaultValue
+          : value
+      }
+      placeholder={`Enter ${chooseArticle(label)} ${label}...`}
       label={label}
       suggestions={suggestions}
       persistValue={(value) => {
@@ -81,9 +86,11 @@ const EditableText = (props: EditableTextProps) => {
         setEditing(true)
       }}
     >
-      <Marquee reverse={false}>
-        {value ? value : (comboboxProps.placeholder ?? '-')}
-      </Marquee>
+      {buttonProps?.children ?? (
+        <Marquee reverse={false}>
+          {value ? value : (comboboxProps.placeholder ?? '-')}
+        </Marquee>
+      )}
     </Button>
   )
 }

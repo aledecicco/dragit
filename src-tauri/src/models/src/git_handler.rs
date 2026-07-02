@@ -146,6 +146,13 @@ pub trait GitHandler {
     /// Commits the current index with the given message.
     fn commit_index(&self, repo_path: &str, message: &str, is_amend: bool) -> Result<(), GitError>;
 
+    /// Returns the diff of the currently staged changes.
+    fn get_staged_diff(
+        &self,
+        channel: &Channel<AppMessage>,
+        repo_path: &str,
+    ) -> Result<String, GitError>;
+
     /// Reset the HEAD to undo the given reference without changing the index or working directory.
     fn reset_head(&self, repo_path: &str, reference: &str) -> Result<(), GitError>;
 

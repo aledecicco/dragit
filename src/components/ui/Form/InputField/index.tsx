@@ -1,3 +1,4 @@
+import { chooseArticle } from '@/utils/string'
 import { propsWithCn } from '@/utils/styles'
 
 import { FormField, type FormFieldProps } from '../Field'
@@ -12,7 +13,7 @@ const InputField = (props: InputFieldProps) => {
 
   return (
     <FormField
-      placeholder={`Enter a ${fieldProps.label}...`}
+      placeholder={`Enter ${chooseArticle(fieldProps.label)} ${fieldProps.label}...`}
       {...propsWithCn(
         fieldProps,
         'p-3 text-sm bg-dark-800 rounded-sm text-light-800',

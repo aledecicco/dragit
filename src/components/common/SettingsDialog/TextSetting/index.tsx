@@ -83,7 +83,7 @@ const TextSetting = (props: TextSettingProps) => {
             setValue={(value) => {
               inputProps.setValue?.(value)
 
-              if (setting && value) {
+              if (setting) {
                 triggerInteraction(setSettingInteraction(setting, value))
               }
             }}

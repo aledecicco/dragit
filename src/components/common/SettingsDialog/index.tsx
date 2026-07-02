@@ -1,5 +1,9 @@
 import { useEffect } from 'react'
-import { IconAdjustments, IconInfoCircle } from '@tabler/icons-react'
+import {
+  IconAdjustments,
+  IconInfoCircle,
+  IconSparklesFilled,
+} from '@tabler/icons-react'
 
 import { useShortcutScopesHandler } from '@/lib/Shortcuts/utils'
 import { showDialog } from '@/state/dialogs'
@@ -11,6 +15,7 @@ import { TabPanel } from '@/ui/Tabs/Panel'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { SettingsDialogAboutContent } from './AboutContent'
+import { SettingsDialogAiContent } from './AiContent'
 import { SettingsDialogPreferencesContent } from './PreferencesContent'
 
 const SETTINGS_DIALOG_KEY = 'settings_dialog'
@@ -61,6 +66,15 @@ const SettingsDialog = (props: SettingsDialogProps) => {
             >
               <Icon Glyph={IconAdjustments} size="lg" />
             </Tab>
+
+            <Tab
+              id="ai"
+              withDecoration={false}
+              className={cn('rounded-none px-5 py-4')}
+            >
+              <Icon Glyph={IconSparklesFilled} size="lg" />
+            </Tab>
+
             <Tab
               id="about"
               withDecoration={false}
@@ -73,6 +87,10 @@ const SettingsDialog = (props: SettingsDialogProps) => {
       >
         <TabPanel tabId="preferences">
           <SettingsDialogPreferencesContent />
+        </TabPanel>
+
+        <TabPanel tabId="ai">
+          <SettingsDialogAiContent />
         </TabPanel>
 
         <TabPanel tabId="about">

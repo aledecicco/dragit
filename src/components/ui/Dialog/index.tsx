@@ -74,7 +74,7 @@ const Dialog = (props: DialogProps) => {
       backdrop={<div className={cn('bg-black/50')} />}
       {...propsWithCn(
         dialogProps,
-        'z-7 group',
+        'z-7 group/dialog',
         'fixed top-half left-half -translate-half',
         'max-w-[70%] max-h-[70%] rounded-lg overflow-hidden',
         'border-2 border-dark-900 bg-dark-900',
@@ -111,7 +111,7 @@ const Dialog = (props: DialogProps) => {
       <Ariakit.Focusable
         ref={handleRef}
         className={cn(
-          'absolute w-full h-2.5 cursor-pointer group-hover:bg-dark-900/20',
+          'absolute w-full h-2.5 cursor-pointer group-hover/dialog:bg-dark-900/20',
           'hover:bg-dark-900/30 focus:bg-dark-900/30',
         )}
       />

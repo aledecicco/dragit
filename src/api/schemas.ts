@@ -1,5 +1,7 @@
 import { BorshSchema } from 'borsher'
 
+export const GENERATED_COMMIT_MESSAGE_SCHEMA = BorshSchema.String
+
 export const PAGE_SCHEMA = <T>(ITEM_SCHEMA: BorshSchema<T>) =>
   BorshSchema.Struct({
     items: BorshSchema.Vec(ITEM_SCHEMA),

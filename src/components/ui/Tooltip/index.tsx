@@ -49,6 +49,7 @@ const Tooltip = (props: TooltipProps) => {
         gutter={8}
         {...propsWithCn(
           tooltipProps,
+          'z-8',
           'shadow-md bg-dark-400',
           'p-2 rounded-sm text-xs text-light-300',
         )}

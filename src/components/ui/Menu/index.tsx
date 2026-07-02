@@ -17,6 +17,7 @@ const Menu = (props: MenuProps) => {
   return (
     <Ariakit.Menu
       gutter={4}
+      modal
       {...propsWithCn(
         menuProps,
         'z-8',

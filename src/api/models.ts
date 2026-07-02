@@ -30,6 +30,10 @@ export interface Settings {
   showLargeDiffs: boolean
   showWordDiffs: boolean
 
+  aiBaseUrl: string
+  aiModel: string
+  aiSystemPrompt: string
+
   commandPaletteShortcut: string
   stageFilesShortcut: string
   unstageFilesShortcut: string

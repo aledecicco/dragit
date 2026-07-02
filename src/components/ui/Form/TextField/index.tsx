@@ -1,5 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 
+import { chooseArticle } from '@/utils/string'
 import { propsWithCn } from '@/utils/styles'
 
 import { FormField, type FormFieldProps } from '../Field'
@@ -17,7 +18,7 @@ const TextField = (props: TextFieldProps) => {
   return (
     <FormField
       render={<textarea rows={5} />}
-      placeholder={`Write a ${fieldProps.label}`}
+      placeholder={`Write ${chooseArticle(fieldProps.label)} ${fieldProps.label}`}
       {...propsWithCn(
         fieldProps,
         'p-3 bg-dark-800 rounded-sm text-sm text-light-800 resize-none',

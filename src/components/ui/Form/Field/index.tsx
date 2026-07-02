@@ -30,7 +30,13 @@ interface FormFieldProps extends Ariakit.FormInputProps {
  * when it appears or disappears.
  */
 const FormField = (props: FormFieldProps) => {
-  const { label, compact = false, containerProps, ...inputProps } = props
+  const {
+    label,
+    compact = false,
+    containerProps,
+    children,
+    ...inputProps
+  } = props
 
   const form = Ariakit.useFormContext()
   const store = inputProps.store ?? form
@@ -62,6 +68,8 @@ const FormField = (props: FormFieldProps) => {
           })
         }}
       />
+
+      {children}
 
       <Ariakit.FormError
         name={inputProps.name}

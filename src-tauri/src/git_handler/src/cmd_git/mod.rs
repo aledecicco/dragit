@@ -603,6 +603,14 @@ impl GitHandler for CmdGit {
         self.spawn_and_await(repo_path, args)
     }
 
+    fn get_staged_diff(
+        &self,
+        channel: &Channel<AppMessage>,
+        repo_path: &str,
+    ) -> Result<String, GitError> {
+        self.spawn_and_get_output(channel, repo_path, ["diff", "--staged"])
+    }
+
     fn reset_head(&self, repo_path: &str, reference: &str) -> Result<(), GitError> {
         let parent = format!("{}^{}", reference, 1);
         self.spawn_and_await(repo_path, ["reset", "--soft", &parent])

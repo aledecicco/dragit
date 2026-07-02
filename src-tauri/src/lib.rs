@@ -119,6 +119,9 @@ pub fn run() {
             api::merge,
             api::revert_commit,
             api::cherry_pick,
+            api::generate_commit_message,
+            api::set_ai_api_key,
+            api::has_ai_api_key,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running application");
