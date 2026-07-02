@@ -86,9 +86,10 @@ const MultiSelectInner = (props: MultiSelectProps) => {
           return
         }
 
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape' && lastSelected !== undefined) {
           setSelection([])
           e.preventDefault()
+          e.stopPropagation()
           return
         }
 
@@ -109,6 +110,7 @@ const MultiSelectInner = (props: MultiSelectProps) => {
         }
       }}
       role="listbox"
+      data-has-selection={lastSelected !== undefined}
       aria-multiselectable
       {...compositeProps}
       render={children}

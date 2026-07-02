@@ -72,6 +72,9 @@ const Dialog = (props: DialogProps) => {
       open
       portal={false}
       backdrop={<div className={cn('bg-black/50')} />}
+      getPersistentElements={() =>
+        document.querySelectorAll('[data-toasts-root]')
+      }
       {...propsWithCn(
         dialogProps,
         'z-7 group/dialog',
