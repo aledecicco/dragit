@@ -41,7 +41,7 @@ const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
-        activationAction={() => {
+        onActivate={() => {
           changeSelectedFile(file)
         }}
         onDelete={discard}

@@ -42,7 +42,7 @@ const StashesListItem = (props: StashesListItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
-        activationAction={() => {
+        onActivate={() => {
           showStashSnapshotDetailsDialog(stash)
         }}
         render={<MultiSelectItem {...itemProps} />}

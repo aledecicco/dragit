@@ -49,7 +49,7 @@ const SnapshotDetailsDialogFileItem = (
       render={
         <InteractiveItem
           interactions={against ? [] : interactions}
-          activationAction={() => {
+          onActivate={() => {
             if (radio?.getState().value === file.path) {
               radio.setValue(null)
             } else {

@@ -170,8 +170,6 @@
   "168": "Vite Build Config",
   "169": "discardStashes.ts",
   "170": "abortRebase.ts",
-  "171": "continueRebase.ts",
-  "172": "continueRevert.ts",
   "173": "abortRebase.ts",
   "174": "generateMessage.ts"
 }

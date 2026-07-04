@@ -17,7 +17,7 @@ interface InteractiveItemProps extends Ariakit.RoleProps {
   /**
    * The action to trigger by default when this item is activated.
    */
-  activationAction?: () => void
+  onActivate?: () => void
 
   /**
    * The interaction to trigger when this item is deleted.
@@ -29,8 +29,7 @@ interface InteractiveItemProps extends Ariakit.RoleProps {
  * An abstract component that's equipped to handle action tracking through different interactions.
  */
 const InteractiveItem = (props: InteractiveItemProps) => {
-  const { interactions, activationAction, onDelete, children, ...itemProps } =
-    props
+  const { interactions, onActivate, onDelete, children, ...itemProps } = props
 
   const actions = interactions.flatMap((section) =>
     section.flatMap((interaction) =>
@@ -49,13 +48,13 @@ const InteractiveItem = (props: InteractiveItemProps) => {
         {...propsWithCn(itemProps, 'relative')}
         onDoubleClick={(e) => {
           itemProps.onDoubleClick?.(e)
-          activationAction?.()
+          onActivate?.()
         }}
         onKeyDown={(e) => {
           itemProps.onKeyDown?.(e)
 
           if (e.key === 'Enter') {
-            activationAction?.()
+            onActivate?.()
           }
 
           if (e.key === 'Delete' && onDelete) {

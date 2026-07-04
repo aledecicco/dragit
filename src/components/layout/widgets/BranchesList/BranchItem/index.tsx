@@ -56,7 +56,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
-        activationAction={() => {
+        onActivate={() => {
           if (branch.type === 'remote') {
             triggerInteraction(branchOff)
           } else if (!isCurrentBranch) {

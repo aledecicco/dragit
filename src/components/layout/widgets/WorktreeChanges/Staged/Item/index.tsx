@@ -41,7 +41,7 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
-        activationAction={() => {
+        onActivate={() => {
           changeSelectedFile(file)
         }}
         onDelete={unstage}
