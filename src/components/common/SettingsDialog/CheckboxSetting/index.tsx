@@ -33,7 +33,9 @@ const CheckboxSetting = (props: CheckboxSettingProps) => {
             checkboxProps.onChange?.(e)
 
             if (setting) {
-              triggerInteraction(setSettingInteraction(setting, e.target.checked))
+              triggerInteraction(
+                setSettingInteraction(setting, e.target.checked),
+              )
             }
           }}
         />
