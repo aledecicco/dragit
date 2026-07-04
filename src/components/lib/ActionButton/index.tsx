@@ -15,16 +15,20 @@ import { SplitButton } from '@/ui/SplitButton'
 import { cn } from '@/utils/styles'
 import type { Size } from '@/utils/types'
 
-import { DecoratedButton, type DecoratedButtonProps } from '../DecoratedButton'
+import {
+  type CommonDecoratedButtonProps,
+  DecoratedButton,
+  type DecoratedButtonProps,
+} from '../DecoratedButton'
 import { ShortcutIndicator } from '../Shortcuts/Indicator'
 import { useShortcutBinding } from '../Shortcuts/utils'
 import { useActionButtonAction } from './utils'
 
-type BaseActionButtonProps = Partial<DecoratedButtonProps> & {
+type BaseActionButtonProps = Partial<CommonDecoratedButtonProps> & {
   /**
    * Additional props used for the dropdown menu if alternatives are provided.
    */
-  menuButtonProps?: Partial<DecoratedButtonProps>
+  menuButtonProps?: Partial<CommonDecoratedButtonProps>
 
   /**
    * A list of alternative actions that can be selected from a dropdown menu.

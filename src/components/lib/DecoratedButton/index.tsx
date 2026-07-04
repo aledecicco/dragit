@@ -107,4 +107,8 @@ const BaseDecoratedButton = (props: BaseDecoratedButtonProps) => {
   return compact ? <Tooltip description={label} anchor={button} /> : button
 }
 
-export { DecoratedButton, type DecoratedButtonProps }
+export {
+  DecoratedButton,
+  type DecoratedButtonProps,
+  type CommonDecoratedButtonProps,
+}

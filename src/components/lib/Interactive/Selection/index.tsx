@@ -19,11 +19,11 @@ import {
   type ContextMenuEvent,
   WithContextMenu,
 } from '@/lib/WithContextMenu'
-import type { AnyInteraction } from '@/state/actions'
 import { useUniqueId } from '@/state/ids'
 import { cn } from '@/utils/styles'
 
 import { InteractiveMenuItems } from '../MenuItems'
+import type { InteractionEntry } from '../types'
 import { classifyItemEvent } from './utils'
 
 interface InteractiveSelectionProps<T>
@@ -36,7 +36,7 @@ interface InteractiveSelectionProps<T>
   /**
    * Callback that returns the list of ways to interact with the selected items.
    */
-  getInteractions: (items: T[]) => AnyInteraction[][]
+  getInteractions: (items: T[]) => InteractionEntry[][]
 
   /**
    * Callback that returns the payload to be used when dragging the selected items.

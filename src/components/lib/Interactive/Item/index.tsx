@@ -1,17 +1,17 @@
 import * as Ariakit from '@ariakit/react'
 
 import { ActionIndicator } from '@/common/ActionIndicator'
-import type { AnyInteraction } from '@/lib/ActionButton'
 import { WithContextMenu } from '@/lib/WithContextMenu'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { InteractiveMenuItems } from '../MenuItems'
+import type { InteractionEntry } from '../types'
 
 interface InteractiveItemProps extends Ariakit.RoleProps {
   /**
    * The list of ways to interact with this item.
    */
-  interactions: AnyInteraction[][]
+  interactions: InteractionEntry[][]
 
   /**
    * The action to trigger by default when this item is activated.
@@ -37,7 +37,9 @@ const InteractiveItem = (props: InteractiveItemProps) => {
   } = props
 
   const actions = interactions.flatMap((section) =>
-    section.map((interaction) => interaction.action),
+    section.flatMap((interaction) =>
+      'action' in interaction ? [interaction.action] : [],
+    ),
   )
 
   return (

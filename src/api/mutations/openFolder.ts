@@ -4,6 +4,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import { LogoGlyph } from '@/common/Logo'
 import type { Action } from '@/state/actions'
+import type { Glyph } from '@/ui/Icon'
 
 import { useQueryCurrentDir } from '../queries/currentDir'
 
@@ -56,7 +57,7 @@ const useChangeCurrentFolder = (): Action<string> => {
       success: 'New folder opened',
       error: 'Failed to open folder',
     },
-    Glyph: LogoGlyph,
+    Glyph: LogoGlyph as Glyph,
   }
 }
 

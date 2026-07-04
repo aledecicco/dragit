@@ -1,10 +1,10 @@
-import type { SVGProps } from 'react'
+import type { ComponentProps, SVGProps } from 'react'
 
 import logo from '@/assets/logo.svg'
 
 import type { Glyph } from '@/ui/Icon'
 
-const LogoGlyph: Glyph = (props) => {
+const LogoGlyph = (props: ComponentProps<Glyph>) => {
   return (
     <svg
       overflow="visible"

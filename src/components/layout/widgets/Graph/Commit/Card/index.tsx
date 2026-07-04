@@ -10,9 +10,10 @@ import {
 import { group } from '@/lib/ActionButton/utils'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { InteractiveItem } from '@/lib/Interactive/Item'
+import type { InteractionEntry } from '@/lib/Interactive/types'
 import { ShortcutIndicator } from '@/lib/Shortcuts/Indicator'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
-import { type AnyInteraction, triggerInteraction } from '@/state/actions'
+import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/storage'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
@@ -55,7 +56,7 @@ const GraphCommitCard = (props: GraphCommitCardProps) => {
 
 interface GraphCommitCardInnerProps
   extends Omit<GraphCommitCardProps, 'isCurrent'> {
-  interactions: AnyInteraction[][]
+  interactions: InteractionEntry[][]
 }
 
 const CurrentGraphCommitCardInner = (props: GraphCommitCardInnerProps) => {

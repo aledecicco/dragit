@@ -1,9 +1,9 @@
 import { Draggable, type DraggableProps } from '@/lib/DragAndDrop/Draggable'
 import type { DragPayload, DragType } from '@/lib/DragAndDrop/utils'
 import { WithContextMenu } from '@/lib/WithContextMenu'
-import type { AnyInteraction } from '@/state/actions'
 
 import { InteractiveMenuItems } from '../MenuItems'
+import type { InteractionEntry } from '../types'
 
 interface InteractiveBatchProps
   extends Omit<DraggableProps<DragType>, 'dragPayload'> {
@@ -15,7 +15,7 @@ interface InteractiveBatchProps
   /**
    * Callback that returns the list of ways to interact with the items.
    */
-  getInteractions: () => AnyInteraction[][]
+  getInteractions: () => InteractionEntry[][]
 
   /**
    * Callback that returns the payload to be used when dragging.

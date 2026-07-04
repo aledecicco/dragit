@@ -46,7 +46,6 @@ import {
 import { requestWorktreeFiles } from '@/common/FileSelectorDialog'
 import { requestStashParams } from '@/common/StashDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
-import type { AnyInteraction } from '@/state/actions'
 import { getSettings } from '@/state/storage'
 import { pluralize } from '@/utils/string'
 
@@ -251,6 +250,7 @@ export const useStageFilesInteraction = () => {
 
 export const useStageAllInteraction = () => {
   const stageAll = useStageAll()
+
   return interaction({ action: stageAll, details: 'stage all changes' })
 }
 
@@ -343,7 +343,7 @@ export const useGetNotStagedFilesInteractions = () => {
   const ignoreNewFiles = useIgnoreManyNewFilesInteraction()
   const discard = useDiscardFilesInteraction()
 
-  return (files: NotStagedFile[]): AnyInteraction[][] => {
+  return (files: NotStagedFile[]) => {
     const allBothAddedOrModified = files.every(
       (file) =>
         file.status === 'unmerged' &&
@@ -395,10 +395,7 @@ export const useGetStagedFilesInteractions = () => {
   const unstage = useUnstageFilesInteraction()
   const discard = useDiscardFilesInteraction()
 
-  return (files: StagedFile[]): AnyInteraction[][] => [
-    group(unstage(files)),
-    group(discard(files)),
-  ]
+  return (files: StagedFile[]) => [group(unstage(files)), group(discard(files))]
 }
 
 export const useRestoreFileStatesInteraction = (snapshot: RefName) => {
@@ -415,9 +412,7 @@ export const useRestoreFileStatesInteraction = (snapshot: RefName) => {
 export const useGetVersionedFilesInteractions = (snapshot: RefName) => {
   const restore = useRestoreFileStatesInteraction(snapshot)
 
-  return (files: VersionedFileInfo[]): AnyInteraction[][] => [
-    group(restore(files)),
-  ]
+  return (files: VersionedFileInfo[]) => [group(restore(files))]
 }
 
 export const useSelectAndStageFilesInteraction = () => {

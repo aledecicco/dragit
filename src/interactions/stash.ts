@@ -7,7 +7,6 @@ import {
 import { useStashAll, useStashFiles } from '@/api/mutations/saveStash'
 import { requestStashParams } from '@/common/StashDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
-import type { AnyInteraction } from '@/state/actions'
 import { getSettings } from '@/state/storage'
 import { pluralize } from '@/utils/string'
 
@@ -94,7 +93,5 @@ export const useDiscardStashesInteraction = () => {
 export const useGetStashesListInteractions = () => {
   const discardStashes = useDiscardStashesInteraction()
 
-  return (stashes: StashInfo[]): AnyInteraction[][] => [
-    [discardStashes(stashes)],
-  ]
+  return (stashes: StashInfo[]) => [group(discardStashes(stashes))]
 }

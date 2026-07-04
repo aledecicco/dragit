@@ -2,7 +2,7 @@ import { useSelectStore } from '@ariakit/react'
 import { IconGitBranch } from '@tabler/icons-react'
 
 import { useSwitchBranchesInteraction } from '@/interactions/checkout'
-import { useCompareTwoInteraction } from '@/interactions/view'
+import { compareTwoInteraction } from '@/interactions/view'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
 import { ShortcutIndicator } from '@/lib/Shortcuts/Indicator'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
@@ -26,7 +26,6 @@ const BranchSelectors = () => {
   const baseBranch = useBranch(baseReference)
 
   const switchBranches = useSwitchBranchesInteraction()
-  const compareTwo = useCompareTwoInteraction()
 
   const settings = useSettings()
 
@@ -94,7 +93,7 @@ const BranchSelectors = () => {
 
         {currentReference && baseReference && (
           <ToolbarItem
-            {...compareTwo(currentReference, baseReference)}
+            {...compareTwoInteraction(currentReference, baseReference)}
             className={cn('pl-2 pr-3')}
             variant="filled"
             status="neutral"

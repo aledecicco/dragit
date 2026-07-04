@@ -23,12 +23,11 @@ import {
 } from '@/api/mutations/pushBranch'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
-import type { AnyInteraction } from '@/state/actions'
 import { useCurrentBranch } from '@/utils/repository'
 import { pluralize } from '@/utils/string'
 
 import { useTagSomeBranchInteraction } from './tag'
-import { useCompareBranchInteraction } from './view'
+import { compareBranchInteraction } from './view'
 
 export const useCheckoutBranchInteraction = (branch: BranchInfo) => {
   const checkout = useMakeCheckoutBranch()(branch)
@@ -63,6 +62,7 @@ export const useRebaseSomeBranchInteraction = () => {
 
 export const useRebaseBranchInteraction = (branch: BranchInfo) => {
   const rebaseSome = useRebaseSomeBranchInteraction()
+
   return rebaseSome(branch)
 }
 
@@ -75,6 +75,7 @@ export const usePushSomeBranchInteraction = () => {
 
 export const usePushBranchInteraction = (branch: BranchInfo) => {
   const pushSome = usePushSomeBranchInteraction()
+
   return pushSome(branch)
 }
 
@@ -144,6 +145,7 @@ export const useMergeSomeBranchInteraction = () => {
 
 export const useMergeBranchInteraction = (branch: BranchInfo) => {
   const mergeSome = useMergeSomeBranchInteraction()
+
   return mergeSome(branch)
 }
 
@@ -183,7 +185,7 @@ export const useSingleBranchInteractions = (branch: BranchInfo) => {
   const merge = useMergeBranchInteraction(branch)
   const track = useTrackBranchInteraction(branch)
   const deleteInteraction = useDeleteBranchInteraction(branch)
-  const compare = useCompareBranchInteraction(branch)
+  const compare = compareBranchInteraction(branch)
 
   const forLocal1 = group(
     !isCurrentBranch && checkout,
@@ -235,7 +237,5 @@ export const useCreateBranchAtSomeCommitInteraction = () => {
 export const useGetBranchesListInteractions = () => {
   const deleteBranches = useDeleteBranchesInteraction()
 
-  return (branches: BranchInfo[]): AnyInteraction[][] => [
-    group(deleteBranches(branches)),
-  ]
+  return (branches: BranchInfo[]) => [group(deleteBranches(branches))]
 }

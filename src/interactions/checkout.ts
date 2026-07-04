@@ -12,11 +12,13 @@ import { useActionPresenters } from '@/state/actions'
 
 export const useCheckoutPresenter = () => {
   const checkout = useDummyCheckout()
+
   return useActionPresenters(checkout)
 }
 
 export const useSwitchBranchesInteraction = () => {
   const switchBranches = useSwitchBranches()
+
   return interaction({ action: switchBranches, details: 'switch branches' })
 }
 
@@ -33,6 +35,7 @@ export const useCheckoutSomeCommitInteraction = () => {
 
 export const useCheckoutSomeBranchInteraction = () => {
   const makeCheckout = useMakeCheckoutBranch()
+
   return (branch: BranchInfo) =>
     interaction({
       action: makeCheckout(branch),
@@ -42,6 +45,7 @@ export const useCheckoutSomeBranchInteraction = () => {
 
 export const useCreateAndCheckoutBranchInteraction = () => {
   const checkout = useCheckoutNew()
+
   return (name: string) =>
     interaction({
       action: checkout,
@@ -52,6 +56,7 @@ export const useCreateAndCheckoutBranchInteraction = () => {
 
 export const useCheckoutSomeTagInteraction = () => {
   const makeCheckout = useMakeCheckoutTag()
+
   return (tag: TagInfo) =>
     interaction({
       action: makeCheckout(tag),

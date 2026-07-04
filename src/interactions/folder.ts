@@ -14,6 +14,7 @@ const chooseFolderArgsRequester = async () => {
 
 export const useOpenFolderInteraction = () => {
   const openFolder = useOpenFolder()
+
   return interaction({
     action: openFolder,
     argsRequester: chooseFolderArgsRequester,
@@ -23,6 +24,7 @@ export const useOpenFolderInteraction = () => {
 
 export const useChangeFolderInteraction = () => {
   const changeFolder = useChangeCurrentFolder()
+
   return interaction({
     action: changeFolder,
     argsRequester: chooseFolderArgsRequester,

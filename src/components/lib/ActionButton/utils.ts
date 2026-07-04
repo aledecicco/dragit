@@ -1,3 +1,4 @@
+import type { InteractionEntry } from '@/lib/Interactive/types'
 import { type AnyAction, useActiveAction } from '@/state/actions'
 
 import type { AnyInteraction, Interaction } from '.'
@@ -33,8 +34,8 @@ const interaction = <T>(interaction: Interaction<T>): AnyInteraction => {
  * @param interactions - The interactions to group.
  */
 const group = (
-  ...interactions: (AnyInteraction | AnyInteraction[] | undefined | false)[]
-): AnyInteraction[] => {
+  ...interactions: (InteractionEntry | InteractionEntry[] | undefined | false)[]
+): InteractionEntry[] => {
   return interactions.flatMap((interaction) => {
     if (Array.isArray(interaction)) {
       return interaction

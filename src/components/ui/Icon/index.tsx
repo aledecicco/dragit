@@ -34,8 +34,8 @@ interface IconProps extends ComponentProps<Glyph> {
 const Icon = (props: IconProps) => {
   const { Glyph, size = 'md', containerProps, ...iconProps } = props
 
-  const leavingRef = useRef<Glyph>(null)
-  const currentRef = useRef<Glyph>(null)
+  const leavingRef = useRef<SVGSVGElement>(null)
+  const currentRef = useRef<SVGSVGElement>(null)
 
   const PrevGlyph = usePreviousDistinct(Glyph)
   const [LeavingGlyph, setLeavingGlyph] = useState<Glyph>()

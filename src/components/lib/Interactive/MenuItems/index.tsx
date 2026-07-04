@@ -1,16 +1,17 @@
 import { Fragment } from 'react'
 
 import type { DecoratedButtonProps } from '@/lib/DecoratedButton'
-import type { AnyInteraction } from '@/state/actions'
 import { MenuItem } from '@/ui/Menu/Item'
 import { Separator } from '@/ui/Separator'
 import { cn } from '@/utils/styles'
+
+import type { InteractionEntry } from '../types'
 
 interface InteractiveMenuItemsProps {
   /**
    * The list of ways to interact with the selected items.
    */
-  interactions: AnyInteraction[][]
+  interactions: InteractionEntry[][]
 
   /**
    * Props to be passed to all rendered items.

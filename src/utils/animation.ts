@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import { type AnimationParams, animate, easings } from 'animejs'
 
 import type { ActionStatus } from '@/state/actions'
-import type { Glyph } from '@/ui/Icon'
 
 export const FADE_OUT_ANIMATION: AnimationParams = {
   opacity: [1, 0],
@@ -31,7 +30,7 @@ export const SPINNER_ANIMATION: AnimationParams = {
  * Animates the component that is attached to the returned ref.
  */
 export const useAnimateSpinner = (status: ActionStatus) => {
-  const iconRef = useRef<Glyph>(null)
+  const iconRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
     if (iconRef.current && status === 'running') {
