@@ -169,7 +169,5 @@
   "167": "Vite Env Types",
   "168": "Vite Build Config",
   "169": "discardStashes.ts",
-  "170": "abortRebase.ts",
-  "171": "index.tsx",
-  "172": "removeRecentFolder.ts"
+  "170": "abortRebase.ts"
 }

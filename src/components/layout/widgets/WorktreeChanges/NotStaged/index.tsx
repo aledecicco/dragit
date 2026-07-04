@@ -23,6 +23,7 @@ import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
+import { useSelectedFile } from '@/state/file'
 import {
   setNextPage,
   setPrevPage,
@@ -71,6 +72,8 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
   })
 
   const { count, hasMore } = useNotStagedCount()
+
+  const currentFile = useSelectedFile()
 
   return (
     <InteractiveBatch
@@ -153,7 +156,14 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
               query={filesQuery}
               getItems={(d) => d.items}
               renderItem={(file, position) => (
-                <NotStagedChangesItem file={file} itemIndex={position} />
+                <NotStagedChangesItem
+                  file={file}
+                  itemIndex={position}
+                  aria-current={
+                    file.path === currentFile?.path &&
+                    file.status === currentFile.status
+                  }
+                />
               )}
               size="sm"
               itemSize={50}

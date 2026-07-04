@@ -1035,8 +1035,8 @@
     "semantic_hash": ""
   },
   "src/components/layout/widgets/WorktreeChanges/NotStaged/index.tsx": {
-    "mtime": 1783206257.6058633,
-    "ast_hash": "5bc7e4796052217d506b8380412b1960",
+    "mtime": 1783207633.8365788,
+    "ast_hash": "20a17e09106cd536c99774475cbaf76d",
     "semantic_hash": ""
   },
   "src/components/layout/widgets/WorktreeChanges/Staged/Item/index.tsx": {
@@ -1045,8 +1045,8 @@
     "semantic_hash": ""
   },
   "src/components/layout/widgets/WorktreeChanges/Staged/index.tsx": {
-    "mtime": 1783206258.6325724,
-    "ast_hash": "7d0e8ff119d0f482e9127a7697a33873",
+    "mtime": 1783207704.018174,
+    "ast_hash": "d4473d35ab3ad1f5416bea5b5f791eee",
     "semantic_hash": ""
   },
   "src/components/lib/ActionButton/index.tsx": {
@@ -1430,13 +1430,13 @@
     "semantic_hash": ""
   },
   "src/interactions/commit.ts": {
-    "mtime": 1783203887.056362,
-    "ast_hash": "e62d640703cb437693888bef6cf55983",
+    "mtime": 1783207076.4073398,
+    "ast_hash": "d3e980d1e41f3bf0d575c22d05a04104",
     "semantic_hash": ""
   },
   "src/interactions/file.ts": {
-    "mtime": 1783204182.2123172,
-    "ast_hash": "f574d53789995a20ab295bf8b5e1a565",
+    "mtime": 1783207258.5271285,
+    "ast_hash": "fb751f2b48b23d5989a7d8b9bc6c03d2",
     "semantic_hash": ""
   },
   "src/interactions/flows.ts": {
@@ -1465,8 +1465,8 @@
     "semantic_hash": ""
   },
   "src/interactions/stash.ts": {
-    "mtime": 1783204059.8087988,
-    "ast_hash": "a44e7846c11a88ad98a11db0e1b25322",
+    "mtime": 1783207107.941831,
+    "ast_hash": "05ebff69cfc7e6abfd70cd84720f8ef5",
     "semantic_hash": ""
   },
   "src/interactions/storage.ts": {
@@ -1485,8 +1485,8 @@
     "semantic_hash": ""
   },
   "src/interactions/view.ts": {
-    "mtime": 1783193315.354114,
-    "ast_hash": "e13bb84876a2499b303af0444ac70949",
+    "mtime": 1783207288.2052598,
+    "ast_hash": "183588d50714d83a683eecd901adb67f",
     "semantic_hash": ""
   },
   "src/main.tsx": {
@@ -1510,9 +1510,9 @@
     "semantic_hash": "6895ca54da0d7c891dee3ed744ff9bd3"
   },
   "src/state/file.ts": {
-    "mtime": 1781580518.0317268,
-    "ast_hash": "50bd6ad601c88ff16400688ee9b3cb97",
-    "semantic_hash": "50bd6ad601c88ff16400688ee9b3cb97"
+    "mtime": 1783207586.6949658,
+    "ast_hash": "03d3cdf4bb9d3f7480e7cc0666e55e49",
+    "semantic_hash": ""
   },
   "src/state/ids.ts": {
     "mtime": 1781580518.0317268,

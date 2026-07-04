@@ -50,6 +50,7 @@ import { getSettings } from '@/state/storage'
 import { pluralize } from '@/utils/string'
 
 import { useStashFilesInteraction } from './stash'
+import { viewFileInteraction } from './view'
 
 export const useStageFileInteraction = (file: WorktreeFileInfo) => {
   const stage = useStageFile(file)
@@ -162,6 +163,7 @@ export const useRestoreFileInteraction = (
 }
 
 export const useSingleNotStagedFileInteractions = (file: NotStagedFile) => {
+  const view = viewFileInteraction(file)
   const stage = useStageFileInteraction(file)
   const stash = useStashFileInteraction(file)
   const discard = useDiscardFileInteraction(file)
@@ -174,29 +176,31 @@ export const useSingleNotStagedFileInteractions = (file: NotStagedFile) => {
   const acceptNewFile = useAcceptNewFileInteraction(file)
   const ignoreNewFile = useIgnoreNewFileInteraction(file)
 
-  if (file.status === 'unmerged') {
-    return match(file.changes)
-      .with(P.union('bothAdded', 'bothModified'), () => [
-        group(acceptAsIs, acceptOurs, acceptTheirs),
-      ])
-      .with(P.union('addedByUs', 'addedByThem'), () => [
-        group(acceptNewFile, ignoreNewFile),
-      ])
-      .with('bothDeleted', () => [group(acceptDeletion)])
-      .with(P.union('deletedByUs', 'deletedByThem'), () => [
-        group(acceptDeletion, ignoreDeletion),
-      ])
-      .exhaustive()
-  }
+  const interactions =
+    file.status === 'unmerged'
+      ? match(file.changes)
+          .with(P.union('bothAdded', 'bothModified'), () => [
+            group(acceptAsIs, acceptOurs, acceptTheirs),
+          ])
+          .with(P.union('addedByUs', 'addedByThem'), () => [
+            group(acceptNewFile, ignoreNewFile),
+          ])
+          .with('bothDeleted', () => [group(acceptDeletion)])
+          .with(P.union('deletedByUs', 'deletedByThem'), () => [
+            group(acceptDeletion, ignoreDeletion),
+          ])
+          .exhaustive()
+      : [group(stage, stash), group(discard)]
 
-  return [group(stage, stash), group(discard)]
+  return [group(view), ...interactions]
 }
 
 export const useSingleStagedFileInteractions = (file: StagedFile) => {
+  const view = viewFileInteraction(file)
   const unstage = useUnstageFileInteraction(file)
   const discard = useDiscardFileInteraction(file)
 
-  return [group(unstage), group(discard)]
+  return [group(view), group(unstage), group(discard)]
 }
 
 export const useSingleVersionedFileInteractions = (

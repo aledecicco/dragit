@@ -10,6 +10,8 @@ import { group, interaction } from '@/lib/ActionButton/utils'
 import { getSettings } from '@/state/storage'
 import { pluralize } from '@/utils/string'
 
+import { viewStashInteraction } from './view'
+
 export const useDiscardStashInteraction = (stash: StashInfo) => {
   const discard = useMakeDiscardStash()(stash)
 
@@ -37,10 +39,11 @@ export const useApplyStashInteraction = (stash: StashInfo) => {
 }
 
 export const useSingleStashInteractions = (stash: StashInfo) => {
+  const view = viewStashInteraction(stash)
   const apply = useApplyStashInteraction(stash)
   const discard = useDiscardStashInteraction(stash)
 
-  return [group(apply), group(discard)]
+  return [group(view), group(apply, discard)]
 }
 
 export const useStashFilesInteraction = () => {

@@ -74,7 +74,11 @@ const useFileDiffsSync = () => {
         )
 
         if (!stillExists) {
-          store.setSelected(undefined)
+          const nowUnstaged = notStagedFilesQuery.data?.items?.find(
+            (f) => f.path === file.path,
+          )
+
+          store.setSelected(nowUnstaged)
         }
       })
       .with({ status: P.union(...NOT_STAGED_FILE_TYPES) }, (file) => {
@@ -83,7 +87,11 @@ const useFileDiffsSync = () => {
         )
 
         if (!stillExists) {
-          store.setSelected(undefined)
+          const nowStaged = stagedFilesQuery.data?.items?.find(
+            (f) => f.path === file.path,
+          )
+
+          store.setSelected(nowStaged)
         }
       })
       .exhaustive()

@@ -23,6 +23,7 @@ import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
+import { useSelectedFile } from '@/state/file'
 import {
   setNextPage,
   setPrevPage,
@@ -68,22 +69,18 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
     ref.current?.focus()
   })
 
-  const stagedCount = useStagedCount()
+  const { count, hasMore } = useStagedCount()
+
+  const currentFile = useSelectedFile()
 
   return (
     <InteractiveBatch
       className={cn('border-none group/drag')}
-      count={
-        stagedCount.count
-          ? stagedCount.hasMore
-            ? `${stagedCount.count}+`
-            : `${stagedCount.count}`
-          : undefined
-      }
+      count={count ? (hasMore ? `${count}+` : `${count}`) : undefined}
       getInteractions={() => [[unstageAll]]}
       getDragPayload={() => ({
         type: 'index',
-        label: pluralize('staged file', stagedCount.count, true),
+        label: pluralize('staged file', count, true),
         Glyph: IconFileCheck,
         dragged: { fromDraft: false },
       })}
@@ -157,7 +154,14 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
               query={filesQuery}
               getItems={(d) => d.items}
               renderItem={(file, position) => (
-                <StagedChangesItem file={file} itemIndex={position} />
+                <StagedChangesItem
+                  file={file}
+                  itemIndex={position}
+                  aria-current={
+                    file.path === currentFile?.path &&
+                    file.status === currentFile.status
+                  }
+                />
               )}
               size="sm"
               itemSize={50}

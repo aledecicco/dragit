@@ -14,7 +14,7 @@ import { group, interaction } from '@/lib/ActionButton/utils'
 
 import { useCheckoutSomeCommitInteraction } from './checkout'
 import { useTagSomeCommitInteraction } from './tag'
-import { compareCommitInteraction } from './view'
+import { compareCommitInteraction, viewCommitInteraction } from './view'
 
 export const useCheckoutCommitInteraction = (commit: CommitInfo) => {
   const checkout = useCheckoutSomeCommitInteraction()
@@ -117,12 +117,13 @@ export const useSingleCommitInteractions = (commit: CommitInfo) => {
   const cherryPick = useCherryPickCommitInteraction(commit)
   const revert = useRevertCommitInteraction(commit)
   const rewind = useRewindCommitInteraction(commit)
+  const view = viewCommitInteraction(commit)
   const compare = compareCommitInteraction(commit)
 
   return [
+    group(view, compare),
     group(tag, createBranch),
     group(checkout, branchOff),
     group(merge, cherryPick, revert, rewind),
-    group(compare),
   ]
 }
