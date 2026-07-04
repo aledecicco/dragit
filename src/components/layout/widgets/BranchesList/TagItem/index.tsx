@@ -11,7 +11,6 @@ import {
   MultiSelectItem,
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
-import { triggerInteraction } from '@/state/actions'
 import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { cn } from '@/utils/styles'
@@ -45,9 +44,7 @@ const TagsListItem = (props: TagsListItemProps) => {
     >
       <InteractiveItem
         interactions={interactions}
-        deleteAction={() => {
-          triggerInteraction(deleteTag)
-        }}
+        onDelete={deleteTag}
         render={<MultiSelectItem {...itemProps} />}
       >
         <div className={cn('flex flex-col justify-between')}>

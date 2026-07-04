@@ -12,7 +12,6 @@ import {
   MultiSelectItem,
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
-import { triggerInteraction } from '@/state/actions'
 import { changeSelectedFile } from '@/state/file'
 
 interface StagedChangesItemProps extends MultiSelectItemProps {
@@ -45,9 +44,7 @@ const StagedChangesItem = (props: StagedChangesItemProps) => {
         activationAction={() => {
           changeSelectedFile(file)
         }}
-        deleteAction={() => {
-          triggerInteraction(unstage)
-        }}
+        onDelete={unstage}
         render={<MultiSelectItem {...itemProps} />}
       >
         <FileItem file={file} />

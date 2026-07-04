@@ -150,9 +150,7 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
             items={filesQuery.data?.items ?? []}
             getInteractions={getInteractions}
             getDragPayload={getDragPayload}
-            deleteAction={(files) => {
-              triggerInteraction(unstageFiles(files))
-            }}
+            onDelete={unstageFiles}
           >
             <QueryList
               name="files with staged changes"

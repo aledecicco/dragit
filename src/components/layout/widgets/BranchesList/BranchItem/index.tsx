@@ -63,11 +63,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
             triggerInteraction(checkout)
           }
         }}
-        deleteAction={() => {
-          if (!isCurrentBranch) {
-            triggerInteraction(deleteBranch)
-          }
-        }}
+        onDelete={isCurrentBranch ? undefined : deleteBranch}
         render={
           <MultiSelectItem aria-current={isCurrentBranch} {...itemProps} />
         }

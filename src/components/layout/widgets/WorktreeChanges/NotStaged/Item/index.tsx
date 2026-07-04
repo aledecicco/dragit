@@ -12,7 +12,6 @@ import {
   MultiSelectItem,
   type MultiSelectItemProps,
 } from '@/lib/MultiSelect/Item'
-import { triggerInteraction } from '@/state/actions'
 import { changeSelectedFile } from '@/state/file'
 
 interface NotStagedChangesItemProps extends MultiSelectItemProps {
@@ -45,9 +44,7 @@ const NotStagedChangesItem = (props: NotStagedChangesItemProps) => {
         activationAction={() => {
           changeSelectedFile(file)
         }}
-        deleteAction={() => {
-          triggerInteraction(discard)
-        }}
+        onDelete={discard}
         render={<MultiSelectItem {...itemProps} />}
       >
         <FileItem file={file} />

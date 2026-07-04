@@ -222,9 +222,7 @@ const BranchesList = (props: BranchesListProps) => {
             items={tagsItems ?? []}
             getInteractions={getTagsListInteractions}
             getDragPayload={getTagsDragPayload}
-            deleteAction={(tags) => {
-              triggerInteraction(deleteTags(tags))
-            }}
+            onDelete={deleteTags}
           >
             <QueryList
               name="tags"
@@ -246,9 +244,7 @@ const BranchesList = (props: BranchesListProps) => {
             items={currentBranchesItems ?? []}
             getInteractions={getBranchesListInteractions}
             getDragPayload={getBranchesDragPayload}
-            deleteAction={(branches) => {
-              triggerInteraction(deleteBranches(branches))
-            }}
+            onDelete={deleteBranches}
           >
             <QueryList
               name={match(tabsHandler.selectedTab)

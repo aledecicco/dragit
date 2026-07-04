@@ -2,6 +2,7 @@ import * as Ariakit from '@ariakit/react'
 
 import { ActionIndicator } from '@/common/ActionIndicator'
 import { WithContextMenu } from '@/lib/WithContextMenu'
+import { type AnyInteraction, triggerInteraction } from '@/state/actions'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { InteractiveMenuItems } from '../MenuItems'
@@ -19,22 +20,17 @@ interface InteractiveItemProps extends Ariakit.RoleProps {
   activationAction?: () => void
 
   /**
-   * The action to trigger when this item is deleted.
+   * The interaction to trigger when this item is deleted.
    */
-  deleteAction?: () => void
+  onDelete?: AnyInteraction
 }
 
 /**
  * An abstract component that's equipped to handle action tracking through different interactions.
  */
 const InteractiveItem = (props: InteractiveItemProps) => {
-  const {
-    interactions,
-    activationAction,
-    deleteAction,
-    children,
-    ...itemProps
-  } = props
+  const { interactions, activationAction, onDelete, children, ...itemProps } =
+    props
 
   const actions = interactions.flatMap((section) =>
     section.flatMap((interaction) =>
@@ -62,8 +58,8 @@ const InteractiveItem = (props: InteractiveItemProps) => {
             activationAction?.()
           }
 
-          if (e.key === 'Delete') {
-            deleteAction?.()
+          if (e.key === 'Delete' && onDelete) {
+            triggerInteraction(onDelete)
           }
         }}
       >

@@ -1,16 +1,16 @@
 # Graph Report - dragit  (2026-07-04)
 
 ## Corpus Check
-- 327 files · ~687,870 words
+- 328 files · ~687,868 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2361 nodes · 7202 edges · 173 communities (113 shown, 60 thin omitted)
+- 2363 nodes · 7194 edges · 175 communities (115 shown, 60 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 245 edges (avg confidence: 0.67)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1b73ddba`
+- Built from commit: `a6dd81b6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -178,6 +178,8 @@
 - [[_COMMUNITY_abortRebase.ts|abortRebase.ts]]
 - [[_COMMUNITY_continueRebase.ts|continueRebase.ts]]
 - [[_COMMUNITY_continueRevert.ts|continueRevert.ts]]
+- [[_COMMUNITY_abortRebase.ts|abortRebase.ts]]
+- [[_COMMUNITY_generateMessage.ts|generateMessage.ts]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `cn()` - 199 edges
@@ -188,14 +190,14 @@
 6. `with_handler()` - 67 edges
 7. `CmdGit` - 66 edges
 8. `AppState` - 65 edges
-9. `Action` - 48 edges
+9. `Action` - 47 edges
 10. `useSettings()` - 44 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Publish GitHub Actions Workflow` --references--> `Dragit App`  [INFERRED]
   .github/workflows/publish.yml → README.md
-- `ActionPresenter` --references--> `Glyph`  [EXTRACTED]
-  src/state/actions.ts → src/components/ui/Icon/index.tsx
+- `GraphCommitCardInnerProps` --references--> `InteractionEntry`  [EXTRACTED]
+  src/components/layout/widgets/Graph/Commit/Card/index.tsx → src/components/lib/Interactive/types.ts
 - `open_folder()` --calls--> `add_recent_folder()`  [INFERRED]
   src-tauri/src/api/src/commands.rs → src-tauri/src/storage/src/lib.rs
 - `open_folder()` --calls--> `set_last_opened()`  [INFERRED]
@@ -207,7 +209,6 @@
 - 3-file cycle: `src/components/layout/widgets/WorktreeChanges/Staged/Item/index.tsx -> src/state/file.ts -> src/components/layout/widgets/WorktreeChanges/Staged/index.tsx -> src/components/layout/widgets/WorktreeChanges/Staged/Item/index.tsx`
 - 3-file cycle: `src/components/layout/widgets/WorktreeChanges/NotStaged/Item/index.tsx -> src/state/file.ts -> src/components/layout/widgets/WorktreeChanges/NotStaged/index.tsx -> src/components/layout/widgets/WorktreeChanges/NotStaged/Item/index.tsx`
 - 3-file cycle: `src/api/client.tsx -> src/utils/time.ts -> src/state/storage.ts -> src/api/client.tsx`
-- 3-file cycle: `src/components/ui/Icon/index.tsx -> src/utils/animation.ts -> src/state/actions.ts -> src/components/ui/Icon/index.tsx`
 - 4-file cycle: `src/components/common/SettingsDialog/AboutContent/index.tsx -> src/utils/behavior.ts -> src/components/common/Toasts/NewUpdateAvailable/index.tsx -> src/components/common/SettingsDialog/index.tsx -> src/components/common/SettingsDialog/AboutContent/index.tsx`
 - 5-file cycle: `src/api/queries/appInfo.ts -> src/app.tsx -> src/components/layout/pages/InRepository/index.tsx -> src/components/common/SettingsDialog/index.tsx -> src/components/common/SettingsDialog/AboutContent/index.tsx -> src/api/queries/appInfo.ts`
 
@@ -216,7 +217,7 @@
 - **Git Processing Stack: Rust Backend + Git CLI + imara-diff** — readme_rustbackend, readme_gitcli, readme_imareadiff [INFERRED 0.85]
 - **Multi-platform Release Pipeline: CI Workflow + AUR Packaging + Auto-Updater** — github_workflows_publish_publishworkflow, readme_aurpackaging, readme_autoupdater [INFERRED 0.75]
 
-## Communities (173 total, 60 thin omitted)
+## Communities (175 total, 60 thin omitted)
 
 ### Community 0 - "Git Process Execution"
 Cohesion: 0.05
@@ -227,192 +228,192 @@ Cohesion: 0.09
 Nodes (102): Arc, Fn, Mutex, SafeWatcher, abort_cherry_pick(), abort_merge(), abort_rebase(), abort_revert() (+94 more)
 
 ### Community 2 - "React Query & UI Components"
-Cohesion: 0.11
-Nodes (41): CommitInfo, StashInfo, useQueryVersionedFiles(), askForConfirmation(), ConfirmationDialog(), ConfirmationDialogProps, ChangesSummary(), DiffFilterSelector() (+33 more)
+Cohesion: 0.09
+Nodes (37): CommitInfo, StashInfo, stashFilesQuery(), useQueryStashFiles(), useQueryVersionedFiles(), versionedFilesQuery(), ChangesSummary(), DiffFilterSelector() (+29 more)
 
 ### Community 3 - "File Watching & Error Handling"
-Cohesion: 0.15
-Nodes (36): AgentError, DebounceEventHandler, Entry, Path, PathBuf, Read, ChatResponse, Choice (+28 more)
+Cohesion: 0.09
+Nodes (47): AgentError, DebounceEventHandler, Debouncer, Entry, Path, PathBuf, Read, RecommendedCache (+39 more)
 
 ### Community 4 - "Diff & Conflict Models"
-Cohesion: 0.10
-Nodes (41): ConflictType, DiffLineSegment, DiffType, FileConflicts, FileDiff, MergeDiffStage, LineIndicator(), LineIndicatorProps (+33 more)
+Cohesion: 0.16
+Nodes (25): ConflictType, DiffLineSegment, DiffType, MergeDiffStage, getContentOurs(), getContentTheirs(), getIndicatorLine(), highlightConflicts() (+17 more)
 
 ### Community 5 - "Worktree File Management"
-Cohesion: 0.11
-Nodes (38): useQueryWorktreeFiles(), useNeedsPagination(), FileSelectorDialog(), getBranchesDragPayload(), getTagsDragPayload(), getDragPayload(), getDragPayload(), NotStagedWorktreeChanges() (+30 more)
+Cohesion: 0.10
+Nodes (44): useQueryWorktreeFiles(), useNeedsPagination(), FileSelectorDialog(), PAGINATION_SHORTCUTS, requestWorktreeFiles(), SHORTCUTS, SnapshotDetailsDialogFileList(), getBranchesDragPayload() (+36 more)
 
 ### Community 6 - "Biome Linter Config"
 Cohesion: 0.04
 Nodes (45): source, assist, actions, noSwitchDeclarations, noUnusedVariables, files, ignoreUnknown, includes (+37 more)
 
 ### Community 7 - "Commit Dialog UI"
-Cohesion: 0.06
-Nodes (56): SetAiApiKeyArgs, setAiApiKeyKey, setAiApiKeyMutation, useSetAiApiKey(), useQueryBranches(), hasAiApiKeyQuery, hasAiApiKeyQueryKey, AiGenerationButton() (+48 more)
+Cohesion: 0.18
+Nodes (13): CommitDialogProps, CreateBranchDialogProps, CreateTagDialogProps, RepositoryUrlDialog(), RepositoryUrlDialogProps, RepositoryUrlFormValues, requestRepositoryUrl(), requestStashParams() (+5 more)
 
 ### Community 8 - "Commit History"
-Cohesion: 0.15
-Nodes (23): AncestorInfo, HistoryItem, commitHistoryQuery(), commitHistoryQueryKeys, fetchCommitHistoryPage(), useQueryCommitHistory(), useQueryCommonAncestor(), HISTORY_PAGE_SCHEMA (+15 more)
+Cohesion: 0.11
+Nodes (28): AncestorInfo, HistoryItem, commitHistoryQuery(), commitHistoryQueryKeys, fetchCommitHistoryPage(), useQueryCommitHistory(), HISTORY_PAGE_SCHEMA, getPaginatedItem() (+20 more)
 
 ### Community 9 - "Branch Management"
-Cohesion: 0.08
-Nodes (45): BranchName, LocalBranch, Upstream, FastForwardBranchArgs, fastForwardBranchKey(), fastForwardBranchMutation(), useMakeFastForwardBranch(), pullBranchKey() (+37 more)
+Cohesion: 0.23
+Nodes (13): FastForwardBranchArgs, fastForwardBranchKey(), fastForwardBranchMutation(), useMakeFastForwardBranch(), pullBranchKey(), pullBranchMutation(), useMakePullBranch(), useMakeRebaseBranch() (+5 more)
 
 ### Community 10 - "File Icons & Versioned Files"
-Cohesion: 0.14
-Nodes (30): MainToolbar(), MainToolbarProps, NotStagedChangesItem(), interaction(), ToolbarProps, useAcceptAsIsInteraction(), useAcceptDeletionInteraction(), useAcceptManyAsIsInteraction() (+22 more)
+Cohesion: 0.13
+Nodes (30): NotStagedFile, InFolder(), NotStagedChangesItem(), NotStagedChangesItemProps, interaction(), useAcceptAsIsInteraction(), useAcceptDeletionInteraction(), useAcceptManyAsIsInteraction() (+22 more)
 
 ### Community 11 - "Git Operation Mutations"
-Cohesion: 0.16
-Nodes (20): DraftCommit(), DraftCommitInner, SecondaryToolbar(), SecondaryToolbarProps, Toolbar(), ActionToolbarItemProps, BaseToolbarItem(), BaseToolbarItemProps (+12 more)
+Cohesion: 0.38
+Nodes (11): SecondaryToolbar(), SecondaryToolbarProps, useAbortCherryPickInteraction(), useAbortMergeInteraction(), useAbortRebaseInteraction(), useAbortRevertInteraction(), useCommitInteraction(), useContinueCherryPickInteraction() (+3 more)
 
 ### Community 12 - "Remote & Confirmation Dialogs"
-Cohesion: 0.16
-Nodes (18): FileItem(), FilePath(), FilePathProps, PAGINATION_SHORTCUTS, SHORTCUTS, FileSelectorDialogItem(), FileSelectorDialogItemProps, Shortcut (+10 more)
+Cohesion: 0.10
+Nodes (28): ActionIndicatorProps, ActiveActionIndicator(), CommandPaletteItem(), FileSelectorDialogItem(), FileSelectorDialogItemProps, ProfilePictureVariant, StartupPageInner(), ScrollShadowDiv() (+20 more)
 
 ### Community 13 - "Settings Dialog & Layout"
-Cohesion: 0.10
-Nodes (35): FileViewerContent(), FileViewerContentProps, RemotesDialogItem(), SettingsDialog(), SettingsDialogProps, showSettingsDialog(), SettingsDialogPreferencesContent(), Accordion() (+27 more)
+Cohesion: 0.08
+Nodes (43): ProfilePictureProps, SettingsDialog(), SettingsDialogProps, showSettingsDialog(), SettingsDialogPreferencesContent(), CurrentRemote(), CurrentRemoteProps, ShortcutIndicatorProps (+35 more)
 
 ### Community 14 - "Rust Storage & Settings"
-Cohesion: 0.13
-Nodes (31): Default, Error, PartialStorage, Reference, Settings, run(), RepositoryStorage, Option (+23 more)
+Cohesion: 0.11
+Nodes (34): Default, Error, PartialStorage, Reference, Settings, run(), AppEvent, AppMessage (+26 more)
 
 ### Community 15 - "NPM Dependencies"
 Cohesion: 0.05
 Nodes (40): dependencies, animejs, @ariakit/react, borsher, @dnd-kit/abstract, @dnd-kit/collision, @dnd-kit/dom, @dnd-kit/react (+32 more)
 
 ### Community 16 - "Git Graph Renderer"
-Cohesion: 0.07
-Nodes (40): ProfilePictureData, profilePictureQuery(), profilePictureQueryKeys, useQueryProfilePicture(), Edges(), BEGIN_PATH(), buildPath(), DOWN_TO_PARENT() (+32 more)
+Cohesion: 0.09
+Nodes (34): Edges(), BEGIN_PATH(), buildPath(), DOWN_TO_PARENT(), END_PATH(), ENTER_PARENT(), HORIZONTAL_LINE(), LEAVE_ELEMENT() (+26 more)
 
 ### Community 17 - "Git Repository Models"
 Cohesion: 0.11
 Nodes (38): AncestorInfo, BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, CommonAncestorInfo, ConflictLine, ConflictMode (+30 more)
 
 ### Community 18 - "Diff Computation Engine"
-Cohesion: 0.05
-Nodes (49): Debouncer, Diff, Hunk, InternedInput, RecommendedCache, RecommendedWatcher, RepoWatcherError, CompositeStore (+41 more)
+Cohesion: 0.08
+Nodes (35): Diff, Hunk, InternedInput, CompositeStore, ItemEventClassification, compute_diff(), get_diff_sources(), DiffLine (+27 more)
 
 ### Community 19 - "Staging & Conflict Resolution"
-Cohesion: 0.11
-Nodes (33): ResolutionStrategy, AddToIndexArgs, addToIndexKey(), addToIndexMutation(), useMakeStageFile(), useStageAll(), useStageFile(), useStageFiles() (+25 more)
+Cohesion: 0.12
+Nodes (38): ResolutionStrategy, AddToIndexArgs, addToIndexKey(), addToIndexMutation(), useMakeStageFile(), useStageAll(), useStageFile(), useStageFiles() (+30 more)
 
 ### Community 20 - "Drag & Drop UI"
-Cohesion: 0.21
-Nodes (13): CommitSection(), ComboboxContext, ComboboxContextProvider(), ComboboxGroup, ComboboxStore, Setters, useComboboxContext(), useComboboxGroupHandler() (+5 more)
+Cohesion: 0.09
+Nodes (31): BranchName, RefName, RepositoryStorage, Settings, Upstream, CheckoutArgs, CreateBranchArgs, MergeArgs (+23 more)
 
 ### Community 21 - "Action Button Components"
-Cohesion: 0.14
-Nodes (24): RepositoryStorage, ShortcutSetting(), ShortcutSettingProps, ShortcutSettingRecorder(), ShortcutSettingRecorderProps, TextSettingProps, BooleanRepositoryStorageKey, BooleanSettingKey (+16 more)
+Cohesion: 0.16
+Nodes (21): ShortcutSetting(), ShortcutSettingProps, ShortcutSettingRecorder(), ShortcutSettingRecorderProps, StringSettingKey, Shortcut, ShortcutCheatsheetProps, ShortcutIndicator() (+13 more)
 
 ### Community 22 - "Tags & Branch Queries"
-Cohesion: 0.08
-Nodes (28): ActionIndicatorProps, ActionButtonProps, BaseDecoratedButtonProps, CommonDecoratedButtonProps, DecoratedButtonProps, TrackerDecoratedButtonProps, InteractiveMenuItemsProps, PaginationProps (+20 more)
+Cohesion: 0.21
+Nodes (10): ActionButtonProps, CONTEXT_MENU_HANDLER_KEY, ContextMenuEvent, WithContextMenu(), WithContextMenuProps, DropdownProps, Menu(), MenuProps (+2 more)
 
 ### Community 23 - "Stash File Status"
 Cohesion: 0.12
-Nodes (19): eventHandler(), AppEvent, CommonAncestorInfo, commonAncestorQuery(), commonAncestorQueryKeys, fetchCommonAncestor(), currentDirQueryKey, fileConflictsQueryKeys (+11 more)
+Nodes (16): eventHandler(), AppEvent, BranchDivergence, BranchType, branchDivergenceQuery(), branchDivergenceQueryKeys, fetchBranchDivergence(), useQueryBranchDivergence() (+8 more)
 
 ### Community 24 - "Index & Resolution Mutations"
-Cohesion: 0.11
-Nodes (25): useCurrentPath(), FileViewerTitle(), FileViewerTitleProps, agentFailedToast(), gitOperationFailedToast(), newUpdateAvailableToast(), DecoratedButton(), DragAndDropIndicator() (+17 more)
+Cohesion: 0.12
+Nodes (22): useCurrentPath(), FileViewerTitle(), FileViewerTitleProps, agentFailedToast(), gitOperationFailedToast(), newUpdateAvailableToast(), DragAndDropIndicatorProps, Toast() (+14 more)
 
 ### Community 25 - "AI Integration & Settings"
-Cohesion: 0.15
-Nodes (18): Settings, SetSettingsArgs, setSettingsKey, setSettingsMutation, useSetSettings(), useQueryHasAiApiKey(), SettingsDialogAiContent(), CheckboxSetting() (+10 more)
+Cohesion: 0.16
+Nodes (15): CheckboxSetting(), CheckboxSettingProps, PerRepositoryPreferences(), SettingsDialogSection(), SettingsDialogSectionProps, TextSetting(), TextSettingProps, EditableText() (+7 more)
 
 ### Community 26 - "App Models & Events"
-Cohesion: 0.11
-Nodes (21): ConflictLine, DiffLine, DiffScope, FileInfo, UnmergedFileInfo, UnstagedFileInfo, UntrackedFileInfo, fetchFileConflicts() (+13 more)
+Cohesion: 0.13
+Nodes (19): ConflictLine, DiffLine, FileConflicts, UnmergedFileInfo, fetchFileConflicts(), fileConflictsQuery(), fileConflictsQueryKeys, useQueryFileConflicts() (+11 more)
 
 ### Community 27 - "Remote Management Mutations"
-Cohesion: 0.13
-Nodes (23): RemoteName, AddRemoteArgs, addRemoteKey(), addRemoteMutation(), useAddRemote(), ChangeRemoteUrlArgs, changeRemoteUrlKey(), changeRemoteUrlMutation() (+15 more)
+Cohesion: 0.11
+Nodes (30): RemoteInfo, RemoteName, AddRemoteArgs, addRemoteKey(), addRemoteMutation(), useAddRemote(), ChangeRemoteUrlArgs, changeRemoteUrlKey() (+22 more)
 
 ### Community 28 - "Commit Mutations"
-Cohesion: 0.14
-Nodes (20): ActionIndicator(), ActionButton(), BaseActionButtonProps, useActionButtonAction(), ActionId, ActionPresenter, ActionsTracker, AnyInteraction (+12 more)
+Cohesion: 0.10
+Nodes (21): ApplyStashArgs, applyStashKey(), applyStashMutation(), useMakeApplyStash(), ResetHeadArgs, resetHeadKey(), resetHeadMutation(), useRewindCommit() (+13 more)
 
 ### Community 29 - "Keyboard Shortcuts & Palette"
-Cohesion: 0.11
-Nodes (19): AppMessage, FileTypeFilter, WorktreeFileType, CherryPickArgs, cherryPickKey(), cherryPickMutation(), useCherryPickCommit(), CloneRepositoryArgs (+11 more)
+Cohesion: 0.14
+Nodes (17): CloneRepositoryArgs, cloneRepositoryKey(), cloneRepositoryMutation(), useCloneRepository(), RemoveFromIndexArgs, removeFromIndexKey(), removeFromIndexMutation(), useMakeUnstageFile() (+9 more)
 
 ### Community 30 - "TypeScript Config"
 Cohesion: 0.07
 Nodes (28): compilerOptions, allowImportingTsExtensions, isolatedModules, jsx, lib, module, moduleResolution, noEmit (+20 more)
 
 ### Community 31 - "Drop Zone Components"
-Cohesion: 0.10
-Nodes (30): DragAndDropBackdrop(), DragAndDropBackdropProps, Draggable(), DraggableInner(), DraggableProps, DropArea(), DropAreaProps, DragAndDropHandler() (+22 more)
+Cohesion: 0.12
+Nodes (25): DragAndDropBackdrop(), DragAndDropBackdropProps, Draggable(), DraggableInner(), DraggableProps, DropArea(), DropAreaProps, DragAndDropHandler() (+17 more)
 
 ### Community 32 - "Branch Toolbar"
-Cohesion: 0.16
-Nodes (30): BranchInfo, BranchToolbar(), BranchToolbarProps, BranchesListItem(), BranchesListItemProps, BranchesList(), BranchesListProps, useQueryItems() (+22 more)
+Cohesion: 0.05
+Nodes (87): BranchInfo, LocalBranch, Reference, TagInfo, TagName, DeleteTagsArgs, PushTagArgs, pushTagKey() (+79 more)
 
 ### Community 33 - "Stash Operations"
-Cohesion: 0.29
-Nodes (7): DiffSummary, diffSummaryQuery(), diffSummaryQueryKeys, fetchDiffSummary(), useQueryDiffSummary(), DIFF_SUMMARY_SCHEMA, ChangesSummaryProps
+Cohesion: 0.11
+Nodes (23): CommonAncestorInfo, DiffSummary, commonAncestorQuery(), useQueryCommonAncestor(), diffSummaryQuery(), diffSummaryQueryKeys, fetchDiffSummary(), useQueryDiffSummary() (+15 more)
 
 ### Community 34 - "Checkout Mutations"
-Cohesion: 0.25
-Nodes (16): ActiveActionIndicator(), CurrentBranchSelector(), CurrentBranchSelectorProps, NoBranchMatches(), GraphDropAreas(), TrackerDecoratedButton(), useBranchOffSomeBranchInteraction(), useCheckoutPresenter() (+8 more)
+Cohesion: 0.17
+Nodes (13): BaseDecoratedButtonProps, CommonDecoratedButtonProps, TrackerDecoratedButton(), TrackerDecoratedButtonProps, DragDef, ComboboxProps, Glyph, IconProps (+5 more)
 
 ### Community 35 - "Folder Open Operations"
-Cohesion: 0.24
-Nodes (11): OpenFolderArgs, openFolderKey, openFolderMutation, useChangeCurrentFolder(), useMakeOpenRecentFolder(), useOpenFolder(), useOpenRecentFolder(), LogoGlyph() (+3 more)
+Cohesion: 0.13
+Nodes (25): DiffScope, FileDiff, FileViewerContainer(), FileViewerContainerProps, FileViewerContent(), FileViewerContentProps, LineIndicator(), LineIndicatorProps (+17 more)
 
 ### Community 36 - "Merge Operations"
-Cohesion: 0.22
-Nodes (14): NotStagedFile, StagedFile, SnapshotDetailsDialogFileItem(), SnapshotDetailsDialogFileItemProps, NotStagedChangesItemProps, StagedChangesItem(), StagedChangesItemProps, InteractiveItem() (+6 more)
+Cohesion: 0.28
+Nodes (9): DecoratedButtonProps, InteractiveBatchProps, InteractiveItemProps, InteractiveMenuItems(), InteractiveMenuItemsProps, InteractiveSelectionInnerProps, InteractiveSelectionProps, InteractionEntry (+1 more)
 
 ### Community 37 - "Action Indicator UI"
-Cohesion: 0.18
-Nodes (12): RepositoryHost, ProfilePictureProps, ProfilePictureVariant, ScrollShadowDiv(), ScrollShadowDivProps, ShortcutIndicatorProps, ToastProps, ProgressBar() (+4 more)
+Cohesion: 0.10
+Nodes (22): AppMessage, CleanFileInfo, conflictTypes, FileInfo, FileOfType, HeadInfo, HeadState, RepositoryHost (+14 more)
 
 ### Community 38 - "Tauri App Config"
 Cohesion: 0.09
 Nodes (22): app, security, windows, build, beforeBuildCommand, beforeDevCommand, devUrl, frontendDist (+14 more)
 
 ### Community 39 - "Ref Checkout & Merge Args"
-Cohesion: 0.09
-Nodes (30): ChangeStatus, CleanFileInfo, conflictTypes, FileOfType, HeadInfo, HeadState, MergeStatus, MovedStatus (+22 more)
+Cohesion: 0.11
+Nodes (24): ChangeStatus, FileTypeFilter, MergeStatus, MovedStatus, Page, StagedFileInfo, WorktreeFileType, fetchStashFilesPage() (+16 more)
 
 ### Community 40 - "App Info & Updates UI"
-Cohesion: 0.09
-Nodes (22): AppInfo, appInfoQuery, appInfoQueryKey, useQueryAppInfo(), SettingsDialogAboutContent(), QueryListProps, QueryLoader(), QueryLoaderProps (+14 more)
+Cohesion: 0.14
+Nodes (16): useQueryAppInfo(), SettingsDialogAboutContent(), DecoratedButton(), QueryListProps, QueryLoader(), QueryLoaderProps, RetryError(), RetryErrorProps (+8 more)
 
 ### Community 41 - "Backend Event System"
-Cohesion: 0.28
-Nodes (6): client, ClientProvider(), initialScopes, ShortcutsHandler(), ShortcutsHandlerProps, ShortcutScope
+Cohesion: 0.15
+Nodes (16): MainToolbar(), MainToolbarProps, ActionButton(), BaseActionButtonProps, useActionButtonAction(), Toolbar(), ToolbarProps, ActionToolbarItemProps (+8 more)
 
 ### Community 42 - "Branch Divergence Queries"
-Cohesion: 0.21
-Nodes (15): VersionedFileInfo, WorktreeFileInfo, FileIcon(), FileIconProps, getFileGlyph(), FileItemProps, FileStatus(), FileStatusProps (+7 more)
+Cohesion: 0.15
+Nodes (19): VersionedFileInfo, WorktreeFileInfo, FileIcon(), FileIconProps, getFileGlyph(), FileItem(), FileItemProps, FilePath() (+11 more)
 
 ### Community 43 - "Save Stash Mutations"
-Cohesion: 0.33
-Nodes (9): DIFF_VIEW_MODES, UnmergedViewSelectorProps, useViewModeSelector(), DiffFilterSelectorProps, ToggleGroup(), ToggleGroupProps, useToggleHandler(), ToggleGroupItem() (+1 more)
+Cohesion: 0.19
+Nodes (19): DIFF_VIEW_MODES, UnmergedViewSelector(), UnmergedViewSelectorProps, useViewModeSelector(), DiffFilterSelectorProps, useDiffFilterSelector(), InRepositoryPage(), CurrentDirectory() (+11 more)
 
 ### Community 44 - "Conflict View Selector"
-Cohesion: 0.25
-Nodes (6): BranchType, RemoteRef, SetUpstreamArgs, branchesQueryKeys, fetchBranches(), BRANCHES_SCHEMA
+Cohesion: 0.48
+Nodes (6): RemoteRef, SetUpstreamArgs, setUpstreamKey(), setUpstreamMutation(), useMakeSetUpstream(), useSetUpstream()
 
 ### Community 45 - "Drag Payloads & Branch List"
 Cohesion: 0.50
 Nodes (4): default, description, type, description
 
 ### Community 46 - "Multi-Select UI"
-Cohesion: 0.21
-Nodes (15): MultiSelectContext, MultiSelectContextProvider(), MultiSelectStore, Setters, useIsSelected(), useMultiSelectContext(), useSelectedItems(), useSelectionAnchors() (+7 more)
+Cohesion: 0.13
+Nodes (26): StagedFile, SnapshotDetailsDialogFileItem(), SnapshotDetailsDialogFileItemProps, StagedChangesItem(), StagedChangesItemProps, InteractiveItem(), MultiSelectContext, MultiSelectContextProvider() (+18 more)
 
 ### Community 47 - "Storage & Events"
-Cohesion: 0.10
-Nodes (18): ANCESTOR_INFO_SCHEMA, BRANCH_INFO_SCHEMA, CHANGE_STATUS_SCHEMA, HEAD_INFO_SCHEMA, HEAD_STATE_SCHEMA, HISTORY_ITEM_SCHEMA, MERGE_STATUS_SCHEMA, MOVED_STATUS_SCHEMA (+10 more)
+Cohesion: 0.09
+Nodes (22): fetchTags(), tagsQuery(), tagsQueryKeys, useQueryTags(), ANCESTOR_INFO_SCHEMA, BRANCH_INFO_SCHEMA, CHANGE_STATUS_SCHEMA, HEAD_STATE_SCHEMA (+14 more)
 
 ### Community 48 - "Current Directory Info"
-Cohesion: 0.07
-Nodes (43): abortCherryPickKey(), abortCherryPickMutation(), useAbortCherryPick(), abortMergeKey(), abortMergeMutation(), useAbortMerge(), abortRebaseKey(), abortRebaseMutation() (+35 more)
+Cohesion: 0.10
+Nodes (26): abortCherryPickKey(), abortCherryPickMutation(), useAbortCherryPick(), abortRevertKey(), abortRevertMutation(), useAbortRevert(), CherryPickArgs, cherryPickKey() (+18 more)
 
 ### Community 49 - "Auto-Update Mutations"
 Cohesion: 0.14
@@ -427,16 +428,16 @@ Cohesion: 0.50
 Nodes (4): default, description, type, description
 
 ### Community 52 - "Staged/Unstaged File Models"
-Cohesion: 0.30
-Nodes (13): RefSelector(), GraphCurrentBranch(), BaseBranchSelector(), BaseBranchSelectorProps, Graph(), GraphInner(), GraphProps, ComboboxProps (+5 more)
+Cohesion: 0.18
+Nodes (14): ActionIndicator(), RemoteForm(), RemoteFormProps, RemoteFormValues, Form(), FormCallback, FormProps, FormDialog() (+6 more)
 
 ### Community 53 - "StashSnapshotDetailsDialog"
-Cohesion: 0.17
-Nodes (17): NoTagMatches(), CurrentGraphCommitCardInner(), GraphCommitCard(), GraphCommitCardInnerProps, GraphCommitCardProps, useAmendInteraction(), useBranchOffCommitInteraction(), useCheckoutCommitInteraction() (+9 more)
+Cohesion: 0.14
+Nodes (22): NoTagMatches(), CurrentGraphCommitCardInner(), GraphCommitCard(), GraphCommitCardInnerProps, GraphCommitCardProps, group(), useAmendInteraction(), useBranchOffCommitInteraction() (+14 more)
 
 ### Community 54 - "Command Palette"
 Cohesion: 0.29
-Nodes (13): CommandPalette(), CommandPaletteItem(), CommandPaletteItemProps, usePushSomeBranchInteraction(), useRebaseSomeBranchInteraction(), useAmendSomeCommitInteraction(), useStageAllInteraction(), Flow (+5 more)
+Nodes (13): CommandPalette(), showCommandPalette(), CommandPaletteItemProps, usePushSomeBranchInteraction(), useRebaseSomeBranchInteraction(), useAmendSomeCommitInteraction(), useStageAllInteraction(), Flow (+5 more)
 
 ### Community 55 - "Desktop Tauri Schema"
 Cohesion: 0.12
@@ -455,12 +456,12 @@ Cohesion: 0.15
 Nodes (13): devDependencies, babel-plugin-react-compiler, @biomejs/biome, dotenv-cli, react-devtools, @tauri-apps/cli, @types/hast, @types/react (+5 more)
 
 ### Community 60 - "removeRecentFolder.ts"
-Cohesion: 0.29
-Nodes (7): RemoteInfo, fetchRemotes(), remotesQuery(), remotesQueryKeys, useQueryRemotes(), REMOTES_SCHEMA, RemotesDialogItemProps
+Cohesion: 0.27
+Nodes (10): useQueryBranches(), askForConfirmation(), ConfirmationDialog(), ConfirmationDialogProps, CreateBranchDialog(), CreateBranchFormValues, requestBranchName(), requestValueFromDialog() (+2 more)
 
 ### Community 61 - "setUpstream.ts"
-Cohesion: 0.27
-Nodes (12): TagInfo, RefSelectorProps, TagsListItem(), TagsListItemProps, useBranchOffTagInteraction(), useCheckoutTagInteraction(), useCreateBranchAtTagInteraction(), useDeleteTagInteraction() (+4 more)
+Cohesion: 0.42
+Nodes (8): useBranchOffTagInteraction(), useCheckoutTagInteraction(), useCreateBranchAtTagInteraction(), useDeleteTagInteraction(), useMergeSomeTagInteraction(), useMergeTagInteraction(), usePushTagInteraction(), useSingleTagInteractions()
 
 ### Community 62 - "CI/CD & Distribution"
 Cohesion: 0.50
@@ -475,12 +476,12 @@ Cohesion: 0.67
 Nodes (3): ShellScopeEntryAllowedArg, anyOf, description
 
 ### Community 65 - "Remote Branch Deletion"
-Cohesion: 0.11
-Nodes (25): useBackendEventshandler(), Storage, useQueryCurrentDir(), storageQuery, StorageResponse, useQueryStorage(), App(), InFolder() (+17 more)
+Cohesion: 0.07
+Nodes (35): client, ClientProvider(), useBackendEventshandler(), Storage, OpenFolderArgs, openFolderKey, openFolderMutation, useChangeCurrentFolder() (+27 more)
 
 ### Community 66 - "AI API Key Mutations"
-Cohesion: 0.24
-Nodes (10): fetchGeneratedCommitMessage(), generatedCommitMessageQuery(), generatedCommitMessageQueryKey(), useQueryGeneratedCommitMessage(), fetchMatchingCommits(), matchingCommitsQuery(), matchingCommitsQueryKeys, useQueryMatchingCommits() (+2 more)
+Cohesion: 0.29
+Nodes (10): CreateTagDialog(), CreateTagFormValues, requestTagParams(), FormField(), FormFieldProps, InputField(), InputFieldProps, TextField() (+2 more)
 
 ### Community 67 - "Desktop Schema Capabilities"
 Cohesion: 0.15
@@ -527,16 +528,16 @@ Cohesion: 0.27
 Nodes (11): RemoteBranch, DeleteLocalBranchesArgs, deleteLocalBranchesKey(), deleteLocalBranchesMutation(), DeleteRemoteBranchesArgs, deleteRemoteBranchesKey(), deleteRemoteBranchesMutation(), findRemoteAndBranch() (+3 more)
 
 ### Community 84 - "Create Tag Mutations"
-Cohesion: 0.10
-Nodes (40): RefName, CheckoutArgs, checkoutKey(), checkoutMutation(), useCheckoutNew(), useMakeCheckoutBranch(), useMakeCheckoutCommit(), useMakeCheckoutTag() (+32 more)
+Cohesion: 0.23
+Nodes (13): checkoutKey(), checkoutMutation(), useCheckoutNew(), useMakeCheckoutBranch(), useMakeCheckoutCommit(), useMakeCheckoutTag(), useSwitchBranches(), createBranchKey() (+5 more)
 
 ### Community 86 - "Merge/Branch View Screenshots"
 Cohesion: 0.67
 Nodes (6): merge.gif - Branch Merge/Compare UI Demo, Branch Comparison View - dual-panel local vs remote branch commit list, Branch Selector Dropdown - switch between local and remote branches, Commit Card - displays commit message, author, timestamp, and short hash, Merge Arc Connector - visual curved line connecting selected commit to target branch, indicating merge/rebase target, Pull/Push Action Buttons - fetch/pull and push actions with dropdown
 
 ### Community 87 - "index.tsx"
-Cohesion: 0.53
-Nodes (4): CommitType, GraphCommitInnerProps, GraphCommitNode(), GraphCommitNodeProps
+Cohesion: 0.21
+Nodes (9): SetAiApiKeyArgs, setAiApiKeyKey, setAiApiKeyMutation, useSetAiApiKey(), hasAiApiKeyQuery, hasAiApiKeyQueryKey, useQueryHasAiApiKey(), SettingsDialogAiContent() (+1 more)
 
 ### Community 88 - "Discard Stash Mutations"
 Cohesion: 0.31
@@ -551,8 +552,8 @@ Cohesion: 0.60
 Nodes (5): amend.gif — animated demo of the commit/amend workflow UI in dragit, showing staged vs unstaged file counts, Stage All and Commit action buttons, a dark-themed git graph with commit nodes and branch lines, and a commit entry row displaying message, author, timestamp, and short hash, Commit action button — primary CTA with a speech-bubble/commit icon and the label 'Commit', part of the commit toolbar alongside 'Stage all', Commit history row — shows commit message 'A commit with a message', author 'Alejandro De Cicco', relative time '1 minute ago', and short hash '#6e2a5e38' on a dark card, Git graph visualization — left-side column of commit nodes (filled circles) connected by vertical lines and a pink/red branch line, representing the commit history timeline, Staged files summary panel — displays '8 staged files • 3 not staged files' with a hand-cursor hover indicator, showing the staging status widget UI
 
 ### Community 91 - "index.tsx"
-Cohesion: 0.46
-Nodes (6): BranchSelectors(), compareBranchInteraction(), compareCommitInteraction(), compareSomeReferenceInteraction(), compareTagInteraction(), compareTwoInteraction()
+Cohesion: 0.30
+Nodes (11): CleanFilesArgs, cleanFilesKey(), cleanFilesMutation(), RestoreArgs, restoreKey(), restoreMutation(), useDiscardChanges(), useDiscardFileChanges() (+3 more)
 
 ### Community 92 - "Desktop Schema Root"
 Cohesion: 0.40
@@ -567,32 +568,32 @@ Cohesion: 0.67
 Nodes (4): context.gif — Dragit UI screenshot: 'Unstaged Changes' panel showing 5 modified files (README.md, models.ts, branches.ts, app.tsx) in a dark-themed git staging interface with file icons and directory paths, Dragit – Git GUI Application, Unstaged Changes Panel — dark-themed list UI displaying modified git files with icons, filenames, and relative directory paths; badge shows count (5), Unstaged Changes Panel
 
 ### Community 95 - "branches.ts"
-Cohesion: 0.23
-Nodes (14): Reference, ComparisonSnapshotDetailsDialogProps, chooseBase(), computeBases(), getDefaultBase(), SelectedReferences, Setters, useBases() (+6 more)
+Cohesion: 0.33
+Nodes (8): DialogsHandler(), useShortcutScopesHandler(), DialogEntry, Dialogs, Setters, useDialog(), useDialogsStore, AnyObject
 
 ### Community 96 - "Desktop Capability Schema"
 Cohesion: 0.50
 Nodes (4): description, required, type, Capability
 
 ### Community 97 - "index.tsx"
-Cohesion: 0.14
-Nodes (24): showCommandPalette(), InRepositoryPage(), RecyclingBin(), RecyclingBinProps, SelectedFileDiff(), StashesList(), StashesListProps, group() (+16 more)
+Cohesion: 0.24
+Nodes (13): BranchesList(), BranchesListProps, TagsListItem(), useQueryItems(), RecyclingBin(), RecyclingBinProps, useCreateBranchAtSomeCommitInteraction(), useDeleteBranchesInteraction() (+5 more)
 
 ### Community 98 - "Linux Capability Schema"
 Cohesion: 0.50
 Nodes (4): description, required, type, Capability
 
 ### Community 99 - "restore.ts"
-Cohesion: 0.33
-Nodes (6): BranchDivergence, branchDivergenceQuery(), branchDivergenceQueryKeys, fetchBranchDivergence(), useQueryBranchDivergence(), BRANCH_DIVERGENCE_SCHEMA
+Cohesion: 0.47
+Nodes (5): AiGenerationButton(), CommitDialog(), CommitFormValues, requestCommitParams(), useGenerateCommitMessageInteraction()
 
 ### Community 100 - "Diff Viewer Screenshots"
 Cohesion: 1.33
 Nodes (3): Diff Viewer Screenshot (GIF), Settings TypeScript Interface, Diff Viewer UI Component
 
 ### Community 101 - "commitInfo.ts"
-Cohesion: 0.18
-Nodes (12): CurrentDirInfo, commitInfoQuery(), commitInfoQueryKeys, fetchCommitInfo(), useQueryCommitInfo(), currentDirQuery, fetchCurrentDir(), fetchHeadInfo() (+4 more)
+Cohesion: 0.11
+Nodes (21): CommitId, CurrentDirInfo, commitInfoQuery(), commitInfoQueryKeys, fetchCommitInfo(), useQueryCommitInfo(), fetchCommonAncestor(), currentDirQuery (+13 more)
 
 ### Community 102 - "Desktop Shell Scope Args"
 Cohesion: 0.67
@@ -603,52 +604,60 @@ Cohesion: 0.67
 Nodes (3): Value, anyOf, description
 
 ### Community 104 - "deleteTags.ts"
-Cohesion: 0.39
-Nodes (7): TagName, DeleteTagsArgs, deleteTagsKey(), deleteTagsMutation(), useDeleteTags(), useMakeDeleteTag(), PushTagArgs
+Cohesion: 0.70
+Nodes (4): deleteTagsKey(), deleteTagsMutation(), useDeleteTags(), useMakeDeleteTag()
 
 ### Community 105 - "createTag.ts"
-Cohesion: 0.18
-Nodes (13): CommitId, CreateTagArgs, createTagKey(), createTagMutation(), TagAction, useMakeTagBranch(), useMakeTagCommit(), ResetHeadArgs (+5 more)
+Cohesion: 0.43
+Nodes (6): CreateTagArgs, createTagKey(), createTagMutation(), TagAction, useMakeTagBranch(), useMakeTagCommit()
 
 ### Community 106 - "Linux Value Schema"
 Cohesion: 0.67
 Nodes (3): Value, anyOf, description
 
 ### Community 169 - "discardStashes.ts"
-Cohesion: 0.60
-Nodes (5): discardStashKey(), discardStashMutation(), useDiscardStash(), useDiscardStashes(), useMakeDiscardStash()
+Cohesion: 0.43
+Nodes (7): StashId, DiscardStashArgs, discardStashKey(), discardStashMutation(), useDiscardStash(), useDiscardStashes(), useMakeDiscardStash()
 
 ### Community 170 - "abortRebase.ts"
-Cohesion: 0.38
-Nodes (6): fetchStashes(), stashesQuery(), stashesQueryKeys, useQueryStashes(), STASHES_SCHEMA, getUniqueId()
+Cohesion: 0.24
+Nodes (9): fetchStashes(), stashesQuery(), stashesQueryKeys, useQueryStashes(), STASHES_SCHEMA, getUniqueId(), Ids, Setters (+1 more)
 
 ### Community 171 - "continueRebase.ts"
-Cohesion: 0.83
-Nodes (3): continueRebaseKey(), continueRebaseMutation(), useContinueRebase()
+Cohesion: 0.60
+Nodes (4): RevertCommitArgs, revertCommitKey(), revertCommitMutation(), useRevertCommit()
 
 ### Community 172 - "continueRevert.ts"
 Cohesion: 0.83
-Nodes (3): continueRevertKey(), continueRevertMutation(), useContinueRevert()
+Nodes (3): abortMergeKey(), abortMergeMutation(), useAbortMerge()
+
+### Community 173 - "abortRebase.ts"
+Cohesion: 0.83
+Nodes (3): abortRebaseKey(), abortRebaseMutation(), useAbortRebase()
+
+### Community 174 - "generateMessage.ts"
+Cohesion: 0.83
+Nodes (3): generateMessageKey(), generateMessageMutation(), useGenerateCommitMessage()
 
 ## Knowledge Gaps
-- **473 isolated node(s):** `OpenFolderArgs`, `openFolderKey`, `openFolderMutation`, `GraphCommitCardProps`, `GraphCommitCardInnerProps` (+468 more)
+- **472 isolated node(s):** `OpenFolderArgs`, `openFolderKey`, `openFolderMutation`, `GraphCommitCardProps`, `BaseActionButtonProps` (+467 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **60 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `cn()` connect `React Query & UI Components` to `Diff & Conflict Models`, `Worktree File Management`, `Commit Dialog UI`, `Commit History`, `Branch Management`, `Git Operation Mutations`, `Remote & Confirmation Dialogs`, `Settings Dialog & Layout`, `Git Graph Renderer`, `Drag & Drop UI`, `Action Button Components`, `Tags & Branch Queries`, `Stash File Status`, `Index & Resolution Mutations`, `AI Integration & Settings`, `Drop Zone Components`, `Branch Toolbar`, `Checkout Mutations`, `Action Indicator UI`, `App Info & Updates UI`, `Branch Divergence Queries`, `Save Stash Mutations`, `Auto-Update Mutations`, `Staged/Unstaged File Models`, `StashSnapshotDetailsDialog`, `Command Palette`, `setUpstream.ts`, `Remote Branch Deletion`, `index.tsx`, `index.tsx`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
-- **Why does `propsWithCn()` connect `Settings Dialog & Layout` to `React Query & UI Components`, `Diff & Conflict Models`, `Worktree File Management`, `Commit Dialog UI`, `Commit History`, `Branch Management`, `File Icons & Versioned Files`, `Git Operation Mutations`, `Remote & Confirmation Dialogs`, `Git Graph Renderer`, `Drag & Drop UI`, `Action Button Components`, `Tags & Branch Queries`, `Index & Resolution Mutations`, `AI Integration & Settings`, `Drop Zone Components`, `Branch Toolbar`, `Checkout Mutations`, `Action Indicator UI`, `App Info & Updates UI`, `Branch Divergence Queries`, `Save Stash Mutations`, `Multi-Select UI`, `Staged/Unstaged File Models`, `Command Palette`, `Remote Branch Deletion`, `index.tsx`, `index.tsx`?**
-  _High betweenness centrality (0.035) - this node is a cross-community bridge._
+- **Why does `cn()` connect `Folder Open Operations` to `React Query & UI Components`, `Worktree File Management`, `Commit Dialog UI`, `Commit History`, `File Icons & Versioned Files`, `Remote & Confirmation Dialogs`, `Settings Dialog & Layout`, `Git Graph Renderer`, `Action Button Components`, `Tags & Branch Queries`, `Stash File Status`, `Index & Resolution Mutations`, `AI Integration & Settings`, `Remote Management Mutations`, `Drop Zone Components`, `Branch Toolbar`, `App Info & Updates UI`, `Branch Divergence Queries`, `Save Stash Mutations`, `Auto-Update Mutations`, `Staged/Unstaged File Models`, `StashSnapshotDetailsDialog`, `Command Palette`, `removeRecentFolder.ts`, `Remote Branch Deletion`, `AI API Key Mutations`, `index.tsx`, `index.tsx`, `restore.ts`?**
+  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+- **Why does `propsWithCn()` connect `Remote & Confirmation Dialogs` to `React Query & UI Components`, `Worktree File Management`, `Commit History`, `Settings Dialog & Layout`, `Git Graph Renderer`, `Action Button Components`, `Tags & Branch Queries`, `Index & Resolution Mutations`, `AI Integration & Settings`, `Remote Management Mutations`, `Drop Zone Components`, `Branch Toolbar`, `Folder Open Operations`, `App Info & Updates UI`, `Backend Event System`, `Branch Divergence Queries`, `Save Stash Mutations`, `Multi-Select UI`, `Staged/Unstaged File Models`, `Remote Branch Deletion`, `AI API Key Mutations`, `index.tsx`?**
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
 - **What connects `OpenFolderArgs`, `openFolderKey`, `openFolderMutation` to the rest of the system?**
-  _474 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _473 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Git Process Execution` be split into smaller, more focused modules?**
   _Cohesion score 0.05179095713446859 - nodes in this community are weakly interconnected._
 - **Should `Rust Core & IPC Commands` be split into smaller, more focused modules?**
   _Cohesion score 0.08876909254267745 - nodes in this community are weakly interconnected._
 - **Should `React Query & UI Components` be split into smaller, more focused modules?**
-  _Cohesion score 0.10971348707197764 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08897959183673469 - nodes in this community are weakly interconnected._
 - **Should `File Watching & Error Handling` be split into smaller, more focused modules?**
-  _Cohesion score 0.145748987854251 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08956228956228957 - nodes in this community are weakly interconnected._

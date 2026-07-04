@@ -146,9 +146,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
             items={filesQuery.data?.items ?? []}
             getInteractions={getInteractions}
             getDragPayload={getDragPayload}
-            deleteAction={(files) => {
-              triggerInteraction(discardFiles(files))
-            }}
+            onDelete={discardFiles}
           >
             <QueryList
               name="files with unstaged changes"

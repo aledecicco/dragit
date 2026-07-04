@@ -19,6 +19,7 @@ import {
   type ContextMenuEvent,
   WithContextMenu,
 } from '@/lib/WithContextMenu'
+import { type AnyInteraction, triggerInteraction } from '@/state/actions'
 import { useUniqueId } from '@/state/ids'
 import { cn } from '@/utils/styles'
 
@@ -44,9 +45,9 @@ interface InteractiveSelectionProps<T>
   getDragPayload?: (items: T[]) => DragPayload
 
   /**
-   * The action to trigger when the selected items are deleted.
+   * Callback that returns the interaction to trigger when the selected items are deleted.
    */
-  deleteAction?: (items: T[]) => void
+  onDelete?: (items: T[]) => AnyInteraction | undefined
 }
 /**
  * A component that allows selecting arbitrary child items and performing actions on all of them.
@@ -56,7 +57,7 @@ const InteractiveSelection = <T,>(props: InteractiveSelectionProps<T>) => {
     items,
     getInteractions,
     getDragPayload,
-    deleteAction,
+    onDelete,
     children,
     ...multiSelectProps
   } = props
@@ -67,7 +68,7 @@ const InteractiveSelection = <T,>(props: InteractiveSelectionProps<T>) => {
         getInteractions={getInteractions}
         items={items}
         getDragPayload={getDragPayload}
-        deleteAction={deleteAction}
+        onDelete={onDelete}
       >
         {children}
       </InteractiveSelectionInner>
@@ -77,7 +78,7 @@ const InteractiveSelection = <T,>(props: InteractiveSelectionProps<T>) => {
 
 type InteractiveSelectionInnerProps<T> = Pick<
   InteractiveSelectionProps<T>,
-  'getInteractions' | 'items' | 'getDragPayload' | 'deleteAction' | 'children'
+  'getInteractions' | 'items' | 'getDragPayload' | 'onDelete' | 'children'
 > &
   Omit<Ariakit.RoleProps, 'children'>
 
@@ -88,7 +89,7 @@ const InteractiveSelectionInner = <T,>(
     getInteractions,
     items,
     getDragPayload,
-    deleteAction,
+    onDelete,
     children,
     ref,
     ...contentProps
@@ -153,7 +154,11 @@ const InteractiveSelectionInner = <T,>(
               // we want to delete all of them.
               e.stopPropagation()
               e.preventDefault()
-              deleteAction?.(selectedItems)
+
+              const deleteInteraction = onDelete?.(selectedItems)
+              if (deleteInteraction) {
+                triggerInteraction(deleteInteraction)
+              }
             })
             .with({ kind: 'singleItem' }, ({ itemIndex }) => {
               // If the delete key is pressed while a single unselected item is focused,
