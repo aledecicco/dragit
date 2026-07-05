@@ -27,6 +27,7 @@ const ComboboxItem = (props: ComboboxItemProps) => {
           value={itemProps.value}
           className={cn(
             'cursor-pointer wrap-anywhere text-light-50',
+            'transition-colors duration-150',
 
             !itemProps.value && 'italic not-aria-selected:text-light-800',
             'data-active-item:bg-light-50/8',

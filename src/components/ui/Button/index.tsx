@@ -48,6 +48,7 @@ const Button = (props: ButtonProps) => {
         'h-max text-nowrap',
         'flex flex-row justify-center items-center text-center',
         'border-0 font-semibold',
+        'transition-colors duration-200 ease-in-out',
 
         match(size)
           .with('xs', () => [

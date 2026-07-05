@@ -69,6 +69,7 @@ const AiGenerationButton = () => {
       {...generateMessage}
       className={cn(
         'absolute bottom-2 right-2',
+        'transition-opacity duration-150',
         'opacity-80 hover:opacity-100 focus:opacity-100',
         'border border-light-950/30',
       )}

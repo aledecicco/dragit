@@ -32,6 +32,7 @@ const Checkbox = (props: CheckboxProps) => {
       className={cn(
         'group/checkbox relative',
         'flex gap-2 items-center cursor-pointer p-2',
+        'transition-colors duration-150',
         'hover:bg-light-950/5 data-focus-visible:bg-light-950/5',
         'hover:data-focus-visible:bg-light-950/10',
       )}
@@ -62,6 +63,7 @@ const Checkbox = (props: CheckboxProps) => {
         className={cn(
           'w-5 h-5 bg-dark-500 rounded-full',
           'flex items-center justify-center',
+          'transition-colors duration-150',
           checked && 'bg-primary-600',
           checked
             ? 'group-hover/checkbox:bg-primary-500 group-data-focus-visible/checkbox:bg-primary-500'

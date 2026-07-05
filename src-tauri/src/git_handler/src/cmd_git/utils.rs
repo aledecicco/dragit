@@ -1,4 +1,4 @@
-use std::{io::Read, str::FromStr, u32};
+use std::{str::FromStr, u32};
 
 use models::{
     BranchDivergence, BranchInfo, ChangeStatus, CommitInfo, DiffSummary, HeadState, HistoryItem,

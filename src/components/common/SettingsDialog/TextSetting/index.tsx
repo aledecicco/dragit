@@ -63,6 +63,7 @@ const TextSetting = (props: TextSettingProps) => {
         divProps,
         'flex flex-row gap-1.5 items-center p-2',
         'text-sm text-light-400',
+        'transition-colors duration-150',
         'hover:bg-light-950/5 data-focus-visible:bg-light-950/5',
         'hover:data-focus-visible:bg-light-950/10',
       )}

@@ -126,6 +126,7 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
               'flex flex-col items-center justify-center gap-2 p-4',
               'rounded-md border border-dashed border-primary-400 bg-dark-400',
               'text-base text-light-950/50 text-center select-none',
+              'transition-colors duration-150',
               isDropTarget && 'border-accent-400 bg-dark-300 text-light-950/80',
             )}
             style={rect}
