@@ -102,6 +102,7 @@ const unregisterElement = useSvgTrackerStore.getState().unregisterElement
 
 export {
   useTrackedElements,
+  useSvgTrackerStore,
   registerElement,
   unregisterElement,
   type ElementId,

@@ -37,6 +37,11 @@ interface DraftCommitProps extends ComponentProps<'div'> {
    * The id of the last commit.
    */
   parentId: CommitId | undefined
+
+  /**
+   * The vertical offset the draft commit should be displayed at.
+   */
+  targetY: number
 }
 
 /**
@@ -45,11 +50,11 @@ interface DraftCommitProps extends ComponentProps<'div'> {
  * Registers/unregisters itself in the SVG overlay when mounted/unmounted.
  */
 const DraftCommit = (props: DraftCommitProps) => {
-  const { parentId, ...divProps } = props
+  const { parentId, ...innerProps } = props
 
   return (
     <DraftCommitInner
-      {...divProps}
+      {...innerProps}
       elementId={DRAFT_COMMIT_ID}
       parent={
         parentId

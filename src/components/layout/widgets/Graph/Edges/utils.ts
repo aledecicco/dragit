@@ -1,5 +1,23 @@
 import type { Position } from '@/layout/widgets/Graph/SvgOverlay/utils'
 
+import { NODE_SIZE } from '../Commit/Node'
+
+/**
+ * Offsets the raw positions of two connected elements to the anchor points used by edges.
+ *
+ * @param elemPos - The raw position of the element to connect from.
+ * @param parentPos - The raw position of the parent element to connect to.
+ *
+ * @returns The anchored positions as a `[elemPos, parentPos]` tuple.
+ */
+export const getEdgeAnchors = (
+  elemPos: Position,
+  parentPos: Position,
+): [Position, Position] => [
+  { x: elemPos.x + NODE_SIZE / 2, y: elemPos.y + NODE_SIZE + EDGE_OFFSET },
+  { x: parentPos.x + NODE_SIZE / 2, y: parentPos.y - EDGE_OFFSET },
+]
+
 /**
  * Builds the SVG path commands to connect two elements at the given positions.
  *

@@ -3,3 +3,4 @@ dist
 .claude
 src-tauri/target
 assets
+graphify-out

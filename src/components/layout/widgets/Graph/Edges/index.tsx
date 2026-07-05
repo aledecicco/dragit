@@ -8,8 +8,8 @@ import { getPosition } from '@/layout/widgets/Graph/SvgOverlay/utils'
 
 import { cn } from '@/utils/styles'
 
-import { NODE_SIZE } from '../Commit/Node'
-import { buildPath, EDGE_OFFSET } from './utils'
+import { graphAnimator } from '../SvgOverlay/animation'
+import { buildPath, getEdgeAnchors } from './utils'
 
 /**
  * Implementation of the SVG overlay renderer that draws edges between a commit and its parent.
@@ -30,22 +30,17 @@ const Edges = () => {
       return undefined
     }
 
-    const elemPos = getPosition(elem)
-    const parentPos = getPosition(parentElem)
-
-    // Anchor is center bottom
-    elemPos.x += NODE_SIZE / 2
-    elemPos.y += NODE_SIZE + EDGE_OFFSET
-
-    // Anchor is center top
-    parentPos.x += NODE_SIZE / 2
-    parentPos.y -= EDGE_OFFSET
+    const [elemPos, parentPos] = getEdgeAnchors(
+      getPosition(elem),
+      getPosition(parentElem),
+    )
 
     const path = buildPath(elemPos, parentPos).join(' ')
 
     return (
       <path
         key={id}
+        ref={(pathEl) => graphAnimator.registerPath(id, pathEl)}
         className={cn(
           'fill-none stroke-4',
           match(elem.parent.type)

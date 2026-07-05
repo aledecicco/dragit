@@ -83,9 +83,11 @@
   "81": "Linux Remote Capabilities",
   "82": "Node TypeScript Config",
   "83": "identifier",
+  "84": "ShellScopeEntryAllowedArg",
   "85": "Rust Backend",
   "86": "Merge/Branch View Screenshots",
   "87": "index.tsx",
+  "88": "Discard Stash Mutations",
   "89": "Tauri Capabilities Config",
   "90": "Amend UI Screenshots",
   "91": "index.tsx",
@@ -161,5 +163,6 @@
   "166": "Syntax Highlighting Util",
   "167": "Vite Env Types",
   "168": "Vite Build Config",
-  "172": "storage.ts"
+  "172": "storage.ts",
+  "176": "main.tsx"
 }

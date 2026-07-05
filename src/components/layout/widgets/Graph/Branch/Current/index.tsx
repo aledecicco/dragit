@@ -104,10 +104,8 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
                   : currentReference.refName,
               ),
           )}
+          targetY={CURVE_SIZE * 2 + EDGE_OFFSET}
           className={cn('absolute top-0 left-[3%]')}
-          style={{
-            transform: `translateY(${CURVE_SIZE * 2 + EDGE_OFFSET}px)`,
-          }}
         />
       )}
 
@@ -161,10 +159,12 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
               distance={
                 hasWorktreeChanges ? virtualRow.index + 1 : virtualRow.index
               }
+              targetY={
+                hasWorktreeChanges
+                  ? virtualRow.end + EDGE_LENGTH
+                  : virtualRow.start
+              }
               className={cn('absolute top-0 left-[3%]')}
-              style={{
-                transform: `translateY(${hasWorktreeChanges ? virtualRow.end + EDGE_LENGTH : virtualRow.start}px)`,
-              }}
             />
           )
         })}

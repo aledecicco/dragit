@@ -78,10 +78,8 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
           type: parentIsDistantAnchor ? 'dashed' : 'solid',
         }))}
         distance={virtualRow.index}
+        targetY={virtualRow.start}
         className={cn('absolute top-0 left-[55%]')}
-        style={{
-          transform: `translateY(${virtualRow.start}px)`,
-        }}
       />
     )
   })

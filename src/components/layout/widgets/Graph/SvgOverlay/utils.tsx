@@ -1,13 +1,8 @@
 import { type ComponentType, type RefObject, useEffect, useRef } from 'react'
 
-import {
-  type ThrottleOptions,
-  useRerender,
-  useThrottledCallback,
-} from '@/utils/performance'
-import { MS_IN_SECOND } from '@/utils/time'
 import type { AnyObject } from '@/utils/types'
 
+import { graphAnimator } from './animation'
 import {
   type ElementId,
   type ParentElement,
@@ -17,8 +12,20 @@ import {
 } from './store'
 
 interface TrackedComponentProps {
+  /**
+   * The unique id of this element in the tracker.
+   */
   elementId: ElementId
+
+  /**
+   * A relationship to a parent element.
+   */
   parent: ParentElement | undefined
+
+  /**
+   * The vertical offset the element should be displayed at.
+   */
+  targetY: number
 }
 
 interface TrackRefProps<T extends HTMLElement> {
@@ -36,7 +43,7 @@ const makeTracked = <P extends AnyObject, T extends HTMLElement>(
   >,
 ) => {
   const TrackedComponent = (props: P & TrackedComponentProps) => {
-    const { elementId, parent, ...componentProps } = props
+    const { elementId, parent, targetY, ...componentProps } = props
 
     const ref = useRef<T>(null)
 
@@ -48,11 +55,18 @@ const makeTracked = <P extends AnyObject, T extends HTMLElement>(
           parent,
         })
       }
+    }, [elementId, parent?.id, parent?.type])
 
+    useEffect(() => {
+      graphAnimator.setNodeTarget(elementId, targetY)
+    }, [elementId, targetY])
+
+    useEffect(() => {
       return () => {
         unregisterElement(elementId)
+        graphAnimator.removeNode(elementId)
       }
-    }, [elementId, parent?.id, parent?.type])
+    }, [elementId])
 
     return <WrappedComponent {...componentProps} trackRef={ref} />
   }
@@ -92,29 +106,4 @@ const getPosition = (elem: TrackedElement): Position => {
   return pos
 }
 
-const REFRESH_OPTIONS: ThrottleOptions = {
-  trailingCall: true,
-  delay: MS_IN_SECOND / 60,
-}
-
-/**
- * Hook that provides a way to trigger a refresh of the SVG overlay, throttled to 60 FPS.
- *
- * @returns An object containing:
- * - `refreshTrigger`: A variable that can be used as a dependency to trigger a refresh.
- * - `refresh`: A function that can be called to manually trigger a refresh.
- */
-const useRefreshCanvas = () => {
-  const { rerenderTrigger, rerender } = useRerender()
-  const refresh = useThrottledCallback(rerender, REFRESH_OPTIONS)
-
-  return { refreshTrigger: rerenderTrigger, refresh }
-}
-
-export {
-  makeTracked,
-  getPosition,
-  useRefreshCanvas,
-  type TrackRefProps,
-  type Position,
-}
+export { makeTracked, getPosition, type TrackRefProps, type Position }
