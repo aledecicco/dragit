@@ -1342,7 +1342,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_properties_identifier",
-      "community": 67,
+      "community": 34,
       "norm_label": "identifier"
     },
     {
@@ -1352,7 +1352,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_identifier_description",
-      "community": 67,
+      "community": 34,
       "norm_label": "description"
     },
     {
@@ -1362,7 +1362,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_identifier_type",
-      "community": 67,
+      "community": 34,
       "norm_label": "type"
     },
     {
@@ -1372,7 +1372,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_properties_description",
-      "community": 64,
+      "community": 67,
       "norm_label": "description"
     },
     {
@@ -1382,7 +1382,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_description_description",
-      "community": 64,
+      "community": 67,
       "norm_label": "description"
     },
     {
@@ -1392,7 +1392,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_description_default",
-      "community": 64,
+      "community": 67,
       "norm_label": "default"
     },
     {
@@ -1402,7 +1402,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_description_type",
-      "community": 64,
+      "community": 67,
       "norm_label": "type"
     },
     {
@@ -1792,7 +1792,7 @@
       "source_location": "L692",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_definitions_identifier",
-      "community": 67,
+      "community": 55,
       "norm_label": "identifier"
     },
     {
@@ -1802,7 +1802,7 @@
       "source_location": "L694",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_identifier_oneof",
-      "community": 67,
+      "community": 55,
       "norm_label": "oneof"
     },
     {
@@ -1962,7 +1962,7 @@
       "source_location": "L3386",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_definitions_shellscopeentryallowedargs",
-      "community": 55,
+      "community": 23,
       "norm_label": "shellscopeentryallowedargs"
     },
     {
@@ -1972,7 +1972,7 @@
       "source_location": "L3387",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_shellscopeentryallowedargs_description",
-      "community": 55,
+      "community": 23,
       "norm_label": "description"
     },
     {
@@ -1982,7 +1982,7 @@
       "source_location": "L3388",
       "_origin": "ast",
       "id": "src_tauri_gen_schemas_desktop_schema_shellscopeentryallowedargs_anyof",
-      "community": 55,
+      "community": 23,
       "norm_label": "anyof"
     },
     {
@@ -3722,7 +3722,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_tauri_src_api_src_lib",
-      "community": 4,
+      "community": 1,
       "norm_label": "lib.rs"
     },
     {
@@ -4122,7 +4122,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_tauri_src_git_handler_src_cmd_git_mod",
-      "community": 4,
+      "community": 35,
       "norm_label": "mod.rs"
     },
     {
@@ -7382,7 +7382,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "src_api_models_branchname",
-      "community": 43,
+      "community": 32,
       "norm_label": "branchname"
     },
     {
@@ -7422,7 +7422,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "src_api_models_diffsummary",
-      "community": 12,
+      "community": 35,
       "norm_label": "diffsummary"
     },
     {
@@ -7462,7 +7462,7 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "src_api_models_ancestorinfo",
-      "community": 53,
+      "community": 35,
       "norm_label": "ancestorinfo"
     },
     {
@@ -7472,7 +7472,7 @@
       "source_location": "L123",
       "_origin": "ast",
       "id": "src_api_models_commonancestorinfo",
-      "community": 40,
+      "community": 53,
       "norm_label": "commonancestorinfo"
     },
     {
@@ -7482,7 +7482,7 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "src_api_models_branchdivergence",
-      "community": 53,
+      "community": 40,
       "norm_label": "branchdivergence"
     },
     {
@@ -7522,7 +7522,7 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "src_api_models_mergestatus",
-      "community": 54,
+      "community": 16,
       "norm_label": "mergestatus"
     },
     {
@@ -7582,7 +7582,7 @@
       "source_location": "L180",
       "_origin": "ast",
       "id": "src_api_models_worktreefileinfo",
-      "community": 16,
+      "community": 4,
       "norm_label": "worktreefileinfo"
     },
     {
@@ -7612,7 +7612,7 @@
       "source_location": "L194",
       "_origin": "ast",
       "id": "src_api_models_fileoftype",
-      "community": 54,
+      "community": 16,
       "norm_label": "fileoftype"
     },
     {
@@ -7642,7 +7642,7 @@
       "source_location": "L199",
       "_origin": "ast",
       "id": "src_api_models_filetypefilter",
-      "community": 53,
+      "community": 35,
       "norm_label": "filetypefilter"
     },
     {
@@ -7652,7 +7652,7 @@
       "source_location": "L202",
       "_origin": "ast",
       "id": "src_api_models_versionedfileinfo",
-      "community": 16,
+      "community": 4,
       "norm_label": "versionedfileinfo"
     },
     {
@@ -7712,7 +7712,7 @@
       "source_location": "L236",
       "_origin": "ast",
       "id": "src_api_models_remotebranch",
-      "community": 43,
+      "community": 12,
       "norm_label": "remotebranch"
     },
     {
@@ -7882,7 +7882,7 @@
       "source_location": "L296",
       "_origin": "ast",
       "id": "src_api_models_appmessage",
-      "community": 53,
+      "community": 35,
       "norm_label": "appmessage"
     },
     {
@@ -7892,7 +7892,7 @@
       "source_location": "L301",
       "_origin": "ast",
       "id": "src_api_models_appevent",
-      "community": 40,
+      "community": 35,
       "norm_label": "appevent"
     },
     {
@@ -8062,7 +8062,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_api_mutations_addremote",
-      "community": 47,
+      "community": 27,
       "norm_label": "addremote.ts"
     },
     {
@@ -8072,7 +8072,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "src_api_mutations_addremote_addremoteargs",
-      "community": 47,
+      "community": 27,
       "norm_label": "addremoteargs"
     },
     {
@@ -8082,7 +8082,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "src_api_mutations_addremote_addremotekey",
-      "community": 47,
+      "community": 27,
       "norm_label": "addremotekey()"
     },
     {
@@ -8092,7 +8092,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "src_api_mutations_addremote_addremotemutation",
-      "community": 47,
+      "community": 27,
       "norm_label": "addremotemutation()"
     },
     {
@@ -8102,7 +8102,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "src_api_mutations_addremote_useaddremote",
-      "community": 47,
+      "community": 27,
       "norm_label": "useaddremote()"
     },
     {
@@ -8902,7 +8902,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_api_mutations_deletebranches",
-      "community": 43,
+      "community": 12,
       "norm_label": "deletebranches.ts"
     },
     {
@@ -8912,7 +8912,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "src_api_mutations_deletebranches_deletelocalbranchesargs",
-      "community": 43,
+      "community": 12,
       "norm_label": "deletelocalbranchesargs"
     },
     {
@@ -8932,7 +8932,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "src_api_mutations_deletebranches_deletelocalbrancheskey",
-      "community": 43,
+      "community": 12,
       "norm_label": "deletelocalbrancheskey()"
     },
     {
@@ -8942,7 +8942,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "src_api_mutations_deletebranches_deletelocalbranchesmutation",
-      "community": 43,
+      "community": 12,
       "norm_label": "deletelocalbranchesmutation()"
     },
     {
@@ -8952,7 +8952,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "src_api_mutations_deletebranches_deleteremotebrancheskey",
-      "community": 43,
+      "community": 12,
       "norm_label": "deleteremotebrancheskey()"
     },
     {
@@ -8962,7 +8962,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "src_api_mutations_deletebranches_deleteremotebranchesmutation",
-      "community": 43,
+      "community": 12,
       "norm_label": "deleteremotebranchesmutation()"
     },
     {
@@ -8972,7 +8972,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "src_api_mutations_deletebranches_usemakedeletebranch",
-      "community": 43,
+      "community": 12,
       "norm_label": "usemakedeletebranch()"
     },
     {
@@ -8982,7 +8982,7 @@
       "source_location": "L104",
       "_origin": "ast",
       "id": "src_api_mutations_deletebranches_usedeletebranches",
-      "community": 43,
+      "community": 12,
       "norm_label": "usedeletebranches()"
     },
     {
@@ -8992,7 +8992,7 @@
       "source_location": "L164",
       "_origin": "ast",
       "id": "src_api_mutations_deletebranches_findremoteandbranch",
-      "community": 43,
+      "community": 12,
       "norm_label": "findremoteandbranch()"
     },
     {
@@ -9002,7 +9002,7 @@
       "source_location": "L191",
       "_origin": "ast",
       "id": "src_api_mutations_deletebranches_groupbranchesbyremote",
-      "community": 43,
+      "community": 12,
       "norm_label": "groupbranchesbyremote()"
     },
     {
@@ -9772,7 +9772,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_api_mutations_removefromtree",
-      "community": 23,
+      "community": 47,
       "norm_label": "removefromtree.ts"
     },
     {
@@ -9782,7 +9782,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "src_api_mutations_removefromtree_removefromtreeargs",
-      "community": 23,
+      "community": 47,
       "norm_label": "removefromtreeargs"
     },
     {
@@ -9792,7 +9792,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "src_api_mutations_removefromtree_removefromtreekey",
-      "community": 23,
+      "community": 47,
       "norm_label": "removefromtreekey()"
     },
     {
@@ -9802,7 +9802,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "src_api_mutations_removefromtree_removefromtreemutation",
-      "community": 23,
+      "community": 47,
       "norm_label": "removefromtreemutation()"
     },
     {
@@ -9812,7 +9812,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "src_api_mutations_removefromtree_usemakemarkasremoved",
-      "community": 23,
+      "community": 47,
       "norm_label": "usemakemarkasremoved()"
     },
     {
@@ -9822,7 +9822,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "src_api_mutations_removefromtree_usemarkasremoved",
-      "community": 23,
+      "community": 47,
       "norm_label": "usemarkasremoved()"
     },
     {
@@ -10222,7 +10222,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "src_api_mutations_savestash_savestashargs",
-      "community": 16,
+      "community": 4,
       "norm_label": "savestashargs"
     },
     {
@@ -10682,7 +10682,7 @@
       "source_location": "L282",
       "_origin": "ast",
       "id": "src_api_mutations_solvefileconflicts_useacceptmanydeletions",
-      "community": 23,
+      "community": 47,
       "norm_label": "useacceptmanydeletions()"
     },
     {
@@ -11102,7 +11102,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_api_queries_commonancestor",
-      "community": 40,
+      "community": 53,
       "norm_label": "commonancestor.ts"
     },
     {
@@ -11112,7 +11112,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "src_api_queries_commonancestor_commonancestorquerykeys",
-      "community": 40,
+      "community": 53,
       "norm_label": "commonancestorquerykeys"
     },
     {
@@ -11122,7 +11122,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "src_api_queries_commonancestor_fetchcommonancestor",
-      "community": 40,
+      "community": 53,
       "norm_label": "fetchcommonancestor()"
     },
     {
@@ -11132,7 +11132,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "src_api_queries_commonancestor_commonancestorquery",
-      "community": 40,
+      "community": 53,
       "norm_label": "commonancestorquery()"
     },
     {
@@ -11202,7 +11202,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_api_queries_diffsummary",
-      "community": 12,
+      "community": 40,
       "norm_label": "diffsummary.ts"
     },
     {
@@ -11212,7 +11212,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "src_api_queries_diffsummary_diffsummaryquerykeys",
-      "community": 12,
+      "community": 40,
       "norm_label": "diffsummaryquerykeys"
     },
     {
@@ -11222,7 +11222,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "src_api_queries_diffsummary_fetchdiffsummary",
-      "community": 12,
+      "community": 40,
       "norm_label": "fetchdiffsummary()"
     },
     {
@@ -11232,7 +11232,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "src_api_queries_diffsummary_diffsummaryquery",
-      "community": 12,
+      "community": 40,
       "norm_label": "diffsummaryquery()"
     },
     {
@@ -11242,7 +11242,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "src_api_queries_diffsummary_usequerydiffsummary",
-      "community": 12,
+      "community": 40,
       "norm_label": "usequerydiffsummary()"
     },
     {
@@ -11682,7 +11682,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "src_api_queries_stashfiles_fetchstashfilespage",
-      "community": 40,
+      "community": 54,
       "norm_label": "fetchstashfilespage()"
     },
     {
@@ -11922,7 +11922,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_api_queries_worktreefiles",
-      "community": 54,
+      "community": 16,
       "norm_label": "worktreefiles.ts"
     },
     {
@@ -11932,7 +11932,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "src_api_queries_worktreefiles_worktreefilesquerykeys",
-      "community": 54,
+      "community": 16,
       "norm_label": "worktreefilesquerykeys"
     },
     {
@@ -11942,7 +11942,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "src_api_queries_worktreefiles_fetchworktreefilespage",
-      "community": 54,
+      "community": 16,
       "norm_label": "fetchworktreefilespage()"
     },
     {
@@ -11952,7 +11952,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "src_api_queries_worktreefiles_worktreefilesquery",
-      "community": 54,
+      "community": 16,
       "norm_label": "worktreefilesquery()"
     },
     {
@@ -12002,7 +12002,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "src_api_schemas_diff_summary_schema",
-      "community": 12,
+      "community": 40,
       "norm_label": "diff_summary_schema"
     },
     {
@@ -12032,7 +12032,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "src_api_schemas_common_ancestor_info_schema",
-      "community": 40,
+      "community": 53,
       "norm_label": "common_ancestor_info_schema"
     },
     {
@@ -12212,7 +12212,7 @@
       "source_location": "L155",
       "_origin": "ast",
       "id": "src_api_schemas_worktree_files_page_schema",
-      "community": 54,
+      "community": 16,
       "norm_label": "worktree_files_page_schema"
     },
     {
@@ -12442,7 +12442,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "src_api_utils_userepositoryquery",
-      "community": 54,
+      "community": 40,
       "norm_label": "userepositoryquery()"
     },
     {
@@ -12872,7 +12872,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "src_components_common_diffsummary_index_changessummaryprops",
-      "community": 12,
+      "community": 35,
       "norm_label": "changessummaryprops"
     },
     {
@@ -12942,7 +12942,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "src_components_common_file_item_index_fileitemprops",
-      "community": 16,
+      "community": 4,
       "norm_label": "fileitemprops"
     },
     {
@@ -12992,7 +12992,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_common_file_status_index",
-      "community": 16,
+      "community": 4,
       "norm_label": "index.tsx"
     },
     {
@@ -13002,7 +13002,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "src_components_common_file_status_index_filestatusprops",
-      "community": 16,
+      "community": 4,
       "norm_label": "filestatusprops"
     },
     {
@@ -13012,7 +13012,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "src_components_common_file_status_index_filestatus",
-      "community": 16,
+      "community": 4,
       "norm_label": "filestatus()"
     },
     {
@@ -13022,7 +13022,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "src_components_common_file_status_index_getfilestatus",
-      "community": 16,
+      "community": 4,
       "norm_label": "getfilestatus()"
     },
     {
@@ -13072,7 +13072,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "src_components_common_fileselectordialog_index_fileselectordialogprops",
-      "community": 54,
+      "community": 16,
       "norm_label": "fileselectordialogprops"
     },
     {
@@ -14752,7 +14752,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_common_toasts_dirdisappeared_index",
-      "community": 39,
+      "community": 40,
       "norm_label": "index.tsx"
     },
     {
@@ -16082,7 +16082,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "src_components_layout_widgets_selectedfilediff_index_selectedfilediffprops",
-      "community": 16,
+      "community": 4,
       "norm_label": "selectedfilediffprops"
     },
     {
@@ -17712,7 +17712,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "src_components_lib_toasts_toast_index_toastargs",
-      "community": 39,
+      "community": 40,
       "norm_label": "toastargs"
     },
     {
@@ -18022,7 +18022,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_ui_chip_index",
-      "community": 39,
+      "community": 40,
       "norm_label": "index.tsx"
     },
     {
@@ -18042,7 +18042,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "src_components_ui_chip_index_chip",
-      "community": 39,
+      "community": 40,
       "norm_label": "chip()"
     },
     {
@@ -21182,7 +21182,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_state_file",
-      "community": 16,
+      "community": 39,
       "norm_label": "file.ts"
     },
     {
@@ -21192,7 +21192,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "src_state_file_filediffs",
-      "community": 16,
+      "community": 4,
       "norm_label": "filediffs"
     },
     {
@@ -21202,7 +21202,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "src_state_file_setters",
-      "community": 16,
+      "community": 4,
       "norm_label": "setters"
     },
     {
@@ -21212,7 +21212,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "src_state_file_usefilediffsstore",
-      "community": 16,
+      "community": 39,
       "norm_label": "usefilediffsstore"
     },
     {
@@ -32264,7 +32264,7 @@
       "weight": 1.0,
       "context": "import",
       "source": "src_tauri_src_api_src_lib",
-      "target": "src_components_common_fileviewer_conflict_utils",
+      "target": "src_components_layout_widgets_graph_utils",
       "confidence_score": 1.0
     },
     {
@@ -32565,7 +32565,7 @@
       "weight": 1.0,
       "context": "import",
       "source": "src_tauri_src_diffs_src_lib",
-      "target": "src_components_common_fileviewer_conflict_utils",
+      "target": "src_components_layout_widgets_graph_utils",
       "confidence_score": 1.0
     },
     {
@@ -33161,7 +33161,7 @@
       "weight": 1.0,
       "context": "import",
       "source": "src_tauri_src_git_handler_src_cmd_git_mod",
-      "target": "src_components_common_fileviewer_conflict_utils",
+      "target": "src_components_layout_widgets_graph_utils",
       "confidence_score": 1.0
     },
     {
@@ -39836,7 +39836,7 @@
       "weight": 1.0,
       "context": "import",
       "source": "src_tauri_src_repo_watcher_src_debounced_watcher",
-      "target": "src_components_common_fileviewer_conflict_utils",
+      "target": "src_components_layout_widgets_graph_utils",
       "confidence_score": 1.0
     },
     {
@@ -96086,7 +96086,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/lib/WithContextMenu/index.tsx",
-      "source_location": "L79",
+      "source_location": "L78",
       "weight": 1.0,
       "source": "src_components_lib_withcontextmenu_index_withcontextmenu",
       "target": "src_utils_styles_cn"
@@ -99386,7 +99386,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/ui/Menu/index.tsx",
-      "source_location": "L33",
+      "source_location": "L34",
       "weight": 1.0,
       "source": "src_components_ui_menu_index_menu",
       "target": "src_utils_styles_propswithcn"

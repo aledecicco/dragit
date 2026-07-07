@@ -52,27 +52,38 @@ const Marquee = (props: MarqueeProps) => {
     ...divProps
   } = props
 
-  const [overflow, setOverflow] = useState(0)
-  const shouldScroll = overflow > 0
-  const animationDuration = Math.max(0.5, overflow / speed)
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
+  // Sizes as last reported by the ResizeObserver
+  const sizes = useRef({ container: 0, content: 0 })
+
+  // Measurements are written directly to the DOM to go around react's render cycle as much as possible.
   const refresh = useThrottledCallback(
     () => {
-      if (
-        contentRef.current &&
-        containerRef.current &&
-        contentRef.current.clientWidth > containerRef.current.clientWidth
-      ) {
-        setOverflow(
-          infinite
-            ? contentRef.current.clientWidth + INFINITE_SPACING
-            : contentRef.current.clientWidth - containerRef.current.clientWidth,
-        )
-      } else {
-        setOverflow(0)
+      const container = containerRef.current
+
+      if (!container) {
+        return
       }
+
+      const { container: containerWidth, content: contentWidth } = sizes.current
+
+      const overflow =
+        contentWidth - containerWidth > 1
+          ? Math.floor(
+              infinite
+                ? contentWidth + INFINITE_SPACING
+                : contentWidth - containerWidth,
+            )
+          : 0
+
+      container.toggleAttribute('data-overflowing', overflow > 0)
+      container.style.setProperty('--marquee-overflow', `${overflow}px`)
+      container.style.setProperty(
+        '--marquee-duration',
+        `${Math.max(0.5, overflow / speed)}s`,
+      )
     },
     {
       trailingCall: true,
@@ -80,23 +91,36 @@ const Marquee = (props: MarqueeProps) => {
     },
   )
 
-  const observer = useRef(new ResizeObserver(refresh))
+  const [observer] = useState(
+    () =>
+      new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.target === containerRef.current) {
+            sizes.current.container = entry.contentRect.width
+          } else if (entry.target === contentRef.current) {
+            sizes.current.content = entry.contentRect.width
+          }
+        }
+
+        refresh()
+      }),
+  )
 
   useEffect(() => {
     if (contentRef.current) {
-      observer.current.observe(contentRef.current)
+      observer.observe(contentRef.current)
     }
 
     if (containerRef.current) {
-      observer.current.observe(containerRef.current)
+      observer.observe(containerRef.current)
     }
 
     return () => {
-      observer.current.disconnect()
+      observer.disconnect()
     }
-  }, [])
+  }, [observer])
 
-  const childrenCopy = infinite && shouldScroll && (
+  const childrenCopy = infinite && (
     <div
       className={cn('absolute top-0', reverse ? 'right-full' : 'left-full')}
       style={
@@ -123,43 +147,35 @@ const Marquee = (props: MarqueeProps) => {
         ref={contentRef}
         className={cn(
           'text-nowrap whitespace-nowrap min-w-max',
-          shouldScroll &&
-            'group-hover:animate-scroll-horizontal group-focus:animate-scroll-horizontal',
+          'group-data-overflowing:will-change-transform',
+          'group-data-overflowing:group-hover:animate-scroll-horizontal',
+          'group-data-overflowing:group-focus:animate-scroll-horizontal',
           infinite && 'relative',
         )}
-        style={{
-          ...(shouldScroll &&
-            ({
-              animationDuration: `${animationDuration}s`,
-              animationFillMode: infinite ? undefined : 'forwards',
-              animationIterationCount: infinite ? 'infinite' : 1,
-              '--scroll-to': infinite
-                ? reverse
-                  ? `calc(100% + ${INFINITE_SPACING}px)`
-                  : `calc(-100% - ${INFINITE_SPACING}px)`
-                : reverse
-                  ? `${overflow}px`
-                  : `${-overflow}px`,
-            } as CSSProperties)),
-        }}
+        style={
+          {
+            animationDuration: 'var(--marquee-duration, 1s)',
+            animationFillMode: infinite ? undefined : 'forwards',
+            animationIterationCount: infinite ? 'infinite' : 1,
+            '--scroll-to': infinite
+              ? reverse
+                ? `calc(100% + ${INFINITE_SPACING}px)`
+                : `calc(-100% - ${INFINITE_SPACING}px)`
+              : reverse
+                ? 'var(--marquee-overflow, 0px)'
+                : 'calc(-1 * var(--marquee-overflow, 0px))',
+          } as CSSProperties
+        }
       >
-        {reverse ? (
-          <>
-            {children}
-            {childrenCopy}
-          </>
-        ) : (
-          <>
-            {children}
-            {childrenCopy}
-          </>
-        )}
+        {children}
+        {childrenCopy}
       </div>
 
-      {shouldScroll && withShadows && (
+      {withShadows && (
         <>
           <div
             className={cn(
+              'hidden group-data-overflowing:block',
               'absolute top-0 -left-0.5 h-full',
               'w-2 bg-linear-to-r from-dark-950/70 to-transparent rounded-r-xs',
               reverse
@@ -173,11 +189,13 @@ const Marquee = (props: MarqueeProps) => {
               'pointer-events-none',
             )}
             style={{
-              animationDuration: `${Math.min(0.5, animationDuration / 2)}s`,
+              animationDuration:
+                'min(0.5s, calc(var(--marquee-duration, 1s) / 2))',
             }}
           />
           <div
             className={cn(
+              'hidden group-data-overflowing:block',
               'absolute top-0 -right-0.5 h-full',
               'opacity-100 w-2 bg-linear-to-l from-dark-950/70 to-transparent rounded-r-xs',
               reverse
@@ -189,7 +207,7 @@ const Marquee = (props: MarqueeProps) => {
                   ],
             )}
             style={{
-              animationDuration: `${animationDuration}s`,
+              animationDuration: 'var(--marquee-duration, 1s)',
             }}
           />
         </>

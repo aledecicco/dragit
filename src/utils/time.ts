@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useSettings } from '@/state/storage'
 
@@ -18,7 +18,7 @@ export const MS_IN_YEAR = 365 * MS_IN_DAY
  */
 export const useTimedValue = <T>(factory: () => T, interval: number) => {
   const isSet = useRef(false)
-  const [value, setValue] = useState(factory())
+  const [value, setValue] = useState(() => factory())
 
   useEffect(() => {
     if (!isSet.current) {
@@ -95,11 +95,20 @@ export const useDateDifference = (timestamp: Date | number): string => {
 export const useDateInfo = (timestamp: Date | number) => {
   const { relativeTimestamps } = useSettings()
 
-  const date = typeof timestamp === 'number' ? new Date(timestamp) : timestamp
-  const dateString = `on ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`
-  const timeAgo = useDateDifference(date)
+  const timeAgo = useDateDifference(timestamp)
 
-  return relativeTimestamps ? timeAgo : dateString
+  // The absolute date string is comparatively expensive to build (`toLocale*`
+  // creates an `Intl.DateTimeFormat` internally), so only build it when used.
+  return useMemo(() => {
+    if (relativeTimestamps) {
+      return timeAgo
+    }
+
+    const date =
+      typeof timestamp === 'number' ? new Date(timestamp) : timestamp
+
+    return `on ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`
+  }, [relativeTimestamps, timeAgo, timestamp])
 }
 
 /**

@@ -72,25 +72,19 @@ function useThrottledCallback<T>(
   callback: (args: T) => void,
   options?: ThrottleOptions,
 ): (args: T) => void {
-  /**
-   * Whether calls must be stopped.
-   */
-  const wait = useRef(false)
-  /**
-   * Whether a call was made during the wait period.
-   */
-  const pending = useRef(false)
+  const shouldSkip = useRef(false)
+  const hasPendingCall = useRef(false)
 
   const timeoutId = useRef<number>(null)
 
   return (args: T) => {
-    if (wait.current) {
-      pending.current = true
+    if (shouldSkip.current) {
+      hasPendingCall.current = true
       return
     }
 
-    wait.current = true
-    pending.current = false
+    shouldSkip.current = true
+    hasPendingCall.current = false
 
     const executeAndSchedule = () => {
       callback(args)
@@ -102,10 +96,10 @@ function useThrottledCallback<T>(
       timeoutId.current = setTimeout(
         () => {
           timeoutId.current = null
-          wait.current = false
+          shouldSkip.current = false
 
-          if (pending.current) {
-            pending.current = false
+          if (hasPendingCall.current) {
+            hasPendingCall.current = false
 
             if (options?.trailingCall) {
               callback(args)

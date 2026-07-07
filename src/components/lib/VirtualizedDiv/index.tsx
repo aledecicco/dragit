@@ -67,7 +67,7 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
     paddingEnd: 8,
     gap: 8,
     count: items?.length ?? 0,
-    overscan: 2,
+    overscan: 8,
     ...options,
   })
 
