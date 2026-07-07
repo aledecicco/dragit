@@ -50,6 +50,7 @@ const Tooltip = (props: TooltipProps) => {
         {...propsWithCn(
           tooltipProps,
           'z-8',
+          'opacity-0 data-enter:opacity-100 transition-opacity duration-100 ease-in-out',
           'shadow-md bg-dark-400',
           'p-2 rounded-sm text-xs text-light-300',
         )}

@@ -3,16 +3,22 @@ import { type AnimationParams, animate, easings } from 'animejs'
 
 import type { ActionStatus } from '@/state/actions'
 
-export const FADE_OUT_ANIMATION: AnimationParams = {
+export const DISAPPEAR_ANIMATION: AnimationParams = {
   opacity: [1, 0],
   translateY: [0, 10],
   duration: 200,
   ease: 'outSine',
 }
 
-export const FADE_IN_ANIMATION: AnimationParams = {
+export const APPEAR_ANIMATION: AnimationParams = {
   opacity: [0, 1],
   translateY: [-10, 0],
+  duration: 200,
+  ease: 'outSine',
+}
+
+export const FADE_IN_ANIMATION: AnimationParams = {
+  opacity: [0, 1],
   duration: 200,
   ease: 'outSine',
 }

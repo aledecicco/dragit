@@ -21666,14 +21666,14 @@
       "norm_label": "animation.ts"
     },
     {
-      "label": "FADE_OUT_ANIMATION",
+      "label": "DISAPPEAR_ANIMATION",
       "file_type": "code",
       "source_file": "src/utils/animation.ts",
       "source_location": "L6",
       "_origin": "ast",
-      "id": "src_utils_animation_fade_out_animation",
+      "id": "src_utils_animation_DISAPPEAR_ANIMATION",
       "community": 42,
-      "norm_label": "fade_out_animation"
+      "norm_label": "DISAPPEAR_ANIMATION"
     },
     {
       "label": "FADE_IN_ANIMATION",
@@ -98913,7 +98913,7 @@
       "source_location": "L8",
       "weight": 1.0,
       "source": "src_components_ui_icon_index",
-      "target": "src_utils_animation_fade_out_animation",
+      "target": "src_utils_animation_DISAPPEAR_ANIMATION",
       "confidence_score": 1.0
     },
     {
@@ -105146,7 +105146,7 @@
       "source_location": "L6",
       "weight": 1.0,
       "source": "src_utils_animation",
-      "target": "src_utils_animation_fade_out_animation",
+      "target": "src_utils_animation_DISAPPEAR_ANIMATION",
       "confidence_score": 1.0
     },
     {

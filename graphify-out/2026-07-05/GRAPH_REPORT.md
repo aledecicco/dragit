@@ -388,7 +388,7 @@ Nodes (12): OpenFolderArgs, openFolderKey, openFolderMutation, useChangeCurrentF
 
 ### Community 42 - "animation.ts"
 Cohesion: 0.22
-Nodes (9): ActiveActionIndicator(), TrackerDecoratedButton(), ActionStatus, getActionGlyph(), useActionPresenters(), FADE_IN_ANIMATION, FADE_OUT_ANIMATION, SPINNER_ANIMATION (+1 more)
+Nodes (9): ActiveActionIndicator(), TrackerDecoratedButton(), ActionStatus, getActionGlyph(), useActionPresenters(), FADE_IN_ANIMATION, DISAPPEAR_ANIMATION, SPINNER_ANIMATION (+1 more)
 
 ### Community 43 - "Save Stash Mutations"
 Cohesion: 0.24

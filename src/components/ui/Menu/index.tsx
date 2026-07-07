@@ -21,6 +21,7 @@ const Menu = (props: MenuProps) => {
       {...propsWithCn(
         menuProps,
         'z-8',
+        'opacity-0 data-enter:opacity-100 transition-opacity duration-100 ease-in-out',
         'rounded-md shadow-md',
         'bg-dark-300',
         '*:[[role=menuitem]]:not-first-of-type:rounded-t-none',

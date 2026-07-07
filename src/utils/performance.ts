@@ -1,4 +1,4 @@
-import { useReducer, useRef } from 'react'
+import { useCallback, useReducer, useRef } from 'react'
 import { useVirtualizer as useTanstackVirtualizer } from '@tanstack/react-virtual'
 
 import { MS_IN_SECOND } from './time'
@@ -150,6 +150,8 @@ type VirtualizerOptions<T extends Element, I extends Element> = Parameters<
  * - `scrollElement`: The scrollable element.
  * - `totalSize`: The total size of the virtualized content.
  * - `virtualItems`: The list of virtual items.
+ * - `getItemKey`: Returns the key of the item at an index, the same key used
+ *   for the virtual items. Stable across renders, safe as effect dependency.
  */
 const useVirtualizer = <T extends Element, I extends Element>(
   options: VirtualizerOptions<T, I>,
@@ -159,14 +161,21 @@ const useVirtualizer = <T extends Element, I extends Element>(
   // TODO: https://github.com/TanStack/virtual/issues/736
   // TODO: https://github.com/TanStack/virtual/issues/743
 
+  const instance = useTanstackVirtualizer(options)
   const { scrollOffset, scrollElement, getTotalSize, getVirtualItems } =
-    useTanstackVirtualizer(options)
+    instance
+
+  const getItemKey = useCallback(
+    (index: number) => instance.options.getItemKey(index),
+    [instance],
+  )
 
   return {
     scrollOffset,
     scrollElement,
     totalSize: getTotalSize(),
     virtualItems: getVirtualItems(),
+    getItemKey,
   }
 }
 

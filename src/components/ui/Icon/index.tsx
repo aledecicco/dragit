@@ -5,7 +5,7 @@ import { mergeRefs } from 'react-merge-refs'
 import { usePreviousDistinct } from 'react-use'
 import { match } from 'ts-pattern'
 
-import { FADE_IN_ANIMATION, FADE_OUT_ANIMATION } from '@/utils/animation'
+import { APPEAR_ANIMATION, DISAPPEAR_ANIMATION } from '@/utils/animation'
 import { propsWithCn } from '@/utils/styles'
 import type { Size } from '@/utils/types'
 
@@ -51,7 +51,7 @@ const Icon = (props: IconProps) => {
 
     if (leavingRef.current) {
       animate(leavingRef.current, {
-        ...FADE_OUT_ANIMATION,
+        ...DISAPPEAR_ANIMATION,
         onComplete: () => {
           setLeavingGlyph(undefined)
         },
@@ -59,7 +59,7 @@ const Icon = (props: IconProps) => {
     }
 
     if (currentRef.current) {
-      animate(currentRef.current, FADE_IN_ANIMATION)
+      animate(currentRef.current, APPEAR_ANIMATION)
     }
   }, [LeavingGlyph])
 

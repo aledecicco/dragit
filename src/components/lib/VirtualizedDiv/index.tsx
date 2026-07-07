@@ -1,4 +1,4 @@
-import { type ReactNode, useRef } from 'react'
+import { type Key, type ReactNode, useEffect, useRef } from 'react'
 import type { VirtualizerOptions } from '@tanstack/react-virtual'
 
 import {
@@ -59,6 +59,7 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
   } = props
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+
   const virtualizer = useVirtualizer({
     estimateSize: () => itemSize,
     getScrollElement: () => scrollContainerRef.current,
@@ -69,6 +70,26 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
     overscan: 2,
     ...options,
   })
+
+  const seenKeys = useRef(new Set<Key>())
+
+  useEffect(() => {
+    for (const virtualRow of virtualizer.virtualItems) {
+      seenKeys.current.add(virtualRow.key)
+    }
+  }, [virtualizer.virtualItems])
+
+  useEffect(() => {
+    const currentKeys = new Set(
+      items?.map((_, index) => virtualizer.getItemKey(index)),
+    )
+
+    for (const key of seenKeys.current) {
+      if (!currentKeys.has(key)) {
+        seenKeys.current.delete(key)
+      }
+    }
+  }, [items, virtualizer.getItemKey])
 
   return (
     <ScrollShadowDiv
@@ -97,6 +118,7 @@ const VirtualizedDiv = <T,>(props: VirtualizedDivProps<T>) => {
                 key={virtualRow.key}
                 itemSize={itemSize}
                 position={virtualRow.start}
+                isNew={!seenKeys.current.has(virtualRow.key)}
                 {...itemProps}
               >
                 {renderItem(items[virtualRow.index], virtualRow.index)}
