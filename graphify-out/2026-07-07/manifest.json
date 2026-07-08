@@ -440,9 +440,9 @@
     "semantic_hash": "acfbf0dfdc3f590f84966ced9a9bd4ea"
   },
   "src/api/queries/commitHistory.ts": {
-    "mtime": 1781580518.0253544,
-    "ast_hash": "8d5ee8ba7fa07da0b4e9f24338c70ad3",
-    "semantic_hash": "8d5ee8ba7fa07da0b4e9f24338c70ad3"
+    "mtime": 1783468255.3395002,
+    "ast_hash": "c6da3f2fbf1e0a05bfaf064c3522813c",
+    "semantic_hash": ""
   },
   "src/api/queries/commitInfo.ts": {
     "mtime": 1782515060.2746966,
@@ -450,9 +450,9 @@
     "semantic_hash": "eeb71298abf4e40ff6161b62cb16bb11"
   },
   "src/api/queries/commonAncestor.ts": {
-    "mtime": 1781580518.0253544,
-    "ast_hash": "d036f97d6594ce67c4b98ccb4c4b26d0",
-    "semantic_hash": "d036f97d6594ce67c4b98ccb4c4b26d0"
+    "mtime": 1783468242.7676494,
+    "ast_hash": "f883c878f01c0324187e95381f043633",
+    "semantic_hash": ""
   },
   "src/api/queries/currentDir.ts": {
     "mtime": 1782515060.2746966,
@@ -910,13 +910,13 @@
     "semantic_hash": "b1df84b2df7c13347f52e937c79f9619"
   },
   "src/components/layout/widgets/Graph/Branch/Base/index.tsx": {
-    "mtime": 1783309627.6504958,
+    "mtime": 1783470540.9581044,
     "ast_hash": "4fcb25030c5c353baf24aa2002424e27",
     "semantic_hash": ""
   },
   "src/components/layout/widgets/Graph/Branch/Current/index.tsx": {
-    "mtime": 1783309627.6504958,
-    "ast_hash": "428cb5a1cd5a5d9cfa83f001ceb29503",
+    "mtime": 1783470536.8101487,
+    "ast_hash": "accd968754a63dc1db72dc2ac847d578",
     "semantic_hash": ""
   },
   "src/components/layout/widgets/Graph/Branch/Message/index.tsx": {
@@ -950,13 +950,13 @@
     "semantic_hash": ""
   },
   "src/components/layout/widgets/Graph/Commit/index.tsx": {
-    "mtime": 1783301457.8314948,
-    "ast_hash": "2d1d48b8ca04188eaaa6dc6fe1a7f1d6",
-    "semantic_hash": "2d1d48b8ca04188eaaa6dc6fe1a7f1d6"
+    "mtime": 1783471695.7699373,
+    "ast_hash": "4af145f62a869a0abd95920a20988e84",
+    "semantic_hash": ""
   },
   "src/components/layout/widgets/Graph/Draft/index.tsx": {
-    "mtime": 1783309627.6504958,
-    "ast_hash": "cc7aa3a6db324ec9d1dd2c5712274e23",
+    "mtime": 1783471689.32002,
+    "ast_hash": "700465b642db1986ec7f6ec56e109c28",
     "semantic_hash": ""
   },
   "src/components/layout/widgets/Graph/DropAreas/index.tsx": {
@@ -965,8 +965,8 @@
     "semantic_hash": "e4f9d9fff283b6b951c895d5e0407abf"
   },
   "src/components/layout/widgets/Graph/Edges/index.tsx": {
-    "mtime": 1783309627.6504958,
-    "ast_hash": "2d598c4870818a0de043a27e2c7c8189",
+    "mtime": 1783471683.7610912,
+    "ast_hash": "6597c41b570ee4469bf121a8e581a624",
     "semantic_hash": ""
   },
   "src/components/layout/widgets/Graph/Edges/utils.ts": {
@@ -995,9 +995,9 @@
     "semantic_hash": ""
   },
   "src/components/layout/widgets/Graph/utils.ts": {
-    "mtime": 1782515060.2768738,
-    "ast_hash": "bbe9b5817a31f1fcaab83672bdc33f51",
-    "semantic_hash": "bbe9b5817a31f1fcaab83672bdc33f51"
+    "mtime": 1783467123.6174219,
+    "ast_hash": "d827f25ccd511b69da85bfd929b16fc4",
+    "semantic_hash": ""
   },
   "src/components/layout/widgets/MainToolbar/index.tsx": {
     "mtime": 1782515060.2768738,
@@ -1535,8 +1535,8 @@
     "semantic_hash": "3ff59791cdaba9e1eb00238956ff14bb"
   },
   "src/utils/animation.ts": {
-    "mtime": 1783394477.4187174,
-    "ast_hash": "46ef0be76be684f4574bd85908257239",
+    "mtime": 1783470463.7369316,
+    "ast_hash": "62c6ab0fb6eb20b3843c755bcf30a2a6",
     "semantic_hash": ""
   },
   "src/utils/array.ts": {
@@ -1980,7 +1980,7 @@
     "semantic_hash": ""
   },
   "src/components/layout/widgets/Graph/SvgOverlay/animation.ts": {
-    "mtime": 1783368405.1422276,
+    "mtime": 1783471422.1115453,
     "ast_hash": "a8521561cdb3267ba024080067b66daa",
     "semantic_hash": ""
   }

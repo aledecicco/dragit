@@ -144,8 +144,7 @@ type VirtualizerOptions<T extends Element, I extends Element> = Parameters<
  * - `scrollElement`: The scrollable element.
  * - `totalSize`: The total size of the virtualized content.
  * - `virtualItems`: The list of virtual items.
- * - `getItemKey`: Returns the key of the item at an index, the same key used
- *   for the virtual items. Stable across renders, safe as effect dependency.
+ * - `getItemKey`: Returns the key of the item at an index.
  */
 const useVirtualizer = <T extends Element, I extends Element>(
   options: VirtualizerOptions<T, I>,

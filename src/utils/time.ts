@@ -94,21 +94,15 @@ export const useDateDifference = (timestamp: Date | number): string => {
  */
 export const useDateInfo = (timestamp: Date | number) => {
   const { relativeTimestamps } = useSettings()
-
   const timeAgo = useDateDifference(timestamp)
 
-  // The absolute date string is comparatively expensive to build (`toLocale*`
-  // creates an `Intl.DateTimeFormat` internally), so only build it when used.
-  return useMemo(() => {
-    if (relativeTimestamps) {
-      return timeAgo
-    }
+  if (relativeTimestamps) {
+    return timeAgo
+  }
 
-    const date =
-      typeof timestamp === 'number' ? new Date(timestamp) : timestamp
+  const date = typeof timestamp === 'number' ? new Date(timestamp) : timestamp
 
-    return `on ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`
-  }, [relativeTimestamps, timeAgo, timestamp])
+  return `on ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`
 }
 
 /**

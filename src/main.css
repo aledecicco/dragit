@@ -106,6 +106,7 @@
   }
 
   --animate-fade-in: fade-in 0.5s linear forwards;
+  --animate-node-fade-in: fade-in 200ms ease-in-out both;
 
   @keyframes fade-in {
     from {
@@ -115,8 +116,6 @@
       opacity: 1;
     }
   }
-
-  --animate-node-fade-in: fade-in 200ms ease-in-out both;
 
   --animate-fade-out: fade-out 0.5s linear forwards;
 
