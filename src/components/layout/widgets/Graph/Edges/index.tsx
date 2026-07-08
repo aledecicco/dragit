@@ -42,7 +42,7 @@ const Edges = () => {
         key={id}
         ref={(pathEl) => graphAnimator.registerPath(id, pathEl)}
         className={cn(
-          'fill-none stroke-4',
+          'fill-none stroke-4 animate-node-fade-in',
           match(elem.parent.type)
             .with('solid', () => 'stroke-primary-600')
             .with('dashed', () => 'stroke-primary-600 [stroke-dasharray:8_5]')

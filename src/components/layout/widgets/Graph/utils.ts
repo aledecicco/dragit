@@ -64,7 +64,9 @@ const useInfiniteScroll = (
       lastItem &&
       lastItem.index >= getPaginatedLength(historyQuery.data) - 1 &&
       historyQuery.hasNextPage &&
-      !historyQuery.isFetchingNextPage
+      !historyQuery.isFetchingNextPage &&
+      // Placeholder pages belong to a previously displayed reference.
+      !historyQuery.isPlaceholderData
     ) {
       historyQuery.fetchNextPage()
     }
@@ -72,6 +74,7 @@ const useInfiniteScroll = (
     items,
     historyQuery.hasNextPage,
     historyQuery.isFetchingNextPage,
+    historyQuery.isPlaceholderData,
     historyQuery.fetchNextPage,
     historyQuery.data,
   ])

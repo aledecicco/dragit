@@ -1,5 +1,6 @@
 import {
   infiniteQueryOptions,
+  keepPreviousData,
   type QueryFunctionContext,
   skipToken,
 } from '@tanstack/react-query'
@@ -54,6 +55,7 @@ const commitHistoryQuery = (repoPath: string, refName: string | undefined) =>
           fetchCommitHistoryPage(repoPath, refName, context.pageParam, context)
       : skipToken,
     enabled: !!refName,
+    placeholderData: refName ? keepPreviousData : undefined,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _, lastPageParam) => {
       return lastPage.hasNext ? lastPageParam + 1 : undefined

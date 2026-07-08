@@ -116,6 +116,8 @@
     }
   }
 
+  --animate-node-fade-in: fade-in 200ms ease-in-out both;
+
   --animate-fade-out: fade-out 0.5s linear forwards;
 
   @keyframes fade-out {

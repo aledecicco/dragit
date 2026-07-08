@@ -94,7 +94,7 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
 
     return (
       <div
-        {...propsWithCn(divProps, 'select-none')}
+        {...propsWithCn(divProps, 'select-none animate-node-fade-in')}
         ref={mergeRefs([trackRef, divProps.ref])}
       >
         <div

@@ -1,4 +1,5 @@
 import type { VirtualItem } from '@tanstack/react-virtual'
+import { usePrevious } from 'react-use'
 
 import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStaged'
 import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
@@ -73,11 +74,16 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
     !!stagedChangesQuery.data?.items.length ||
     !!notStagedChangesQuery.data?.items.length
 
+  // Keeps the draft mounted until the refreshed history arrives.
+  const prevHasWorktreeChanges = usePrevious(hasWorktreeChanges)
+  const showDraft =
+    hasWorktreeChanges || (!!prevHasWorktreeChanges && historyQuery.isFetching)
+
   if (!currentReference) {
     return <BranchMessage isBase={false}>No branch checked out</BranchMessage>
   }
 
-  if (commonAncestor && anchor === null && !hasWorktreeChanges) {
+  if (commonAncestor && anchor === null && !showDraft) {
     return <BranchMessage isBase={false}>No new commits</BranchMessage>
   }
 
@@ -91,7 +97,7 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
 
   return (
     <>
-      {hasWorktreeChanges && (
+      {showDraft && (
         <DraftCommit
           parentId={mapFn(
             historyQuery.data.pages.at(0)?.items.at(0),
@@ -156,13 +162,9 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
                     ? 'unconfirmed'
                     : 'solid',
               }))}
-              distance={
-                hasWorktreeChanges ? virtualRow.index + 1 : virtualRow.index
-              }
+              distance={showDraft ? virtualRow.index + 1 : virtualRow.index}
               targetY={
-                hasWorktreeChanges
-                  ? virtualRow.end + EDGE_LENGTH
-                  : virtualRow.start
+                showDraft ? virtualRow.end + EDGE_LENGTH : virtualRow.start
               }
               className={cn('absolute top-0 left-[3%]')}
             />

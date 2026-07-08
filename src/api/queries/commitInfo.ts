@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   type QueryFunctionContext,
   queryOptions,
   skipToken,
@@ -48,6 +49,9 @@ const commitInfoQuery = (repoPath: string, commitId: CommitId | undefined) =>
     queryFn: commitId
       ? (context) => fetchCommitInfo(repoPath, commitId, context)
       : skipToken,
+    // A component surviving a commit id change (e.g. the tip card after an
+    // amend) keeps showing the previous info instead of flashing a skeleton.
+    placeholderData: commitId ? keepPreviousData : undefined,
   })
 
 const useQueryCommitInfo = (commitId: CommitId | undefined) =>

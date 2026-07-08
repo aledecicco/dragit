@@ -98,8 +98,12 @@
   "96": "Desktop Capability Schema",
   "97": "index.tsx",
   "98": "Linux Capability Schema",
+  "99": "fileConflicts.ts",
   "100": "Diff Viewer Screenshots",
+  "101": "index.tsx",
+  "102": "createBranch.ts",
   "103": "Desktop Value Schema",
+  "104": "removeFromTree.ts",
   "105": "appInfo.ts",
   "106": "Linux Value Schema",
   "107": "App Entry Point",
@@ -164,5 +168,9 @@
   "166": "Syntax Highlighting Util",
   "167": "Vite Env Types",
   "168": "Vite Build Config",
-  "172": "storage.ts"
+  "169": "index.tsx",
+  "170": "setSettings.ts",
+  "171": "ShellScopeEntryAllowedArgs",
+  "172": "storage.ts",
+  "173": "ShellScopeEntryAllowedArgs"
 }

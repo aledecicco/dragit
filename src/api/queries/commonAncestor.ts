@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   type QueryFunctionContext,
   queryOptions,
   skipToken,
@@ -64,6 +65,7 @@ const commonAncestorQuery = (
             fetchCommonAncestor(repoPath, refName, baseRefName, context)
         : skipToken,
     enabled: !!refName && !!baseRefName,
+    placeholderData: refName && baseRefName ? keepPreviousData : undefined,
   })
 
 const useQueryCommonAncestor = (

@@ -76,7 +76,7 @@ const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
 
   return (
     <div
-      {...propsWithCn(divProps, 'relative')}
+      {...propsWithCn(divProps, 'relative animate-node-fade-in')}
       ref={mergeRefs([trackRef, divProps.ref])}
     >
       <GraphCommitNode commitType={commitType} />
