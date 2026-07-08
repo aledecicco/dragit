@@ -169,7 +169,7 @@ const DropAreaInner = (props: DropAreaInnerProps) => {
             rx="6"
             strokeWidth="1.5"
             className={cn(
-              'fill-none [stroke-dasharray:4_5] ',
+              'fill-none [stroke-dasharray:5_4] ',
               'transition-[stroke]',
               isDropTarget
                 ? 'stroke-accent-400 animate-marching-ants'

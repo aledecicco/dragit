@@ -117,11 +117,11 @@
     }
   }
 
-  --animate-marching-ants: marching-ants 0.150s linear infinite;
+  --animate-marching-ants: marching-ants 0.250s linear infinite;
 
   @keyframes marching-ants {
     to {
-      stroke-dashoffset: -8px;
+      stroke-dashoffset: -9px;
     }
   }
 

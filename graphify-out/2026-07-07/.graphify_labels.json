@@ -171,6 +171,5 @@
   "169": "index.tsx",
   "170": "setSettings.ts",
   "171": "ShellScopeEntryAllowedArgs",
-  "172": "storage.ts",
-  "173": "ShellScopeEntryAllowedArgs"
+  "172": "storage.ts"
 }
