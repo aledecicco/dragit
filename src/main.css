@@ -106,7 +106,7 @@
   }
 
   --animate-fade-in: fade-in 0.5s linear forwards;
-  --animate-node-fade-in: fade-in 200ms ease-in-out both;
+  --animate-enter-fade-in: fade-in 200ms ease-in-out both;
 
   @keyframes fade-in {
     from {
@@ -114,6 +114,14 @@
     }
     to {
       opacity: 1;
+    }
+  }
+
+  --animate-marching-ants: marching-ants 0.150s linear infinite;
+
+  @keyframes marching-ants {
+    to {
+      stroke-dashoffset: -8px;
     }
   }
 

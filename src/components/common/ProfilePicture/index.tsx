@@ -72,10 +72,10 @@ const ProfilePicture = (props: ProfilePictureProps) => {
         <img
           src={pictureQuery.data.url}
           alt={username}
-          className={cn('w-full h-full')}
+          className={cn('size-full')}
         />
       ) : (
-        <Icon Glyph={IconUserFilled} className={cn('w-full h-full p-0.5')} />
+        <Icon Glyph={IconUserFilled} className={cn('size-full p-0.5')} />
       )}
     </div>
   )

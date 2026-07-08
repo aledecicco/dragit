@@ -64,7 +64,7 @@ const ComparisonSnapshotDetailsDialog = (
       {...propsWithCn(
         dialogProps,
         'max-w-[90%] max-h-[85%]',
-        !!selectedFile && 'w-full h-full grid-cols-[430px_1fr]',
+        !!selectedFile && 'size-full grid-cols-[430px_1fr]',
       )}
     >
       <DialogContent
@@ -165,7 +165,7 @@ const ComparisonSnapshotDetailsDialog = (
       </DialogContent>
 
       {!!selectedFile && (
-        <div className={cn('w-full h-full relative')}>
+        <div className={cn('size-full relative')}>
           <FileDiffViewer
             diffScope={{
               type: 'versioned',

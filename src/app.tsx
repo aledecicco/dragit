@@ -25,7 +25,7 @@ const App = () => {
     <>
       <div
         className={cn(
-          'px-8 py-4 w-full h-full max-h-full',
+          'px-8 py-4 size-full max-h-full',
           'grid grid-cols-[1fr_1.95fr_1fr] grid-rows-1 gap-4',
         )}
       >

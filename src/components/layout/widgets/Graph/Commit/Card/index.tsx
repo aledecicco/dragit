@@ -103,7 +103,7 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
           'transition-colors duration-150',
           'hover:dithered-bg-dark-400 data-active-item:dithered-bg-dark-400',
           'hover:data-active-item:dithered-bg-dark-300',
-          'w-full h-full',
+          'size-full',
         )}
         render={
           <InteractiveItem
@@ -116,7 +116,7 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
       >
         <div
           className={cn(
-            'w-full h-full overflow-hidden',
+            'size-full overflow-hidden',
             'flex flex-col gap-y-1 items-stretch',
           )}
         >

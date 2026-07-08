@@ -94,7 +94,7 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
 
     return (
       <div
-        {...propsWithCn(divProps, 'select-none animate-node-fade-in')}
+        {...propsWithCn(divProps, 'select-none animate-enter-fade-in')}
         ref={mergeRefs([trackRef, divProps.ref])}
       >
         <div
@@ -133,7 +133,7 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
               Glyph: IconFileCheck,
               dragged: { fromDraft: true },
             })}
-            className={cn('w-full h-full')}
+            className={cn('size-full')}
           >
             <div>
               <Ariakit.CompositeItem
@@ -142,19 +142,19 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
                   <div
                     className={cn(
                       'border border-dark-100 bg-dark-600 rounded-sm',
-                      'w-full h-full',
+                      'size-full',
                       'focus:bg-dark-500 focus:border-light-950/30',
                     )}
                   >
                     <div
                       className={cn(
-                        'w-full h-full overflow-hidden',
+                        'size-full overflow-hidden',
                         'flex flex-col gap-y-1 items-stretch',
                       )}
                     >
                       <div
                         className={cn(
-                          'flex flex-col items-center justify-between w-full h-full',
+                          'flex flex-col items-center justify-between size-full',
                         )}
                       >
                         <div className={cn('w-full py-1 px-2')}>

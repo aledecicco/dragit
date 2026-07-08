@@ -17,7 +17,7 @@ const DragAndDropBackdrop = (props: DragAndDropBackdropProps) => {
         {...propsWithCn(
           divProps,
           'z-2',
-          'fixed top-0 left-0 w-full h-full bg-black/15',
+          'fixed top-0 left-0 size-full bg-black/15',
         )}
       />
     )

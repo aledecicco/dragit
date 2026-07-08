@@ -43,10 +43,10 @@ const Graph = (props: GraphProps) => {
   const baseBranch = useCurrentBaseBranch()
 
   return (
-    <div {...propsWithCn(divProps, 'h-full w-full min-h-0')}>
+    <div {...propsWithCn(divProps, 'size-full min-h-0')}>
       <div
         className={cn(
-          'overflow-hidden w-full h-full',
+          'overflow-hidden size-full',
           'grid grid-cols-[1fr_max-content_1fr] grid-rows-[max-content_max-content_1fr]',
           'gap-y-1 gap-x-8 place-items-center',
           'relative',
@@ -73,7 +73,7 @@ const Graph = (props: GraphProps) => {
 
         <div
           className={cn(
-            'col-span-3 row-start-3 overflow-hidden w-full h-full relative',
+            'col-span-3 row-start-3 overflow-hidden size-full relative',
           )}
         >
           <GraphInner />
@@ -158,7 +158,7 @@ const GraphInner = () => {
               virtualizer.scrollOffset <
                 virtualizer.totalSize - virtualizer.scrollElement.clientHeight
             }
-            className={cn('w-full h-full col-span-3 col-start-1 row-start-3')}
+            className={cn('size-full col-span-3 col-start-1 row-start-3')}
             size="md"
           />
         }
@@ -166,7 +166,7 @@ const GraphInner = () => {
         <div
           ref={scrollContainerRef}
           className={cn(
-            'overflow-auto scroll-smooth w-full h-full bg-dark-800/80',
+            'overflow-auto scroll-smooth size-full bg-dark-800/80',
             'will-change-transform',
           )}
         >

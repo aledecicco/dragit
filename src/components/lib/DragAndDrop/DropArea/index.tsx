@@ -63,7 +63,6 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
     Glyph,
     overlayProps,
     children,
-    ref,
     ...divProps
   } = props
 
@@ -110,37 +109,76 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
           (!currentDrag || disabledByValidation) &&
           'pointer-events-none',
       )}
-      ref={mergeRefs([dropRef, ref, sizeRef])}
+      ref={mergeRefs([dropRef, sizeRef, divProps.ref])}
     >
       {children}
 
       {currentDrag && !disabledByValidation && (
-        <Ariakit.Portal>
-          <div
-            {...propsWithCn(
-              typeof overlayProps === 'function'
-                ? overlayProps(currentDrag.data)
-                : overlayProps,
-              'z-3',
-              'fixed overflow-hidden',
-              'flex flex-col items-center justify-center gap-2 p-4',
-              'rounded-md border border-dashed border-primary-400 bg-dark-400',
-              'text-base text-light-950/50 text-center select-none',
-              'transition-colors duration-150',
-              isDropTarget && 'border-accent-400 bg-dark-300 text-light-950/80',
-            )}
-            style={rect}
-          >
-            <Icon
-              size="lg"
-              Glyph={Glyph ?? IconDragDrop}
-              className={cn('size-7')}
-            />
-            Drop here to {label[currentDrag.data.type]}
-          </div>
-        </Ariakit.Portal>
+        <DropAreaInner
+          {...(typeof overlayProps === 'function'
+            ? overlayProps(currentDrag.data)
+            : overlayProps)}
+          isDropTarget={isDropTarget}
+          style={rect}
+        >
+          <Icon
+            size="lg"
+            Glyph={Glyph ?? IconDragDrop}
+            className={cn('size-7')}
+          />
+          Drop here to {label[currentDrag.data.type]}
+        </DropAreaInner>
       )}
     </div>
+  )
+}
+
+interface DropAreaInnerProps extends ComponentProps<'div'> {
+  isDropTarget: boolean
+}
+
+const DropAreaInner = (props: DropAreaInnerProps) => {
+  const { isDropTarget, children, ...divProps } = props
+
+  return (
+    <Ariakit.Portal>
+      <div
+        {...propsWithCn(
+          divProps,
+          'z-3',
+          'fixed overflow-hidden',
+          'flex flex-col items-center justify-center gap-2 p-4',
+          'rounded-md bg-dark-400',
+          'text-base text-light-950/50 text-center select-none',
+          'transition-colors duration-100',
+          'animate-enter-fade-in',
+          isDropTarget && 'bg-dark-300 text-light-950/80',
+        )}
+      >
+        {children}
+
+        <svg
+          role="presentation"
+          className={cn('absolute inset-0 size-full pointer-events-none')}
+        >
+          <rect
+            x="0.75"
+            y="0.75"
+            width="calc(100% - 1.5px)"
+            height="calc(100% - 1.5px)"
+            rx="6"
+            strokeWidth="1.5"
+            className={cn(
+              'fill-none [stroke-dasharray:4_5] ',
+              'transition-[stroke]',
+              isDropTarget
+                ? 'stroke-accent-400 animate-marching-ants'
+                : 'stroke-primary-400',
+            )}
+          />
+        </svg>
+      </div>
+    </Ariakit.Portal>
   )
 }
 

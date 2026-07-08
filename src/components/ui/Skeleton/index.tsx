@@ -27,7 +27,7 @@ const Skeleton = (props: SkeletonProps) => {
         divProps,
         'animate-pulse bg-dark-400 rounded-xs',
         match(variant)
-          .with('fill', () => 'w-full h-full')
+          .with('fill', () => 'size-full')
           .with('line', () => 'h-3')
           .exhaustive(),
       )}

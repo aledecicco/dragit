@@ -78,7 +78,7 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
     <div
       {...propsWithCn(
         divProps,
-        'w-full h-full',
+        'size-full',
         'grid grid-rows-[max-content_max-content_1fr]',
       )}
     >

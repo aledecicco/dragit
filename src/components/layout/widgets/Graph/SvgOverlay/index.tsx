@@ -15,10 +15,7 @@ const SvgOverlay = (props: SvgOverlayProps) => {
   return (
     <div {...propsWithCn(divProps, 'relative')}>
       <svg
-        className={cn(
-          'absolute left-0 top-0 w-full h-full',
-          'pointer-events-none',
-        )}
+        className={cn('absolute left-0 top-0 size-full', 'pointer-events-none')}
         role="img"
         aria-label="SVG Overlay"
       >

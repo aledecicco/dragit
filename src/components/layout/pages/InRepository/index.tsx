@@ -97,7 +97,7 @@ const InRepositoryPage = () => {
         {selectedFile ? (
           <SelectedFileDiff
             selectedFile={selectedFile}
-            className={cn('w-full h-full min-h-0')}
+            className={cn('size-full min-h-0')}
           />
         ) : (
           <Graph />

@@ -18,7 +18,7 @@ export const APPEAR_ANIMATION: AnimationParams = {
 }
 
 export const FADE_IN_ANIMATION: AnimationParams = {
-  opacity: 1,
+  opacity: [0, 1],
   duration: 200,
   ease: 'outSine',
 }
