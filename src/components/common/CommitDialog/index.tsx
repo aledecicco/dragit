@@ -1,11 +1,14 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import * as Ariakit from '@ariakit/react'
 import { IconMessageCheck, IconMessageCog } from '@tabler/icons-react'
 
 import { useQueryGeneratedCommitMessage } from '@/api/queries/generatedMessage'
 import { useGenerateCommitMessageInteraction } from '@/interactions/ai'
 import { ActionButton } from '@/lib/ActionButton'
-import { DecoratedButton } from '@/lib/DecoratedButton'
+import {
+  DecoratedButton,
+  type DecoratedButtonProps,
+} from '@/lib/DecoratedButton'
 import {
   requestValueFromDialog,
   ValueRequesterDialog,
@@ -13,7 +16,7 @@ import {
 } from '@/lib/ValueRequester/Dialog'
 import { DialogContent } from '@/ui/Dialog/Content'
 import { TextField } from '@/ui/Form/TextField'
-import { cn } from '@/utils/styles'
+import { cn, propsWithCn } from '@/utils/styles'
 
 interface CommitDialogProps
   extends ValueRequesterDialogProps<CommitFormValues> {}
@@ -32,12 +35,32 @@ const CommitDialog = (props: CommitDialogProps) => {
   const { ...dialogProps } = props
 
   const isAmend = dialogProps.formOptions?.defaultValues.isAmend ?? false
+  const fieldRef = useRef<HTMLInputElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   return (
     <ValueRequesterDialog {...dialogProps}>
       <DialogContent heading={isAmend ? 'Amend Commit' : 'Commit Changes'}>
-        <TextField label="commit message" name="message" autoFocus required>
-          {!isAmend && <AiGenerationButton />}
+        <TextField
+          ref={fieldRef}
+          label="commit message"
+          name="message"
+          autoFocus
+          required
+          onBlur={(e) => {
+            if (e.relatedTarget === buttonRef.current) {
+              e.preventDefault()
+            }
+          }}
+        >
+          {!isAmend && (
+            <AiGenerationButton
+              ref={buttonRef}
+              onClick={() => {
+                fieldRef.current?.focus()
+              }}
+            />
+          )}
         </TextField>
 
         <DecoratedButton
@@ -52,7 +75,8 @@ const CommitDialog = (props: CommitDialogProps) => {
   )
 }
 
-const AiGenerationButton = () => {
+const AiGenerationButton = (props: Partial<DecoratedButtonProps>) => {
+  const { ...buttonProps } = props
   const form = Ariakit.useFormContext()
 
   const generateMessage = useGenerateCommitMessageInteraction()
@@ -67,16 +91,17 @@ const AiGenerationButton = () => {
   return (
     <ActionButton
       {...generateMessage}
-      className={cn(
+      status="neutral"
+      variant="filled"
+      size="sm"
+      compact
+      {...propsWithCn(
+        buttonProps,
         'absolute bottom-2 right-2',
         'transition-opacity duration-150',
         'opacity-80 hover:opacity-100 focus:opacity-100',
         'border border-light-950/30',
       )}
-      status="neutral"
-      variant="filled"
-      size="sm"
-      compact
     />
   )
 }

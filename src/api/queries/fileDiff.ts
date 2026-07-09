@@ -1,7 +1,7 @@
 import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
-import type { DiffLine, DiffScope, FileDiff } from '../models'
+import type { CleanFileInfo, DiffLine, DiffScope, FileDiff } from '../models'
 import { FILE_DIFF_SCHEMA } from '../schemas'
 import {
   serializeUnmergedFile,
@@ -15,6 +15,11 @@ const fileDiffQueryKeys = {
     ({
       ...pathQueryKey(repoPath),
       key: 'file_diff',
+    }) as const,
+  status: (repoPath: string, status: CleanFileInfo['status']) =>
+    ({
+      ...fileDiffQueryKeys.all(repoPath),
+      scope: { type: 'worktree', file: { status } },
     }) as const,
   file: (repoPath: string, scope: DiffScope) =>
     ({

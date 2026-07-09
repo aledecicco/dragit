@@ -9,7 +9,6 @@ import { useDeleteTagsInteraction } from '@/interactions/tag'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { triggerInteraction } from '@/state/actions'
 import { useCurrentBranch } from '@/utils/repository'
-import { cn } from '@/utils/styles'
 
 interface RecyclingBinProps extends ComponentProps<'div'> {}
 
@@ -29,9 +28,7 @@ const RecyclingBin = (props: RecyclingBinProps) => {
   return (
     <DropArea
       {...divProps}
-      overlayProps={{
-        className: cn('border-danger-400'),
-      }}
+      isDangerous
       acceptedTypes={[
         'branch',
         'branches',

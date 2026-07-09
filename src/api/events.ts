@@ -118,6 +118,14 @@ const eventHandler = (event: Event<AppEvent>) => {
       client.invalidateQueries({
         queryKey: [fileConflictsQueryKeys.all(repoPath)],
       })
+
+      client.invalidateQueries({
+        queryKey: [fileDiffQueryKeys.status(repoPath, 'unstaged')],
+      })
+
+      client.invalidateQueries({
+        queryKey: [fileDiffQueryKeys.status(repoPath, 'untracked')],
+      })
     })
     .with({ type: 'configUpdated', repoPath: P.string }, ({ repoPath }) => {
       client.invalidateQueries({
