@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { IconGitBranch, IconGitCommit, IconTag } from '@tabler/icons-react'
-import { match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 
 import type {
   BranchInfo,
@@ -102,6 +102,11 @@ const RefSelector = ({
   return (
     <Combobox
       value={value}
+      defaultGroup={match(reference)
+        .with({ type: 'branch' }, () => 'branches')
+        .with({ type: 'tag' }, () => 'tags')
+        .with({ type: 'commit' }, () => 'commits')
+        .otherwise(() => undefined)}
       {...comboboxProps}
       Glyph={comboboxProps.Glyph ?? Glyph}
     >

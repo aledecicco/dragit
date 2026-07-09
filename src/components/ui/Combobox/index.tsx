@@ -24,6 +24,11 @@ interface ComboboxProps extends Partial<ButtonProps> {
   value: string
 
   /**
+   * The group to have focused initially when the combobox opens.
+   */
+  defaultGroup?: string
+
+  /**
    * Placeholder text to display when no option is selected.
    */
   placeholder?: string
@@ -66,6 +71,7 @@ const ComboboxInner = (props: ComboboxProps) => {
   const {
     children,
     value,
+    defaultGroup,
     placeholder = 'Select...',
     Glyph,
     iconProps,
@@ -103,6 +109,9 @@ const ComboboxInner = (props: ComboboxProps) => {
         value={value}
         setOpen={(open) => {
           if (open) {
+            if (defaultGroup) {
+              setCurrentGroup(defaultGroup)
+            }
             setSearch('')
           }
         }}
