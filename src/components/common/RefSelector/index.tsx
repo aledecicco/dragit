@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { IconGitBranch, IconGitCommit, IconTag } from '@tabler/icons-react'
-import { match, P } from 'ts-pattern'
+import { match } from 'ts-pattern'
 
 import type {
   BranchInfo,

@@ -41,7 +41,7 @@ const Icon = (props: IconProps) => {
   const [LeavingGlyph, setLeavingGlyph] = useState<Glyph>()
 
   useEffect(() => {
-    setLeavingGlyph(PrevGlyph)
+    setLeavingGlyph(() => PrevGlyph)
   }, [PrevGlyph])
 
   useEffect(() => {
