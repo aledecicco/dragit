@@ -15,6 +15,7 @@
     "@dnd-kit/collision": "^0.4.0",
     "@dnd-kit/dom": "^0.4.0",
     "@dnd-kit/react": "^0.4.0",
+    "@fontsource/geist-mono": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
     "@tabler/icons-react": "^3.44.0",
     "@tailwindcss/vite": "4.3.0",

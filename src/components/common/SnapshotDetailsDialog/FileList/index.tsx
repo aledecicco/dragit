@@ -86,11 +86,13 @@ const SnapshotDetailsDialogFileList = (
     >
       <div
         className={cn(
-          'text-sm text-light-600 text-start',
+          'text-sm text-light-800 text-start',
           'py-2 flex flex-row gap-x-2 items-center',
         )}
       >
-        <p>Files</p>
+        <p className={cn('uppercase text-2xs font-semibold tracking-widest')}>
+          Files
+        </p>
 
         {showPagination ? (
           <Pagination

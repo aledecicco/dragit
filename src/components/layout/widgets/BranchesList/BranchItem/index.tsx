@@ -99,7 +99,10 @@ const BranchesListItem = (props: BranchesListItemProps) => {
             {remoteCounterpart && (
               <>
                 , tracking{' '}
-                <Marquee className={cn('text-light-400')} reverse={false}>
+                <Marquee
+                  className={cn('font-mono tracking-normal text-light-300')}
+                  reverse={false}
+                >
                   {remoteCounterpart.remote}/{remoteCounterpart.remoteBranch}
                 </Marquee>
               </>

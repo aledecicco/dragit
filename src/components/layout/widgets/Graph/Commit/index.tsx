@@ -85,7 +85,7 @@ const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
       {...propsWithCn(divProps, 'relative animate-enter-fade-in')}
       ref={mergeRefs([trackRef, divProps.ref])}
     >
-      <GraphCommitNode commitType={commitType} />
+      <GraphCommitNode commitType={commitType} isCurrent={isCurrent} />
 
       {isCurrent ? (
         <DropArea

@@ -74,7 +74,7 @@ const CurrentGraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
       <GraphCommitCardInner
         commitInfo={commitInfo}
         interactions={[group(amend), ...interactions]}
-        {...buttonProps}
+        {...propsWithCn(buttonProps, 'ring-1 ring-light-950/30')}
       />
     </ShortcutIndicator>
   )
@@ -137,7 +137,13 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
               {commitInfo.authorName}, {committedTime}
             </Marquee>
 
-            <p className={cn('text-xs text-light-600 min-w-max')}>
+            <p
+              className={cn(
+                'font-mono text-xs tracking-normal min-w-max',
+                'px-1 py-px rounded-xs',
+                'text-primary-300/90 bg-primary-500/15',
+              )}
+            >
               #{commitInfo.shortHash}
             </p>
           </div>

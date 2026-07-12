@@ -53,7 +53,9 @@ const CreateBranchDialog = (props: CreateBranchDialogProps) => {
         heading={
           <>
             Branch from{' '}
-            <span className={cn('font-semibold')}>{fromReference}</span>
+            <span className={cn('font-semibold text-primary-300')}>
+              {fromReference}
+            </span>
           </>
         }
       >

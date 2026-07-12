@@ -18,7 +18,13 @@ const SettingsDialogSection = (props: SettingsDialogSectionProps) => {
 
   return (
     <>
-      <Separator label={label} className={cn('mb-2 not-first:mt-6')} />
+      <Separator
+        label={label}
+        className={cn(
+          'mb-2 not-first:mt-6',
+          'uppercase text-2xs font-semibold tracking-widest text-light-800',
+        )}
+      />
 
       <section
         {...propsWithCn(sectionProps, 'grid auto-rows-fr')}

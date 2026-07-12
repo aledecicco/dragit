@@ -40,9 +40,9 @@ const AccordionSection = (props: AccordionSectionProps) => {
           render={
             <Ariakit.Disclosure
               className={cn(
-                'capitalize',
+                'uppercase text-2xs font-semibold tracking-widest',
                 'cursor-pointer w-full group/accordion',
-                'text-sm text-light-600 text-start',
+                'text-light-800 text-start',
                 'py-2 flex flex-row gap-x-2 items-center w-max',
                 'hover:underline',
                 'focus:underline',

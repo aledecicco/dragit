@@ -35,7 +35,7 @@ const FileViewerTitle = (props: FileViewerTitleProps) => {
         {...propsWithCn(
           buttonProps,
           'text-sm',
-          'font-medium',
+          'font-medium font-mono tracking-tight',
           'cursor-pointer hover:underline focus:underline',
           'px-0 pt-0.5 pb-0',
           'text-light-300',
@@ -48,7 +48,7 @@ const FileViewerTitle = (props: FileViewerTitleProps) => {
         <Marquee>
           <FilePath
             filepath={`./${filepath}`}
-            separatorProps={{ className: cn('text-light-50') }}
+            separatorProps={{ className: cn('text-light-950') }}
           />
         </Marquee>
       </Ariakit.Button>

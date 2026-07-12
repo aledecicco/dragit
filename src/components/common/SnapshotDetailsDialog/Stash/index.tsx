@@ -54,7 +54,9 @@ const StashSnapshotDetailsDialog = (props: StashSnapshotDetailsDialogProps) => {
         heading={
           <>
             Stash{' '}
-            <span className={cn('font-semibold')}>#{stash.stashNumber}</span>
+            <span className={cn('font-mono font-semibold text-primary-300')}>
+              #{stash.stashNumber}
+            </span>
           </>
         }
         className={cn('grid grid-rows-[max-content_max-content_1fr]')}

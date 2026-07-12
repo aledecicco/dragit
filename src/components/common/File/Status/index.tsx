@@ -21,28 +21,32 @@ const FileStatus = (props: FileStatusProps) => {
     <span
       {...propsWithCn(
         spanProps,
-        'text-xs',
+        'text-xs tracking-normal',
+        'px-1 py-px rounded-xs',
         match(file)
           .with({ status: P.union('staged', 'versioned') }, (file) =>
             match(file.changes)
-              .with('added', () => 'text-success-200/90')
-              .with('deleted', () => 'text-danger-200/90')
-              .with('modified', () => 'text-success-200/90')
-              .with('typeChanged', () => 'text-light-400')
-              .with('copied', () => 'text-light-400')
-              .with('renamed', () => 'text-light-400')
+              .with('added', () => 'text-success-200/90 bg-success-400/15')
+              .with('deleted', () => 'text-danger-200/90 bg-danger-400/15')
+              .with('modified', () => 'text-success-200/90 bg-success-400/15')
+              .with('typeChanged', () => 'text-light-400 bg-light-600/15')
+              .with('copied', () => 'text-light-400 bg-light-600/15')
+              .with('renamed', () => 'text-light-400 bg-light-600/15')
               .exhaustive(),
           )
           .with({ status: 'unstaged' }, (file) =>
             match(file.changes)
-              .with('added', () => 'text-success-200/90')
-              .with('deleted', () => 'text-danger-200/90')
-              .with('modified', () => 'text-success-200/90')
-              .with('typeChanged', () => 'text-light-400')
+              .with('added', () => 'text-success-200/90 bg-success-400/15')
+              .with('deleted', () => 'text-danger-200/90 bg-danger-400/15')
+              .with('modified', () => 'text-success-200/90 bg-success-400/15')
+              .with('typeChanged', () => 'text-light-400 bg-light-600/15')
               .exhaustive(),
           )
-          .with({ status: 'untracked' }, () => 'text-light-600')
-          .with({ status: 'unmerged' }, () => 'text-warning-100/90')
+          .with({ status: 'untracked' }, () => 'text-light-600 bg-light-800/15')
+          .with(
+            { status: 'unmerged' },
+            () => 'text-warning-100/90 bg-warning-300/15',
+          )
           .exhaustive(),
       )}
     >

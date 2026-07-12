@@ -1,4 +1,5 @@
 @import "@fontsource/inter";
+@import "@fontsource/geist-mono";
 @import "tailwindcss";
 
 @import "./utilities.css";
@@ -18,29 +19,29 @@
   --color-light-900: #a2a2a2;
   --color-light-950: #989898;
 
-  --color-dark-50: #424242;
-  --color-dark-100: #3e3e3e;
-  --color-dark-200: #3a3a3a;
-  --color-dark-300: #363636;
-  --color-dark-400: #323232;
-  --color-dark-500: #2e2e2e;
-  --color-dark-600: #2a2a2a;
-  --color-dark-700: #262626;
-  --color-dark-800: #222222;
-  --color-dark-900: #1e1e1e;
-  --color-dark-950: #1a1a1a;
+  --color-dark-50: #3a3d47;
+  --color-dark-100: #363944;
+  --color-dark-200: #323540;
+  --color-dark-300: #2e313c;
+  --color-dark-400: #2a2d38;
+  --color-dark-500: #262934;
+  --color-dark-600: #222530;
+  --color-dark-700: #1e212b;
+  --color-dark-800: #1a1d26;
+  --color-dark-900: #161922;
+  --color-dark-950: #12141c;
 
-  --color-primary-50: #eff4fe;
-  --color-primary-100: #e3e9fc;
-  --color-primary-200: #ccd7f9;
-  --color-primary-300: #adbcf4;
-  --color-primary-400: #8b99ee;
-  --color-primary-500: #6f78e5;
-  --color-primary-600: #6564db;
-  --color-primary-700: #4845bd;
-  --color-primary-800: #3b3a99;
-  --color-primary-900: #35357a;
-  --color-primary-950: #201f47;
+  --color-primary-50: #eef0fe;
+  --color-primary-100: #e2e5fd;
+  --color-primary-200: #ccd0fb;
+  --color-primary-300: #adb2f8;
+  --color-primary-400: #8b8ef4;
+  --color-primary-500: #7370ee;
+  --color-primary-600: #6a63e6;
+  --color-primary-700: #514bce;
+  --color-primary-800: #3f3aa6;
+  --color-primary-900: #353080;
+  --color-primary-950: #1f1c4b;
 
   --color-accent-50: #fdf3f3;
   --color-accent-100: #fce4e5;
@@ -92,7 +93,9 @@
 
   --spacing-half: 50%;
 
-  --text-2xs: 9px;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+
+  --text-2xs: 10px;
 
   --animate-scroll-horizontal: scroll-horizontal 1s linear;
 

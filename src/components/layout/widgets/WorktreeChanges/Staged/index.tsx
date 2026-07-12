@@ -108,13 +108,13 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
       >
         <div
           className={cn(
-            'text-sm text-light-600 text-start',
+            'text-sm text-light-800 text-start',
             'py-2 flex flex-row gap-x-2 items-center',
           )}
         >
           <p
             className={cn(
-              'select-none',
+              'select-none uppercase text-2xs font-semibold tracking-widest',
               'group-focus/drag:underline',
               'group-data-focus/drag:underline',
             )}

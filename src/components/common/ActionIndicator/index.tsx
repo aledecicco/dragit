@@ -52,7 +52,7 @@ const ActiveActionIndicator = (
           ref={mergeRefs([iconRef, iconProps.ref])}
           containerProps={propsWithCn(
             iconProps.containerProps,
-            'bg-dark-50 rounded-full',
+            'bg-dark-300 rounded-full',
           )}
         />
       }

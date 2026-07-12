@@ -114,8 +114,10 @@ const Dialog = (props: DialogProps) => {
       <Ariakit.Focusable
         ref={handleRef}
         className={cn(
-          'absolute w-full h-2.5 cursor-pointer group-hover/dialog:bg-dark-900/20',
-          'hover:bg-dark-900/30 focus:bg-dark-900/30',
+          'absolute w-full h-2.5 cursor-pointer',
+          'bg-dark-900 opacity-0 transition-opacity duration-200',
+          'group-hover/dialog:opacity-20',
+          'hover:opacity-30 focus:opacity-30',
         )}
       />
     </Ariakit.Dialog>

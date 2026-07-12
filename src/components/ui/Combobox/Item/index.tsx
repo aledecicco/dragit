@@ -26,13 +26,13 @@ const ComboboxItem = (props: ComboboxItemProps) => {
         <Ariakit.ComboboxItem
           value={itemProps.value}
           className={cn(
-            'cursor-pointer wrap-anywhere text-light-50',
+            'cursor-pointer wrap-anywhere text-light-300',
             'transition-colors duration-150',
 
             !itemProps.value && 'italic not-aria-selected:text-light-800',
-            'data-active-item:bg-light-50/8',
-            'aria-selected:bg-accent-400/40',
-            'data-active-item:aria-selected:bg-accent-400/50',
+            'data-active-item:bg-light-50/10',
+            'aria-selected:bg-primary-500/50',
+            'data-active-item:aria-selected:bg-primary-500/60',
             'not-first-of-type:rounded-t-none not-last-of-type:rounded-b-none',
 
             match(size)

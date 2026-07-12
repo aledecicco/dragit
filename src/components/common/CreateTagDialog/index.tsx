@@ -58,7 +58,10 @@ const CreateTagDialog = (props: CreateTagDialogProps) => {
       <DialogContent
         heading={
           <>
-            Tag <span className={cn('font-semibold')}>{reference}</span>
+            Tag{' '}
+            <span className={cn('font-semibold text-primary-300')}>
+              {reference}
+            </span>
           </>
         }
       >

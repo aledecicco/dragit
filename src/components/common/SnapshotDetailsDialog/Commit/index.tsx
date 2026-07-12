@@ -56,7 +56,9 @@ const CommitSnapshotDetailsDialog = (
         heading={
           <>
             Commit{' '}
-            <span className={cn('font-semibold')}>#{commit.shortHash}</span>
+            <span className={cn('font-mono font-semibold text-primary-300')}>
+              #{commit.shortHash}
+            </span>
           </>
         }
         className={cn('grid grid-rows-[max-content_max-content_1fr]')}
