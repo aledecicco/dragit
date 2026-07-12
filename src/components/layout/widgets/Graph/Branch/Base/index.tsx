@@ -1,5 +1,6 @@
 import type { VirtualItem } from '@tanstack/react-virtual'
 
+import type { CommitId } from '@/api/models'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
 import { getPaginatedLength } from '@/api/utils'
@@ -8,7 +9,7 @@ import { useHeadReference } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-import { COMMIT_ELEMENT_ID, GraphCommit } from '../../Commit'
+import { ANCHOR_ELEMENT_ID, COMMIT_ELEMENT_ID, GraphCommit } from '../../Commit'
 import { getGraphCommitData, useInfiniteScroll } from '../../utils'
 import { BranchMessage } from '../Message'
 
@@ -39,6 +40,9 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
   ).data
   const anchor = commonAncestor?.commonCommit
 
+  const idFor = (hash: CommitId) =>
+    hash === anchor?.hash ? ANCHOR_ELEMENT_ID : COMMIT_ELEMENT_ID(hash, 'base')
+
   if (!baseReference) {
     return <BranchMessage isBase={true}>No base branch selected</BranchMessage>
   }
@@ -57,24 +61,31 @@ const GraphBaseBranch = (props: GraphBaseBranchProps) => {
       return undefined
     }
 
+    // Avoid duplicate items if the anchor pops up at a different index (during a base switch).
+    if (anchor && commitData.isAnchor && virtualRow.index !== anchor.distance) {
+      return undefined
+    }
+
     const parentIsDistantAnchor =
       anchor &&
       commitData.parent === anchor.hash &&
       anchor.distance > virtualRow.index + 1
 
+    const elementId = idFor(commitData.hash)
+
     return (
       <GraphCommit
-        key={commitData.hash}
+        key={elementId}
         commitId={commitData.hash}
         commitType="confirmed"
-        elementId={COMMIT_ELEMENT_ID(commitData.hash, baseReference.refName)}
+        elementId={elementId}
         isCurrent={
           virtualRow.index === 0 &&
           commonAncestor?.lastCommit === null &&
           commitData.hash === commonAncestor?.commonCommit?.hash
         }
         parent={mapFn(commitData.parent, (parentCommit) => ({
-          id: COMMIT_ELEMENT_ID(parentCommit, baseReference.refName),
+          id: idFor(parentCommit),
           type: parentIsDistantAnchor ? 'dashed' : 'solid',
         }))}
         distance={virtualRow.index}

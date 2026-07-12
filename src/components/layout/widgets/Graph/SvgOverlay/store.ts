@@ -100,11 +100,17 @@ const registerElement = useSvgTrackerStore.getState().registerElement
  */
 const unregisterElement = useSvgTrackerStore.getState().unregisterElement
 
+/**
+ * Get the currently registered elements in the SVG overlay.
+ */
+const getRegisteredElements = () => useSvgTrackerStore.getState().elements
+
 export {
   useTrackedElements,
   useSvgTrackerStore,
   registerElement,
   unregisterElement,
+  getRegisteredElements,
   type ElementId,
   type ParentType,
   type TrackedElements,

@@ -25,6 +25,7 @@ import { pluralize } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 
 import { NODE_SIZE } from '../Commit/Node'
+import type { ElementId } from '../SvgOverlay/store'
 import { makeTracked } from '../SvgOverlay/utils'
 
 const DRAFT_COMMIT_ID = 'commit_draft'
@@ -39,6 +40,11 @@ interface DraftCommitProps extends ComponentProps<'div'> {
   parentId: CommitId | undefined
 
   /**
+   * Overrides the id the draft registers itself under.
+   */
+  elementId?: ElementId
+
+  /**
    * The vertical offset the draft commit should be displayed at.
    */
   targetY: number
@@ -50,12 +56,12 @@ interface DraftCommitProps extends ComponentProps<'div'> {
  * Registers/unregisters itself in the SVG overlay when mounted/unmounted.
  */
 const DraftCommit = (props: DraftCommitProps) => {
-  const { parentId, ...innerProps } = props
+  const { parentId, elementId, ...innerProps } = props
 
   return (
     <DraftCommitInner
       {...innerProps}
-      elementId={DRAFT_COMMIT_ID}
+      elementId={elementId ?? DRAFT_COMMIT_ID}
       parent={
         parentId
           ? {

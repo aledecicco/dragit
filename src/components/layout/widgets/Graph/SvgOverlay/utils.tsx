@@ -5,6 +5,7 @@ import type { AnyObject } from '@/utils/types'
 import { graphAnimator } from './animation'
 import {
   type ElementId,
+  getRegisteredElements,
   type ParentElement,
   registerElement,
   type TrackedElement,
@@ -63,8 +64,17 @@ const makeTracked = <P extends AnyObject, T extends HTMLElement>(
 
     useEffect(() => {
       return () => {
-        unregisterElement(elementId)
-        graphAnimator.removeNode(elementId)
+        // If another instance re-registered this id in the meantime, leave it alive.
+        if (getRegisteredElements().get(elementId)?.ref === ref) {
+          unregisterElement(elementId)
+        }
+
+        // Only clean up this animation if no other instance claimed it.
+        queueMicrotask(() => {
+          if (!getRegisteredElements().has(elementId)) {
+            graphAnimator.removeNode(elementId)
+          }
+        })
       }
     }, [elementId])
 

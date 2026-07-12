@@ -17,8 +17,14 @@ import { GraphCommitNode } from './Node'
 
 export type CommitType = 'confirmed' | 'unconfirmed'
 
-export const COMMIT_ELEMENT_ID = (commitId: CommitId, refName: string) =>
-  `commit_${commitId}_${refName}`
+export type GraphColumn = 'current' | 'base'
+
+export const COMMIT_ELEMENT_ID = (commitId: CommitId, column: GraphColumn) =>
+  `commit_${commitId}_${column}`
+
+export const ANCHOR_ELEMENT_ID = 'commit_anchor'
+
+export const LAST_COMMIT_ELEMENT_ID = 'commit_last'
 
 const COMMIT_WIDTH = 320
 const COMMIT_HEIGHT = 66

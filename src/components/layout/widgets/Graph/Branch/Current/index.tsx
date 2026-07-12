@@ -4,6 +4,7 @@ import { usePrevious } from 'react-use'
 import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStaged'
 import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
 
+import type { CommitId } from '@/api/models'
 import { useQueryBranchDivergence } from '@/api/queries/branchDivergence'
 import { useQueryCommitHistory } from '@/api/queries/commitHistory'
 import { useQueryCommonAncestor } from '@/api/queries/commonAncestor'
@@ -20,7 +21,12 @@ import {
 import { cn } from '@/utils/styles'
 import { mapFn } from '@/utils/types'
 
-import { COMMIT_ELEMENT_ID, GraphCommit } from '../../Commit'
+import {
+  ANCHOR_ELEMENT_ID,
+  COMMIT_ELEMENT_ID,
+  GraphCommit,
+  LAST_COMMIT_ELEMENT_ID,
+} from '../../Commit'
 import { DraftCommit } from '../../Draft'
 import { CURVE_SIZE, EDGE_LENGTH, EDGE_OFFSET } from '../../Edges/utils'
 import {
@@ -64,6 +70,11 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
   ).data
   const anchor = commonAncestor?.lastCommit
 
+  const idFor = (hash: CommitId) =>
+    hash === anchor?.hash
+      ? LAST_COMMIT_ELEMENT_ID
+      : COMMIT_ELEMENT_ID(hash, 'current')
+
   const stagedPage = useWorktreeFilesPage(STAGED_FILE_TYPES)
   const notStagedPage = useWorktreeFilesPage(NOT_STAGED_FILE_TYPES)
   const stagedChangesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
@@ -99,16 +110,18 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
     <>
       {showDraft && (
         <DraftCommit
+          elementId={
+            !!baseReference && anchor === null
+              ? LAST_COMMIT_ELEMENT_ID
+              : undefined
+          }
           parentId={mapFn(
             historyQuery.data.pages.at(0)?.items.at(0),
             (commit) =>
-              COMMIT_ELEMENT_ID(
-                commit.hash,
-                !!baseReference &&
-                  commit.hash === commonAncestor?.commonCommit.hash
-                  ? baseReference?.refName
-                  : currentReference.refName,
-              ),
+              !!baseReference &&
+              commit.hash === commonAncestor?.commonCommit.hash
+                ? ANCHOR_ELEMENT_ID
+                : idFor(commit.hash),
           )}
           targetY={CURVE_SIZE * 2 + EDGE_OFFSET}
           className={cn('absolute top-0 left-[3%]')}
@@ -130,6 +143,15 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
             return undefined
           }
 
+          // Avoid duplicate items if the anchor pops up at a different index (during a base switch).
+          if (
+            anchor &&
+            commitData.isAnchor &&
+            virtualRow.index !== anchor.distance
+          ) {
+            return undefined
+          }
+
           const parentIsDistantAnchor =
             anchor &&
             commitData.parent === anchor.hash &&
@@ -139,23 +161,20 @@ const GraphCurrentBranch = (props: GraphCurrentBranchProps) => {
             !!mainDivergenceQuery.data &&
             ancestorIsDivergent(virtualRow.index, mainDivergenceQuery.data)
 
+          const elementId = idFor(commitData.hash)
+
           return (
             <GraphCommit
-              key={commitData.hash}
+              key={elementId}
               commitId={commitData.hash}
               commitType={isUnconfirmed ? 'unconfirmed' : 'confirmed'}
-              elementId={COMMIT_ELEMENT_ID(
-                commitData.hash,
-                currentReference.refName,
-              )}
+              elementId={elementId}
               isCurrent={virtualRow.index === 0}
               parent={mapFn(commitData.parent, (parentCommit) => ({
-                id: COMMIT_ELEMENT_ID(
-                  parentCommit,
+                id:
                   commitData.isAnchor && !!baseReference
-                    ? baseReference.refName
-                    : currentReference.refName,
-                ),
+                    ? ANCHOR_ELEMENT_ID
+                    : idFor(parentCommit),
                 type: parentIsDistantAnchor
                   ? 'dashed'
                   : isUnconfirmed

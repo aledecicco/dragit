@@ -155,6 +155,9 @@ const createGraphAnimator = () => {
       return
     }
 
+    // Re-apply state in case this id was claimed by a new instance.
+    placeNode(id, node)
+
     if (node.targetY !== targetY) {
       node.targetY = targetY
 
