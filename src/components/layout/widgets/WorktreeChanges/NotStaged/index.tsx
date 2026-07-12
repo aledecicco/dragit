@@ -9,12 +9,15 @@ import {
 } from '@/api/queries/worktreeFiles'
 import { useNeedsPagination } from '@/api/utils'
 import {
+  useDiscardAllNotStagedFilesInteraction,
   useDiscardFilesInteraction,
   useGetNotStagedFilesInteractions,
   useStageAllInteraction,
   useUnstageAllInteraction,
   useUnstageFilesInteraction,
 } from '@/interactions/file'
+import { useStashAllInteraction } from '@/interactions/stash'
+import { group } from '@/lib/ActionButton/utils'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { InteractiveBatch } from '@/lib/Interactive/Batch'
@@ -64,6 +67,8 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
   const unstageAll = useUnstageAllInteraction()
   const stageAll = useStageAllInteraction()
   const discardFiles = useDiscardFilesInteraction()
+  const discardAll = useDiscardAllNotStagedFilesInteraction()
+  const stashAll = useStashAllInteraction()
 
   const ref = useRef<HTMLDivElement>(null)
   const settings = useSettings()
@@ -79,7 +84,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
     <InteractiveBatch
       className={cn('border-none group/drag')}
       count={count ? (hasMore ? `${count}+` : `${count}`) : undefined}
-      getInteractions={() => [[stageAll]]}
+      getInteractions={() => [group(stageAll, stashAll), group(discardAll)]}
       getDragPayload={() => ({
         type: 'worktree',
         label: pluralize('unstaged file', count, true),
@@ -91,7 +96,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
         {...propsWithCn(divProps, 'flex flex-col gap-y-1 overflow-hidden')}
         acceptedTypes={['staged-files', 'index']}
         label={{
-          'staged-files': 'unstage changes',
+          'staged-files': 'unstage these changes',
           index: 'unstage all changes',
         }}
         handleDrop={(payload) => {

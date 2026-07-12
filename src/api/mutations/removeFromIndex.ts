@@ -104,7 +104,7 @@ const useUnstageAll = (): Action => {
     },
     derivedIds: stagedChangesQuery.data
       ? () =>
-          stagedChangesQuery.data?.items.map((file) => ({
+          stagedChangesQuery.data.items.map((file) => ({
             key: 'file_operation',
             operation: 'unstage_file',
             file: file.path,

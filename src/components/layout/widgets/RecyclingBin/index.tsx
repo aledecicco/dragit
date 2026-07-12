@@ -3,7 +3,11 @@ import { IconTrashFilled } from '@tabler/icons-react'
 import { match, P } from 'ts-pattern'
 
 import { useDeleteBranchesInteraction } from '@/interactions/branch'
-import { useDiscardFilesInteraction } from '@/interactions/file'
+import {
+  useDiscardAllNotStagedFilesInteraction,
+  useDiscardAllStagedFilesInteraction,
+  useDiscardFilesInteraction,
+} from '@/interactions/file'
 import { useDiscardStashesInteraction } from '@/interactions/stash'
 import { useDeleteTagsInteraction } from '@/interactions/tag'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
@@ -24,6 +28,8 @@ const RecyclingBin = (props: RecyclingBinProps) => {
   const discardStashes = useDiscardStashesInteraction()
   const deleteTags = useDeleteTagsInteraction()
   const discardFiles = useDiscardFilesInteraction()
+  const discardAllStaged = useDiscardAllStagedFilesInteraction()
+  const discardAllNotStaged = useDiscardAllNotStagedFilesInteraction()
 
   return (
     <DropArea
@@ -38,6 +44,8 @@ const RecyclingBin = (props: RecyclingBinProps) => {
         'tags',
         'not-staged-files',
         'staged-files',
+        'worktree',
+        'index',
       ]}
       extraValidation={(payload) => {
         if (payload.type === 'branch' && currentBranch) {
@@ -59,6 +67,8 @@ const RecyclingBin = (props: RecyclingBinProps) => {
         tags: 'delete these tags',
         'not-staged-files': 'discard changes in these files',
         'staged-files': 'discard changes in these files',
+        worktree: 'discard all unstaged changes',
+        index: 'discard all staged changes',
       }}
       Glyph={IconTrashFilled}
       handleDrop={(payload) => {
@@ -87,6 +97,12 @@ const RecyclingBin = (props: RecyclingBinProps) => {
               triggerInteraction(discardFiles(dragged))
             },
           )
+          .with({ type: 'worktree' }, () => {
+            triggerInteraction(discardAllNotStaged)
+          })
+          .with({ type: 'index' }, () => {
+            triggerInteraction(discardAllStaged)
+          })
           .exhaustive()
       }}
     />

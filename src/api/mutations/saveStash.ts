@@ -3,7 +3,6 @@ import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
 import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStaged'
-import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
 
 import type { Action } from '@/state/actions'
 
@@ -105,7 +104,6 @@ const useStashFiles = (): Action<StashFilesArgs> => {
 const useStashAll = (): Action<Omit<StashFilesArgs, 'files'>> => {
   const saveStash = useRepositoryMutation(saveStashMutation)
   const notStagedChangesQuery = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
-  const stagedChangesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
 
   return {
     id: { key: 'file_operation', operation: 'stash_all_files' },
@@ -122,11 +120,6 @@ const useStashAll = (): Action<Omit<StashFilesArgs, 'files'>> => {
     },
     derivedIds: () => [
       ...(notStagedChangesQuery.data?.items.map((file) => ({
-        key: 'file_operation',
-        operation: 'save_stash',
-        file: file.path,
-      })) ?? []),
-      ...(stagedChangesQuery.data?.items.map((file) => ({
         key: 'file_operation',
         operation: 'save_stash',
         file: file.path,

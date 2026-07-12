@@ -1,10 +1,12 @@
 import { type ComponentProps, useRef } from 'react'
 import { IconArchive } from '@tabler/icons-react'
+import { match } from 'ts-pattern'
 
 import type { StashInfo } from '@/api/models'
 import { useQueryStashes } from '@/api/queries/stashes'
 import {
   useGetStashesListInteractions,
+  useStashAllInteraction,
   useStashFilesInteraction,
 } from '@/interactions/stash'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
@@ -43,6 +45,7 @@ const StashesList = (props: StashesListProps) => {
   const stashesQuery = useQueryStashes()
   const getInteractions = useGetStashesListInteractions()
   const stashFiles = useStashFilesInteraction()
+  const stashAll = useStashAllInteraction()
 
   const ref = useRef<HTMLDivElement>(null)
   const settings = useSettings()
@@ -59,12 +62,20 @@ const StashesList = (props: StashesListProps) => {
       getDragPayload={() => getDragPayload(stashesQuery.data)}
     >
       <DropArea
-        acceptedTypes={['not-staged-files']}
+        acceptedTypes={['not-staged-files', 'worktree']}
         label={{
-          'not-staged-files': 'stash changes',
+          'not-staged-files': 'stash these changes',
+          worktree: 'stash all changes',
         }}
-        handleDrop={({ dragged }) => {
-          triggerInteraction(stashFiles(dragged))
+        handleDrop={(payload) => {
+          match(payload)
+            .with({ type: 'not-staged-files' }, ({ dragged }) => {
+              triggerInteraction(stashFiles(dragged))
+            })
+            .with({ type: 'worktree' }, () => {
+              triggerInteraction(stashAll)
+            })
+            .exhaustive()
         }}
         overlayProps={{
           className: cn(!accordionHandler.isOpen && 'flex-row text-sm'),

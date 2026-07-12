@@ -21,6 +21,8 @@ import {
   useUnstageFiles,
 } from '@/api/mutations/removeFromIndex'
 import {
+  useDiscardAllNotStagedChanges,
+  useDiscardAllStagedChanges,
   useDiscardChanges,
   useDiscardFileChanges,
   useRestoreFileState,
@@ -239,6 +241,26 @@ export const useDiscardFilesInteraction = () => {
       isDangerous: true,
       details: `discard changes in ${pluralize('file', files.length, true)}`,
     })
+}
+
+export const useDiscardAllNotStagedFilesInteraction = () => {
+  const discardAll = useDiscardAllNotStagedChanges()
+
+  return interaction({
+    action: discardAll,
+    isDangerous: true,
+    details: 'discard all not staged changes',
+  })
+}
+
+export const useDiscardAllStagedFilesInteraction = () => {
+  const discardAll = useDiscardAllStagedChanges()
+
+  return interaction({
+    action: discardAll,
+    isDangerous: true,
+    details: 'discard all staged changes',
+  })
 }
 
 export const useStageFilesInteraction = () => {

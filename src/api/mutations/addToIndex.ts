@@ -104,7 +104,7 @@ const useStageAll = (): Action => {
     },
     derivedIds: notStagedChangesQuery.data
       ? () =>
-          notStagedChangesQuery.data?.items.map((file) => ({
+          notStagedChangesQuery.data.items.map((file) => ({
             key: 'file_operation',
             operation: 'add_file',
             file: file.path,

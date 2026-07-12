@@ -2,9 +2,13 @@ import { IconRestore, IconTrash } from '@tabler/icons-react'
 import { mutationOptions } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
+import { NOT_STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/NotStaged'
+import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
+
 import type { Action } from '@/state/actions'
 
 import type { RefName, VersionedFileInfo, WorktreeFileInfo } from '../models'
+import { useQueryWorktreeFiles } from '../queries/worktreeFiles'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface RestoreArgs {
@@ -147,6 +151,93 @@ const useDiscardChanges = (): Action<WorktreeFileInfo[]> => {
   }
 }
 
+const useDiscardAllNotStagedChanges = (): Action => {
+  const restoreFiles = useRepositoryMutation(restoreMutation)
+  const cleanFiles = useRepositoryMutation(cleanFilesMutation)
+
+  const notStagedChangesQuery = useQueryWorktreeFiles(NOT_STAGED_FILE_TYPES)
+
+  return {
+    id: {
+      key: 'file_operation',
+      operation: 'discard_all_file_changes',
+      file_type: 'not_staged',
+    },
+    blockedBy: [
+      { key: 'file_operation' },
+      { key: 'branch_operation', type: 'current' },
+    ],
+    run: async () => {
+      await restoreFiles.mutateAsync({
+        files: ['.'],
+        reference: null,
+        isStaged: false,
+        isWorktree: true,
+      })
+
+      await cleanFiles.mutateAsync({ files: ['.'] })
+    },
+    derivedIds: notStagedChangesQuery.data
+      ? () =>
+          notStagedChangesQuery.data.items.map((file) => ({
+            key: 'file_operation',
+            operation: 'discard_file_changes',
+            file: file.path,
+            status: file.status,
+          }))
+      : undefined,
+    label: {
+      idle: 'Discard all changes',
+      running: 'Discarding changes',
+      success: 'Changes discarded',
+      error: 'Failed to discard changes',
+    },
+    Glyph: IconTrash,
+  }
+}
+
+const useDiscardAllStagedChanges = (): Action => {
+  const restoreFiles = useRepositoryMutation(restoreMutation)
+
+  const stagedChangesQuery = useQueryWorktreeFiles(STAGED_FILE_TYPES)
+
+  return {
+    id: {
+      key: 'file_operation',
+      operation: 'discard_all_file_changes',
+      file_type: 'staged',
+    },
+    blockedBy: [
+      { key: 'file_operation' },
+      { key: 'branch_operation', type: 'current' },
+    ],
+    run: async () => {
+      await restoreFiles.mutateAsync({
+        files: ['.'],
+        reference: null,
+        isStaged: true,
+        isWorktree: true,
+      })
+    },
+    derivedIds: stagedChangesQuery.data
+      ? () =>
+          stagedChangesQuery.data.items.map((file) => ({
+            key: 'file_operation',
+            operation: 'discard_file_changes',
+            file: file.path,
+            status: file.status,
+          }))
+      : undefined,
+    label: {
+      idle: 'Discard all changes',
+      running: 'Discarding changes',
+      success: 'Changes discarded',
+      error: 'Failed to discard changes',
+    },
+    Glyph: IconTrash,
+  }
+}
+
 const useRestoreFileState = (
   file: VersionedFileInfo,
   snapshot: RefName,
@@ -242,6 +333,8 @@ export {
   useDiscardChanges,
   useRestoreFileState,
   useRestoreFileStates,
+  useDiscardAllNotStagedChanges,
+  useDiscardAllStagedChanges,
   restoreKey,
   restoreMutation,
   cleanFilesKey,
