@@ -112,6 +112,7 @@ const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
           <GraphCommitInner
             commitId={commitId}
             distance={distance}
+            commitType={commitType}
             isCurrent={isCurrent}
           />
         </DropArea>
@@ -119,6 +120,7 @@ const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
         <GraphCommitInner
           commitId={commitId}
           distance={distance}
+          commitType={commitType}
           isCurrent={isCurrent}
           {...commonStyles}
         />
@@ -132,11 +134,13 @@ interface GraphCommitInnerProps extends ComponentProps<'div'> {
 
   distance: number
 
+  commitType: CommitType
+
   isCurrent: boolean
 }
 
 const GraphCommitInner = (props: GraphCommitInnerProps) => {
-  const { commitId, distance, isCurrent, ...divProps } = props
+  const { commitId, distance, commitType, isCurrent, ...divProps } = props
 
   const commitInfoQuery = useQueryCommitInfo(commitId)
 
@@ -147,7 +151,11 @@ const GraphCommitInner = (props: GraphCommitInnerProps) => {
           <Ariakit.CompositeItem
             rowId={`${distance}`}
             render={
-              <GraphCommitCard commitInfo={commitInfo} isCurrent={isCurrent} />
+              <GraphCommitCard
+                commitInfo={commitInfo}
+                commitType={commitType}
+                isCurrent={isCurrent}
+              />
             }
           />
         )}

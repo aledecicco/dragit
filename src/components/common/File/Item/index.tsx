@@ -34,9 +34,7 @@ const FileItem = (props: FileItemProps) => {
         <Marquee className={cn('text-sm text-light-500')}>{filename}</Marquee>
       </div>
 
-      <Marquee
-        className={cn('font-mono text-xs tracking-tight text-light-600/80')}
-      >
+      <Marquee className={cn('text-xs text-light-600/80')}>
         <FilePath
           filepath={filedir}
           separatorProps={{ className: cn('text-light-400') }}

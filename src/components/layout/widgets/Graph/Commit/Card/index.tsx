@@ -1,5 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 import { IconGitCommit } from '@tabler/icons-react'
+import { match } from 'ts-pattern'
 
 import type { CommitInfo } from '@/api/models'
 import { showCommitSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog/Commit'
@@ -19,11 +20,18 @@ import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateInfo } from '@/utils/time'
 
+import type { CommitType } from '..'
+
 interface GraphCommitCardProps extends Ariakit.ButtonProps {
   /**
    * Information about the commit to display.
    */
   commitInfo: CommitInfo
+
+  /**
+   * The type of the commit.
+   */
+  commitType: CommitType
 
   /**
    * Whether this commit is the current one.
@@ -35,19 +43,21 @@ interface GraphCommitCardProps extends Ariakit.ButtonProps {
  * A summary card for a commit in the commit graph.
  */
 const GraphCommitCard = (props: GraphCommitCardProps) => {
-  const { commitInfo, isCurrent = false, ...buttonProps } = props
+  const { commitInfo, commitType, isCurrent = false, ...buttonProps } = props
 
   const interactions = useSingleCommitInteractions(commitInfo)
 
   return isCurrent ? (
     <CurrentGraphCommitCardInner
       commitInfo={commitInfo}
+      commitType={commitType}
       interactions={interactions}
       {...buttonProps}
     />
   ) : (
     <GraphCommitCardInner
       commitInfo={commitInfo}
+      commitType={commitType}
       interactions={interactions}
       {...buttonProps}
     />
@@ -60,7 +70,7 @@ interface GraphCommitCardInnerProps
 }
 
 const CurrentGraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
-  const { commitInfo, interactions, ...buttonProps } = props
+  const { commitInfo, commitType, interactions, ...buttonProps } = props
 
   const amend = useAmendInteraction(commitInfo)
   const settings = useSettings()
@@ -73,15 +83,23 @@ const CurrentGraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
     <ShortcutIndicator hotkey={settings.amendShortcut}>
       <GraphCommitCardInner
         commitInfo={commitInfo}
+        commitType={commitType}
         interactions={[group(amend), ...interactions]}
-        {...propsWithCn(buttonProps, 'ring-1 ring-light-950/30')}
+        {...propsWithCn(
+          buttonProps,
+          'border-l-2',
+          match(commitType)
+            .with('confirmed', () => 'border-l-primary-300')
+            .with('unconfirmed', () => 'border-l-accent-300')
+            .exhaustive(),
+        )}
       />
     </ShortcutIndicator>
   )
 }
 
 const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
-  const { commitInfo, interactions, ...buttonProps } = props
+  const { commitInfo, commitType, interactions, ...buttonProps } = props
 
   const committedTime = useDateInfo(commitInfo.timestamp)
 
@@ -141,7 +159,16 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
               className={cn(
                 'font-mono text-xs tracking-normal min-w-max',
                 'px-1 py-px rounded-xs',
-                'text-primary-300/90 bg-primary-500/15',
+                match(commitType)
+                  .with(
+                    'confirmed',
+                    () => 'text-primary-300/90 bg-primary-500/15',
+                  )
+                  .with(
+                    'unconfirmed',
+                    () => 'text-accent-300/90 bg-accent-500/15',
+                  )
+                  .exhaustive(),
               )}
             >
               #{commitInfo.shortHash}
