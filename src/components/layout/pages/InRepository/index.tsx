@@ -1,5 +1,3 @@
-import { IconSettings } from '@tabler/icons-react'
-
 import { BranchesList } from '@/layout/widgets/BranchesList'
 import { CurrentDirectory } from '@/layout/widgets/CurrentDirectory'
 import { CurrentRemote } from '@/layout/widgets/CurrentRemote'

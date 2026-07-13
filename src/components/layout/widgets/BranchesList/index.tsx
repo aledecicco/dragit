@@ -260,7 +260,7 @@ const BranchesList = (props: BranchesListProps) => {
                 <BranchesListItem branch={branch} itemIndex={position} />
               )}
               size="sm"
-              itemSize={74}
+              itemSize={80}
               options={mapFn(currentBranchesItems, (branches) => ({
                 getItemKey: (index: number) => branches[index].name,
               }))}

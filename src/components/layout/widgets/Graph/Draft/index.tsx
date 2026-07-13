@@ -12,7 +12,7 @@ import { useCommitInteraction } from '@/interactions/operations'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { InteractiveBatch } from '@/lib/Interactive/Batch'
 import { triggerInteraction } from '@/state/actions'
-import { Marquee } from '@/ui/Marquee'
+import { Chip } from '@/ui/Chip'
 import { Toolbar } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
 import {
@@ -31,7 +31,7 @@ import { makeTracked } from '../SvgOverlay/utils'
 const DRAFT_COMMIT_ID = 'commit_draft'
 
 const COMMIT_WIDTH = 320
-const COMMIT_HEIGHT = 66
+const COMMIT_HEIGHT = 80
 
 interface DraftCommitProps extends ComponentProps<'div'> {
   /**
@@ -104,7 +104,7 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
         ref={mergeRefs([trackRef, divProps.ref])}
       >
         <div
-          className={'rounded-full shadow-sm p-0.5 bg-light-950/60'}
+          className={'rounded-full shadow-sm p-0.5 bg-light-300/60'}
           style={{ width: NODE_SIZE, height: NODE_SIZE }}
         />
 
@@ -147,72 +147,71 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
                 render={
                   <div
                     className={cn(
-                      'border border-dark-100 bg-dark-600 rounded-sm',
-                      'size-full',
-                      'focus:bg-dark-500 focus:border-light-950/30',
+                      'border border-dark-100 border-l-2 border-l-light-300',
+                      'rounded-sm size-full',
+                      'bg-dark-600',
+                      'hover:bg-dark-500 data-active-item:bg-dark-500',
+                      'hover:data-active-item:bg-dark-400',
                     )}
                   >
                     <div
                       className={cn(
                         'size-full overflow-hidden',
-                        'flex flex-col gap-y-1 items-stretch',
+                        'flex flex-col items-stretch',
                       )}
                     >
+                      <p
+                        className={cn(
+                          'py-1 px-2',
+                          'uppercase text-2xs font-semibold tracking-widest text-light-600',
+                        )}
+                      >
+                        Uncommitted changes
+                      </p>
                       <div
                         className={cn(
                           'flex flex-col items-center justify-between size-full',
                         )}
                       >
-                        <div className={cn('w-full py-1 px-2')}>
-                          <Marquee
-                            className={cn('text-xs text-light-600 mt-1')}
-                            reverse={false}
-                          >
-                            {hasStagedChanges && (
-                              <span className={cn('text-success-300')}>
-                                {stagedCount.hasMore
-                                  ? `${stagedCount.count}+`
-                                  : `${stagedCount.count}`}{' '}
-                                {pluralize(
-                                  'staged file',
-                                  stagedCount.count,
-                                  false,
-                                )}
-                              </span>
-                            )}
-                            {hasStagedChanges && hasNotStagedChanges && ' • '}
-                            {hasNotStagedChanges && (
-                              <span>
-                                {notStagedCount.hasMore
-                                  ? `${notStagedCount.count}+`
-                                  : `${notStagedCount.count}`}{' '}
-                                {pluralize(
-                                  'unstaged file',
-                                  notStagedCount.count,
-                                  false,
-                                )}
-                              </span>
-                            )}
-                          </Marquee>
+                        <div
+                          className={cn('w-full flex flex-row gap-x-1 px-2')}
+                        >
+                          {hasStagedChanges && (
+                            <Chip size="xs" rounded={false} status="neutral">
+                              {stagedCount.hasMore
+                                ? `${stagedCount.count}+`
+                                : `${stagedCount.count}`}{' '}
+                              staged
+                            </Chip>
+                          )}
+                          {hasNotStagedChanges && (
+                            <Chip size="xs" rounded={false} status="neutral">
+                              {notStagedCount.hasMore
+                                ? `${notStagedCount.count}+`
+                                : `${notStagedCount.count}`}{' '}
+                              unstaged
+                            </Chip>
+                          )}
                         </div>
 
-                        <Toolbar fixed className={cn('w-full')}>
+                        <Toolbar
+                          fixed
+                          className={cn('w-full grid grid-cols-[1fr_1.3fr]')}
+                        >
                           <ToolbarItem
                             className={cn('rounded-t-none rounded-b-xs')}
                             status="neutral"
                             {...stageAll}
-                            disabled={!hasNotStagedChanges}
-                            size="sm"
+                            size="xs"
                             compact={false}
                             fixed
                           />
 
                           <ToolbarItem
                             className={cn('rounded-t-none rounded-b-xs')}
-                            status="neutral"
+                            status="primary"
                             {...commit}
-                            disabled={!hasStagedChanges}
-                            size="sm"
+                            size="xs"
                             compact={false}
                             fixed
                           />

@@ -176,7 +176,11 @@ const EditableTextInner = (props: EditableTextInnerProps) => {
           portal
           sameWidth
           gutter={4}
-          className={cn('rounded-lg shadow-md', 'bg-dark-300 p')}
+          className={cn(
+            'rounded-lg',
+            'shadow-lg shadow-black/40',
+            'bg-dark-500/70 backdrop-blur-lg border border-light-50/12 border-t-light-50/22',
+          )}
         >
           <Ariakit.ComboboxList className={cn('max-h-80 overflow-y-auto')}>
             {matchingSuggestions.length === 0 ? (

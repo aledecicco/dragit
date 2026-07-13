@@ -1,4 +1,9 @@
-import { IconGitBranch, IconLocationFilled } from '@tabler/icons-react'
+import {
+  IconGitBranch,
+  IconLocationFilled,
+  IconWorld,
+  IconWorldQuestion,
+} from '@tabler/icons-react'
 import { match } from 'ts-pattern'
 
 import type { BranchInfo } from '@/api/models'
@@ -16,6 +21,7 @@ import {
 } from '@/lib/MultiSelect/Item'
 import { triggerInteraction } from '@/state/actions'
 import { useSelectedUpstream } from '@/state/upstream'
+import { Chip } from '@/ui/Chip'
 import { Icon } from '@/ui/Icon'
 import { Marquee } from '@/ui/Marquee'
 import { useCurrentBranch } from '@/utils/repository'
@@ -87,27 +93,50 @@ const BranchesListItem = (props: BranchesListItemProps) => {
 
           <div
             className={cn(
-              'text-xs text-light-950',
+              'flex flex-row items-center gap-1.5 mt-1',
               'text-nowrap overflow-hidden text-ellipsis',
-              'flex flex-row gap-1',
             )}
           >
-            {match(branch.type)
-              .with('local', () => 'Local branch')
-              .with('remote', () => 'Remote branch')
-              .exhaustive()}
-            {remoteCounterpart && (
-              <>
-                , tracking{' '}
+            <Chip
+              size="xs"
+              rounded={false}
+              className={cn('text-2xs font-semibold uppercase')}
+            >
+              {match(branch.type)
+                .with('local', () => 'Local')
+                .with('remote', () => 'Remote')
+                .exhaustive()}
+            </Chip>
+
+            {remoteCounterpart ? (
+              <Chip
+                size="xs"
+                rounded={false}
+                status="primary"
+                className={cn('flex flex-row items-center gap-1')}
+              >
+                <Icon Glyph={IconWorld} size="xs" />
                 <Marquee
-                  className={cn('tracking-wider text-light-300')}
+                  className={cn('text-xs tracking-wide')}
                   reverse={false}
                 >
                   {remoteCounterpart.remote}/{remoteCounterpart.remoteBranch}
                 </Marquee>
-              </>
+              </Chip>
+            ) : (
+              branch.type === 'local' && (
+                <Chip
+                  size="xs"
+                  rounded={false}
+                  className={cn('flex flex-row items-center gap-1')}
+                >
+                  <Icon Glyph={IconWorldQuestion} size="xs" />
+                  Not tracking
+                </Chip>
+              )
             )}
           </div>
+
           <p
             className={cn(
               'text-xs text-light-950/60 mt-2',

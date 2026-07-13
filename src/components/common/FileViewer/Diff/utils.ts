@@ -185,8 +185,8 @@ const addVisibleNewlines = (
         tagName: 'span',
         properties: {
           className: match(segmentType)
-            .with('added', () => 'text-success-300/90 py-0.5')
-            .with('removed', () => 'text-danger-300/90 py-0.5')
+            .with('added', () => 'text-success-300/90 py-0.5 select-none')
+            .with('removed', () => 'text-danger-300/90 py-0.5 select-none')
             .exhaustive(),
         },
         children: [{ type: 'text', value: '⤶\n' }],

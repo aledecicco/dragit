@@ -20,8 +20,8 @@ const EditableTextItem = (props: EditableTextItemProps) => {
         'text-sm text-center text-light-200 tracking-wider',
         'p-2 rounded-sm cursor-pointer',
         'wrap-anywhere',
+        'data-active-item:bg-dark-300/80',
         itemProps.value === '' && 'italic',
-        'data-active-item:bg-dark-100',
       )}
     >
       <Ariakit.ComboboxItemValue

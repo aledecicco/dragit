@@ -16,6 +16,7 @@ import { ShortcutIndicator } from '@/lib/Shortcuts/Indicator'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
 import { useSettings } from '@/state/storage'
+import { Chip } from '@/ui/Chip'
 import { Marquee } from '@/ui/Marquee'
 import { cn, propsWithCn } from '@/utils/styles'
 import { useDateInfo } from '@/utils/time'
@@ -155,24 +156,17 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
               {commitInfo.authorName}, {committedTime}
             </Marquee>
 
-            <p
-              className={cn(
-                'font-mono text-xs tracking-normal min-w-max',
-                'px-1 py-px rounded-xs',
-                match(commitType)
-                  .with(
-                    'confirmed',
-                    () => 'text-primary-300/90 bg-primary-500/15',
-                  )
-                  .with(
-                    'unconfirmed',
-                    () => 'text-accent-300/90 bg-accent-500/15',
-                  )
-                  .exhaustive(),
-              )}
+            <Chip
+              size="xs"
+              rounded={false}
+              status={match(commitType)
+                .with('confirmed', () => 'primary' as const)
+                .with('unconfirmed', () => 'accent' as const)
+                .exhaustive()}
+              className={cn('font-mono tracking-normal min-w-max')}
             >
               #{commitInfo.shortHash}
-            </p>
+            </Chip>
           </div>
         </div>
       </Ariakit.CompositeItem>

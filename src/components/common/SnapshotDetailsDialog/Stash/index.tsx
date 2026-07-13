@@ -61,7 +61,7 @@ const StashSnapshotDetailsDialog = (props: StashSnapshotDetailsDialogProps) => {
         }
         className={cn(
           'grid grid-rows-[max-content_max-content_1fr]',
-          'border-r-0 rounded-r-none',
+          !!selectedFile && 'border-r-0 rounded-r-none',
         )}
       >
         <ChangesSummary

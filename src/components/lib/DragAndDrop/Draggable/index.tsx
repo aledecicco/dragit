@@ -84,7 +84,6 @@ const DraggableInner = <T extends DragType>(
         roleProps,
         'touch-manipulation cursor-pointer',
         'transition-colors duration-150',
-        isDragging && 'border border-neutral-600',
       )}
       ref={mergeRefs([componentRef, dragRef, ref])}
       render={children}
