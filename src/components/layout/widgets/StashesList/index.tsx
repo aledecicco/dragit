@@ -101,6 +101,7 @@ const StashesList = (props: StashesListProps) => {
             >
               <QueryList
                 name="stashes"
+                emptyIcon={IconArchive}
                 query={stashesQuery}
                 renderItem={(stash, position) => (
                   <StashesListItem stash={stash} itemIndex={position} />

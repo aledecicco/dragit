@@ -226,6 +226,7 @@ const BranchesList = (props: BranchesListProps) => {
           >
             <QueryList
               name="tags"
+              emptyIcon={IconTags}
               query={tagsQuery}
               getItems={() => tagsItems ?? []}
               renderItem={(tag, position) => (
@@ -251,6 +252,7 @@ const BranchesList = (props: BranchesListProps) => {
                 .with('local', () => 'local branches')
                 .with('remote', () => 'remote branches')
                 .otherwise(() => 'branches')}
+              emptyIcon={IconGitBranch}
               query={currentBranchesQuery}
               getItems={() => currentBranchesItems ?? []}
               renderItem={(branch, position) => (

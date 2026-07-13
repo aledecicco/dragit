@@ -16,7 +16,7 @@ const InputField = (props: InputFieldProps) => {
       placeholder={`Enter ${chooseArticle(fieldProps.label)} ${fieldProps.label}...`}
       {...propsWithCn(
         fieldProps,
-        'p-3 text-sm bg-dark-800 rounded-sm text-light-800',
+        'p-3 text-sm bg-dark-950/60 rounded-sm text-light-800',
         fieldProps.compact && 'px-2 py-1',
         'border border-transparent',
         'aria-invalid:border-danger-300',

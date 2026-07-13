@@ -17,7 +17,10 @@ const SettingsDialogPreferencesContent = () => {
   return (
     <DialogContent
       heading="Preferences"
-      className={cn('h-full grid grid-rows-[max-content_1fr]')}
+      className={cn(
+        'h-full grid grid-rows-[max-content_1fr]',
+        'border-l-0 rounded-l-none',
+      )}
     >
       <div className={cn('overflow-hidden h-full')}>
         <Ariakit.CompositeProvider orientation="vertical" focusLoop>

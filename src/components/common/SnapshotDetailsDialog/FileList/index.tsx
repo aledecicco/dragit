@@ -1,6 +1,7 @@
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 import * as Ariakit from '@ariakit/react'
 import type { UseQueryResult } from '@tanstack/react-query'
+import { IconFileDiff } from '@tabler/icons-react'
 
 import type { Page, RefName, VersionedFileInfo } from '@/api/models'
 import { VERSIONED_FILES_PAGE_SIZE } from '@/api/queries/versionedFiles'
@@ -127,6 +128,7 @@ const SnapshotDetailsDialogFileList = (
           >
             <QueryList
               name="modified files"
+              emptyIcon={IconFileDiff}
               query={filesQuery}
               getItems={(d) => d.items}
               renderItem={(file, position) => (

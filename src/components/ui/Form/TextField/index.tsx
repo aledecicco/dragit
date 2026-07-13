@@ -21,7 +21,7 @@ const TextField = (props: TextFieldProps) => {
       placeholder={`Write ${chooseArticle(fieldProps.label)} ${fieldProps.label}`}
       {...propsWithCn(
         fieldProps,
-        'p-3 bg-dark-800 rounded-sm text-sm text-light-800 resize-none',
+        'p-3 bg-dark-950/60 rounded-sm text-sm text-light-800 resize-none',
         'border border-transparent',
         'aria-invalid:border-danger-300',
       )}

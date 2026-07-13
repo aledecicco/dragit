@@ -79,7 +79,7 @@ const Dialog = (props: DialogProps) => {
         dialogProps,
         'z-7 group/dialog',
         'fixed top-half left-half -translate-half',
-        'max-w-[70%] max-h-[70%] rounded-lg overflow-hidden',
+        'max-w-[70%] max-h-[70%] overflow-hidden',
         'shadow-2xl shadow-black/50',
         'grid grid-rows-1 grid-cols-[530px]',
       )}

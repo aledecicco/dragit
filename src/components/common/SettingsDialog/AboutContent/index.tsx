@@ -16,7 +16,7 @@ const SettingsDialogAboutContent = () => {
   const appInfoQuery = useQueryAppInfo()
 
   return (
-    <DialogContent heading="About">
+    <DialogContent heading="About" className={cn('border-l-0 rounded-l-none')}>
       <div className={cn('grid auto-rows-auto')}>
         <div
           className={cn('min-h-15', 'w-full flex flex-col items-center gap-2')}

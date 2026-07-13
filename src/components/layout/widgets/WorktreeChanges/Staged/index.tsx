@@ -154,6 +154,7 @@ const StagedWorktreeChanges = (props: StagedWorktreeChangesProps) => {
           >
             <QueryList
               name="files with staged changes"
+              emptyIcon={IconFileCheck}
               query={filesQuery}
               getItems={(d) => d.items}
               renderItem={(file, position) => (

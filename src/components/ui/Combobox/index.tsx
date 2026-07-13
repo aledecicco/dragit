@@ -152,7 +152,7 @@ const ComboboxInner = (props: ComboboxProps) => {
             popoverProps,
             'z-5 min-w-50',
             'shadow-lg shadow-black/40',
-            'bg-dark-500/80 backdrop-blur-lg border border-light-50/12',
+            'bg-dark-500/70 backdrop-blur-lg border border-light-50/12 border-t-light-50/22',
             match(size)
               .with('xs', () => 'p-1.5 rounded-sm')
               .with('sm', () => 'p-1.5 rounded-md')
@@ -188,7 +188,7 @@ const ComboboxInner = (props: ComboboxProps) => {
               placeholder={group ? `Search ${group.name}...` : 'Search...'}
               autoSelect="always"
               className={cn(
-                'w-full bg-dark-600 border border-light-50/6',
+                'w-full bg-dark-950/40 ',
 
                 match(size)
                   .with('xs', () => 'p-1.5 rounded-xs text-xs')

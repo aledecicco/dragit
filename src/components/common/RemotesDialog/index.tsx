@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { IconServer2 } from '@tabler/icons-react'
 
 import { useQueryRemotes } from '@/api/queries/remotes'
 import { QueryList } from '@/lib/QueryList'
@@ -53,6 +54,7 @@ const RemotesDialog = (props: RemotesDialogProps) => {
         >
           <QueryList
             name="remotes"
+            emptyIcon={IconServer2}
             query={remotesQuery}
             renderItem={(remote) => <RemotesDialogItem remote={remote} />}
             itemSize={34}

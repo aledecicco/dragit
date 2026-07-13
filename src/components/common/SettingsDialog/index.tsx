@@ -54,7 +54,10 @@ const SettingsDialog = (props: SettingsDialogProps) => {
       {...propsWithCn(dialogProps, 'grid-cols-[max-content_600px] max-h-[70%]')}
     >
       <Tabs
-        className={cn('bg-dark-700')}
+        className={cn(
+          'bg-dark-700/60 backdrop-blur-lg border rounded-l-lg',
+          'border-light-50/12 border-t-light-50/22 border-r-0',
+        )}
         direction="vertical"
         store={tabsHandler.store}
         list={

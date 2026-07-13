@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { IconFileSearch } from '@tabler/icons-react'
 import { useDebounce } from 'react-use'
 
 import type { FileOfType, WorktreeFileType } from '@/api/models'
@@ -138,6 +139,7 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
     >
       <QueryList
         name="matching files"
+        emptyIcon={IconFileSearch}
         size="sm"
         query={filesQuery}
         getItems={(page) => page.items}

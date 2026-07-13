@@ -23,7 +23,7 @@ const Menu = (props: MenuProps) => {
         'z-8',
         'opacity-0 data-enter:opacity-100 transition-opacity duration-100 ease-in-out',
         'rounded-md shadow-lg shadow-black/40',
-        'bg-dark-500/80 backdrop-blur-lg border border-light-50/10',
+        'bg-dark-500/80 backdrop-blur-lg border border-light-50/10 border-t-light-50/20',
         '*:[[role=menuitem]]:not-first-of-type:rounded-t-none',
         '*:[[role=menuitem]]:not-last-of-type:rounded-b-none',
       )}

@@ -69,7 +69,8 @@ const CommandMenu = (props: CommandMenuProps) => {
     <ValueRequesterDialog
       {...propsWithCn(
         dialogProps,
-        'rounded-lg bg-dark-500/80 backdrop-blur-lg border border-light-50/10',
+        'rounded-lg',
+        'bg-dark-500/80 backdrop-blur-lg border border-light-50/10 border-t-light-50/20',
       )}
       formOptions={{
         defaultValues: { selected: '' },

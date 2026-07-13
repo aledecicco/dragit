@@ -4,6 +4,7 @@ import { usePrevious } from 'react-use'
 
 import { QueryLoader } from '@/lib/QueryLoader'
 import { VirtualizedDiv, type VirtualizedDivProps } from '@/lib/VirtualizedDiv'
+import { type Glyph, Icon } from '@/ui/Icon'
 import { Skeleton } from '@/ui/Skeleton'
 import { range } from '@/utils/array'
 import { cn } from '@/utils/styles'
@@ -18,6 +19,11 @@ interface QueryListProps<T, I> extends Omit<VirtualizedDivProps<I>, 'items'> {
    * The name of the items being displayed.
    */
   name: string
+
+  /**
+   * An icon to display above the "no items" message when the list is empty.
+   */
+  emptyIcon?: Glyph
 
   /**
    * A function that extracts the list of items from the query data.
@@ -45,6 +51,7 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
   const {
     query,
     name,
+    emptyIcon,
     getItems,
     placeholdersCount,
     className,
@@ -103,13 +110,31 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
             size="sm"
             items={items}
             fallback={
-              <p
+              <div
                 className={cn(
-                  'p-3 text-xs text-light-50/30 italic select-none',
+                  'h-full flex flex-col items-center justify-center',
+                  'gap-y-3 py-3 px-4 select-none',
                 )}
               >
-                No {name} found.
-              </p>
+                {emptyIcon && (
+                  <div
+                    className={cn(
+                      'flex items-center justify-center size-9 rounded-full',
+                      'border border-dashed border-light-50/15 text-light-950/80',
+                    )}
+                  >
+                    <Icon Glyph={emptyIcon} size="md" />
+                  </div>
+                )}
+
+                <p
+                  className={cn(
+                    'text-xs text-light-50/35 text-center leading-relaxed',
+                  )}
+                >
+                  No {name} found.
+                </p>
+              </div>
             }
             {...virtualizedDivProps}
             className={cn('h-full px-2 select-none', className)}

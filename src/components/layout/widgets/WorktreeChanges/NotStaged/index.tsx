@@ -158,6 +158,7 @@ const NotStagedWorktreeChanges = (props: NotStagedWorktreeChangesProps) => {
           >
             <QueryList
               name="files with unstaged changes"
+              emptyIcon={IconFiles}
               query={filesQuery}
               getItems={(d) => d.items}
               renderItem={(file, position) => (

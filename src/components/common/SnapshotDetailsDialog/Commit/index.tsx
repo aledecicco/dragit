@@ -61,7 +61,10 @@ const CommitSnapshotDetailsDialog = (
             </span>
           </>
         }
-        className={cn('grid grid-rows-[max-content_max-content_1fr]')}
+        className={cn(
+          'grid grid-rows-[max-content_max-content_1fr]',
+          'border-r-0 rounded-r-none',
+        )}
       >
         <ChangesSummary
           diff={commit.changes}
@@ -87,7 +90,13 @@ const CommitSnapshotDetailsDialog = (
       </DialogContent>
 
       {!!selectedFile && (
-        <div className={cn('size-full relative')}>
+        <div
+          className={cn(
+            'size-full relative',
+            'bg-dark-700/70 backdrop-blur-lg border rounded-r-lg',
+            'border-light-50/12 border-t-light-50/22 border-l-0',
+          )}
+        >
           <FileDiffViewer
             diffScope={{
               type: 'versioned',
