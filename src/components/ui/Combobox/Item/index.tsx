@@ -30,7 +30,7 @@ const ComboboxItem = (props: ComboboxItemProps) => {
             'transition-colors duration-150',
 
             !itemProps.value && 'italic not-aria-selected:text-light-800',
-            'data-active-item:bg-light-50/10',
+            'data-active-item:bg-dark-300/80',
             'aria-selected:bg-primary-500/50',
             'data-active-item:aria-selected:bg-primary-500/60',
             'not-first-of-type:rounded-t-none not-last-of-type:rounded-b-none',

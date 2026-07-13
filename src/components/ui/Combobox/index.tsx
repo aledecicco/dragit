@@ -7,6 +7,7 @@ import { Button, type ButtonProps } from '@/ui/Button'
 import { Marquee } from '@/ui/Marquee'
 import { Separator } from '@/ui/Separator'
 import { cn, propsWithCn } from '@/utils/styles'
+import type { Size } from '@/utils/types'
 
 import { type Glyph, Icon, type IconProps } from '../Icon'
 import { Tabs, useTabsHandler } from '../Tabs'
@@ -161,6 +162,7 @@ const ComboboxInner = (props: ComboboxProps) => {
           )}
         >
           <Tabs
+            className={cn('ml-0.5')}
             store={tabsHandler.store}
             list={
               groups.length > 1 &&
@@ -169,7 +171,13 @@ const ComboboxInner = (props: ComboboxProps) => {
                   key={group.name}
                   id={group.name}
                   className={cn('capitalize')}
-                  size={size}
+                  size={match(size)
+                    .returnType<Size>()
+                    .with('lg', () => 'md')
+                    .with('md', () => 'sm')
+                    .with('sm', () => 'xs')
+                    .with('xs', () => 'xs')
+                    .exhaustive()}
                 >
                   {group.name}
                 </Tab>
@@ -180,7 +188,7 @@ const ComboboxInner = (props: ComboboxProps) => {
               placeholder={group ? `Search ${group.name}...` : 'Search...'}
               autoSelect="always"
               className={cn(
-                'w-full bg-dark-500',
+                'w-full bg-dark-600 border border-light-50/6',
 
                 match(size)
                   .with('xs', () => 'p-1.5 rounded-xs text-xs')
