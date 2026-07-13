@@ -96,7 +96,6 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
         className={cn(
           'pl-1 py-1 text-sm overflow-y-auto',
           'grid grid-cols-[max-content_max-content_1fr] grid-rows-[1fr]',
-          'border border-transparent focus:border-x-dark-50 focus:border-b-dark-50',
         )}
       >
         <QueryLoader
@@ -107,7 +106,7 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
                 className={cn(
                   'h-6.5 flex flex-row items-center font-mono',
                   'text-xs w-19 px-1 overflow-hidden',
-                  'bg-dark-600 text-light-950/30',
+                  'bg-dark-950/50 text-light-950/30',
                 )}
               >
                 {i + 1}

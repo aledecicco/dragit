@@ -59,7 +59,10 @@ const StashSnapshotDetailsDialog = (props: StashSnapshotDetailsDialogProps) => {
             </span>
           </>
         }
-        className={cn('grid grid-rows-[max-content_max-content_1fr]')}
+        className={cn(
+          'grid grid-rows-[max-content_max-content_1fr]',
+          'border-r-0 rounded-r-none',
+        )}
       >
         <ChangesSummary
           diff={stash.changes}
@@ -85,7 +88,13 @@ const StashSnapshotDetailsDialog = (props: StashSnapshotDetailsDialogProps) => {
       </DialogContent>
 
       {!!selectedFile && (
-        <div className={cn('size-full relative')}>
+        <div
+          className={cn(
+            'size-full relative',
+            'bg-dark-700/70 backdrop-blur-lg border rounded-r-lg',
+            'border-light-50/12 border-t-light-50/22',
+          )}
+        >
           <FileDiffViewer
             diffScope={{
               type: 'versioned',

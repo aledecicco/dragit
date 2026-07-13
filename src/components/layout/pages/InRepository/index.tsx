@@ -13,9 +13,7 @@ import { NotStagedWorktreeChanges } from '@/layout/widgets/WorktreeChanges/NotSt
 import { StagedWorktreeChanges } from '@/layout/widgets/WorktreeChanges/Staged'
 
 import { showCommandPalette } from '@/common/CommandPalette'
-import { showSettingsDialog } from '@/common/SettingsDialog'
 import { useApplySomeStashInteraction } from '@/interactions/stash'
-import { DecoratedButton } from '@/lib/DecoratedButton'
 import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
@@ -70,29 +68,7 @@ const InRepositoryPage = () => {
       <div
         className={cn('grid grid-rows-[max-content_1fr] gap-4 overflow-hidden')}
       >
-        <div
-          className={cn(
-            'flex flex-row items-center gap-2',
-            'justify-self-center max-w-half',
-          )}
-        >
-          <DecoratedButton
-            label="View settings"
-            Glyph={IconSettings}
-            onClick={() => {
-              showSettingsDialog()
-            }}
-            status="primary"
-            variant="plain"
-            size="lg"
-            round
-            compact
-            className={cn(
-              'text-primary-200 p-1.5 border border-primary-200/10 ',
-            )}
-          />
-          <CurrentDirectory />
-        </div>
+        <CurrentDirectory className={cn('justify-self-center max-w-half')} />
 
         {selectedFile ? (
           <SelectedFileDiff

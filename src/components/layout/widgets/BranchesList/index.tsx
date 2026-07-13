@@ -94,7 +94,7 @@ const BranchesList = (props: BranchesListProps) => {
     <DropArea
       {...propsWithCn(
         divProps,
-        'grid grid-rows-[max-content_1fr] gap-y-1 overflow-hidden',
+        'grid grid-rows-[max-content_1fr] overflow-hidden',
       )}
       acceptedTypes={['commit', 'branch']}
       label={
@@ -131,6 +131,7 @@ const BranchesList = (props: BranchesListProps) => {
       }}
     >
       <Tabs
+        className={cn('ml-0.5')}
         store={tabsHandler.store}
         list={
           <>

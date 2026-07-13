@@ -21,7 +21,7 @@ const ListItem = (props: ListItemProps) => {
         'aria-selected:bg-dark-400',
         'hover:aria-selected:bg-dark-300 focus:aria-selected:bg-dark-300 data-focus:aria-selected:bg-dark-300',
         'border border-transparent',
-        'aria-current:border-accent-300 aria-checked:border-accent-300',
+        'aria-current:border-primary-300 aria-checked:border-primary-300',
       )}
     />
   )

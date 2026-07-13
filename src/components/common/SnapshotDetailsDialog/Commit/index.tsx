@@ -94,7 +94,7 @@ const CommitSnapshotDetailsDialog = (
           className={cn(
             'size-full relative',
             'bg-dark-700/70 backdrop-blur-lg border rounded-r-lg',
-            'border-light-50/12 border-t-light-50/22 border-l-0',
+            'border-light-50/12 border-t-light-50/22',
           )}
         >
           <FileDiffViewer

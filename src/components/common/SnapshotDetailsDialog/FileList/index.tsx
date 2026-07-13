@@ -1,7 +1,7 @@
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 import * as Ariakit from '@ariakit/react'
-import type { UseQueryResult } from '@tanstack/react-query'
 import { IconFileDiff } from '@tabler/icons-react'
+import type { UseQueryResult } from '@tanstack/react-query'
 
 import type { Page, RefName, VersionedFileInfo } from '@/api/models'
 import { VERSIONED_FILES_PAGE_SIZE } from '@/api/queries/versionedFiles'
@@ -117,7 +117,7 @@ const SnapshotDetailsDialogFileList = (
           focusable
           className={cn(
             'h-full overflow-hidden',
-            'bg-dark-800 rounded-md',
+            'bg-dark-950/50 rounded-md',
             'border border-transparent',
             'focus:border-dark-100',
           )}

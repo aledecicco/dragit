@@ -80,7 +80,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
               <Icon
                 Glyph={IconLocationFilled}
                 size="sm"
-                className={cn('text-accent-400/90')}
+                className={cn('text-primary-300')}
               />
             )}
           </div>
@@ -100,7 +100,7 @@ const BranchesListItem = (props: BranchesListItemProps) => {
               <>
                 , tracking{' '}
                 <Marquee
-                  className={cn('font-mono tracking-normal text-light-300')}
+                  className={cn('tracking-wider text-light-300')}
                   reverse={false}
                 >
                   {remoteCounterpart.remote}/{remoteCounterpart.remoteBranch}
