@@ -42,7 +42,7 @@ const CommandPaletteItem = (props: CommandPaletteItemProps) => {
         'grid grid-cols-[max-content_max-content_1fr] w-full overflow-hidden',
         'items-center gap-3 p-2 rounded-md',
         'transition-colors duration-150',
-        'focus:bg-dark-500/80 hover:bg-dark-500/80',
+        'focus:bg-dark-400/80 hover:bg-dark-400/80',
       )}
       onClick={(e) => {
         itemProps.onClick?.(e)

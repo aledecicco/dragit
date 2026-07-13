@@ -22,8 +22,8 @@ const Menu = (props: MenuProps) => {
         menuProps,
         'z-8',
         'opacity-0 data-enter:opacity-100 transition-opacity duration-100 ease-in-out',
-        'rounded-md shadow-md',
-        'bg-dark-300',
+        'rounded-md shadow-lg shadow-black/40',
+        'bg-dark-500/80 backdrop-blur-lg border border-light-50/10',
         '*:[[role=menuitem]]:not-first-of-type:rounded-t-none',
         '*:[[role=menuitem]]:not-last-of-type:rounded-b-none',
       )}

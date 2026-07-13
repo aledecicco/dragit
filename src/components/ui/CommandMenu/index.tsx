@@ -67,7 +67,10 @@ const CommandMenu = (props: CommandMenuProps) => {
 
   return (
     <ValueRequesterDialog
-      {...propsWithCn(dialogProps, 'rounded-lg bg-dark-300')}
+      {...propsWithCn(
+        dialogProps,
+        'rounded-lg bg-dark-500/80 backdrop-blur-lg border border-light-50/10',
+      )}
       formOptions={{
         defaultValues: { selected: '' },
         className: cn('gap-0'),
@@ -87,7 +90,7 @@ const CommandMenu = (props: CommandMenuProps) => {
       >
         <Ariakit.Combobox
           placeholder="Search..."
-          className={cn('w-full p-3 rounded-none', 'text-sm bg-dark-500')}
+          className={cn('w-full p-3 rounded-none', 'text-sm bg-dark-500/30')}
           autoSelect
           {...fieldProps}
         />
@@ -95,7 +98,10 @@ const CommandMenu = (props: CommandMenuProps) => {
         <Separator className={cn('border-dark-700')} />
 
         <div className={cn('grid max-h-100')}>
-          <Ariakit.ComboboxList className={cn('h-full')} render={children} />
+          <Ariakit.ComboboxList
+            className={cn('h-full bg-dark-800/30')}
+            render={children}
+          />
         </div>
       </Ariakit.ComboboxProvider>
 

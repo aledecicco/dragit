@@ -149,7 +149,9 @@ const ComboboxInner = (props: ComboboxProps) => {
           gutter={4}
           {...propsWithCn(
             popoverProps,
-            'z-5 shadow-md min-w-50 bg-dark-300 border-2 border-dark-50',
+            'z-5 min-w-50',
+            'shadow-lg shadow-black/40',
+            'bg-dark-500/80 backdrop-blur-lg border border-light-50/12',
             match(size)
               .with('xs', () => 'p-1.5 rounded-sm')
               .with('sm', () => 'p-1.5 rounded-md')

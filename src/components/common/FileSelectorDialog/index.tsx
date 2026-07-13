@@ -142,7 +142,7 @@ const FileSelectorDialog = <T extends WorktreeFileType>(
         query={filesQuery}
         getItems={(page) => page.items}
         itemSize={52}
-        className={cn('px-0 bg-dark-700')}
+        className={cn('px-0')}
         renderItem={(file) => <FileSelectorDialogItem file={file} />}
         options={{
           paddingStart: 3,

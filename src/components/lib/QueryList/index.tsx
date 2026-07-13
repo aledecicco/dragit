@@ -112,7 +112,7 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
               </p>
             }
             {...virtualizedDivProps}
-            className={cn('h-full px-2', className)}
+            className={cn('h-full px-2 select-none', className)}
           />
         )
       }}

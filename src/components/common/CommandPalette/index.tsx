@@ -30,7 +30,10 @@ const CommandPalette = () => {
     <Dialog
       dialogKey={COMMAND_PALETTE_DIALOG_KEY}
       showClose={false}
-      className={cn('p-3 grid-cols-[600px]')}
+      className={cn(
+        'p-3 grid-cols-[600px]',
+        'bg-dark-500/80 backdrop-blur-lg border border-light-50/10',
+      )}
     >
       <Ariakit.CompositeProvider focusLoop>
         <Ariakit.Composite

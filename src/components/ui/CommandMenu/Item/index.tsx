@@ -21,7 +21,7 @@ const CommandMenuItem = (props: CommandMenuItemProps) => {
         itemProps,
         'text-sm',
         'py-2 px-3 rounded-none cursor-pointer',
-        'data-active-item:bg-dark-500',
+        'data-active-item:bg-dark-500/80',
       )}
     />
   )

@@ -71,7 +71,7 @@ const Dialog = (props: DialogProps) => {
     <Ariakit.Dialog
       open
       portal={false}
-      backdrop={<div className={cn('bg-black/50')} />}
+      backdrop={<div className={cn('bg-black/40 backdrop-blur-sm')} />}
       getPersistentElements={() =>
         document.querySelectorAll('[data-toasts-root]')
       }
@@ -80,7 +80,7 @@ const Dialog = (props: DialogProps) => {
         'z-7 group/dialog',
         'fixed top-half left-half -translate-half',
         'max-w-[70%] max-h-[70%] rounded-lg overflow-hidden',
-        'border-2 border-dark-900 bg-dark-900',
+        'shadow-2xl shadow-black/50',
         'grid grid-rows-1 grid-cols-[530px]',
       )}
       style={{

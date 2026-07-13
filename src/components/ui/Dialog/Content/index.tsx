@@ -20,8 +20,8 @@ const DialogContent = (props: DialogContentProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'overflow-hidden',
-        'p-6 bg-dark-600',
+        'overflow-hidden p-6',
+        'bg-dark-500/80 backdrop-blur-lg border border-light-50/12',
         !!heading && 'pt-4',
       )}
     >

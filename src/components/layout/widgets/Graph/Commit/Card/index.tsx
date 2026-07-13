@@ -117,7 +117,7 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
           buttonProps,
           'group cursor-pointer select-none',
           'p-2 border border-dark-100 rounded-sm',
-          'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3]',
+          'bg-dark-800/75 dithered-bg-dark-600 dithering-size-[0.3] backdrop-blur-sm',
           'transition-colors duration-150',
           'hover:dithered-bg-dark-400 data-active-item:dithered-bg-dark-400',
           'hover:data-active-item:dithered-bg-dark-300',
