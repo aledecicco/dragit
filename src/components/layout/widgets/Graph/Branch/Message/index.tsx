@@ -18,7 +18,7 @@ const BranchMessage = (props: BranchMessageProps) => {
     <p
       {...propsWithCn(
         pProps,
-        'text-center text-sm text-light-50/30 italic font-light select-none',
+        'text-center text-sm text-light-50/30 italic select-none',
         'absolute top-7 w-max p-1 overflow-visible',
         isBase ? 'left-[67%]' : 'left-[13.5%]',
       )}
