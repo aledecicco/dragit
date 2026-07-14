@@ -26,8 +26,10 @@ const BaseBranchSelector = (props: BaseBranchSelectorProps) => {
   return (
     <RefSelector
       placeholder="Choose a base branch..."
-      {...propsWithCn(comboboxProps, 'w-full border border-dark-50')}
-      disabled={!currentReference || comboboxProps.disabled}
+      {...propsWithCn(
+        comboboxProps,
+        'w-full border border-dark-50 shadow-xs shadow-black/20',
+      )}
       reference={baseReference}
       pinnedBranches={
         currentUpstream
@@ -37,6 +39,7 @@ const BaseBranchSelector = (props: BaseBranchSelectorProps) => {
       excludedBranches={
         currentReference ? [currentReference.refName] : undefined
       }
+      disabled={!currentReference || comboboxProps.disabled}
       onSelectBranch={(value) => {
         if (currentReference) {
           changeSelectedBase(

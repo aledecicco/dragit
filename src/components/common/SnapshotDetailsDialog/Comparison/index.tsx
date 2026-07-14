@@ -145,7 +145,8 @@ const ComparisonSnapshotDetailsDialog = (
         ) : (
           <p
             className={cn(
-              'text-sm bg-dark-700 text-light-950/50 italic select-none',
+              'text-sm text-light-50/35 bg-dark-950/50',
+              'leading-relaxed italic select-none',
               'p-3 rounded-md h-full',
             )}
           >

@@ -43,6 +43,18 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
   return (
     <RefSelector
       placeholder="Checkout a branch..."
+      {...propsWithCn(
+        comboboxProps,
+        'w-full border border-dark-50 shadow-xs shadow-black/20',
+      )}
+      reference={currentReference}
+      pinnedBranches={currentBranch ? [currentBranch.name] : undefined}
+      disabled={
+        checkoutTracker.actionStatus === 'running' ||
+        checkoutTracker.actionStatus === 'disabled' ||
+        !currentReference ||
+        props.disabled
+      }
       Glyph={
         checkoutTracker.actionStatus !== 'disabled' &&
         checkoutTracker.actionStatus !== 'idle'
@@ -59,15 +71,6 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
           .with('error', () => 'text-danger-600')
           .otherwise(() => undefined),
       )}
-      {...propsWithCn(comboboxProps, 'w-full border border-dark-50')}
-      disabled={
-        checkoutTracker.actionStatus === 'running' ||
-        checkoutTracker.actionStatus === 'disabled' ||
-        !currentReference ||
-        props.disabled
-      }
-      reference={currentReference}
-      pinnedBranches={currentBranch ? [currentBranch.name] : undefined}
       onSelectBranch={(_, branch) => {
         if (branch?.type === 'remote') {
           triggerInteraction(branchOff(branch.name))

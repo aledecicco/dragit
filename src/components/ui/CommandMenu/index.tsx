@@ -70,7 +70,7 @@ const CommandMenu = (props: CommandMenuProps) => {
       {...propsWithCn(
         dialogProps,
         'rounded-lg',
-        'bg-dark-500/80 backdrop-blur-lg border border-light-50/10 border-t-light-50/20',
+        'bg-dark-500/70 backdrop-blur-lg border border-light-50/10 border-t-light-50/20',
       )}
       formOptions={{
         defaultValues: { selected: '' },
@@ -91,7 +91,7 @@ const CommandMenu = (props: CommandMenuProps) => {
       >
         <Ariakit.Combobox
           placeholder="Search..."
-          className={cn('w-full p-3 rounded-none', 'text-sm bg-dark-500/30')}
+          className={cn('w-full p-3 rounded-none', 'text-sm bg-dark-500/70')}
           autoSelect
           {...fieldProps}
         />

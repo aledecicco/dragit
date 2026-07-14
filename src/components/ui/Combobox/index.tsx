@@ -188,7 +188,7 @@ const ComboboxInner = (props: ComboboxProps) => {
               placeholder={group ? `Search ${group.name}...` : 'Search...'}
               autoSelect="always"
               className={cn(
-                'w-full bg-dark-950/40 ',
+                'w-full bg-dark-950/40',
 
                 match(size)
                   .with('xs', () => 'p-1.5 rounded-xs text-xs')

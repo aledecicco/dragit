@@ -55,7 +55,7 @@ const SettingsDialog = (props: SettingsDialogProps) => {
     >
       <Tabs
         className={cn(
-          'bg-dark-700/60 backdrop-blur-lg border rounded-l-lg',
+          'bg-dark-700/70 backdrop-blur-lg border rounded-l-lg',
           'border-light-50/12 border-t-light-50/22 border-r-0',
         )}
         direction="vertical"

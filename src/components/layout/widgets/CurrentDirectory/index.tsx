@@ -32,9 +32,9 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
     <Toolbar
       {...propsWithCn(
         toolbarProps,
-        'bg-dark-700/60 backdrop-blur-sm rounded-full',
+        'bg-dark-700/70 backdrop-blur-sm rounded-full',
         'border border-light-50/8 border-t-light-50/16',
-        'shadow-sm shadow-black/20',
+        'shadow-xs shadow-black/20',
       )}
     >
       <ToolbarItem

@@ -49,7 +49,7 @@ const RemotesDialog = (props: RemotesDialogProps) => {
         <div
           className={cn(
             'overflow-y-hidden mb-6',
-            'bg-dark-700 border border-dark-300 rounded-lg',
+            'bg-dark-950/50 border border-dark-300 rounded-lg',
           )}
         >
           <QueryList
