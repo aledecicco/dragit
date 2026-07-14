@@ -70,14 +70,14 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
       pinnedBranches={currentBranch ? [currentBranch.name] : undefined}
       onSelectBranch={(_, branch) => {
         if (branch?.type === 'remote') {
-          triggerInteraction(branchOff(branch))
+          triggerInteraction(branchOff(branch.name))
         } else if (branch?.type === 'local') {
-          triggerInteraction(checkoutBranch(branch))
+          triggerInteraction(checkoutBranch(branch.name))
         }
       }}
       onSelectTag={(_, tag) => {
         if (tag) {
-          triggerInteraction(checkoutTag(tag))
+          triggerInteraction(checkoutTag(tag.name))
         }
       }}
       onSelectCommit={(_, commit) => {

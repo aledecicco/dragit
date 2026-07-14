@@ -108,7 +108,7 @@ const GraphCommitCardInner = (props: GraphCommitCardInnerProps) => {
     <Draggable
       dragPayload={{
         type: 'commit',
-        dragged: commitInfo,
+        dragged: commitInfo.shortHash,
         label: `#${commitInfo.shortHash}`,
         Glyph: IconGitCommit,
       }}

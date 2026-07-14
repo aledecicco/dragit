@@ -6,7 +6,7 @@ import type { Action } from '@/state/actions'
 import { useChangeSelectedBase, useSelectedBase } from '@/state/branches'
 import { useHeadReference } from '@/utils/repository'
 
-import type { BranchInfo, CommitId, RefName, TagInfo } from '../models'
+import type { BranchName, CommitId, RefName, TagName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface CheckoutArgs {
@@ -93,18 +93,18 @@ const useMakeCheckoutCommit = (): ((commit: CommitId) => Action) => {
   })
 }
 
-const useMakeCheckoutBranch = (): ((branch: BranchInfo) => Action) => {
+const useMakeCheckoutBranch = (): ((branch: BranchName) => Action) => {
   const checkout = useRepositoryMutation(checkoutMutation)
 
-  return (branch: BranchInfo): Action => ({
+  return (branch: BranchName): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'checkout',
-      reference: branch.name,
+      reference: branch,
     },
     blockedBy: [{ key: 'branch_operation' }],
     run: async () => {
-      await checkout.mutateAsync({ reference: branch.name, isNew: false })
+      await checkout.mutateAsync({ reference: branch, isNew: false })
     },
     Glyph: IconGitBranch,
     label: {
@@ -116,18 +116,18 @@ const useMakeCheckoutBranch = (): ((branch: BranchInfo) => Action) => {
   })
 }
 
-const useMakeCheckoutTag = (): ((tag: TagInfo) => Action) => {
+const useMakeCheckoutTag = (): ((tag: TagName) => Action) => {
   const checkout = useRepositoryMutation(checkoutMutation)
 
-  return (tag: TagInfo): Action => ({
+  return (tag: TagName): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'checkout',
-      reference: tag.name,
+      reference: tag,
     },
     blockedBy: [{ key: 'branch_operation' }],
     run: async () => {
-      await checkout.mutateAsync({ reference: tag.name, isNew: false })
+      await checkout.mutateAsync({ reference: tag, isNew: false })
     },
     Glyph: IconGitBranch,
     label: {

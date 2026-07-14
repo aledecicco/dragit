@@ -1,4 +1,4 @@
-import type { BranchInfo, CommitId, TagInfo } from '@/api/models'
+import type { BranchName, CommitId, TagName } from '@/api/models'
 import {
   useCheckoutNew,
   useDummyCheckout,
@@ -36,10 +36,10 @@ export const useCheckoutSomeCommitInteraction = () => {
 export const useCheckoutSomeBranchInteraction = () => {
   const makeCheckout = useMakeCheckoutBranch()
 
-  return (branch: BranchInfo) =>
+  return (branch: BranchName) =>
     interaction({
       action: makeCheckout(branch),
-      details: `checkout branch "${branch.name}"`,
+      details: `checkout branch "${branch}"`,
     })
 }
 
@@ -57,9 +57,9 @@ export const useCreateAndCheckoutBranchInteraction = () => {
 export const useCheckoutSomeTagInteraction = () => {
   const makeCheckout = useMakeCheckoutTag()
 
-  return (tag: TagInfo) =>
+  return (tag: TagName) =>
     interaction({
       action: makeCheckout(tag),
-      details: `checkout tag "${tag.name}"`,
+      details: `checkout tag "${tag}"`,
     })
 }

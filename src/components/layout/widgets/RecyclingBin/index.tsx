@@ -49,7 +49,7 @@ const RecyclingBin = (props: RecyclingBinProps) => {
       ]}
       extraValidation={(payload) => {
         if (payload.type === 'branch' && currentBranch) {
-          return payload.dragged.name !== currentBranch.name
+          return payload.dragged !== currentBranch.name
         }
 
         if (payload.type === 'not-staged-files') {

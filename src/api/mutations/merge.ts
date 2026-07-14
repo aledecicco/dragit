@@ -4,7 +4,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
 
-import type { BranchInfo, CommitId, RefName, TagInfo } from '../models'
+import type { BranchName, CommitId, RefName, TagName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface MergeArgs {
@@ -26,22 +26,22 @@ const mergeMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useMakeMergeBranch = (): ((branch: BranchInfo) => Action) => {
+const useMakeMergeBranch = (): ((branch: BranchName) => Action) => {
   const merge = useRepositoryMutation(mergeMutation)
 
-  return (branch: BranchInfo): Action => ({
+  return (branch: BranchName): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'merge',
       type: 'current',
-      branch: branch.name,
+      branch,
     },
     blockedBy: [
       { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
     run: async () => {
-      await merge.mutateAsync({ reference: branch.name })
+      await merge.mutateAsync({ reference: branch })
     },
     Glyph: IconGitMerge,
     label: {
@@ -53,19 +53,19 @@ const useMakeMergeBranch = (): ((branch: BranchInfo) => Action) => {
   })
 }
 
-const useMakeMergeTag = (): ((tag: TagInfo) => Action) => {
+const useMakeMergeTag = (): ((tag: TagName) => Action) => {
   const merge = useRepositoryMutation(mergeMutation)
 
-  return (tag: TagInfo): Action => ({
+  return (tag: TagName): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'merge',
       type: 'current',
-      tag: tag.name,
+      tag,
     },
     blockedBy: [{ key: 'branch_operation', type: 'current' }],
     run: async () => {
-      await merge.mutateAsync({ reference: tag.name })
+      await merge.mutateAsync({ reference: tag })
     },
     Glyph: IconGitMerge,
     label: {

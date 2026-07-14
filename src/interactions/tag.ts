@@ -15,74 +15,74 @@ import { pluralize } from '@/utils/string'
 
 import { compareTagInteraction } from './view'
 
-export const useCheckoutTagInteraction = (tag: TagInfo) => {
+export const useCheckoutTagInteraction = (tag: TagName) => {
   const checkout = useMakeCheckoutTag()(tag)
 
   return interaction({
     action: checkout,
-    details: `checkout tag "${tag.name}"`,
+    details: `checkout tag "${tag}"`,
   })
 }
 
-export const usePushTagInteraction = (tag: TagInfo) => {
+export const usePushTagInteraction = (tag: TagName) => {
   const push = usePushTag(tag)
 
-  return interaction({ action: push, details: `push tag "${tag.name}"` })
+  return interaction({ action: push, details: `push tag "${tag}"` })
 }
 
-export const useCreateBranchAtTagInteraction = (tag: TagInfo) => {
-  const createBranch = useMakeCreateBranchAt()(tag.name)
+export const useCreateBranchAtTagInteraction = (tag: TagName) => {
+  const createBranch = useMakeCreateBranchAt()(tag)
 
   return interaction({
     action: createBranch,
-    argsRequester: () => requestBranchName(`#${tag.reference}`),
-    details: `create a new branch at tag "${tag.name}"`,
+    argsRequester: () => requestBranchName(`tag "${tag}"`),
+    details: `create a new branch at tag "${tag}"`,
   })
 }
 
-export const useBranchOffTagInteraction = (tag: TagInfo) => {
-  const branchOff = useMakeBranchOff()(tag.name)
+export const useBranchOffTagInteraction = (tag: TagName) => {
+  const branchOff = useMakeBranchOff()(tag)
 
   return interaction({
     action: branchOff,
-    argsRequester: () => requestBranchName(`#${tag.reference}`),
-    details: `branch off of tag "${tag.name}"`,
+    argsRequester: () => requestBranchName(`tag "${tag}"`),
+    details: `branch off of tag "${tag}"`,
   })
 }
 
 export const useMergeSomeTagInteraction = () => {
   const makeMerge = useMakeMergeTag()
 
-  return (tag: TagInfo) =>
+  return (tag: TagName) =>
     interaction({
       action: makeMerge(tag),
-      details: `merge tag "${tag.name}" into worktree`,
+      details: `merge tag "${tag}" into worktree`,
     })
 }
 
-export const useMergeTagInteraction = (tag: TagInfo) => {
+export const useMergeTagInteraction = (tag: TagName) => {
   const mergeSome = useMergeSomeTagInteraction()
   return mergeSome(tag)
 }
 
-export const useDeleteTagInteraction = (tag: TagInfo) => {
+export const useDeleteTagInteraction = (tag: TagName) => {
   const deleteTag = useMakeDeleteTag()(tag)
 
   return interaction({
     action: deleteTag,
     isDangerous: true,
-    details: `delete tag "${tag.name}"`,
+    details: `delete tag "${tag}"`,
   })
 }
 
 export const useSingleTagInteractions = (tag: TagInfo) => {
-  const checkout = useCheckoutTagInteraction(tag)
-  const push = usePushTagInteraction(tag)
-  const createBranch = useCreateBranchAtTagInteraction(tag)
-  const branchOff = useBranchOffTagInteraction(tag)
-  const merge = useMergeTagInteraction(tag)
-  const deleteTag = useDeleteTagInteraction(tag)
-  const compare = compareTagInteraction(tag)
+  const checkout = useCheckoutTagInteraction(tag.name)
+  const push = usePushTagInteraction(tag.name)
+  const createBranch = useCreateBranchAtTagInteraction(tag.name)
+  const branchOff = useBranchOffTagInteraction(tag.name)
+  const merge = useMergeTagInteraction(tag.name)
+  const deleteTag = useDeleteTagInteraction(tag.name)
+  const compare = compareTagInteraction(tag.name)
 
   return [
     group(checkout, push),
@@ -117,7 +117,7 @@ export const useTagSomeBranchInteraction = () => {
 export const useDeleteTagsInteraction = () => {
   const deleteTags = useDeleteTags()
 
-  return (tags: TagInfo[]) =>
+  return (tags: TagName[]) =>
     interaction({
       action: deleteTags,
       argsRequester: () => tags,
@@ -129,5 +129,7 @@ export const useDeleteTagsInteraction = () => {
 export const useGetTagsListInteractions = () => {
   const deleteTagsInteraction = useDeleteTagsInteraction()
 
-  return (tags: TagInfo[]) => [group(deleteTagsInteraction(tags))]
+  return (tags: TagInfo[]) => [
+    group(deleteTagsInteraction(tags.map((tag) => tag.name))),
+  ]
 }

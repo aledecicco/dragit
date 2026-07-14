@@ -6,7 +6,7 @@ import type { Action } from '@/state/actions'
 import { useSelectedUpstream } from '@/state/upstream'
 import { useCurrentBranch } from '@/utils/repository'
 
-import type { RemoteName, TagInfo, TagName } from '../models'
+import type { RemoteName, TagName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface PushTagArgs {
@@ -29,7 +29,7 @@ const pushTagMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const usePushTag = (tag: TagInfo): Action => {
+const usePushTag = (tag: TagName): Action => {
   const currentBranch = useCurrentBranch()
   const upstream = useSelectedUpstream(currentBranch)
 
@@ -39,16 +39,16 @@ const usePushTag = (tag: TagInfo): Action => {
     id: {
       key: 'tag_operation',
       operation: 'push',
-      tag: tag.name,
+      tag,
     },
-    blockedBy: [{ key: 'tag_operation', tag: tag.name }],
+    blockedBy: [{ key: 'tag_operation', tag }],
     run: async () => {
       if (!upstream) {
         throw new Error('No upstream set')
       }
 
       await pushTag.mutateAsync({
-        tag: tag.name,
+        tag,
         remote: upstream.remote,
       })
     },

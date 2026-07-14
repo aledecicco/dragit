@@ -6,6 +6,7 @@ import { STAGED_FILE_TYPES } from '@/layout/widgets/WorktreeChanges/Staged'
 import type {
   BranchInfo,
   Reference,
+  RefName,
   RemoteInfo,
   RemoteName,
   RepositoryHost,
@@ -29,10 +30,21 @@ import { useSelectedUpstream } from '@/state/upstream'
  * @param branches - The list of branches to search in.
  */
 export const findBranchInfo = (
-  refName: string,
+  refName: RefName,
   branches: BranchInfo[],
 ): BranchInfo | undefined => {
   return branches.find((branch) => branch.name === refName)
+}
+
+/**
+ * Returns a function that finds a branch's info by name.
+ */
+export const useBranchResolver = (): ((
+  refName: RefName,
+) => BranchInfo | undefined) => {
+  const branchesQuery = useQueryBranches()
+
+  return (name) => findBranchInfo(name, branchesQuery.data ?? [])
 }
 
 /**
@@ -45,14 +57,13 @@ export const findBranchInfo = (
 export const useBranch = (
   reference: Reference | undefined,
 ): BranchInfo | undefined => {
-  const branchesQuery = useQueryBranches()
+  const resolveBranch = useBranchResolver()
 
-  const branch =
-    reference && branchesQuery.data?.length
-      ? findBranchInfo(reference.refName, branchesQuery.data)
-      : undefined
+  if (!reference) {
+    return undefined
+  }
 
-  return branch
+  return resolveBranch(reference.refName)
 }
 
 /**

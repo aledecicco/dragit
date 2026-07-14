@@ -4,7 +4,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
 
-import type { BranchInfo, BranchName, RefName } from '../models'
+import type { BranchName, RefName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 import { checkoutMutation } from './checkout'
 
@@ -54,14 +54,14 @@ const useMakeCreateBranchAt = (): ((
   })
 }
 
-const useMakeTrackBranch = (): ((branch: BranchInfo) => Action<BranchName>) => {
+const useMakeTrackBranch = (): ((branch: BranchName) => Action<BranchName>) => {
   const createBranch = useRepositoryMutation(createBranchMutation)
 
-  return (branch: BranchInfo): Action<BranchName> => ({
+  return (branch: BranchName): Action<BranchName> => ({
     id: {
       key: 'branch_operation',
       operation: 'checkout',
-      at: branch.name,
+      at: branch,
     },
     blockedBy: [{ key: 'branch_operation' }],
     label: {
@@ -74,7 +74,7 @@ const useMakeTrackBranch = (): ((branch: BranchInfo) => Action<BranchName>) => {
     run: async (name) => {
       await createBranch.mutateAsync({
         branchName: name,
-        fromReference: branch.name,
+        fromReference: branch,
       })
     },
   })

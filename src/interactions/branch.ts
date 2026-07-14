@@ -1,6 +1,6 @@
 import { match } from 'ts-pattern'
 
-import type { BranchInfo, CommitInfo } from '@/api/models'
+import type { BranchInfo, BranchName, CommitId } from '@/api/models'
 import { useMakeCheckoutBranch } from '@/api/mutations/checkout'
 import {
   useMakeBranchOff,
@@ -23,44 +23,44 @@ import {
 } from '@/api/mutations/pushBranch'
 import { requestBranchName } from '@/common/CreateBranchDialog'
 import { group, interaction } from '@/lib/ActionButton/utils'
-import { useCurrentBranch } from '@/utils/repository'
+import { useBranchResolver, useCurrentBranch } from '@/utils/repository'
 import { pluralize } from '@/utils/string'
 
 import { useTagSomeBranchInteraction } from './tag'
 import { compareBranchInteraction } from './view'
 
-export const useCheckoutBranchInteraction = (branch: BranchInfo) => {
+export const useCheckoutBranchInteraction = (branch: BranchName) => {
   const checkout = useMakeCheckoutBranch()(branch)
 
-  return interaction({ action: checkout, details: `checkout "${branch.name}"` })
+  return interaction({ action: checkout, details: `checkout "${branch}"` })
 }
 
-export const useFastForwardBranchInteraction = (branch: BranchInfo) => {
+export const useFastForwardBranchInteraction = (branch: BranchName) => {
   const fastForward = useMakeFastForwardBranch()
 
   return interaction({
     action: fastForward(branch),
-    details: `fast-forward "${branch.name}"`,
+    details: `fast-forward "${branch}"`,
   })
 }
 
-export const usePullBranchInteraction = (branch: BranchInfo) => {
+export const usePullBranchInteraction = (branch: BranchName) => {
   const pull = useMakePullBranch()
 
-  return interaction({ action: pull(branch), details: `pull "${branch.name}"` })
+  return interaction({ action: pull(branch), details: `pull "${branch}"` })
 }
 
 export const useRebaseSomeBranchInteraction = () => {
   const rebase = useMakeRebaseBranch()
 
-  return (branch: BranchInfo) =>
+  return (branch: BranchName) =>
     interaction({
       action: rebase(branch),
-      details: `rebase "${branch.name}"`,
+      details: `rebase "${branch}"`,
     })
 }
 
-export const useRebaseBranchInteraction = (branch: BranchInfo) => {
+export const useRebaseBranchInteraction = (branch: BranchName) => {
   const rebaseSome = useRebaseSomeBranchInteraction()
 
   return rebaseSome(branch)
@@ -69,38 +69,38 @@ export const useRebaseBranchInteraction = (branch: BranchInfo) => {
 export const usePushSomeBranchInteraction = () => {
   const push = useMakePushBranch()
 
-  return (branch: BranchInfo) =>
-    interaction({ action: push(branch), details: `push "${branch.name}"` })
+  return (branch: BranchName) =>
+    interaction({ action: push(branch), details: `push "${branch}"` })
 }
 
-export const usePushBranchInteraction = (branch: BranchInfo) => {
+export const usePushBranchInteraction = (branch: BranchName) => {
   const pushSome = usePushSomeBranchInteraction()
 
   return pushSome(branch)
 }
 
-export const useForcePushBranchInteraction = (branch: BranchInfo) => {
+export const useForcePushBranchInteraction = (branch: BranchName) => {
   const forcePush = useMakeForcePushBranch()
 
   return interaction({
     action: forcePush(branch),
     isDangerous: true,
-    details: `force push "${branch.name}"`,
+    details: `force push "${branch}"`,
   })
 }
 
 export const useCreateBranchAtSomeBranchInteraction = () => {
   const makeCreateBranchAt = useMakeCreateBranchAt()
 
-  return (branch: BranchInfo) =>
+  return (branch: BranchName) =>
     interaction({
-      action: makeCreateBranchAt(branch.name),
-      argsRequester: () => requestBranchName(branch.name),
-      details: `create a new branch at "${branch.name}"`,
+      action: makeCreateBranchAt(branch),
+      argsRequester: () => requestBranchName(branch),
+      details: `create a new branch at "${branch}"`,
     })
 }
 
-export const useCreateBranchAtBranchInteraction = (branch: BranchInfo) => {
+export const useCreateBranchAtBranchInteraction = (branch: BranchName) => {
   const createBranchAtSome = useCreateBranchAtSomeBranchInteraction()
 
   return createBranchAtSome(branch)
@@ -108,84 +108,86 @@ export const useCreateBranchAtBranchInteraction = (branch: BranchInfo) => {
 
 export const useBranchOffSomeBranchInteraction = () => {
   const makeBranchOff = useMakeBranchOff()
+  const resolveBranch = useBranchResolver()
 
-  return (branch: BranchInfo) =>
+  return (branch: BranchName) =>
     interaction({
-      action: makeBranchOff(branch.name),
+      action: makeBranchOff(branch),
       argsRequester: () =>
         requestBranchName(
-          branch.name,
-          branch.type === 'remote' ? branch.name.split('/').at(-1) : undefined,
+          branch,
+          resolveBranch(branch)?.type === 'remote'
+            ? branch.split('/').at(-1)
+            : undefined,
         ),
-      details: `branch off of "${branch.name}"`,
+      details: `branch off of "${branch}"`,
     })
 }
 
-export const useBranchOffBranchInteraction = (branch: BranchInfo) => {
+export const useBranchOffBranchInteraction = (branch: BranchName) => {
   const branchOffSome = useBranchOffSomeBranchInteraction()
 
   return branchOffSome(branch)
 }
 
-export const useTagBranchInteraction = (branch: BranchInfo) => {
+export const useTagBranchInteraction = (branch: BranchName) => {
   const tagSome = useTagSomeBranchInteraction()
 
-  return tagSome(branch.name)
+  return tagSome(branch)
 }
 
 export const useMergeSomeBranchInteraction = () => {
   const makeMerge = useMakeMergeBranch()
 
-  return (branch: BranchInfo) =>
+  return (branch: BranchName) =>
     interaction({
       action: makeMerge(branch),
-      details: `merge "${branch.name}" into worktree`,
+      details: `merge "${branch}" into worktree`,
     })
 }
 
-export const useMergeBranchInteraction = (branch: BranchInfo) => {
+export const useMergeBranchInteraction = (branch: BranchName) => {
   const mergeSome = useMergeSomeBranchInteraction()
 
   return mergeSome(branch)
 }
 
-export const useTrackBranchInteraction = (branch: BranchInfo) => {
+export const useTrackBranchInteraction = (branch: BranchName) => {
   const track = useMakeTrackBranch()(branch)
 
   return interaction({
     action: track,
-    argsRequester: () =>
-      requestBranchName(branch.name, branch.name.split('/').at(-1)),
-    details: `track "${branch.name}"`,
+    argsRequester: () => requestBranchName(branch, branch.split('/').at(-1)),
+    details: `track "${branch}"`,
   })
 }
 
-export const useDeleteBranchInteraction = (branch: BranchInfo) => {
+export const useDeleteBranchInteraction = (branch: BranchName) => {
   const deleteBranch = useMakeDeleteBranch()(branch)
 
   return interaction({
     action: deleteBranch,
     isDangerous: true,
-    details: `delete branch "${branch.name}"`,
+    details: `delete branch "${branch}"`,
   })
 }
 
 export const useSingleBranchInteractions = (branch: BranchInfo) => {
   const isCurrentBranch = useCurrentBranch()?.name === branch.name
 
-  const checkout = useCheckoutBranchInteraction(branch)
-  const fastForward = useFastForwardBranchInteraction(branch)
-  const pull = usePullBranchInteraction(branch)
-  const rebase = useRebaseBranchInteraction(branch)
-  const push = usePushBranchInteraction(branch)
-  const forcePush = useForcePushBranchInteraction(branch)
-  const createBranchAt = useCreateBranchAtBranchInteraction(branch)
-  const branchOff = useBranchOffBranchInteraction(branch)
-  const tag = useTagBranchInteraction(branch)
-  const merge = useMergeBranchInteraction(branch)
-  const track = useTrackBranchInteraction(branch)
-  const deleteInteraction = useDeleteBranchInteraction(branch)
-  const compare = compareBranchInteraction(branch)
+  const checkout = useCheckoutBranchInteraction(branch.name)
+  const fastForward = useFastForwardBranchInteraction(branch.name)
+  const pull = usePullBranchInteraction(branch.name)
+  const rebase = useRebaseBranchInteraction(branch.name)
+  const push = usePushBranchInteraction(branch.name)
+  const forcePush = useForcePushBranchInteraction(branch.name)
+  const createBranchAt = useCreateBranchAtBranchInteraction(branch.name)
+  const branchOff = useBranchOffBranchInteraction(branch.name)
+  const tag = useTagBranchInteraction(branch.name)
+  const merge = useMergeBranchInteraction(branch.name)
+  const track = useTrackBranchInteraction(branch.name)
+  const deleteInteraction = useDeleteBranchInteraction(branch.name)
+  const compare = compareBranchInteraction(branch.name)
 
   const forLocal1 = group(
     !isCurrentBranch && checkout,
@@ -214,7 +216,7 @@ export const useSingleBranchInteractions = (branch: BranchInfo) => {
 export const useDeleteBranchesInteraction = () => {
   const deleteBranches = useDeleteBranches()
 
-  return (branches: BranchInfo[]) =>
+  return (branches: BranchName[]) =>
     interaction({
       action: deleteBranches,
       argsRequester: () => branches,
@@ -226,16 +228,18 @@ export const useDeleteBranchesInteraction = () => {
 export const useCreateBranchAtSomeCommitInteraction = () => {
   const makeCreateBranchAt = useMakeCreateBranchAt()
 
-  return (commit: CommitInfo) =>
+  return (commit: CommitId) =>
     interaction({
-      action: makeCreateBranchAt(commit.shortHash),
-      argsRequester: () => requestBranchName(`#${commit.shortHash}`),
-      details: `create a new branch at commit #${commit.shortHash}`,
+      action: makeCreateBranchAt(commit),
+      argsRequester: () => requestBranchName(`#${commit}`),
+      details: `create a new branch at commit #${commit}`,
     })
 }
 
 export const useGetBranchesListInteractions = () => {
   const deleteBranches = useDeleteBranchesInteraction()
 
-  return (branches: BranchInfo[]) => [group(deleteBranches(branches))]
+  return (branches: BranchInfo[]) => [
+    group(deleteBranches(branches.map((branch) => branch.name))),
+  ]
 }

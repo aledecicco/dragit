@@ -4,9 +4,9 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
 import { getSelectedUpstream } from '@/state/upstream'
-import { useCurrentBranch } from '@/utils/repository'
+import { useBranchResolver, useCurrentBranch } from '@/utils/repository'
 
-import type { BranchInfo, BranchName, RemoteName } from '../models'
+import type { BranchName, RemoteName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface PushBranchArgs {
@@ -31,20 +31,21 @@ const pushBranchMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const useMakeForcePushBranch = (): ((branch: BranchInfo) => Action) => {
+const useMakeForcePushBranch = (): ((branch: BranchName) => Action) => {
   const pushBranch = useRepositoryMutation(pushBranchMutation)
   const currentBranch = useCurrentBranch()
+  const resolveBranch = useBranchResolver()
 
-  return (branch: BranchInfo): Action => ({
+  return (branch: BranchName): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'force_push',
       type: 'current',
-      branch: branch.name,
+      branch,
     },
     blockedBy: [
-      { key: 'branch_operation', branch: branch.name },
-      ...(currentBranch?.name === branch.name
+      { key: 'branch_operation', branch },
+      ...(currentBranch?.name === branch
         ? [
             { key: 'branch_operation', type: 'current' },
             { key: 'file_operation' },
@@ -52,11 +53,11 @@ const useMakeForcePushBranch = (): ((branch: BranchInfo) => Action) => {
         : []),
     ],
     run: async () => {
-      if (branch.type !== 'local') {
+      if (resolveBranch(branch)?.type !== 'local') {
         throw new Error('Branch is not local')
       }
 
-      const upstream = getSelectedUpstream(branch.name)
+      const upstream = getSelectedUpstream(branch)
       if (!upstream) {
         throw new Error('No upstream set for branch')
       }
@@ -78,23 +79,24 @@ const useMakeForcePushBranch = (): ((branch: BranchInfo) => Action) => {
   })
 }
 
-const useMakePushBranch = (): ((branch: BranchInfo) => Action) => {
+const useMakePushBranch = (): ((branch: BranchName) => Action) => {
   const pushBranch = useRepositoryMutation(pushBranchMutation)
+  const resolveBranch = useBranchResolver()
 
-  return (branch: BranchInfo): Action => ({
+  return (branch: BranchName): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'push',
       type: 'current',
-      branch: branch.name,
+      branch,
     },
-    blockedBy: [{ key: 'branch_operation', branch: branch.name }],
+    blockedBy: [{ key: 'branch_operation', branch }],
     run: async () => {
-      if (branch.type !== 'local') {
+      if (resolveBranch(branch)?.type !== 'local') {
         throw new Error('Branch is not local')
       }
 
-      const upstream = getSelectedUpstream(branch.name)
+      const upstream = getSelectedUpstream(branch)
       if (!upstream) {
         throw new Error('No upstream set for branch')
       }

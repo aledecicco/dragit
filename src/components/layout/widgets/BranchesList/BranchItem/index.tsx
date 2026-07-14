@@ -47,15 +47,15 @@ const BranchesListItem = (props: BranchesListItemProps) => {
   const isCurrentBranch = useCurrentBranch()?.name === branch.name
 
   const interactions = useSingleBranchInteractions(branch)
-  const checkout = useCheckoutBranchInteraction(branch)
-  const branchOff = useBranchOffBranchInteraction(branch)
-  const deleteBranch = useDeleteBranchInteraction(branch)
+  const checkout = useCheckoutBranchInteraction(branch.name)
+  const branchOff = useBranchOffBranchInteraction(branch.name)
+  const deleteBranch = useDeleteBranchInteraction(branch.name)
 
   return (
     <Draggable
       dragPayload={{
         type: 'branch',
-        dragged: branch,
+        dragged: branch.name,
         label: branch.name,
         Glyph: IconGitBranch,
       }}

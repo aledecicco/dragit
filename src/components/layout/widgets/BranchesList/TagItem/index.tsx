@@ -31,14 +31,14 @@ const TagsListItem = (props: TagsListItemProps) => {
   const { tag, ...itemProps } = props
 
   const interactions = useSingleTagInteractions(tag)
-  const deleteTag = useDeleteTagInteraction(tag)
+  const deleteTag = useDeleteTagInteraction(tag.name)
   const taggedTime = useDateInfo(tag.timestamp)
 
   return (
     <Draggable
       dragPayload={{
         type: 'tag',
-        dragged: tag,
+        dragged: tag.name,
         label: tag.name,
         Glyph: IconTag,
       }}

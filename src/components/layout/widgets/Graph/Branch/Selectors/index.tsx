@@ -1,16 +1,19 @@
 import { useSelectStore } from '@ariakit/react'
-import { IconGitBranch } from '@tabler/icons-react'
+import { IconGitBranch, IconGitCommit, IconTag } from '@tabler/icons-react'
+import { match } from 'ts-pattern'
 
+import type { Reference } from '@/api/models'
 import { useSwitchBranchesInteraction } from '@/interactions/checkout'
 import { compareTwoInteraction } from '@/interactions/view'
 import { Draggable } from '@/lib/DragAndDrop/Draggable'
+import type { DragPayload } from '@/lib/DragAndDrop/utils'
 import { ShortcutIndicator } from '@/lib/Shortcuts/Indicator'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { useSelectedBase } from '@/state/branches'
 import { useSettings } from '@/state/storage'
 import { Toolbar } from '@/ui/Toolbar'
 import { ToolbarItem } from '@/ui/Toolbar/Item'
-import { useBranch, useHeadReference } from '@/utils/repository'
+import { useHeadReference } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 
 import { BaseBranchSelector } from './Base'
@@ -21,9 +24,7 @@ import { CurrentBranchSelector } from './Current'
  */
 const BranchSelectors = () => {
   const currentReference = useHeadReference()
-  const currentBranch = useBranch(currentReference)
   const baseReference = useSelectedBase(currentReference)
-  const baseBranch = useBranch(baseReference)
 
   const switchBranches = useSwitchBranchesInteraction()
 
@@ -59,18 +60,7 @@ const BranchSelectors = () => {
         hotkey={settings.checkoutShortcut}
         className={cn('w-full max-w-65 col-start-1 row-start-1')}
       >
-        <Draggable
-          dragPayload={
-            currentBranch
-              ? {
-                  type: 'branch',
-                  dragged: currentBranch,
-                  label: currentBranch.name,
-                  Glyph: IconGitBranch,
-                }
-              : undefined
-          }
-        >
+        <Draggable dragPayload={getReferenceDragPayload(currentReference)}>
           <CurrentBranchSelector
             providerProps={{
               store: currentSelector,
@@ -108,18 +98,7 @@ const BranchSelectors = () => {
         hotkey={settings.changeBaseShortcut}
         className={cn('w-full max-w-65 col-start-3 row-start-1')}
       >
-        <Draggable
-          dragPayload={
-            baseBranch
-              ? {
-                  type: 'branch',
-                  dragged: baseBranch,
-                  label: baseBranch.name,
-                  Glyph: IconGitBranch,
-                }
-              : undefined
-          }
-        >
+        <Draggable dragPayload={getReferenceDragPayload(baseReference)}>
           <BaseBranchSelector
             providerProps={{
               store: baseSelector,
@@ -129,6 +108,39 @@ const BranchSelectors = () => {
       </ShortcutIndicator>
     </>
   )
+}
+
+/**
+ * Builds the drag payload for a reference.
+ */
+const getReferenceDragPayload = (
+  reference: Reference | undefined,
+): DragPayload | undefined => {
+  if (!reference) {
+    return undefined
+  }
+
+  return match<Reference>(reference)
+    .returnType<DragPayload>()
+    .with({ type: 'branch' }, ({ refName }) => ({
+      type: 'branch',
+      dragged: refName,
+      label: refName,
+      Glyph: IconGitBranch,
+    }))
+    .with({ type: 'commit' }, ({ refName }) => ({
+      type: 'commit',
+      dragged: refName,
+      label: `#${refName}`,
+      Glyph: IconGitCommit,
+    }))
+    .with({ type: 'tag' }, ({ refName }) => ({
+      type: 'tag',
+      dragged: refName,
+      label: refName,
+      Glyph: IconTag,
+    }))
+    .exhaustive()
 }
 
 export { BranchSelectors }

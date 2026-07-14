@@ -29,11 +29,11 @@ interface BranchToolbarProps extends Partial<ToolbarProps> {
 const BranchToolbar = (props: BranchToolbarProps) => {
   const { branch, isBase = false, ...toolbarProps } = props
 
-  const push = usePushBranchInteraction(branch)
-  const forcePush = useForcePushBranchInteraction(branch)
-  const pull = usePullBranchInteraction(branch)
-  const rebase = useRebaseBranchInteraction(branch)
-  const fastForward = useFastForwardBranchInteraction(branch)
+  const push = usePushBranchInteraction(branch.name)
+  const forcePush = useForcePushBranchInteraction(branch.name)
+  const pull = usePullBranchInteraction(branch.name)
+  const rebase = useRebaseBranchInteraction(branch.name)
+  const fastForward = useFastForwardBranchInteraction(branch.name)
 
   const upstream = useSelectedUpstream(branch)
 

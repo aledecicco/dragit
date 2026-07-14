@@ -4,8 +4,9 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
 import { getSelectedUpstream } from '@/state/upstream'
+import { useBranchResolver } from '@/utils/repository'
 
-import type { BranchInfo, BranchName, RemoteName } from '../models'
+import type { BranchName, RemoteName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface FastForwardBranchArgs {
@@ -29,28 +30,29 @@ const fastForwardBranchMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const useMakeFastForwardBranch = (): ((branch: BranchInfo) => Action) => {
+const useMakeFastForwardBranch = (): ((branch: BranchName) => Action) => {
   const fastForwardBranch = useRepositoryMutation(fastForwardBranchMutation)
+  const resolveBranch = useBranchResolver()
 
-  return (branch: BranchInfo): Action => ({
+  return (branch: BranchName): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'fast_forward',
-      branch: branch.name,
+      branch,
     },
-    blockedBy: [{ key: 'branch_operation', branch: branch.name }],
+    blockedBy: [{ key: 'branch_operation', branch }],
     run: async () => {
-      if (branch.type !== 'local') {
+      if (resolveBranch(branch)?.type !== 'local') {
         throw new Error('Branch is not local')
       }
 
-      const upstream = getSelectedUpstream(branch.name)
+      const upstream = getSelectedUpstream(branch)
       if (!upstream) {
         throw new Error('No upstream set for branch')
       }
 
       await fastForwardBranch.mutateAsync({
-        branch: branch.name,
+        branch,
         remote: upstream.remote,
         remoteBranch: upstream.remoteBranch,
       })

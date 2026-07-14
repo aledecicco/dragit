@@ -4,8 +4,9 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
 import { getSelectedUpstream } from '@/state/upstream'
+import { useBranchResolver } from '@/utils/repository'
 
-import type { BranchInfo, BranchName, RemoteName } from '../models'
+import type { BranchName, RemoteName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface PullBranchArgs {
@@ -29,27 +30,28 @@ const pullBranchMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const useMakePullBranch = (): ((branch: BranchInfo) => Action) => {
+const useMakePullBranch = (): ((branch: BranchName) => Action) => {
   const pullBranch = useRepositoryMutation(pullBranchMutation)
+  const resolveBranch = useBranchResolver()
 
-  return (branch: BranchInfo): Action => ({
+  return (branch: BranchName): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'pull',
       type: 'current',
-      branch: branch.name,
+      branch,
     },
     blockedBy: [
-      { key: 'branch_operation', branch: branch.name },
+      { key: 'branch_operation', branch },
       { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
     run: async () => {
-      if (branch.type !== 'local') {
+      if (resolveBranch(branch)?.type !== 'local') {
         throw new Error('Branch is not local')
       }
 
-      const upstream = getSelectedUpstream(branch.name)
+      const upstream = getSelectedUpstream(branch)
       if (!upstream) {
         throw new Error('No upstream set for branch')
       }
@@ -70,27 +72,28 @@ const useMakePullBranch = (): ((branch: BranchInfo) => Action) => {
   })
 }
 
-const useMakeRebaseBranch = (): ((branch: BranchInfo) => Action) => {
+const useMakeRebaseBranch = (): ((branch: BranchName) => Action) => {
   const pullBranch = useRepositoryMutation(pullBranchMutation)
+  const resolveBranch = useBranchResolver()
 
-  return (branch: BranchInfo): Action => ({
+  return (branch: BranchName): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'rebase',
       type: 'current',
-      branch: branch.name,
+      branch,
     },
     blockedBy: [
-      { key: 'branch_operation', branch: branch.name },
+      { key: 'branch_operation', branch },
       { key: 'branch_operation', type: 'current' },
       { key: 'file_operation' },
     ],
     run: async () => {
-      if (branch.type !== 'local') {
+      if (resolveBranch(branch)?.type !== 'local') {
         throw new Error('Branch is not local')
       }
 
-      const upstream = getSelectedUpstream(branch.name)
+      const upstream = getSelectedUpstream(branch)
       if (!upstream) {
         throw new Error('No upstream set for branch')
       }

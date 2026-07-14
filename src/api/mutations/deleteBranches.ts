@@ -4,9 +4,9 @@ import { invoke } from '@tauri-apps/api/core'
 import { match } from 'ts-pattern'
 
 import type { Action } from '@/state/actions'
+import { useBranchResolver } from '@/utils/repository'
 
 import type {
-  BranchInfo,
   BranchName,
   RemoteBranch,
   RemoteInfo,
@@ -54,32 +54,44 @@ const deleteRemoteBranchesMutation = (repoPath: string) =>
     networkMode: 'online',
   })
 
-const useMakeDeleteBranch = (): ((branch: BranchInfo) => Action) => {
+const useMakeDeleteBranch = (): ((branch: BranchName) => Action) => {
   const deleteLocalBranches = useRepositoryMutation(deleteLocalBranchesMutation)
   const deleteRemoteBranches = useRepositoryMutation(
     deleteRemoteBranchesMutation,
   )
   const remotesQuery = useQueryRemotes()
+  const resolveBranch = useBranchResolver()
 
-  return (branch: BranchInfo): Action => ({
+  return (branchName: BranchName): Action => ({
     id: {
       key: 'branch_operation',
       operation: 'delete_branch',
-      branch: branch.name,
+      branch: branchName,
     },
-    blockedBy: [{ key: 'branch_operation', branch: branch.name }],
+    blockedBy: [{ key: 'branch_operation', branch: branchName }],
     run: async () => {
+      const branch = resolveBranch(branchName)
+
+      if (!branch) {
+        throw new Error(`Couldn't find branch ${branchName}`)
+      }
+
       await match(branch)
-        .with({ type: 'local' }, (branch) =>
+        .with({ type: 'local' }, (branchInfo) =>
           deleteLocalBranches.mutateAsync({
-            branchNames: [branch.name],
+            branchNames: [branchInfo.name],
           }),
         )
-        .with({ type: 'remote' }, (branch) => {
-          const remote = findRemoteAndBranch(branch, remotesQuery.data ?? [])
+        .with({ type: 'remote' }, (branchInfo) => {
+          const remote = findRemoteAndBranch(
+            branchInfo,
+            remotesQuery.data ?? [],
+          )
 
           if (!remote) {
-            throw new Error(`Couldn't find remote for branch ${branch.name}`)
+            throw new Error(
+              `Couldn't find remote for branch ${branchInfo.name}`,
+            )
           }
 
           const [remoteName, branchName] = remote
@@ -101,17 +113,22 @@ const useMakeDeleteBranch = (): ((branch: BranchInfo) => Action) => {
   })
 }
 
-const useDeleteBranches = (): Action<BranchInfo[]> => {
+const useDeleteBranches = (): Action<BranchName[]> => {
   const deleteLocalBranches = useRepositoryMutation(deleteLocalBranchesMutation)
   const deleteRemoteBranches = useRepositoryMutation(
     deleteRemoteBranchesMutation,
   )
   const remotesQuery = useQueryRemotes()
+  const resolveBranch = useBranchResolver()
 
   return {
     id: { key: 'branch_operation', operation: 'delete_branches' },
     blockedBy: [{ key: 'branch_operation' }],
-    run: async (branches) => {
+    run: async (branchNames) => {
+      const branches = branchNames
+        .map(resolveBranch)
+        .filter((branch) => !!branch)
+
       const localBranches = branches.filter((branch) => branch.type === 'local')
       const remoteBranches = branches.filter(
         (branch) => branch.type === 'remote',
@@ -146,7 +163,7 @@ const useDeleteBranches = (): Action<BranchInfo[]> => {
       branches.map((branch) => ({
         key: 'branch_operation',
         operation: 'delete_branch',
-        branch: branch.name,
+        branch,
       })),
     Glyph: IconTrash,
     label: {

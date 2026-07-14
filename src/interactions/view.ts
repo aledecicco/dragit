@@ -1,11 +1,12 @@
 import { IconEye, IconGitCompare } from '@tabler/icons-react'
 
 import type {
-  BranchInfo,
+  BranchName,
+  CommitId,
   CommitInfo,
   Reference,
   StashInfo,
-  TagInfo,
+  TagName,
   WorktreeFileInfo,
 } from '@/api/models'
 import { showCommitSnapshotDetailsDialog } from '@/common/SnapshotDetailsDialog/Commit'
@@ -24,19 +25,19 @@ export const compareSomeReferenceInteraction = (
   },
 })
 
-export const compareBranchInteraction = (branch: BranchInfo) =>
+export const compareBranchInteraction = (branch: BranchName) =>
   compareSomeReferenceInteraction({
     type: 'branch',
-    refName: branch.name,
+    refName: branch,
   })
 
-export const compareTagInteraction = (tag: TagInfo) =>
-  compareSomeReferenceInteraction({ type: 'tag', refName: tag.name })
+export const compareTagInteraction = (tag: TagName) =>
+  compareSomeReferenceInteraction({ type: 'tag', refName: tag })
 
-export const compareCommitInteraction = (commit: CommitInfo) =>
+export const compareCommitInteraction = (commit: CommitId) =>
   compareSomeReferenceInteraction({
     type: 'commit',
-    refName: commit.shortHash,
+    refName: commit,
   })
 
 export const compareTwoInteraction = (

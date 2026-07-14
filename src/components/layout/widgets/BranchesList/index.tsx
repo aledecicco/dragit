@@ -112,10 +112,10 @@ const BranchesList = (props: BranchesListProps) => {
         if (tabsHandler.selectedTab === 'tags') {
           match(payload)
             .with({ type: 'commit' }, ({ dragged }) => {
-              triggerInteraction(tagDroppedCommit(dragged.shortHash))
+              triggerInteraction(tagDroppedCommit(dragged))
             })
             .with({ type: 'branch' }, ({ dragged }) => {
-              triggerInteraction(tagDroppedBranch(dragged.name))
+              triggerInteraction(tagDroppedBranch(dragged))
             })
             .exhaustive()
         } else {
@@ -223,7 +223,7 @@ const BranchesList = (props: BranchesListProps) => {
             items={tagsItems ?? []}
             getInteractions={getTagsListInteractions}
             getDragPayload={getTagsDragPayload}
-            onDelete={deleteTags}
+            onDelete={(tags) => deleteTags(tags.map((tag) => tag.name))}
           >
             <QueryList
               name="tags"
@@ -246,7 +246,9 @@ const BranchesList = (props: BranchesListProps) => {
             items={currentBranchesItems ?? []}
             getInteractions={getBranchesListInteractions}
             getDragPayload={getBranchesDragPayload}
-            onDelete={deleteBranches}
+            onDelete={(branches) =>
+              deleteBranches(branches.map((branch) => branch.name))
+            }
           >
             <QueryList
               name={match(tabsHandler.selectedTab)
@@ -274,14 +276,14 @@ const BranchesList = (props: BranchesListProps) => {
 
 const getBranchesDragPayload = (branches: BranchInfo[]): DragPayload => ({
   type: 'branches',
-  dragged: branches ?? [],
+  dragged: branches.map((branch) => branch.name),
   label: pluralize('branch', branches.length, true, 'branches'),
   Glyph: IconGitBranch,
 })
 
 const getTagsDragPayload = (tags: TagInfo[]): DragPayload => ({
   type: 'tags',
-  dragged: tags ?? [],
+  dragged: tags.map((tag) => tag.name),
   label: pluralize('tag', tags.length, true),
   Glyph: IconTags,
 })

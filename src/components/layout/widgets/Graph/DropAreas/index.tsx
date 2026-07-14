@@ -17,7 +17,7 @@ import { DropArea } from '@/lib/DragAndDrop/DropArea'
 import type { MatchingPayload } from '@/lib/DragAndDrop/utils'
 import { triggerInteraction } from '@/state/actions'
 import { useChangeSelectedBase, useSelectedBase } from '@/state/branches'
-import { useHeadReference } from '@/utils/repository'
+import { useBranchResolver, useHeadReference } from '@/utils/repository'
 import { cn } from '@/utils/styles'
 
 /**
@@ -31,6 +31,7 @@ const GraphDropAreas = () => {
   const switchBranches = useSwitchBranchesInteraction()
   const branchOff = useBranchOffSomeBranchInteraction()
   const checkoutBranch = useCheckoutSomeBranchInteraction()
+  const resolveBranch = useBranchResolver()
   const checkoutTag = useCheckoutSomeTagInteraction()
   const checkoutCommit = useCheckoutSomeCommitInteraction()
   const mergeBranch = useMergeSomeBranchInteraction()
@@ -42,29 +43,16 @@ const GraphDropAreas = () => {
   const validateReferenceDrop = (
     payload: MatchingPayload<'branch' | 'tag' | 'commit'>,
   ) => {
-    return match(payload)
-      .with(
-        { type: 'commit' },
-        ({ dragged }) => dragged.shortHash !== currentReference?.refName,
-      )
-      .otherwise(({ dragged }) => dragged.name !== currentReference?.refName)
+    return payload.dragged !== currentReference?.refName
   }
 
   const validateBaseReferenceDrop = (
     payload: MatchingPayload<'branch' | 'tag' | 'commit'>,
   ) => {
-    return match(payload)
-      .with(
-        { type: 'commit' },
-        ({ dragged }) =>
-          dragged.shortHash !== baseReference?.refName &&
-          dragged.shortHash !== currentReference?.refName,
-      )
-      .otherwise(
-        ({ dragged }) =>
-          dragged.name !== baseReference?.refName &&
-          dragged.name !== currentReference?.refName,
-      )
+    return (
+      payload.dragged !== baseReference?.refName &&
+      payload.dragged !== currentReference?.refName
+    )
   }
 
   return (
@@ -85,15 +73,21 @@ const GraphDropAreas = () => {
         }}
         extraValidation={validateReferenceDrop}
         handleDrop={(payload) => {
-          if (payload.type === 'branch' && payload.dragged.type === 'remote') {
-            triggerInteraction(branchOff(payload.dragged))
-          } else if (payload.type === 'branch') {
-            triggerInteraction(checkoutBranch(payload.dragged))
-          } else if (payload.type === 'tag') {
-            triggerInteraction(checkoutTag(payload.dragged))
-          } else {
-            triggerInteraction(checkoutCommit(payload.dragged.shortHash))
-          }
+          match(payload)
+            .with({ type: 'branch' }, ({ dragged }) => {
+              if (resolveBranch(dragged)?.type === 'remote') {
+                triggerInteraction(branchOff(dragged))
+              } else {
+                triggerInteraction(checkoutBranch(dragged))
+              }
+            })
+            .with({ type: 'tag' }, ({ dragged }) => {
+              triggerInteraction(checkoutTag(dragged))
+            })
+            .with({ type: 'commit' }, ({ dragged }) => {
+              triggerInteraction(checkoutCommit(dragged))
+            })
+            .exhaustive()
         }}
       />
 
@@ -114,16 +108,12 @@ const GraphDropAreas = () => {
         extraValidation={validateBaseReferenceDrop}
         handleDrop={(payload) => {
           if (currentReference) {
-            const newRef = match(payload)
-              .with({ type: 'commit' }, ({ dragged }) => dragged.shortHash)
-              .otherwise(({ dragged }) => dragged.name)
-
-            if (newRef === currentReference.refName) {
+            if (payload.dragged === currentReference.refName) {
               triggerInteraction(switchBranches)
             } else {
               changeSelectedBase(currentReference, {
                 type: payload.type,
-                refName: newRef,
+                refName: payload.dragged,
               })
             }
           }
@@ -142,9 +132,7 @@ const GraphDropAreas = () => {
           if (
             payload.type === 'commit' &&
             historyQuery.data?.pages.find((page) =>
-              page.items.find(
-                (item) => item.hash === payload.dragged.shortHash,
-              ),
+              page.items.find((item) => item.hash === payload.dragged),
             )
           ) {
             return false

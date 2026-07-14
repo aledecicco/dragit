@@ -77,8 +77,8 @@ export const useQuickBranchUpdateFlow = (): Flow => {
         throw new Error('No branch currently selected')
       }
 
-      await triggerInteraction(rebaseSome(currentBranch))
-      await triggerInteraction(pushSome(currentBranch))
+      await triggerInteraction(rebaseSome(currentBranch.name))
+      await triggerInteraction(pushSome(currentBranch.name))
     },
   }
 }

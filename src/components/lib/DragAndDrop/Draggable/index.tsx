@@ -63,7 +63,7 @@ const DraggableInner = <T extends DragType>(
   const id = useUniqueId()
 
   const componentRef = useRef<HTMLDivElement>(null)
-  const { ref: dragRef, isDragging } = useDraggable({
+  const { ref: dragRef } = useDraggable({
     id,
     type: dragPayload.type,
     data: dragPayload,

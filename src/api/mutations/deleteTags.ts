@@ -4,7 +4,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { Action } from '@/state/actions'
 
-import type { TagInfo, TagName } from '../models'
+import type { TagName } from '../models'
 import { pathMutationKey, useRepositoryMutation } from '../utils'
 
 interface DeleteTagsArgs {
@@ -26,14 +26,14 @@ const deleteTagsMutation = (repoPath: string) =>
     networkMode: 'always',
   })
 
-const useMakeDeleteTag = (): ((tag: TagInfo) => Action) => {
+const useMakeDeleteTag = (): ((tag: TagName) => Action) => {
   const deleteTags = useRepositoryMutation(deleteTagsMutation)
 
-  return (tag: TagInfo): Action => ({
-    id: { key: 'tag_operation', operation: 'delete_tag', tag: tag.name },
-    blockedBy: [{ key: 'tag_operation', tag: tag.name }],
+  return (tag: TagName): Action => ({
+    id: { key: 'tag_operation', operation: 'delete_tag', tag },
+    blockedBy: [{ key: 'tag_operation', tag }],
     run: async () => {
-      await deleteTags.mutateAsync({ tagNames: [tag.name] })
+      await deleteTags.mutateAsync({ tagNames: [tag] })
     },
     label: {
       idle: 'Delete tag',
@@ -45,20 +45,20 @@ const useMakeDeleteTag = (): ((tag: TagInfo) => Action) => {
   })
 }
 
-const useDeleteTags = (): Action<TagInfo[]> => {
+const useDeleteTags = (): Action<TagName[]> => {
   const deleteTags = useRepositoryMutation(deleteTagsMutation)
 
   return {
     id: { key: 'tag_operation', operation: 'delete_tags' },
     blockedBy: [{ key: 'tag_operation' }],
     run: async (tags) => {
-      await deleteTags.mutateAsync({ tagNames: tags.map((tag) => tag.name) })
+      await deleteTags.mutateAsync({ tagNames: tags })
     },
     derivedIds: (tags) =>
       tags.map((tag) => ({
         key: 'tag_operation',
         operation: 'delete_tag',
-        tag: tag.name,
+        tag,
       })),
     label: {
       idle: 'Delete tags',

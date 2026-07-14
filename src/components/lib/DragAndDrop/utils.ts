@@ -4,12 +4,12 @@ import type * as DndSettings from '@dnd-kit/dom'
 import * as Dnd from '@dnd-kit/react'
 
 import type {
-  BranchInfo,
-  CommitInfo,
+  BranchName,
+  CommitId,
   NotStagedFile,
   StagedFile,
   StashInfo,
-  TagInfo,
+  TagName,
 } from '@/api/models'
 import type { Glyph } from '@/ui/Icon'
 import { clamp } from '@/utils/number'
@@ -51,13 +51,13 @@ interface DragDef<T extends string, D> {
 type DragPayload =
   | DragDef<'not-staged-files', NotStagedFile[]>
   | DragDef<'staged-files', StagedFile[]>
-  | DragDef<'branch', BranchInfo>
-  | DragDef<'branches', BranchInfo[]>
-  | DragDef<'tag', TagInfo>
-  | DragDef<'tags', TagInfo[]>
+  | DragDef<'branch', BranchName>
+  | DragDef<'branches', BranchName[]>
+  | DragDef<'tag', TagName>
+  | DragDef<'tags', TagName[]>
   | DragDef<'stash', StashInfo>
   | DragDef<'stashes', StashInfo[]>
-  | DragDef<'commit', CommitInfo>
+  | DragDef<'commit', CommitId>
   | DragDef<'worktree', undefined>
   | DragDef<'index', { fromDraft: boolean }>
   | DragDef<'dialog', { dialogKey: string }>

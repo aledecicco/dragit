@@ -1,4 +1,4 @@
-import type { CommitInfo } from '@/api/models'
+import type { CommitId, CommitInfo } from '@/api/models'
 import { useCherryPickCommit } from '@/api/mutations/cherryPick'
 import { useAmend } from '@/api/mutations/commitIndex'
 import {
@@ -68,17 +68,17 @@ export const useTagCommitInteraction = (commit: CommitInfo) => {
 export const useMergeSomeCommitInteraction = () => {
   const makeMerge = useMakeMergeCommit()
 
-  return (commit: CommitInfo) =>
+  return (commit: CommitId) =>
     interaction({
-      action: makeMerge(commit.shortHash),
-      details: `merge commit #${commit.shortHash} into worktree`,
+      action: makeMerge(commit),
+      details: `merge commit #${commit} into worktree`,
     })
 }
 
 export const useMergeCommitInteraction = (commit: CommitInfo) => {
   const mergeSome = useMergeSomeCommitInteraction()
 
-  return mergeSome(commit)
+  return mergeSome(commit.shortHash)
 }
 
 export const useCherryPickCommitInteraction = (commit: CommitInfo) => {
@@ -118,7 +118,7 @@ export const useSingleCommitInteractions = (commit: CommitInfo) => {
   const revert = useRevertCommitInteraction(commit)
   const rewind = useRewindCommitInteraction(commit)
   const view = viewCommitInteraction(commit)
-  const compare = compareCommitInteraction(commit)
+  const compare = compareCommitInteraction(commit.shortHash)
 
   return [
     group(view, compare),
