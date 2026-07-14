@@ -148,7 +148,7 @@ const BranchesList = (props: BranchesListProps) => {
                 tabsHandler.store.setSelectedId('local')
               }}
             >
-              <Tab id="local">
+              <Tab id="local" status="primary" className={cn('text-light-50')}>
                 Local
                 <Chip size="sm">{localBranchesItems?.length ?? '...'}</Chip>
               </Tab>
@@ -167,7 +167,7 @@ const BranchesList = (props: BranchesListProps) => {
                 tabsHandler.store.setSelectedId('remote')
               }}
             >
-              <Tab id="remote">
+              <Tab id="remote" status="primary" className={cn('text-light-50')}>
                 Remote
                 <Chip size="sm">{remoteBranchesItems?.length ?? '...'}</Chip>
               </Tab>
@@ -186,7 +186,7 @@ const BranchesList = (props: BranchesListProps) => {
                 tabsHandler.store.setSelectedId('all')
               }}
             >
-              <Tab id="all">
+              <Tab id="all" status="primary" className={cn('text-light-50')}>
                 All
                 <Chip size="sm">{allBranchesItems?.length ?? '...'}</Chip>
               </Tab>
@@ -201,7 +201,11 @@ const BranchesList = (props: BranchesListProps) => {
                 tabsHandler.store.setSelectedId('tags')
               }}
             >
-              <Tab id="tags" className={cn('ml-auto')}>
+              <Tab
+                id="tags"
+                status="primary"
+                className={cn('ml-auto text-light-50')}
+              >
                 Tags
                 <Chip size="sm">{tagsItems?.length ?? '...'}</Chip>
               </Tab>
