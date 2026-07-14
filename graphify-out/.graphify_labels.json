@@ -101,7 +101,10 @@
   "99": "ShellScopeEntryAllowedArgs",
   "100": "Diff Viewer Screenshots",
   "101": "ShellScopeEntryAllowedArg",
+  "102": "versionedFiles.ts",
   "103": "Desktop Value Schema",
+  "104": "Action",
+  "105": "index.tsx",
   "106": "Linux Value Schema",
   "107": "App Entry Point",
   "108": "Tauri Build Script",
@@ -166,5 +169,16 @@
   "167": "Vite Env Types",
   "168": "Vite Build Config",
   "169": "index.tsx",
-  "172": "storage.ts"
+  "170": "fileDiff.ts",
+  "171": "fileConflicts.ts",
+  "172": "storage.ts",
+  "173": "diffSummary.ts",
+  "174": "branchDivergence.ts",
+  "175": "utils.ts",
+  "176": "time.ts",
+  "177": "abortCherryPick.ts",
+  "178": "ids.ts",
+  "179": "local",
+  "180": "ShellScopeEntryAllowedArg",
+  "181": "ShellScopeEntryAllowedArg"
 }
