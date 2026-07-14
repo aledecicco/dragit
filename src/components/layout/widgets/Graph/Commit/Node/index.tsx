@@ -12,18 +12,13 @@ interface GraphCommitNodeProps extends ComponentProps<'div'> {
    * The type of the commit, used to determine the style of the node.
    */
   commitType: CommitType
-
-  /**
-   * Whether this commit is the current one.
-   */
-  isCurrent?: boolean
 }
 
 /**
  * The node used as anchor by edges in the commit graph.
  */
 const GraphCommitNode = (props: GraphCommitNodeProps) => {
-  const { commitType, isCurrent = false, ...divProps } = props
+  const { commitType, ...divProps } = props
 
   return (
     <div
@@ -31,16 +26,9 @@ const GraphCommitNode = (props: GraphCommitNodeProps) => {
         divProps,
         'rounded-full p-0.5',
         'transition-colors duration-150',
-        isCurrent && 'ring-2',
         match(commitType)
-          .with('confirmed', () => [
-            'bg-primary-600',
-            isCurrent && 'ring-primary-300',
-          ])
-          .with('unconfirmed', () => [
-            'bg-accent-400',
-            isCurrent && 'ring-accent-300',
-          ])
+          .with('confirmed', () => 'bg-primary-600')
+          .with('unconfirmed', () => 'bg-accent-400')
           .exhaustive(),
       )}
       style={{ width: NODE_SIZE, height: NODE_SIZE }}

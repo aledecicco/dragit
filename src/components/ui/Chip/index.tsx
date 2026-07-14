@@ -44,7 +44,7 @@ const Chip = (props: ChipProps) => {
           .exhaustive(),
         match(status)
           .with('neutral', () => 'bg-light-950/15 text-light-500/90')
-          .with('primary', () => 'bg-primary-500/30 text-primary-300/90')
+          .with('primary', () => 'bg-primary-600/30 text-primary-200/90')
           .with('accent', () => 'bg-accent-500/30 text-accent-300/90')
           .with('success', () => 'bg-success-400/30 text-success-200/90')
           .with('warning', () => 'bg-warning-300/30 text-warning-100/90')
