@@ -26,7 +26,7 @@ const GitOperationFailedToast = (props: { error: GitError }) => {
       </Chip>
       <div
         className={cn(
-          'bg-dark-700 p-2 mt-2 max-h-30 overflow-y-auto whitespace-pre',
+          'bg-dark-950/50 p-2 mt-2 max-h-30 overflow-y-auto whitespace-pre',
         )}
       >
         Error log: {'reason' in error ? error.reason : '-'}

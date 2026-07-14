@@ -79,7 +79,7 @@ const WithUpdate = (props: WithUpdateProps) => {
 
       <p
         className={cn(
-          'w-full bg-dark-800 p-4 rounded-sm max-h-40 overflow-auto',
+          'w-full bg-dark-950/50 p-4 rounded-sm max-h-40 overflow-auto',
           'text-sm text-light-900 font-light whitespace-pre-wrap',
           !update.description && 'italic text-light-900/75',
         )}

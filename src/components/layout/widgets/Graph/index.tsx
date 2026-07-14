@@ -166,7 +166,7 @@ const GraphInner = () => {
         <div
           ref={scrollContainerRef}
           className={cn(
-            'overflow-auto scroll-smooth size-full bg-dark-800/80',
+            'overflow-auto scroll-smooth size-full bg-dark-800',
             'will-change-transform',
           )}
         >

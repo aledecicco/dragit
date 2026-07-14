@@ -28,7 +28,7 @@ const SettingsDialogPreferencesContent = () => {
             render={
               <div
                 className={cn(
-                  'p-2 rounded-md bg-dark-800 h-full overflow-auto',
+                  'p-2 rounded-md bg-dark-950/50 h-full overflow-auto',
                 )}
               />
             }

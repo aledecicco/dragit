@@ -49,7 +49,10 @@ const ShortcutSettingRecorder = (props: ShortcutSettingRecorderProps) => {
 
   const saveRecording = useEffectEvent(() => {
     triggerInteraction(
-      setSettingInteraction(setting, formatShortcut(getShortcutSequence(recorder.recorded))),
+      setSettingInteraction(
+        setting,
+        formatShortcut(getShortcutSequence(recorder.recorded)),
+      ),
     )
     recorder.stop()
   })
@@ -92,12 +95,8 @@ const ShortcutSettingRecorder = (props: ShortcutSettingRecorderProps) => {
       dialogKey={`${action}_recorder`}
       open
       showClose={false}
-      backdrop={<div className={cn('bg-dark-950/95')} />}
-      {...propsWithCn(
-        dialogProps,
-        'bg-transparent border-none max-w-full',
-        'text-center',
-      )}
+      backdrop={<div className={cn('bg-dark-950/70 backdrop-blur-sm')} />}
+      {...propsWithCn(dialogProps, 'max-w-full text-center')}
       onClose={(e) => {
         dialogProps.onClose?.(e)
         recorder.stop()
@@ -105,7 +104,8 @@ const ShortcutSettingRecorder = (props: ShortcutSettingRecorderProps) => {
     >
       <DialogContent
         className={cn(
-          'grid grid-rows-[max-content_1fr_max-content] items-center gap-6 max-w-full max-h-full',
+          'max-w-full max-h-full',
+          'grid grid-rows-[max-content_1fr_max-content] items-center gap-6',
         )}
       >
         <p className={cn('text-sm text-light-600')}>
@@ -116,7 +116,7 @@ const ShortcutSettingRecorder = (props: ShortcutSettingRecorderProps) => {
         <div
           className={cn(
             'flex flex-row justify-center flex-wrap gap-2',
-            'w-full p-4 rounded-md bg-dark-800/75',
+            'w-full p-4 rounded-md bg-dark-950/50',
             'overflow-y-auto max-h-full',
           )}
         >

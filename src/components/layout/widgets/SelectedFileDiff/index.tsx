@@ -41,7 +41,7 @@ const SelectedFileDiff = (props: SelectedFileDiffProps) => {
   })
 
   return (
-    <div {...propsWithCn(divProps, 'size-full relative bg-dark-800/80')}>
+    <div {...propsWithCn(divProps, 'size-full relative bg-dark-800')}>
       {selectedFile.status === 'unmerged' ? (
         viewModeSelector.value === 'inline' ? (
           <FileConflictViewer viewerRef={ref} file={selectedFile} />
