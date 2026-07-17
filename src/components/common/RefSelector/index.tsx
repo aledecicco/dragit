@@ -15,6 +15,7 @@ import { useQueryTags } from '@/api/queries/tags'
 import { Combobox, type ComboboxProps } from '@/ui/Combobox'
 import { useComboboxState } from '@/ui/Combobox/context'
 import { ComboboxSection } from '@/ui/Combobox/Section'
+import { cn } from '@/utils/styles'
 
 interface RefSelectorProps extends Partial<Omit<ComboboxProps, 'value'>> {
   /**
@@ -91,12 +92,17 @@ const RefSelector = ({
     .with('tag', () => IconTag)
     .otherwise(() => IconGitBranch)
 
-  const branchOptions = [
-    ...(pinnedBranches ?? []),
-    ...(branchesQuery.data?.map((b) => b.name) ?? []).filter(
-      (b) => !pinnedBranches?.includes(b) && !excludedBranches?.includes(b),
-    ),
-  ]
+  const branchOptions = branchesQuery.data
+    ? [
+        ...(pinnedBranches ?? []),
+        ...branchesQuery.data
+          .map((b) => b.name)
+          .filter(
+            (b) =>
+              !pinnedBranches?.includes(b) && !excludedBranches?.includes(b),
+          ),
+      ]
+    : []
   const tagOptions = tagsQuery.data?.map((t) => t.name) ?? []
 
   return (
@@ -120,6 +126,7 @@ const RefSelector = ({
         }
         options={branchOptions}
         noMatches={noBranchMatches}
+        loading={branchesQuery.isFetching}
       />
       <ComboboxSection
         name="tags"
@@ -131,6 +138,7 @@ const RefSelector = ({
         }
         options={tagOptions}
         noMatches={noTagMatches}
+        loading={tagsQuery.isFetching}
       />
 
       <CommitSection
@@ -149,15 +157,27 @@ const CommitSection = (
   const { search } = useComboboxState()
   const matchingCommitsQuery = useQueryMatchingCommits(search)
 
-  const commitOptions =
-    matchingCommitsQuery.data?.map((hash) => `#${hash}`) ?? []
+  const commitOptions = search
+    ? (matchingCommitsQuery.data?.map((hash) => `#${hash}`) ?? [])
+    : []
 
   return (
     <ComboboxSection
       name="commits"
       onSelect={(value) => onSelectCommit(value.slice(1), value.slice(1))}
       options={commitOptions}
-      noMatches={noCommitMatches}
+      noMatches={(search) =>
+        search ? (
+          noCommitMatches?.(search)
+        ) : (
+          <div
+            className={cn('text-center p-2', 'text-sm italic text-light-950')}
+          >
+            Search for a commit by hash
+          </div>
+        )
+      }
+      loading={matchingCommitsQuery.isFetching}
     />
   )
 }

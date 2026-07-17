@@ -46,6 +46,11 @@ interface ComboboxSectionProps
    * @param search - The current search string.
    */
   noMatches?: (search: string) => ReactNode
+
+  /**
+   * Whether options for this section are currently being loaded.
+   */
+  loading?: boolean
 }
 
 const ComboboxSection = (props: ComboboxSectionProps) => {
@@ -56,6 +61,7 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
     renderOption,
     onSelect,
     noMatches,
+    loading = false,
     ...listProps
   } = props
 
@@ -80,19 +86,43 @@ const ComboboxSection = (props: ComboboxSectionProps) => {
         {...propsWithCn(listProps, 'max-h-80 overflow-y-auto')}
       >
         {options.length === 0 && !deferredSearch ? (
-          <div
-            className={cn('text-center p-2', 'text-sm italic text-light-950')}
-          >
-            No {name} found
-          </div>
-        ) : matchingOptions.length === 0 ? (
-          (noMatches?.(deferredSearch) ?? (
+          loading ? (
             <div
               className={cn('text-center p-2', 'text-sm italic text-light-950')}
             >
-              No matching {name} found
+              Loading...
             </div>
-          ))
+          ) : (
+            (noMatches?.(deferredSearch) ?? (
+              <div
+                className={cn(
+                  'text-center p-2',
+                  'text-sm italic text-light-950',
+                )}
+              >
+                No {name} found
+              </div>
+            ))
+          )
+        ) : matchingOptions.length === 0 ? (
+          loading ? (
+            <div
+              className={cn('text-center p-2', 'text-sm italic text-light-950')}
+            >
+              Loading...
+            </div>
+          ) : (
+            (noMatches?.(deferredSearch) ?? (
+              <div
+                className={cn(
+                  'text-center p-2',
+                  'text-sm italic text-light-950',
+                )}
+              >
+                No matching {name} found
+              </div>
+            ))
+          )
         ) : (
           <>
             {matchingOptions.map((option) => (

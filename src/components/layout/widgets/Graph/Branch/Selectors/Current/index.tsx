@@ -88,8 +88,12 @@ const CurrentBranchSelector = (props: CurrentBranchSelectorProps) => {
           triggerInteraction(checkoutCommit(commit))
         }
       }}
-      noBranchMatches={(search) => <NoBranchMatches search={search} />}
-      noTagMatches={(search) => <NoTagMatches search={search} />}
+      noBranchMatches={(search) =>
+        search ? <NoBranchMatches search={search} /> : undefined
+      }
+      noTagMatches={(search) =>
+        search ? <NoTagMatches search={search} /> : undefined
+      }
     />
   )
 }
