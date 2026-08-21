@@ -62,4 +62,4 @@ const fileConflictsQuery = (repoPath: string, file: UnmergedFileInfo) =>
 const useQueryFileConflicts = (file: UnmergedFileInfo) =>
   useRepositoryQuery(fileConflictsQuery, file)
 
-export { fileConflictsQueryKeys, useQueryFileConflicts }
+export { fileConflictsQuery, fileConflictsQueryKeys, useQueryFileConflicts }

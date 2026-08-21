@@ -46,19 +46,20 @@ export const mapOr = <T, R, D>(or: D, arr: T[], fn: (v: T) => R): R[] | D => {
  */
 export const splitWhen = <T>(
   arr: T[],
-  isDelimiter: (item: T) => boolean,
+  isDelimiter: (item: T, pos: number) => boolean,
 ): T[][] => {
   const res: T[][] = []
 
   let chunk: T[] = []
-  for (const item of arr) {
-    if (isDelimiter(item)) {
+
+  arr.forEach((item, pos) => {
+    if (isDelimiter(item, pos)) {
       res.push(chunk)
       chunk = []
     } else {
       chunk.push(item)
     }
-  }
+  })
 
   if (chunk.length > 0) {
     res.push(chunk)
@@ -75,6 +76,22 @@ export const splitWhen = <T>(
  */
 export const splitBy = <T>(arr: T[], delimiter: T): T[][] => {
   return splitWhen(arr, (item) => item === delimiter)
+}
+
+/**
+ * Splits an array into chunks of the given size.
+ *
+ * @param arr - The array to split.
+ * @param chunkSize - The size of the chunks.
+ */
+export const splitIntoChunks = <T>(arr: T[], chunkSize: number): T[][] => {
+  const res: T[][] = []
+
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    res.push(arr.slice(i, i + chunkSize))
+  }
+
+  return res
 }
 
 /**

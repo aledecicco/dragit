@@ -1,6 +1,6 @@
 import * as Ariakit from '@ariakit/react'
 
-import { LARGE_DIFF_THRESHOLD } from '@/common/FileViewer/Diff'
+import { LARGE_FILE_THRESHOLD } from '@/common/FileViewer/common/Gate'
 import { DialogContent } from '@/ui/Dialog/Content'
 import { cn } from '@/utils/styles'
 
@@ -106,7 +106,7 @@ const SettingsDialogPreferencesContent = () => {
               />
               <CheckboxSetting
                 label="Show large diffs"
-                description={`Load diffs with more than ${LARGE_DIFF_THRESHOLD} lines by default`}
+                description={`Load diffs with more than ${LARGE_FILE_THRESHOLD} lines by default`}
                 setting="showLargeDiffs"
               />
               <CheckboxSetting

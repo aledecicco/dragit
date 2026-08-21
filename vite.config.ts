@@ -6,7 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 const host = process.env.TAURI_DEV_HOST
 
 // https://vitejs.dev/config/
-export default defineConfig(async () => ({
+export default defineConfig(() => ({
   plugins: [
     react({
       babel: {
@@ -16,6 +16,13 @@ export default defineConfig(async () => ({
     tailwindcss(),
     tsconfigPaths(),
   ],
+
+  // Plugins are not applied to worker bundles, so path aliases have to be
+  // resolved for them separately.
+  worker: {
+    format: 'es' as const,
+    plugins: () => [tsconfigPaths()],
+  },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //

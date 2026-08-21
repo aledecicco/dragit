@@ -4,6 +4,7 @@ import {
   IconColumns3Filled,
 } from '@tabler/icons-react'
 
+import { DIFF_FILTERS } from '@/highlighting/utils'
 import { useSettings } from '@/state/storage'
 import {
   ToggleGroup,
@@ -12,8 +13,6 @@ import {
 } from '@/ui/ToggleGroup'
 import { ToggleGroupItem } from '@/ui/ToggleGroup/Item'
 import { cn } from '@/utils/styles'
-
-import { DIFF_FILTERS } from '../utils'
 
 interface DiffFilterSelectorProps extends ToggleGroupProps {}
 

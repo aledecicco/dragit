@@ -4,16 +4,15 @@ import type { DiffScope, FileDiff } from '@/api/models'
 import { useQueryFileDiff } from '@/api/queries/fileDiff'
 import { FileIcon } from '@/common/File/Icon'
 import { FileStatus } from '@/common/File/Status'
+import type { DiffFilter } from '@/highlighting/utils'
 import { cn } from '@/utils/styles'
 
 import {
   FileViewerContainer,
   type FileViewerContainerProps,
 } from '../common/Container'
-import { FileDiffViewerContent } from './Content'
-import type { DiffFilter } from './utils'
-
-export const LARGE_DIFF_THRESHOLD = 1000
+import { FileViewerGate } from '../common/Gate'
+import { FileDiffViewerBody } from './Body'
 
 interface FileDiffViewerProps
   extends Partial<FileViewerContainerProps<FileDiff>> {
@@ -78,11 +77,13 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
       annotation={fileStageAnnotation}
     >
       {(fileDiff) => (
-        <FileDiffViewerContent
-          fileDiff={fileDiff}
-          filter={filter}
-          filepath={filepath}
-        />
+        <FileViewerGate lineCount={fileDiff.length}>
+          <FileDiffViewerBody
+            diffScope={diffScope}
+            filter={filter}
+            filepath={filepath}
+          />
+        </FileViewerGate>
       )}
     </FileViewerContainer>
   )

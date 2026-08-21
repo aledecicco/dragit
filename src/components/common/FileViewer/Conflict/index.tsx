@@ -7,7 +7,8 @@ import {
   FileViewerContainer,
   type FileViewerContainerProps,
 } from '../common/Container'
-import { FileConflictViewerContent } from './Content'
+import { FileViewerGate } from '../common/Gate'
+import { FileConflictViewerBody } from './Body'
 
 interface FileConflictViewerProps
   extends Partial<FileViewerContainerProps<FileConflicts>> {
@@ -34,10 +35,9 @@ const FileConflictViewer = (props: FileConflictViewerProps) => {
       annotation={<FileStatus file={file} />}
     >
       {(fileConflicts) => (
-        <FileConflictViewerContent
-          fileConflicts={fileConflicts}
-          filepath={file.path}
-        />
+        <FileViewerGate lineCount={fileConflicts.length}>
+          <FileConflictViewerBody file={file} />
+        </FileViewerGate>
       )}
     </FileViewerContainer>
   )

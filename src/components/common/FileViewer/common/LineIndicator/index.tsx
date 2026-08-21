@@ -1,9 +1,8 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
+import { type LineType, ROW_HEIGHT } from '@/highlighting/utils'
 import { propsWithCn } from '@/utils/styles'
-
-import type { LineType } from '../../utils'
 
 interface LineIndicatorProps extends ComponentProps<'div'> {
   /**
@@ -27,7 +26,7 @@ const LineIndicator = (props: LineIndicatorProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'h-6.5 flex flex-row justify-center font-mono',
+        'flex flex-row justify-center font-mono',
         'w-4 py-1.25 font-bold',
         match(type)
           .with('added', () => 'bg-success-500/30 text-success-500')
@@ -37,6 +36,7 @@ const LineIndicator = (props: LineIndicatorProps) => {
           .with('unchanged', () => 'bg-dark-600 text-light-950')
           .exhaustive(),
       )}
+      style={{ height: ROW_HEIGHT, ...divProps.style }}
     >
       {!empty &&
         match(type)

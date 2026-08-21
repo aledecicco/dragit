@@ -22,6 +22,7 @@
       "@/assets/*": ["./src/assets/*"],
       "@/api/*": ["./src/api/*"],
       "@/common/*": ["./src/components/common/*"],
+      "@/highlighting/*": ["./src/highlighting/*"],
       "@/interactions/*": ["./src/interactions/*"],
       "@/layout/*": ["./src/components/layout/*"],
       "@/lib/*": ["./src/components/lib/*"],

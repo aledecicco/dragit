@@ -84,4 +84,4 @@ const fileDiffQuery = (repoPath: string, scope: DiffScope) =>
 const useQueryFileDiff = (scope: DiffScope) =>
   useRepositoryQuery(fileDiffQuery, scope)
 
-export { fileDiffQueryKeys, useQueryFileDiff }
+export { fileDiffQuery, fileDiffQueryKeys, useQueryFileDiff }

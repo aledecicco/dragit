@@ -1,6 +1,5 @@
 import {
   type ComponentProps,
-  Fragment,
   type ReactNode,
   type RefObject,
   useEffect,
@@ -12,11 +11,11 @@ import { mergeRefs } from 'react-merge-refs'
 
 import { QueryLoader } from '@/lib/QueryLoader'
 import { Separator } from '@/ui/Separator'
-import { Skeleton } from '@/ui/Skeleton'
-import { range } from '@/utils/array'
 import { cn, propsWithCn } from '@/utils/styles'
 
+import { FileViewerLoader } from '../Loader'
 import { FileViewerTitle } from '../Title'
+import { FileViewerContextProvider } from './context'
 
 interface FileViewerContainerProps<T>
   extends Omit<ComponentProps<'div'>, 'children' | 'render'> {
@@ -94,32 +93,15 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
         ref={mergeRefs([ref, viewerRef])}
         render={<div />}
         className={cn(
-          'pl-1 py-1 text-sm overflow-y-auto',
+          'py-1 text-sm overflow-auto',
           'grid grid-cols-[max-content_max-content_1fr] grid-rows-[1fr]',
         )}
       >
-        <QueryLoader
-          query={query}
-          loadingFallback={range(50).map((i) => (
-            <Fragment key={i}>
-              <div
-                className={cn(
-                  'h-6.5 flex flex-row items-center font-mono',
-                  'text-xs w-19 px-1 overflow-hidden',
-                  'bg-dark-950/50 text-light-950/30',
-                )}
-              >
-                {i + 1}
-              </div>
-              <Skeleton
-                variant="line"
-                className={cn('col-span-2 m-1.5 mx-2')}
-              />
-            </Fragment>
-          ))}
-        >
-          {children}
-        </QueryLoader>
+        <FileViewerContextProvider scrollElement={ref}>
+          <QueryLoader query={query} loadingFallback={<FileViewerLoader />}>
+            {children}
+          </QueryLoader>
+        </FileViewerContextProvider>
       </Ariakit.Focusable>
     </div>
   )

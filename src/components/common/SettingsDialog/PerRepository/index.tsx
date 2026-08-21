@@ -14,7 +14,7 @@ const DEFAULT_BASE_BRANCH = 'main'
  */
 const PerRepositoryPreferences = () => {
   const repositoryStorage = useCurrentRepositoryStorage()
-  const setRepositoryStorageInteraction = useSetRepositoryStorageInteraction()
+  const setRepositoryStorage = useSetRepositoryStorageInteraction()
 
   return (
     <SettingsDialogSection label="Per repository">
@@ -24,7 +24,7 @@ const PerRepositoryPreferences = () => {
         checked={repositoryStorage ? !repositoryStorage.defaultBase : true}
         onChange={(e) => {
           triggerInteraction(
-            setRepositoryStorageInteraction({
+            setRepositoryStorage({
               defaultBase: e.target.checked ? null : DEFAULT_BASE_BRANCH,
             }),
           )
@@ -50,7 +50,7 @@ const PerRepositoryPreferences = () => {
           }
           contentAfter=" as default base branch for comparison"
           setValue={(newBase) => {
-            triggerInteraction(setRepositoryStorageInteraction({ defaultBase: newBase }))
+            triggerInteraction(setRepositoryStorage({ defaultBase: newBase }))
           }}
           divProps={{
             className: cn('relative'),

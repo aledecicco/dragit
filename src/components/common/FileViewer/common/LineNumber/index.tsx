@@ -1,9 +1,8 @@
 import type { ComponentProps } from 'react'
 import { match } from 'ts-pattern'
 
+import { type LineType, ROW_HEIGHT } from '@/highlighting/utils'
 import { propsWithCn } from '@/utils/styles'
-
-import type { LineType } from '../../utils'
 
 interface LineNumberProps extends ComponentProps<'div'> {
   /**
@@ -32,7 +31,7 @@ const LineNumber = (props: LineNumberProps) => {
     <div
       {...propsWithCn(
         divProps,
-        'h-6.5 flex flex-row font-mono',
+        'flex flex-row font-mono',
         'text-xs w-15 px-1 py-1.75 overflow-hidden',
         match(type)
           .with('added', () => [
@@ -57,6 +56,7 @@ const LineNumber = (props: LineNumberProps) => {
           ])
           .exhaustive(),
       )}
+      style={{ height: ROW_HEIGHT, ...divProps.style }}
     >
       {lineNumber}
     </div>
