@@ -1,6 +1,8 @@
 import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
+import { MS_IN_MINUTE } from '@/utils/time'
+
 import type { ConflictLine, FileConflicts, UnmergedFileInfo } from '../models'
 import { FILE_CONFLICTS_SCHEMA } from '../schemas'
 import { serializeUnmergedFile } from '../serialization'
@@ -12,10 +14,11 @@ const fileConflictsQueryKeys = {
       ...pathQueryKey(repoPath),
       key: 'file_conflicts',
     }) as const,
-  file: (repoPath: string, filepath: string) =>
+  file: (repoPath: string, file: UnmergedFileInfo) =>
     ({
       ...fileConflictsQueryKeys.all(repoPath),
-      filepath,
+      filepath: file.path,
+      status: file.status,
     }) as const,
 }
 
@@ -55,8 +58,9 @@ const fetchFileConflicts = async (
 
 const fileConflictsQuery = (repoPath: string, file: UnmergedFileInfo) =>
   queryOptions({
-    queryKey: [fileConflictsQueryKeys.file(repoPath, file.path)],
+    queryKey: [fileConflictsQueryKeys.file(repoPath, file)],
     queryFn: (context) => fetchFileConflicts(repoPath, file, context),
+    gcTime: MS_IN_MINUTE,
   })
 
 const useQueryFileConflicts = (file: UnmergedFileInfo) =>

@@ -3,7 +3,7 @@ import {
   type ReactNode,
   type RefObject,
   useEffect,
-  useRef,
+  useState,
 } from 'react'
 import * as Ariakit from '@ariakit/react'
 import type { UseQueryResult } from '@tanstack/react-query'
@@ -66,12 +66,14 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
     ...divProps
   } = props
 
-  const ref = useRef<HTMLDivElement>(null)
+  const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(
+    null,
+  )
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset scroll when a different file is selected
   useEffect(() => {
-    ref.current?.scrollTo({ top: 0, left: 0 })
-  }, [filepath, children])
+    scrollElement?.scrollTo({ top: 0, left: 0 })
+  }, [filepath, children, scrollElement])
 
   return (
     <div
@@ -90,14 +92,14 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
       <Separator />
 
       <Ariakit.Focusable
-        ref={mergeRefs([ref, viewerRef])}
+        ref={mergeRefs([setScrollElement, viewerRef])}
         render={<div />}
         className={cn(
           'py-1 text-sm overflow-auto',
           'grid grid-cols-[max-content_max-content_1fr] grid-rows-[1fr]',
         )}
       >
-        <FileViewerContextProvider scrollElement={ref}>
+        <FileViewerContextProvider scrollElement={scrollElement}>
           <QueryLoader query={query} loadingFallback={<FileViewerLoader />}>
             {children}
           </QueryLoader>

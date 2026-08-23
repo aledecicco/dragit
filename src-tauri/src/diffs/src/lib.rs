@@ -2,8 +2,8 @@ mod utils;
 use utils::*;
 
 use models::{
-    ChangeStatus, CleanFileInfo, DiffLine, DiffMode, DiffScope, DiffSource, MergeDiffStage,
-    MergeStatus, StagedFileStatus, VersionedFileStatus,
+    ChangeStatus, CleanFileInfo, ConflictLine, ConflictMode, DiffLine, DiffMode, DiffScope,
+    DiffSource, MergeDiffStage, MergeStatus, StagedFileStatus, VersionedFileStatus,
 };
 
 pub fn compute_diff(before: &str, after: &str) -> Vec<DiffLine> {
@@ -150,24 +150,126 @@ pub fn get_diff_sources(scope: DiffScope) -> (DiffSource, DiffSource) {
             };
 
             let target = match stage {
-                MergeDiffStage::Ours => {
-                    if ours_exists {
+                MergeDiffStage::Ours => match file.status {
+                    MergeStatus::AddedByUs => DiffSource::GitReferenceWithFallback(
+                        "HEAD".to_string(),
+                        ":2".to_string(),
+                        file.path.to_string(),
+                    ),
+                    _ if ours_exists => {
                         DiffSource::GitReference(":2".to_string(), file.path.to_string())
-                    } else {
-                        DiffSource::Empty
                     }
-                }
+                    _ => DiffSource::Empty,
+                },
 
-                MergeDiffStage::Theirs => {
-                    if theirs_exists {
+                MergeDiffStage::Theirs => match file.status {
+                    MergeStatus::AddedByThem => DiffSource::GitReferenceWithFallback(
+                        "MERGE_HEAD".to_string(),
+                        ":3".to_string(),
+                        file.path.to_string(),
+                    ),
+                    _ if theirs_exists => {
                         DiffSource::GitReference(":3".to_string(), file.path.to_string())
-                    } else {
-                        DiffSource::Empty
                     }
-                }
+                    _ => DiffSource::Empty,
+                },
             };
 
             (base, target)
         }
     }
+}
+
+/// Keeps the segments of the lines one side of a conflict has.
+pub fn get_side_segments(base_content: &str, side_content: &str) -> Vec<Vec<String>> {
+    compute_diff(base_content, side_content)
+        .into_iter()
+        .filter_map(|line| match line {
+            DiffLine::Removed(_) => None,
+            DiffLine::Added(segments) | DiffLine::Unchanged(segments) => Some(segments),
+        })
+        .collect()
+}
+
+/// Whether a line delimits a conflict section.
+fn is_conflict_marker(line: &str, marker: char) -> bool {
+    let width = line.chars().take_while(|c| *c == marker).count();
+
+    width >= 7 && matches!(line[width..].chars().next(), None | Some(' '))
+}
+
+/// Splits a conflicted file into its lines, attributing each one to a side and
+/// giving it the word-diff segments of that side against the base.
+pub fn compute_conflicts(
+    content: &str,
+    status: &MergeStatus,
+    ours_segments: Vec<Vec<String>>,
+    theirs_segments: Vec<Vec<String>>,
+) -> Vec<ConflictLine> {
+    let mut ours_segments = ours_segments.into_iter();
+    let mut theirs_segments = theirs_segments.into_iter();
+
+    // Modify/delete conflicts leave one side's content whole, with nothing marking
+    // who it belongs to, so the file's status has to answer for it instead.
+    let is_marked = content.lines().any(|line| is_conflict_marker(line, '<'));
+
+    let mut current_section = ConflictMode::Unchanged;
+
+    content
+        .lines()
+        .filter_map(|line| {
+            // TODO: Handle cases where conflict markers appear in the actual file content
+            if is_conflict_marker(line, '<') {
+                current_section = ConflictMode::Ours;
+                return None;
+            } else if is_conflict_marker(line, '=') {
+                current_section = ConflictMode::Theirs;
+                return None;
+            } else if is_conflict_marker(line, '|') {
+                current_section = ConflictMode::Common;
+                return None;
+            } else if is_conflict_marker(line, '>') {
+                current_section = ConflictMode::Unchanged;
+                return None;
+            }
+
+            if let ConflictMode::Common = current_section {
+                // Skip common ancestor lines in diff3 or zdiff3 merge styles.
+                return None;
+            }
+
+            let line_content = line.to_string() + "\n";
+
+            // Inside a marked section the markers say which side a line came from.
+            // Outside, the line is unchanged and belongs to both.
+            let side = match current_section {
+                ConflictMode::Ours => ConflictMode::Ours,
+                ConflictMode::Theirs => ConflictMode::Theirs,
+                _ if is_marked => ConflictMode::Unchanged,
+                _ => match status {
+                    MergeStatus::AddedByUs | MergeStatus::DeletedByThem => ConflictMode::Ours,
+                    MergeStatus::AddedByThem | MergeStatus::DeletedByUs => ConflictMode::Theirs,
+                    MergeStatus::BothModified
+                    | MergeStatus::BothAdded
+                    | MergeStatus::BothDeleted => ConflictMode::Unchanged,
+                },
+            };
+
+            let unsegmented = vec![format!(" {line_content}")];
+            Some(match side {
+                ConflictMode::Ours => {
+                    ConflictLine::Ours(ours_segments.next().unwrap_or(unsegmented))
+                }
+                ConflictMode::Theirs => {
+                    ConflictLine::Theirs(theirs_segments.next().unwrap_or(unsegmented))
+                }
+                _ => {
+                    // Lines the merge left alone are in both sides, so we pop from both.
+                    ours_segments.next();
+                    theirs_segments.next();
+                    ConflictLine::Unchanged(unsegmented)
+                }
+            })
+        })
+        .collect()
 }

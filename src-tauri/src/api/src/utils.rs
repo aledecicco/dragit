@@ -1,9 +1,15 @@
-use std::{fs, path::Path};
-
 use borsh::BorshSerialize;
+use std::{fs, path::Path};
+use tauri::{
+    ipc::{Channel, Response},
+    State,
+};
 
-use models::{AppError, AppState, GitError, SafeHandler};
-use tauri::{ipc::Response, State};
+use diffs::{get_diff_sources, get_side_segments};
+use models::{
+    AppError, AppMessage, AppState, DiffScope, DiffSource, GitError, MergeDiffStage, SafeHandler,
+    UnmergedFileInfo,
+};
 
 /// Serializes a value using Borsh so it can be sent efficiently over IPC.
 pub(crate) fn serialize_response<T: BorshSerialize>(value: T) -> Result<Response, AppError> {
@@ -91,4 +97,49 @@ pub(crate) fn budget_diff(diff: &str, budget: usize) -> String {
             }
         })
         .collect()
+}
+
+/// Reads the contents a diff source points to.
+pub(crate) fn get_source_contents(
+    state: &State<'_, AppState>,
+    channel: &Channel<AppMessage>,
+    repo_path: &str,
+    source: DiffSource,
+) -> Result<String, AppError> {
+    match source {
+        DiffSource::Empty => Ok("".to_string()),
+        DiffSource::DiskFile(filepath) => get_disk_file_contents(repo_path, &filepath),
+        DiffSource::GitReference(reference, filepath) => with_handler(state, &|h| {
+            h.get_file_contents(channel, repo_path, &reference, &filepath)
+        }),
+        DiffSource::GitReferenceWithFallback(reference, fallback, filepath) => {
+            with_handler(state, &|h| {
+                h.get_file_contents(channel, repo_path, &reference, &filepath)
+                    .or_else(|_| h.get_file_contents(channel, repo_path, &fallback, &filepath))
+            })
+        }
+    }
+}
+
+/// Word-diffs one side of a conflicted file against the merge base.
+pub(crate) fn get_conflict_side_segments(
+    state: &State<'_, AppState>,
+    channel: &Channel<AppMessage>,
+    repo_path: &str,
+    file: &UnmergedFileInfo,
+    stage: MergeDiffStage,
+) -> Result<Vec<Vec<String>>, AppError> {
+    let (base_source, side_source) = get_diff_sources(DiffScope::Unmerged {
+        file: file.clone(),
+        stage,
+    });
+
+    if let DiffSource::Empty = base_source {
+        return Ok(Vec::new());
+    }
+
+    let base_content = get_source_contents(state, channel, repo_path, base_source)?;
+    let side_content = get_source_contents(state, channel, repo_path, side_source)?;
+
+    Ok(get_side_segments(&base_content, &side_content))
 }

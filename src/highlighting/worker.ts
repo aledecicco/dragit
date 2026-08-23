@@ -251,19 +251,24 @@ const getContentAfter = (fileDiff: FileDiff): string => {
     .join('')
 }
 
+type ChangedLineType = Exclude<LineType, 'unchanged'>
+
 /**
  * Applies a diff segment to a text node, returning a new node
  * and the number of characters covered.
  *
  * @param diffSegment - The diff segment to apply.
  * @param node - The text node to apply it to.
+ * @param lineType - The type of the line the segment belongs to.
  */
 const applyDiffSegment = (
   diffSegment: DiffLineSegment,
   node: Text,
+  lineType: ChangedLineType,
 ): [LineNode, number] => {
   const nodeLength = node.value.length
-  const segmentType = getDiffSegmentType(diffSegment)
+  const segmentType =
+    getDiffSegmentType(diffSegment) === 'unchanged' ? 'unchanged' : lineType
   const segmentLength = diffSegment.length - 1
 
   if (segmentLength >= nodeLength) {
@@ -287,10 +292,12 @@ const applyDiffSegment = (
  *
  * @param diffSegments - The diff segments to apply.
  * @param line - The line to apply them to.
+ * @param lineType - The type of the line the segments belong to.
  */
 const applyDiffLineInner = (
   diffSegments: DiffLineSegment[],
   line: LineNode[],
+  lineType: ChangedLineType,
 ): LineNode[] => {
   const newLine: LineNode[] = []
 
@@ -303,7 +310,7 @@ const applyDiffLineInner = (
 
     if (node.type === 'text') {
       // If the current node is a text node, we can apply the diff segment to it.
-      const [newNode, lengthCovered] = applyDiffSegment(segment, node)
+      const [newNode, lengthCovered] = applyDiffSegment(segment, node, lineType)
       newLine.push(newNode)
 
       if (lengthCovered < node.value.length) {
@@ -332,7 +339,11 @@ const applyDiffLineInner = (
     } else if ('children' in node && node.children.length > 0) {
       // If the current node has children, we apply the diff line to them.
       // This modifies the diff segments as a side effect, so we don't need to do it again.
-      const childLine = applyDiffLineInner(diffSegments, getNodeChildren(node))
+      const childLine = applyDiffLineInner(
+        diffSegments,
+        getNodeChildren(node),
+        lineType,
+      )
       newLine.push({ ...node, children: childLine })
       line.shift()
     } else {
@@ -355,18 +366,18 @@ const applyDiffLineInner = (
  *
  * @param diffSegments - The diff segments for the line.
  * @param line - The line to modify.
+ * @param lineType - The type of the line the newline belongs to.
  */
 const addVisibleNewlines = (
   diffSegments: DiffLineSegment[],
   line: LineNode[],
+  lineType: ChangedLineType,
 ) => {
   const lastSegment = diffSegments.at(-1)
 
   if (line.length > 0 && lastSegment) {
-    const segmentType = getDiffSegmentType(lastSegment)
-
     if (
-      segmentType !== 'unchanged' &&
+      getDiffSegmentType(lastSegment) !== 'unchanged' &&
       NEWLINE_REGEX.test(lastSegment.slice(1)) &&
       diffSegments.length > 1 &&
       diffSegments.every(
@@ -379,9 +390,11 @@ const addVisibleNewlines = (
         type: 'element',
         tagName: 'span',
         properties: {
-          className: match(segmentType)
+          className: match(lineType)
             .with('added', () => 'text-success-300/90 py-0.5 select-none')
             .with('removed', () => 'text-danger-300/90 py-0.5 select-none')
+            .with('ours', () => 'text-primary-300/90 py-0.5 select-none')
+            .with('theirs', () => 'text-warning-300/90 py-0.5 select-none')
             .exhaustive(),
         },
         children: [{ type: 'text', value: '⤶\n' }],
@@ -395,17 +408,19 @@ const addVisibleNewlines = (
  *
  * @param diffSegments - The diff segments to apply.
  * @param line - The line to apply them to.
+ * @param lineType - The type of the line the segments belong to.
  */
 const applyDiffLine = (
   diffSegments: DiffLineSegment[],
   line: LineNode[],
+  lineType: ChangedLineType,
 ): LineNode[] => {
   const newLine = [...line]
   const newSegments = [...diffSegments]
 
-  addVisibleNewlines(newSegments, newLine)
+  addVisibleNewlines(newSegments, newLine, lineType)
 
-  return applyDiffLineInner(newSegments, newLine)
+  return applyDiffLineInner(newSegments, newLine, lineType)
 }
 
 /**
@@ -429,11 +444,19 @@ const addWordDiff = (
 
     match(diffLine.type)
       .with('added', () => {
-        linesAfter[pointerAfter] = applyDiffLine(diffLine.content, lineAfter)
+        linesAfter[pointerAfter] = applyDiffLine(
+          diffLine.content,
+          lineAfter,
+          'added',
+        )
         pointerAfter++
       })
       .with('removed', () => {
-        linesBefore[pointerBefore] = applyDiffLine(diffLine.content, lineBefore)
+        linesBefore[pointerBefore] = applyDiffLine(
+          diffLine.content,
+          lineBefore,
+          'removed',
+        )
         pointerBefore++
       })
       .with('unchanged', () => {
@@ -562,7 +585,7 @@ const buildDiffRows = (
 const getContentOurs = (fileConflicts: FileConflicts): string => {
   return fileConflicts
     .filter((line) => line.type !== 'theirs')
-    .map((line) => line.content)
+    .map((line) => line.content.map((segment) => segment.slice(1)).join(''))
     .join('')
 }
 
@@ -574,8 +597,55 @@ const getContentOurs = (fileConflicts: FileConflicts): string => {
 const getContentTheirs = (fileConflicts: FileConflicts): string => {
   return fileConflicts
     .filter((line) => line.type !== 'ours')
-    .map((line) => line.content)
+    .map((line) => line.content.map((segment) => segment.slice(1)).join(''))
     .join('')
+}
+
+/**
+ * Adds word-diff highlighting segments to the given lines according to a conflict.
+ *
+ * Each side carries its own segments, measured against the merge base, so the two
+ * are applied independently.
+ *
+ * @param fileConflicts - The conflicts to apply.
+ * @param linesOurs - Our lines, to modify in-place.
+ * @param linesTheirs - Their lines, to modify in-place.
+ */
+const addConflictWordDiff = (
+  fileConflicts: FileConflicts,
+  linesOurs: LineNode[][],
+  linesTheirs: LineNode[][],
+) => {
+  let pointerOurs = 0
+  let pointerTheirs = 0
+
+  for (const conflictLine of fileConflicts) {
+    const lineOurs = linesOurs.at(pointerOurs) ?? []
+    const lineTheirs = linesTheirs.at(pointerTheirs) ?? []
+
+    match(conflictLine.type)
+      .with('ours', () => {
+        linesOurs[pointerOurs] = applyDiffLine(
+          conflictLine.content,
+          lineOurs,
+          'ours',
+        )
+        pointerOurs++
+      })
+      .with('theirs', () => {
+        linesTheirs[pointerTheirs] = applyDiffLine(
+          conflictLine.content,
+          lineTheirs,
+          'theirs',
+        )
+        pointerTheirs++
+      })
+      .with('unchanged', () => {
+        pointerOurs++
+        pointerTheirs++
+      })
+      .exhaustive()
+  }
 }
 
 /**
@@ -623,10 +693,12 @@ const getSeparatorRow = (
  *
  * @param fileConflicts - The conflicts to highlight.
  * @param path - The path of the file with conflicts (used to determine the language).
+ * @param showWordDiffs - Whether to add word-diff highlighting segments.
  */
 const buildConflictRows = (
   fileConflicts: FileConflicts,
   path: string,
+  showWordDiffs: boolean,
 ): HighlightedContent => {
   // Recover the contents of the file from the conflict, ours and theirs.
   // Then syntax-highlight both versions completely.
@@ -641,16 +713,43 @@ const buildConflictRows = (
   const linesOurs = treeOurs ? splitIntoLines(treeOurs) : []
   const linesTheirs = treeTheirs ? splitIntoLines(treeTheirs) : []
 
+  if (showWordDiffs) {
+    // Modify the lines in-place to add word-diff highlighting segments.
+    addConflictWordDiff(fileConflicts, linesOurs, linesTheirs)
+  }
+
   // We use pointers to track which lines we're going to provide when the conflict
   // asks for a line from one side or the other.
   let pointerOurs = 0
   let pointerTheirs = 0
   let maxLineLength = 0
 
+  /** Staggers numbers over the sides of a conflict, so they cover the same lines. */
+  let offset = 0
+  let ourLines = 0
+  let theirLines = 0
+
   const rows: ViewerRow[] = []
   let currentSection: ConflictType = 'unchanged'
 
   fileConflicts.forEach((conflictLine, i) => {
+    // Their side of a conflict restarts at the number ours began on, and the
+    // lines after it resume from where ours ended.
+    if (conflictLine.type === 'theirs') {
+      if (theirLines === 0) {
+        offset -= ourLines
+      }
+      theirLines++
+    } else {
+      if (theirLines > 0) {
+        offset += ourLines - theirLines
+        ourLines = 0
+        theirLines = 0
+      }
+
+      ourLines = conflictLine.type === 'ours' ? ourLines + 1 : 0
+    }
+
     // Each time we enter a new side of a conflict, we introduce it with a separator.
     if (
       conflictLine.type !== currentSection &&
@@ -665,6 +764,7 @@ const buildConflictRows = (
 
     const line = match(conflictLine.type)
       .with('theirs', () => {
+        // If this is their line, we take it from the "theirs" content.
         pointerTheirs++
         return lineTheirs
       })
@@ -685,20 +785,21 @@ const buildConflictRows = (
     rows.push({
       key: `${i}`,
       type: conflictLine.type,
-      lineNumber: i + 1,
+      lineNumber: i + 1 + offset,
       content: wrapLineInType(line, conflictLine.type),
     })
 
-    maxLineLength = Math.max(
-      maxLineLength,
-      conflictLine.content.trimEnd().length,
+    const lineLength = conflictLine.content.reduce(
+      (acc, segment) => acc + segment.length - 1,
+      0,
     )
+    maxLineLength = Math.max(maxLineLength, lineLength)
   })
 
   return {
     rows,
     maxLineLength,
-    finalLineNumber: fileConflicts.length + 1,
+    finalLineNumber: pointerOurs + 1,
   }
 }
 
@@ -714,7 +815,7 @@ const highlighter = {
         buildDiffRows(req.fileDiff, req.path, req.filter, req.showWordDiffs),
       )
       .with({ type: 'conflicts' }, (req) =>
-        buildConflictRows(req.fileConflicts, req.path),
+        buildConflictRows(req.fileConflicts, req.path, req.showWordDiffs),
       )
       .exhaustive()
   },

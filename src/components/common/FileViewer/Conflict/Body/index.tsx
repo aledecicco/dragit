@@ -1,5 +1,6 @@
 import type { UnmergedFileInfo } from '@/api/models'
 import { useQueryHighlightedConflicts } from '@/api/queries/highlightedConflicts'
+import { useSettings } from '@/state/storage'
 
 import { FileViewerBody } from '../../common/Body'
 
@@ -16,7 +17,8 @@ interface FileConflictViewerBodyProps {
 const FileConflictViewerBody = (props: FileConflictViewerBodyProps) => {
   const { file } = props
 
-  const highlightedQuery = useQueryHighlightedConflicts(file)
+  const { showWordDiffs } = useSettings()
+  const highlightedQuery = useQueryHighlightedConflicts(file, showWordDiffs)
 
   return <FileViewerBody query={highlightedQuery} />
 }

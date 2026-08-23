@@ -33,7 +33,7 @@ const FileViewerRows = (props: FileViewerRowsProps) => {
 
   const { totalSize, virtualItems } = useVirtualizer({
     count: chunks.length,
-    getScrollElement: () => scrollElement.current,
+    getScrollElement: () => scrollElement,
     estimateSize: (index) =>
       chunks[index].reduce(
         (acc, row) => acc + (row.empty ? SEPARATOR_HEIGHT : ROW_HEIGHT),

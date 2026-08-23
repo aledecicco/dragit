@@ -35,6 +35,7 @@ export type HighlightJob =
       type: 'conflicts'
       fileConflicts: FileConflicts
       path: string
+      showWordDiffs: boolean
     }
 
 export const ROW_HEIGHT = 26

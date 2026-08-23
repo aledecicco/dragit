@@ -286,7 +286,7 @@ export type ConflictType = (typeof conflictTypes)[number]
 
 export interface ConflictLine {
   type: ConflictType
-  content: string
+  content: DiffLineSegment[]
 }
 
 export type FileConflicts = ConflictLine[]

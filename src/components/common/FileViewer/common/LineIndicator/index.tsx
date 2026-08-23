@@ -27,7 +27,7 @@ const LineIndicator = (props: LineIndicatorProps) => {
       {...propsWithCn(
         divProps,
         'flex flex-row justify-center font-mono',
-        'w-4 py-1.25 font-bold',
+        'text-xs w-4 py-1.25 font-bold',
         match(type)
           .with('added', () => 'bg-success-500/30 text-success-500')
           .with('removed', () => 'bg-danger-600/30 text-danger-600')

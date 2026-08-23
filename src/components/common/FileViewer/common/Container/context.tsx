@@ -1,15 +1,10 @@
-import {
-  createContext,
-  type PropsWithChildren,
-  type RefObject,
-  useContext,
-} from 'react'
+import { createContext, type PropsWithChildren, useContext } from 'react'
 
 interface FileViewerContextValue {
   /**
    * The scrollable element of the file viewer, that contents virtualize against.
    */
-  scrollElement: RefObject<HTMLDivElement | null>
+  scrollElement: HTMLDivElement | null
 }
 
 const FileViewerContext = createContext<FileViewerContextValue | null>(null)
@@ -18,7 +13,7 @@ interface FileViewerContextProviderProps extends PropsWithChildren {
   /**
    * The scrollable element of the file viewer.
    */
-  scrollElement: RefObject<HTMLDivElement | null>
+  scrollElement: HTMLDivElement | null
 }
 
 const FileViewerContextProvider = (props: FileViewerContextProviderProps) => {

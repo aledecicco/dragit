@@ -114,7 +114,7 @@ pub enum MovedStatus {
     Copied,
 }
 
-#[derive(borsh::BorshSerialize, strum::EnumString, Debug, serde::Deserialize)]
+#[derive(borsh::BorshSerialize, strum::EnumString, Debug, Clone, serde::Deserialize)]
 pub enum MergeStatus {
     #[strum(serialize = "AA")]
     BothAdded,
@@ -163,7 +163,7 @@ pub struct UnstagedFileInfo {
     pub status: ChangeStatus,
 }
 
-#[derive(borsh::BorshSerialize, Debug, serde::Deserialize)]
+#[derive(borsh::BorshSerialize, Debug, Clone, serde::Deserialize)]
 pub struct UnmergedFileInfo {
     pub path: String,
     pub status: MergeStatus,
@@ -290,7 +290,7 @@ pub enum ConflictMode {
 
 #[derive(borsh::BorshSerialize, Debug)]
 pub enum ConflictLine {
-    Ours(String),
-    Theirs(String),
-    Unchanged(String),
+    Ours(Vec<String>),
+    Theirs(Vec<String>),
+    Unchanged(Vec<String>),
 }

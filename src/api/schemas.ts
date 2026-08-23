@@ -207,8 +207,8 @@ export const FILE_DIFF_SCHEMA = BorshSchema.Vec(
 
 export const FILE_CONFLICTS_SCHEMA = BorshSchema.Vec(
   BorshSchema.Enum({
-    Ours: BorshSchema.String,
-    Theirs: BorshSchema.String,
-    Unchanged: BorshSchema.String,
+    Ours: BorshSchema.Vec(BorshSchema.String),
+    Theirs: BorshSchema.Vec(BorshSchema.String),
+    Unchanged: BorshSchema.Vec(BorshSchema.String),
   }),
 )

@@ -5,7 +5,7 @@ import { useQueryFileDiff } from '@/api/queries/fileDiff'
 import { FileIcon } from '@/common/File/Icon'
 import { FileStatus } from '@/common/File/Status'
 import type { DiffFilter } from '@/highlighting/utils'
-import { cn } from '@/utils/styles'
+import { Chip } from '@/ui/Chip'
 
 import {
   FileViewerContainer,
@@ -38,10 +38,14 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
     diffScope.type === 'unmerged'
       ? match(diffScope.stage)
           .with('ours', () => (
-            <span className={cn('text-xs text-primary-500')}>Ours</span>
+            <Chip size="xs" rounded={false} status="primary">
+              Ours
+            </Chip>
           ))
           .with('theirs', () => (
-            <span className={cn('text-xs text-warning-500')}>Theirs</span>
+            <Chip size="xs" rounded={false} status="warning">
+              Theirs
+            </Chip>
           ))
           .exhaustive()
       : match(filter)

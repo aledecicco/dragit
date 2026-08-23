@@ -1,6 +1,8 @@
 import { type QueryFunctionContext, queryOptions } from '@tanstack/react-query'
 import { match, P } from 'ts-pattern'
 
+import { MS_IN_MINUTE } from '@/utils/time'
+
 import type { CleanFileInfo, DiffLine, DiffScope, FileDiff } from '../models'
 import { FILE_DIFF_SCHEMA } from '../schemas'
 import {
@@ -79,6 +81,7 @@ const fileDiffQuery = (repoPath: string, scope: DiffScope) =>
   queryOptions({
     queryKey: [fileDiffQueryKeys.file(repoPath, scope)],
     queryFn: (context) => fetchFileDiff(repoPath, scope, context),
+    gcTime: MS_IN_MINUTE,
   })
 
 const useQueryFileDiff = (scope: DiffScope) =>

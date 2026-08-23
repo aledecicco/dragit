@@ -8,21 +8,19 @@ import type { UnmergedFileInfo } from '../models'
 import { useRepositoryQuery } from '../utils'
 import { fileConflictsQuery, fileConflictsQueryKeys } from './fileConflicts'
 
-/**
- * Keys extend the ones of the conflicts they are built from, so that anything
- * invalidating conflicts invalidates their highlighted contents as well.
- */
 const highlightedConflictsQueryKeys = {
-  file: (repoPath: string, filepath: string) =>
+  file: (repoPath: string, file: UnmergedFileInfo, showWordDiffs: boolean) =>
     ({
-      ...fileConflictsQueryKeys.file(repoPath, filepath),
+      ...fileConflictsQueryKeys.file(repoPath, file),
       variant: 'highlighted',
+      showWordDiffs,
     }) as const,
 }
 
 const fetchHighlightedConflicts = async (
   repoPath: string,
   file: UnmergedFileInfo,
+  showWordDiffs: boolean,
   context: QueryFunctionContext,
 ): Promise<HighlightedContent> => {
   const fileConflicts = await context.client.fetchQuery(
@@ -30,19 +28,28 @@ const fetchHighlightedConflicts = async (
   )
 
   return highlight(
-    { type: 'conflicts', fileConflicts, path: file.path },
+    { type: 'conflicts', fileConflicts, path: file.path, showWordDiffs },
     context.signal,
   )
 }
 
-const highlightedConflictsQuery = (repoPath: string, file: UnmergedFileInfo) =>
+const highlightedConflictsQuery = (
+  repoPath: string,
+  file: UnmergedFileInfo,
+  showWordDiffs: boolean,
+) =>
   queryOptions({
-    queryKey: [highlightedConflictsQueryKeys.file(repoPath, file.path)],
-    queryFn: (context) => fetchHighlightedConflicts(repoPath, file, context),
+    queryKey: [
+      highlightedConflictsQueryKeys.file(repoPath, file, showWordDiffs),
+    ],
+    queryFn: (context) =>
+      fetchHighlightedConflicts(repoPath, file, showWordDiffs, context),
     gcTime: MS_IN_MINUTE,
   })
 
-const useQueryHighlightedConflicts = (file: UnmergedFileInfo) =>
-  useRepositoryQuery(highlightedConflictsQuery, file)
+const useQueryHighlightedConflicts = (
+  file: UnmergedFileInfo,
+  showWordDiffs: boolean,
+) => useRepositoryQuery(highlightedConflictsQuery, file, showWordDiffs)
 
 export { highlightedConflictsQueryKeys, useQueryHighlightedConflicts }

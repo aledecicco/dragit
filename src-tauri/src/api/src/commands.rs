@@ -6,15 +6,17 @@ use tauri::{
 
 use crate::{
     serialize_response,
-    utils::{budget_diff, find_git_root, get_disk_file_contents},
+    utils::{
+        budget_diff, find_git_root, get_conflict_side_segments, get_disk_file_contents,
+        get_source_contents,
+    },
     with_handler,
 };
-use diffs::{compute_diff, get_diff_sources};
+use diffs::{compute_conflicts, compute_diff, get_diff_sources};
 use models::{
-    AgentError, AppError, AppEvent, AppMessage, AppState, ConflictLine, ConflictMode,
-    CurrentDirInfo, DiffScope, DiffSource, FileTypesFilter, GitHandler, MergeStatus,
-    PartialRepositoryStorage, PartialSettings, RepoWatcherError, ResolutionStrategy, Storage,
-    UnmergedFileInfo, EVENT_ID,
+    AgentError, AppError, AppEvent, AppMessage, AppState, CurrentDirInfo, DiffScope,
+    FileTypesFilter, GitHandler, MergeDiffStage, MergeStatus, PartialRepositoryStorage,
+    PartialSettings, RepoWatcherError, ResolutionStrategy, Storage, UnmergedFileInfo, EVENT_ID,
 };
 use storage::{
     add_recent_folder, get_storage, patch_repository_storage, patch_settings, set_last_opened,
@@ -643,30 +645,8 @@ pub async fn get_file_diff(
 ) -> Result<Response, AppError> {
     let (before_source, after_source) = get_diff_sources(scope);
 
-    let before_content = match before_source {
-        DiffSource::Empty => "".to_string(),
-        DiffSource::DiskFile(filepath) => get_disk_file_contents(repo_path, &filepath)?,
-        DiffSource::GitReference(reference, filepath)
-        | DiffSource::GitReferenceWithFallback(reference, _, filepath) => {
-            with_handler(&state, &|h| {
-                h.get_file_contents(&channel, repo_path, &reference, &filepath)
-            })?
-        }
-    };
-
-    let after_content = match after_source {
-        DiffSource::Empty => "".to_string(),
-        DiffSource::DiskFile(filepath) => get_disk_file_contents(repo_path, &filepath)?,
-        DiffSource::GitReference(reference, filepath) => with_handler(&state, &|h| {
-            h.get_file_contents(&channel, repo_path, &reference, &filepath)
-        })?,
-        DiffSource::GitReferenceWithFallback(reference, fallback, filepath) => {
-            with_handler(&state, &|h| {
-                h.get_file_contents(&channel, repo_path, &reference, &filepath)
-                    .or_else(|_| h.get_file_contents(&channel, repo_path, &fallback, &filepath))
-            })?
-        }
-    };
+    let before_content = get_source_contents(&state, &channel, repo_path, before_source)?;
+    let after_content = get_source_contents(&state, &channel, repo_path, after_source)?;
 
     let diff = compute_diff(&before_content, &after_content);
 
@@ -676,6 +656,8 @@ pub async fn get_file_diff(
 /// Returns the conflict sections of a file with merge conflicts.
 #[tauri::command]
 pub async fn get_file_conflicts(
+    state: State<'_, AppState>,
+    channel: Channel<AppMessage>,
     repo_path: &str,
     file: UnmergedFileInfo,
 ) -> Result<Response, AppError> {
@@ -684,49 +666,12 @@ pub async fn get_file_conflicts(
         _ => get_disk_file_contents(repo_path, &file.path)?,
     };
 
-    let mut current_section = ConflictMode::Unchanged;
+    let ours_segments =
+        get_conflict_side_segments(&state, &channel, repo_path, &file, MergeDiffStage::Ours)?;
+    let theirs_segments =
+        get_conflict_side_segments(&state, &channel, repo_path, &file, MergeDiffStage::Theirs)?;
 
-    let conflicts = content
-        .lines()
-        .map(|line| {
-            // TODO: Handle cases where conflict markers appear in the actual file content
-            if line.starts_with("<<<<<<< ") {
-                current_section = ConflictMode::Ours;
-                return None;
-            } else if line.starts_with("=======") {
-                current_section = ConflictMode::Theirs;
-                return None;
-            } else if line.starts_with("||||||| ") {
-                current_section = ConflictMode::Common;
-                return None;
-            } else if line.starts_with(">>>>>>> ") {
-                current_section = ConflictMode::Unchanged;
-                return None;
-            }
-
-            if let ConflictMode::Common = current_section {
-                // Skip common ancestor lines in diff3 or zdiff3 merge styles.
-                return None;
-            }
-
-            let line_content = line.to_string() + "\n";
-            let constructor = match file.status {
-                MergeStatus::AddedByThem => ConflictLine::Theirs,
-                MergeStatus::AddedByUs => ConflictLine::Ours,
-                MergeStatus::DeletedByThem => ConflictLine::Ours,
-                MergeStatus::DeletedByUs => ConflictLine::Theirs,
-                MergeStatus::BothModified | MergeStatus::BothAdded => match current_section {
-                    ConflictMode::Ours => ConflictLine::Ours,
-                    ConflictMode::Theirs => ConflictLine::Theirs,
-                    _ => ConflictLine::Unchanged,
-                },
-                MergeStatus::BothDeleted => ConflictLine::Unchanged,
-            };
-
-            Some(constructor(line_content))
-        })
-        .flatten()
-        .collect::<Vec<ConflictLine>>();
+    let conflicts = compute_conflicts(&content, &file.status, ours_segments, theirs_segments);
 
     serialize_response(conflicts)
 }
