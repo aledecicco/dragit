@@ -1,9 +1,12 @@
 import { IconBrandGithub } from '@tabler/icons-react'
 
 import { useQueryAppInfo } from '@/api/queries/appInfo'
-import { DecoratedButton } from '@/lib/DecoratedButton'
 import { QueryLoader } from '@/lib/QueryLoader'
+import { BuyMeACoffeeGlyph } from '@/icons/BuyMeACoffee'
 import { DialogContent } from '@/ui/Dialog/Content'
+import type { Glyph } from '@/ui/Icon'
+import { Toolbar } from '@/ui/Toolbar'
+import { ToolbarItem } from '@/ui/Toolbar/Item'
 import { openLink } from '@/utils/behavior'
 import { cn } from '@/utils/styles'
 
@@ -39,16 +42,33 @@ const SettingsDialogAboutContent = () => {
           <p className={cn('text-sm text-center text-light-500')}>
             Made by Alejandro De Cicco
           </p>
-          <DecoratedButton
-            Glyph={IconBrandGithub}
-            label="View source"
-            size="sm"
-            variant="filled"
-            status="neutral"
-            onClick={() => {
-              openLink('https://github.com/aledecicco/dragit')
-            }}
-          />
+
+          <Toolbar className={cn('w-full')} fixed>
+            <ToolbarItem
+              fixed
+              Glyph={IconBrandGithub}
+              label="View source"
+              size="md"
+              variant="filled"
+              status="neutral"
+              className={cn('py-3')}
+              onClick={() => {
+                openLink('https://github.com/aledecicco/dragit')
+              }}
+            />
+            <ToolbarItem
+              fixed
+              Glyph={BuyMeACoffeeGlyph as Glyph}
+              label="Buy me a coffee"
+              size="md"
+              variant="filled"
+              status="neutral"
+              className={cn('py-3')}
+              onClick={() => {
+                openLink('https://www.buymeacoffee.com/adecicco')
+              }}
+            />
+          </Toolbar>
         </div>
       </div>
     </DialogContent>

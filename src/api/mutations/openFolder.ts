@@ -2,7 +2,7 @@ import { IconClock, IconFolderOpen } from '@tabler/icons-react'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import { LogoGlyph } from '@/common/Logo'
+import { DragitGlyph } from '@/icons/Dragit'
 import type { Action } from '@/state/actions'
 import type { Glyph } from '@/ui/Icon'
 
@@ -57,7 +57,7 @@ const useChangeCurrentFolder = (): Action<string> => {
       success: 'New folder opened',
       error: 'Failed to open folder',
     },
-    Glyph: LogoGlyph as Glyph,
+    Glyph: DragitGlyph as Glyph,
   }
 }
 

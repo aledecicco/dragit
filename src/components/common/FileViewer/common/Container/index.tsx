@@ -92,7 +92,7 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
       <Separator />
 
       <Ariakit.Focusable
-        ref={mergeRefs([setScrollElement, viewerRef])}
+        ref={mergeRefs<HTMLDivElement>([setScrollElement, viewerRef])}
         render={<div />}
         className={cn(
           'py-1 text-sm overflow-auto',

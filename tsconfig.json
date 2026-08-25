@@ -23,6 +23,7 @@
       "@/api/*": ["./src/api/*"],
       "@/common/*": ["./src/components/common/*"],
       "@/highlighting/*": ["./src/highlighting/*"],
+      "@/icons/*": ["./src/components/icons/*"],
       "@/interactions/*": ["./src/interactions/*"],
       "@/layout/*": ["./src/components/layout/*"],
       "@/lib/*": ["./src/components/lib/*"],

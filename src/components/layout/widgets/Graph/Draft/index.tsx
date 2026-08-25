@@ -94,7 +94,7 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
       ),
       style: {
         width: COMMIT_WIDTH * 0.75,
-        height: COMMIT_HEIGHT * 1.1,
+        height: COMMIT_HEIGHT,
       },
     }
 
@@ -157,12 +157,12 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
                     <div
                       className={cn(
                         'size-full overflow-hidden',
-                        'flex flex-col items-stretch',
+                        'flex flex-col',
                       )}
                     >
                       <p
                         className={cn(
-                          'py-1 px-2',
+                          'py-0.5 px-2',
                           'uppercase text-2xs font-semibold tracking-widest text-light-600',
                         )}
                       >

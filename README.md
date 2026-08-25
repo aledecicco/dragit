@@ -10,6 +10,7 @@
 
   [![Version](https://img.shields.io/github/v/tag/aledecicco/dragit)](https://github.com/aledecicco/dragit/releases)
   [![License](https://img.shields.io/github/license/aledecicco/dragit)](https://opensource.org/licenses/gpl-3.0)
+  [![Buy me a coffee](https://img.shields.io/badge/%E2%80%8B-Buy%20me%20a%20coffee-FFDD00?logo=buymeacoffee&logoColor=FFDD00)](https://www.buymeacoffee.com/adecicco)
 
   <img src="./assets/merge.webp" width="800"/>
 </div>
