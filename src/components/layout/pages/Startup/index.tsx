@@ -4,6 +4,7 @@ import { IconReload } from '@tabler/icons-react'
 import logo from '@/assets/logo.png'
 
 import type { CurrentDirInfo } from '@/api/models'
+import { useOpenRecentFolder } from '@/api/mutations/openFolder'
 import { useQueryCurrentDir } from '@/api/queries/currentDir'
 import { useQueryStorage } from '@/api/queries/storage'
 import { FilePath } from '@/common/File/Path'
@@ -16,10 +17,12 @@ import {
   useInitRepositoryInteraction,
 } from '@/interactions/repository'
 import { ActionButton } from '@/lib/ActionButton'
+import { interaction } from '@/lib/ActionButton/utils'
 import { DecoratedButton } from '@/lib/DecoratedButton'
 import { QueryLoader } from '@/lib/QueryLoader'
 import { Marquee } from '@/ui/Marquee'
 import { getErrorMessage } from '@/utils/error'
+import { getPathLocation } from '@/utils/string'
 import { cn, propsWithCn } from '@/utils/styles'
 
 /**
@@ -34,12 +37,12 @@ const StartupPage = () => {
       query={currentDirQuery}
       loadingFallback={
         <StartupPageInner className={cn('col-start-2')}>
-          <p className={cn('text-lg text-light-950 italic')}>Loading...</p>
+          <p className={cn('text-sm text-light-950 italic')}>Loading...</p>
         </StartupPageInner>
       }
       errorFallback={(error) => (
         <StartupPageInner className={cn('col-start-2')}>
-          <p className={cn('text-lg text-danger-600 mb-2')}>
+          <p className={cn('text-sm text-danger-300 text-center text-balance')}>
             {getErrorMessage(error)}
           </p>
 
@@ -60,11 +63,13 @@ const StartupPage = () => {
         if (!currentDir) {
           return (
             <StartupPageInner className={cn('col-start-2')}>
-              <p className={cn('text-lg text-light-950')}>
-                No folder currently open.
+              <p className={cn('text-sm text-light-950')}>
+                Open a folder to get started.
               </p>
 
-              <OpenFolderButton />
+              <OpenFolderButton withRecentsMenu={false} />
+
+              <RecentFolders />
             </StartupPageInner>
           )
         }
@@ -81,29 +86,33 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
   const initRepository = useInitRepositoryInteraction()
   const cloneRepository = useCloneRepositoryInteraction()
 
+  const { filedir, filename } = getPathLocation(currentDir.path)
+
+  const canInit = currentDir.exists && !currentDir.isRepository
+
   return (
     <StartupPageInner className={cn('col-start-2')}>
-      <Marquee className={cn('text-lg text-light-500')}>
-        <FilePath
-          filepath={currentDir.path}
-          separatorProps={{ className: cn('text-primary-300') }}
-        />
-      </Marquee>
+      <div className={cn('max-w-full flex flex-col items-center gap-0.5 mb-4')}>
+        <Marquee className={cn('max-w-full text-lg text-light-50')}>
+          {filename}
+        </Marquee>
 
-      {currentDir.exists ? (
-        !currentDir.isRepository && (
-          <p className={cn('text-lg text-light-950')}>
-            This folder is not a Git repository. Initialize it to begin.
-          </p>
-        )
-      ) : (
-        <p className={cn('text-lg text-light-950')}>
-          This folder doesn't exist.
-        </p>
-      )}
+        <Marquee className={cn('max-w-full text-md text-light-950')}>
+          <FilePath
+            filepath={filedir}
+            separatorProps={{ className: cn('text-primary-300/70') }}
+          />
+        </Marquee>
+      </div>
 
-      <div className={cn('flex flex-col gap-2')}>
-        {currentDir.exists && !currentDir.isRepository && (
+      <p className={cn('text-sm text-light-950 text-center text-balance')}>
+        {currentDir.exists
+          ? !currentDir.isRepository && 'This folder is not a Git repository.'
+          : "This folder doesn't exist."}
+      </p>
+
+      <div className={cn('w-full flex flex-col gap-2')}>
+        {canInit && (
           <>
             <ActionButton
               {...initRepository}
@@ -122,7 +131,7 @@ const InFolder = (props: { currentDir: CurrentDirInfo }) => {
           </>
         )}
 
-        <OpenFolderButton />
+        <OpenFolderButton emphasized={!canInit} />
       </div>
     </StartupPageInner>
   )
@@ -135,43 +144,124 @@ const StartupPageInner = (props: ComponentProps<'div'>) => {
     <div
       {...propsWithCn(
         divProps,
-        'flex flex-col gap-6 items-center overflow-hidden',
+        'h-full overflow-hidden',
+        'flex flex-col justify-center items-center',
+        'animate-enter-fade-in',
       )}
     >
-      <img
-        src={logo}
-        alt="Dragit logo"
-        className={cn('w-60 mt-[30%] pointer-events-none select-none')}
-      />
+      <div className={cn('flex flex-col items-center gap-1')}>
+        <img
+          src={logo}
+          alt="Dragit logo"
+          className={cn('w-40 pointer-events-none select-none')}
+        />
 
-      {children}
+        <h1
+          className={cn('text-2xl font-semibold tracking-wider text-light-50')}
+        >
+          Dragit
+        </h1>
+      </div>
+
+      <div
+        className={cn(
+          'mt-10 w-full max-w-sm flex flex-col gap-4 items-center overflow-hidden',
+        )}
+      >
+        {children}
+      </div>
     </div>
   )
 }
 
-const OpenFolderButton = () => {
+const RecentFolders = () => {
+  const storageQuery = useQueryStorage()
+  const recentFolders = storageQuery.data?.recentFolders ?? []
+
+  if (!recentFolders.length) {
+    return undefined
+  }
+
+  return (
+    <div className={cn('w-full flex flex-col gap-1')}>
+      <p
+        className={cn(
+          'px-2.5 pb-1 text-2xs font-semibold uppercase tracking-widest',
+          'text-light-950/60',
+        )}
+      >
+        Recent
+      </p>
+
+      {recentFolders.map((folder) => (
+        <RecentFolderButton key={folder} folder={folder} />
+      ))}
+    </div>
+  )
+}
+
+const RecentFolderButton = (props: { folder: string }) => {
+  const { folder } = props
+
+  const { filedir, filename } = getPathLocation(folder)
+
+  const openFolder = useOpenRecentFolder(folder)
+  const namedInteraction = interaction({
+    action: { ...openFolder, label: { ...openFolder.label, idle: filename } },
+    details: `open "${folder}"`,
+  })
+
+  return (
+    <ActionButton
+      {...namedInteraction}
+      className={cn('w-full justify-start')}
+      size="md"
+      variant="plain"
+      status="neutral"
+      aria-label={`Open "${folder}"`}
+    >
+      <span
+        className={cn(
+          'min-w-0 ml-4 flex-1 text-right text-xs font-normal truncate',
+          'text-light-950/60 group-hover:text-light-950',
+          'transition-colors duration-200 ease-in-out',
+        )}
+      >
+        {filedir}
+      </span>
+    </ActionButton>
+  )
+}
+
+const OpenFolderButton = (props: {
+  withRecentsMenu?: boolean
+  emphasized?: boolean
+}) => {
+  const { withRecentsMenu = true, emphasized = true } = props
+
   const openFolder = useOpenFolderInteraction()
   const openRecentFolder = useOpenSomeRecentFolderInteraction()
 
   const storageQuery = useQueryStorage()
+  const recentFolders = storageQuery.data?.recentFolders ?? []
 
   return (
     <ActionButton
       {...openFolder}
-      className={cn('border border-dark-50')}
+      className={cn('w-full')}
       alternatives={
-        storageQuery.data?.recentFolders.map((folder) =>
-          openRecentFolder(folder),
-        ) ?? []
+        withRecentsMenu
+          ? recentFolders.map((folder) => openRecentFolder(folder))
+          : undefined
       }
       menuButtonProps={{
         label: 'View recent folders',
-        disabled: !storageQuery.data?.recentFolders.length,
+        disabled: !recentFolders.length,
       }}
       aria-label="Select and open a folder in your system"
       size="lg"
-      variant="plain"
-      status="neutral"
+      variant={emphasized ? 'filled' : 'plain'}
+      status={emphasized ? 'primary' : 'neutral'}
     />
   )
 }

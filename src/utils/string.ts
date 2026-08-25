@@ -49,14 +49,19 @@ export const splitPath = (filepath: string): string[] => {
  * @param filepath - The file path to get the location of.
  *
  * @returns An object containing:
- * - `filedir`: The directory that contains the file.
+ * - `filedir`: The directory that contains the file, prefixed with `./` if the path is relative.
  * - `filename`: The name of the file.
  */
 export const getPathLocation = (filepath: string) => {
   const segments = splitPath(filepath)
 
   const filename = segments.pop() ?? filepath
-  const filedir = `.${Path.sep()}${segments.join(Path.sep())}`
+
+  // An absolute path starts with the separator, so its first segment is empty.
+  const isAbsolute = segments[0] === ''
+  const dir = segments.join(Path.sep())
+
+  const filedir = isAbsolute ? dir || Path.sep() : `.${Path.sep()}${dir}`
 
   return { filedir, filename }
 }
