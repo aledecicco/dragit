@@ -26,6 +26,7 @@
               ":PACKAGE:",
               ":BLANK_LINE:",
               "@/assets/**",
+              "@/icons/**",
               ":BLANK_LINE:",
               "@/layout/**",
               ":BLANK_LINE:",

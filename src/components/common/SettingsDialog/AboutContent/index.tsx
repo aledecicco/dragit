@@ -1,8 +1,9 @@
 import { IconBrandGithub } from '@tabler/icons-react'
 
+import { BuyMeACoffeeGlyph } from '@/icons/BuyMeACoffee'
+
 import { useQueryAppInfo } from '@/api/queries/appInfo'
 import { QueryLoader } from '@/lib/QueryLoader'
-import { BuyMeACoffeeGlyph } from '@/icons/BuyMeACoffee'
 import { DialogContent } from '@/ui/Dialog/Content'
 import type { Glyph } from '@/ui/Icon'
 import { Toolbar } from '@/ui/Toolbar'

@@ -37,6 +37,7 @@ const highlightedConflictsQuery = (
   repoPath: string,
   file: UnmergedFileInfo,
   showWordDiffs: boolean,
+  enabled: boolean,
 ) =>
   queryOptions({
     queryKey: [
@@ -45,11 +46,13 @@ const highlightedConflictsQuery = (
     queryFn: (context) =>
       fetchHighlightedConflicts(repoPath, file, showWordDiffs, context),
     gcTime: MS_IN_MINUTE,
+    enabled,
   })
 
 const useQueryHighlightedConflicts = (
   file: UnmergedFileInfo,
   showWordDiffs: boolean,
-) => useRepositoryQuery(highlightedConflictsQuery, file, showWordDiffs)
+  enabled: boolean,
+) => useRepositoryQuery(highlightedConflictsQuery, file, showWordDiffs, enabled)
 
 export { highlightedConflictsQueryKeys, useQueryHighlightedConflicts }

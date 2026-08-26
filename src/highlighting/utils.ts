@@ -90,8 +90,56 @@ export interface HighlightedContent {
 }
 
 /**
- * The single highlighting worker, spawned lazily so its grammars are only
- * loaded once a file actually needs to be highlighted.
+ * A run of consecutive rows sharing the same line type.
+ */
+export interface ContentSegment {
+  /**
+   * The type of the lines the segment covers.
+   */
+  type: LineType
+
+  /**
+   * The starting offset of the segment.
+   */
+  start: number
+
+  /**
+   * The height the segment spans.
+   */
+  height: number
+}
+
+/**
+ * Groups rows into runs of consecutive lines of the same type.
+ *
+ * @param rows - The rows to group.
+ */
+export const getContentSegments = (rows: ViewerRow[]): ContentSegment[] => {
+  const segments: ContentSegment[] = []
+  let offset = 0
+  let current: ContentSegment | undefined
+
+  for (const row of rows) {
+    const height = row.empty ? SEPARATOR_HEIGHT : ROW_HEIGHT
+
+    if (row.type === 'unchanged') {
+      current = undefined
+    } else if (current?.type === row.type) {
+      current.height += height
+    } else {
+      current = { type: row.type, start: offset, height }
+      segments.push(current)
+    }
+
+    offset += height
+  }
+
+  return segments
+}
+
+/**
+ * The highlighting worker.
+ * Spawned lazily so its grammars are only loaded once a file needs to be highlighted.
  */
 let highlighterPromise: Promise<Highlighter> | undefined
 

@@ -51,6 +51,7 @@ const highlightedDiffQuery = (
   filepath: string,
   filter: DiffFilter,
   showWordDiffs: boolean,
+  enabled: boolean,
 ) =>
   queryOptions({
     queryKey: [
@@ -66,6 +67,7 @@ const highlightedDiffQuery = (
         context,
       ),
     gcTime: MS_IN_MINUTE,
+    enabled,
   })
 
 const useQueryHighlightedDiff = (
@@ -73,6 +75,7 @@ const useQueryHighlightedDiff = (
   filepath: string,
   filter: DiffFilter,
   showWordDiffs: boolean,
+  enabled: boolean,
 ) =>
   useRepositoryQuery(
     highlightedDiffQuery,
@@ -80,6 +83,7 @@ const useQueryHighlightedDiff = (
     filepath,
     filter,
     showWordDiffs,
+    enabled,
   )
 
 export { highlightedDiffQueryKeys, useQueryHighlightedDiff }

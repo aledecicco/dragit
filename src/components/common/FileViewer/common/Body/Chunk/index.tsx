@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react'
 
 import type { ViewerRow } from '@/highlighting/utils'
-import { cn, propsWithCn } from '@/utils/styles'
+import { propsWithCn } from '@/utils/styles'
 
 import { ViewerCode } from '../Code'
 import { ViewerGutter } from '../Gutter'
@@ -20,9 +20,9 @@ const ViewerChunk = (props: ViewerChunkProps) => {
   const { rows, ...divProps } = props
 
   return (
-    <div {...propsWithCn(divProps, 'absolute left-0 w-full flex flex-row')}>
+    <div {...propsWithCn(divProps, 'flex flex-row')}>
       <ViewerGutter rows={rows} />
-      <ViewerCode rows={rows} className={cn('grow')} />
+      <ViewerCode rows={rows} />
     </div>
   )
 }

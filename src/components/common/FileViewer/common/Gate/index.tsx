@@ -1,31 +1,42 @@
 import { type PropsWithChildren, useState } from 'react'
 
+import type { DiffScope, UnmergedFileInfo } from '@/api/models'
+import { useQueryFileConflicts } from '@/api/queries/fileConflicts'
+import { useQueryFileDiff } from '@/api/queries/fileDiff'
 import { useSettings } from '@/state/storage'
 import { Button } from '@/ui/Button'
 import { cn } from '@/utils/styles'
 
-/**
- * The number of lines past which a file is considered too large.
- */
 export const LARGE_FILE_THRESHOLD = 20000
+
+type FileViewerGateStatus = 'pending' | 'blocked' | 'allowed'
+
+interface FileViewerGateState {
+  /**
+   * Whether the contents may be highlighted and displayed.
+   */
+  status: FileViewerGateStatus
+
+  /**
+   * Allows the contents to be displayed regardless of their size.
+   */
+  showAnyway: () => void
+}
 
 interface FileViewerGateProps extends PropsWithChildren {
   /**
-   * The number of lines the file holds.
+   * The state of the gate, as tracked by {@link useFileViewerGate}.
    */
-  lineCount: number
+  gate: FileViewerGateState
 }
 
 /**
  * Holds off displaying the contents of very large files until asked to.
  */
 const FileViewerGate = (props: FileViewerGateProps) => {
-  const { lineCount, children } = props
+  const { gate, children } = props
 
-  const { showLargeDiffs } = useSettings()
-  const [showAnyway, setShowAnyway] = useState(showLargeDiffs)
-
-  if (lineCount <= LARGE_FILE_THRESHOLD || showAnyway) {
+  if (gate.status !== 'blocked') {
     return children
   }
 
@@ -42,7 +53,7 @@ const FileViewerGate = (props: FileViewerGateProps) => {
         variant="filled"
         size="sm"
         onClick={() => {
-          setShowAnyway(true)
+          gate.showAnyway()
         }}
       >
         Show anyway
@@ -51,4 +62,56 @@ const FileViewerGate = (props: FileViewerGateProps) => {
   )
 }
 
-export { FileViewerGate, type FileViewerGateProps }
+/**
+ * Decides whether contents of the given size should be displayed.
+ *
+ * @param lineCount - The number of lines the file holds, once known.
+ */
+const useLineCountGate = (
+  lineCount: number | undefined,
+): FileViewerGateState => {
+  const { showLargeDiffs } = useSettings()
+  const [showAnyway, setShowAnyway] = useState(false)
+
+  return {
+    status:
+      lineCount === undefined
+        ? 'pending'
+        : lineCount > LARGE_FILE_THRESHOLD && !showLargeDiffs && !showAnyway
+          ? 'blocked'
+          : 'allowed',
+    showAnyway: () => {
+      setShowAnyway(true)
+    },
+  }
+}
+
+/**
+ * Decides whether the diff of a file should be displayed.
+ *
+ * @param scope - The scope of the diff to display.
+ */
+const useFileDiffGate = (scope: DiffScope): FileViewerGateState => {
+  const fileDiffQuery = useQueryFileDiff(scope)
+
+  return useLineCountGate(fileDiffQuery.data?.length)
+}
+
+/**
+ * Decides whether the conflicts of a file should be displayed.
+ *
+ * @param file - The conflicted file to display.
+ */
+const useFileConflictsGate = (file: UnmergedFileInfo): FileViewerGateState => {
+  const fileConflictsQuery = useQueryFileConflicts(file)
+
+  return useLineCountGate(fileConflictsQuery.data?.length)
+}
+
+export {
+  FileViewerGate,
+  type FileViewerGateProps,
+  type FileViewerGateState,
+  useFileConflictsGate,
+  useFileDiffGate,
+}

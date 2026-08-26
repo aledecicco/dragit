@@ -17,7 +17,9 @@ interface ViewerCodeProps extends ComponentProps<'div'> {
 const ViewerCode = (props: ViewerCodeProps) => {
   const { rows, ...divProps } = props
 
-  return <div {...propsWithCn(divProps, 'pl-2')}>{renderRows(rows)}</div>
+  return (
+    <div {...propsWithCn(divProps, 'pl-2', 'grow')}>{renderRows(rows)}</div>
+  )
 }
 
 export { ViewerCode, type ViewerCodeProps }

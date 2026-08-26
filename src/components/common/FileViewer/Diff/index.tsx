@@ -1,21 +1,21 @@
 import { match } from 'ts-pattern'
 
-import type { DiffScope, FileDiff } from '@/api/models'
-import { useQueryFileDiff } from '@/api/queries/fileDiff'
+import type { DiffScope } from '@/api/models'
+import { useQueryHighlightedDiff } from '@/api/queries/highlightedDiff'
 import { FileIcon } from '@/common/File/Icon'
 import { FileStatus } from '@/common/File/Status'
 import type { DiffFilter } from '@/highlighting/utils'
+import { useSettings } from '@/state/storage'
 import { Chip } from '@/ui/Chip'
 
+import { FileViewerBody } from '../common/Body'
 import {
   FileViewerContainer,
   type FileViewerContainerProps,
 } from '../common/Container'
-import { FileViewerGate } from '../common/Gate'
-import { FileDiffViewerBody } from './Body'
+import { FileViewerGate, useFileDiffGate } from '../common/Gate'
 
-interface FileDiffViewerProps
-  extends Partial<FileViewerContainerProps<FileDiff>> {
+interface FileDiffViewerProps extends Partial<FileViewerContainerProps> {
   /**
    * The scope of the diff to display (staged changes, unstaged changes, or a specific snapshot).
    */
@@ -33,7 +33,6 @@ interface FileDiffViewerProps
 const FileDiffViewer = (props: FileDiffViewerProps) => {
   const { diffScope, filter = 'both', ...containerProps } = props
 
-  const fileDiffQuery = useQueryFileDiff(diffScope)
   const fileStageAnnotation =
     diffScope.type === 'unmerged'
       ? match(diffScope.stage)
@@ -72,23 +71,29 @@ const FileDiffViewer = (props: FileDiffViewerProps) => {
           )
           .otherwise(() => diffScope.file.path)
 
+  const { showWordDiffs } = useSettings()
+
+  const gate = useFileDiffGate(diffScope)
+
+  const highlightedQuery = useQueryHighlightedDiff(
+    diffScope,
+    filepath,
+    filter,
+    showWordDiffs,
+    gate.status === 'allowed',
+  )
+
   return (
     <FileViewerContainer
       {...containerProps}
-      query={fileDiffQuery}
+      content={highlightedQuery.data}
       decoration={<FileIcon file={diffScope.file} size="lg" />}
       filepath={filepath}
       annotation={fileStageAnnotation}
     >
-      {(fileDiff) => (
-        <FileViewerGate lineCount={fileDiff.length}>
-          <FileDiffViewerBody
-            diffScope={diffScope}
-            filter={filter}
-            filepath={filepath}
-          />
-        </FileViewerGate>
-      )}
+      <FileViewerGate gate={gate}>
+        <FileViewerBody query={highlightedQuery} />
+      </FileViewerGate>
     </FileViewerContainer>
   )
 }

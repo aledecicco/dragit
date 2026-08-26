@@ -6,23 +6,22 @@ import {
   useState,
 } from 'react'
 import * as Ariakit from '@ariakit/react'
-import type { UseQueryResult } from '@tanstack/react-query'
 import { mergeRefs } from 'react-merge-refs'
 
-import { QueryLoader } from '@/lib/QueryLoader'
+import type { HighlightedContent } from '@/highlighting/utils'
 import { Separator } from '@/ui/Separator'
 import { cn, propsWithCn } from '@/utils/styles'
 
-import { FileViewerLoader } from '../Loader'
+import { FileViewerRuler } from '../Ruler'
 import { FileViewerTitle } from '../Title'
 import { FileViewerContextProvider } from './context'
 
-interface FileViewerContainerProps<T>
-  extends Omit<ComponentProps<'div'>, 'children' | 'render'> {
+interface FileViewerContainerProps
+  extends Omit<ComponentProps<'div'>, 'render' | 'content'> {
   /**
-   * The query result to wait for.
+   * The highlighted contents being displayed, once available.
    */
-  query: UseQueryResult<T>
+  content: HighlightedContent | undefined
 
   /**
    * The path of the file being displayed.
@@ -43,21 +42,14 @@ interface FileViewerContainerProps<T>
    * Optional ref to hook into the file viewer.
    */
   viewerRef?: RefObject<HTMLDivElement | null>
-
-  /**
-   * Function that accepts the query's result and returns the children to render.
-   *
-   * @param result - The resulting data of the query.
-   */
-  children: (result: T) => ReactNode
 }
 
 /**
  * Displays the contents of a file, showing changes made to it on each line.
  */
-const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
+const FileViewerContainer = (props: FileViewerContainerProps) => {
   const {
-    query,
+    content,
     filepath,
     decoration,
     annotation,
@@ -79,7 +71,7 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
     <div
       {...propsWithCn(
         divProps,
-        'size-full',
+        'size-full isolate',
         'grid grid-rows-[max-content_max-content_1fr]',
       )}
     >
@@ -91,20 +83,21 @@ const FileViewerContainer = <T,>(props: FileViewerContainerProps<T>) => {
 
       <Separator />
 
-      <Ariakit.Focusable
-        ref={mergeRefs<HTMLDivElement>([setScrollElement, viewerRef])}
-        render={<div />}
-        className={cn(
-          'py-1 text-sm overflow-auto',
-          'grid grid-cols-[max-content_max-content_1fr] grid-rows-[1fr]',
-        )}
-      >
-        <FileViewerContextProvider scrollElement={scrollElement}>
-          <QueryLoader query={query} loadingFallback={<FileViewerLoader />}>
-            {children}
-          </QueryLoader>
-        </FileViewerContextProvider>
-      </Ariakit.Focusable>
+      <FileViewerContextProvider scrollElement={scrollElement}>
+        {content && <FileViewerRuler content={content} />}
+
+        <Ariakit.Focusable
+          ref={mergeRefs<HTMLDivElement>([setScrollElement, viewerRef])}
+          render={<div />}
+          className={cn(
+            'row-start-3 col-start-1',
+            'text-sm overflow-auto',
+            'grid grid-cols-[max-content_max-content_1fr] grid-rows-[1fr]',
+          )}
+        >
+          {children}
+        </Ariakit.Focusable>
+      </FileViewerContextProvider>
     </div>
   )
 }

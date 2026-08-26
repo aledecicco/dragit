@@ -47,20 +47,19 @@ const FileViewerRows = (props: FileViewerRowsProps) => {
     <div
       className={cn(
         'col-start-1 -col-end-1 flex flex-col',
-        'whitespace-pre font-mono',
+        'w-max min-w-full',
+        'whitespace-pre font-mono [font-variant-ligatures:none]',
       )}
-      style={{
-        lineHeight: `${ROW_HEIGHT}px`,
-        minWidth: `calc(${content.maxLineLength}ch + 2rem)`,
-      }}
+      style={{ lineHeight: `${ROW_HEIGHT}px` }}
     >
-      <div className={cn('relative')} style={{ height: totalSize }}>
+      <div
+        style={{
+          paddingTop: virtualItems.at(0)?.start ?? 0,
+          paddingBottom: totalSize - (virtualItems.at(-1)?.end ?? 0),
+        }}
+      >
         {virtualItems.map((item) => (
-          <ViewerChunk
-            key={item.key}
-            rows={chunks[item.index]}
-            style={{ top: item.start }}
-          />
+          <ViewerChunk key={item.key} rows={chunks[item.index]} />
         ))}
       </div>
 

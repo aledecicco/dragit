@@ -1,17 +1,17 @@
-import type { FileConflicts, UnmergedFileInfo } from '@/api/models'
-import { useQueryFileConflicts } from '@/api/queries/fileConflicts'
+import type { UnmergedFileInfo } from '@/api/models'
+import { useQueryHighlightedConflicts } from '@/api/queries/highlightedConflicts'
 import { FileIcon } from '@/common/File/Icon'
 import { FileStatus } from '@/common/File/Status'
+import { useSettings } from '@/state/storage'
 
+import { FileViewerBody } from '../common/Body'
 import {
   FileViewerContainer,
   type FileViewerContainerProps,
 } from '../common/Container'
-import { FileViewerGate } from '../common/Gate'
-import { FileConflictViewerBody } from './Body'
+import { FileViewerGate, useFileConflictsGate } from '../common/Gate'
 
-interface FileConflictViewerProps
-  extends Partial<FileViewerContainerProps<FileConflicts>> {
+interface FileConflictViewerProps extends Partial<FileViewerContainerProps> {
   /**
    * The conflicted file to display.
    */
@@ -24,21 +24,27 @@ interface FileConflictViewerProps
 const FileConflictViewer = (props: FileConflictViewerProps) => {
   const { file, ...containerProps } = props
 
-  const fileConflictsQuery = useQueryFileConflicts(file)
+  const { showWordDiffs } = useSettings()
+
+  const gate = useFileConflictsGate(file)
+
+  const highlightedQuery = useQueryHighlightedConflicts(
+    file,
+    showWordDiffs,
+    gate.status === 'allowed',
+  )
 
   return (
     <FileViewerContainer
       {...containerProps}
-      query={fileConflictsQuery}
+      content={highlightedQuery.data}
       filepath={file.path}
       decoration={<FileIcon file={file} size="lg" />}
       annotation={<FileStatus file={file} />}
     >
-      {(fileConflicts) => (
-        <FileViewerGate lineCount={fileConflicts.length}>
-          <FileConflictViewerBody file={file} />
-        </FileViewerGate>
-      )}
+      <FileViewerGate gate={gate}>
+        <FileViewerBody query={highlightedQuery} />
+      </FileViewerGate>
     </FileViewerContainer>
   )
 }
