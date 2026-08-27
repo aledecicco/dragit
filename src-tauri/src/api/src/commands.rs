@@ -19,7 +19,8 @@ use models::{
     PartialSettings, RepoWatcherError, ResolutionStrategy, Storage, UnmergedFileInfo, EVENT_ID,
 };
 use storage::{
-    add_recent_folder, get_storage, patch_repository_storage, patch_settings, set_last_opened,
+    add_recent_folder, get_storage, patch_repository_storage, patch_settings, remove_recent_folder,
+    set_last_opened,
 };
 
 /// Opens a folder that contains/will contain a git repository.
@@ -47,6 +48,18 @@ pub async fn open_folder(app_handle: AppHandle, new_path: &str) -> Result<(), Ap
     let _ = add_recent_folder(&app_handle, &new_path);
     let _ = set_last_opened(&app_handle, &new_path);
     let _ = app_handle.emit(EVENT_ID, AppEvent::DirChanged);
+
+    Ok(())
+}
+
+/// Removes a recently opened folder from storage.
+#[tauri::command]
+pub async fn remove_recent(app_handle: AppHandle, path: &str) -> Result<(), AppError> {
+    remove_recent_folder(&app_handle, path).map_err(|e| AppError::UpdateStorageFailed {
+        reason: e.to_string(),
+    })?;
+
+    let _ = app_handle.emit(EVENT_ID, AppEvent::StorageUpdated);
 
     Ok(())
 }

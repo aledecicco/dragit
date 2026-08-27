@@ -5,7 +5,7 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Action } from '@/state/actions'
 
 interface RemoveRecentFolderArgs {
-  recentPath: string
+  path: string
 }
 
 const removeRecentFolderKey = ['remove_recent_folder'] as const
@@ -21,10 +21,10 @@ const removeRecentFolderMutation = mutationOptions({
 const useMakeRemoveRecentFolder = (): ((recentPath: string) => Action) => {
   const remove = useMutation(removeRecentFolderMutation)
 
-  return (recentPath: string): Action => ({
-    id: { key: 'remove_recent_folder', path: recentPath },
+  return (path: string): Action => ({
+    id: { key: 'remove_recent_folder', path },
     run: async () => {
-      await remove.mutateAsync({ recentPath })
+      await remove.mutateAsync({ path })
     },
     label: {
       idle: 'Remove',

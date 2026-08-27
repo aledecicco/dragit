@@ -165,7 +165,8 @@ const StartupPageInner = (props: ComponentProps<'div'>) => {
 
       <div
         className={cn(
-          'mt-10 w-full max-w-sm flex flex-col gap-4 items-center overflow-hidden',
+          'mt-10 w-full max-w-sm min-h-0 flex flex-col gap-4 items-center',
+          'overflow-hidden',
         )}
       >
         {children}
@@ -183,7 +184,7 @@ const RecentFolders = () => {
   }
 
   return (
-    <div className={cn('w-full flex flex-col gap-1')}>
+    <div className={cn('w-full min-h-0 flex flex-col')}>
       <p
         className={cn(
           'px-2.5 pb-1 text-2xs font-semibold uppercase tracking-widest',
@@ -193,9 +194,15 @@ const RecentFolders = () => {
         Recent
       </p>
 
-      {recentFolders.map((folder) => (
-        <RecentFolderButton key={folder} folder={folder} />
-      ))}
+      <div
+        className={cn(
+          'min-h-0 max-h-48 flex flex-col gap-1 p-0.5 overflow-y-auto',
+        )}
+      >
+        {recentFolders.map((folder) => (
+          <RecentFolderButton key={folder} folder={folder} />
+        ))}
+      </div>
     </div>
   )
 }

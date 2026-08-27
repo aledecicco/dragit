@@ -58,6 +58,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             api::open_folder,
+            api::remove_recent,
             api::get_app_storage,
             api::set_settings,
             api::set_repository_storage,
