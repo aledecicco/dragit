@@ -67,6 +67,7 @@ pub struct Settings {
     pub relative_timestamps: bool,
     pub sort_branches_by_date: bool,
     pub stashes_open_by_default: bool,
+    pub compact_layout: bool,
 
     pub prefer_inline: bool,
     pub show_large_diffs: bool,
@@ -110,6 +111,7 @@ impl Default for Settings {
             relative_timestamps: true,
             sort_branches_by_date: true,
             stashes_open_by_default: false,
+            compact_layout: false,
 
             prefer_inline: true,
             show_large_diffs: false,

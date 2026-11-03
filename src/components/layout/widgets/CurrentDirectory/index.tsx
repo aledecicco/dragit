@@ -35,6 +35,7 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
         'bg-dark-700/70 backdrop-blur-sm rounded-full',
         'border border-light-50/8 border-t-light-50/16',
         'shadow-xs shadow-black/20',
+        'grid-cols-[max-content_minmax(0,max-content)]',
       )}
     >
       <ToolbarItem
@@ -48,13 +49,19 @@ const CurrentDirectory = (props: CurrentDirectoryProps) => {
         size="lg"
         round
         compact
-        className={cn('text-primary-200 p-1.5 not-last:border-r-0')}
+        className={cn('text-primary-200 p-1.5 aspect-square relative z-1')}
       />
 
       <ToolbarItem
         {...changeFolder}
         alternatives={recentOptions.map((folder) => openRecentFolder(folder))}
-        className={cn('font-medium', !currentDirQuery.data && 'italic')}
+        className={cn(
+          'font-medium',
+          '-ml-4.25 notch-left-4.25',
+          !currentDirQuery.data && 'italic',
+        )}
+        iconProps={{ containerProps: { className: cn('ml-3') } }}
+        marqueeProps={{ reverse: true }}
         menuButtonProps={{
           label: 'View recent folders',
           disabled: !recentOptions.length,

@@ -69,6 +69,12 @@ type MatchingPayload<T extends DragType> = Extract<DragPayload, { type: T }>
 const collisionDetector = DndCollision.pointerIntersection
 
 /**
+ * Collision detection that picks an area up as soon as the dragged item touches
+ * it, instead of waiting for the pointer to be inside it.
+ */
+const looseCollisionDetector = DndCollision.shapeIntersection
+
+/**
  * A modifier that restricts the drag overlay to within the window.
  */
 class RestrictMovement extends DndTypes.Modifier {
@@ -274,6 +280,7 @@ const isEmptyDragPayload = (payload: DragPayload): boolean =>
   Array.isArray(payload.dragged) && payload.dragged.length === 0
 
 export {
+  looseCollisionDetector,
   useDraggable,
   useDroppable,
   useBeforeDrag,

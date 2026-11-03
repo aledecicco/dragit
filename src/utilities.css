@@ -26,6 +26,47 @@
 }
 
 /*
+ * Carves a circular notch out of the left edge of the element, so that a round sibling
+ * placed right before it nests exactly inside it.
+ * The parameter is the radius of that sibling: if it's a number, it follows Tailwind's
+ * spacing scale, otherwise an arbitrary length can be specified.
+ *
+ * The notch is centered on the left edge, which means the element is expected to be
+ * pulled over its sibling by that same radius (through a negative margin), so that its
+ * edge falls right on the sibling's center. Its contents should be pushed right by at
+ * least the radius too, to keep clear of the notch.
+ *
+ * @examples
+ * ... className="-ml-4 notch-left-4" ...
+ * ... className="-ml-[16px] notch-left-[16px]" ...
+ */
+@utility notch-left-* {
+  --notch-radius: calc(var(--spacing) * --value(number, [number]));
+  --notch-radius: --value([length]);
+
+  --notch-mask: radial-gradient(
+    circle calc(var(--notch-radius) + var(--notch-gap, 2px)) at 0 50%,
+    transparent calc(100% - 1px),
+    black 100%
+  );
+
+  -webkit-mask-image: var(--notch-mask);
+  mask-image: var(--notch-mask);
+}
+
+/*
+ * Overrides the space left between a notch and the sibling nested inside it (2px by default).
+ *
+ * @examples
+ * ... className="notch-gap-1" ...
+ * ... className="notch-gap-[3px]" ...
+ */
+@utility notch-gap-* {
+  --notch-gap: calc(var(--spacing) * --value(number, [number]));
+  --notch-gap: --value([length]);
+}
+
+/*
  * Overrides the color of the dithering circles (transparent by default).
  * Accepts colors from Tailwind's palette, or any color defined in your theme.
  * Can also receive an arbitrary color.

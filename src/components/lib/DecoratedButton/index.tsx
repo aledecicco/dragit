@@ -4,7 +4,7 @@ import { match } from 'ts-pattern'
 import { type AnyAction, useActionPresenters } from '@/state/actions'
 import { Button, type ButtonProps } from '@/ui/Button'
 import { type Glyph, Icon, type IconProps } from '@/ui/Icon'
-import { Marquee } from '@/ui/Marquee'
+import { Marquee, type MarqueeProps } from '@/ui/Marquee'
 import { Tooltip } from '@/ui/Tooltip'
 import { useAnimateSpinner } from '@/utils/animation'
 import type { Status } from '@/utils/types'
@@ -30,6 +30,11 @@ interface BaseDecoratedButtonProps extends ButtonProps {
    * Additional props to pass to the icon component.
    */
   iconProps?: Partial<IconProps>
+
+  /**
+   * Additional props to pass to the label's marquee.
+   */
+  marqueeProps?: Partial<MarqueeProps>
 }
 
 type DecoratedButtonProps =
@@ -88,7 +93,15 @@ const TrackerDecoratedButton = (props: TrackerDecoratedButtonProps) => {
 }
 
 const BaseDecoratedButton = (props: BaseDecoratedButtonProps) => {
-  const { label, Glyph, compact, iconProps, children, ...buttonProps } = props
+  const {
+    label,
+    Glyph,
+    compact,
+    iconProps,
+    marqueeProps,
+    children,
+    ...buttonProps
+  } = props
 
   const button = (
     <Button aria-label={label} {...buttonProps}>
@@ -97,7 +110,9 @@ const BaseDecoratedButton = (props: BaseDecoratedButtonProps) => {
         children
       ) : (
         <>
-          <Marquee>{label}</Marquee>
+          <Marquee reverse={false} {...marqueeProps}>
+            {label}
+          </Marquee>
           {children}
         </>
       )}

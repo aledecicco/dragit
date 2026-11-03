@@ -93,9 +93,12 @@
 
   --spacing-half: 50%;
 
+  /* Kept in sync with COMPACT_LAYOUT_BREAKPOINT in state/layout.ts */
+  --breakpoint-md-screen: 1400px;
+
   --font-mono: "Geist Mono", ui-monospace, monospace;
 
-  --text-2xs: 10px;
+  --text-2xs: 0.625rem;
 
   --animate-scroll-horizontal: scroll-horizontal 1s linear;
 

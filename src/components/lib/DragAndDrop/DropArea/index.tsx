@@ -4,6 +4,7 @@ import { IconDragDrop } from '@tabler/icons-react'
 import { mergeRefs } from 'react-merge-refs'
 
 import { useUniqueId } from '@/state/ids'
+import { useSideColumn } from '@/state/layout'
 import { type Glyph, Icon } from '@/ui/Icon'
 import { cn, propsWithCn } from '@/utils/styles'
 
@@ -94,6 +95,9 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
   const sizeRef = useRef<HTMLDivElement>(null)
   const [rect, setRect] = useState({ top: 0, left: 0, width: 0, height: 0 })
 
+  const sideColumn = useSideColumn()
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies(sideColumn): swapping the open column shifts the layout.
   useLayoutEffect(() => {
     if (currentDrag && !disabledByValidation && sizeRef.current) {
       const newRect = sizeRef.current.getBoundingClientRect()
@@ -104,7 +108,7 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
         height: newRect.height,
       })
     }
-  }, [currentDrag, disabledByValidation])
+  }, [currentDrag, disabledByValidation, sideColumn])
 
   return (
     <div
@@ -119,7 +123,7 @@ const DropArea = <T extends DragType>(props: DropAreaProps<T>) => {
     >
       {children}
 
-      {currentDrag && !disabledByValidation && (
+      {currentDrag && !disabledByValidation && !!rect.width && (
         <Ariakit.Portal>
           <div
             {...propsWithCn(

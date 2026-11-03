@@ -16,6 +16,7 @@ import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
+import { revealSideColumn } from '@/state/layout'
 import { useSettings } from '@/state/storage'
 import { Accordion } from '@/ui/Accordion'
 import {
@@ -50,6 +51,7 @@ const StashesList = (props: StashesListProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const settings = useSettings()
   useShortcutBinding(settings.focusStashesShortcut, () => {
+    revealSideColumn('left')
     accordionHandler.store.setOpen(true)
     ref.current?.focus()
   })

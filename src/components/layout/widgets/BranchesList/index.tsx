@@ -24,6 +24,7 @@ import { InteractiveSelection } from '@/lib/Interactive/Selection'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
+import { revealSideColumn } from '@/state/layout'
 import { useSettings } from '@/state/storage'
 import { Chip } from '@/ui/Chip'
 import { Tabs, useTabsHandler } from '@/ui/Tabs'
@@ -80,6 +81,8 @@ const BranchesList = (props: BranchesListProps) => {
 
   const ref = useRef<HTMLDivElement>(null)
   useShortcutBinding(settings.focusBranchesShortcut, () => {
+    revealSideColumn('right')
+
     if (
       ref.current === document.activeElement ||
       ref.current?.contains(document.activeElement)

@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2.0.0",
   "productName": "Dragit",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "identifier": "com.dragit",
   "build": {
     "beforeDevCommand": "pnpm dev",
@@ -13,7 +13,9 @@
     "windows": [
       {
         "title": "Dragit",
-        "maximized": true
+        "maximized": true,
+        "minWidth": 1100,
+        "minHeight": 700
       }
     ],
     "security": {

@@ -22,6 +22,11 @@ interface BaseToolbarItemProps extends Ariakit.ToolbarItemProps {
    * The status of the item.
    */
   status?: Status
+
+  /**
+   * Whether the item should be round.
+   */
+  round?: boolean
 }
 
 type ToolbarItemProps<T = void> =
@@ -47,6 +52,7 @@ const ToolbarItem = <T = void>(props: ToolbarItemProps<T>) => {
     <BaseToolbarItem
       fixed={fixed}
       status={itemProps.status}
+      round={itemProps.round}
       render={<DecoratedButton {...itemProps} />}
     />
   )
@@ -59,6 +65,7 @@ const ActionToolbarItem = <T = void>(props: ActionToolbarItemProps<T>) => {
     <BaseToolbarItem
       fixed={fixed}
       status={itemProps.status}
+      round={itemProps.round}
       render={
         <ActionButton
           menuButtonProps={{ render: <Ariakit.ToolbarItem /> }}
@@ -70,24 +77,30 @@ const ActionToolbarItem = <T = void>(props: ActionToolbarItemProps<T>) => {
 }
 
 const BaseToolbarItem = (props: BaseToolbarItemProps) => {
-  const { fixed = false, status = 'neutral', ...itemProps } = props
+  const {
+    fixed = false,
+    status = 'neutral',
+    round = false,
+    ...itemProps
+  } = props
 
   return (
     <Ariakit.ToolbarItem
       {...propsWithCn(
         itemProps,
         'flex flex-row items-center justify-center h-full',
-        fixed && 'w-full',
-        'not-first:rounded-l-none',
-        'not-last:rounded-r-none',
-        'not-last:border-solid not-last:border-r',
-        match(status)
-          .with('primary', () => 'not-last:border-r-primary-800')
-          .with('success', () => 'not-last:border-r-green-800')
-          .with('warning', () => 'not-last:border-r-warning-800')
-          .with('danger', () => 'not-last:border-r-danger-900')
-          .with('neutral', () => 'not-last:border-r-dark-500')
-          .exhaustive(),
+        fixed && 'w-full min-w-0',
+        !round && 'not-first:rounded-l-none',
+        !round && 'not-last:rounded-r-none',
+        !round && 'not-last:border-solid not-last:border-r',
+        !round &&
+          match(status)
+            .with('primary', () => 'not-last:border-r-primary-800')
+            .with('success', () => 'not-last:border-r-green-800')
+            .with('warning', () => 'not-last:border-r-warning-800')
+            .with('danger', () => 'not-last:border-r-danger-900')
+            .with('neutral', () => 'not-last:border-r-dark-500')
+            .exhaustive(),
       )}
     />
   )

@@ -30,7 +30,6 @@ import { makeTracked } from '../SvgOverlay/utils'
 
 const DRAFT_COMMIT_ID = 'commit_draft'
 
-const COMMIT_WIDTH = 320
 const COMMIT_HEIGHT = 80
 
 interface DraftCommitProps extends ComponentProps<'div'> {
@@ -93,7 +92,7 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
         'border-4 border-dark-600 rounded-lg shadow-md',
       ),
       style: {
-        width: COMMIT_WIDTH * 0.75,
+        width: 'calc(var(--commit-width) * 0.75)',
         height: COMMIT_HEIGHT,
       },
     }
@@ -196,7 +195,7 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
 
                         <Toolbar
                           fixed
-                          className={cn('w-full grid grid-cols-[1fr_1.3fr]')}
+                          className={cn('w-full grid grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]')}
                         >
                           <ToolbarItem
                             className={cn('rounded-t-none rounded-b-xs')}

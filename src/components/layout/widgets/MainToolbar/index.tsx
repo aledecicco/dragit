@@ -23,7 +23,13 @@ const MainToolbar = (props: MainToolbarProps) => {
   const settings = useSettings()
 
   return (
-    <Toolbar {...propsWithCn(toolbarProps, 'grid-cols-[7fr_8fr_7fr]')} fixed>
+    <Toolbar
+      {...propsWithCn(
+        toolbarProps,
+        'grid-cols-[minmax(0,7fr)_minmax(0,8fr)_minmax(0,7fr)]',
+      )}
+      fixed
+    >
       <ToolbarItem
         {...stageFiles}
         shortcut={settings.stageFilesShortcut}

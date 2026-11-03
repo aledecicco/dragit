@@ -186,7 +186,14 @@ const createGraphAnimator = () => {
     }
   }
 
-  return { setNodeTarget, removeNode, registerPath }
+  /**
+   * Rebuilds every edge from where its nodes currently sit.
+   */
+  const redrawAllEdges = () => {
+    redrawEdges(new Set(edgePaths.keys()))
+  }
+
+  return { setNodeTarget, removeNode, registerPath, redrawAllEdges }
 }
 
 export const graphAnimator = createGraphAnimator()

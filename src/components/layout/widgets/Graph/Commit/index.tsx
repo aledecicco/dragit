@@ -26,7 +26,6 @@ export const ANCHOR_ELEMENT_ID = 'commit_anchor'
 
 export const LAST_COMMIT_ELEMENT_ID = 'commit_last'
 
-const COMMIT_WIDTH = 320
 const COMMIT_HEIGHT = 66
 
 interface GraphCommitProps extends ComponentProps<'div'> {
@@ -75,7 +74,7 @@ const GraphCommit = makeTracked<GraphCommitProps, HTMLDivElement>((props) => {
       'border-4 border-dark-600 rounded-lg shadow-md',
     ),
     style: {
-      width: COMMIT_WIDTH,
+      width: 'var(--commit-width)',
       height: COMMIT_HEIGHT,
     },
   }

@@ -64,7 +64,10 @@ const ComparisonSnapshotDetailsDialog = (
       {...propsWithCn(
         dialogProps,
         'max-w-[90%] max-h-[85%]',
-        !!selectedFile && 'size-full grid-cols-[430px_1fr]',
+        !!selectedFile && [
+          'size-full grid-cols-[27rem_1fr]',
+          'max-md-screen:grid-cols-[20rem_1fr]',
+        ],
       )}
     >
       <DialogContent

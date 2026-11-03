@@ -25,6 +25,7 @@ export interface Settings {
   relativeTimestamps: boolean
   sortBranchesByDate: boolean
   stashesOpenByDefault: boolean
+  compactLayout: boolean
 
   preferInline: boolean
   showLargeDiffs: boolean

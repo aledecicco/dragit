@@ -43,11 +43,17 @@ const Graph = (props: GraphProps) => {
   const baseBranch = useCurrentBaseBranch()
 
   return (
-    <div {...propsWithCn(divProps, 'size-full min-h-0')}>
+    <div
+      {...propsWithCn(
+        divProps,
+        'size-full min-h-0 min-w-0',
+        '[--commit-width:320px] max-md-screen:[--commit-width:260px]',
+      )}
+    >
       <div
         className={cn(
           'overflow-hidden size-full',
-          'grid grid-cols-[1fr_max-content_1fr] grid-rows-[max-content_max-content_1fr]',
+          'grid grid-cols-[minmax(0,1fr)_max-content_minmax(0,1fr)] grid-rows-[max-content_max-content_1fr]',
           'gap-y-1 gap-x-8 place-items-center',
           'relative',
         )}
@@ -56,7 +62,7 @@ const Graph = (props: GraphProps) => {
 
         {currentBranch && (
           <BranchToolbar
-            className={cn('col-start-1 row-start-2 w-40')}
+            className={cn('col-start-1 row-start-2 w-full max-w-40 min-w-0')}
             branch={currentBranch}
             fixed
           />
@@ -64,7 +70,7 @@ const Graph = (props: GraphProps) => {
 
         {baseBranch && (
           <BranchToolbar
-            className={cn('col-start-3 row-start-2 w-40')}
+            className={cn('col-start-3 row-start-2 w-full max-w-40 min-w-0')}
             branch={baseBranch}
             isBase
             fixed

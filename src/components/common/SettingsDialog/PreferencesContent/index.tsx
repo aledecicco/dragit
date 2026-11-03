@@ -96,6 +96,11 @@ const SettingsDialogPreferencesContent = () => {
                 description="Show the stashes list expanded by default"
                 setting="stashesOpenByDefault"
               />
+              <CheckboxSetting
+                label="Compact layout"
+                description="Show one side column at a time, instead of both, even on wide windows"
+                setting="compactLayout"
+              />
             </SettingsDialogSection>
 
             <SettingsDialogSection label="Diffs">

@@ -120,7 +120,7 @@ function QueryList<T, I>(props: QueryListProps<T, I>) {
                   <div
                     className={cn(
                       'flex items-center justify-center size-9 rounded-full',
-                      'border border-dashed border-light-50/15 text-light-950/80',
+                      'border border-dashed border-light-50/15 text-light-950/40',
                     )}
                   >
                     <Icon Glyph={emptyIcon} size="md" />
