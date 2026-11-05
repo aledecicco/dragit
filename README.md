@@ -34,51 +34,135 @@ Here are a few:
 <br/>
 
 <div align="center">
-    <img src="./assets/stage-file.webp" width="500"/>
-    <p>Stage or unstage a file</p>
+    <img src="./assets/stage-many.webp" width="380"/>
+    <p>Stage files by dragging them, one at a time, a few, or all of them at once</p>
 </div>
 
 <br/>
 
 <div align="center">
-    <img src="./assets/stage-many.webp" width="500"/>
-    <p>Or all of them at once</p>
+    <img src="./assets/commit.webp" width="800"/>
+    <p>Drop your staged changes on the draft commit to commit them</p>
 </div>
 
 <br/>
 
 <div align="center">
-    <img src="./assets/amend.webp" width="500"/>
+    <img src="./assets/ai.webp" width="800"/>
+    <p>Or let an AI agent write the commit message for you</p>
+</div>
+
+<br/>
+
+<div align="center">
+    <img src="./assets/amend.webp" width="800"/>
     <p>Amend that last commit if you made a mistake</p>
 </div>
 
 <br/>
 
+<table align="center">
+  <tr>
+    <td align="center" width="50%"><img src="./assets/stash.webp" width="380"/></td>
+    <td align="center" width="50%"><img src="./assets/delete.webp" width="380"/></td>
+  </tr>
+  <tr>
+    <td align="center">Stash your changes, and drop the stash back to apply it</td>
+    <td align="center">Drag old branches that are lying around to the recycling bin</td>
+  </tr>
+</table>
+
+<br/>
+
 <div align="center">
-    <img src="./assets/delete.webp" width="500"/>
-    <p>Drag old branches that are lying around to the recycling bin</p>
+    <img src="./assets/checkout.webp" width="800"/>
+    <p>Check out a branch, or compare against a different base, by dropping refs on the graph</p>
 </div>
 
 <br/>
 
 <div align="center">
-    <img src="./assets/context.webp" width="500"/>
+    <img src="./assets/tag.webp" width="800"/>
+    <p>Tag a commit by dropping it on the tags list</p>
+</div>
+
+<br/>
+
+<table align="center">
+  <tr>
+    <td align="center" width="50%"><img src="./assets/cherry-pick.webp" width="380"/></td>
+    <td align="center" width="50%"><img src="./assets/revert.webp" width="380"/></td>
+  </tr>
+  <tr>
+    <td align="center">Cherry-pick commits from other branches</td>
+    <td align="center">Or revert them, from the same menu</td>
+  </tr>
+</table>
+
+<br/>
+
+<div align="center">
+    <img src="./assets/context.webp" width="380"/>
     <p>Open context menus for a more detailed list of all actions available</p>
 </div>
 
 <br/>
 
 <div align="center">
-    <img src="./assets/shortcut.webp" width="500"/>
-    <p>Or use keyboard shortcuts to go faster</p>
+    <img src="./assets/shortcut.webp" width="800"/>
+    <p>Or use keyboard shortcuts to go faster: hold the modifiers to reveal them</p>
 </div>
 
 <br/>
 
 <div align="center">
-    <img src="./assets/diff.webp" align="center" width="800"/>
-    <p>Check your changes with the integrated word-level diff viewer, complete with syntax highlighting for all languages (including unmerged conflicts)</p>
+    <img src="./assets/settings.webp" width="800"/>
+    <p>Every shortcut can be changed to your liking</p>
 </div>
+
+<br/>
+
+<div align="center">
+    <img src="./assets/palette.webp" width="800"/>
+    <p>The command palette runs whole flows, like staging and committing everything at once</p>
+</div>
+
+<br/>
+
+<div align="center">
+    <img src="./assets/diff.webp" width="800"/>
+    <p>Check your changes with the integrated word-level diff viewer, complete with syntax highlighting for all languages, and views of the file before and after the changes</p>
+</div>
+
+<br/>
+
+<div align="center">
+    <img src="./assets/conflict.webp" width="800"/>
+    <p>Merge conflicts get the same treatment</p>
+</div>
+
+<br/>
+
+<div align="center">
+    <img src="./assets/compare.webp" width="800"/>
+    <p>Compare any two branches, tags or commits side by side</p>
+</div>
+
+<br/>
+
+<div align="center">
+    <img src="./assets/details.webp" width="800"/>
+    <p>See what any commit changed</p>
+</div>
+
+<br/>
+
+<div align="center">
+    <img src="./assets/compact.webp" width="800"/>
+    <p>On smaller screens, columns collapse into rails that open up while you drag things over them</p>
+</div>
+
+<br/>
 
 
 ## Installation
@@ -129,7 +213,7 @@ Dragit is built with Tauri v2. A React/TypeScript frontend runs in a WebView, wh
 There's always things to improve:
 
 - [ ] Replace `CmdGit` with a native Rust Git backend (removes the system `git` dependency)
-- [ ] Highlight changed file sections in the diff scrollbar
+- [x] Highlight changed file sections in the diff scrollbar
 - [x] Compare arbitrary refspecs side-by-side
 - [ ] Show merge unions between branches
 - [x] Clone and open a repository from a URL
