@@ -25,8 +25,8 @@ import { Pagination } from '@/lib/Pagination'
 import { QueryList } from '@/lib/QueryList'
 import { useShortcutBinding } from '@/lib/Shortcuts/utils'
 import { triggerInteraction } from '@/state/actions'
-import { revealSideColumn } from '@/state/layout'
 import { useSelectedFile } from '@/state/file'
+import { revealSideColumn } from '@/state/layout'
 import {
   setNextPage,
   setPrevPage,

@@ -195,7 +195,9 @@ const DraftCommitInner = makeTracked<ComponentProps<'div'>, HTMLDivElement>(
 
                         <Toolbar
                           fixed
-                          className={cn('w-full grid grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]')}
+                          className={cn(
+                            'w-full grid grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]',
+                          )}
                         >
                           <ToolbarItem
                             className={cn('rounded-t-none rounded-b-xs')}

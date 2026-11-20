@@ -90,8 +90,7 @@ const ColumnRail = (props: ColumnRailProps) => {
             'h-full w-full min-w-6 shrink-0 px-0 active:scale-100',
             'flex-col gap-3',
             'border border-dark-50/50 text-light-900',
-            currentDrag &&
-              'border-dashed border-primary-400 text-primary-300',
+            currentDrag && 'border-dashed border-primary-400 text-primary-300',
           )}
         >
           {glyphs.map((Glyph) => (

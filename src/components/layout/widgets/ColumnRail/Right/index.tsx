@@ -1,7 +1,6 @@
 import { IconGitBranch, IconTrash } from '@tabler/icons-react'
 
-
-import { ColumnRail,type ColumnRailProps } from '..'
+import { ColumnRail, type ColumnRailProps } from '..'
 
 interface RightColumnRailProps extends Partial<ColumnRailProps> {}
 

@@ -34,7 +34,7 @@ Here are a few:
 <br/>
 
 <div align="center">
-    <img src="./assets/stage-many.webp" width="380"/>
+    <img src="./assets/stage-many.webp" width="600"/>
     <p>Stage files by dragging them, one at a time, a few, or all of them at once</p>
 </div>
 
@@ -61,16 +61,12 @@ Here are a few:
 
 <br/>
 
-<table align="center">
-  <tr>
-    <td align="center" width="50%"><img src="./assets/stash.webp" width="380"/></td>
-    <td align="center" width="50%"><img src="./assets/delete.webp" width="380"/></td>
-  </tr>
-  <tr>
-    <td align="center">Stash your changes, and drop the stash back to apply it</td>
-    <td align="center">Drag old branches that are lying around to the recycling bin</td>
-  </tr>
-</table>
+<p align="center">
+    <img src="./assets/stash.webp" height="300"/>
+    &nbsp;
+    <img src="./assets/delete.webp" height="300"/>
+</p>
+<p align="center">Stash your changes and drop the stash back to apply it, or drag old branches to the recycling bin</p>
 
 <br/>
 
@@ -88,21 +84,17 @@ Here are a few:
 
 <br/>
 
-<table align="center">
-  <tr>
-    <td align="center" width="50%"><img src="./assets/cherry-pick.webp" width="380"/></td>
-    <td align="center" width="50%"><img src="./assets/revert.webp" width="380"/></td>
-  </tr>
-  <tr>
-    <td align="center">Cherry-pick commits from other branches</td>
-    <td align="center">Or revert them, from the same menu</td>
-  </tr>
-</table>
+<p align="center">
+    <img src="./assets/cherry-pick.webp" height="300"/>
+    &nbsp;
+    <img src="./assets/revert.webp" height="300"/>
+</p>
+<p align="center">Cherry-pick commits from other branches, or revert them, from the same menu</p>
 
 <br/>
 
 <div align="center">
-    <img src="./assets/context.webp" width="380"/>
+    <img src="./assets/context.webp" width="600"/>
     <p>Open context menus for a more detailed list of all actions available</p>
 </div>
 
